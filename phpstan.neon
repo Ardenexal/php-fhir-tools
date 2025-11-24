@@ -1,0 +1,13 @@
+parameters:
+    level: 8
+    paths:
+        - bin/
+        - config/
+        - public/
+        - src/
+        - tests/
+    excludePaths:
+        - */vendor/*
+    parallel:
+        # more than one thread uses lots of ram, keep at 1 for now
+        maximumNumberOfProcesses: 4

@@ -1,4 +1,4 @@
-
+.idea/
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
@@ -7,4 +7,10 @@
 /public/bundles/
 /var/
 /vendor/
+/output/
+/resources/
 ###< symfony/framework-bundle ###
+
+###> phpstan/phpstan ###
+phpstan.neon
+###< phpstan/phpstan ###
