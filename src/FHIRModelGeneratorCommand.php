@@ -15,18 +15,18 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
-#[AsCommand(name: 'fhir:generate-models', description: 'Generates FHIR model classes from FHIR definitions.')]
+#[AsCommand(name: 'fhir:generate', description: 'Generates FHIR model classes from FHIR definitions.')]
 readonly class FHIRModelGeneratorCommand
 {
     public function __construct(
-        private Filesystem $filesystem,
+        private Filesystem     $filesystem,
         private BuilderContext $context
     ) {
     }
 
     public function __invoke(
         #[Argument(description: 'Select FHIR version to generate model classes for.', suggestedValues: ['R4', 'R4B', 'R5'])]
-        string $version,
+        string          $version,
         OutputInterface $output
     ): int {
         $definitionFiles = [
@@ -35,14 +35,15 @@ readonly class FHIRModelGeneratorCommand
             'resources' => 'profiles-resource.json',
         ];
 
-        $targetNamespace  = "Ardenexal\\FhirTools\\$version\\Element";
+        $targetNamespace  = "Ardenexal\\FHIRTools\\$version\\Element";
         $elementNamespace = new PhpNamespace($targetNamespace);
         $this->context->addElementNamespace($version, $elementNamespace);
 
-        $targetNamespace = "Ardenexal\\FhirTools\\$version\\Enum";
+        $targetNamespace = "Ardenexal\\FHIRTools\\$version\\Enum";
         $enumNamespace   = new PhpNamespace($targetNamespace);
         $this->context->addEnumNamespace($version, $enumNamespace);
 
+        $this->loadDefinitions($output, $version);
 
         $this->buildElementClasses($output, $version, $definitionFiles['types'], $elementNamespace);
 
@@ -66,19 +67,15 @@ readonly class FHIRModelGeneratorCommand
     public function buildElementClasses(OutputInterface $output, string $version, string $types1, PhpNamespace $namespace): void
     {
         $output->writeln('Generating model classes...');
-        $structureDefinitionBundle = file_get_contents(Path::canonicalize(__DIR__ . "/../resources/definitions/FHIR/{$version}/{$types1}"));
-        if ($structureDefinitionBundle === false) {
-            throw new \RuntimeException("Failed to load FHIR structure definition bundle for version {$version}");
-        }
-        $structureDefinitionBundle = json_decode($structureDefinitionBundle, true, 512, JSON_THROW_ON_ERROR);
 
-        foreach ($structureDefinitionBundle['entry'] as $type) {
-            $structureDefinition = $type['resource'];
-            $this->context->addDefinition($structureDefinition['url'], $structureDefinition);
+        foreach ($this->context->getDefinitions() as $structureDefinition) {
+            if ($structureDefinition['resourceType'] !== 'StructureDefinition') {
+                continue;
+            }
             $output->writeln("Generating model class for {$structureDefinition['name']}");
             $generator = new FHIRModelGenerator($this->context);
 
-            $class     = $generator->generateModelClass($structureDefinition, $version);
+            $class = $generator->generateModelClass($structureDefinition, $version);
             $this->context->addType($structureDefinition['url'], $class);
             $namespace->add($class);
         }
@@ -93,15 +90,17 @@ readonly class FHIRModelGeneratorCommand
     public function outputFiles(OutputInterface $output, string $version): void
     {
         foreach ($this->context->getTypes() as $type) {
-            $classContents = self::asPhpFile($type, $this->context->getElementNamespace($version));
-            $path          = Path::canonicalize(__DIR__ . '/../output/' . $type->getNamespace()?->getName() . '/' . $type->getName() . '.php');
+            $elementNamespace = $this->context->getElementNamespace($version);
+            $classContents    = self::asPhpFile($type, $elementNamespace);
+            $path             = Path::canonicalize(__DIR__ . '/../output/' . $elementNamespace->getName() . '/' . $type->getName() . '.php');
             $this->filesystem->dumpFile($path, $classContents);
             $output->writeln("Generated model class for {$type->getName()}");
         }
 
         foreach ($this->context->getEnums() as $type) {
-            $classContents = self::asPhpFile($type, $this->context->getEnumNamespace($version));
-            $path          = Path::canonicalize(__DIR__ . '/../output/' . $type->getNamespace()?->getName() . '/' . $type->getName() . '.php');
+            $enumNamespace = $this->context->getEnumNamespace($version);
+            $classContents = self::asPhpFile($type, $enumNamespace);
+            $path          = Path::canonicalize(__DIR__ . '/../output/' . $enumNamespace->getName() . '/' . $type->getName() . '.php');
             $this->filesystem->dumpFile($path, $classContents);
             $output->writeln("Generated model class for {$type->getName()}");
         }
@@ -129,6 +128,39 @@ readonly class FHIRModelGeneratorCommand
     /**
      * @param OutputInterface $output
      * @param string          $version
+     *
+     * @return void
+     * @throws \JsonException
+     */
+    private function loadDefinitions(OutputInterface $output, string $version): void
+    {
+        $output->writeln('Loading base elements into context');
+        $structureDefinitionBundle = file_get_contents(Path::canonicalize(__DIR__ . "/../resources/definitions/FHIR/{$version}/profiles-types.json"));
+        if ($structureDefinitionBundle === false) {
+            throw new \RuntimeException("Failed to load FHIR structure definition bundle for version {$version}");
+        }
+        $structureDefinitionBundle = json_decode($structureDefinitionBundle, true, 512, JSON_THROW_ON_ERROR);
+
+        foreach ($structureDefinitionBundle['entry'] as $type) {
+            $this->context->addDefinition($type['fullUrl'], $type['resource']);
+        }
+
+        $output->writeln('Loading value sets into context');
+        $valuesets = file_get_contents(Path::canonicalize(__DIR__ . "/../resources/definitions/FHIR/{$version}/valuesets.json"));
+        if ($valuesets === false) {
+            throw new \RuntimeException("Failed to load FHIR value sets for version {$version}");
+        }
+        $valuesets = json_decode($valuesets, true);
+        foreach ($valuesets['entry'] as $valueset) {
+            $this->context->addDefinition($valueset['fullUrl'], $valueset['resource']);
+        }
+
+
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @param string          $version
      * @param string          $valueSetJsonFile
      *
      * @return void
@@ -136,15 +168,11 @@ readonly class FHIRModelGeneratorCommand
     private function buildEnumsForValuesSets(OutputInterface $output, string $version, string $valueSetJsonFile): void
     {
         $output->writeln('Generating Enums for value sets');
-        $valuesets = file_get_contents(Path::canonicalize(__DIR__ . "/../resources/definitions/FHIR/{$version}/{$valueSetJsonFile}"));
-        if ($valuesets === false) {
-            throw new \RuntimeException("Failed to load FHIR value sets for version {$version}");
-        }
-        $valuesets = json_decode($valuesets, true);
-        foreach ($valuesets['entry'] as $valueset) {
+
+        foreach ($this->context->getPendingEnums() as $pendingEnum) {
+            $valueset = $this->context->getDefinition($pendingEnum);
             $url = $valueset['resource']['url'];
 
-            $this->context->addDefinition($valueset['resource']['url'], $valueset['resource']);
             if (isset($valueset['resource']['version'])) {
                 $url .= '|' . $valueset['resource']['version'];
             }
@@ -157,7 +185,7 @@ readonly class FHIRModelGeneratorCommand
             $enumGenerator  = new FHIRValueSetGenerator($this->context);
             $classGenerator = new FHIRModelGenerator($this->context);
 
-            $enumType       = $enumGenerator->generateEnum($valueset['resource'], $version);
+            $enumType = $enumGenerator->generateEnum($valueset['resource'], $version);
             $this->context->getEnumNamespace($version)->add($enumType);
             $this->context->addEnum($valueSet['url'], $enumType);
 

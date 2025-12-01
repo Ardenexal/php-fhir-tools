@@ -22,7 +22,8 @@
     "require-dev": {
         "laravel/pint": "^1.25",
         "phpstan/phpstan": "^2.1",
-        "roave/security-advisories": "dev-latest"
+        "roave/security-advisories": "dev-latest",
+        "phpunit/phpunit": "^12"
     },
     "config": {
         "allow-plugins": {
@@ -40,7 +41,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Ardenexal\\FHIR-PHP-Model-Generator\\Tests\\": "tests/"
+            "Ardenexal\\FHIR-PHP-Model-Generator\\Tests\\": "tests/",
+            "Ardenexal\\FHIRTools\\R4B\\": "output/Ardenexal/FhirTools/R4B/"
         }
     },
     "replace": {
@@ -65,7 +67,8 @@
             "@auto-scripts"
         ],
         "phpstan": "php ./vendor/bin/phpstan.phar analyse --configuration=phpstan.neon --memory-limit=-1 -v",
-        "lint": "php ./vendor/bin/pint -v --parallel --max-processes=4"
+        "lint": "php ./vendor/bin/pint -v --parallel --max-processes=4",
+        "test": "php ./vendor/phpunit/phpunit/phpunit"
     },
     "conflict": {
         "symfony/symfony": "*"

@@ -1,4 +1,4 @@
-# FHIR Structure Definition PHP Generator
+# PHP FHIR Tools
 
 This project generates PHP model classes and enums from FHIR Structure Definitions using Symfony Console and Nette PhpGenerator.
 
@@ -20,7 +20,7 @@ php bin/console
 
 ### Available Commands
 
-#### `fhir:generate-models`
+#### `fhir:generate`
 Generates FHIR model classes from FHIR definitions.
 
 **Arguments:**
@@ -29,7 +29,7 @@ Generates FHIR model classes from FHIR definitions.
 
 **Example:**
 ```bash
-php bin/console fhir:generate-models R4B
+php bin/console fhir:generate R4B
 ```
 
 ## Composer Scripts

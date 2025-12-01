@@ -6,6 +6,7 @@ parameters:
         - public/
         - src/
         - tests/
+        - output/
     excludePaths:
         - */vendor/*
     parallel:

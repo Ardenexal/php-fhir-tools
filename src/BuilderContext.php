@@ -212,4 +212,22 @@ class BuilderContext
 
         return $this->enumNamespaces[$version];
     }
+
+    /**
+     * @param string $path
+     *
+     * @return ClassType|null
+     */
+    public function getType(string $path): ?ClassType
+    {
+        return $this->types[$path] ?? null;
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getDefinitions(): array
+    {
+        return $this->definitions;
+    }
 }

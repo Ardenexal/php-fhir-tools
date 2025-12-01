@@ -51,7 +51,7 @@ class FHIRValueSetGenerator
                     // There are too many mimetypes to include here, Use other valuesets to have a more manageable set
                     continue;
                 } else {
-                    $this->addConceptsFromCodeSystem($include['system'], $enumType);
+                    $this->addConceptsFromCodeSystem($include, $enumType);
                 }
                 continue;
             }
@@ -69,19 +69,37 @@ class FHIRValueSetGenerator
     }
 
     /**
-     * @param string   $system
+     * @param array{
+     *     system: string,
+     *     concept?: array{code: string, display: string}
+     * } $include
      * @param EnumType $enum
      *
      * @return void
      */
-    private function addConceptsFromCodeSystem(mixed $system, EnumType $enum): void
+    private function addConceptsFromCodeSystem(array $include, EnumType $enum): void
     {
-        $codeSystem = $this->builderContext->getDefinition($system);
-
-        foreach ($codeSystem['concept'] as $concept) {
-            $enum->addCase(u($concept['display'])->upper()->snake()->toString(), $concept['code'])
-                 ->addComment($concept['display'] ?? '');
+        $codeSystem = $this->builderContext->getDefinition($include['system']);
+        if($codeSystem !== null){
+            foreach ($codeSystem['concept'] as $concept) {
+                $enum->addCase(u($concept['display'])->upper()->snake()->toString(), $concept['code'])
+                     ->addComment($concept['display'] ?? '');
+            }
         }
+
+        if(isset($include['concept']) && is_array($include['concept'])){
+            foreach ($include['concept'] as $concept) {
+                $display = $concept['display'] ?? $concept['code'];
+                $enum->addCase(u($display)->upper()->snake()->toString(), $concept['code'])
+                    ->addComment($display ?? '');
+                foreach ($concept['extension'] ?? [] as $extension) {
+                    if ($extension['url'] !== 'http://hl7.org/fhir/StructureDefinition/valueset-concept-definition' && isset($extension['valueString'])) {
+                        $enum->addComment($extension['valueString']);
+                    }
+                }
+            }
+        }
+
     }
 
     /**
