@@ -7,6 +7,7 @@ use Nette\PhpGenerator\EnumType;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpNamespace;
 
+use Symfony\Component\Validator\Constraints\NotBlank;
 use function Symfony\Component\String\u;
 
 /**
@@ -40,13 +41,14 @@ class FHIRModelGenerator
      */
     public function __construct(
         BuilderContext $builderContext
-    ) {
+    )
+    {
         $this->builderContext = $builderContext;
     }
 
     /**
      * @param mixed[] $structureDefinition
-     * @param string  $version
+     * @param string $version
      *
      * @return ClassType
      */
@@ -54,7 +56,7 @@ class FHIRModelGenerator
     {
         $className = BuilderContext::DEFAULT_CLASS_PREFIX . u($structureDefinition['name'])->pascal();
         $namespace = $this->builderContext->getElementNamespace($version);
-        $class     = new ClassType($className, $namespace);
+        $class = new ClassType($className, $namespace);
 
         if ($structureDefinition['abstract'] === true) {
             $class->setAbstract();
@@ -68,9 +70,9 @@ class FHIRModelGenerator
         $class->addComment('@see ' . $structureDefinition['url']);
         $class->addComment('@description ' . $structureDefinition['snapshot']['element'][0]['definition']);
 
-        $constructor      = $class->addMethod('__construct');
+        $constructor = $class->addMethod('__construct');
         $parentParameters = [];
-        $elements         = $this->nestElements($structureDefinition['snapshot']['element']);
+        $elements = $this->nestElements($structureDefinition['snapshot']['element']);
 
         foreach ($elements['_properties'] as $key => $property) {
             $element = $property['_element'];
@@ -91,15 +93,15 @@ class FHIRModelGenerator
     }
 
     /**
-     * @param NestedElement            $classElement
+     * @param NestedElement $classElement
      * @param array<int,NestedElement> $propertyElements
-     * @param string                   $version
+     * @param string $version
      *
      * @return ClassType
      */
     public function createForElement(ClassType $classType, array $classElement, array $propertyElements, string $version): ClassType
     {
-        $constructor      = $classType->getMethod('__construct');
+        $constructor = $classType->getMethod('__construct');
         $parentParameters = [];
         foreach ($propertyElements as $key => $propertyElement) {
             // This is a primitive type
@@ -117,11 +119,11 @@ class FHIRModelGenerator
                 }
                 $this->addElementAsProperty($propertyElement['_element'], $constructor, $version);
             } else {
-                $element    = $propertyElement['_element'];
-                $className  = BuilderContext::DEFAULT_CLASS_PREFIX . u($element['path'])->pascal();
-                $namespace  = $this->builderContext->getElementNamespace($version);
+                $element = $propertyElement['_element'];
+                $className = BuilderContext::DEFAULT_CLASS_PREFIX . u($element['path'])->pascal();
+                $namespace = $this->builderContext->getElementNamespace($version);
                 $childClass = new ClassType($className, $namespace);
-                $childConstructor = $childClass->addMethod('__construct');
+                $childClass->addMethod('__construct');
                 $this->builderContext->addType($element['path'], $childClass);
 
                 if (isset($element['base']) && $element['type'][0]['code'] === 'Element') {
@@ -136,7 +138,7 @@ class FHIRModelGenerator
                 ) {
                     $parentParameters[] = $this->convertToMethodName($element['base']['path']);
                 }
-                $this->addElementAsProperty($element, $childConstructor, $version);
+                $this->addElementAsProperty($element, $constructor, $version);
 
                 $this->createForElement($childClass, $element, $propertyElement['_properties'], $version);
             }
@@ -160,14 +162,15 @@ class FHIRModelGenerator
      *     comment: string,
      *     min: int,
      *     max: string,
-     *     type: array<int,array{
+     *     contentReference?:string,
+     *     type?: array<int,array{
      *          extension?: array<int,array{url: string, valueUrl: string}>,
      *          code: string
      *      }>,
      *     binding?: array{strength: string, valueSet: string},
-     * }                    $element
-     * @param Method        $method
-     * @param string        $version
+     * } $element
+     * @param Method $method
+     * @param string $version
      * @param EnumType|null $enum
      *
      * @return void
@@ -175,83 +178,92 @@ class FHIRModelGenerator
     private function addElementAsProperty(array $element, Method $method, string $version, ?EnumType $enum = null): void
     {
         $types = [];
-        foreach ($element['type'] as $type) {
-            $code = $type['code'];
+        if (isset($element['type']) === false && isset($element['contentReference'])) {
+            $relatedClass = $this->builderContext->getType(str_replace('#', '', $element['contentReference']));
+            $types[] = $this->builderContext->getElementNamespace($version)->getName() . '\\'.$relatedClass->getName();
+        }else{
+            foreach ($element['type'] as $type) {
+                $code = $type['code'];
 
-            $targetElementNamespace = $this->builderContext->getElementNamespace($version)->getName();
-            $targetEnumNamespace    = $this->builderContext->getEnumNamespace($version)->getName();
-            if ($code === 'http://hl7.org/fhirpath/System.String') {
-                if (isset($element['base']['path']) && $element['base']['path'] === 'integer.value') {
+                $targetElementNamespace = $this->builderContext->getElementNamespace($version)->getName();
+                $targetEnumNamespace = $this->builderContext->getEnumNamespace($version)->getName();
+                if ($code === 'http://hl7.org/fhirpath/System.String') {
+                    if (isset($element['base']['path']) && $element['base']['path'] === 'integer.value') {
+                        $types[] = 'int';
+                        continue;
+                    }
+                    $fhirTypeExtension = array_find($type['extension'] ?? [], fn($ext) => $ext['url'] === 'http://hl7.org/fhir/StructureDefinition/structuredefinition-fhir-type');
+                    if ($enum !== null && $fhirTypeExtension !== null && $fhirTypeExtension['valueUrl'] === 'code') {
+                        $types[] = '\\' . $targetEnumNamespace . '\\' . $enum->getName();
+                        continue;
+                    }
+
+                    $types[] = 'string';
+                    continue;
+                }
+                if ($code === 'http://hl7.org/fhirpath/System.Boolean') {
+                    $types[] = 'bool';
+                    continue;
+                }
+                if ($code === 'http://hl7.org/fhirpath/System.Integer') {
                     $types[] = 'int';
                     continue;
                 }
-                $fhirTypeExtension = array_find($type['extension'] ?? [], fn($ext) => $ext['url'] === 'http://hl7.org/fhir/StructureDefinition/structuredefinition-fhir-type');
-                if ($enum !== null && $fhirTypeExtension !== null && $fhirTypeExtension['valueUrl'] === 'code') {
-                    $types[] = '\\' . $targetEnumNamespace . '\\' . $enum->getName();
+                if ($code === 'http://hl7.org/fhirpath/System.Decimal') {
+                    $types[] = 'float';
+                    continue;
+                }
+                if ($code === 'http://hl7.org/fhirpath/System.DateTime') {
+                    $types[] = '\\' . \DateTimeInterface::class;
+                    continue;
+                }
+                if ($code === 'http://hl7.org/fhirpath/System.Date') {
+                    $types[] = 'string';
+                    continue;
+                }
+                if ($code === 'http://hl7.org/fhirpath/System.Time') {
+                    $types[] = 'string';
                     continue;
                 }
 
-                $types[] = 'string';
-                continue;
-            }
-            if ($code === 'http://hl7.org/fhirpath/System.Boolean') {
-                $types[] = 'bool';
-                continue;
-            }
-            if ($code === 'http://hl7.org/fhirpath/System.Integer') {
-                $types[] = 'int';
-                continue;
-            }
-            if ($code === 'http://hl7.org/fhirpath/System.Decimal') {
-                $types[] = 'float';
-                continue;
-            }
-            if ($code === 'http://hl7.org/fhirpath/System.DateTime') {
-                $types[] = '\\' . \DateTimeInterface::class;
-                continue;
-            }
-            if ($code === 'http://hl7.org/fhirpath/System.Date') {
-                $types[] = 'string';
-                continue;
-            }
-            if ($code === 'http://hl7.org/fhirpath/System.Time') {
-                $types[] = 'string';
-                continue;
-            }
-
-            if ($code === 'string') {
-                $types[] = '\\' . $targetElementNamespace . '\\' . BuilderContext::DEFAULT_CLASS_PREFIX . u($code)->pascal();
-                $types[] = 'string';
-                continue;
-            }
-
-            if ($code === 'Element') {
-                $elementClass = u($element['path'])->pascal()->toString();
-
-                $types[] = '\\' . $targetElementNamespace . '\\' . BuilderContext::DEFAULT_CLASS_PREFIX . $elementClass;
-                continue;
-            }
-
-
-            if ($code === 'code' && isset($element['binding']['strength']) && $element['binding']['strength'] === 'required') {
-                $enum = $this->builderContext->getEnum($element['binding']['valueSet']);
-                if ($enum !== null) {
-                    $codeType = '\\' . $targetElementNamespace . '\\' . BuilderContext::DEFAULT_CLASS_PREFIX . $enum->getName() . 'Type';
-                } else {
-                    $valueSet = $element['binding']['valueSet'];
-                    // TODO handle versioned value sets better
-                    $valueSetData = $this->builderContext->getDefinition(explode('|', $valueSet)[0]);
-                    /** @var class-string $codeType */
-                    $codeType = '\\' . $targetElementNamespace . '\\' . BuilderContext::DEFAULT_CLASS_PREFIX . u($valueSetData['name'])->pascal() . 'Type';
-                    $this->builderContext->addPendingType($valueSet, $codeType);
+                if ($code === 'string') {
+                    $types[] = '\\' . $targetElementNamespace . '\\' . BuilderContext::DEFAULT_CLASS_PREFIX . u($code)->pascal();
+                    $types[] = 'string';
+                    continue;
                 }
 
-                $types[] = $codeType;
-                continue;
-            }
+                if ($code === 'Element') {
+                    $elementClass = u($element['path'])->pascal()->toString();
 
-            $types[] = '\\' . $targetElementNamespace . '\\' . BuilderContext::DEFAULT_CLASS_PREFIX . u($code)->pascal();
+                    $types[] = '\\' . $targetElementNamespace . '\\' . BuilderContext::DEFAULT_CLASS_PREFIX . $elementClass;
+                    continue;
+                }
+
+
+                if ($code === 'code' && isset($element['binding']['strength']) && $element['binding']['strength'] === 'required') {
+                    $enum = $this->builderContext->getEnum($element['binding']['valueSet']);
+                    if ($enum !== null) {
+                        $codeType = '\\' . $targetElementNamespace . '\\' . BuilderContext::DEFAULT_CLASS_PREFIX . $enum->getName() . 'Type';
+                    } else {
+                        $valueSet = $element['binding']['valueSet'];
+                        // TODO handle versioned value sets better
+                        $valueSetData = $this->builderContext->getDefinition(explode('|', $valueSet)[0]);
+                        /** @var class-string $codeType */
+                        if(isset($valueSetData['name']) === false) {
+                            xdebug_break();
+                        }
+                        $codeType = '\\' . $targetElementNamespace . '\\' . BuilderContext::DEFAULT_CLASS_PREFIX . u($valueSetData['name'])->pascal() . 'Type';
+                        $this->builderContext->addPendingType($valueSet, $codeType);
+                    }
+
+                    $types[] = $codeType;
+                    continue;
+                }
+
+                $types[] = '\\' . $targetElementNamespace . '\\' . BuilderContext::DEFAULT_CLASS_PREFIX . u($code)->pascal();
+            }
         }
+
 
 
         $parameterName = $this->convertToMethodName($element['path']);
@@ -262,18 +274,16 @@ class FHIRModelGenerator
         if ($element['max'] !== '0') {
             if ($isArray) {
                 $method->addPromotedParameter($parameterName, [])
-                       ->setNullable(false)
-                       ->setType('array')
-                       ->addComment('@var  array<' . implode('|', $types) . '> $' . $parameterName . ' ' . $element['short']);
-            } elseif ($isNullable === false) {
-                $method->addPromotedParameter($parameterName)
-                       ->setNullable(false)
-                       ->setType(implode('|', $types))
-                       ->addComment('@var ' . implode('|', $types) . ' $' . $parameterName . ' ' . $element['short']);
+                    ->setNullable(false)
+                    ->setType('array')
+                    ->addComment('@var  array<' . implode('|', $types) . '> $' . $parameterName . ' ' . $element['short']);
             } else {
-                $method->addPromotedParameter($parameterName, null)
-                       ->setType(implode('|', $types))
-                       ->addComment('@var null|' . implode('|', $types) . ' $' . $parameterName . ' ' . $element['short']);
+                $parameter = $method->addPromotedParameter($parameterName, null)
+                    ->setType(implode('|', $types))
+                    ->addComment('@var null|' . implode('|', $types) . ' $' . $parameterName . ' ' . $element['short']);
+                if ($isNullable === false) {
+                    $parameter->addAttribute(NotBlank::class);
+                }
             }
         }
     }
@@ -290,22 +300,22 @@ class FHIRModelGenerator
 
     /**
      * @param EnumType $enumType
-     * @param string   $version
+     * @param string $version
      *
      * @return ClassType
      */
     public function generateModelCodeType(EnumType $enumType, string $version): ClassType
     {
-        $elementNamespace    = $this->builderContext->getElementNamespace($version);
+        $elementNamespace = $this->builderContext->getElementNamespace($version);
         $structureDefinition = $this->builderContext->getDefinition('http://hl7.org/fhir/StructureDefinition/code');
-        $className           = $enumType->getName() . 'Type';
-        $class               = new ClassType($className, $elementNamespace);
+        $className = $enumType->getName() . 'Type';
+        $class = new ClassType($className, $elementNamespace);
 
         $class->addComment('@author ' . $structureDefinition['publisher']);
         $class->addComment('@see ' . $structureDefinition['url']);
         $class->addComment('@description ' . $structureDefinition['snapshot']['element'][0]['definition']);
 
-        $constructor      = $class->addMethod('__construct');
+        $constructor = $class->addMethod('__construct');
         $parentParameters = [];
 
         foreach ($structureDefinition['snapshot']['element'] as $element) {
@@ -342,7 +352,7 @@ class FHIRModelGenerator
      * code: string
      * }>,
      * binding?: array{strength: string, valueSet: string},
-     * }             $element
+     * } $element
      * @param string $version
      *
      * @return ClassType
@@ -350,9 +360,9 @@ class FHIRModelGenerator
     private function generateElementClass(array $element, string $version): ClassType
     {
         $elementClass = $this->builderContext->getType(u($element['path'])->pascal()->toString());
-        $className    = BuilderContext::DEFAULT_CLASS_PREFIX . $elementClass . 'Element';
-        $namespace    = $this->builderContext->getElementNamespace($version);
-        $class        = new ClassType($className, $namespace);
+        $className = BuilderContext::DEFAULT_CLASS_PREFIX . $elementClass . 'Element';
+        $namespace = $this->builderContext->getElementNamespace($version);
+        $class = new ClassType($className, $namespace);
 
 
         if (isset($element['base'])) {
@@ -364,7 +374,7 @@ class FHIRModelGenerator
         //        $class->addComment('@see ' . $structureDefinition['url']);
         $class->addComment('@description ' . $element['description']);
 
-        $constructor      = $class->addMethod('__construct');
+        $constructor = $class->addMethod('__construct');
         $parentParameters = ['id', 'extension'];
 
 
@@ -392,7 +402,7 @@ class FHIRModelGenerator
         $nestedArray = [];
         foreach ($elements as $item) {
             $pathParts = explode('.', $item['path']);
-            $current   = &$nestedArray;
+            $current = &$nestedArray;
             foreach ($pathParts as $part) {
                 if (!isset($current['_properties'])) {
                     $current['_properties'] = [];

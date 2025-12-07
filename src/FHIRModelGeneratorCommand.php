@@ -10,7 +10,10 @@ use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\Printer;
 use Symfony\Component\Console\Attribute\Argument;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Attribute\Ask;
+use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\ProgressIndicator;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
@@ -18,17 +21,41 @@ use Symfony\Component\Filesystem\Path;
 #[AsCommand(name: 'fhir:generate', description: 'Generates FHIR model classes from FHIR definitions.')]
 readonly class FHIRModelGeneratorCommand
 {
+    private const array DEFAULT_IG_PACKAGES = [
+        'R4'  => [
+            'hl7.fhir.r4.core',
+        ],
+        'R4B' => [
+            'hl7.fhir.r4b.core',
+        ],
+        'R5'  => [
+            'hl7.fhir.r5.core',
+        ],
+    ];
+
     public function __construct(
         private Filesystem     $filesystem,
-        private BuilderContext $context
+        private BuilderContext $context,
+        private PackageLoader  $packageLoader,
     ) {
     }
 
     public function __invoke(
-        #[Argument(description: 'Select FHIR version to generate model classes for.', suggestedValues: ['R4', 'R4B', 'R5'])]
-        string          $version,
-        OutputInterface $output
+        OutputInterface $output,
+        #[Option(description: 'Implementation Guide packages to include.', name: 'package', suggestedValues: self::DEFAULT_IG_PACKAGES)]
+        #[Ask(question: 'Which FHIR Implementation Guide packages do you want to include?')]
+        array           $packages = self::DEFAULT_IG_PACKAGES['R4B'],
     ): int {
+        $loadingPackagesIndicator = new ProgressIndicator($output);
+        $loadingPackagesIndicator->start('Loading FHIR Implementation Guide packages...');
+        foreach ($packages as $package) {
+            $version = explode('#', $package)[1] ?? null;
+            $loadingPackagesIndicator->setMessage('Loading package ' . $package . ($version ? " version $version" : ''));
+            $this->packageLoader->loadPackage($package, $version);
+            $loadingPackagesIndicator->advance();
+        }
+
+        $loadingPackagesIndicator->finish('Finished loading FHIR Implementation Guide packages.');
         $definitionFiles = [
             'types'     => 'profiles-types.json',
             'enums'     => 'valuesets.json',
@@ -145,6 +172,17 @@ readonly class FHIRModelGeneratorCommand
             $this->context->addDefinition($type['fullUrl'], $type['resource']);
         }
 
+        $output->writeln('Loading resources into context');
+        $structureDefinitionBundle = file_get_contents(Path::canonicalize(__DIR__ . "/../resources/definitions/FHIR/{$version}/profiles-resources.json"));
+        if ($structureDefinitionBundle === false) {
+            throw new \RuntimeException("Failed to load FHIR structure definition bundle for version {$version}");
+        }
+        $structureDefinitionBundle = json_decode($structureDefinitionBundle, true, 512, JSON_THROW_ON_ERROR);
+
+        foreach ($structureDefinitionBundle['entry'] as $type) {
+            $this->context->addDefinition($type['fullUrl'], $type['resource']);
+        }
+
         $output->writeln('Loading value sets into context');
         $valuesets = file_get_contents(Path::canonicalize(__DIR__ . "/../resources/definitions/FHIR/{$version}/valuesets.json"));
         if ($valuesets === false) {
@@ -171,7 +209,7 @@ readonly class FHIRModelGeneratorCommand
 
         foreach ($this->context->getPendingEnums() as $pendingEnum) {
             $valueset = $this->context->getDefinition($pendingEnum);
-            $url = $valueset['resource']['url'];
+            $url      = $valueset['resource']['url'];
 
             if (isset($valueset['resource']['version'])) {
                 $url .= '|' . $valueset['resource']['version'];
