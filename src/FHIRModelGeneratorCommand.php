@@ -87,7 +87,7 @@ readonly class FHIRModelGeneratorCommand
                 continue;
             }
 
-            // Ingore Profiles that are constraints on other types for now
+                        // Ignore Profiles that are constraints on other types for now
             if ($structureDefinition['kind'] === 'logical' || (isset($structureDefinition['derivation']) && $structureDefinition['derivation'] === 'constraint')) {
                 continue;
             }
@@ -193,14 +193,14 @@ readonly class FHIRModelGeneratorCommand
 
     /**
      * @param OutputInterface $output
-     * @param mixed           $package
+         * @param string          $package
      * @param string|null     $version
      *
      * @return void
      *
      * @throws \JsonException
      */
-    private function generateClassesForPackage(OutputInterface $output, mixed $package, ?string $version): void
+    private function generateClassesForPackage(OutputInterface $output, string $package, ?string $version): void
     {
         $namespaceParts = s($package)->split('.');
         $parts          = [];

@@ -137,7 +137,7 @@ class PackageLoader
                         $this->contextBuilder->addDefinition($json['url'], $json);
                         break;
                     default:
-                        null;
+                                                // No action needed for other resource types.
                         break;
                 }
             }

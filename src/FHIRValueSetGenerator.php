@@ -19,6 +19,7 @@ use function Symfony\Component\String\u;
 class FHIRValueSetGenerator
 {
     private BuilderContext $builderContext;
+    private AsciiSlugger   $slugger;
 
     /**
      * @param BuilderContext $builderContext
@@ -27,10 +28,18 @@ class FHIRValueSetGenerator
         BuilderContext $builderContext
     ) {
         $this->builderContext = $builderContext;
+        $this->slugger        = new AsciiSlugger('en', [
+            'en' => [
+                '=' => 'equals',
+                '<' => 'less_than',
+                '>' => 'greater_than',
+                '&' => 'and',
+            ],
+        ]);
     }
 
     /**
-     * @param mixed[] $valueSet
+     * @param array $valueSet
      * @param string  $version
      *
      * @return EnumType
@@ -57,12 +66,12 @@ class FHIRValueSetGenerator
 
                 continue;
             }
-            if (! isset($include['concept'])) {
+            if (!isset($include['concept'])) {
                 continue;
             }
             foreach ($include['concept'] as $concept) {
                 $enumType->addCase(u($concept['code'])->upper()->snake()->toString(), $concept['code'])
-                    ->addComment($concept['display'] ?? '');
+                         ->addComment($concept['display'] ?? '');
             }
         }
 
@@ -83,21 +92,23 @@ class FHIRValueSetGenerator
     {
         $codeSystem = $this->builderContext->getDefinition($include['system']);
         if ($codeSystem !== null && isset($codeSystem['concept']) && is_array($codeSystem['concept'])) {
-            foreach ($codeSystem['concept'] as $key => $concept) {
+            foreach ($codeSystem['concept'] as $concept) {
                 $code     = $concept['code'];
                 $enumName = $this->getEnumName($concept);
                 if (empty($enumName)) {
-                    xdebug_break();
+                    throw new \RuntimeException(
+                        'Failed to generate enum name for concept: ' . json_encode($concept)
+                    );
                 }
                 if (is_numeric($enumName[0])) {
                     $enumName = 'CODE_' . $enumName;
                 }
                 // Skip if already exists
-                if (count(array_filter($enum->getCases(), fn ($case) => $case->getName() === $enumName)) > 0) {
+                if (array_any($enum->getCases(), fn($case) => $case->getName() === $enumName)) {
                     continue;
                 }
                 $enum->addCase($enumName, $code)
-                    ->addComment($concept['display'] ?? '');
+                     ->addComment($concept['display'] ?? '');
             }
         }
 
@@ -106,12 +117,12 @@ class FHIRValueSetGenerator
                 $display  = $concept['display'] ?? $concept['code'];
                 $enumName = u($display)->upper()->snake()->toString();
                 // Skip if already exists
-                if (count(array_filter($enum->getCases(), fn ($case) => $case->getName() === $enumName)) > 0) {
+                if (array_any($enum->getCases(), fn($case) => $case->getName() === $enumName)) {
                     continue;
                 }
 
                 $enum->addCase($enumName, $concept['code'])
-                    ->addComment($display ?? '');
+                     ->addComment($display ?? '');
                 foreach ($concept['extension'] ?? [] as $extension) {
                     if ($extension['url'] !== 'http://hl7.org/fhir/StructureDefinition/valueset-concept-definition' && isset($extension['valueString'])) {
                         $enum->addComment($extension['valueString']);
@@ -131,20 +142,19 @@ class FHIRValueSetGenerator
         foreach (Currencies::getCurrencyCodes() as $code) {
             $caseName = u(Currencies::getName($code))->upper()->snake()->toString();
             $enumType->addCase($caseName, $code)
-                ->addComment(Currencies::getName($code));
+                     ->addComment(Currencies::getName($code));
         }
     }
 
-    /**
-     * @param mixed $concept
-     *
-     * @return string
-     */
-    public function getEnumName(mixed $concept): string
+    /*
+            * @param array $concept
+         *
+         * @return string
+         */
+    public function getEnumName(array $concept): string
     {
-        $slugger = new AsciiSlugger('en', ['en' => ['=' => 'equals', '<' => 'less_than', '>' => 'greater_than', '&' => 'and']]);
-        $name    = $concept['display'] ?? $concept['code'];
-        $name    = $slugger->slug($name);
+        $name = $concept['display'] ?? $concept['code'];
+        $name = $this->slugger->slug($name);
 
         return u($name)->upper()->snake()->toString();
     }
