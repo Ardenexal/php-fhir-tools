@@ -5,6 +5,7 @@ namespace Ardenexal\FHIRTools;
 use Nette\PhpGenerator\EnumType;
 use Nette\PhpGenerator\PhpNamespace;
 use Symfony\Component\Intl\Currencies;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 
 use function Symfony\Component\String\u;
 
@@ -36,8 +37,8 @@ class FHIRValueSetGenerator
      */
     public function generateEnum(array $valueSet, string $version): EnumType
     {
-        $className    = BuilderContext::DEFAULT_CLASS_PREFIX . u($valueSet['name'])->pascal();
-        $enumType     = new EnumType($className, $this->builderContext->getEnumNamespace($version));
+        $className = BuilderContext::DEFAULT_CLASS_PREFIX . u($valueSet['name'])->pascal();
+        $enumType  = new EnumType($className, $this->builderContext->getEnumNamespace($version));
         $enumType->addComment('ValueSet: ' . ($valueSet['title'] ?? $valueSet['name']));
         $enumType->addComment('URL: ' . ($valueSet['url'] ?? 'unknown'));
         $enumType->addComment('Version: ' . ($valueSet['version'] ?? 'unknown'));
@@ -53,14 +54,15 @@ class FHIRValueSetGenerator
                 } else {
                     $this->addConceptsFromCodeSystem($include, $enumType);
                 }
+
                 continue;
             }
-            if (!isset($include['concept'])) {
+            if (! isset($include['concept'])) {
                 continue;
             }
             foreach ($include['concept'] as $concept) {
                 $enumType->addCase(u($concept['code'])->upper()->snake()->toString(), $concept['code'])
-                ->addComment($concept['display'] ?? '');
+                    ->addComment($concept['display'] ?? '');
             }
         }
 
@@ -72,7 +74,7 @@ class FHIRValueSetGenerator
      * @param array{
      *     system: string,
      *     concept?: array{code: string, display: string}
-     * } $include
+     * }               $include
      * @param EnumType $enum
      *
      * @return void
@@ -80,17 +82,35 @@ class FHIRValueSetGenerator
     private function addConceptsFromCodeSystem(array $include, EnumType $enum): void
     {
         $codeSystem = $this->builderContext->getDefinition($include['system']);
-        if($codeSystem !== null){
-            foreach ($codeSystem['concept'] as $concept) {
-                $enum->addCase(u($concept['display'])->upper()->snake()->toString(), $concept['code'])
-                     ->addComment($concept['display'] ?? '');
+        if ($codeSystem !== null && isset($codeSystem['concept']) && is_array($codeSystem['concept'])) {
+            foreach ($codeSystem['concept'] as $key => $concept) {
+                $code     = $concept['code'];
+                $enumName = $this->getEnumName($concept);
+                if (empty($enumName)) {
+                    xdebug_break();
+                }
+                if (is_numeric($enumName[0])) {
+                    $enumName = 'CODE_' . $enumName;
+                }
+                // Skip if already exists
+                if (count(array_filter($enum->getCases(), fn ($case) => $case->getName() === $enumName)) > 0) {
+                    continue;
+                }
+                $enum->addCase($enumName, $code)
+                    ->addComment($concept['display'] ?? '');
             }
         }
 
-        if(isset($include['concept']) && is_array($include['concept'])){
+        if (isset($include['concept']) && is_array($include['concept'])) {
             foreach ($include['concept'] as $concept) {
-                $display = $concept['display'] ?? $concept['code'];
-                $enum->addCase(u($display)->upper()->snake()->toString(), $concept['code'])
+                $display  = $concept['display'] ?? $concept['code'];
+                $enumName = u($display)->upper()->snake()->toString();
+                // Skip if already exists
+                if (count(array_filter($enum->getCases(), fn ($case) => $case->getName() === $enumName)) > 0) {
+                    continue;
+                }
+
+                $enum->addCase($enumName, $concept['code'])
                     ->addComment($display ?? '');
                 foreach ($concept['extension'] ?? [] as $extension) {
                     if ($extension['url'] !== 'http://hl7.org/fhir/StructureDefinition/valueset-concept-definition' && isset($extension['valueString'])) {
@@ -99,7 +119,6 @@ class FHIRValueSetGenerator
                 }
             }
         }
-
     }
 
     /**
@@ -112,7 +131,21 @@ class FHIRValueSetGenerator
         foreach (Currencies::getCurrencyCodes() as $code) {
             $caseName = u(Currencies::getName($code))->upper()->snake()->toString();
             $enumType->addCase($caseName, $code)
-                     ->addComment(Currencies::getName($code));
+                ->addComment(Currencies::getName($code));
         }
+    }
+
+    /**
+     * @param mixed $concept
+     *
+     * @return string
+     */
+    public function getEnumName(mixed $concept): string
+    {
+        $slugger = new AsciiSlugger('en', ['en' => ['=' => 'equals', '<' => 'less_than', '>' => 'greater_than', '&' => 'and']]);
+        $name    = $concept['display'] ?? $concept['code'];
+        $name    = $slugger->slug($name);
+
+        return u($name)->upper()->snake()->toString();
     }
 }

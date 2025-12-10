@@ -123,6 +123,7 @@ class BuilderContext
      */
     public function addPendingType(string $url, string $typeClassName): void
     {
+        $url                      = preg_replace('/\|.*$/', '', $url);
         $this->pendingTypes[$url] = $typeClassName;
     }
 
@@ -229,5 +230,15 @@ class BuilderContext
     public function getDefinitions(): array
     {
         return $this->definitions;
+    }
+
+    /**
+     * @param string $valuesetURL
+     *
+     * @return void
+     */
+    public function removePendingEnum(string $valuesetURL): void
+    {
+        unset($this->pendingEnums[$valuesetURL]);
     }
 }
