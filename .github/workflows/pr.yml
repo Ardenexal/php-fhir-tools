@@ -1,0 +1,105 @@
+name: Pull Request
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        # Fetch full history for better diff analysis
+        fetch-depth: 0
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+        extensions: ctype, iconv, zip
+    
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v4
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-8.3-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-8.3-
+    
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress --no-suggest
+    
+    - name: Validate composer files
+      run: composer validate --strict
+    
+    - name: Check code style (Pint)
+      run: composer run lint
+    
+    - name: Run PHPStan static analysis
+      run: composer run phpstan
+    
+    - name: Run unit tests
+      run: composer run test-unit
+    
+    - name: Run integration tests
+      run: composer run test-integration
+    
+    - name: Run FHIR tests
+      run: composer run test-fhir
+    
+    - name: Security audit
+      run: composer audit
+    
+    - name: Check for code style violations
+      run: |
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "❌ Code style issues found. Please run 'composer run lint' locally and commit the changes."
+          echo ""
+          echo "Files that need formatting:"
+          git status --porcelain
+          echo ""
+          echo "Diff of changes needed:"
+          git diff
+          exit 1
+        else
+          echo "✅ Code style is compliant"
+        fi
+    
+    - name: Validate commit messages
+      run: |
+        # Check if commit messages follow conventional commits
+        git log --oneline origin/main..HEAD | while read line; do
+          commit_msg=$(echo "$line" | cut -d' ' -f2-)
+          if ! echo "$commit_msg" | grep -qE '^(feat|fix|chore|test|docs|refactor|perf|style)(\(.+\))?: .+'; then
+            echo "❌ Commit message does not follow conventional commits format: $commit_msg"
+            echo "Expected format: type: description"
+            echo "Valid types: feat, fix, chore, test, docs, refactor, perf, style"
+            exit 1
+          fi
+        done
+        echo "✅ All commit messages follow conventional commits format"
+
+  performance:
+    runs-on: ubuntu-latest
+    needs: validate
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+        extensions: ctype, iconv, zip
+    
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress --no-suggest
+    
+    - name: Test command performance
+      run: |
+        echo "Testing basic command performance..."
+        time php bin/console list > /dev/null
+        echo "✅ Command execution completed successfully"
