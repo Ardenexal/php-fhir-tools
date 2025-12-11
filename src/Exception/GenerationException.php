@@ -195,4 +195,29 @@ class GenerationException extends FHIRToolsException
             ],
         );
     }
+
+    /**
+     * Create exception for invalid StructureDefinition kind
+     *
+     * This method creates an exception when a StructureDefinition has an
+     * invalid or unsupported kind value.
+     *
+     * @param string $kind The invalid kind value
+     * @param string $url  The URL of the StructureDefinition
+     *
+     * @return self The configured exception instance
+     */
+    public static function invalidStructureDefinitionKind(string $kind, string $url): self
+    {
+        return new self(
+            "Invalid StructureDefinition kind '{$kind}' for '{$url}'",
+            400,
+            null,
+            [
+                'kind'                     => $kind,
+                'structure_definition_url' => $url,
+                'error_type'               => 'invalid_structure_definition_kind',
+            ],
+        );
+    }
 }
