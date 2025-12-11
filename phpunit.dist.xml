@@ -18,7 +18,16 @@
     </php>
 
     <testsuites>
-        <testsuite name="Project Test Suite">
+        <testsuite name="unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="integration">
+            <directory>tests/Integration</directory>
+        </testsuite>
+        <testsuite name="fhir">
+            <directory>tests/FHIR</directory>
+        </testsuite>
+        <testsuite name="all">
             <directory>tests</directory>
         </testsuite>
     </testsuites>
@@ -31,12 +40,28 @@
         <include>
             <directory>src</directory>
         </include>
+        <exclude>
+            <directory>src/Exception</directory>
+        </exclude>
 
         <deprecationTrigger>
             <function>trigger_deprecation</function>
         </deprecationTrigger>
     </source>
 
+    <coverage includeUncoveredFiles="true"
+              ignoreDeprecatedCodeUnits="true"
+              disableCodeCoverageIgnore="false">
+        <report>
+            <html outputDirectory="coverage" lowUpperBound="50" highLowerBound="80"/>
+            <text outputFile="php://stdout" showUncoveredFiles="false"/>
+        </report>
+    </coverage>
+
     <extensions>
+        <bootstrap class="Symfony\Bridge\PhpUnit\SymfonyExtension">
+            <parameter name="clock-mock-namespaces" value="App" />
+            <parameter name="dns-mock-namespaces" value="App" />
+        </bootstrap>
     </extensions>
 </phpunit>

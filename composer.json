@@ -10,24 +10,30 @@
         "ext-zip": "*",
         "amphp/http-client": "5",
         "nette/php-generator": "^4.2.0",
-        "symfony/console": "^7.4",
+        "symfony/console": "^7.4.1",
         "symfony/dotenv": "^7.4",
         "symfony/filesystem": "^7.4",
         "symfony/flex": "^2.10",
-        "symfony/framework-bundle": "^7.4",
-        "symfony/http-client": "^7.4",
+        "symfony/framework-bundle": "^7.4.1",
+        "symfony/http-client": "^7.4.1",
         "symfony/intl": "^7.4",
         "symfony/polyfill-php84": "^v1.33.0",
         "symfony/polyfill-php85": "^v1.33.0",
-        "symfony/runtime": "^7.4",
-        "symfony/validator": "^7.4",
-        "symfony/yaml": "^7.4"
+        "symfony/runtime": "^7.4.1",
+        "symfony/validator": "^7.4.2",
+        "symfony/yaml": "^7.4.1"
     },
     "require-dev": {
         "laravel/pint": "^1.26",
         "phpstan/phpstan": "^2.1.33",
         "roave/security-advisories": "dev-latest",
-        "phpunit/phpunit": "^12.5.0"
+        "phpunit/phpunit": "^12.5.3",
+        "giorgiosironi/eris": "^1.0",
+        "symfony/browser-kit": "^7.4",
+        "symfony/css-selector": "^7.4",
+        "symfony/dom-crawler": "^7.4.1",
+        "symfony/maker-bundle": "^1.65.1",
+        "symfony/phpunit-bridge": "^7.4"
     },
     "config": {
         "allow-plugins": {
@@ -45,7 +51,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Ardenexal\\FHIR-PHP-Model-Generator\\Tests\\": "tests/",
+            "Ardenexal\\FHIRTools\\Tests\\": "tests/",
             "Ardenexal\\FHIRTools\\R4B\\": "output/Ardenexal/FhirTools/R4B/"
         }
     },
@@ -73,6 +79,11 @@
         "phpstan": "php ./vendor/bin/phpstan.phar analyse --configuration=phpstan.neon --memory-limit=-1 -v",
         "lint": "php ./vendor/bin/pint -v --parallel --max-processes=4",
         "test": "php ./vendor/phpunit/phpunit/phpunit",
+        "test-coverage": "php ./vendor/phpunit/phpunit/phpunit --coverage-html coverage",
+        "test-unit": "php ./vendor/phpunit/phpunit/phpunit --testsuite=unit",
+        "test-integration": "php ./vendor/phpunit/phpunit/phpunit --testsuite=integration",
+        "test-fhir": "php ./vendor/phpunit/phpunit/phpunit --testsuite=fhir",
+
         "generate-models": "php ./bin/console fhir:generate -vvv"
     },
     "conflict": {
