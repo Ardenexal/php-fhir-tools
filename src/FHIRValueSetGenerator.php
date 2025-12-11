@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ardenexal\FHIRTools;
 
+use Ardenexal\FHIRTools\Exception\GenerationException;
 use Nette\PhpGenerator\EnumType;
 use Nette\PhpGenerator\PhpNamespace;
 use Symfony\Component\Intl\Currencies;
@@ -10,20 +13,49 @@ use Symfony\Component\String\Slugger\AsciiSlugger;
 use function Symfony\Component\String\u;
 
 /**
- * Class FHIRTools
+ * Generates PHP enums from FHIR ValueSets and CodeSystems
+ *
+ * This class is responsible for converting FHIR ValueSets and CodeSystems
+ * into PHP enums with proper naming and documentation. It handles:
+ *
+ * - Enum generation from ValueSet definitions
+ * - Code system concept processing
+ * - Currency code integration for ISO 4217 systems
+ * - Concept name normalization and collision handling
+ * - Enhanced error handling and validation
+ * - Support for various FHIR terminology systems
+ *
+ * The generator produces PSR-12 compliant enums with descriptive case names
+ * and comprehensive documentation for each enum value.
  *
  * @phpstan-type GenerationContext array{targetNamespace: PhpNamespace, classPrefix: string}
+ *
+ * @author FHIR Tools
+ *
+ * @since 1.0.0
  *
  * @package Ardenexal\FHIRTools
  */
 class FHIRValueSetGenerator
 {
+    /**
+     * Builder context for managing generated types and namespaces
+     *
+     * @var BuilderContext
+     */
     private BuilderContext $builderContext;
 
-    private AsciiSlugger   $slugger;
+    /**
+     * String slugger for normalizing concept names into valid PHP identifiers
+     *
+     * @var AsciiSlugger
+     */
+    private AsciiSlugger $slugger;
 
     /**
-     * @param BuilderContext $builderContext
+     * Construct a new FHIRValueSetGenerator with required dependencies
+     *
+     * @param BuilderContext $builderContext Context for managing generated types and namespaces
      */
     public function __construct(
         BuilderContext $builderContext
@@ -97,7 +129,7 @@ class FHIRValueSetGenerator
                 $code     = $concept['code'];
                 $enumName = $this->getEnumName($concept);
                 if (empty($enumName)) {
-                    throw new \RuntimeException('Failed to generate enum name for concept: ' . json_encode($concept));
+                    throw GenerationException::enumGenerationFailed($code, 'Could not generate valid enum name from concept data');
                 }
                 if (is_numeric($enumName[0])) {
                     $enumName = 'CODE_' . $enumName;
@@ -156,8 +188,107 @@ class FHIRValueSetGenerator
     public function getEnumName(array $concept): string
     {
         $name = $concept['display'] ?? $concept['code'];
-        $name = $this->slugger->slug($name);
+        $name = $this->slugger->slug($name)->toString();
 
         return u($name)->upper()->snake()->toString();
+    }
+
+    /**
+     * Validate a ValueSet before processing
+     *
+     * @param array<string, mixed> $valueSet
+     * @param ErrorCollector       $errorCollector
+     *
+     * @return bool
+     */
+    public function validateValueSet(array $valueSet, ErrorCollector $errorCollector): bool
+    {
+        $isValid = true;
+        $url     = $valueSet['url'] ?? 'unknown';
+
+        // Check required fields
+        $requiredFields = ['resourceType', 'name', 'url'];
+        foreach ($requiredFields as $field) {
+            if (!isset($valueSet[$field])) {
+                $errorCollector->addError(
+                    "Missing required field: {$field}",
+                    $url,
+                    'MISSING_REQUIRED_FIELD',
+                );
+                $isValid = false;
+            }
+        }
+
+        // Validate resource type
+        if (isset($valueSet['resourceType']) && $valueSet['resourceType'] !== 'ValueSet') {
+            $errorCollector->addError(
+                "Invalid resource type: expected 'ValueSet', got '{$valueSet['resourceType']}'",
+                $url,
+                'INVALID_RESOURCE_TYPE',
+            );
+            $isValid = false;
+        }
+
+        // Validate compose structure
+        if (isset($valueSet['compose'])) {
+            if (!isset($valueSet['compose']['include']) || !is_array($valueSet['compose']['include'])) {
+                $errorCollector->addWarning(
+                    "ValueSet compose missing or invalid 'include' array",
+                    $url,
+                    ['compose_structure' => $valueSet['compose']],
+                );
+            }
+        } else {
+            $errorCollector->addWarning(
+                "ValueSet missing 'compose' section",
+                $url,
+            );
+        }
+
+        return $isValid;
+    }
+
+    /**
+     * Enhanced enum generation with error collection
+     *
+     * @param array<string, mixed> $valueSet
+     * @param string               $version
+     * @param ErrorCollector       $errorCollector
+     *
+     * @return EnumType|null
+     */
+    public function generateEnumWithErrorHandling(array $valueSet, string $version, ErrorCollector $errorCollector): ?EnumType
+    {
+        try {
+            if (!$this->validateValueSet($valueSet, $errorCollector)) {
+                return null;
+            }
+
+            return $this->generateEnum($valueSet, $version);
+        } catch (GenerationException $e) {
+            $errorCollector->addError(
+                $e->getMessage(),
+                $valueSet['url'] ?? 'unknown',
+                'ENUM_GENERATION_EXCEPTION',
+                'error',
+                $e->getContext(),
+            );
+
+            return null;
+        } catch (\Throwable $e) {
+            $errorCollector->addError(
+                "Unexpected error during enum generation: {$e->getMessage()}",
+                $valueSet['url'] ?? 'unknown',
+                'UNEXPECTED_ENUM_ERROR',
+                'error',
+                [
+                    'exception_class' => get_class($e),
+                    'file'            => $e->getFile(),
+                    'line'            => $e->getLine(),
+                ],
+            );
+
+            return null;
+        }
     }
 }
