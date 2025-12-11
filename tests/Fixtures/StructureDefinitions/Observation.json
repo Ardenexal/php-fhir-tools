@@ -34,10 +34,7 @@
             "code": "code"
           }
         ],
-        "binding": {
-          "strength": "required",
-          "valueSet": "http://hl7.org/fhir/ValueSet/observation-status"
-        }
+        "mustSupport": true
       },
       {
         "id": "Observation.code",
@@ -48,24 +45,23 @@
           {
             "code": "CodeableConcept"
           }
-        ]
+        ],
+        "mustSupport": true
       },
       {
-        "id": "Observation.value[x]",
-        "path": "Observation.value[x]",
-        "min": 0,
+        "id": "Observation.subject",
+        "path": "Observation.subject",
+        "min": 1,
         "max": "1",
         "type": [
           {
-            "code": "Quantity"
-          },
-          {
-            "code": "string"
-          },
-          {
-            "code": "boolean"
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Patient"
+            ]
           }
-        ]
+        ],
+        "mustSupport": true
       }
     ]
   }

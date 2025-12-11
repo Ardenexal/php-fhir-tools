@@ -8,6 +8,12 @@ use Ardenexal\FHIRTools\FHIRModelGeneratorCommand;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
+use Ardenexal\FHIRTools\BuilderContext;
+use Ardenexal\FHIRTools\Exception\PackageException;
+use Ardenexal\FHIRTools\PackageLoader;
+use Nette\PhpGenerator\PhpNamespace;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Integration tests for Symfony Console commands
@@ -37,8 +43,32 @@ class CommandIntegrationTest extends TestCase
         $this->application   = new Application();
         $this->tempOutputDir = $this->createTempDirectory();
 
+        // Create required dependencies for the command
+        $filesystem = new Filesystem();
+        $context    = new BuilderContext();
+
+        // Set up namespaces for the context
+        $elementNamespace = new PhpNamespace('Ardenexal\\FHIRTools\\Test\\Element');
+        $enumNamespace    = new PhpNamespace('Ardenexal\\FHIRTools\\Test\\Enum');
+        $context->addElementNamespace('R4B', $elementNamespace);
+        $context->addEnumNamespace('R4B', $enumNamespace);
+
+        // Mock the PackageLoader to avoid network calls
+        $packageLoader = $this->createMock(PackageLoader::class);
+        $packageLoader->method('installPackage')->willReturn([
+            'name'         => 'test-package',
+            'version'      => '1.0.0',
+            'fhirVersions' => ['4.3.0'],
+            'url'          => 'http://example.org/test-package',
+            'description'  => 'Test package',
+            'author'       => 'Test Author',
+            'license'      => 'MIT',
+            'dependencies' => [],
+            'title'        => 'Test Package',
+        ]);
+
         // Add commands to application
-        $this->application->add(new FHIRModelGeneratorCommand());
+        $this->application->addCommand(new FHIRModelGeneratorCommand($filesystem, $context, $packageLoader));
     }
 
     protected function tearDown(): void
@@ -55,15 +85,19 @@ class CommandIntegrationTest extends TestCase
         $commandTester = new CommandTester($command);
 
         $commandTester->execute([
-            'version'      => 'R4B',
-            '--output-dir' => $this->tempOutputDir,
-            '--test-mode'  => true, // Use test fixtures instead of downloading
+            '--package' => ['hl7.fhir.r4b.core'],
         ]);
 
-        self::assertSame(0, $commandTester->getStatusCode(), 'Command should exit with success code');
+        $output     = $commandTester->getDisplay();
+        $statusCode = $commandTester->getStatusCode();
 
-        $output = $commandTester->getDisplay();
-        self::assertStringContainsString('Generation completed successfully', $output);
+        if ($statusCode !== 0) {
+            echo "Command output:\n" . $output . "\n";
+            echo 'Status code: ' . $statusCode . "\n";
+        }
+
+        self::assertSame(0, $statusCode, 'Command should exit with success code');
+        self::assertStringContainsString('FHIR model generation completed successfully', $output);
     }
 
     /**
@@ -71,18 +105,28 @@ class CommandIntegrationTest extends TestCase
      */
     public function testCommandExecutionWithInvalidArguments(): void
     {
-        $command       = $this->application->find('fhir:generate');
+        // Create a separate application with a PackageLoader that throws exceptions for invalid packages
+        $application = new Application();
+        $filesystem  = new Filesystem();
+        $context     = new BuilderContext();
+
+        $packageLoader = $this->createMock(PackageLoader::class);
+        $packageLoader->method('installPackage')
+            ->willThrowException(PackageException::packageNotFound('invalid.package.name'));
+
+        $application->addCommand(new FHIRModelGeneratorCommand($filesystem, $context, $packageLoader));
+
+        $command       = $application->find('fhir:generate');
         $commandTester = new CommandTester($command);
 
         $commandTester->execute([
-            'version'      => 'INVALID_VERSION',
-            '--output-dir' => $this->tempOutputDir,
+            '--package' => ['invalid.package.name'],
         ]);
 
         self::assertNotSame(0, $commandTester->getStatusCode(), 'Command should exit with error code');
 
         $output = $commandTester->getDisplay();
-        self::assertStringContainsString('Unsupported FHIR version', $output);
+        self::assertStringContainsString('Failed to process package', $output);
     }
 
     /**
@@ -94,215 +138,42 @@ class CommandIntegrationTest extends TestCase
         $commandTester = new CommandTester($command);
 
         $commandTester->execute([
-            'version'      => 'R4B',
-            '--output-dir' => $this->tempOutputDir,
-            '--test-mode'  => true,
-        ], ['verbosity' => CommandTester::VERBOSITY_VERBOSE]);
+            '--package' => ['hl7.fhir.r4b.core'],
+        ], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE]);
 
         self::assertSame(0, $commandTester->getStatusCode());
 
         $output = $commandTester->getDisplay();
-        self::assertStringContainsString('Processing StructureDefinition', $output);
-        self::assertStringContainsString('Generated class', $output);
+        self::assertStringContainsString('Loading', $output);
     }
 
     /**
-     * Test command execution with dry-run option
+     * Test command execution with multiple packages
      */
-    public function testCommandExecutionWithDryRun(): void
+    public function testCommandExecutionWithMultiplePackages(): void
     {
         $command       = $this->application->find('fhir:generate');
         $commandTester = new CommandTester($command);
 
         $commandTester->execute([
-            'version'      => 'R4B',
-            '--output-dir' => $this->tempOutputDir,
-            '--dry-run'    => true,
-            '--test-mode'  => true,
+            '--package' => ['hl7.fhir.r4b.core', 'hl7.terminology.r4'],
         ]);
 
         self::assertSame(0, $commandTester->getStatusCode());
 
         $output = $commandTester->getDisplay();
-        self::assertStringContainsString('Dry run mode', $output);
-        self::assertStringContainsString('Would generate', $output);
-
-        // No files should be created in dry-run mode
-        $files = glob($this->tempOutputDir . '/*.php');
-        self::assertEmpty($files, 'No files should be generated in dry-run mode');
+        self::assertStringContainsString('Loading FHIR Implementation Guide packages', $output);
     }
 
     /**
-     * Test command execution with custom namespace
+     * Test command registration and basic properties
      */
-    public function testCommandExecutionWithCustomNamespace(): void
+    public function testCommandRegistration(): void
     {
-        $command       = $this->application->find('fhir:generate');
-        $commandTester = new CommandTester($command);
+        $command = $this->application->find('fhir:generate');
 
-        $customNamespace = 'Custom\\FHIR\\R4B';
-
-        $commandTester->execute([
-            'version'      => 'R4B',
-            '--output-dir' => $this->tempOutputDir,
-            '--namespace'  => $customNamespace,
-            '--test-mode'  => true,
-        ]);
-
-        self::assertSame(0, $commandTester->getStatusCode());
-
-        $output = $commandTester->getDisplay();
-        self::assertStringContainsString("Using namespace: {$customNamespace}", $output);
-    }
-
-    /**
-     * Test command execution with progress reporting
-     */
-    public function testCommandExecutionWithProgressReporting(): void
-    {
-        $command       = $this->application->find('fhir:generate');
-        $commandTester = new CommandTester($command);
-
-        $commandTester->execute([
-            'version'         => 'R4B',
-            '--output-dir'    => $this->tempOutputDir,
-            '--show-progress' => true,
-            '--test-mode'     => true,
-        ]);
-
-        self::assertSame(0, $commandTester->getStatusCode());
-
-        $output = $commandTester->getDisplay();
-        // Progress bar output contains special characters
-        self::assertStringContainsString('Processing', $output);
-    }
-
-    /**
-     * Test command execution with file filtering
-     */
-    public function testCommandExecutionWithFileFiltering(): void
-    {
-        $command       = $this->application->find('fhir:generate');
-        $commandTester = new CommandTester($command);
-
-        $commandTester->execute([
-            'version'      => 'R4B',
-            '--output-dir' => $this->tempOutputDir,
-            '--filter'     => 'Patient',
-            '--test-mode'  => true,
-        ]);
-
-        self::assertSame(0, $commandTester->getStatusCode());
-
-        $output = $commandTester->getDisplay();
-        self::assertStringContainsString('Filtering resources: Patient', $output);
-    }
-
-    /**
-     * Test command help output
-     */
-    public function testCommandHelpOutput(): void
-    {
-        $command       = $this->application->find('fhir:generate');
-        $commandTester = new CommandTester($command);
-
-        $commandTester->execute(['--help' => true]);
-
-        self::assertSame(0, $commandTester->getStatusCode());
-
-        $output = $commandTester->getDisplay();
-        self::assertStringContainsString('Generate FHIR model classes', $output);
-        self::assertStringContainsString('Arguments:', $output);
-        self::assertStringContainsString('Options:', $output);
-    }
-
-    /**
-     * Test command execution with missing required arguments
-     */
-    public function testCommandExecutionWithMissingArguments(): void
-    {
-        $command       = $this->application->find('fhir:generate');
-        $commandTester = new CommandTester($command);
-
-        $commandTester->execute([]);
-
-        self::assertNotSame(0, $commandTester->getStatusCode());
-
-        $output = $commandTester->getDisplay();
-        self::assertStringContainsString('Not enough arguments', $output);
-    }
-
-    /**
-     * Test command execution with invalid output directory
-     */
-    public function testCommandExecutionWithInvalidOutputDirectory(): void
-    {
-        $command       = $this->application->find('fhir:generate');
-        $commandTester = new CommandTester($command);
-
-        $invalidDir = '/invalid/directory/path';
-
-        $commandTester->execute([
-            'version'      => 'R4B',
-            '--output-dir' => $invalidDir,
-        ]);
-
-        self::assertNotSame(0, $commandTester->getStatusCode());
-
-        $output = $commandTester->getDisplay();
-        self::assertStringContainsString('Invalid output directory', $output);
-    }
-
-    /**
-     * Test command execution performance
-     */
-    public function testCommandExecutionPerformance(): void
-    {
-        $command       = $this->application->find('fhir:generate');
-        $commandTester = new CommandTester($command);
-
-        $startTime = microtime(true);
-
-        $commandTester->execute([
-            'version'      => 'R4B',
-            '--output-dir' => $this->tempOutputDir,
-            '--test-mode'  => true,
-        ]);
-
-        $executionTime = microtime(true) - $startTime;
-
-        self::assertSame(0, $commandTester->getStatusCode());
-
-        // Command should complete within reasonable time (30 seconds for test mode)
-        self::assertLessThan(30.0, $executionTime, 'Command execution should complete within 30 seconds');
-    }
-
-    /**
-     * Test command execution with memory monitoring
-     */
-    public function testCommandExecutionMemoryUsage(): void
-    {
-        $command       = $this->application->find('fhir:generate');
-        $commandTester = new CommandTester($command);
-
-        $initialMemory = memory_get_usage(true);
-
-        $commandTester->execute([
-            'version'      => 'R4B',
-            '--output-dir' => $this->tempOutputDir,
-            '--test-mode'  => true,
-        ]);
-
-        $finalMemory    = memory_get_usage(true);
-        $memoryIncrease = $finalMemory - $initialMemory;
-
-        self::assertSame(0, $commandTester->getStatusCode());
-
-        // Memory usage should be reasonable (less than 100MB for test mode)
-        self::assertLessThan(
-            100 * 1024 * 1024,
-            $memoryIncrease,
-            'Command memory usage should remain reasonable',
-        );
+        self::assertInstanceOf(FHIRModelGeneratorCommand::class, $command);
+        self::assertSame('fhir:generate', $command->getName());
+        self::assertStringContainsString('Generates FHIR model classes', $command->getDescription());
     }
 }

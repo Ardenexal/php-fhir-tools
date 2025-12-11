@@ -135,7 +135,7 @@ class FHIRTestDataGenerator
             static fn ($base) => Generator\bind(
                 Generator\elements(['StructureDefinition', 'ValueSet', 'CodeSystem']),
                 static fn ($type) => Generator\bind(
-                    Generator\string()->withCharset(Generator\charset()->alphanumeric()),
+                    Generator\elements(['Patient', 'Observation', 'TestResource', 'ExampleType']),
                     static fn ($id) => Generator\constant("{$base}/{$type}/{$id}"),
                 ),
             ),

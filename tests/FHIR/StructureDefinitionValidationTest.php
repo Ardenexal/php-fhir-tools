@@ -193,6 +193,7 @@ class StructureDefinitionValidationTest extends TestCase
 
     /**
      * Load test fixture from JSON file
+     *
      * @return array<string, mixed>
      */
     private function loadFixture(string $filename): array
