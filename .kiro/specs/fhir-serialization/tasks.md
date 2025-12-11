@@ -42,14 +42,21 @@ subm# Implementation Plan
   - **Property 36: Attribute reusability**
   - **Validates: Requirements 8.5**
 
-- [ ] 2. Implement core interfaces for FHIR serialization
+- [x] 2. Implement core interfaces for FHIR serialization
+
+
+
+
+
   - Create FHIRNormalizerInterface extending Symfony normalizer interfaces
   - Create FHIRTypeResolverInterface for discriminator map support
   - Create FHIRMetadataExtractorInterface for attribute-based metadata extraction
   - Define interface contracts for extensibility and testing
   - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
 
-- [ ] 2.1 Write property test for version-specific serialization support
+- [x] 2.1 Write property test for version-specific serialization support
+
+
   - **Property 26: Version-specific serialization support**
   - **Validates: Requirements 6.4**
 
