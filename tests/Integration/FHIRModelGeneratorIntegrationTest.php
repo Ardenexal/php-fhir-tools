@@ -6,13 +6,9 @@ namespace Ardenexal\FHIRTools\Tests\Integration;
 
 use Ardenexal\FHIRTools\ErrorCollector;
 use Ardenexal\FHIRTools\FHIRModelGenerator;
-use Ardenexal\FHIRTools\PackageLoader;
-use Ardenexal\FHIRTools\RetryHandler;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
-use Symfony\Component\Filesystem\Filesystem;
 use Ardenexal\FHIRTools\BuilderContext;
 use Nette\PhpGenerator\PhpNamespace;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * Integration tests for FHIR model generation workflow
