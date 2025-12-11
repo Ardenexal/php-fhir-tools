@@ -1,0 +1,78 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Listen for Xdebug",
+            "type": "php",
+            "request": "launch",
+            "port": 9003,
+            "pathMappings": {
+                "/workspace": "${workspaceFolder}"
+            },
+            "ignore": [
+                "**/vendor/**/*.php"
+            ]
+        },
+        {
+            "name": "Debug FHIR Generate Command",
+            "type": "php",
+            "request": "launch",
+            "program": "${workspaceFolder}/bin/console",
+            "args": [
+                "fhir:generate",
+                "--help"
+            ],
+            "cwd": "${workspaceFolder}",
+            "port": 9003,
+            "pathMappings": {
+                "/workspace": "${workspaceFolder}"
+            },
+            "env": {
+                "XDEBUG_MODE": "debug",
+                "XDEBUG_CONFIG": "client_host=host.docker.internal client_port=9003 start_with_request=yes"
+            }
+        },
+        {
+            "name": "Debug PHPUnit Tests",
+            "type": "php",
+            "request": "launch",
+            "program": "${workspaceFolder}/vendor/bin/phpunit",
+            "args": [
+                "--configuration",
+                "phpunit.dist.xml"
+            ],
+            "cwd": "${workspaceFolder}",
+            "port": 9003,
+            "pathMappings": {
+                "/workspace": "${workspaceFolder}"
+            },
+            "env": {
+                "XDEBUG_MODE": "debug,coverage"
+            }
+        },
+        {
+            "name": "Debug Specific Test",
+            "type": "php",
+            "request": "launch",
+            "program": "${workspaceFolder}/vendor/bin/phpunit",
+            "args": [
+                "--configuration",
+                "phpunit.dist.xml",
+                "${input:testFile}"
+            ],
+            "cwd": "${workspaceFolder}",
+            "port": 9003,
+            "pathMappings": {
+                "/workspace": "${workspaceFolder}"
+            }
+        }
+    ],
+    "inputs": [
+        {
+            "id": "testFile",
+            "description": "Test file to run",
+            "default": "tests/",
+            "type": "promptString"
+        }
+    ]
+}

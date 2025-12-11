@@ -20,4 +20,4 @@ phpstan.neon
 /.phpunit.cache/
 /coverage
 ###< phpunit/phpunit ###
-coverage/BuilderContext.php.html
+
