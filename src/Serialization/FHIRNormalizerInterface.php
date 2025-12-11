@@ -18,8 +18,8 @@ interface FHIRNormalizerInterface extends NormalizerInterface, DenormalizerInter
     /**
      * Checks whether the given data can be normalized by this normalizer.
      *
-     * @param mixed $data The data to normalize
-     * @param string|null $format The format being (de)serialized from or into
+     * @param mixed                $data    The data to normalize
+     * @param string|null          $format  The format being (de)serialized from or into
      * @param array<string, mixed> $context Options available to the normalizer
      *
      * @return bool True if this normalizer can handle the data, false otherwise
@@ -29,9 +29,9 @@ interface FHIRNormalizerInterface extends NormalizerInterface, DenormalizerInter
     /**
      * Checks whether the given data can be denormalized by this normalizer.
      *
-     * @param mixed $data The data to denormalize
-     * @param string $type The expected type of the denormalized data
-     * @param string|null $format The format being deserialized from
+     * @param mixed                $data    The data to denormalize
+     * @param string               $type    The expected type of the denormalized data
+     * @param string|null          $format  The format being deserialized from
      * @param array<string, mixed> $context Options available to the denormalizer
      *
      * @return bool True if this normalizer can handle the data, false otherwise

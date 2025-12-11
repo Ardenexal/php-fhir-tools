@@ -39,10 +39,10 @@ class FHIRSerializationInterfaceTest extends TestCase
         $this->forAll(
             FHIRTestDataGenerator::fhirVersion(),
             FHIRTestDataGenerator::fhirResourceType(),
-        )->then(function (string $fhirVersion, string $resourceType): void {
+        )->then(function(string $fhirVersion, string $resourceType): void {
             // Create mock implementations that support version-specific behavior
-            $normalizer = $this->createMockNormalizer($fhirVersion);
-            $typeResolver = $this->createMockTypeResolver($fhirVersion);
+            $normalizer        = $this->createMockNormalizer($fhirVersion);
+            $typeResolver      = $this->createMockTypeResolver($fhirVersion);
             $metadataExtractor = $this->createMockMetadataExtractor($fhirVersion);
 
             // Test that interfaces support version-specific implementations
@@ -52,7 +52,7 @@ class FHIRSerializationInterfaceTest extends TestCase
 
             // Test that version-specific behavior can be implemented
             $mockData = $this->createMockFHIRData($resourceType, $fhirVersion);
-            
+
             // Verify normalizer supports version-specific normalization
             $supportsNormalization = $normalizer->supportsNormalization($mockData, 'json', ['fhir_version' => $fhirVersion]);
             self::assertTrue($supportsNormalization, "Normalizer should support version-specific normalization for FHIR {$fhirVersion}");
@@ -63,7 +63,7 @@ class FHIRSerializationInterfaceTest extends TestCase
 
             // Verify metadata extractor can extract version information
             $extractedVersion = $metadataExtractor->extractFHIRVersion($mockData);
-            self::assertEquals($fhirVersion, $extractedVersion, "Metadata extractor should extract correct FHIR version");
+            self::assertEquals($fhirVersion, $extractedVersion, 'Metadata extractor should extract correct FHIR version');
         });
     }
 
@@ -74,7 +74,7 @@ class FHIRSerializationInterfaceTest extends TestCase
     {
         $this->forAll(
             FHIRTestDataGenerator::fhirVersion(),
-        )->then(function (string $fhirVersion): void {
+        )->then(function(string $fhirVersion): void {
             $normalizer = $this->createMockNormalizer($fhirVersion);
 
             // Test required methods exist and return expected types
@@ -97,7 +97,7 @@ class FHIRSerializationInterfaceTest extends TestCase
     {
         $this->forAll(
             FHIRTestDataGenerator::fhirVersion(),
-        )->then(function (string $fhirVersion): void {
+        )->then(function(string $fhirVersion): void {
             $typeResolver = $this->createMockTypeResolver($fhirVersion);
 
             // Test required methods exist
@@ -126,9 +126,9 @@ class FHIRSerializationInterfaceTest extends TestCase
         $this->forAll(
             FHIRTestDataGenerator::fhirVersion(),
             FHIRTestDataGenerator::fhirResourceType(),
-        )->then(function (string $fhirVersion, string $resourceType): void {
+        )->then(function(string $fhirVersion, string $resourceType): void {
             $metadataExtractor = $this->createMockMetadataExtractor($fhirVersion);
-            $mockObject = $this->createMockFHIRData($resourceType, $fhirVersion);
+            $mockObject        = $this->createMockFHIRData($resourceType, $fhirVersion);
 
             // Test required methods exist
             self::assertTrue(method_exists($metadataExtractor, 'extractResourceType'));
@@ -161,8 +161,10 @@ class FHIRSerializationInterfaceTest extends TestCase
      */
     private function createMockNormalizer(string $fhirVersion): FHIRNormalizerInterface
     {
-        return new class($fhirVersion) implements FHIRNormalizerInterface {
-            public function __construct(private readonly string $fhirVersion) {}
+        return new class ($fhirVersion) implements FHIRNormalizerInterface {
+            public function __construct(private readonly string $fhirVersion)
+            {
+            }
 
             public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
             {
@@ -196,14 +198,17 @@ class FHIRSerializationInterfaceTest extends TestCase
      */
     private function createMockTypeResolver(string $fhirVersion): FHIRTypeResolverInterface
     {
-        return new class($fhirVersion) implements FHIRTypeResolverInterface {
-            public function __construct(private readonly string $fhirVersion) {}
+        return new class ($fhirVersion) implements FHIRTypeResolverInterface {
+            public function __construct(private readonly string $fhirVersion)
+            {
+            }
 
             public function resolveType(array $data, array $context = []): ?string
             {
                 if (isset($context['fhir_version']) && $context['fhir_version'] === $this->fhirVersion) {
                     return $data['resourceType'] ?? 'UnknownType';
                 }
+
                 return null;
             }
 
@@ -229,6 +234,7 @@ class FHIRSerializationInterfaceTest extends TestCase
                         return substr($key, strlen($propertyName));
                     }
                 }
+
                 return null;
             }
 
@@ -244,8 +250,10 @@ class FHIRSerializationInterfaceTest extends TestCase
      */
     private function createMockMetadataExtractor(string $fhirVersion): FHIRMetadataExtractorInterface
     {
-        return new class($fhirVersion) implements FHIRMetadataExtractorInterface {
-            public function __construct(private readonly string $fhirVersion) {}
+        return new class ($fhirVersion) implements FHIRMetadataExtractorInterface {
+            public function __construct(private readonly string $fhirVersion)
+            {
+            }
 
             public function extractResourceType(object $object): ?string
             {
@@ -301,8 +309,8 @@ class FHIRSerializationInterfaceTest extends TestCase
     {
         return (object) [
             'resourceType' => $resourceType,
-            'fhirVersion' => $fhirVersion,
-            'fhirType' => $resourceType,
+            'fhirVersion'  => $fhirVersion,
+            'fhirType'     => $resourceType,
         ];
     }
 }

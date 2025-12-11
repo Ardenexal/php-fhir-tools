@@ -15,7 +15,7 @@ interface FHIRTypeResolverInterface
     /**
      * Resolves the concrete type from the given data and context.
      *
-     * @param array<string, mixed> $data The serialized data to analyze
+     * @param array<string, mixed> $data    The serialized data to analyze
      * @param array<string, mixed> $context Additional context for type resolution
      *
      * @return string|null The resolved type class name, or null if type cannot be resolved
@@ -48,8 +48,8 @@ interface FHIRTypeResolverInterface
     /**
      * Resolves the type for FHIR choice elements (value[x] patterns).
      *
-     * @param string $propertyName The base property name (e.g., "value")
-     * @param array<string, mixed> $data The data containing the choice element
+     * @param string               $propertyName The base property name (e.g., "value")
+     * @param array<string, mixed> $data         The data containing the choice element
      *
      * @return string|null The resolved type for the choice element, or null if not found
      */
