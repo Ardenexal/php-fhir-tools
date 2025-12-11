@@ -134,8 +134,25 @@ class FHIRModelGeneratorCommand extends Command
                 $loadingPackagesIndicator->setMessage('Loading package ' . $package . ($version ? " version $version" : ''));
 
                 try {
-                    $packageMetaData = $this->packageLoader->installPackage($package, $version);
-                    $this->generateClassesForPackage($output, $package, $packageMetaData['fhirVersions'][0]);
+                    $packageMetaData = $this->packageLoader->installPackage(
+                        packageName: $package,
+                        version: $version,
+                        fhirVersion: 'R4B', // Use R4B as specified in the command
+                        registry: null,
+                        resolveDeps: false, // Don't resolve dependencies for now
+                    );
+
+                    // Map FHIR version names to version numbers expected by generateClassesForPackage
+                    $fhirVersions    = $packageMetaData->getFhirVersions();
+                    $fhirVersionName = $fhirVersions[0] ?? 'R4B';
+                    $versionNumber   = match ($fhirVersionName) {
+                        'R4'    => '4.0.1',
+                        'R4B'   => '4.3.0',
+                        'R5'    => '5.0.0',
+                        default => '4.3.0', // Default to R4B
+                    };
+
+                    $this->generateClassesForPackage($output, $package, $versionNumber);
                 } catch (\Throwable $e) {
                     $this->errorCollector->addError(
                         "Failed to process package '{$package}': {$e->getMessage()}",
