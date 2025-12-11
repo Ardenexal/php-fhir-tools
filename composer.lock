@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "aa2c2d278956cfd903227202a4c65ad5",
+    "content-hash": "05cc11fbff8f64da92142f104238c856",
     "packages": [
         {
             "name": "amphp/amp",
@@ -456,16 +456,16 @@
         },
         {
             "name": "amphp/http-client",
-            "version": "v5.0.0",
+            "version": "v5.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/amphp/http-client.git",
-                "reference": "03476991480578deb2058b926c1be1479129779f"
+                "reference": "75ad21574fd632594a2dd914496647816d5106bc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amphp/http-client/zipball/03476991480578deb2058b926c1be1479129779f",
-                "reference": "03476991480578deb2058b926c1be1479129779f",
+                "url": "https://api.github.com/repos/amphp/http-client/zipball/75ad21574fd632594a2dd914496647816d5106bc",
+                "reference": "75ad21574fd632594a2dd914496647816d5106bc",
                 "shasum": ""
             },
             "require": {
@@ -476,15 +476,18 @@
                 "amphp/pipeline": "^1",
                 "amphp/socket": "^2",
                 "amphp/sync": "^2",
-                "league/uri": "^6 | ^7",
-                "league/uri-components": "^2.4 | ^7",
+                "league/uri": "^7",
+                "league/uri-components": "^7",
                 "league/uri-interfaces": "^7.1",
                 "php": ">=8.1",
                 "psr/http-message": "^1 | ^2",
                 "revolt/event-loop": "^1"
             },
+            "conflict": {
+                "amphp/file": "<3 | >=5"
+            },
             "require-dev": {
-                "amphp/file": "^3",
+                "amphp/file": "^3 | ^4",
                 "amphp/http-server": "^3",
                 "amphp/php-cs-fixer-config": "^2",
                 "amphp/phpunit-util": "^3",
@@ -492,7 +495,7 @@
                 "kelunik/link-header-rfc5988": "^1",
                 "laminas/laminas-diactoros": "^2.3",
                 "phpunit/phpunit": "^9",
-                "psalm/phar": "^5.4"
+                "psalm/phar": "~5.23"
             },
             "suggest": {
                 "amphp/file": "Required for file request bodies and HTTP archive logging",
@@ -539,7 +542,7 @@
             ],
             "support": {
                 "issues": "https://github.com/amphp/http-client/issues",
-                "source": "https://github.com/amphp/http-client/tree/v5.0.0"
+                "source": "https://github.com/amphp/http-client/tree/v5.3.4"
             },
             "funding": [
                 {
@@ -547,7 +550,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-10-08T16:24:43+00:00"
+            "time": "2025-08-16T20:41:23+00:00"
         },
         {
             "name": "amphp/parser",
@@ -962,6 +965,83 @@
                 }
             ],
             "time": "2024-08-03T19:31:26+00:00"
+        },
+        {
+            "name": "composer/semver",
+            "version": "3.4.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/composer/semver.git",
+                "reference": "198166618906cb2de69b95d7d47e5fa8aa1b2b95"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/composer/semver/zipball/198166618906cb2de69b95d7d47e5fa8aa1b2b95",
+                "reference": "198166618906cb2de69b95d7d47e5fa8aa1b2b95",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.3.2 || ^7.0 || ^8.0"
+            },
+            "require-dev": {
+                "phpstan/phpstan": "^1.11",
+                "symfony/phpunit-bridge": "^3 || ^7"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-main": "3.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Composer\\Semver\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nils Adermann",
+                    "email": "naderman@naderman.de",
+                    "homepage": "http://www.naderman.de"
+                },
+                {
+                    "name": "Jordi Boggiano",
+                    "email": "j.boggiano@seld.be",
+                    "homepage": "http://seld.be"
+                },
+                {
+                    "name": "Rob Bast",
+                    "email": "rob.bast@gmail.com",
+                    "homepage": "http://robbast.nl"
+                }
+            ],
+            "description": "Semver library that offers utilities, version constraint parsing and validation.",
+            "keywords": [
+                "semantic",
+                "semver",
+                "validation",
+                "versioning"
+            ],
+            "support": {
+                "irc": "ircs://irc.libera.chat:6697/composer",
+                "issues": "https://github.com/composer/semver/issues",
+                "source": "https://github.com/composer/semver/tree/3.4.4"
+            },
+            "funding": [
+                {
+                    "url": "https://packagist.com",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/composer",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-08-20T19:15:30+00:00"
         },
         {
             "name": "daverandom/libdns",

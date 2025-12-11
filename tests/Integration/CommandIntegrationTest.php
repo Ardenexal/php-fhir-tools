@@ -11,6 +11,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Ardenexal\FHIRTools\BuilderContext;
 use Ardenexal\FHIRTools\Exception\PackageException;
 use Ardenexal\FHIRTools\PackageLoader;
+use Ardenexal\FHIRTools\Package\PackageMetadata;
 use Nette\PhpGenerator\PhpNamespace;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -55,17 +56,17 @@ class CommandIntegrationTest extends TestCase
 
         // Mock the PackageLoader to avoid network calls
         $packageLoader = $this->createMock(PackageLoader::class);
-        $packageLoader->method('installPackage')->willReturn([
-            'name'         => 'test-package',
-            'version'      => '1.0.0',
-            'fhirVersions' => ['4.3.0'],
-            'url'          => 'http://example.org/test-package',
-            'description'  => 'Test package',
-            'author'       => 'Test Author',
-            'license'      => 'MIT',
-            'dependencies' => [],
-            'title'        => 'Test Package',
-        ]);
+        $packageLoader->method('installPackage')->willReturn(new PackageMetadata(
+            name: 'test-package',
+            version: '1.0.0',
+            fhirVersions: ['4.3.0'],
+            url: 'http://example.org/test-package',
+            description: 'Test package',
+            author: 'Test Author',
+            license: 'MIT',
+            dependencies: [],
+            title: 'Test Package',
+        ));
 
         // Add commands to application
         $this->application->addCommand(new FHIRModelGeneratorCommand($filesystem, $context, $packageLoader));
