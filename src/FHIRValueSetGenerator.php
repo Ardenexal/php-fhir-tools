@@ -19,6 +19,7 @@ use function Symfony\Component\String\u;
 class FHIRValueSetGenerator
 {
     private BuilderContext $builderContext;
+
     private AsciiSlugger   $slugger;
 
     /**
@@ -39,8 +40,8 @@ class FHIRValueSetGenerator
     }
 
     /**
-     * @param array $valueSet
-     * @param string  $version
+     * @param array<string,mixed> $valueSet
+     * @param string              $version
      *
      * @return EnumType
      */
@@ -80,11 +81,8 @@ class FHIRValueSetGenerator
     }
 
     /**
-     * @param array{
-     *     system: string,
-     *     concept?: array{code: string, display: string}
-     * }               $include
-     * @param EnumType $enum
+     * @param array<string,mixed> $include
+     * @param EnumType            $enum
      *
      * @return void
      */
@@ -93,18 +91,19 @@ class FHIRValueSetGenerator
         $codeSystem = $this->builderContext->getDefinition($include['system']);
         if ($codeSystem !== null && isset($codeSystem['concept']) && is_array($codeSystem['concept'])) {
             foreach ($codeSystem['concept'] as $concept) {
+                if (!is_array($concept) || !isset($concept['code']) || !is_string($concept['code'])) {
+                    continue;
+                }
                 $code     = $concept['code'];
                 $enumName = $this->getEnumName($concept);
                 if (empty($enumName)) {
-                    throw new \RuntimeException(
-                        'Failed to generate enum name for concept: ' . json_encode($concept)
-                    );
+                    throw new \RuntimeException('Failed to generate enum name for concept: ' . json_encode($concept));
                 }
                 if (is_numeric($enumName[0])) {
                     $enumName = 'CODE_' . $enumName;
                 }
                 // Skip if already exists
-                if (array_any($enum->getCases(), fn($case) => $case->getName() === $enumName)) {
+                if (array_any($enum->getCases(), fn ($case) => $case->getName() === $enumName)) {
                     continue;
                 }
                 $enum->addCase($enumName, $code)
@@ -114,17 +113,20 @@ class FHIRValueSetGenerator
 
         if (isset($include['concept']) && is_array($include['concept'])) {
             foreach ($include['concept'] as $concept) {
+                if (!is_array($concept) || !isset($concept['code']) || !is_string($concept['code'])) {
+                    continue;
+                }
                 $display  = $concept['display'] ?? $concept['code'];
                 $enumName = u($display)->upper()->snake()->toString();
                 // Skip if already exists
-                if (array_any($enum->getCases(), fn($case) => $case->getName() === $enumName)) {
+                if (array_any($enum->getCases(), fn ($case) => $case->getName() === $enumName)) {
                     continue;
                 }
 
                 $enum->addCase($enumName, $concept['code'])
-                     ->addComment($display ?? '');
+                     ->addComment($display);
                 foreach ($concept['extension'] ?? [] as $extension) {
-                    if ($extension['url'] !== 'http://hl7.org/fhir/StructureDefinition/valueset-concept-definition' && isset($extension['valueString'])) {
+                    if (is_array($extension) && isset($extension['url']) && $extension['url'] !== 'http://hl7.org/fhir/StructureDefinition/valueset-concept-definition' && isset($extension['valueString'])) {
                         $enum->addComment($extension['valueString']);
                     }
                 }
@@ -146,11 +148,11 @@ class FHIRValueSetGenerator
         }
     }
 
-    /*
-            * @param array $concept
-         *
-         * @return string
-         */
+    /**
+     * @param array<string,mixed> $concept
+     *
+     * @return string
+     */
     public function getEnumName(array $concept): string
     {
         $name = $concept['display'] ?? $concept['code'];

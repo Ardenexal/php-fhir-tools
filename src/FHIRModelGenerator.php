@@ -22,15 +22,14 @@ use function Symfony\Component\String\u;
  *      short?: string,
  *      description?: string,
  *      comment?: string,
+ *      definition?: string,
  *      min?: int,
  *      max?: string,
+ *      contentReference?: string,
  *      type?: array<int,array{extension?: array<int,array{url: string, valueUrl: string}>, code: string}>,
  *      binding?: array{strength: string, valueSet: string}
  *  }
- * @phpstan-type NestedElement array{
- *      _element: ElementProperties,
- *      _properties: array<string, NestedElement>
- *  }
+ * @phpstan-type NestedElementArray array<string, mixed>
  *
  * @package Ardenexal\FHIRTools
  */
@@ -106,10 +105,10 @@ class FHIRModelGenerator
     }
 
     /**
-     * @param ClassType                $classType
-     * @param NestedElement            $classElement
-     * @param array<int,NestedElement> $propertyElements
-     * @param string                   $version
+     * @param ClassType                        $classType
+     * @param ElementProperties                $classElement
+     * @param array<string,NestedElementArray> $propertyElements
+     * @param string                           $version
      *
      * @return ClassType
      */
@@ -120,7 +119,7 @@ class FHIRModelGenerator
 
         foreach ($propertyElements as $key => $propertyElement) {
             // This is a primitive type
-            if (count($propertyElement['_properties']) === 0) {
+            if (!array_key_exists('_properties', $propertyElement) || count($propertyElement['_properties']) === 0) {
                 if ($propertyElement['_element']['max'] === '0') {
                     continue;
                 }
@@ -141,11 +140,13 @@ class FHIRModelGenerator
                 $childClass->addMethod('__construct');
                 $this->builderContext->addType($element['path'], $childClass);
 
-                if (isset($element['base']) && $element['type'][0]['code'] === 'Element') {
+                if (isset($element['base']) && isset($element['type'][0]['code']) && $element['type'][0]['code'] === 'Element') {
                     $childClass->setExtends($namespace->getName() . '\\' . BuilderContext::DEFAULT_CLASS_PREFIX . 'Element');
                 }
 
-                $childClass->addComment('@description ' . $element['definition']);
+                if (isset($element['definition'])) {
+                    $childClass->addComment('@description ' . $element['definition']);
+                }
                 if (
                     $element['path'] !== $element['base']['path']
                     && !in_array($element['path'], $parentParameters, true)
@@ -155,7 +156,9 @@ class FHIRModelGenerator
                 }
                 $this->addElementAsProperty($element, $constructor, $version);
 
-                $this->createForElement($childClass, $element, $propertyElement['_properties'], $version);
+                if (isset($propertyElement['_properties'])) {
+                    $this->createForElement($childClass, $element, $propertyElement['_properties'], $version);
+                }
             }
         }
 
@@ -167,38 +170,27 @@ class FHIRModelGenerator
     }
 
     /**
-     * @param array{
-     *     id: string,
-     *     path: string,
-     *     base?: array{path: string},
-     *     short: string,
-     *     description: string,
-     *     comment: string,
-     *     min: int,
-     *     max: string,
-     *     contentReference?:string,
-     *     type?: array<int,array{
-     *          extension?: array<int,array{url: string, valueUrl: string}>,
-     *          code: string
-     *      }>,
-     *     binding?: array{strength: string, valueSet: string},
-     * }                    $element
-     * @param Method        $method
-     * @param string        $version
-     * @param EnumType|null $enum
+     * @param ElementProperties $element
+     * @param Method            $method
+     * @param string            $version
+     * @param EnumType|null     $enum
      *
      * @return void
      */
     private function addElementAsProperty(array $element, Method $method, string $version, ?EnumType $enum = null): void
     {
         $types = [];
-        if (isset($element['type']) === false && isset($element['contentReference'])) {
-            $relatedClass = $this->builderContext->getType(preg_replace('/^.*#/', '', $element['contentReference']));
+        if (!isset($element['type']) && isset($element['contentReference'])) {
+            $contentRef = preg_replace('/^.*#/', '', $element['contentReference']);
+            if ($contentRef === null) {
+                throw new \RuntimeException('Invalid content reference: ' . $element['contentReference']);
+            }
+            $relatedClass = $this->builderContext->getType($contentRef);
             if ($relatedClass === null) {
                 throw new \RuntimeException('Related class not found for content reference ' . $element['contentReference']);
             }
             $types[] = '\\' . $this->builderContext->getElementNamespace($version)->getName() . '\\' . $relatedClass->getName();
-        } else {
+        } elseif (isset($element['type'])) {
             foreach ($element['type'] as $type) {
                 $code = $type['code'];
 
@@ -210,7 +202,7 @@ class FHIRModelGenerator
 
                         continue;
                     }
-                    $fhirTypeExtension = array_find($type['extension'] ?? [], fn($ext) => $ext['url'] === 'http://hl7.org/fhir/StructureDefinition/structuredefinition-fhir-type');
+                    $fhirTypeExtension = array_find($type['extension'] ?? [], fn ($ext) => $ext['url'] === 'http://hl7.org/fhir/StructureDefinition/structuredefinition-fhir-type');
                     if ($enum !== null && $fhirTypeExtension !== null && $fhirTypeExtension['valueUrl'] === 'code') {
                         $types[] = '\\' . $targetEnumNamespace . '\\' . $enum->getName();
 
@@ -288,6 +280,7 @@ class FHIRModelGenerator
                         $codeType = '\\' . $targetElementNamespace . '\\' . BuilderContext::DEFAULT_CLASS_PREFIX . u($valueSetData['name'])->pascal() . 'Type';
                         $enumType = '\\' . $targetEnumNamespace . '\\' . BuilderContext::DEFAULT_CLASS_PREFIX . u($valueSetData['name'])->pascal();
                         $this->builderContext->addPendingType($valueSet, $codeType);
+                        /** @var class-string $enumType */
                         $this->builderContext->addPendingEnum($valueSetData['url'], $enumType);
                     }
 
@@ -303,19 +296,23 @@ class FHIRModelGenerator
 
         $parameterName = $this->convertToMethodName($element['path']);
 
-        $isArray = in_array($element['max'], ['1', '0'], true) === false;
+        $maxValue = $element['max'] ?? '1';
+        $minValue = $element['min'] ?? 0;
 
-        $isNullable = $element['min'] === 0 && $isArray === false;
-        if ($element['max'] !== '0') {
+        $isArray    = !in_array($maxValue, ['1', '0'], true);
+        $isNullable = $minValue === 0 && $isArray === false;
+
+        if ($maxValue !== '0') {
+            $shortDescription = $element['short'] ?? '';
             if ($isArray) {
                 $method->addPromotedParameter($parameterName, [])
                        ->setNullable(false)
                        ->setType('array')
-                       ->addComment('@var  array<' . implode('|', $types) . '> $' . $parameterName . ' ' . $element['short']);
+                       ->addComment('@var  array<' . implode('|', $types) . '> $' . $parameterName . ' ' . $shortDescription);
             } else {
                 $parameter = $method->addPromotedParameter($parameterName, null)
                                     ->setType(implode('|', $types))
-                                    ->addComment('@var null|' . implode('|', $types) . ' $' . $parameterName . ' ' . $element['short']);
+                                    ->addComment('@var null|' . implode('|', $types) . ' $' . $parameterName . ' ' . $shortDescription);
                 if ($isNullable === false) {
                     $parameter->addAttribute(NotBlank::class);
                 }
@@ -330,7 +327,13 @@ class FHIRModelGenerator
      */
     private function convertToMethodName(string $path): string
     {
-        return lcfirst(array_last(u($path)->split('.'))->camel()->toString());
+        $pathParts = u($path)->split('.');
+        $lastPart  = array_last($pathParts);
+        if ($lastPart === null) {
+            throw new \RuntimeException('Invalid path: ' . $path);
+        }
+
+        return lcfirst($lastPart->camel()->toString());
     }
 
     /**
@@ -378,27 +381,28 @@ class FHIRModelGenerator
      * The element details are stored in a reserved '_element' key at the deepest level.
      * Child elements are nested under '_properties'.
      *
-     * @param array<ElementProperties> $elements
+     * @param array<int,ElementProperties> $elements
      *
-     * @return array<string, NestedElement>
+     * @return array{_properties: array<string, NestedElementArray>}
      */
     private function nestElements(array $elements): array
     {
-        $nestedArray = [];
+        /** @var array{_properties: array<string, NestedElementArray>} $nestedArray */
+        $nestedArray = ['_properties' => []];
         foreach ($elements as $item) {
             $pathParts = explode('.', $item['path']);
             $current   = &$nestedArray;
             foreach ($pathParts as $part) {
-                if (!isset($current['_properties'])) {
+                if (!array_key_exists('_properties', $current)) {
                     $current['_properties'] = [];
                 }
-                if (!isset($current['_properties'][$part])) {
+                if (!array_key_exists($part, $current['_properties'])) {
                     $current['_properties'][$part] = [];
                 }
                 $current = &$current['_properties'][$part];
             }
             $current['_element'] = $item;
-            if (!isset($current['_properties'])) {
+            if (!array_key_exists('_properties', $current)) {
                 $current['_properties'] = [];
             }
         }

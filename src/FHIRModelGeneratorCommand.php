@@ -43,9 +43,15 @@ readonly class FHIRModelGeneratorCommand
     ) {
     }
 
+    /**
+     * @param OutputInterface $output
+     * @param array<string>   $packages
+     *
+     * @return int
+     */
     public function __invoke(
         OutputInterface $output,
-        #[Option(description: 'Implementation Guide packages to include.', name: 'package', suggestedValues: self::DEFAULT_IG_PACKAGES)]
+        #[Option(description: 'Implementation Guide packages to include.', name: 'package')]
         #[Ask(question: 'Which FHIR Implementation Guide packages do you want to include?')]
         array $packages = self::DEFAULT_IG_PACKAGES['R4B'],
     ): int {
@@ -87,7 +93,7 @@ readonly class FHIRModelGeneratorCommand
                 continue;
             }
 
-                        // Ignore Profiles that are constraints on other types for now
+            // Ignore Profiles that are constraints on other types for now
             if ($structureDefinition['kind'] === 'logical' || (isset($structureDefinition['derivation']) && $structureDefinition['derivation'] === 'constraint')) {
                 continue;
             }
@@ -148,7 +154,6 @@ readonly class FHIRModelGeneratorCommand
     /**
      * @param OutputInterface $output
      * @param string          $version
-     * @param string          $valueSetJsonFile
      *
      * @return void
      */
@@ -193,7 +198,7 @@ readonly class FHIRModelGeneratorCommand
 
     /**
      * @param OutputInterface $output
-         * @param string          $package
+     * @param string          $package
      * @param string|null     $version
      *
      * @return void

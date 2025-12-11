@@ -58,8 +58,16 @@ class PackageLoader
     {
         if ($version === null) {
             $packageVersions = $this->httpClient->request('GET', "$registry/$packageName");
-            $packageVersions->toArray();
-            $version = array_last(array_keys($packageVersions->toArray()['versions']));
+            $versionsData    = $packageVersions->toArray();
+            if (!isset($versionsData['versions']) || !is_array($versionsData['versions'])) {
+                throw new \RuntimeException("Invalid package versions response for: $packageName");
+            }
+            $versionKeys = array_keys($versionsData['versions']);
+            $lastVersion = array_last($versionKeys);
+            if ($lastVersion === null) {
+                throw new \RuntimeException("No versions found for package: $packageName");
+            }
+            $version = (string) $lastVersion;
         }
         $url            = "$registry/$packageName/$version/";
         $extractPath    = $this->cacheDir . '/' . $packageName . '-' . $version;
@@ -116,7 +124,7 @@ class PackageLoader
                         $this->contextBuilder->addDefinition($json['url'], $json);
                         break;
                     default:
-                                                // No action needed for other resource types.
+                        // No action needed for other resource types.
                         break;
                 }
             }
