@@ -180,6 +180,8 @@ abstract class TestCase extends BaseTestCase
 
     /**
      * Create a mock FHIR StructureDefinition for testing
+     *
+     * @return array<string, mixed>
      */
     protected function createMockStructureDefinition(
         string $resourceType = 'Patient',
@@ -216,6 +218,8 @@ abstract class TestCase extends BaseTestCase
 
     /**
      * Assert that generated code contains required PHPDoc elements
+     *
+     * @param array<string> $expectedTags
      */
     protected function assertContainsPhpDoc(string $code, array $expectedTags = []): void
     {

@@ -193,17 +193,23 @@ class StructureDefinitionValidationTest extends TestCase
 
     /**
      * Load test fixture from JSON file
+     * @return array<string, mixed>
      */
     private function loadFixture(string $filename): array
     {
         $path    = __DIR__ . '/../Fixtures/StructureDefinitions/' . $filename;
         $content = file_get_contents($path);
+        if ($content === false) {
+            throw new \RuntimeException("Failed to read file: {$path}");
+        }
 
         return json_decode($content, true, 512, JSON_THROW_ON_ERROR);
     }
 
     /**
      * Simulate StructureDefinition validation
+     *
+     * @param array<string, mixed> $structureDefinition
      */
     private function validateStructureDefinition(array $structureDefinition): void
     {

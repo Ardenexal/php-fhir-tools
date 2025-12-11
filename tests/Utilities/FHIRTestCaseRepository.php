@@ -16,6 +16,7 @@ namespace Ardenexal\FHIRTools\Tests\Utilities;
  */
 class FHIRTestCaseRepository
 {
+    /** @phpstan-ignore-next-line */
     private const FHIR_TEST_CASES_URL = 'https://github.com/HL7/fhir-test-cases';
 
     private const CACHE_DIR = 'tests/cache/fhir-test-cases';
@@ -30,6 +31,8 @@ class FHIRTestCaseRepository
 
     /**
      * Get official FHIR test cases for a specific resource type
+     *
+     * @return array<string, mixed>
      */
     public function getTestCasesForResource(string $resourceType, string $fhirVersion = 'R4B'): array
     {
@@ -47,6 +50,8 @@ class FHIRTestCaseRepository
 
     /**
      * Get validation test cases for StructureDefinitions
+     *
+     * @return array<string, mixed>
      */
     public function getValidationTestCases(string $fhirVersion = 'R4B'): array
     {
@@ -58,6 +63,8 @@ class FHIRTestCaseRepository
 
     /**
      * Get performance test cases for large FHIR packages
+     *
+     * @return array<string, mixed>
      */
     public function getPerformanceTestCases(): array
     {
@@ -70,6 +77,8 @@ class FHIRTestCaseRepository
 
     /**
      * Get edge case test data
+     *
+     * @return array<string, mixed>
      */
     public function getEdgeCaseTestData(): array
     {
@@ -116,16 +125,23 @@ class FHIRTestCaseRepository
 
     /**
      * Load test cases from cache
+     *
+     * @return array<string, mixed>
      */
     private function loadFromCache(string $cacheFile): array
     {
         $content = file_get_contents($cacheFile);
+        if ($content === false) {
+            throw new \RuntimeException("Failed to read cache file: {$cacheFile}");
+        }
 
         return json_decode($content, true, 512, JSON_THROW_ON_ERROR);
     }
 
     /**
      * Save test cases to cache
+     *
+     * @param array<string, mixed> $testCases
      */
     private function saveToCache(string $cacheFile, array $testCases): void
     {
@@ -135,6 +151,8 @@ class FHIRTestCaseRepository
 
     /**
      * Download test cases from FHIR repository (mock implementation)
+     *
+     * @return array<string, mixed>
      */
     private function downloadTestCases(string $resourceType, string $fhirVersion): array
     {
@@ -145,6 +163,8 @@ class FHIRTestCaseRepository
 
     /**
      * Generate mock test cases for testing
+     *
+     * @return array<string, mixed>
      */
     private function generateMockTestCases(string $resourceType, string $fhirVersion): array
     {
@@ -180,6 +200,8 @@ class FHIRTestCaseRepository
 
     /**
      * Generate valid resource for testing
+     *
+     * @return array<string, mixed>
      */
     private function generateValidResource(string $resourceType): array
     {
@@ -221,6 +243,8 @@ class FHIRTestCaseRepository
 
     /**
      * Generate invalid resource for testing
+     *
+     * @return array<string, mixed>
      */
     private function generateInvalidResource(string $resourceType, string $errorType): array
     {
@@ -248,6 +272,8 @@ class FHIRTestCaseRepository
 
     /**
      * Get valid StructureDefinitions for testing
+     *
+     * @return array<string, mixed>
      */
     private function getValidStructureDefinitions(string $fhirVersion): array
     {
@@ -259,6 +285,8 @@ class FHIRTestCaseRepository
 
     /**
      * Get invalid StructureDefinitions for testing
+     *
+     * @return array<string, mixed>
      */
     private function getInvalidStructureDefinitions(string $fhirVersion): array
     {
@@ -269,6 +297,8 @@ class FHIRTestCaseRepository
 
     /**
      * Load fixture file
+     *
+     * @return array<string, mixed>
      */
     private function loadFixture(string $filename): array
     {
@@ -278,12 +308,17 @@ class FHIRTestCaseRepository
         }
 
         $content = file_get_contents($path);
+        if ($content === false) {
+            throw new \RuntimeException("Failed to read fixture file: {$path}");
+        }
 
         return json_decode($content, true, 512, JSON_THROW_ON_ERROR);
     }
 
     /**
      * Generate small package for performance testing
+     *
+     * @return array<string, mixed>
      */
     private function generateSmallPackage(): array
     {
@@ -296,6 +331,8 @@ class FHIRTestCaseRepository
 
     /**
      * Generate medium package for performance testing
+     *
+     * @return array<string, mixed>
      */
     private function generateMediumPackage(): array
     {
@@ -308,6 +345,8 @@ class FHIRTestCaseRepository
 
     /**
      * Generate large package for performance testing
+     *
+     * @return array<string, mixed>
      */
     private function generateLargePackage(): array
     {
@@ -320,6 +359,8 @@ class FHIRTestCaseRepository
 
     /**
      * Get empty element test cases
+     *
+     * @return array<string, mixed>
      */
     private function getEmptyElementTestCases(): array
     {
@@ -332,6 +373,8 @@ class FHIRTestCaseRepository
 
     /**
      * Get complex cardinality test cases
+     *
+     * @return array<string, mixed>
      */
     private function getComplexCardinalityTestCases(): array
     {
@@ -346,6 +389,8 @@ class FHIRTestCaseRepository
 
     /**
      * Get deep nesting test cases
+     *
+     * @return array<string, mixed>
      */
     private function getDeepNestingTestCases(): array
     {
@@ -364,6 +409,8 @@ class FHIRTestCaseRepository
 
     /**
      * Get Unicode test cases
+     *
+     * @return array<string, mixed>
      */
     private function getUnicodeTestCases(): array
     {
@@ -381,6 +428,8 @@ class FHIRTestCaseRepository
 
     /**
      * Get large content test cases
+     *
+     * @return array<string, mixed>
      */
     private function getLargeContentTestCases(): array
     {

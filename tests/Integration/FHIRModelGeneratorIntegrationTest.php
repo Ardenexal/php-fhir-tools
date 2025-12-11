@@ -85,6 +85,9 @@ class FHIRModelGeneratorIntegrationTest extends TestCase
 
         // Verify generated code quality
         $generatedCode = file_get_contents($expectedFile);
+        if ($generatedCode === false) {
+            throw new \RuntimeException("Failed to read generated file: {$expectedFile}");
+        }
         $this->assertValidPhpCode($generatedCode);
         $this->assertUsesStrictTypes($generatedCode);
         $this->assertContainsPhpDoc($generatedCode, ['author', 'since']);
@@ -151,6 +154,9 @@ class FHIRModelGeneratorIntegrationTest extends TestCase
         self::assertTrue($result, 'Generation with custom namespace should succeed');
 
         $generatedCode = file_get_contents($this->tempOutputDir . '/TestPatient.php');
+        if ($generatedCode === false) {
+            throw new \RuntimeException('Failed to read generated file for namespace test');
+        }
         self::assertStringContainsString(
             "namespace {$customNamespace};",
             $generatedCode,
@@ -254,6 +260,9 @@ class FHIRModelGeneratorIntegrationTest extends TestCase
         );
 
         $generatedCode = file_get_contents($this->tempOutputDir . '/TestPatient.php');
+        if ($generatedCode === false) {
+            throw new \RuntimeException('Failed to read generated file for PSR-12 test');
+        }
 
         // Check PSR-12 compliance
         self::assertStringContainsString('<?php', $generatedCode);
@@ -293,10 +302,16 @@ class FHIRModelGeneratorIntegrationTest extends TestCase
     /**
      * Load test StructureDefinition from fixtures
      */
+    /**
+     * @return array<string, mixed>
+     */
     private function loadTestStructureDefinition(string $filename): array
     {
         $path    = __DIR__ . '/../Fixtures/StructureDefinitions/' . $filename;
         $content = file_get_contents($path);
+        if ($content === false) {
+            throw new \RuntimeException("Failed to read test structure definition: {$path}");
+        }
 
         return json_decode($content, true, 512, JSON_THROW_ON_ERROR);
     }
