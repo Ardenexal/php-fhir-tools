@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ardenexal\FHIRTools;
 
 use Ardenexal\FHIRTools\Attributes\FhirResource;
+use Ardenexal\FHIRTools\Exception\GenerationException;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\EnumType;
 use Nette\PhpGenerator\Method;
@@ -12,7 +15,23 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use function Symfony\Component\String\u;
 
 /**
- * Class FHIRTools
+ * Generates PHP model classes from FHIR StructureDefinitions
+ *
+ * This class is responsible for converting FHIR StructureDefinitions into
+ * PHP classes with proper type hints, validation constraints, and documentation.
+ * It handles:
+ *
+ * - Class generation from StructureDefinitions
+ * - Property creation with appropriate PHP types
+ * - Constructor generation with promoted properties
+ * - Inheritance relationships between FHIR types
+ * - Validation constraint application
+ * - Nested element processing and class creation
+ * - Content reference resolution
+ * - Enhanced error handling and validation
+ *
+ * The generator produces PSR-12 compliant code with comprehensive PHPDoc
+ * annotations and Symfony validation constraints.
  *
  * @phpstan-type GenerationContext array{targetNamespace: PhpNamespace, classPrefix: string}
  * @phpstan-type ElementProperties array{
@@ -31,14 +50,25 @@ use function Symfony\Component\String\u;
  *  }
  * @phpstan-type NestedElementArray array<string, mixed>
  *
+ * @author FHIR Tools
+ *
+ * @since 1.0.0
+ *
  * @package Ardenexal\FHIRTools
  */
 class FHIRModelGenerator
 {
+    /**
+     * Builder context for managing generated types and namespaces
+     *
+     * @var BuilderContext
+     */
     private BuilderContext $builderContext;
 
     /**
-     * @param BuilderContext $builderContext
+     * Construct a new FHIRModelGenerator with required dependencies
+     *
+     * @param BuilderContext $builderContext Context for managing generated types and namespaces
      */
     public function __construct(
         BuilderContext $builderContext
@@ -183,11 +213,11 @@ class FHIRModelGenerator
         if (!isset($element['type']) && isset($element['contentReference'])) {
             $contentRef = preg_replace('/^.*#/', '', $element['contentReference']);
             if ($contentRef === null) {
-                throw new \RuntimeException('Invalid content reference: ' . $element['contentReference']);
+                throw GenerationException::invalidElementPath($element['contentReference']);
             }
             $relatedClass = $this->builderContext->getType($contentRef);
             if ($relatedClass === null) {
-                throw new \RuntimeException('Related class not found for content reference ' . $element['contentReference']);
+                throw GenerationException::missingContentReference($element['contentReference'], $element['path']);
             }
             $types[] = '\\' . $this->builderContext->getElementNamespace($version)->getName() . '\\' . $relatedClass->getName();
         } elseif (isset($element['type'])) {
@@ -330,7 +360,7 @@ class FHIRModelGenerator
         $pathParts = u($path)->split('.');
         $lastPart  = array_last($pathParts);
         if ($lastPart === null) {
-            throw new \RuntimeException('Invalid path: ' . $path);
+            throw GenerationException::invalidElementPath($path);
         }
 
         return lcfirst($lastPart->camel()->toString());
@@ -408,5 +438,116 @@ class FHIRModelGenerator
         }
 
         return $nestedArray;
+    }
+
+    /**
+     * Validate a structure definition before processing
+     *
+     * @param array<string, mixed> $structureDefinition
+     * @param ErrorCollector       $errorCollector
+     *
+     * @return bool
+     */
+    public function validateStructureDefinition(array $structureDefinition, ErrorCollector $errorCollector): bool
+    {
+        $isValid = true;
+        $url     = $structureDefinition['url'] ?? 'unknown';
+
+        // Check required fields
+        $requiredFields = ['resourceType', 'name', 'kind', 'url'];
+        foreach ($requiredFields as $field) {
+            if (!isset($structureDefinition[$field])) {
+                $errorCollector->addError(
+                    "Missing required field: {$field}",
+                    $url,
+                    'MISSING_REQUIRED_FIELD',
+                );
+                $isValid = false;
+            }
+        }
+
+        // Validate resource type
+        if (isset($structureDefinition['resourceType']) && $structureDefinition['resourceType'] !== 'StructureDefinition') {
+            $errorCollector->addError(
+                "Invalid resource type: expected 'StructureDefinition', got '{$structureDefinition['resourceType']}'",
+                $url,
+                'INVALID_RESOURCE_TYPE',
+            );
+            $isValid = false;
+        }
+
+        // Validate kind
+        if (isset($structureDefinition['kind'])) {
+            $validKinds = ['primitive-type', 'complex-type', 'resource', 'logical'];
+            if (!in_array($structureDefinition['kind'], $validKinds, true)) {
+                $errorCollector->addWarning(
+                    "Unusual kind value: '{$structureDefinition['kind']}'",
+                    $url,
+                    ['valid_kinds' => $validKinds],
+                );
+            }
+        }
+
+        // Validate snapshot elements if present
+        if (isset($structureDefinition['snapshot']['element']) && is_array($structureDefinition['snapshot']['element'])) {
+            foreach ($structureDefinition['snapshot']['element'] as $index => $element) {
+                if (!isset($element['path'])) {
+                    $errorCollector->addError(
+                        "Element at index {$index} missing required 'path' field",
+                        $url,
+                        'MISSING_ELEMENT_PATH',
+                        'error',
+                        ['element_index' => $index],
+                    );
+                    $isValid = false;
+                }
+            }
+        }
+
+        return $isValid;
+    }
+
+    /**
+     * Enhanced element processing with error collection
+     *
+     * @param array<string, mixed> $structureDefinition
+     * @param string               $version
+     * @param ErrorCollector       $errorCollector
+     *
+     * @return ClassType|null
+     */
+    public function generateModelClassWithErrorHandling(array $structureDefinition, string $version, ErrorCollector $errorCollector): ?ClassType
+    {
+        try {
+            if (!$this->validateStructureDefinition($structureDefinition, $errorCollector)) {
+                return null;
+            }
+
+            return $this->generateModelClass($structureDefinition, $version);
+        } catch (GenerationException $e) {
+            $errorCollector->addError(
+                $e->getMessage(),
+                $structureDefinition['url'] ?? 'unknown',
+                'GENERATION_EXCEPTION',
+                'error',
+                $e->getContext(),
+            );
+
+            return null;
+        } catch (\Throwable $e) {
+            $errorCollector->addError(
+                "Unexpected error during class generation: {$e->getMessage()}",
+                $structureDefinition['url'] ?? 'unknown',
+                'UNEXPECTED_ERROR',
+                'error',
+                [
+                    'exception_class' => get_class($e),
+                    'file'            => $e->getFile(),
+                    'line'            => $e->getLine(),
+                ],
+            );
+
+            return null;
+        }
     }
 }

@@ -72,7 +72,8 @@
         ],
         "phpstan": "php ./vendor/bin/phpstan.phar analyse --configuration=phpstan.neon --memory-limit=-1 -v",
         "lint": "php ./vendor/bin/pint -v --parallel --max-processes=4",
-        "test": "php ./vendor/phpunit/phpunit/phpunit"
+        "test": "php ./vendor/phpunit/phpunit/phpunit",
+        "generate-models": "php ./bin/console fhir:generate -vvv"
     },
     "conflict": {
         "symfony/symfony": "*"
