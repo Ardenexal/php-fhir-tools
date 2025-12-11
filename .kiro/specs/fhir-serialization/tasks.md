@@ -72,7 +72,12 @@ subm# Implementation Plan
   - Implement cache invalidation and management
   - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5_
 
-- [ ] 4. Implement FHIRResourceNormalizer
+- [x] 4. Implement FHIRResourceNormalizer
+
+
+
+
+
   - Create normalizer for FHIR resource classes with resourceType handling
   - Implement JSON serialization following FHIR JSON specification
   - Add support for resource-level extensions and metadata
@@ -80,27 +85,39 @@ subm# Implementation Plan
   - Handle resourceType field inclusion and validation
   - _Requirements: 1.1, 1.2, 2.1, 2.2, 3.1, 4.1_
 
-- [ ] 4.1 Write property test for FHIR JSON specification compliance
+- [x] 4.1 Write property test for FHIR JSON specification compliance
+
+
   - **Property 1: FHIR JSON specification compliance**
   - **Validates: Requirements 1.1**
 
-- [ ] 4.2 Write property test for resourceType inclusion
+- [x] 4.2 Write property test for resourceType inclusion
+
+
   - **Property 2: ResourceType inclusion**
   - **Validates: Requirements 1.2**
 
-- [ ] 4.3 Write property test for correct class instantiation
+- [x] 4.3 Write property test for correct class instantiation
+
+
   - **Property 6: Correct class instantiation**
   - **Validates: Requirements 2.1**
 
-- [ ] 4.4 Write property test for resourceType-based class resolution
+- [x] 4.4 Write property test for resourceType-based class resolution
+
+
   - **Property 7: ResourceType-based class resolution**
   - **Validates: Requirements 2.2**
 
-- [ ] 4.5 Write property test for resource normalizer selection
+- [x] 4.5 Write property test for resource normalizer selection
+
+
   - **Property 11: Resource normalizer selection**
   - **Validates: Requirements 3.1**
 
-- [ ] 4.6 Write property test for discriminator map type resolution
+- [x] 4.6 Write property test for discriminator map type resolution
+
+
   - **Property 16: Discriminator map type resolution**
   - **Validates: Requirements 4.1**
 
