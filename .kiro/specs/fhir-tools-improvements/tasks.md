@@ -1,9 +1,6 @@
 # Implementation Plan
 
 - [ ] 1. Fix PHPStan type safety issues
-
-
-
   - Resolve circular type definition in NestedElement type alias
   - Add complete generic type annotations for all array parameters
   - Fix nullable value handling and method calls
