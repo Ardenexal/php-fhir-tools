@@ -1,6 +1,8 @@
 {
+    "name": "ardenexal/fhir-tools",
+    "description": "PHP CLI tool for generating FHIR types, resources, and profiles from FHIR StructureDefinitions",
     "type": "project",
-    "license": "proprietary",
+    "license": "MIT",
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
@@ -8,7 +10,7 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "ext-zip": "*",
-        "amphp/http-client": "5",
+        "amphp/http-client": "^5.0",
         "nette/php-generator": "^4.2.0",
         "symfony/console": "^7.4.1",
         "symfony/dotenv": "^7.4",
@@ -83,7 +85,6 @@
         "test-unit": "php ./vendor/phpunit/phpunit/phpunit --testsuite=unit",
         "test-integration": "php ./vendor/phpunit/phpunit/phpunit --testsuite=integration",
         "test-fhir": "php ./vendor/phpunit/phpunit/phpunit --testsuite=fhir",
-
         "generate-models": "php ./bin/console fhir:generate -vvv"
     },
     "conflict": {
