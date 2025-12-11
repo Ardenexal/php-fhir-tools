@@ -22,27 +22,6 @@ class PackageLoader
 {
     private const       DEFAULT_REGISTRY = 'https://packages.fhir.org';
 
-    public const         array SUPPORTED_KIND   = [
-        //        'CapabilityStatement',
-        //        'CodeSystem',
-        //        'Compartment',
-        'complex-type',
-        'ConceptMap',
-        //        'Extension',
-        //        'ImplementationGuide',
-        'Interface',
-        //        'LogicalModel',
-        //        'NamingSystem',
-        //        'Operation',
-        'PrimitiveType',
-        //        'Profile',
-        'resource',
-        //        'SearchParameter',
-        //        'StructureMap',
-        //        'Unknown',
-        //        'ValueSet',
-    ];
-
     public function __construct(
         private HttpClientInterface $httpClient,
         #[Autowire('%kernel.cache_dir%/.fhir')]
