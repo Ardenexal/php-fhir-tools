@@ -1,0 +1,101 @@
+{
+  "name": "PHP FHIRTools Development",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "php",
+  "workspaceFolder": "/workspace",
+  
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {
+      "ppa": true,
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {
+      "installDirectlyFromGitHubRelease": true,
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "configureZshAsDefaultShell": true,
+      "installOhMyZsh": true,
+      "upgradePackages": true,
+      "username": "vscode",
+      "userUid": "automatic",
+      "userGid": "automatic"
+    }
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "bmewburn.vscode-intelephense-client",
+        "xdebug.php-debug",
+        "zobo.php-intellisense",
+        "ms-vscode.vscode-json",
+        "redhat.vscode-yaml",
+        "bradlc.vscode-tailwindcss",
+        "formulahendry.auto-rename-tag",
+        "ms-azuretools.vscode-docker",
+        "eamodio.gitlens",
+        "github.copilot",
+        "github.copilot-chat",
+        "ms-vscode.test-adapter-converter",
+        "recca0120.vscode-phpunit",
+        "sanderronde.phpstan-vscode",
+        "open-southeners.laravel-pint"
+      ],
+      "settings": {
+        "php.validate.executablePath": "/usr/local/bin/php",
+        "php.debug.executablePath": "/usr/local/bin/php",
+        "intelephense.files.maxSize": 5000000,
+        "intelephense.telemetry.enabled": false,
+        "intelephense.format.enable": false,
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.fixAll": "explicit"
+        },
+        "files.associations": {
+          "*.php": "php",
+          "composer.lock": "json"
+        },
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "git.enableCommitSigning": true,
+        "phpunit.php": "/usr/local/bin/php",
+        "phpunit.phpunit": "./vendor/bin/phpunit",
+        "phpunit.args": [
+          "--configuration",
+          "phpunit.dist.xml"
+        ],
+        "phpstan.enabled": true,
+        "phpstan.path": "./vendor/bin/phpstan.phar",
+        "phpstan.configFile": "./phpstan.neon"
+      }
+    }
+  },
+
+  "forwardPorts": [8000, 9000, 9003],
+  "portsAttributes": {
+    "8000": {
+      "label": "Symfony Dev Server",
+      "onAutoForward": "notify"
+    },
+    "9000": {
+      "label": "PHP-FPM",
+      "onAutoForward": "silent"
+    },
+    "9003": {
+      "label": "Xdebug",
+      "onAutoForward": "silent"
+    }
+  },
+
+  "postCreateCommand": ".devcontainer/setup.sh",
+  "postStartCommand": "composer install --no-interaction",
+
+  "remoteUser": "vscode",
+  "containerUser": "vscode",
+
+  "mounts": [
+    "source=${localWorkspaceFolder}/.devcontainer/php.ini,target=/usr/local/etc/php/conf.d/99-custom.ini,type=bind",
+    "source=fhir-tools-composer-cache,target=/home/vscode/.composer,type=volume"
+  ]
+}
