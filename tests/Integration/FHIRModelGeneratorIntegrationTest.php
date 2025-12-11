@@ -37,16 +37,11 @@ class FHIRModelGeneratorIntegrationTest extends TestCase
 
     private ErrorCollector $errorCollector;
 
-
-
-    private Filesystem $filesystem;
-
     private string $tempOutputDir;
 
     protected function setUp(): void
     {
         $this->errorCollector = new ErrorCollector();
-        $this->filesystem     = new Filesystem();
 
         // Create BuilderContext
         $context = new BuilderContext();

@@ -5,31 +5,13 @@ parameters:
 			message: '#Function Eris\\Generator\\.*#'
 			path: tests/Utilities/FHIRTestDataGenerator.php
 		
-		# Ignore missing methods in integration tests (these are placeholder tests)
-		-
-			message: '#Call to an undefined method.*FHIRModelGenerator::.*#'
-			path: tests/Integration/FHIRModelGeneratorIntegrationTest.php
-		
-		# Ignore constructor parameter issues in integration tests
-		-
-			message: '#Class.*constructor invoked with.*parameters.*required#'
-			paths:
-				- tests/Integration/CommandIntegrationTest.php
-				- tests/Integration/FHIRModelGeneratorIntegrationTest.php
-		
 		# Ignore parameter type issues in integration tests (placeholder code)
 		-
 			message: '#Parameter.*expects.*given#'
 			paths:
-				- tests/Integration/CommandIntegrationTest.php
 				- tests/Integration/FHIRModelGeneratorIntegrationTest.php
 		
 		# Ignore generic type issues with Eris
 		-
 			message: '#return type with generic interface Eris\\Generator does not specify its types#'
 			path: tests/Utilities/FHIRTestDataGenerator.php
-		
-		# Ignore undefined constant in CommandTester
-		-
-			message: '#Access to undefined constant.*CommandTester::VERBOSITY_VERBOSE#'
-			path: tests/Integration/CommandIntegrationTest.php
