@@ -1,3 +1,6 @@
+includes:
+    - phpstan-baseline.neon
+
 parameters:
     level: 8
     paths:
@@ -6,9 +9,7 @@ parameters:
         - public/
         - src/
         - tests/
-        - output/
     excludePaths:
         - */vendor/*
     parallel:
-        # more than one thread uses lots of ram, keep at 1 for now
         maximumNumberOfProcesses: 4

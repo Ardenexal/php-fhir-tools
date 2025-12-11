@@ -8,6 +8,7 @@
 /var/
 /vendor/
 /output/
+!/output/.gitkeep
 /resources/
 ###< symfony/framework-bundle ###
 

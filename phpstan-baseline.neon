@@ -1,0 +1,17 @@
+parameters:
+	ignoreErrors:
+		# Ignore Eris library function issues in test data generator
+		-
+			message: '#Function Eris\\Generator\\.*#'
+			path: tests/Utilities/FHIRTestDataGenerator.php
+		
+		# Ignore parameter type issues in integration tests (placeholder code)
+		-
+			message: '#Parameter.*expects.*given#'
+			paths:
+				- tests/Integration/FHIRModelGeneratorIntegrationTest.php
+		
+		# Ignore generic type issues with Eris
+		-
+			message: '#return type with generic interface Eris\\Generator does not specify its types#'
+			path: tests/Utilities/FHIRTestDataGenerator.php

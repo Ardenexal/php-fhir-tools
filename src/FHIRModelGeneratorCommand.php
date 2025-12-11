@@ -40,7 +40,7 @@ use function Symfony\Component\String\s;
  * @since 1.0.0
  */
 #[AsCommand(name: 'fhir:generate', description: 'Generates FHIR model classes from FHIR definitions.')]
-readonly class FHIRModelGeneratorCommand
+class FHIRModelGeneratorCommand extends Command
 {
     /**
      * Default terminology package for FHIR code systems and value sets
@@ -72,6 +72,21 @@ readonly class FHIRModelGeneratorCommand
     private ErrorCollector $errorCollector;
 
     /**
+     * Filesystem operations handler
+     */
+    private Filesystem $filesystem;
+
+    /**
+     * Context for managing generated types
+     */
+    private BuilderContext $context;
+
+    /**
+     * Package loading and caching handler
+     */
+    private PackageLoader $packageLoader;
+
+    /**
      * Construct a new FHIR model generator command
      *
      * @param Filesystem     $filesystem    Filesystem operations handler
@@ -79,10 +94,14 @@ readonly class FHIRModelGeneratorCommand
      * @param PackageLoader  $packageLoader Package loading and caching handler
      */
     public function __construct(
-        private Filesystem $filesystem,
-        private BuilderContext $context,
-        private PackageLoader $packageLoader,
+        Filesystem $filesystem,
+        BuilderContext $context,
+        PackageLoader $packageLoader,
     ) {
+        parent::__construct();
+        $this->filesystem     = $filesystem;
+        $this->context        = $context;
+        $this->packageLoader  = $packageLoader;
         $this->errorCollector = new ErrorCollector();
     }
 
