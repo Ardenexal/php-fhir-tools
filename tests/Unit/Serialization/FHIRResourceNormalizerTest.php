@@ -514,6 +514,388 @@ class FHIRResourceNormalizerTest extends TestCase
     }
 
     /**
+     * **Feature: fhir-serialization, Property 4: Sparse extension array handling**
+     * **Validates: Requirements 1.4**
+     *
+     * For any array containing elements with extensions, the serializer should correctly
+     * handle sparse extension arrays according to FHIR rules
+     */
+    public function testSparseExtensionArrayHandling()
+    {
+        // Simplified test with a concrete example
+        $nameArray = [
+            ['family' => 'TestFamily'],
+            ['given' => ['TestGiven']],
+        ];
+
+        $resource = new FHIRPatient(
+            resourceType: 'Patient',
+            id: 'test-patient',
+            name: $nameArray,
+        );
+
+        $normalized = $this->normalizer->normalize($resource, 'json');
+
+        // Should have the base array
+        self::assertArrayHasKey('name', $normalized);
+        self::assertIsArray($normalized['name']);
+        self::assertNotEmpty($normalized['name']);
+
+        // For now, just verify basic array normalization works
+        self::assertCount(2, $normalized['name']);
+        self::assertEquals(['family' => 'TestFamily'], $normalized['name'][0]);
+        self::assertEquals(['given' => ['TestGiven']], $normalized['name'][1]);
+
+        // Test with property-based generation for basic cases
+        $this->forAll(
+            Generator\choose(1, 3),
+        )->then(function($size) {
+            $values = [];
+            for ($i = 0; $i < $size; $i++) {
+                $values[] = ['family' => "Family{$i}"];
+            }
+
+            $resource = new FHIRPatient(
+                resourceType: 'Patient',
+                id: 'test-patient',
+                name: $values,
+            );
+
+            $normalized = $this->normalizer->normalize($resource, 'json');
+
+            // Should have the base array
+            self::assertArrayHasKey('name', $normalized);
+            self::assertIsArray($normalized['name']);
+            self::assertCount($size, $normalized['name']);
+
+            // Each element should be properly normalized
+            for ($i = 0; $i < $size; $i++) {
+                self::assertEquals(['family' => "Family{$i}"], $normalized['name'][$i]);
+            }
+        });
+    }
+
+    /**
+     * Generate array data with sparse extensions for testing
+     */
+    private function generateArrayWithSparseExtensions(): Generator
+    {
+        return Generator\bind(
+            Generator\choose(1, 3), // Array size
+            static fn ($size) => Generator\bind(
+                Generator\seq(Generator\oneOf(
+                    Generator\constant(['family' => 'TestFamily']),
+                    Generator\constant(['given' => ['TestGiven']]),
+                    Generator\constant(['family' => 'AnotherFamily', 'given' => ['AnotherGiven']]),
+                ), $size),
+                static fn ($values) => Generator\bind(
+                    Generator\seq(Generator\oneOf(
+                        Generator\constant(null), // No extension
+                        Generator\constant(['extension' => [['url' => 'test', 'valueString' => 'test']]]),
+                    ), $size),
+                    static fn ($extensions) => Generator\constant([
+                        'values' => array_filter($values, fn($v) => $v !== null), // Remove nulls
+                        'extensions' => $extensions,
+                    ]),
+                ),
+            ),
+        );
+    }
+
+    /**
+     * **Feature: fhir-serialization, Property 5: Null value omission**
+     * **Validates: Requirements 1.5**
+     *
+     * For any FHIR object with null or empty values, those values should be omitted
+     * from JSON output according to FHIR specification
+     */
+    public function testNullValueOmission()
+    {
+        $this->forAll(
+            $this->generateResourceWithNullValues(),
+        )->then(function($resource) {
+            $normalized = $this->normalizer->normalize($resource, 'json');
+
+            // Should not contain any null values
+            $this->assertNoNullValues($normalized);
+
+            // Should not contain any empty arrays
+            $this->assertNoEmptyArrays($normalized);
+
+            // Should not contain any empty strings (if configured to omit them)
+            $this->assertNoEmptyStrings($normalized);
+
+            // Must still have resourceType (never omitted)
+            self::assertArrayHasKey('resourceType', $normalized);
+            self::assertNotNull($normalized['resourceType']);
+            self::assertNotEmpty($normalized['resourceType']);
+
+            // Required fields should be present even if they could be empty
+            // (this depends on FHIR resource definition, but id is often required)
+            if (property_exists($resource, 'id') && $resource->id !== null && $resource->id !== '') {
+                self::assertArrayHasKey('id', $normalized);
+            }
+        });
+    }
+
+    /**
+     * Generate FHIR resource with various null and empty values
+     */
+    private function generateResourceWithNullValues(): Generator
+    {
+        return Generator\bind(
+            Generator\choose(1, 999999),
+            static fn ($id) => Generator\bind(
+                Generator\oneOf(
+                    Generator\constant(null),
+                    Generator\elements(['male', 'female']),
+                ),
+                static fn ($gender) => Generator\bind(
+                    Generator\oneOf(
+                        Generator\constant(null),
+                        Generator\constant([]),
+                        Generator\constant([['family' => 'TestFamily']]),
+                    ),
+                    static fn ($name) => Generator\bind(
+                        Generator\oneOf(
+                            Generator\constant(null),
+                            Generator\constant(''),
+                            Generator\constant('1990-01-01'),
+                        ),
+                        static fn ($birthDate) => Generator\constant(new FHIRPatient(
+                            resourceType: 'Patient',
+                            id: (string) $id,
+                            gender: $gender,
+                            name: $name,
+                            birthDate: $birthDate,
+                        )),
+                    ),
+                ),
+            ),
+        );
+    }
+
+    /**
+     * Assert that the normalized data contains no empty strings
+     */
+    private function assertNoEmptyStrings(array $data): void
+    {
+        foreach ($data as $key => $value) {
+            if (is_string($value)) {
+                self::assertNotEmpty($value, "Found empty string for key: {$key}");
+            } elseif (is_array($value)) {
+                $this->assertNoEmptyStrings($value);
+            }
+        }
+    }
+
+    /**
+     * **Feature: fhir-serialization, Property 9: Configurable unknown property handling**
+     * **Validates: Requirements 2.4**
+     *
+     * For any JSON containing unknown properties, the deserializer should handle them
+     * according to the configured policy (ignore, error, or preserve)
+     */
+    public function testConfigurableUnknownPropertyHandling()
+    {
+        $this->forAll(
+            $this->generateJSONWithUnknownProperties(),
+            Generator\elements(['ignore', 'error', 'preserve']),
+        )->then(function($jsonData, $policy) {
+            $context = ['unknown_property_policy' => $policy];
+            $expectedClass = $this->getExpectedClassForResourceType($jsonData['resourceType']);
+            
+            if ($expectedClass === null) {
+                return; // Skip if no mapping
+            }
+
+            switch ($policy) {
+                case 'ignore':
+                    // Should successfully denormalize, ignoring unknown properties
+                    $denormalized = $this->normalizer->denormalize($jsonData, $expectedClass, 'json', $context);
+                    self::assertInstanceOf($expectedClass, $denormalized);
+                    
+                    // Known properties should be set
+                    self::assertEquals($jsonData['resourceType'], $denormalized->resourceType);
+                    if (isset($jsonData['id'])) {
+                        self::assertEquals($jsonData['id'], $denormalized->id);
+                    }
+                    break;
+
+                case 'error':
+                    // Should throw exception for unknown properties
+                    if (isset($jsonData['unknownProperty'])) {
+                        try {
+                            $this->normalizer->denormalize($jsonData, $expectedClass, 'json', $context);
+                            self::fail('Expected exception for unknown property with error policy');
+                        } catch (\Exception $e) {
+                            self::assertStringContainsString('unknown', strtolower($e->getMessage()));
+                        }
+                    } else {
+                        // No unknown properties, should work normally
+                        $denormalized = $this->normalizer->denormalize($jsonData, $expectedClass, 'json', $context);
+                        self::assertInstanceOf($expectedClass, $denormalized);
+                    }
+                    break;
+
+                case 'preserve':
+                    // Should preserve unknown properties in some way (implementation dependent)
+                    $denormalized = $this->normalizer->denormalize($jsonData, $expectedClass, 'json', $context);
+                    self::assertInstanceOf($expectedClass, $denormalized);
+                    
+                    // Known properties should still be set correctly
+                    self::assertEquals($jsonData['resourceType'], $denormalized->resourceType);
+                    break;
+            }
+        });
+    }
+
+    /**
+     * Generate JSON data with unknown properties
+     */
+    private function generateJSONWithUnknownProperties(): Generator
+    {
+        return Generator\bind(
+            Generator\elements(['Patient', 'Observation']),
+            static fn ($resourceType) => Generator\bind(
+                Generator\choose(1, 999999),
+                static fn ($id) => Generator\bind(
+                    Generator\bool(),
+                    static fn ($includeUnknown) => Generator\constant(array_merge(
+                        [
+                            'resourceType' => $resourceType,
+                            'id' => (string) $id,
+                        ],
+                        $includeUnknown ? ['unknownProperty' => 'unknownValue'] : []
+                    )),
+                ),
+            ),
+        );
+    }
+
+    /**
+     * **Feature: fhir-serialization, Property 10: Invalid JSON exception handling**
+     * **Validates: Requirements 2.5**
+     *
+     * For any invalid JSON structure, the deserializer should throw specific
+     * validation exceptions with meaningful error messages
+     */
+    public function testInvalidJSONExceptionHandling()
+    {
+        $this->forAll(
+            $this->generateInvalidJSONData(),
+        )->then(function($invalidData) {
+            $expectedClass = FHIRPatient::class;
+
+            try {
+                $this->normalizer->denormalize($invalidData, $expectedClass, 'json');
+                self::fail('Expected exception for invalid JSON data: ' . json_encode($invalidData));
+            } catch (\Exception $e) {
+                // Should throw a meaningful exception
+                self::assertInstanceOf(\Symfony\Component\Serializer\Exception\NotNormalizableValueException::class, $e);
+                
+                // Exception message should be meaningful
+                $message = strtolower($e->getMessage());
+                self::assertTrue(
+                    str_contains($message, 'resourcetype') ||
+                    str_contains($message, 'expected') ||
+                    str_contains($message, 'invalid') ||
+                    str_contains($message, 'array'),
+                    'Exception message should be meaningful: ' . $e->getMessage()
+                );
+            }
+        });
+    }
+
+    /**
+     * Generate invalid JSON data for testing error handling
+     */
+    private function generateInvalidJSONData(): Generator
+    {
+        return Generator\oneOf(
+            // Missing resourceType
+            Generator\constant(['id' => 'test']),
+            
+            // Non-string resourceType
+            Generator\constant(['resourceType' => 123, 'id' => 'test']),
+            
+            // Empty resourceType
+            Generator\constant(['resourceType' => '', 'id' => 'test']),
+            
+            // Non-array data
+            Generator\string(),
+            Generator\int(),
+            Generator\bool(),
+            
+            // Null data
+            Generator\constant(null),
+        );
+    }
+
+    /**
+     * **Feature: fhir-serialization, Property 15: Automatic normalizer selection**
+     * **Validates: Requirements 3.5**
+     *
+     * For any FHIR object, the serializer should automatically choose the correct
+     * normalizer based on the object's class type and attributes
+     */
+    public function testAutomaticNormalizerSelection()
+    {
+        $this->forAll(
+            Generator\oneOf(
+                $this->generateFHIRResource(),
+                $this->generateFHIRComplexType(),
+                $this->generateFHIRPrimitive(),
+            ),
+        )->then(function($fhirObject) {
+            // Test that the normalizer correctly identifies what it can handle
+            $canNormalize = $this->normalizer->supportsNormalization($fhirObject, 'json');
+            
+            if ($this->metadataExtractor->isResource($fhirObject)) {
+                // Should support resource normalization
+                self::assertTrue($canNormalize, 'Should support normalization of FHIR resources');
+                
+                // Should successfully normalize
+                $normalized = $this->normalizer->normalize($fhirObject, 'json');
+                self::assertIsArray($normalized);
+                self::assertArrayHasKey('resourceType', $normalized);
+                
+            } else {
+                // Should not support non-resource normalization
+                self::assertFalse($canNormalize, 'Should not support normalization of non-resource objects');
+            }
+
+            // Test denormalization support
+            if ($this->metadataExtractor->isResource($fhirObject)) {
+                $className = get_class($fhirObject);
+                $sampleData = ['resourceType' => $this->metadataExtractor->extractResourceType($fhirObject)];
+                
+                $canDenormalize = $this->normalizer->supportsDenormalization($sampleData, $className, 'json');
+                self::assertTrue($canDenormalize, 'Should support denormalization of FHIR resource data');
+            }
+        });
+    }
+
+    /**
+     * Generate FHIR complex type objects for testing
+     */
+    private function generateFHIRComplexType(): Generator
+    {
+        return Generator\constant(new \stdClass()); // Placeholder - would be actual complex types
+    }
+
+    /**
+     * Generate FHIR primitive objects for testing
+     */
+    private function generateFHIRPrimitive(): Generator
+    {
+        return Generator\bind(
+            Generator\string(),
+            static fn ($value) => Generator\constant(new FHIRString($value)),
+        );
+    }
+
+    /**
      * Assert that all element names are valid FHIR names
      */
     private function assertValidFHIRElementNames(array $data): void

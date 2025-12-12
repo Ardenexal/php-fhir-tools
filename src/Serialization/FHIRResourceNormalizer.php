@@ -66,18 +66,22 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
 
             $value = $property->getValue($object);
 
-            // Skip null values according to FHIR JSON rules
-            if ($value === null) {
+            // Apply FHIR JSON omission rules
+            if ($this->shouldOmitValue($value)) {
                 continue;
             }
 
-            // Skip empty arrays according to FHIR JSON rules
-            if (is_array($value) && empty($value)) {
-                continue;
-            }
-
-            // Handle extensions with underscore notation for primitives
-            if ($this->isPrimitiveWithExtensions($value, $propertyName)) {
+            // Handle arrays with potential sparse extensions
+            if (is_array($value)) {
+                $normalizedArray = $this->normalizeArrayWithExtensions($value, $propertyName, $format, $context);
+                if ($normalizedArray !== null) {
+                    $data[$propertyName] = $normalizedArray['values'];
+                    if (isset($normalizedArray['extensions'])) {
+                        $data['_' . $propertyName] = $normalizedArray['extensions'];
+                    }
+                }
+            } elseif ($this->isPrimitiveWithExtensions($value, $propertyName)) {
+                // Handle extensions with underscore notation for primitives
                 $normalizedValue = $this->normalizePrimitiveWithExtensions($value, $format, $context);
                 if ($normalizedValue !== null) {
                     $data[$propertyName] = $normalizedValue['value'];
@@ -93,7 +97,7 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
                     $normalizedValue = $this->normalizeBasicValue($value, $format, $context);
                 }
 
-                if ($normalizedValue !== null) {
+                if ($normalizedValue !== null && !$this->shouldOmitValue($normalizedValue)) {
                     $data[$propertyName] = $normalizedValue;
                 }
             }
@@ -133,6 +137,10 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
             throw new NotNormalizableValueException('resourceType must be a string');
         }
 
+        if (empty($resourceType)) {
+            throw new NotNormalizableValueException('resourceType cannot be empty');
+        }
+
         // Use type resolver to get the correct class for the resourceType
         $resolvedType = $this->typeResolver->resolveResourceType($data);
         if ($resolvedType === null) {
@@ -148,6 +156,9 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
         try {
             $reflection = new \ReflectionClass($resolvedType);
             $object     = $reflection->newInstanceWithoutConstructor();
+
+            // Get unknown property policy from context
+            $unknownPropertyPolicy = $context['unknown_property_policy'] ?? 'ignore';
 
             // Set properties from the data
             foreach ($data as $propertyName => $value) {
@@ -183,6 +194,9 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
                     }
 
                     $property->setValue($object, $denormalizedValue);
+                } else {
+                    // Handle unknown properties according to policy
+                    $this->handleUnknownProperty($propertyName, $value, $unknownPropertyPolicy, $object);
                 }
             }
 
@@ -329,6 +343,123 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
     {
         // For basic denormalization, just return the value as-is
         return $value;
+    }
+
+    /**
+     * Check if a value should be omitted according to FHIR JSON rules
+     */
+    private function shouldOmitValue(mixed $value): bool
+    {
+        // Omit null values
+        if ($value === null) {
+            return true;
+        }
+
+        // Omit empty arrays
+        if (is_array($value) && empty($value)) {
+            return true;
+        }
+
+        // Omit empty strings (configurable)
+        if (is_string($value) && $value === '') {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Normalize array with potential sparse extensions
+     *
+     * @param array<mixed> $array
+     * @param array<string, mixed> $context
+     *
+     * @return array<string, mixed>|null
+     */
+    private function normalizeArrayWithExtensions(array $array, string $propertyName, ?string $format, array $context): ?array
+    {
+        if (empty($array)) {
+            return null;
+        }
+
+        $normalizedValues = [];
+        $extensions = [];
+        $hasExtensions = false;
+
+        foreach ($array as $index => $item) {
+            if ($this->shouldOmitValue($item)) {
+                continue;
+            }
+
+            // Check if item has extensions
+            if (is_object($item) && $this->metadataExtractor->isPrimitiveType($item)) {
+                $primitiveResult = $this->normalizePrimitiveWithExtensions($item, $format, $context);
+                if ($primitiveResult !== null) {
+                    $normalizedValues[$index] = $primitiveResult['value'];
+                    if (isset($primitiveResult['extensions'])) {
+                        $extensions[$index] = $primitiveResult['extensions'];
+                        $hasExtensions = true;
+                    } else {
+                        $extensions[$index] = null;
+                    }
+                }
+            } else {
+                // Regular normalization
+                if ($this->normalizer !== null) {
+                    $normalizedItem = $this->normalizer->normalize($item, $format, $context);
+                } else {
+                    $normalizedItem = $this->normalizeBasicValue($item, $format, $context);
+                }
+
+                if ($normalizedItem !== null && !$this->shouldOmitValue($normalizedItem)) {
+                    $normalizedValues[$index] = $normalizedItem;
+                    $extensions[$index] = null;
+                }
+            }
+        }
+
+        if (empty($normalizedValues)) {
+            return null;
+        }
+
+        $result = ['values' => array_values($normalizedValues)];
+
+        // Only include extensions if there are actual extensions
+        if ($hasExtensions) {
+            // Create sparse extension array with same indices as values
+            $sparseExtensions = [];
+            $valueIndices = array_keys($normalizedValues);
+            foreach ($valueIndices as $originalIndex => $valueIndex) {
+                $sparseExtensions[$originalIndex] = $extensions[$valueIndex] ?? null;
+            }
+            $result['extensions'] = array_values($sparseExtensions);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Handle unknown properties according to the configured policy
+     */
+    private function handleUnknownProperty(string $propertyName, mixed $value, string $policy, object $object): void
+    {
+        switch ($policy) {
+            case 'error':
+                throw new NotNormalizableValueException(sprintf('Unknown property "%s" encountered', $propertyName));
+
+            case 'preserve':
+                // Try to set the property dynamically if possible
+                if (property_exists($object, $propertyName)) {
+                    $object->{$propertyName} = $value;
+                }
+                // Could also store in a special "unknown properties" collection
+                break;
+
+            case 'ignore':
+            default:
+                // Do nothing - ignore the unknown property
+                break;
+        }
     }
 
     /**

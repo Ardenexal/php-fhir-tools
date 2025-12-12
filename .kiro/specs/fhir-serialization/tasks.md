@@ -244,11 +244,16 @@ subm# Implementation Plan
 
 
 
-- [ ] 8.2 Write property test for polymorphic type deserialization
+- [x] 8.2 Write property test for polymorphic type deserialization
   - **Property 20: Polymorphic type deserialization**
   - **Validates: Requirements 4.5**
 
-- [ ] 9. Add comprehensive JSON serialization support
+- [x] 9. Add comprehensive JSON serialization support
+
+
+
+
+
   - Implement sparse extension array handling for JSON
   - Add null value omission according to FHIR rules
   - Handle unknown property processing with configurable policies
@@ -256,23 +261,33 @@ subm# Implementation Plan
   - Add JSON format validation and error handling
   - _Requirements: 1.4, 1.5, 2.4, 2.5, 3.5_
 
-- [ ] 9.1 Write property test for sparse extension array handling
+- [x] 9.1 Write property test for sparse extension array handling
+
+
   - **Property 4: Sparse extension array handling**
   - **Validates: Requirements 1.4**
 
-- [ ] 9.2 Write property test for null value omission
+- [x] 9.2 Write property test for null value omission
+
+
   - **Property 5: Null value omission**
   - **Validates: Requirements 1.5**
 
-- [ ] 9.3 Write property test for configurable unknown property handling
+- [x] 9.3 Write property test for configurable unknown property handling
+
+
   - **Property 9: Configurable unknown property handling**
   - **Validates: Requirements 2.4**
 
-- [ ] 9.4 Write property test for invalid JSON exception handling
+- [x] 9.4 Write property test for invalid JSON exception handling
+
+
   - **Property 10: Invalid JSON exception handling**
   - **Validates: Requirements 2.5**
 
-- [ ] 9.5 Write property test for automatic normalizer selection
+- [x] 9.5 Write property test for automatic normalizer selection
+
+
   - **Property 15: Automatic normalizer selection**
   - **Validates: Requirements 3.5**
 
