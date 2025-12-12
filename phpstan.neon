@@ -8,7 +8,6 @@ parameters:
         - config/
         - public/
         - src/
-        - tests/
     excludePaths:
         - */vendor/*
     parallel:

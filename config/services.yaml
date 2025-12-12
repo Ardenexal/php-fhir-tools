@@ -16,5 +16,27 @@ services:
     Ardenexal\FHIRTools\:
         resource: '../src/'
 
+    # Configure FHIR normalizers to avoid circular dependency with serializer
+    # These normalizers should not be injected with the main serializer service
+    Ardenexal\FHIRTools\Serialization\FHIRResourceNormalizer:
+        arguments:
+            $normalizer: null
+            $denormalizer: null
+
+    Ardenexal\FHIRTools\Serialization\FHIRBackboneElementNormalizer:
+        arguments:
+            $normalizer: null
+            $denormalizer: null
+
+    Ardenexal\FHIRTools\Serialization\FHIRComplexTypeNormalizer:
+        arguments:
+            $normalizer: null
+            $denormalizer: null
+
+    Ardenexal\FHIRTools\Serialization\FHIRPrimitiveTypeNormalizer:
+        arguments:
+            $normalizer: null
+            $denormalizer: null
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
