@@ -33,6 +33,11 @@ class FHIRComplexTypeNormalizer implements FHIRNormalizerInterface
     /**
      * {@inheritDoc}
      */
+    /**
+     * @param array<string, mixed> $context
+     *
+     * @return array<string, mixed>|string|int|float|bool|\ArrayObject<string, mixed>|null
+     */
     public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         if (!is_object($object)) {
@@ -131,6 +136,7 @@ class FHIRComplexTypeNormalizer implements FHIRNormalizerInterface
         }
 
         try {
+            /** @var class-string $resolvedType */
             $reflection = new \ReflectionClass($resolvedType);
             $object     = $reflection->newInstanceWithoutConstructor();
 
@@ -193,6 +199,7 @@ class FHIRComplexTypeNormalizer implements FHIRNormalizerInterface
 
         // Check if the type is a FHIR complex type class
         try {
+            /** @var class-string $type */
             $reflection = new \ReflectionClass($type);
             $attributes = $reflection->getAttributes(FHIRComplexType::class);
 

@@ -33,6 +33,11 @@ class FHIRBackboneElementNormalizer implements FHIRNormalizerInterface
     /**
      * {@inheritDoc}
      */
+    /**
+     * @param array<string, mixed> $context
+     *
+     * @return array<string, mixed>|string|int|float|bool|\ArrayObject<string, mixed>|null
+     */
     public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         if (!is_object($object)) {
@@ -119,6 +124,7 @@ class FHIRBackboneElementNormalizer implements FHIRNormalizerInterface
         }
 
         try {
+            /** @var class-string $type */
             $reflection = new \ReflectionClass($type);
 
             // Use constructor if available to properly initialize properties
@@ -202,6 +208,7 @@ class FHIRBackboneElementNormalizer implements FHIRNormalizerInterface
 
         // Check if the type is a FHIR backbone element class
         try {
+            /** @var class-string $type */
             $reflection = new \ReflectionClass($type);
             $attributes = $reflection->getAttributes(FHIRBackboneElement::class);
 
@@ -224,6 +231,8 @@ class FHIRBackboneElementNormalizer implements FHIRNormalizerInterface
      * Normalize extensions array
      *
      * @param array<string, mixed> $context
+     *
+     * @return list<mixed>|null
      */
     private function normalizeExtensions(mixed $extensions, ?string $format, array $context): ?array
     {
@@ -244,13 +253,15 @@ class FHIRBackboneElementNormalizer implements FHIRNormalizerInterface
             }
         }
 
-        return empty($result) ? null : $result;
+        return count($result) === 0 ? null : $result;
     }
 
     /**
      * Denormalize extensions array
      *
      * @param array<string, mixed> $context
+     *
+     * @return list<mixed>|null
      */
     private function denormalizeExtensions(mixed $extensions, ?string $format, array $context): ?array
     {
@@ -268,7 +279,7 @@ class FHIRBackboneElementNormalizer implements FHIRNormalizerInterface
             }
         }
 
-        return empty($result) ? null : $result;
+        return $result;
     }
 
     /**

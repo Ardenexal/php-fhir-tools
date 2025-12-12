@@ -32,6 +32,11 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
     /**
      * {@inheritDoc}
      */
+    /**
+     * @param array<string, mixed> $context
+     *
+     * @return array<string, mixed>|string|int|float|bool|\ArrayObject<string, mixed>|null
+     */
     public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         if (!is_object($object)) {
@@ -154,6 +159,7 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
         }
 
         try {
+            /** @var class-string $resolvedType */
             $reflection = new \ReflectionClass($resolvedType);
             $object     = $reflection->newInstanceWithoutConstructor();
 
@@ -222,6 +228,8 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
 
         // Check if the type is a FHIR resource class
         try {
+            /** @var class-string $type */
+            /** @var class-string $type */
             $reflection = new \ReflectionClass($type);
             $attributes = $reflection->getAttributes(FhirResource::class);
 
@@ -254,6 +262,10 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
 
     /**
      * Normalize a primitive value with extensions
+     *
+     * @param array<string, mixed> $context
+     *
+     * @return array<string, mixed>|null
      */
     private function normalizePrimitiveWithExtensions(mixed $value, ?string $format, array $context): ?array
     {
@@ -288,6 +300,8 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
 
     /**
      * Denormalize a primitive value with extensions
+     *
+     * @param array<string, mixed> $context
      */
     private function denormalizePrimitiveWithExtensions(mixed $value, mixed $extensions, ?string $format, array $context): mixed
     {
@@ -298,6 +312,8 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
 
     /**
      * Normalize basic values (fallback when no normalizer is injected)
+     *
+     * @param array<string, mixed> $context
      */
     private function normalizeBasicValue(mixed $value, ?string $format, array $context): mixed
     {
@@ -338,6 +354,8 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
 
     /**
      * Denormalize basic values (fallback when no denormalizer is injected)
+     *
+     * @param array<string, mixed> $context
      */
     private function denormalizeBasicValue(mixed $value, ?string $format, array $context): mixed
     {
@@ -371,7 +389,7 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
     /**
      * Normalize array with potential sparse extensions
      *
-     * @param array<mixed> $array
+     * @param array<mixed>         $array
      * @param array<string, mixed> $context
      *
      * @return array<string, mixed>|null
@@ -383,8 +401,8 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
         }
 
         $normalizedValues = [];
-        $extensions = [];
-        $hasExtensions = false;
+        $extensions       = [];
+        $hasExtensions    = false;
 
         foreach ($array as $index => $item) {
             if ($this->shouldOmitValue($item)) {
@@ -398,7 +416,7 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
                     $normalizedValues[$index] = $primitiveResult['value'];
                     if (isset($primitiveResult['extensions'])) {
                         $extensions[$index] = $primitiveResult['extensions'];
-                        $hasExtensions = true;
+                        $hasExtensions      = true;
                     } else {
                         $extensions[$index] = null;
                     }
@@ -413,7 +431,7 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
 
                 if ($normalizedItem !== null && !$this->shouldOmitValue($normalizedItem)) {
                     $normalizedValues[$index] = $normalizedItem;
-                    $extensions[$index] = null;
+                    $extensions[$index]       = null;
                 }
             }
         }
@@ -428,7 +446,7 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
         if ($hasExtensions) {
             // Create sparse extension array with same indices as values
             $sparseExtensions = [];
-            $valueIndices = array_keys($normalizedValues);
+            $valueIndices     = array_keys($normalizedValues);
             foreach ($valueIndices as $originalIndex => $valueIndex) {
                 $sparseExtensions[$originalIndex] = $extensions[$valueIndex] ?? null;
             }

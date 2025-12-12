@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRString;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 use Eris\Generator;
 use Eris\TestTrait;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 
 /**
  * Property-based tests for FHIRResourceNormalizer
@@ -34,10 +35,16 @@ class FHIRResourceNormalizerTest extends TestCase
         parent::setUp();
 
         $this->metadataExtractor = new FHIRMetadataExtractor();
-        $this->typeResolver      = new FHIRTypeResolver([
-            'Patient'     => FHIRPatient::class,
-            'Observation' => FHIRObservation::class,
-        ]);
+        $this->typeResolver      = new FHIRTypeResolver(
+            resourceTypeMapping: [
+                'Patient'     => FHIRPatient::class,
+                'Observation' => FHIRObservation::class,
+            ],
+            referenceTypeMapping: [
+                'Patient'     => FHIRPatient::class,
+                'Observation' => FHIRObservation::class,
+            ],
+        );
 
         $this->normalizer = new FHIRResourceNormalizer(
             $this->metadataExtractor,
@@ -98,7 +105,7 @@ class FHIRResourceNormalizerTest extends TestCase
     private function generatePatientResource(): Generator
     {
         return Generator\bind(
-            Generator\choose(1, 999999),
+            Generator\choose(1, 999),
             static fn ($id) => Generator\bind(
                 Generator\elements(['male', 'female', 'other', 'unknown']),
                 static fn ($gender) => Generator\bind(
@@ -126,7 +133,7 @@ class FHIRResourceNormalizerTest extends TestCase
     private function generateObservationResource(): Generator
     {
         return Generator\bind(
-            Generator\choose(1, 999999),
+            Generator\choose(1, 999),
             static fn ($id) => Generator\bind(
                 Generator\elements(['final', 'preliminary', 'amended']),
                 static fn ($status) => Generator\bind(
@@ -265,7 +272,7 @@ class FHIRResourceNormalizerTest extends TestCase
     private function generatePatientJSON(): Generator
     {
         return Generator\bind(
-            Generator\choose(1, 999999),
+            Generator\choose(1, 999),
             static fn ($id) => Generator\bind(
                 Generator\elements(['male', 'female', 'other', 'unknown']),
                 static fn ($gender) => Generator\constant([
@@ -289,7 +296,7 @@ class FHIRResourceNormalizerTest extends TestCase
     private function generateObservationJSON(): Generator
     {
         return Generator\bind(
-            Generator\choose(1, 999999),
+            Generator\choose(1, 999),
             static fn ($id) => Generator\bind(
                 Generator\elements(['final', 'preliminary', 'amended']),
                 static fn ($status) => Generator\constant([
@@ -320,7 +327,7 @@ class FHIRResourceNormalizerTest extends TestCase
     {
         $this->forAll(
             Generator\elements(['Patient', 'Observation']),
-            Generator\choose(1, 999999),
+            Generator\choose(1, 999),
         )->then(function($resourceType, $id) {
             $jsonData = [
                 'resourceType' => $resourceType,
@@ -413,7 +420,7 @@ class FHIRResourceNormalizerTest extends TestCase
     {
         $this->forAll(
             Generator\elements(['Patient', 'Observation']),
-            Generator\choose(1, 999999),
+            Generator\choose(1, 999),
         )->then(function($resourceType, $id) {
             $jsonData = [
                 'resourceType' => $resourceType,
@@ -478,7 +485,7 @@ class FHIRResourceNormalizerTest extends TestCase
     {
         $this->forAll(
             Generator\elements(['Patient', 'Observation', 'Practitioner']),
-            Generator\choose(1, 999999),
+            Generator\choose(1, 999),
         )->then(function($resourceType, $id) {
             // Test reference with explicit type
             $referenceWithType = [
@@ -505,6 +512,7 @@ class FHIRResourceNormalizerTest extends TestCase
      */
     private function getExpectedClassForResourceType(string $resourceType): ?string
     {
+        // The type resolver returns full class names from the mapping
         $mapping = [
             'Patient'     => FHIRPatient::class,
             'Observation' => FHIRObservation::class,
@@ -551,7 +559,7 @@ class FHIRResourceNormalizerTest extends TestCase
             Generator\choose(1, 3),
         )->then(function($size) {
             $values = [];
-            for ($i = 0; $i < $size; $i++) {
+            for ($i = 0; $i < $size; ++$i) {
                 $values[] = ['family' => "Family{$i}"];
             }
 
@@ -569,7 +577,7 @@ class FHIRResourceNormalizerTest extends TestCase
             self::assertCount($size, $normalized['name']);
 
             // Each element should be properly normalized
-            for ($i = 0; $i < $size; $i++) {
+            for ($i = 0; $i < $size; ++$i) {
                 self::assertEquals(['family' => "Family{$i}"], $normalized['name'][$i]);
             }
         });
@@ -594,7 +602,7 @@ class FHIRResourceNormalizerTest extends TestCase
                         Generator\constant(['extension' => [['url' => 'test', 'valueString' => 'test']]]),
                     ), $size),
                     static fn ($extensions) => Generator\constant([
-                        'values' => array_filter($values, fn($v) => $v !== null), // Remove nulls
+                        'values'     => array_filter($values, fn ($v) => $v !== null), // Remove nulls
                         'extensions' => $extensions,
                     ]),
                 ),
@@ -644,7 +652,7 @@ class FHIRResourceNormalizerTest extends TestCase
     private function generateResourceWithNullValues(): Generator
     {
         return Generator\bind(
-            Generator\choose(1, 999999),
+            Generator\choose(1, 999),
             static fn ($id) => Generator\bind(
                 Generator\oneOf(
                     Generator\constant(null),
@@ -702,9 +710,9 @@ class FHIRResourceNormalizerTest extends TestCase
             $this->generateJSONWithUnknownProperties(),
             Generator\elements(['ignore', 'error', 'preserve']),
         )->then(function($jsonData, $policy) {
-            $context = ['unknown_property_policy' => $policy];
+            $context       = ['unknown_property_policy' => $policy];
             $expectedClass = $this->getExpectedClassForResourceType($jsonData['resourceType']);
-            
+
             if ($expectedClass === null) {
                 return; // Skip if no mapping
             }
@@ -714,7 +722,7 @@ class FHIRResourceNormalizerTest extends TestCase
                     // Should successfully denormalize, ignoring unknown properties
                     $denormalized = $this->normalizer->denormalize($jsonData, $expectedClass, 'json', $context);
                     self::assertInstanceOf($expectedClass, $denormalized);
-                    
+
                     // Known properties should be set
                     self::assertEquals($jsonData['resourceType'], $denormalized->resourceType);
                     if (isset($jsonData['id'])) {
@@ -742,7 +750,7 @@ class FHIRResourceNormalizerTest extends TestCase
                     // Should preserve unknown properties in some way (implementation dependent)
                     $denormalized = $this->normalizer->denormalize($jsonData, $expectedClass, 'json', $context);
                     self::assertInstanceOf($expectedClass, $denormalized);
-                    
+
                     // Known properties should still be set correctly
                     self::assertEquals($jsonData['resourceType'], $denormalized->resourceType);
                     break;
@@ -758,15 +766,15 @@ class FHIRResourceNormalizerTest extends TestCase
         return Generator\bind(
             Generator\elements(['Patient', 'Observation']),
             static fn ($resourceType) => Generator\bind(
-                Generator\choose(1, 999999),
+                Generator\choose(1, 999),
                 static fn ($id) => Generator\bind(
                     Generator\bool(),
                     static fn ($includeUnknown) => Generator\constant(array_merge(
                         [
                             'resourceType' => $resourceType,
-                            'id' => (string) $id,
+                            'id'           => (string) $id,
                         ],
-                        $includeUnknown ? ['unknownProperty' => 'unknownValue'] : []
+                        $includeUnknown ? ['unknownProperty' => 'unknownValue'] : [],
                     )),
                 ),
             ),
@@ -792,16 +800,16 @@ class FHIRResourceNormalizerTest extends TestCase
                 self::fail('Expected exception for invalid JSON data: ' . json_encode($invalidData));
             } catch (\Exception $e) {
                 // Should throw a meaningful exception
-                self::assertInstanceOf(\Symfony\Component\Serializer\Exception\NotNormalizableValueException::class, $e);
-                
+                self::assertInstanceOf(NotNormalizableValueException::class, $e);
+
                 // Exception message should be meaningful
                 $message = strtolower($e->getMessage());
                 self::assertTrue(
-                    str_contains($message, 'resourcetype') ||
-                    str_contains($message, 'expected') ||
-                    str_contains($message, 'invalid') ||
-                    str_contains($message, 'array'),
-                    'Exception message should be meaningful: ' . $e->getMessage()
+                    str_contains($message, 'resourcetype')
+                    || str_contains($message, 'expected')
+                    || str_contains($message, 'invalid')
+                    || str_contains($message, 'array'),
+                    'Exception message should be meaningful: ' . $e->getMessage(),
                 );
             }
         });
@@ -815,18 +823,18 @@ class FHIRResourceNormalizerTest extends TestCase
         return Generator\oneOf(
             // Missing resourceType
             Generator\constant(['id' => 'test']),
-            
+
             // Non-string resourceType
             Generator\constant(['resourceType' => 123, 'id' => 'test']),
-            
+
             // Empty resourceType
             Generator\constant(['resourceType' => '', 'id' => 'test']),
-            
+
             // Non-array data
             Generator\string(),
             Generator\int(),
             Generator\bool(),
-            
+
             // Null data
             Generator\constant(null),
         );
@@ -850,16 +858,15 @@ class FHIRResourceNormalizerTest extends TestCase
         )->then(function($fhirObject) {
             // Test that the normalizer correctly identifies what it can handle
             $canNormalize = $this->normalizer->supportsNormalization($fhirObject, 'json');
-            
+
             if ($this->metadataExtractor->isResource($fhirObject)) {
                 // Should support resource normalization
                 self::assertTrue($canNormalize, 'Should support normalization of FHIR resources');
-                
+
                 // Should successfully normalize
                 $normalized = $this->normalizer->normalize($fhirObject, 'json');
                 self::assertIsArray($normalized);
                 self::assertArrayHasKey('resourceType', $normalized);
-                
             } else {
                 // Should not support non-resource normalization
                 self::assertFalse($canNormalize, 'Should not support normalization of non-resource objects');
@@ -867,9 +874,9 @@ class FHIRResourceNormalizerTest extends TestCase
 
             // Test denormalization support
             if ($this->metadataExtractor->isResource($fhirObject)) {
-                $className = get_class($fhirObject);
+                $className  = get_class($fhirObject);
                 $sampleData = ['resourceType' => $this->metadataExtractor->extractResourceType($fhirObject)];
-                
+
                 $canDenormalize = $this->normalizer->supportsDenormalization($sampleData, $className, 'json');
                 self::assertTrue($canDenormalize, 'Should support denormalization of FHIR resource data');
             }

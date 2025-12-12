@@ -33,6 +33,11 @@ class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface
     /**
      * {@inheritDoc}
      */
+    /**
+     * @param array<string, mixed> $context
+     *
+     * @return array<string, mixed>|string|int|float|bool|\ArrayObject<string, mixed>|null
+     */
     public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         if (!is_object($object)) {
@@ -97,6 +102,7 @@ class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface
     {
         // Check if the type is a FHIR primitive type class
         try {
+            /** @var class-string $type */
             $reflection = new \ReflectionClass($type);
             $attributes = $reflection->getAttributes(FHIRPrimitive::class);
 
@@ -119,6 +125,10 @@ class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface
      * Normalize primitive for JSON format with underscore notation for extensions
      *
      * @param array<string, mixed> $context
+     */
+    /**
+     * @param \ReflectionClass<object> $reflection
+     * @param array<string, mixed>     $context
      */
     private function normalizeForJSON(object $object, \ReflectionClass $reflection, array $context): mixed
     {
@@ -164,6 +174,12 @@ class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface
      * Normalize primitive for XML format with attributes and child elements
      *
      * @param array<string, mixed> $context
+     *
+     * @return array<string, mixed>
+     */
+    /**
+     * @param \ReflectionClass<object> $reflection
+     * @param array<string, mixed>     $context
      *
      * @return array<string, mixed>
      */
@@ -247,6 +263,7 @@ class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface
     private function createPrimitiveInstance(string $type, mixed $value, mixed $extensions): mixed
     {
         try {
+            /** @var class-string $type */
             $reflection = new \ReflectionClass($type);
 
             // Validate and convert the value based on primitive type
@@ -298,6 +315,7 @@ class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface
         }
 
         try {
+            /** @var class-string $type */
             $reflection = new \ReflectionClass($type);
             $attributes = $reflection->getAttributes(FHIRPrimitive::class);
 
