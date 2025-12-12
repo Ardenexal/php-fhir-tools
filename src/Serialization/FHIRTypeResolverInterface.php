@@ -63,4 +63,14 @@ interface FHIRTypeResolverInterface
      * @return string|null The resolved reference target type, or null if not resolvable
      */
     public function resolveReferenceType(array $referenceData): ?string;
+
+    /**
+     * Resolves the concrete complex type from the given data and context.
+     *
+     * @param array<string, mixed> $data    The serialized complex type data to analyze
+     * @param array<string, mixed> $context Additional context for type resolution
+     *
+     * @return string|null The resolved complex type class name, or null if type cannot be resolved
+     */
+    public function resolveComplexType(array $data, array $context = []): ?string;
 }

@@ -177,4 +177,23 @@ class FHIRTypeResolver implements FHIRTypeResolverInterface
     {
         $this->referenceTypeMapping[$referenceType] = $className;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function resolveComplexType(array $data, array $context = []): ?string
+    {
+        // For complex types, we typically don't have a discriminator field like resourceType
+        // The type resolution is usually handled by the caller based on the expected type
+        // However, we can try to infer from context or data structure
+
+        // If context provides a hint about the expected type, use it
+        if (isset($context['expected_type'])) {
+            return $context['expected_type'];
+        }
+
+        // For now, return null to let the caller handle type resolution
+        // This can be extended in the future with more sophisticated logic
+        return null;
+    }
 }

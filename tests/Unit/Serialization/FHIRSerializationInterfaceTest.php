@@ -242,6 +242,11 @@ class FHIRSerializationInterfaceTest extends TestCase
             {
                 return $referenceData['type'] ?? null;
             }
+
+            public function resolveComplexType(array $data, array $context = []): ?string
+            {
+                return $context['expected_type'] ?? null;
+            }
         };
     }
 

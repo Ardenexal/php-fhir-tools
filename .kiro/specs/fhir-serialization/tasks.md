@@ -121,7 +121,12 @@ subm# Implementation Plan
   - **Property 16: Discriminator map type resolution**
   - **Validates: Requirements 4.1**
 
-- [ ] 5. Implement FHIRComplexTypeNormalizer
+- [x] 5. Implement FHIRComplexTypeNormalizer
+
+
+
+
+
   - Create normalizer for FHIR complex type classes (Address, HumanName, etc.)
   - Handle nested object serialization and deserialization
   - Implement choice element (value[x]) pattern support
@@ -129,15 +134,21 @@ subm# Implementation Plan
   - Support polymorphic complex type resolution
   - _Requirements: 1.1, 2.1, 3.2, 4.2, 4.3_
 
-- [ ] 5.1 Write property test for complex type normalizer selection
+- [x] 5.1 Write property test for complex type normalizer selection
+
+
   - **Property 12: Complex type normalizer selection**
   - **Validates: Requirements 3.2**
 
-- [ ] 5.2 Write property test for choice element type suffix
+- [x] 5.2 Write property test for choice element type suffix
+
+
   - **Property 17: Choice element type suffix**
   - **Validates: Requirements 4.2**
 
-- [ ] 5.3 Write property test for polymorphic reference handling
+- [x] 5.3 Write property test for polymorphic reference handling
+
+
   - **Property 18: Polymorphic reference handling**
   - **Validates: Requirements 4.3**
 
