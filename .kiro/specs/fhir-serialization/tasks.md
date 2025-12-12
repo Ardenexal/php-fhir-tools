@@ -152,7 +152,15 @@ subm# Implementation Plan
   - **Property 18: Polymorphic reference handling**
   - **Validates: Requirements 4.3**
 
-- [ ] 6. Implement FHIRPrimitiveTypeNormalizer
+- [x] 6. Implement FHIRPrimitiveTypeNormalizer
+
+
+
+
+
+
+
+
   - Create normalizer for FHIR primitive types with extension support
   - Implement underscore notation for primitive extensions in JSON
   - Handle primitive value validation and type conversion
@@ -160,23 +168,34 @@ subm# Implementation Plan
   - Support primitive extension round-trip preservation
   - _Requirements: 1.3, 2.3, 3.3, 5.3, 7.5_
 
-- [ ] 6.1 Write property test for primitive extension underscore notation
+- [x] 6.1 Write property test for primitive extension underscore notation
+
+
+
   - **Property 3: Primitive extension underscore notation**
   - **Validates: Requirements 1.3**
 
-- [ ] 6.2 Write property test for primitive extension deserialization
+- [x] 6.2 Write property test for primitive extension deserialization
+
+
   - **Property 8: Primitive extension deserialization**
   - **Validates: Requirements 2.3**
 
-- [ ] 6.3 Write property test for primitive type normalizer selection
+- [x] 6.3 Write property test for primitive type normalizer selection
+
+
   - **Property 13: Primitive type normalizer selection**
   - **Validates: Requirements 3.3**
 
-- [ ] 6.4 Write property test for XML primitive extension serialization
+- [x] 6.4 Write property test for XML primitive extension serialization
+
+
   - **Property 23: XML primitive extension serialization**
   - **Validates: Requirements 5.3**
 
-- [ ] 6.5 Write property test for primitive extension round-trip
+- [x] 6.5 Write property test for primitive extension round-trip
+
+
   - **Property 31: Primitive extension round-trip**
   - **Validates: Requirements 7.5**
 
