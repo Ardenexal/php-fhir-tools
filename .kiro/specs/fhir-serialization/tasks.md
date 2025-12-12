@@ -223,7 +223,12 @@ subm# Implementation Plan
   - **Property 30: Nested structure preservation**
   - **Validates: Requirements 7.4**
 
-- [ ] 8. Implement discriminator map resolver
+- [x] 8. Implement discriminator map resolver
+
+
+
+
+
   - Create DiscriminatorMapResolver for polymorphic type resolution
   - Add resourceType-based resolution for resources
   - Implement choice element type resolution (value[x] patterns)
@@ -231,9 +236,13 @@ subm# Implementation Plan
   - Support extension value type resolution
   - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
 
-- [ ] 8.1 Write property test for polymorphic extension value serialization
+- [x] 8.1 Write property test for polymorphic extension value serialization
+
+
   - **Property 19: Polymorphic extension value serialization**
   - **Validates: Requirements 4.4**
+
+
 
 - [ ] 8.2 Write property test for polymorphic type deserialization
   - **Property 20: Polymorphic type deserialization**

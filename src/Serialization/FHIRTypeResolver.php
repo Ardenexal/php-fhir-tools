@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Serialization;
 
 /**
- * Basic implementation of FHIR type resolver for discriminator map support.
+ * Comprehensive FHIR discriminator map resolver for polymorphic type resolution.
  *
  * This resolver handles type resolution for polymorphic FHIR elements using
- * discriminator maps and other type resolution strategies.
+ * discriminator maps and other type resolution strategies including:
+ * - Resource type resolution based on resourceType field
+ * - Choice element resolution (value[x] patterns)
+ * - Reference type resolution for polymorphic references
+ * - Extension value type resolution
  *
  * @author Kiro AI Assistant
  */
@@ -23,11 +27,31 @@ class FHIRTypeResolver implements FHIRTypeResolverInterface
     /** @var array<string, string> */
     private array $referenceTypeMapping = [];
 
-    public function __construct(array $resourceTypeMapping = [], array $choiceElementMapping = [], array $referenceTypeMapping = [])
-    {
-        $this->resourceTypeMapping  = $resourceTypeMapping;
-        $this->choiceElementMapping = $choiceElementMapping;
-        $this->referenceTypeMapping = $referenceTypeMapping;
+    /** @var array<string, string> */
+    private array $extensionValueMapping = [];
+
+    /** @var array<string, string> */
+    private array $complexTypeMapping = [];
+
+    /**
+     * @param array<string, string> $resourceTypeMapping
+     * @param array<string, string> $choiceElementMapping
+     * @param array<string, string> $referenceTypeMapping
+     * @param array<string, string> $extensionValueMapping
+     * @param array<string, string> $complexTypeMapping
+     */
+    public function __construct(
+        array $resourceTypeMapping = [],
+        array $choiceElementMapping = [],
+        array $referenceTypeMapping = [],
+        array $extensionValueMapping = [],
+        array $complexTypeMapping = []
+    ) {
+        $this->resourceTypeMapping   = $resourceTypeMapping;
+        $this->choiceElementMapping  = $choiceElementMapping;
+        $this->referenceTypeMapping  = $referenceTypeMapping;
+        $this->extensionValueMapping = $extensionValueMapping;
+        $this->complexTypeMapping    = $complexTypeMapping;
     }
 
     /**
@@ -38,6 +62,14 @@ class FHIRTypeResolver implements FHIRTypeResolverInterface
         // Try to resolve as resource type first
         if (isset($data['resourceType'])) {
             return $this->resolveResourceType($data);
+        }
+
+        // Try to resolve as extension with polymorphic value
+        if (isset($data['url']) && $this->hasExtensionValue($data)) {
+            $type = $this->resolveExtensionValueType($data);
+            if ($type !== null) {
+                return $type;
+            }
         }
 
         // Try to resolve as choice element
@@ -55,7 +87,8 @@ class FHIRTypeResolver implements FHIRTypeResolverInterface
             return $this->resolveReferenceType($data);
         }
 
-        return null;
+        // Try to resolve as complex type using context or data structure
+        return $this->resolveComplexType($data, $context);
     }
 
     /**
@@ -129,8 +162,13 @@ class FHIRTypeResolver implements FHIRTypeResolverInterface
         // Try to resolve from explicit type field
         if (isset($referenceData['type'])) {
             $type = $referenceData['type'];
-            if (is_string($type) && isset($this->referenceTypeMapping[$type])) {
-                return $this->referenceTypeMapping[$type];
+            if (is_string($type)) {
+                if (isset($this->referenceTypeMapping[$type])) {
+                    return $this->referenceTypeMapping[$type];
+                }
+
+                // Default mapping for explicit type field
+                return 'FHIR' . $type;
             }
         }
 
@@ -179,21 +217,157 @@ class FHIRTypeResolver implements FHIRTypeResolverInterface
     }
 
     /**
+     * Add an extension value type mapping
+     */
+    public function addExtensionValueMapping(string $valueType, string $className): void
+    {
+        $this->extensionValueMapping[$valueType] = $className;
+    }
+
+    /**
+     * Add a complex type mapping
+     */
+    public function addComplexTypeMapping(string $complexType, string $className): void
+    {
+        $this->complexTypeMapping[$complexType] = $className;
+    }
+
+    /**
+     * Get all resource type mappings
+     *
+     * @return array<string, string>
+     */
+    public function getResourceTypeMappings(): array
+    {
+        return $this->resourceTypeMapping;
+    }
+
+    /**
+     * Get all choice element mappings
+     *
+     * @return array<string, string>
+     */
+    public function getChoiceElementMappings(): array
+    {
+        return $this->choiceElementMapping;
+    }
+
+    /**
+     * Get all reference type mappings
+     *
+     * @return array<string, string>
+     */
+    public function getReferenceTypeMappings(): array
+    {
+        return $this->referenceTypeMapping;
+    }
+
+    /**
+     * Get all extension value mappings
+     *
+     * @return array<string, string>
+     */
+    public function getExtensionValueMappings(): array
+    {
+        return $this->extensionValueMapping;
+    }
+
+    /**
+     * Get all complex type mappings
+     *
+     * @return array<string, string>
+     */
+    public function getComplexTypeMappings(): array
+    {
+        return $this->complexTypeMapping;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function resolveComplexType(array $data, array $context = []): ?string
     {
-        // For complex types, we typically don't have a discriminator field like resourceType
-        // The type resolution is usually handled by the caller based on the expected type
-        // However, we can try to infer from context or data structure
-
         // If context provides a hint about the expected type, use it
         if (isset($context['expected_type'])) {
             return $context['expected_type'];
         }
 
-        // For now, return null to let the caller handle type resolution
-        // This can be extended in the future with more sophisticated logic
+        // Try to infer complex type from data structure patterns
+        if (isset($context['property_name'])) {
+            $propertyName = $context['property_name'];
+
+            // Check if we have a mapping for this property to a complex type
+            if (isset($this->complexTypeMapping[$propertyName])) {
+                return $this->complexTypeMapping[$propertyName];
+            }
+        }
+
+        // Try to infer from common FHIR complex type patterns
+        if (isset($data['system']) && isset($data['code'])) {
+            return $this->complexTypeMapping['Coding'] ?? 'FHIRCoding';
+        }
+
+        if (isset($data['family']) || isset($data['given'])) {
+            return $this->complexTypeMapping['HumanName'] ?? 'FHIRHumanName';
+        }
+
+        if (isset($data['line']) || isset($data['city']) || isset($data['postalCode'])) {
+            return $this->complexTypeMapping['Address'] ?? 'FHIRAddress';
+        }
+
+        if (isset($data['start']) || isset($data['end'])) {
+            return $this->complexTypeMapping['Period'] ?? 'FHIRPeriod';
+        }
+
+        if (isset($data['value']) && isset($data['unit'])) {
+            return $this->complexTypeMapping['Quantity'] ?? 'FHIRQuantity';
+        }
+
         return null;
+    }
+
+    /**
+     * Resolves the type for FHIR extension values (polymorphic extensions).
+     *
+     * @param array<string, mixed> $extensionData The extension data containing value[x]
+     *
+     * @return string|null The resolved extension value type, or null if not found
+     */
+    public function resolveExtensionValueType(array $extensionData): ?string
+    {
+        // Look for value[x] patterns in extension data
+        foreach ($extensionData as $key => $value) {
+            if (str_starts_with($key, 'value') && $key !== 'value') {
+                $typeSuffix = substr($key, 5); // Remove 'value' prefix
+
+                // Check if we have a mapping for this extension value type
+                if (isset($this->extensionValueMapping[$typeSuffix])) {
+                    return $this->extensionValueMapping[$typeSuffix];
+                }
+
+                // Default mapping: assume classes are named FHIR{Type}
+                return 'FHIR' . $typeSuffix;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Checks if the given data contains an extension value field.
+     *
+     * @param array<string, mixed> $data The data to check
+     *
+     * @return bool True if extension value field is present
+     */
+    private function hasExtensionValue(array $data): bool
+    {
+        foreach ($data as $key => $value) {
+            if (str_starts_with($key, 'value') && $key !== 'value') {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
