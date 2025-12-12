@@ -122,20 +122,20 @@ class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface
      */
     private function normalizeForJSON(object $object, \ReflectionClass $reflection, array $context): mixed
     {
-        $value = null;
+        $value      = null;
         $extensions = null;
 
         // Extract value
         if ($reflection->hasProperty('value')) {
             $valueProperty = $reflection->getProperty('value');
-            $value = $valueProperty->getValue($object);
+            $value         = $valueProperty->getValue($object);
         }
 
         // Extract extensions
         if ($reflection->hasProperty('extension')) {
             $extensionProperty = $reflection->getProperty('extension');
-            $extensionValue = $extensionProperty->getValue($object);
-            
+            $extensionValue    = $extensionProperty->getValue($object);
+
             if ($extensionValue !== null && !empty($extensionValue)) {
                 if ($this->normalizer !== null) {
                     $extensions = $this->normalizer->normalize($extensionValue, 'json', $context);
@@ -174,8 +174,8 @@ class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface
         // Extract value for XML attribute
         if ($reflection->hasProperty('value')) {
             $valueProperty = $reflection->getProperty('value');
-            $value = $valueProperty->getValue($object);
-            
+            $value         = $valueProperty->getValue($object);
+
             if ($value !== null) {
                 $result['@value'] = $value;
             }
@@ -184,8 +184,8 @@ class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface
         // Extract extensions for XML child elements
         if ($reflection->hasProperty('extension')) {
             $extensionProperty = $reflection->getProperty('extension');
-            $extensions = $extensionProperty->getValue($object);
-            
+            $extensions        = $extensionProperty->getValue($object);
+
             if ($extensions !== null && !empty($extensions)) {
                 if ($this->normalizer !== null) {
                     $result['extension'] = $this->normalizer->normalize($extensions, 'xml', $context);
@@ -206,7 +206,7 @@ class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface
      */
     private function denormalizeFromArray(array $data, string $type, ?string $format, array $context): mixed
     {
-        $value = null;
+        $value      = null;
         $extensions = null;
 
         // Handle JSON format
@@ -248,10 +248,10 @@ class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface
     {
         try {
             $reflection = new \ReflectionClass($type);
-            
+
             // Validate and convert the value based on primitive type
             $validatedValue = $this->validateAndConvertValue($value, $type);
-            
+
             // Create instance
             $instance = $reflection->newInstanceWithoutConstructor();
 
@@ -264,7 +264,7 @@ class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface
             // Set extension property
             if ($extensions !== null && $reflection->hasProperty('extension')) {
                 $extensionProperty = $reflection->getProperty('extension');
-                
+
                 // Denormalize extensions if denormalizer is available
                 if ($this->denormalizer !== null && is_array($extensions)) {
                     $denormalizedExtensions = [];
@@ -300,23 +300,23 @@ class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface
         try {
             $reflection = new \ReflectionClass($type);
             $attributes = $reflection->getAttributes(FHIRPrimitive::class);
-            
+
             if (empty($attributes)) {
                 return $value; // Not a FHIR primitive, return as-is
             }
 
             /** @var FHIRPrimitive $primitiveAttribute */
             $primitiveAttribute = $attributes[0]->newInstance();
-            $primitiveType = $primitiveAttribute->primitiveType;
+            $primitiveType      = $primitiveAttribute->primitiveType;
 
             return match ($primitiveType) {
-                'string', 'code', 'uri', 'url', 'canonical', 'base64Binary', 
-                'instant', 'date', 'dateTime', 'time', 'oid', 'id', 'uuid', 
+                'string', 'code', 'uri', 'url', 'canonical', 'base64Binary',
+                'instant', 'date', 'dateTime', 'time', 'oid', 'id', 'uuid',
                 'markdown', 'xhtml' => $this->validateString($value),
                 'integer', 'positiveInt', 'unsignedInt' => $this->validateInteger($value),
                 'decimal' => $this->validateDecimal($value),
                 'boolean' => $this->validateBoolean($value),
-                default => $value, // Unknown type, return as-is
+                default   => $value, // Unknown type, return as-is
             };
         } catch (\ReflectionException) {
             return $value; // Can't reflect, return as-is

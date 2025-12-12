@@ -20,13 +20,14 @@ use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 class FHIRPrimitiveTypeNormalizerTest extends TestCase
 {
     private FHIRPrimitiveTypeNormalizer $normalizer;
+
     private FHIRMetadataExtractor $metadataExtractor;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->metadataExtractor = new FHIRMetadataExtractor();
-        $this->normalizer = new FHIRPrimitiveTypeNormalizer($this->metadataExtractor);
+        $this->normalizer        = new FHIRPrimitiveTypeNormalizer($this->metadataExtractor);
     }
 
     /**
@@ -38,13 +39,13 @@ class FHIRPrimitiveTypeNormalizerTest extends TestCase
         // Test with various primitive types and extensions
         $extensions = [
             ['url' => 'http://example.com/ext1', 'valueString' => 'test'],
-            ['url' => 'http://example.com/ext2', 'valueInteger' => 42]
+            ['url' => 'http://example.com/ext2', 'valueInteger' => 42],
         ];
 
         // Test FHIRString with extensions
         $stringPrimitive = new FHIRString('test value', $extensions);
-        $result = $this->normalizer->normalize($stringPrimitive, 'json');
-        
+        $result          = $this->normalizer->normalize($stringPrimitive, 'json');
+
         self::assertTrue($this->normalizer->supportsNormalization($stringPrimitive, 'json'));
         self::assertEquals('test value', $result);
     }
@@ -57,15 +58,15 @@ class FHIRPrimitiveTypeNormalizerTest extends TestCase
     {
         // Test JSON with primitive extension underscore notation
         $jsonData = [
-            'value' => 'test value',
+            'value'     => 'test value',
             'extension' => [
                 ['url' => 'http://example.com/ext1', 'valueString' => 'test'],
-                ['url' => 'http://example.com/ext2', 'valueInteger' => 42]
-            ]
+                ['url' => 'http://example.com/ext2', 'valueInteger' => 42],
+            ],
         ];
 
         $result = $this->normalizer->denormalize($jsonData, FHIRString::class, 'json');
-        
+
         self::assertInstanceOf(FHIRString::class, $result);
         self::assertEquals('test value', $result->value);
         self::assertNotNull($result->extension);
@@ -85,20 +86,20 @@ class FHIRPrimitiveTypeNormalizerTest extends TestCase
             new FHIRString('test'),
             new FHIRInteger(42),
             new FHIRBoolean(true),
-            new FHIRDecimal(3.14)
+            new FHIRDecimal(3.14),
         ];
 
         foreach ($primitives as $primitive) {
             // The normalizer should support normalization for all FHIR primitive types
             self::assertTrue(
                 $this->normalizer->supportsNormalization($primitive),
-                sprintf('Normalizer should support %s', get_class($primitive))
+                sprintf('Normalizer should support %s', get_class($primitive)),
             );
-            
+
             // The normalizer should support denormalization for all FHIR primitive types
             self::assertTrue(
                 $this->normalizer->supportsDenormalization([], get_class($primitive)),
-                sprintf('Normalizer should support denormalization of %s', get_class($primitive))
+                sprintf('Normalizer should support denormalization of %s', get_class($primitive)),
             );
         }
 
@@ -108,13 +109,13 @@ class FHIRPrimitiveTypeNormalizerTest extends TestCase
             'string',
             42,
             true,
-            []
+            [],
         ];
 
         foreach ($nonPrimitives as $nonPrimitive) {
             self::assertFalse(
                 $this->normalizer->supportsNormalization($nonPrimitive),
-                sprintf('Normalizer should not support %s', gettype($nonPrimitive))
+                sprintf('Normalizer should not support %s', gettype($nonPrimitive)),
             );
         }
     }
@@ -128,25 +129,25 @@ class FHIRPrimitiveTypeNormalizerTest extends TestCase
         // Test XML serialization with primitive extensions
         $extensions = [
             ['url' => 'http://example.com/ext1', 'valueString' => 'test'],
-            ['url' => 'http://example.com/ext2', 'valueInteger' => 42]
+            ['url' => 'http://example.com/ext2', 'valueInteger' => 42],
         ];
 
         $stringPrimitive = new FHIRString('test value', $extensions);
-        $result = $this->normalizer->normalize($stringPrimitive, 'xml');
-        
+        $result          = $this->normalizer->normalize($stringPrimitive, 'xml');
+
         // For XML format, the result should be an array with @value and extension
         self::assertIsArray($result);
         self::assertArrayHasKey('@value', $result);
         self::assertEquals('test value', $result['@value']);
-        
+
         // Extensions should be included as child elements
         self::assertArrayHasKey('extension', $result);
         self::assertEquals($extensions, $result['extension']);
 
         // Test with integer primitive
         $integerPrimitive = new FHIRInteger(42, $extensions);
-        $result = $this->normalizer->normalize($integerPrimitive, 'xml');
-        
+        $result           = $this->normalizer->normalize($integerPrimitive, 'xml');
+
         self::assertIsArray($result);
         self::assertArrayHasKey('@value', $result);
         self::assertEquals(42, $result['@value']);
@@ -162,36 +163,36 @@ class FHIRPrimitiveTypeNormalizerTest extends TestCase
         // Test round-trip preservation of primitive values with extensions
         $extensions = [
             ['url' => 'http://example.com/ext1', 'valueString' => 'test'],
-            ['url' => 'http://example.com/ext2', 'valueInteger' => 42]
+            ['url' => 'http://example.com/ext2', 'valueInteger' => 42],
         ];
 
         $primitives = [
             new FHIRString('test value', $extensions),
             new FHIRInteger(42, $extensions),
             new FHIRBoolean(true, $extensions),
-            new FHIRDecimal(3.14, $extensions)
+            new FHIRDecimal(3.14, $extensions),
         ];
 
         foreach ($primitives as $original) {
             // Test JSON round-trip
             $normalized = $this->normalizer->normalize($original, 'json');
-            
+
             // For JSON, we need to simulate the full round-trip with extensions
             $jsonData = [
-                'value' => $normalized,
-                'extension' => $extensions
+                'value'     => $normalized,
+                'extension' => $extensions,
             ];
-            
+
             $denormalized = $this->normalizer->denormalize($jsonData, get_class($original), 'json');
-            
+
             self::assertInstanceOf(get_class($original), $denormalized);
             self::assertEquals($original->value, $denormalized->value);
             self::assertEquals($original->extension, $denormalized->extension);
 
             // Test XML round-trip
-            $xmlNormalized = $this->normalizer->normalize($original, 'xml');
+            $xmlNormalized   = $this->normalizer->normalize($original, 'xml');
             $xmlDenormalized = $this->normalizer->denormalize($xmlNormalized, get_class($original), 'xml');
-            
+
             self::assertInstanceOf(get_class($original), $xmlDenormalized);
             self::assertEquals($original->value, $xmlDenormalized->value);
             self::assertEquals($original->extension, $xmlDenormalized->extension);
@@ -200,7 +201,7 @@ class FHIRPrimitiveTypeNormalizerTest extends TestCase
 
     public function testSupportsNormalization()
     {
-        $string = new FHIRString('test');
+        $string  = new FHIRString('test');
         $integer = new FHIRInteger(42);
 
         self::assertTrue($this->normalizer->supportsNormalization($string));

@@ -108,8 +108,8 @@ class FHIRComplexTypeNormalizerTest extends TestCase
             }
 
             // If the extension has choice elements, at least one should be present
-            if ($extension->valueString                                          !== null || $extension->valueInteger !== null
-                                                                                          || $extension->valueBoolean !== null || $extension->valueCodeableConcept !== null) {
+            if ($extension->valueString                                                                               !== null || $extension->valueInteger !== null
+                                                                                                                               || $extension->valueBoolean !== null || $extension->valueCodeableConcept !== null) {
                 self::assertTrue($hasChoiceElement, 'Choice elements should be preserved with type suffix');
             }
         });

@@ -199,7 +199,12 @@ subm# Implementation Plan
   - **Property 31: Primitive extension round-trip**
   - **Validates: Requirements 7.5**
 
-- [ ] 7. Implement FHIRBackboneElementNormalizer
+- [x] 7. Implement FHIRBackboneElementNormalizer
+
+
+
+
+
   - Create normalizer for backbone elements within resources
   - Handle backbone element extensions and modifierExtensions
   - Support nested backbone element structures
@@ -207,11 +212,14 @@ subm# Implementation Plan
   - Add backbone element metadata handling
   - _Requirements: 1.1, 2.1, 3.4, 7.4_
 
-- [ ] 7.1 Write property test for backbone element normalizer selection
+- [x] 7.1 Write property test for backbone element normalizer selection
+
+
   - **Property 14: Backbone element normalizer selection**
   - **Validates: Requirements 3.4**
 
-- [ ] 7.2 Write property test for nested structure preservation
+- [x] 7.2 Write property test for nested structure preservation
+
   - **Property 30: Nested structure preservation**
   - **Validates: Requirements 7.4**
 
