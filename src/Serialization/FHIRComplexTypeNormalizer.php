@@ -48,58 +48,13 @@ class FHIRComplexTypeNormalizer implements FHIRNormalizerInterface
             throw new InvalidArgumentException('Object is not a FHIR complex type');
         }
 
-        $data = [];
-
-        // Normalize all properties of the object
-        $reflection = new \ReflectionClass($object);
-        $properties = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
-
-        foreach ($properties as $property) {
-            $propertyName = $property->getName();
-            $value        = $property->getValue($object);
-
-            // Skip null values according to FHIR JSON rules
-            if ($value === null) {
-                continue;
-            }
-
-            // Skip empty arrays according to FHIR JSON rules
-            if (is_array($value) && empty($value)) {
-                continue;
-            }
-
-            // Handle choice elements (value[x] pattern)
-            if ($this->isChoiceElement($propertyName)) {
-                $normalizedValue = $this->normalizeChoiceElement($propertyName, $value, $format, $context);
-                if ($normalizedValue !== null) {
-                    $data[$propertyName] = $normalizedValue;
-                }
-            } else {
-                // Handle extensions with underscore notation for primitives
-                if ($this->isPrimitiveWithExtensions($value, $propertyName)) {
-                    $normalizedValue = $this->normalizePrimitiveWithExtensions($value, $format, $context);
-                    if ($normalizedValue !== null) {
-                        $data[$propertyName] = $normalizedValue['value'];
-                        if (isset($normalizedValue['extensions'])) {
-                            $data['_' . $propertyName] = $normalizedValue['extensions'];
-                        }
-                    }
-                } else {
-                    // Use the injected normalizer if available, otherwise handle basic types
-                    if ($this->normalizer !== null) {
-                        $normalizedValue = $this->normalizer->normalize($value, $format, $context);
-                    } else {
-                        $normalizedValue = $this->normalizeBasicValue($value, $format, $context);
-                    }
-
-                    if ($normalizedValue !== null) {
-                        $data[$propertyName] = $normalizedValue;
-                    }
-                }
-            }
+        // Handle XML format
+        if ($format === 'xml') {
+            return $this->normalizeForXML($object, $context);
         }
 
-        return $data;
+        // Handle JSON format (default)
+        return $this->normalizeForJSON($object, $context);
     }
 
     /**
@@ -414,6 +369,129 @@ class FHIRComplexTypeNormalizer implements FHIRNormalizerInterface
     {
         // For basic denormalization, just return the value as-is
         return $value;
+    }
+
+    /**
+     * Normalize complex type for JSON format
+     *
+     * @param array<string, mixed> $context
+     *
+     * @return array<string, mixed>
+     */
+    private function normalizeForJSON(object $object, array $context): array
+    {
+        $data = [];
+
+        // Normalize all properties of the object
+        $reflection = new \ReflectionClass($object);
+        $properties = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
+
+        foreach ($properties as $property) {
+            $propertyName = $property->getName();
+            $value        = $property->getValue($object);
+
+            // Skip null values according to FHIR JSON rules
+            if ($value === null) {
+                continue;
+            }
+
+            // Skip empty arrays according to FHIR JSON rules
+            if (is_array($value) && empty($value)) {
+                continue;
+            }
+
+            // Handle choice elements (value[x] pattern)
+            if ($this->isChoiceElement($propertyName)) {
+                $normalizedValue = $this->normalizeChoiceElement($propertyName, $value, 'json', $context);
+                if ($normalizedValue !== null) {
+                    $data[$propertyName] = $normalizedValue;
+                }
+            } else {
+                // Handle extensions with underscore notation for primitives
+                if ($this->isPrimitiveWithExtensions($value, $propertyName)) {
+                    $normalizedValue = $this->normalizePrimitiveWithExtensions($value, 'json', $context);
+                    if ($normalizedValue !== null) {
+                        $data[$propertyName] = $normalizedValue['value'];
+                        if (isset($normalizedValue['extensions'])) {
+                            $data['_' . $propertyName] = $normalizedValue['extensions'];
+                        }
+                    }
+                } else {
+                    // Use the injected normalizer if available, otherwise handle basic types
+                    if ($this->normalizer !== null) {
+                        $normalizedValue = $this->normalizer->normalize($value, 'json', $context);
+                    } else {
+                        $normalizedValue = $this->normalizeBasicValue($value, 'json', $context);
+                    }
+
+                    if ($normalizedValue !== null) {
+                        $data[$propertyName] = $normalizedValue;
+                    }
+                }
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Normalize complex type for XML format
+     *
+     * @param array<string, mixed> $context
+     *
+     * @return array<string, mixed>
+     */
+    private function normalizeForXML(object $object, array $context): array
+    {
+        $data = [];
+
+        // Normalize all properties of the object
+        $reflection = new \ReflectionClass($object);
+        $properties = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
+
+        foreach ($properties as $property) {
+            $propertyName = $property->getName();
+            $value        = $property->getValue($object);
+
+            // Skip null values according to FHIR XML rules
+            if ($value === null) {
+                continue;
+            }
+
+            // Skip empty arrays according to FHIR XML rules
+            if (is_array($value) && empty($value)) {
+                continue;
+            }
+
+            // Handle choice elements (value[x] pattern) - same as JSON
+            if ($this->isChoiceElement($propertyName)) {
+                $normalizedValue = $this->normalizeChoiceElement($propertyName, $value, 'xml', $context);
+                if ($normalizedValue !== null) {
+                    $data[$propertyName] = $normalizedValue;
+                }
+            } else {
+                // Handle primitive extensions for XML (no underscore notation)
+                if ($this->isPrimitiveWithExtensions($value, $propertyName)) {
+                    $normalizedValue = $this->normalizePrimitiveWithExtensions($value, 'xml', $context);
+                    if ($normalizedValue !== null) {
+                        $data[$propertyName] = $normalizedValue;
+                    }
+                } else {
+                    // Use the injected normalizer if available, otherwise handle basic types
+                    if ($this->normalizer !== null) {
+                        $normalizedValue = $this->normalizer->normalize($value, 'xml', $context);
+                    } else {
+                        $normalizedValue = $this->normalizeBasicValue($value, 'xml', $context);
+                    }
+
+                    if ($normalizedValue !== null) {
+                        $data[$propertyName] = $normalizedValue;
+                    }
+                }
+            }
+        }
+
+        return $data;
     }
 
     /**

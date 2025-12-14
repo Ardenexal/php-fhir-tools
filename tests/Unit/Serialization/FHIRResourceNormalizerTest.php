@@ -903,6 +903,327 @@ class FHIRResourceNormalizerTest extends TestCase
     }
 
     /**
+     * **Feature: fhir-serialization, Property 21: FHIR XML specification compliance**
+     * **Validates: Requirements 5.1**
+     *
+     * For any FHIR resource, serializing to XML should produce output that conforms
+     * to the official FHIR XML specification
+     */
+    public function testFHIRXMLSpecificationCompliance()
+    {
+        $this->forAll(
+            $this->generateFHIRResource(),
+        )->then(function($resource) {
+            $normalized = $this->normalizer->normalize($resource, 'xml');
+
+            // Must be an array (XML structure)
+            self::assertIsArray($normalized);
+
+            // Must have FHIR namespace declaration
+            self::assertArrayHasKey('@xmlns', $normalized);
+            self::assertEquals('http://hl7.org/fhir', $normalized['@xmlns']);
+
+            // Must have resourceType information
+            self::assertArrayHasKey('@resourceType', $normalized);
+            self::assertIsString($normalized['@resourceType']);
+
+            // resourceType should match the resource's type
+            $expectedResourceType = $this->metadataExtractor->extractResourceType($resource);
+            self::assertEquals($expectedResourceType, $normalized['@resourceType']);
+
+            // Should not contain null values (FHIR XML rule)
+            $this->assertNoNullValues($normalized);
+
+            // Should not contain empty arrays (FHIR XML rule)
+            $this->assertNoEmptyArrays($normalized);
+
+            // Should not have underscore notation (that's JSON-specific)
+            $this->assertNoUnderscoreNotation($normalized);
+
+            // All keys should be valid FHIR element names or XML attributes
+            $this->assertValidFHIRXMLElementNames($normalized);
+        });
+    }
+
+    /**
+     * **Feature: fhir-serialization, Property 22: XML namespace inclusion**
+     * **Validates: Requirements 5.2**
+     *
+     * For any FHIR XML output, proper FHIR namespace declarations should be included
+     * according to the specification
+     */
+    public function testXMLNamespaceInclusion()
+    {
+        $this->forAll(
+            $this->generateFHIRResource(),
+        )->then(function($resource) {
+            $normalized = $this->normalizer->normalize($resource, 'xml');
+
+            // Must have FHIR namespace declaration
+            self::assertArrayHasKey('@xmlns', $normalized);
+            self::assertEquals('http://hl7.org/fhir', $normalized['@xmlns']);
+
+            // Namespace should be the official FHIR namespace
+            self::assertStringStartsWith('http://hl7.org/fhir', $normalized['@xmlns']);
+
+            // Should not have multiple conflicting namespace declarations
+            $xmlnsKeys = array_filter(array_keys($normalized), fn ($key) => str_starts_with($key, '@xmlns'));
+            self::assertCount(1, $xmlnsKeys, 'Should have exactly one namespace declaration');
+        });
+    }
+
+    /**
+     * **Feature: fhir-serialization, Property 24: XML deserialization accuracy**
+     * **Validates: Requirements 5.4**
+     *
+     * For any valid FHIR XML input, deserialization should correctly parse
+     * the XML into appropriate PHP FHIR objects
+     */
+    public function testXMLDeserializationAccuracy()
+    {
+        $this->forAll(
+            $this->generateValidFHIRXML(),
+        )->then(function($xmlData) {
+            $resourceType  = $xmlData['@resourceType'] ?? 'Patient';
+            $expectedClass = $this->getExpectedClassForResourceType($resourceType);
+
+            if ($expectedClass === null) {
+                // Skip if we don't have a mapping for this resource type
+                return;
+            }
+
+            // Add context to help with XML deserialization
+            $context = ['xml_element_name' => $resourceType];
+
+            $denormalized = $this->normalizer->denormalize($xmlData, $expectedClass, 'xml', $context);
+
+            // Should create an instance of the correct class
+            self::assertInstanceOf($expectedClass, $denormalized);
+
+            // Should be a FHIR resource
+            self::assertTrue($this->metadataExtractor->isResource($denormalized));
+
+            // Should have the correct resource type
+            $actualResourceType = $this->metadataExtractor->extractResourceType($denormalized);
+            self::assertEquals($resourceType, $actualResourceType);
+
+            // Properties should be correctly set from XML data
+            if (isset($xmlData['id'])) {
+                self::assertEquals($xmlData['id'], $denormalized->id);
+            }
+        });
+    }
+
+    /**
+     * **Feature: fhir-serialization, Property 25: XML schema validation**
+     * **Validates: Requirements 5.5**
+     *
+     * For any FHIR XML when validation is enabled, the output should validate
+     * against official FHIR XML schemas
+     */
+    public function testXMLSchemaValidation()
+    {
+        $this->forAll(
+            $this->generateFHIRResource(),
+        )->then(function($resource) {
+            $normalized = $this->normalizer->normalize($resource, 'xml');
+
+            // Basic structural validation (simplified schema validation)
+            self::assertIsArray($normalized);
+
+            // Must have required XML structure elements
+            self::assertArrayHasKey('@xmlns', $normalized);
+            self::assertArrayHasKey('@resourceType', $normalized);
+
+            // Namespace must be valid FHIR namespace
+            self::assertEquals('http://hl7.org/fhir', $normalized['@xmlns']);
+
+            // ResourceType must be valid
+            $resourceType = $normalized['@resourceType'];
+            self::assertIsString($resourceType);
+            self::assertNotEmpty($resourceType);
+            self::assertMatchesRegularExpression('/^[A-Z][a-zA-Z0-9]*$/', $resourceType);
+
+            // All element names should follow FHIR XML naming conventions
+            $this->assertValidFHIRXMLStructure($normalized);
+        });
+    }
+
+    /**
+     * Generate valid FHIR XML data for testing deserialization
+     */
+    private function generateValidFHIRXML(): Generator
+    {
+        return Generator\oneOf(
+            $this->generatePatientXML(),
+            $this->generateObservationXML(),
+        );
+    }
+
+    /**
+     * Generate Patient XML data
+     */
+    private function generatePatientXML(): Generator
+    {
+        return Generator\bind(
+            Generator\choose(1, 999),
+            static fn ($id) => Generator\bind(
+                Generator\elements(['male', 'female', 'other', 'unknown']),
+                static fn ($gender) => Generator\constant([
+                    '@xmlns'        => 'http://hl7.org/fhir',
+                    '@resourceType' => 'Patient',
+                    'id'            => (string) $id,
+                    'gender'        => $gender, // Simple string for now
+                    'name'          => [
+                        [
+                            'family' => 'TestFamily',
+                            'given'  => ['TestGiven'],
+                        ],
+                    ],
+                ]),
+            ),
+        );
+    }
+
+    /**
+     * Generate Observation XML data
+     */
+    private function generateObservationXML(): Generator
+    {
+        return Generator\bind(
+            Generator\choose(1, 999),
+            static fn ($id) => Generator\bind(
+                Generator\elements(['final', 'preliminary', 'amended']),
+                static fn ($status) => Generator\constant([
+                    '@xmlns'        => 'http://hl7.org/fhir',
+                    '@resourceType' => 'Observation',
+                    'id'            => (string) $id,
+                    'status'        => $status, // Simple string for now
+                    'code'          => [
+                        'coding' => [
+                            [
+                                'system' => 'http://loinc.org',
+                                'code'   => '29463-7',
+                            ],
+                        ],
+                    ],
+                ]),
+            ),
+        );
+    }
+
+    /**
+     * Assert that the normalized data contains no underscore notation (JSON-specific)
+     */
+    private function assertNoUnderscoreNotation(array $data): void
+    {
+        foreach ($data as $key => $value) {
+            // Skip numeric keys (array indices)
+            if (is_int($key)) {
+                if (is_array($value)) {
+                    $this->assertNoUnderscoreNotation($value);
+                }
+                continue;
+            }
+
+            // Skip XML attributes (start with @)
+            if (str_starts_with($key, '@')) {
+                continue;
+            }
+
+            // Should not have underscore notation in XML
+            self::assertFalse(
+                str_starts_with($key, '_'),
+                "Found underscore notation in XML output: {$key}",
+            );
+
+            if (is_array($value)) {
+                $this->assertNoUnderscoreNotation($value);
+            }
+        }
+    }
+
+    /**
+     * Assert that all element names are valid FHIR XML names
+     */
+    private function assertValidFHIRXMLElementNames(array $data): void
+    {
+        foreach ($data as $key => $value) {
+            // Skip numeric keys (array indices)
+            if (is_int($key)) {
+                if (is_array($value)) {
+                    $this->assertValidFHIRXMLElementNames($value);
+                }
+                continue;
+            }
+
+            // XML attributes start with @
+            if (str_starts_with($key, '@')) {
+                $attributeName = substr($key, 1);
+                self::assertMatchesRegularExpression('/^[a-zA-Z][a-zA-Z0-9]*$/', $attributeName, "Invalid XML attribute name: {$key}");
+            } else {
+                // Regular element names should be valid FHIR element names
+                self::assertMatchesRegularExpression('/^[a-zA-Z][a-zA-Z0-9]*$/', $key, "Invalid FHIR XML element name: {$key}");
+            }
+
+            if (is_array($value)) {
+                $this->assertValidFHIRXMLElementNames($value);
+            }
+        }
+    }
+
+    /**
+     * Assert valid FHIR XML structure
+     */
+    private function assertValidFHIRXMLStructure(array $data): void
+    {
+        // Must have namespace
+        self::assertArrayHasKey('@xmlns', $data);
+
+        // Must have resourceType
+        self::assertArrayHasKey('@resourceType', $data);
+
+        // All primitive values should be in @value attributes or proper structure
+        $this->assertValidXMLPrimitiveStructure($data);
+    }
+
+    /**
+     * Assert valid XML primitive structure
+     */
+    private function assertValidXMLPrimitiveStructure(array $data): void
+    {
+        foreach ($data as $key => $value) {
+            // Skip numeric keys (array indices)
+            if (is_int($key)) {
+                if (is_array($value)) {
+                    $this->assertValidXMLPrimitiveStructure($value);
+                }
+                continue;
+            }
+
+            // Skip XML attributes
+            if (str_starts_with($key, '@')) {
+                continue;
+            }
+
+            if (is_array($value)) {
+                // If it's an array representing a primitive with extensions,
+                // it should have @value for the primitive value
+                if (isset($value['@value'])) {
+                    // This is a primitive with potential extensions
+                    self::assertTrue(
+                        is_scalar($value['@value']) || is_null($value['@value']),
+                        "Primitive @value should be scalar for element: {$key}",
+                    );
+                }
+
+                // Recursively check nested structures
+                $this->assertValidXMLPrimitiveStructure($value);
+            }
+        }
+    }
+
+    /**
      * Assert that all element names are valid FHIR names
      */
     private function assertValidFHIRElementNames(array $data): void

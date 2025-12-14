@@ -52,63 +52,13 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
             throw new InvalidArgumentException('Could not extract resource type from object');
         }
 
-        $data = [];
-
-        // Always include resourceType as the first field for FHIR JSON compliance
-        $data['resourceType'] = $resourceType;
-
-        // Normalize all properties of the object
-        $reflection = new \ReflectionClass($object);
-        $properties = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
-
-        foreach ($properties as $property) {
-            $propertyName = $property->getName();
-
-            // Skip resourceType as we already handled it
-            if ($propertyName === 'resourceType') {
-                continue;
-            }
-
-            $value = $property->getValue($object);
-
-            // Apply FHIR JSON omission rules
-            if ($this->shouldOmitValue($value)) {
-                continue;
-            }
-
-            // Handle arrays with potential sparse extensions
-            if (is_array($value)) {
-                $normalizedArray = $this->normalizeArrayWithExtensions($value, $propertyName, $format, $context);
-                if ($normalizedArray !== null) {
-                    $data[$propertyName] = $normalizedArray['values'];
-                    if (isset($normalizedArray['extensions'])) {
-                        $data['_' . $propertyName] = $normalizedArray['extensions'];
-                    }
-                }
-            } elseif ($this->isPrimitiveWithExtensions($value, $propertyName)) {
-                // Handle extensions with underscore notation for primitives
-                $normalizedValue = $this->normalizePrimitiveWithExtensions($value, $format, $context);
-                if ($normalizedValue !== null) {
-                    $data[$propertyName] = $normalizedValue['value'];
-                    if (isset($normalizedValue['extensions'])) {
-                        $data['_' . $propertyName] = $normalizedValue['extensions'];
-                    }
-                }
-            } else {
-                // Use the injected normalizer if available, otherwise handle basic types
-                if ($this->normalizer !== null) {
-                    $normalizedValue = $this->normalizer->normalize($value, $format, $context);
-                } else {
-                    $normalizedValue = $this->normalizeBasicValue($value, $format, $context);
-                }
-
-                if ($normalizedValue !== null && !$this->shouldOmitValue($normalizedValue)) {
-                    $data[$propertyName] = $normalizedValue;
-                }
-            }
+        // Handle XML format
+        if ($format === 'xml') {
+            return $this->normalizeForXML($object, $resourceType, $context);
         }
 
-        return $data;
+        // Handle JSON format (default)
+        return $this->normalizeForJSON($object, $resourceType, $context);
     }
 
     /**
@@ -132,84 +82,13 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
             throw new NotNormalizableValueException('Expected array, got ' . gettype($data));
         }
 
-        // Validate that resourceType is present
-        if (!isset($data['resourceType'])) {
-            throw new NotNormalizableValueException('Missing required resourceType field');
+        // Handle XML format
+        if ($format === 'xml') {
+            return $this->denormalizeFromXML($data, $type, $context);
         }
 
-        $resourceType = $data['resourceType'];
-        if (!is_string($resourceType)) {
-            throw new NotNormalizableValueException('resourceType must be a string');
-        }
-
-        if (empty($resourceType)) {
-            throw new NotNormalizableValueException('resourceType cannot be empty');
-        }
-
-        // Use type resolver to get the correct class for the resourceType
-        $resolvedType = $this->typeResolver->resolveResourceType($data);
-        if ($resolvedType === null) {
-            // Fall back to the provided type if resolver can't determine the type
-            $resolvedType = $type;
-        }
-
-        // Validate that the resolved type matches the expected type
-        if ($resolvedType !== $type && !is_subclass_of($resolvedType, $type)) {
-            throw new NotNormalizableValueException(sprintf('Resolved type "%s" is not compatible with expected type "%s"', $resolvedType, $type));
-        }
-
-        try {
-            /** @var class-string $resolvedType */
-            $reflection = new \ReflectionClass($resolvedType);
-            $object     = $reflection->newInstanceWithoutConstructor();
-
-            // Get unknown property policy from context
-            $unknownPropertyPolicy = $context['unknown_property_policy'] ?? 'ignore';
-
-            // Set properties from the data
-            foreach ($data as $propertyName => $value) {
-                // Skip underscore-prefixed extension properties, they're handled with their base property
-                if (str_starts_with($propertyName, '_')) {
-                    continue;
-                }
-
-                if ($reflection->hasProperty($propertyName)) {
-                    $property = $reflection->getProperty($propertyName);
-
-                    // Handle primitive extensions
-                    $extensionKey = '_' . $propertyName;
-                    if (isset($data[$extensionKey])) {
-                        $denormalizedValue = $this->denormalizePrimitiveWithExtensions(
-                            $value,
-                            $data[$extensionKey],
-                            $format,
-                            $context,
-                        );
-                    } else {
-                        // Use the injected denormalizer if available
-                        if ($this->denormalizer !== null) {
-                            $propertyType = $this->getPropertyType($property);
-                            if ($propertyType !== null) {
-                                $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, $format, $context);
-                            } else {
-                                $denormalizedValue = $value;
-                            }
-                        } else {
-                            $denormalizedValue = $this->denormalizeBasicValue($value, $format, $context);
-                        }
-                    }
-
-                    $property->setValue($object, $denormalizedValue);
-                } else {
-                    // Handle unknown properties according to policy
-                    $this->handleUnknownProperty($propertyName, $value, $unknownPropertyPolicy, $object);
-                }
-            }
-
-            return $object;
-        } catch (\ReflectionException $e) {
-            throw new NotNormalizableValueException(sprintf('Cannot create instance of class "%s": %s', $resolvedType, $e->getMessage()), 0, $e);
-        }
+        // Handle JSON format (default)
+        return $this->denormalizeFromJSON($data, $type, $context);
     }
 
     /**
@@ -477,6 +356,348 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
             default:
                 // Do nothing - ignore the unknown property
                 break;
+        }
+    }
+
+    /**
+     * Normalize resource for JSON format
+     *
+     * @param array<string, mixed> $context
+     *
+     * @return array<string, mixed>
+     */
+    private function normalizeForJSON(object $object, string $resourceType, array $context): array
+    {
+        $data = [];
+
+        // Always include resourceType as the first field for FHIR JSON compliance
+        $data['resourceType'] = $resourceType;
+
+        // Normalize all properties of the object
+        $reflection = new \ReflectionClass($object);
+        $properties = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
+
+        foreach ($properties as $property) {
+            $propertyName = $property->getName();
+
+            // Skip resourceType as we already handled it
+            if ($propertyName === 'resourceType') {
+                continue;
+            }
+
+            $value = $property->getValue($object);
+
+            // Apply FHIR JSON omission rules
+            if ($this->shouldOmitValue($value)) {
+                continue;
+            }
+
+            // Handle arrays with potential sparse extensions
+            if (is_array($value)) {
+                $normalizedArray = $this->normalizeArrayWithExtensions($value, $propertyName, 'json', $context);
+                if ($normalizedArray !== null) {
+                    $data[$propertyName] = $normalizedArray['values'];
+                    if (isset($normalizedArray['extensions'])) {
+                        $data['_' . $propertyName] = $normalizedArray['extensions'];
+                    }
+                }
+            } elseif ($this->isPrimitiveWithExtensions($value, $propertyName)) {
+                // Handle extensions with underscore notation for primitives
+                $normalizedValue = $this->normalizePrimitiveWithExtensions($value, 'json', $context);
+                if ($normalizedValue !== null) {
+                    $data[$propertyName] = $normalizedValue['value'];
+                    if (isset($normalizedValue['extensions'])) {
+                        $data['_' . $propertyName] = $normalizedValue['extensions'];
+                    }
+                }
+            } else {
+                // Use the injected normalizer if available, otherwise handle basic types
+                if ($this->normalizer !== null) {
+                    $normalizedValue = $this->normalizer->normalize($value, 'json', $context);
+                } else {
+                    $normalizedValue = $this->normalizeBasicValue($value, 'json', $context);
+                }
+
+                if ($normalizedValue !== null && !$this->shouldOmitValue($normalizedValue)) {
+                    $data[$propertyName] = $normalizedValue;
+                }
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Normalize resource for XML format
+     *
+     * @param array<string, mixed> $context
+     *
+     * @return array<string, mixed>
+     */
+    private function normalizeForXML(object $object, string $resourceType, array $context): array
+    {
+        $data = [];
+
+        // Add FHIR namespace declaration
+        $data['@xmlns'] = 'http://hl7.org/fhir';
+
+        // Add resourceType as XML element name (handled by parent serializer)
+        $data['@resourceType'] = $resourceType;
+
+        // Normalize all properties of the object
+        $reflection = new \ReflectionClass($object);
+        $properties = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
+
+        foreach ($properties as $property) {
+            $propertyName = $property->getName();
+
+            // Skip resourceType as it's handled as element name
+            if ($propertyName === 'resourceType') {
+                continue;
+            }
+
+            $value = $property->getValue($object);
+
+            // Apply FHIR XML omission rules (similar to JSON but no underscore notation)
+            if ($this->shouldOmitValue($value)) {
+                continue;
+            }
+
+            // Handle arrays
+            if (is_array($value)) {
+                $normalizedArray = $this->normalizeArrayForXML($value, $propertyName, $context);
+                if ($normalizedArray !== null) {
+                    $data[$propertyName] = $normalizedArray;
+                }
+            } elseif ($this->isPrimitiveWithExtensions($value, $propertyName)) {
+                // Handle primitive extensions for XML (as attributes and child elements)
+                $normalizedValue = $this->normalizePrimitiveWithExtensions($value, 'xml', $context);
+                if ($normalizedValue !== null) {
+                    $data[$propertyName] = $normalizedValue;
+                }
+            } else {
+                // Use the injected normalizer if available, otherwise handle basic types
+                if ($this->normalizer !== null) {
+                    $normalizedValue = $this->normalizer->normalize($value, 'xml', $context);
+                } else {
+                    $normalizedValue = $this->normalizeBasicValue($value, 'xml', $context);
+                }
+
+                if ($normalizedValue !== null && !$this->shouldOmitValue($normalizedValue)) {
+                    $data[$propertyName] = $normalizedValue;
+                }
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Normalize array for XML format
+     *
+     * @param array<mixed>         $array
+     * @param array<string, mixed> $context
+     *
+     * @return array<mixed>|null
+     */
+    private function normalizeArrayForXML(array $array, string $propertyName, array $context): ?array
+    {
+        if (empty($array)) {
+            return null;
+        }
+
+        $result = [];
+
+        foreach ($array as $item) {
+            if ($this->shouldOmitValue($item)) {
+                continue;
+            }
+
+            if ($this->normalizer !== null) {
+                $normalizedItem = $this->normalizer->normalize($item, 'xml', $context);
+            } else {
+                $normalizedItem = $this->normalizeBasicValue($item, 'xml', $context);
+            }
+
+            if ($normalizedItem !== null) {
+                $result[] = $normalizedItem;
+            }
+        }
+
+        return empty($result) ? null : $result;
+    }
+
+    /**
+     * Denormalize from JSON format
+     *
+     * @param array<string, mixed> $data
+     * @param array<string, mixed> $context
+     */
+    private function denormalizeFromJSON(array $data, string $type, array $context): mixed
+    {
+        // Validate that resourceType is present
+        if (!isset($data['resourceType'])) {
+            throw new NotNormalizableValueException('Missing required resourceType field');
+        }
+
+        $resourceType = $data['resourceType'];
+        if (!is_string($resourceType)) {
+            throw new NotNormalizableValueException('resourceType must be a string');
+        }
+
+        if (empty($resourceType)) {
+            throw new NotNormalizableValueException('resourceType cannot be empty');
+        }
+
+        // Use type resolver to get the correct class for the resourceType
+        $resolvedType = $this->typeResolver->resolveResourceType($data);
+        if ($resolvedType === null) {
+            // Fall back to the provided type if resolver can't determine the type
+            $resolvedType = $type;
+        }
+
+        // Validate that the resolved type matches the expected type
+        if ($resolvedType !== $type && !is_subclass_of($resolvedType, $type)) {
+            throw new NotNormalizableValueException(sprintf('Resolved type "%s" is not compatible with expected type "%s"', $resolvedType, $type));
+        }
+
+        try {
+            /** @var class-string $resolvedType */
+            $reflection = new \ReflectionClass($resolvedType);
+            $object     = $reflection->newInstanceWithoutConstructor();
+
+            // Get unknown property policy from context
+            $unknownPropertyPolicy = $context['unknown_property_policy'] ?? 'ignore';
+
+            // Set properties from the data
+            foreach ($data as $propertyName => $value) {
+                // Skip underscore-prefixed extension properties, they're handled with their base property
+                if (str_starts_with($propertyName, '_')) {
+                    continue;
+                }
+
+                // Skip XML-specific properties
+                if (str_starts_with($propertyName, '@')) {
+                    continue;
+                }
+
+                if ($reflection->hasProperty($propertyName)) {
+                    $property = $reflection->getProperty($propertyName);
+
+                    // Handle primitive extensions
+                    $extensionKey = '_' . $propertyName;
+                    if (isset($data[$extensionKey])) {
+                        $denormalizedValue = $this->denormalizePrimitiveWithExtensions(
+                            $value,
+                            $data[$extensionKey],
+                            'json',
+                            $context,
+                        );
+                    } else {
+                        // Use the injected denormalizer if available
+                        if ($this->denormalizer !== null) {
+                            $propertyType = $this->getPropertyType($property);
+                            if ($propertyType !== null) {
+                                $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, 'json', $context);
+                            } else {
+                                $denormalizedValue = $value;
+                            }
+                        } else {
+                            $denormalizedValue = $this->denormalizeBasicValue($value, 'json', $context);
+                        }
+                    }
+
+                    $property->setValue($object, $denormalizedValue);
+                } else {
+                    // Handle unknown properties according to policy
+                    $this->handleUnknownProperty($propertyName, $value, $unknownPropertyPolicy, $object);
+                }
+            }
+
+            return $object;
+        } catch (\ReflectionException $e) {
+            throw new NotNormalizableValueException(sprintf('Cannot create instance of class "%s": %s', $resolvedType, $e->getMessage()), 0, $e);
+        }
+    }
+
+    /**
+     * Denormalize from XML format
+     *
+     * @param array<string, mixed> $data
+     * @param array<string, mixed> $context
+     */
+    private function denormalizeFromXML(array $data, string $type, array $context): mixed
+    {
+        // Extract resourceType from XML data (could be in @resourceType or element name)
+        $resourceType = $data['@resourceType'] ?? $context['xml_element_name'] ?? null;
+
+        if ($resourceType === null) {
+            throw new NotNormalizableValueException('Missing required resourceType in XML data');
+        }
+
+        if (!is_string($resourceType)) {
+            throw new NotNormalizableValueException('resourceType must be a string');
+        }
+
+        if (empty($resourceType)) {
+            throw new NotNormalizableValueException('resourceType cannot be empty');
+        }
+
+        // Create data array for type resolver
+        $resolverData = ['resourceType' => $resourceType];
+
+        // Use type resolver to get the correct class for the resourceType
+        $resolvedType = $this->typeResolver->resolveResourceType($resolverData);
+        if ($resolvedType === null) {
+            // Fall back to the provided type if resolver can't determine the type
+            $resolvedType = $type;
+        }
+
+        // Validate that the resolved type matches the expected type
+        if ($resolvedType !== $type && !is_subclass_of($resolvedType, $type)) {
+            throw new NotNormalizableValueException(sprintf('Resolved type "%s" is not compatible with expected type "%s"', $resolvedType, $type));
+        }
+
+        try {
+            /** @var class-string $resolvedType */
+            $reflection = new \ReflectionClass($resolvedType);
+            $object     = $reflection->newInstanceWithoutConstructor();
+
+            // Get unknown property policy from context
+            $unknownPropertyPolicy = $context['unknown_property_policy'] ?? 'ignore';
+
+            // Set properties from the data
+            foreach ($data as $propertyName => $value) {
+                // Skip XML-specific properties
+                if (str_starts_with($propertyName, '@')) {
+                    continue;
+                }
+
+                if ($reflection->hasProperty($propertyName)) {
+                    $property = $reflection->getProperty($propertyName);
+
+                    // Use the injected denormalizer if available
+                    if ($this->denormalizer !== null) {
+                        $propertyType = $this->getPropertyType($property);
+                        if ($propertyType !== null) {
+                            $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, 'xml', $context);
+                        } else {
+                            $denormalizedValue = $value;
+                        }
+                    } else {
+                        $denormalizedValue = $this->denormalizeBasicValue($value, 'xml', $context);
+                    }
+
+                    $property->setValue($object, $denormalizedValue);
+                } else {
+                    // Handle unknown properties according to policy
+                    $this->handleUnknownProperty($propertyName, $value, $unknownPropertyPolicy, $object);
+                }
+            }
+
+            return $object;
+        } catch (\ReflectionException $e) {
+            throw new NotNormalizableValueException(sprintf('Cannot create instance of class "%s": %s', $resolvedType, $e->getMessage()), 0, $e);
         }
     }
 

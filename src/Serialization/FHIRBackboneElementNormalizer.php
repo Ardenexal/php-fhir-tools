@@ -48,58 +48,13 @@ class FHIRBackboneElementNormalizer implements FHIRNormalizerInterface
             throw new InvalidArgumentException('Object is not a FHIR backbone element');
         }
 
-        $data = [];
-
-        // Normalize all properties of the backbone element
-        $reflection = new \ReflectionClass($object);
-        $properties = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
-
-        foreach ($properties as $property) {
-            $propertyName = $property->getName();
-            $value        = $property->getValue($object);
-
-            // Skip null values according to FHIR JSON rules
-            if ($value === null) {
-                continue;
-            }
-
-            // Skip empty arrays according to FHIR JSON rules
-            if (is_array($value) && empty($value)) {
-                continue;
-            }
-
-            // Handle extensions and modifierExtensions specially
-            if ($propertyName === 'extension' || $propertyName === 'modifierExtension') {
-                $normalizedValue = $this->normalizeExtensions($value, $format, $context);
-                if ($normalizedValue !== null && !empty($normalizedValue)) {
-                    $data[$propertyName] = $normalizedValue;
-                }
-            } else {
-                // Handle primitive extensions with underscore notation
-                if ($this->isPrimitiveWithExtensions($value, $propertyName)) {
-                    $normalizedValue = $this->normalizePrimitiveWithExtensions($value, $format, $context);
-                    if ($normalizedValue !== null) {
-                        $data[$propertyName] = $normalizedValue['value'];
-                        if (isset($normalizedValue['extensions'])) {
-                            $data['_' . $propertyName] = $normalizedValue['extensions'];
-                        }
-                    }
-                } else {
-                    // Handle nested backbone elements and other complex types
-                    if ($this->normalizer !== null) {
-                        $normalizedValue = $this->normalizer->normalize($value, $format, $context);
-                    } else {
-                        $normalizedValue = $this->normalizeBasicValue($value, $format, $context);
-                    }
-
-                    if ($normalizedValue !== null) {
-                        $data[$propertyName] = $normalizedValue;
-                    }
-                }
-            }
+        // Handle XML format
+        if ($format === 'xml') {
+            return $this->normalizeForXML($object, $context);
         }
 
-        return $data;
+        // Handle JSON format (default)
+        return $this->normalizeForJSON($object, $context);
     }
 
     /**
@@ -410,6 +365,129 @@ class FHIRBackboneElementNormalizer implements FHIRNormalizerInterface
         }
 
         return null;
+    }
+
+    /**
+     * Normalize backbone element for JSON format
+     *
+     * @param array<string, mixed> $context
+     *
+     * @return array<string, mixed>
+     */
+    private function normalizeForJSON(object $object, array $context): array
+    {
+        $data = [];
+
+        // Normalize all properties of the backbone element
+        $reflection = new \ReflectionClass($object);
+        $properties = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
+
+        foreach ($properties as $property) {
+            $propertyName = $property->getName();
+            $value        = $property->getValue($object);
+
+            // Skip null values according to FHIR JSON rules
+            if ($value === null) {
+                continue;
+            }
+
+            // Skip empty arrays according to FHIR JSON rules
+            if (is_array($value) && empty($value)) {
+                continue;
+            }
+
+            // Handle extensions and modifierExtensions specially
+            if ($propertyName === 'extension' || $propertyName === 'modifierExtension') {
+                $normalizedValue = $this->normalizeExtensions($value, 'json', $context);
+                if ($normalizedValue !== null && !empty($normalizedValue)) {
+                    $data[$propertyName] = $normalizedValue;
+                }
+            } else {
+                // Handle primitive extensions with underscore notation
+                if ($this->isPrimitiveWithExtensions($value, $propertyName)) {
+                    $normalizedValue = $this->normalizePrimitiveWithExtensions($value, 'json', $context);
+                    if ($normalizedValue !== null) {
+                        $data[$propertyName] = $normalizedValue['value'];
+                        if (isset($normalizedValue['extensions'])) {
+                            $data['_' . $propertyName] = $normalizedValue['extensions'];
+                        }
+                    }
+                } else {
+                    // Handle nested backbone elements and other complex types
+                    if ($this->normalizer !== null) {
+                        $normalizedValue = $this->normalizer->normalize($value, 'json', $context);
+                    } else {
+                        $normalizedValue = $this->normalizeBasicValue($value, 'json', $context);
+                    }
+
+                    if ($normalizedValue !== null) {
+                        $data[$propertyName] = $normalizedValue;
+                    }
+                }
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Normalize backbone element for XML format
+     *
+     * @param array<string, mixed> $context
+     *
+     * @return array<string, mixed>
+     */
+    private function normalizeForXML(object $object, array $context): array
+    {
+        $data = [];
+
+        // Normalize all properties of the backbone element
+        $reflection = new \ReflectionClass($object);
+        $properties = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
+
+        foreach ($properties as $property) {
+            $propertyName = $property->getName();
+            $value        = $property->getValue($object);
+
+            // Skip null values according to FHIR XML rules
+            if ($value === null) {
+                continue;
+            }
+
+            // Skip empty arrays according to FHIR XML rules
+            if (is_array($value) && empty($value)) {
+                continue;
+            }
+
+            // Handle extensions and modifierExtensions specially
+            if ($propertyName === 'extension' || $propertyName === 'modifierExtension') {
+                $normalizedValue = $this->normalizeExtensions($value, 'xml', $context);
+                if ($normalizedValue !== null && !empty($normalizedValue)) {
+                    $data[$propertyName] = $normalizedValue;
+                }
+            } else {
+                // Handle primitive extensions for XML (no underscore notation)
+                if ($this->isPrimitiveWithExtensions($value, $propertyName)) {
+                    $normalizedValue = $this->normalizePrimitiveWithExtensions($value, 'xml', $context);
+                    if ($normalizedValue !== null) {
+                        $data[$propertyName] = $normalizedValue;
+                    }
+                } else {
+                    // Handle nested backbone elements and other complex types
+                    if ($this->normalizer !== null) {
+                        $normalizedValue = $this->normalizer->normalize($value, 'xml', $context);
+                    } else {
+                        $normalizedValue = $this->normalizeBasicValue($value, 'xml', $context);
+                    }
+
+                    if ($normalizedValue !== null) {
+                        $data[$propertyName] = $normalizedValue;
+                    }
+                }
+            }
+        }
+
+        return $data;
     }
 
     /**
