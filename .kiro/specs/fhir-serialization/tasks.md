@@ -385,7 +385,12 @@ subm# Implementation Plan
   - **Property 41: Debug information availability**
   - **Validates: Requirements 9.5**
 
-- [ ] 13. Implement comprehensive round-trip testing
+- [x] 13. Implement comprehensive round-trip testing
+
+
+
+
+
   - Add round-trip property tests for all FHIR types
   - Test extension data preservation through serialization cycles
   - Verify metadata preservation in round-trip operations
@@ -393,12 +398,18 @@ subm# Implementation Plan
   - Validate primitive extension round-trip behavior
   - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5_
 
-- [ ] 13.1 Write property test for object equivalence preservation
+- [x] 13.1 Write property test for object equivalence preservation
+
+
   - **Property 27: Object equivalence preservation**
   - **Validates: Requirements 7.1**
 
+
+
 - [ ] 13.2 Write property test for extension data preservation
   - **Property 28: Extension data preservation**
+
+
   - **Validates: Requirements 7.2**
 
 - [ ] 13.3 Write property test for metadata preservation
