@@ -35,10 +35,15 @@ class FHIRRoundTripTest extends TestCase
     use TestTrait;
 
     private FHIRResourceNormalizer $resourceNormalizer;
+
     private FHIRComplexTypeNormalizer $complexTypeNormalizer;
+
     private FHIRPrimitiveTypeNormalizer $primitiveTypeNormalizer;
+
     private FHIRBackboneElementNormalizer $backboneElementNormalizer;
+
     private FHIRMetadataExtractor $metadataExtractor;
+
     private FHIRTypeResolver $typeResolver;
 
     protected function setUp(): void
@@ -46,18 +51,18 @@ class FHIRRoundTripTest extends TestCase
         parent::setUp();
 
         $this->metadataExtractor = new FHIRMetadataExtractor();
-        $this->typeResolver = new FHIRTypeResolver(
+        $this->typeResolver      = new FHIRTypeResolver(
             resourceTypeMapping: [
-                'Patient' => FHIRPatient::class,
+                'Patient'     => FHIRPatient::class,
                 'Observation' => FHIRObservation::class,
             ],
             referenceTypeMapping: [
-                'Patient' => FHIRPatient::class,
+                'Patient'     => FHIRPatient::class,
                 'Observation' => FHIRObservation::class,
             ],
             complexTypeMapping: [
                 'HumanName' => FHIRHumanName::class,
-                'Address' => FHIRAddress::class,
+                'Address'   => FHIRAddress::class,
                 'Reference' => FHIRReference::class,
                 'Extension' => FHIRExtension::class,
             ],
@@ -94,7 +99,7 @@ class FHIRRoundTripTest extends TestCase
         $this->forAll(
             $this->generateSimpleFHIRResource(),
         )->then(function($original) {
-            $className = get_class($original);
+            $className  = get_class($original);
             $normalizer = $this->getNormalizerForObject($original);
 
             if ($normalizer === null) {
@@ -102,14 +107,14 @@ class FHIRRoundTripTest extends TestCase
             }
 
             // Test JSON round-trip
-            $jsonNormalized = $normalizer->normalize($original, 'json');
+            $jsonNormalized   = $normalizer->normalize($original, 'json');
             $jsonDeserialized = $normalizer->denormalize($jsonNormalized, $className, 'json');
 
             $this->assertObjectsEquivalent($original, $jsonDeserialized, 'JSON round-trip');
 
             // Test XML round-trip (if supported)
             try {
-                $xmlNormalized = $normalizer->normalize($original, 'xml');
+                $xmlNormalized   = $normalizer->normalize($original, 'xml');
                 $xmlDeserialized = $normalizer->denormalize($xmlNormalized, $className, 'xml');
                 $this->assertObjectsEquivalent($original, $xmlDeserialized, 'XML round-trip');
             } catch (\Exception $e) {
@@ -130,7 +135,7 @@ class FHIRRoundTripTest extends TestCase
         $this->forAll(
             $this->generateFHIRObjectWithExtensions(),
         )->then(function($original) {
-            $className = get_class($original);
+            $className  = get_class($original);
             $normalizer = $this->getNormalizerForObject($original);
 
             if ($normalizer === null) {
@@ -144,14 +149,14 @@ class FHIRRoundTripTest extends TestCase
             }
 
             // Test JSON round-trip with extension preservation
-            $jsonNormalized = $normalizer->normalize($original, 'json');
+            $jsonNormalized   = $normalizer->normalize($original, 'json');
             $jsonDeserialized = $normalizer->denormalize($jsonNormalized, $className, 'json');
 
             $this->assertExtensionsPreserved($original, $jsonDeserialized, 'JSON round-trip');
 
             // Test XML round-trip with extension preservation (if supported)
             try {
-                $xmlNormalized = $normalizer->normalize($original, 'xml');
+                $xmlNormalized   = $normalizer->normalize($original, 'xml');
                 $xmlDeserialized = $normalizer->denormalize($xmlNormalized, $className, 'xml');
                 $this->assertExtensionsPreserved($original, $xmlDeserialized, 'XML round-trip');
             } catch (\Exception $e) {
@@ -172,7 +177,7 @@ class FHIRRoundTripTest extends TestCase
         $this->forAll(
             $this->generateSimpleFHIRResource(),
         )->then(function($original) {
-            $className = get_class($original);
+            $className  = get_class($original);
             $normalizer = $this->getNormalizerForObject($original);
 
             if ($normalizer === null) {
@@ -180,14 +185,14 @@ class FHIRRoundTripTest extends TestCase
             }
 
             // Test JSON round-trip with metadata preservation
-            $jsonNormalized = $normalizer->normalize($original, 'json');
+            $jsonNormalized   = $normalizer->normalize($original, 'json');
             $jsonDeserialized = $normalizer->denormalize($jsonNormalized, $className, 'json');
 
             $this->assertBasicMetadataPreserved($original, $jsonDeserialized, 'JSON round-trip');
 
             // Test XML round-trip with metadata preservation (if supported)
             try {
-                $xmlNormalized = $normalizer->normalize($original, 'xml');
+                $xmlNormalized   = $normalizer->normalize($original, 'xml');
                 $xmlDeserialized = $normalizer->denormalize($xmlNormalized, $className, 'xml');
                 $this->assertBasicMetadataPreserved($original, $xmlDeserialized, 'XML round-trip');
             } catch (\Exception $e) {
@@ -346,7 +351,7 @@ class FHIRRoundTripTest extends TestCase
                         'coding' => [
                             [
                                 'system' => 'http://loinc.org',
-                                'code' => '29463-7',
+                                'code'   => '29463-7',
                             ],
                         ],
                     ],
@@ -532,15 +537,15 @@ class FHIRRoundTripTest extends TestCase
                 Generator\string(),
                 fn ($url) => Generator\oneOf(
                     Generator\constant([
-                        'url' => $url,
+                        'url'         => $url,
                         'valueString' => 'test-string',
                     ]),
                     Generator\constant([
-                        'url' => $url,
+                        'url'          => $url,
                         'valueInteger' => 42,
                     ]),
                     Generator\constant([
-                        'url' => $url,
+                        'url'          => $url,
                         'valueBoolean' => true,
                     ]),
                 ),
@@ -572,7 +577,7 @@ class FHIRRoundTripTest extends TestCase
                 Generator\seq(
                     Generator\constant([
                         'system' => 'http://example.org/identifiers',
-                        'value' => 'ID-' . $id,
+                        'value'  => 'ID-' . $id,
                     ]),
                     1,
                     2,
@@ -601,15 +606,15 @@ class FHIRRoundTripTest extends TestCase
                 code: [
                     'coding' => [
                         [
-                            'system' => 'http://loinc.org',
-                            'code' => '29463-7',
+                            'system'  => 'http://loinc.org',
+                            'code'    => '29463-7',
                             'display' => 'Body weight',
                         ],
                     ],
                 ],
                 subject: [
                     'reference' => 'Patient/' . $id,
-                    'display' => 'Test Patient',
+                    'display'   => 'Test Patient',
                 ],
             )),
         );
@@ -659,9 +664,9 @@ class FHIRRoundTripTest extends TestCase
             if (!$property->isInitialized($original) && !$property->isInitialized($deserialized)) {
                 continue; // Both uninitialized, skip
             }
-            
+
             // If only one is initialized, treat uninitialized as null
-            $originalValue = $property->isInitialized($original) ? $property->getValue($original) : null;
+            $originalValue     = $property->isInitialized($original) ? $property->getValue($original) : null;
             $deserializedValue = $property->isInitialized($deserialized) ? $property->getValue($deserialized) : null;
 
             $this->assertValuesEquivalent(
@@ -683,6 +688,7 @@ class FHIRRoundTripTest extends TestCase
 
         if ($original === null || $deserialized === null) {
             self::assertEquals($original, $deserialized, "{$context}: Null value mismatch");
+
             return;
         }
 
@@ -693,11 +699,13 @@ class FHIRRoundTripTest extends TestCase
                 self::assertArrayHasKey($key, $deserialized, "{$context}: Missing array key {$key}");
                 $this->assertValuesEquivalent($value, $deserialized[$key], "{$context}[{$key}]");
             }
+
             return;
         }
 
         if (is_object($original) && is_object($deserialized)) {
             $this->assertObjectsEquivalent($original, $deserialized, $context);
+
             return;
         }
 
@@ -713,7 +721,8 @@ class FHIRRoundTripTest extends TestCase
 
         try {
             $extensionProperty = $reflection->getProperty('extension');
-            $extensions = $extensionProperty->getValue($object);
+            $extensions        = $extensionProperty->getValue($object);
+
             return $extensions !== null && !empty($extensions);
         } catch (\ReflectionException) {
             return false;
@@ -729,10 +738,10 @@ class FHIRRoundTripTest extends TestCase
 
         try {
             $extensionProperty = $reflection->getProperty('extension');
-            
+
             // Check if property is initialized before accessing
             if ($extensionProperty->isInitialized($original) && $extensionProperty->isInitialized($deserialized)) {
-                $originalExtensions = $extensionProperty->getValue($original);
+                $originalExtensions     = $extensionProperty->getValue($original);
                 $deserializedExtensions = $extensionProperty->getValue($deserialized);
 
                 $this->assertValuesEquivalent(
@@ -748,10 +757,10 @@ class FHIRRoundTripTest extends TestCase
         // Also check modifierExtension if present
         try {
             $modifierExtensionProperty = $reflection->getProperty('modifierExtension');
-            
+
             // Check if property is initialized before accessing
             if ($modifierExtensionProperty->isInitialized($original) && $modifierExtensionProperty->isInitialized($deserialized)) {
-                $originalModifierExtensions = $modifierExtensionProperty->getValue($original);
+                $originalModifierExtensions     = $modifierExtensionProperty->getValue($original);
                 $deserializedModifierExtensions = $modifierExtensionProperty->getValue($deserialized);
 
                 $this->assertValuesEquivalent(
@@ -770,20 +779,20 @@ class FHIRRoundTripTest extends TestCase
      */
     private function assertBasicMetadataPreserved(object $original, object $deserialized, string $context): void
     {
-        $reflection = new \ReflectionClass($original);
+        $reflection              = new \ReflectionClass($original);
         $basicMetadataProperties = ['resourceType', 'id', 'status'];
 
         foreach ($basicMetadataProperties as $propertyName) {
             try {
                 $property = $reflection->getProperty($propertyName);
-                
+
                 // Check if property is initialized before accessing
                 if (!$property->isInitialized($original) && !$property->isInitialized($deserialized)) {
                     continue; // Both uninitialized, skip
                 }
-                
+
                 // If only one is initialized, treat uninitialized as null
-                $originalValue = $property->isInitialized($original) ? $property->getValue($original) : null;
+                $originalValue     = $property->isInitialized($original) ? $property->getValue($original) : null;
                 $deserializedValue = $property->isInitialized($deserialized) ? $property->getValue($deserialized) : null;
 
                 $this->assertValuesEquivalent(
@@ -802,20 +811,20 @@ class FHIRRoundTripTest extends TestCase
      */
     private function assertMetadataPreserved(object $original, object $deserialized, string $context): void
     {
-        $reflection = new \ReflectionClass($original);
+        $reflection         = new \ReflectionClass($original);
         $metadataProperties = ['id', 'identifier', 'resourceType', 'code', 'subject'];
 
         foreach ($metadataProperties as $propertyName) {
             try {
                 $property = $reflection->getProperty($propertyName);
-                
+
                 // Check if property is initialized before accessing
                 if (!$property->isInitialized($original) && !$property->isInitialized($deserialized)) {
                     continue; // Both uninitialized, skip
                 }
-                
+
                 // If only one is initialized, treat uninitialized as null
-                $originalValue = $property->isInitialized($original) ? $property->getValue($original) : null;
+                $originalValue     = $property->isInitialized($original) ? $property->getValue($original) : null;
                 $deserializedValue = $property->isInitialized($deserialized) ? $property->getValue($deserialized) : null;
 
                 $this->assertValuesEquivalent(

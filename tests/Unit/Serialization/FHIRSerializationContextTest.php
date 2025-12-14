@@ -23,6 +23,7 @@ use PHPUnit\Framework\TestCase;
 class FHIRSerializationContextTest extends TestCase
 {
     use TestTrait;
+
     /**
      * **Feature: fhir-serialization, Property 37: Format support**
      * **Validates: Requirements 9.1**
@@ -32,8 +33,8 @@ class FHIRSerializationContextTest extends TestCase
     public function testFormatSupportProperty()
     {
         $this->forAll(
-            Generator\elements(FHIRSerializationContext::FORMAT_JSON, FHIRSerializationContext::FORMAT_XML)
-        )->then(function (string $format) {
+            Generator\elements(FHIRSerializationContext::FORMAT_JSON, FHIRSerializationContext::FORMAT_XML),
+        )->then(function(string $format) {
             // Create context with the specified format
             $context = new FHIRSerializationContext(format: $format);
 
@@ -68,8 +69,8 @@ class FHIRSerializationContextTest extends TestCase
     public function testValidationModeSupportProperty()
     {
         $this->forAll(
-            Generator\elements(FHIRSerializationContext::VALIDATION_STRICT, FHIRSerializationContext::VALIDATION_LENIENT)
-        )->then(function (string $validationMode) {
+            Generator\elements(FHIRSerializationContext::VALIDATION_STRICT, FHIRSerializationContext::VALIDATION_LENIENT),
+        )->then(function(string $validationMode) {
             // Create context with the specified validation mode
             $context = new FHIRSerializationContext(validationMode: $validationMode);
 
@@ -107,9 +108,9 @@ class FHIRSerializationContextTest extends TestCase
             Generator\elements(
                 FHIRSerializationContext::UNKNOWN_POLICY_IGNORE,
                 FHIRSerializationContext::UNKNOWN_POLICY_ERROR,
-                FHIRSerializationContext::UNKNOWN_POLICY_PRESERVE
-            )
-        )->then(function (string $policy) {
+                FHIRSerializationContext::UNKNOWN_POLICY_PRESERVE,
+            ),
+        )->then(function(string $policy) {
             // Create context with the specified unknown element policy
             $context = new FHIRSerializationContext(unknownElementPolicy: $policy);
 
@@ -155,12 +156,12 @@ class FHIRSerializationContextTest extends TestCase
     {
         $this->forAll(
             Generator\bool(),
-            Generator\bool()
-        )->then(function (bool $skipNonEssentialValidation, bool $validateReferences) {
+            Generator\bool(),
+        )->then(function(bool $skipNonEssentialValidation, bool $validateReferences) {
             // Create context with performance optimization settings
             $context = new FHIRSerializationContext(
                 skipNonEssentialValidation: $skipNonEssentialValidation,
-                validateReferences: $validateReferences
+                validateReferences: $validateReferences,
             );
 
             // Verify the performance options are correctly set
@@ -197,8 +198,8 @@ class FHIRSerializationContextTest extends TestCase
     public function testDebugInformationAvailabilityProperty()
     {
         $this->forAll(
-            Generator\bool()
-        )->then(function (bool $enableDebugInfo) {
+            Generator\bool(),
+        )->then(function(bool $enableDebugInfo) {
             // Create context with debug info setting
             $context = new FHIRSerializationContext(enableDebugInfo: $enableDebugInfo);
 

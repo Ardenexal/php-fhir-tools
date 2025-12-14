@@ -16,29 +16,33 @@ namespace Ardenexal\FHIRTools\Serialization;
 class FHIRSerializationContext
 {
     public const FORMAT_JSON = 'json';
+
     public const FORMAT_XML = 'xml';
 
     public const VALIDATION_STRICT = 'strict';
+
     public const VALIDATION_LENIENT = 'lenient';
 
     public const UNKNOWN_POLICY_IGNORE = 'ignore';
+
     public const UNKNOWN_POLICY_ERROR = 'error';
+
     public const UNKNOWN_POLICY_PRESERVE = 'preserve';
 
     /**
-     * @param string                $format                 Serialization format (json or xml)
-     * @param string                $validationMode         Validation mode (strict or lenient)
-     * @param string                $unknownElementPolicy   Policy for handling unknown elements
-     * @param bool                  $includeExtensions      Whether to include FHIR extensions
-     * @param bool                  $includeMetadata        Whether to include metadata elements
-     * @param bool                  $skipNonEssentialValidation Whether to skip non-essential validation for performance
-     * @param bool                  $enableDebugInfo        Whether to provide detailed debug information
-     * @param bool                  $validateReferences     Whether to validate FHIR references
-     * @param bool                  $omitNullValues         Whether to omit null values from output
-     * @param bool                  $omitEmptyArrays        Whether to omit empty arrays from output
-     * @param bool                  $enableXmlNamespaces    Whether to include XML namespaces (XML format only)
-     * @param bool                  $enableXmlSchemaValidation Whether to validate against XML schemas (XML format only)
-     * @param array<string, mixed>  $customOptions          Additional custom configuration options
+     * @param string               $format                     Serialization format (json or xml)
+     * @param string               $validationMode             Validation mode (strict or lenient)
+     * @param string               $unknownElementPolicy       Policy for handling unknown elements
+     * @param bool                 $includeExtensions          Whether to include FHIR extensions
+     * @param bool                 $includeMetadata            Whether to include metadata elements
+     * @param bool                 $skipNonEssentialValidation Whether to skip non-essential validation for performance
+     * @param bool                 $enableDebugInfo            Whether to provide detailed debug information
+     * @param bool                 $validateReferences         Whether to validate FHIR references
+     * @param bool                 $omitNullValues             Whether to omit null values from output
+     * @param bool                 $omitEmptyArrays            Whether to omit empty arrays from output
+     * @param bool                 $enableXmlNamespaces        Whether to include XML namespaces (XML format only)
+     * @param bool                 $enableXmlSchemaValidation  Whether to validate against XML schemas (XML format only)
+     * @param array<string, mixed> $customOptions              Additional custom configuration options
      */
     public function __construct(
         public readonly string $format = self::FORMAT_JSON,
@@ -73,7 +77,7 @@ class FHIRSerializationContext
     {
         return new self(
             format: self::FORMAT_XML,
-            enableXmlNamespaces: true
+            enableXmlNamespaces: true,
         );
     }
 
@@ -85,7 +89,7 @@ class FHIRSerializationContext
         return new self(
             validationMode: self::VALIDATION_STRICT,
             validateReferences: true,
-            skipNonEssentialValidation: false
+            skipNonEssentialValidation: false,
         );
     }
 
@@ -97,7 +101,7 @@ class FHIRSerializationContext
         return new self(
             validationMode: self::VALIDATION_LENIENT,
             validateReferences: false,
-            skipNonEssentialValidation: true
+            skipNonEssentialValidation: true,
         );
     }
 
@@ -143,7 +147,7 @@ class FHIRSerializationContext
             omitEmptyArrays: $this->omitEmptyArrays,
             enableXmlNamespaces: $this->enableXmlNamespaces,
             enableXmlSchemaValidation: $this->enableXmlSchemaValidation,
-            customOptions: $this->customOptions
+            customOptions: $this->customOptions,
         );
     }
 
@@ -165,7 +169,7 @@ class FHIRSerializationContext
             omitEmptyArrays: $this->omitEmptyArrays,
             enableXmlNamespaces: $this->enableXmlNamespaces,
             enableXmlSchemaValidation: $this->enableXmlSchemaValidation,
-            customOptions: $this->customOptions
+            customOptions: $this->customOptions,
         );
     }
 
@@ -187,7 +191,7 @@ class FHIRSerializationContext
             omitEmptyArrays: $this->omitEmptyArrays,
             enableXmlNamespaces: $this->enableXmlNamespaces,
             enableXmlSchemaValidation: $this->enableXmlSchemaValidation,
-            customOptions: $this->customOptions
+            customOptions: $this->customOptions,
         );
     }
 
@@ -209,7 +213,7 @@ class FHIRSerializationContext
             omitEmptyArrays: $this->omitEmptyArrays,
             enableXmlNamespaces: $this->enableXmlNamespaces,
             enableXmlSchemaValidation: $this->enableXmlSchemaValidation,
-            customOptions: $this->customOptions
+            customOptions: $this->customOptions,
         );
     }
 
@@ -231,7 +235,7 @@ class FHIRSerializationContext
             omitEmptyArrays: $this->omitEmptyArrays,
             enableXmlNamespaces: $this->enableXmlNamespaces,
             enableXmlSchemaValidation: $this->enableXmlSchemaValidation,
-            customOptions: $this->customOptions
+            customOptions: $this->customOptions,
         );
     }
 
@@ -255,7 +259,7 @@ class FHIRSerializationContext
             omitEmptyArrays: $this->omitEmptyArrays,
             enableXmlNamespaces: $this->enableXmlNamespaces,
             enableXmlSchemaValidation: $this->enableXmlSchemaValidation,
-            customOptions: array_merge($this->customOptions, $customOptions)
+            customOptions: array_merge($this->customOptions, $customOptions),
         );
     }
 
@@ -331,19 +335,19 @@ class FHIRSerializationContext
     public function toSymfonyContext(): array
     {
         return [
-            'fhir_format' => $this->format,
-            'fhir_validation_mode' => $this->validationMode,
-            'fhir_unknown_element_policy' => $this->unknownElementPolicy,
-            'fhir_include_extensions' => $this->includeExtensions,
-            'fhir_include_metadata' => $this->includeMetadata,
+            'fhir_format'                        => $this->format,
+            'fhir_validation_mode'               => $this->validationMode,
+            'fhir_unknown_element_policy'        => $this->unknownElementPolicy,
+            'fhir_include_extensions'            => $this->includeExtensions,
+            'fhir_include_metadata'              => $this->includeMetadata,
             'fhir_skip_non_essential_validation' => $this->skipNonEssentialValidation,
-            'fhir_enable_debug_info' => $this->enableDebugInfo,
-            'fhir_validate_references' => $this->validateReferences,
-            'fhir_omit_null_values' => $this->omitNullValues,
-            'fhir_omit_empty_arrays' => $this->omitEmptyArrays,
-            'fhir_enable_xml_namespaces' => $this->enableXmlNamespaces,
-            'fhir_enable_xml_schema_validation' => $this->enableXmlSchemaValidation,
-            'fhir_custom_options' => $this->customOptions,
+            'fhir_enable_debug_info'             => $this->enableDebugInfo,
+            'fhir_validate_references'           => $this->validateReferences,
+            'fhir_omit_null_values'              => $this->omitNullValues,
+            'fhir_omit_empty_arrays'             => $this->omitEmptyArrays,
+            'fhir_enable_xml_namespaces'         => $this->enableXmlNamespaces,
+            'fhir_enable_xml_schema_validation'  => $this->enableXmlSchemaValidation,
+            'fhir_custom_options'                => $this->customOptions,
             // Legacy context keys for backward compatibility
             'unknown_property_policy' => $this->unknownElementPolicy,
         ];
@@ -357,19 +361,19 @@ class FHIRSerializationContext
     public static function fromSymfonyContext(array $context): self
     {
         return new self(
-            format: $context['fhir_format'] ?? self::FORMAT_JSON,
-            validationMode: $context['fhir_validation_mode'] ?? self::VALIDATION_STRICT,
-            unknownElementPolicy: $context['fhir_unknown_element_policy'] ?? $context['unknown_property_policy'] ?? self::UNKNOWN_POLICY_IGNORE,
-            includeExtensions: $context['fhir_include_extensions'] ?? true,
-            includeMetadata: $context['fhir_include_metadata'] ?? true,
+            format: $context['fhir_format']                                            ?? self::FORMAT_JSON,
+            validationMode: $context['fhir_validation_mode']                           ?? self::VALIDATION_STRICT,
+            unknownElementPolicy: $context['fhir_unknown_element_policy']              ?? $context['unknown_property_policy'] ?? self::UNKNOWN_POLICY_IGNORE,
+            includeExtensions: $context['fhir_include_extensions']                     ?? true,
+            includeMetadata: $context['fhir_include_metadata']                         ?? true,
             skipNonEssentialValidation: $context['fhir_skip_non_essential_validation'] ?? false,
-            enableDebugInfo: $context['fhir_enable_debug_info'] ?? false,
-            validateReferences: $context['fhir_validate_references'] ?? false,
-            omitNullValues: $context['fhir_omit_null_values'] ?? true,
-            omitEmptyArrays: $context['fhir_omit_empty_arrays'] ?? true,
-            enableXmlNamespaces: $context['fhir_enable_xml_namespaces'] ?? true,
-            enableXmlSchemaValidation: $context['fhir_enable_xml_schema_validation'] ?? false,
-            customOptions: $context['fhir_custom_options'] ?? []
+            enableDebugInfo: $context['fhir_enable_debug_info']                        ?? false,
+            validateReferences: $context['fhir_validate_references']                   ?? false,
+            omitNullValues: $context['fhir_omit_null_values']                          ?? true,
+            omitEmptyArrays: $context['fhir_omit_empty_arrays']                        ?? true,
+            enableXmlNamespaces: $context['fhir_enable_xml_namespaces']                ?? true,
+            enableXmlSchemaValidation: $context['fhir_enable_xml_schema_validation']   ?? false,
+            customOptions: $context['fhir_custom_options']                             ?? [],
         );
     }
 
@@ -382,29 +386,17 @@ class FHIRSerializationContext
     {
         $validFormats = [self::FORMAT_JSON, self::FORMAT_XML];
         if (!in_array($this->format, $validFormats, true)) {
-            throw new \InvalidArgumentException(sprintf(
-                'Invalid format "%s". Valid formats are: %s',
-                $this->format,
-                implode(', ', $validFormats)
-            ));
+            throw new \InvalidArgumentException(sprintf('Invalid format "%s". Valid formats are: %s', $this->format, implode(', ', $validFormats)));
         }
 
         $validValidationModes = [self::VALIDATION_STRICT, self::VALIDATION_LENIENT];
         if (!in_array($this->validationMode, $validValidationModes, true)) {
-            throw new \InvalidArgumentException(sprintf(
-                'Invalid validation mode "%s". Valid modes are: %s',
-                $this->validationMode,
-                implode(', ', $validValidationModes)
-            ));
+            throw new \InvalidArgumentException(sprintf('Invalid validation mode "%s". Valid modes are: %s', $this->validationMode, implode(', ', $validValidationModes)));
         }
 
         $validUnknownPolicies = [self::UNKNOWN_POLICY_IGNORE, self::UNKNOWN_POLICY_ERROR, self::UNKNOWN_POLICY_PRESERVE];
         if (!in_array($this->unknownElementPolicy, $validUnknownPolicies, true)) {
-            throw new \InvalidArgumentException(sprintf(
-                'Invalid unknown element policy "%s". Valid policies are: %s',
-                $this->unknownElementPolicy,
-                implode(', ', $validUnknownPolicies)
-            ));
+            throw new \InvalidArgumentException(sprintf('Invalid unknown element policy "%s". Valid policies are: %s', $this->unknownElementPolicy, implode(', ', $validUnknownPolicies)));
         }
     }
 }

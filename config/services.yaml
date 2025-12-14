@@ -15,28 +15,19 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     Ardenexal\FHIRTools\:
         resource: '../src/'
+        exclude:
+            - '../src/Serialization/*Normalizer.php'
 
-    # Configure FHIR normalizers to avoid circular dependency with serializer
-    # These normalizers should not be injected with the main serializer service
-    Ardenexal\FHIRTools\Serialization\FHIRResourceNormalizer:
-        arguments:
-            $normalizer: null
-            $denormalizer: null
+    # FHIR serialization services are configured in config/packages/serializer.yaml
+    # to ensure proper integration with Symfony's serializer component
 
-    Ardenexal\FHIRTools\Serialization\FHIRBackboneElementNormalizer:
-        arguments:
-            $normalizer: null
-            $denormalizer: null
-
-    Ardenexal\FHIRTools\Serialization\FHIRComplexTypeNormalizer:
-        arguments:
-            $normalizer: null
-            $denormalizer: null
-
-    Ardenexal\FHIRTools\Serialization\FHIRPrimitiveTypeNormalizer:
-        arguments:
-            $normalizer: null
-            $denormalizer: null
+    # Import FHIR serialization service configuration
+    _instanceof:
+        Ardenexal\FHIRTools\Serialization\FHIRNormalizerInterface:
+            tags: ['serializer.normalizer']
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+imports:
+    - { resource: services/fhir_serialization.yaml }

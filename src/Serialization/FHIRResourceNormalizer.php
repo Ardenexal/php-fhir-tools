@@ -55,12 +55,12 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
 
         // Create or extract FHIR serialization context
         $fhirContext = FHIRSerializationContext::fromSymfonyContext($context);
-        
+
         // If format is specified as parameter, override the context format
         if ($format !== null && $format !== $fhirContext->format) {
             $fhirContext = $fhirContext->withFormat($format);
         }
-        
+
         // Create debug info if enabled
         $debugInfo = null;
         if ($fhirContext->enableDebugInfo) {
@@ -69,7 +69,7 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
                 null,
                 get_class($object),
                 self::class,
-                $context
+                $context,
             );
         }
 
@@ -94,18 +94,14 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
             if ($debugInfo !== null) {
                 $debugInfo = $debugInfo->completed()->withWarning("Exception: {$e->getMessage()}");
             }
-            
+
             // Re-throw FHIR serialization exceptions and Symfony serializer exceptions as-is
             if ($e instanceof FHIRSerializationException || $e instanceof InvalidArgumentException) {
                 throw $e;
             }
-            
+
             // Only wrap unexpected exceptions
-            throw FHIRSerializationException::formatError(
-                $fhirContext->format,
-                $e->getMessage(),
-                ['object_type' => get_class($object), 'resource_type' => $resourceType]
-            );
+            throw FHIRSerializationException::formatError($fhirContext->format, $e->getMessage(), ['object_type' => get_class($object), 'resource_type' => $resourceType]);
         }
     }
 
@@ -128,7 +124,7 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
     {
         // Create or extract FHIR serialization context
         $fhirContext = FHIRSerializationContext::fromSymfonyContext($context);
-        
+
         // If format is specified as parameter, override the context format
         if ($format !== null && $format !== $fhirContext->format) {
             $fhirContext = $fhirContext->withFormat($format);
@@ -137,7 +133,7 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
         if (!is_array($data)) {
             throw new NotNormalizableValueException('Expected array, got ' . gettype($data));
         }
-        
+
         // Create debug info if enabled
         $debugInfo = null;
         if ($fhirContext->enableDebugInfo) {
@@ -146,7 +142,7 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
                 null,
                 $type,
                 self::class,
-                $context
+                $context,
             );
         }
 
@@ -171,18 +167,14 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
             if ($debugInfo !== null) {
                 $debugInfo = $debugInfo->completed()->withWarning("Exception: {$e->getMessage()}");
             }
-            
+
             // Re-throw FHIR serialization exceptions and Symfony serializer exceptions as-is
             if ($e instanceof FHIRSerializationException || $e instanceof NotNormalizableValueException) {
                 throw $e;
             }
-            
+
             // Only wrap unexpected exceptions
-            throw FHIRSerializationException::formatError(
-                $fhirContext->format,
-                $e->getMessage(),
-                ['target_type' => $type, 'data_keys' => array_keys($data)]
-            );
+            throw FHIRSerializationException::formatError($fhirContext->format, $e->getMessage(), ['target_type' => $type, 'data_keys' => array_keys($data)]);
         }
     }
 
@@ -437,12 +429,7 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
     {
         switch ($policy) {
             case FHIRSerializationContext::UNKNOWN_POLICY_ERROR:
-                throw FHIRSerializationException::unknownElementError(
-                    $propertyName,
-                    $policy,
-                    $elementPath,
-                    ['property_value' => $value]
-                );
+                throw FHIRSerializationException::unknownElementError($propertyName, $policy, $elementPath, ['property_value' => $value]);
 
             case FHIRSerializationContext::UNKNOWN_POLICY_PRESERVE:
                 // Try to set the property dynamically if possible

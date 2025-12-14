@@ -377,11 +377,11 @@ subm# Implementation Plan
   - **Property 39: Unknown element policy enforcement**
   - **Validates: Requirements 9.3**
 
-- [ ] 12.4 Write property test for performance optimization options
+- [x] 12.4 Write property test for performance optimization options
   - **Property 40: Performance optimization options**
   - **Validates: Requirements 9.4**
 
-- [ ] 12.5 Write property test for debug information availability
+- [x] 12.5 Write property test for debug information availability
   - **Property 41: Debug information availability**
   - **Validates: Requirements 9.5**
 
@@ -406,17 +406,17 @@ subm# Implementation Plan
 
 
 
-- [ ] 13.2 Write property test for extension data preservation
+- [x] 13.2 Write property test for extension data preservation
   - **Property 28: Extension data preservation**
 
 
   - **Validates: Requirements 7.2**
 
-- [ ] 13.3 Write property test for metadata preservation
+- [x] 13.3 Write property test for metadata preservation
   - **Property 29: Metadata preservation**
   - **Validates: Requirements 7.3**
 
-- [ ] 14. Update FHIR class generation to include attributes
+- [x] 14. Update FHIR class generation to include attributes
   - Modify FHIRModelGenerator to add appropriate attributes to generated classes
   - Add FHIRResource attributes to resource classes with resourceType
   - Add FHIRComplexType attributes to complex type classes
@@ -425,7 +425,12 @@ subm# Implementation Plan
   - Ensure attributes are simple and reusable across model types
   - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5_
 
-- [ ] 15. Create Symfony service configuration
+- [x] 15. Create Symfony service configuration
+
+
+
+
+
   - Configure normalizers as Symfony services with proper tags
   - Set up dependency injection for metadata extractor and cache
   - Configure discriminator map resolver as a service
