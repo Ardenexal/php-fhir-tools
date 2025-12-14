@@ -19,10 +19,8 @@ class FHIRSerializationService
 {
     public function __construct(
         private readonly SerializerInterface $serializer,
-        private readonly FHIRMetadataExtractorInterface $metadataExtractor,
         private readonly FHIRSerializationContextFactory $contextFactory,
         private readonly FHIRSerializationDebugInfo $debugInfo,
-        private readonly string $defaultVersion = 'R4B'
     ) {
     }
 

@@ -10,6 +10,9 @@ use Ardenexal\FHIRTools\Serialization\FHIRMetadataExtractor;
 use Ardenexal\FHIRTools\Serialization\FHIRTypeResolver;
 use Ardenexal\FHIRTools\Serialization\FHIRMetadataCache;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
+use Ardenexal\FHIRTools\Serialization\FHIRMetadataExtractorInterface;
+use Ardenexal\FHIRTools\Serialization\FHIRSerializationDebugInfo;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Test FHIR service configuration and basic functionality.
@@ -21,12 +24,12 @@ class FHIRServiceConfigurationTest extends TestCase
     public function testFHIRSerializationContextFactoryCanCreateContexts(): void
     {
         $factory = new FHIRSerializationContextFactory();
-        
+
         $jsonContext = $factory->createJsonContext();
         self::assertIsArray($jsonContext);
         self::assertEquals('json', $jsonContext['format']);
         self::assertTrue($jsonContext['skip_null_values']);
-        
+
         $xmlContext = $factory->createXmlContext();
         self::assertIsArray($xmlContext);
         self::assertEquals('xml', $xmlContext['format']);
@@ -36,7 +39,7 @@ class FHIRServiceConfigurationTest extends TestCase
     public function testFHIRMetadataCacheCanStoreAndRetrieve(): void
     {
         $cache = new FHIRMetadataCache();
-        
+
         // Test that cache returns null for non-existent entries
         self::assertNull($cache->getResourceMetadata('NonExistentClass'));
         self::assertNull($cache->getComplexTypeMetadata('NonExistentClass'));
@@ -47,36 +50,36 @@ class FHIRServiceConfigurationTest extends TestCase
     public function testFHIRTypeResolverCanBeInstantiated(): void
     {
         $resolver = new FHIRTypeResolver();
-        
+
         self::assertInstanceOf(FHIRTypeResolver::class, $resolver);
-        
+
         // Test with empty data
         self::assertNull($resolver->resolveType([], []));
     }
 
     public function testFHIRMetadataExtractorCanBeInstantiated(): void
     {
-        $cache = new FHIRMetadataCache();
+        $cache     = new FHIRMetadataCache();
         $extractor = new FHIRMetadataExtractor($cache);
-        
+
         self::assertInstanceOf(FHIRMetadataExtractor::class, $extractor);
     }
 
     public function testFHIRSerializationServiceRequiredDependencies(): void
     {
         // This test verifies that the service can be instantiated with mocked dependencies
-        $serializer = $this->createMock(\Symfony\Component\Serializer\SerializerInterface::class);
-        $metadataExtractor = $this->createMock(\Ardenexal\FHIRTools\Serialization\FHIRMetadataExtractorInterface::class);
-        $contextFactory = new FHIRSerializationContextFactory();
-        $debugInfo = $this->createMock(\Ardenexal\FHIRTools\Serialization\FHIRSerializationDebugInfo::class);
-        
+        $serializer        = $this->createMock(SerializerInterface::class);
+        $metadataExtractor = $this->createMock(FHIRMetadataExtractorInterface::class);
+        $contextFactory    = new FHIRSerializationContextFactory();
+        $debugInfo         = $this->createMock(FHIRSerializationDebugInfo::class);
+
         $service = new FHIRSerializationService(
             $serializer,
             $metadataExtractor,
             $contextFactory,
-            $debugInfo
+            $debugInfo,
         );
-        
+
         self::assertInstanceOf(FHIRSerializationService::class, $service);
     }
 
@@ -85,7 +88,7 @@ class FHIRServiceConfigurationTest extends TestCase
         // Verify that the configuration files exist
         self::assertFileExists(__DIR__ . '/../../../config/packages/serializer.yaml');
         self::assertFileExists(__DIR__ . '/../../../config/services/fhir_serialization.yaml');
-        
+
         // Verify the main services.yaml imports the FHIR configuration
         $servicesContent = file_get_contents(__DIR__ . '/../../../config/services.yaml');
         self::assertStringContainsString('imports:', $servicesContent);
@@ -95,16 +98,16 @@ class FHIRServiceConfigurationTest extends TestCase
     public function testSerializerConfigurationIsValid(): void
     {
         $configContent = file_get_contents(__DIR__ . '/../../../config/packages/serializer.yaml');
-        
+
         // Check that serializer is enabled
         self::assertStringContainsString('enabled: true', $configContent);
-        
+
         // Check that FHIR normalizers are configured
         self::assertStringContainsString('fhir.normalizer.resource:', $configContent);
         self::assertStringContainsString('fhir.normalizer.complex_type:', $configContent);
         self::assertStringContainsString('fhir.normalizer.primitive:', $configContent);
         self::assertStringContainsString('fhir.normalizer.backbone_element:', $configContent);
-        
+
         // Check that version-specific services are configured
         self::assertStringContainsString('fhir.r4b.type_resolver:', $configContent);
         self::assertStringContainsString('fhir.r5.type_resolver:', $configContent);

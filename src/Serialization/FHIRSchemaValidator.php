@@ -16,9 +16,6 @@ use Ardenexal\FHIRTools\Exception\ValidationException;
  */
 class FHIRSchemaValidator
 {
-    /** @var array<string, string|null> */
-    private array $schemaCache = [];
-
     /**
      * Validate FHIR XML against its schema.
      *
@@ -124,22 +121,5 @@ class FHIRSchemaValidator
         // This would need to be implemented based on actual FHIR schema locations
         // For now, return null to indicate schema detection is not implemented
         return null;
-    }
-
-    /**
-     * Load and cache schema content.
-     */
-    private function loadSchema(string $schemaPath): ?string
-    {
-        if (!isset($this->schemaCache[$schemaPath])) {
-            if (file_exists($schemaPath)) {
-                $content = file_get_contents($schemaPath);
-                $this->schemaCache[$schemaPath] = $content !== false ? $content : null;
-            } else {
-                $this->schemaCache[$schemaPath] = null;
-            }
-        }
-
-        return $this->schemaCache[$schemaPath];
     }
 }
