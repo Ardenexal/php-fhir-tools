@@ -75,7 +75,6 @@ class FHIRServiceConfigurationTest extends TestCase
 
         $service = new FHIRSerializationService(
             $serializer,
-            $metadataExtractor,
             $contextFactory,
             $debugInfo,
         );

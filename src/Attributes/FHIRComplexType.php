@@ -7,7 +7,7 @@ namespace Ardenexal\FHIRTools\Attributes;
 /**
  * Attribute for FHIR complex type classes with type name information
  *
- * @author Kiro AI Assistant
+ * @author Ardenexal
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class FHIRComplexType

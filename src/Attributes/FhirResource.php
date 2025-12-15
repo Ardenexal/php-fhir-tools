@@ -11,7 +11,7 @@ namespace Ardenexal\FHIRTools\Attributes;
  * 1. Code generation metadata (type, version, url, fhirVersion)
  * 2. Serialization metadata (resourceType via type, profile via url)
  *
- * @author Kiro AI Assistant
+ * @author Ardenexal
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class FhirResource

@@ -106,7 +106,6 @@ class FHIRSerializationIntegrationTest extends TestCase
         );
         $this->serializationService = new FHIRSerializationService(
             $this->serializer,
-            $metadataExtractor,
             $contextFactory,
             $debugInfo,
         );

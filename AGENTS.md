@@ -48,6 +48,7 @@ php bin/console fhir:generate R4B
 ### Testing
 ```bash
 composer run test
+composer run generate-models
 ```
 
 ### Code Quality

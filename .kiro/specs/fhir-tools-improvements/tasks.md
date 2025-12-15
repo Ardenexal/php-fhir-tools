@@ -109,14 +109,14 @@
   - **Property 20: Metadata completeness**
   - **Validates: Requirements 4.5**
 
-- [ ] 5. Checkpoint - Ensure all tests pass
+- [x] 5. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 6. Implement enhanced code generation features
+- [x] 6. Implement enhanced code generation features
   - Add comprehensive PHPDoc annotation generation
   - Implement proper constructor property promotion for all generated classes
   - Create Symfony Serializer normalizers and denormalizers for JSON conversion
-  - Add Symfony validator constraint generation from FHIR validation rules
+  - Add Symfony validator constraint generation from FHIR validation rules (That don't require FHIRPath)
   - Implement output organization by StructureDefinition kind
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 

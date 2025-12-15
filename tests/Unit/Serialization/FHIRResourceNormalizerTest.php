@@ -14,6 +14,7 @@ use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 use Eris\Generator;
 use Eris\TestTrait;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
+use Ardenexal\FHIRTools\Exception\FHIRSerializationException;
 
 /**
  * Property-based tests for FHIRResourceNormalizer
@@ -800,7 +801,12 @@ class FHIRResourceNormalizerTest extends TestCase
                 self::fail('Expected exception for invalid JSON data: ' . json_encode($invalidData));
             } catch (\Exception $e) {
                 // Should throw a meaningful exception
-                self::assertInstanceOf(NotNormalizableValueException::class, $e);
+                // NotNormalizableValueException for basic type errors (non-array data)
+                // FHIRSerializationException for FHIR-specific validation errors in strict mode
+                self::assertTrue(
+                    $e instanceof NotNormalizableValueException || $e instanceof FHIRSerializationException,
+                    'Expected NotNormalizableValueException or FHIRSerializationException, got ' . get_class($e),
+                );
 
                 // Exception message should be meaningful
                 $message = strtolower($e->getMessage());
