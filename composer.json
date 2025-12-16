@@ -50,7 +50,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Ardenexal\\FHIRTools\\": "src/"
+            "Ardenexal\\FHIRTools\\": "src/",
+            "Ardenexal\\FHIRTools\\Component\\CodeGeneration\\": "src/Component/CodeGeneration/src/"
         }
     },
     "autoload-dev": {

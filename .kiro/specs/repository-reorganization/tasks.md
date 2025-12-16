@@ -100,7 +100,7 @@
 - [x] 5. Checkpoint - Verify basic structure and configuration
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 6. Migrate existing code to CodeGeneration component
+- [x] 6. Migrate existing code to CodeGeneration component
   - Move FHIRModelGenerator, FHIRValueSetGenerator to CodeGeneration component
   - Move Package/ directory classes to CodeGeneration component
   - Move BuilderContext and related generation classes
@@ -108,22 +108,22 @@
   - Update all import statements and class references
   - _Requirements: 6.3, 7.1, 7.2_
 
-- [ ] 6.1 Create CodeGeneration component interfaces and services
+- [x] 6.1 Create CodeGeneration component interfaces and services
   - Define clear interfaces for code generation functionality
   - Implement service classes with minimal external dependencies
   - Create proper exception hierarchy for CodeGeneration component
   - Set up component-specific configuration and options
   - _Requirements: 7.2, 7.3_
 
-- [ ] 6.2 Write property test for CodeGeneration independence
+- [x] 6.2 Write property test for CodeGeneration independence
   - **Property 18: CodeGeneration independence**
   - **Validates: Requirements 7.2**
 
-- [ ] 6.3 Write property test for CodeGeneration dependency minimization
+- [x] 6.3 Write property test for CodeGeneration dependency minimization
   - **Property 19: CodeGeneration dependency minimization**
   - **Validates: Requirements 7.3**
 
-- [ ] 6.4 Write property test for CodeGeneration test coverage
+- [x] 6.4 Write property test for CodeGeneration test coverage
   - **Property 20: CodeGeneration test coverage**
   - **Validates: Requirements 7.4**
 

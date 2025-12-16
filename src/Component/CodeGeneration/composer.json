@@ -1,0 +1,34 @@
+{
+    "name": "ardenexal/fhir-tools-code-generation",
+    "description": "FHIR code generation component for PHP FHIRTools",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "FHIR Tools Contributors",
+            "email": "contributors@fhirtools.dev"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "nette/php-generator": "^4.1",
+        "symfony/string": "^6.4|^7.0",
+        "symfony/intl": "^6.4|^7.0",
+        "symfony/validator": "^6.4|^7.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ardenexal\\FHIRTools\\Component\\CodeGeneration\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ardenexal\\FHIRTools\\Component\\CodeGeneration\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
