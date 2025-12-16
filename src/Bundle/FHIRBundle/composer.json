@@ -1,0 +1,37 @@
+{
+    "name": "ardenexal/fhir-bundle",
+    "description": "Symfony Bundle for integrating FHIR Tools components",
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=8.3",
+        "symfony/framework-bundle": "^6.4|^7.4",
+        "symfony/config": "^6.4|^7.4",
+        "symfony/dependency-injection": "^6.4|^7.4",
+        "symfony/yaml": "^6.4|^7.4",
+        "ardenexal/fhir-code-generation": "^1.0",
+        "ardenexal/fhir-serialization": "^1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^12.5",
+        "symfony/phpunit-bridge": "^6.4|^7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ardenexal\\FHIRTools\\Bundle\\FHIRBundle\\": ""
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ardenexal\\FHIRTools\\Bundle\\FHIRBundle\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": false,
+            "require": "^6.4|^7.4"
+        }
+    }
+}
