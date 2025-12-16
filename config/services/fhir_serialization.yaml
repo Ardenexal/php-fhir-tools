@@ -17,7 +17,6 @@ services:
         class: Ardenexal\FHIRTools\Serialization\FHIRSerializationService
         arguments:
             $serializer: '@serializer'
-            $metadataExtractor: '@fhir.metadata_extractor'
             $contextFactory: '@fhir.serialization_context_factory'
             $debugInfo: '@fhir.serialization_debug_info'
         public: true
@@ -30,20 +29,16 @@ services:
         class: Ardenexal\FHIRTools\Serialization\FHIRSerializationService
         arguments:
             $serializer: '@serializer'
-            $metadataExtractor: '@fhir.metadata_extractor'
             $contextFactory: '@fhir.serialization_context_factory'
             $debugInfo: '@fhir.serialization_debug_info'
-            $defaultVersion: 'R4B'
         public: true
 
     fhir.r5.serialization_service:
         class: Ardenexal\FHIRTools\Serialization\FHIRSerializationService
         arguments:
             $serializer: '@serializer'
-            $metadataExtractor: '@fhir.metadata_extractor'
             $contextFactory: '@fhir.serialization_context_factory'
             $debugInfo: '@fhir.serialization_debug_info'
-            $defaultVersion: 'R5'
         public: true
 
     # FHIR Validation Services (for future use)

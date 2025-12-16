@@ -18,7 +18,9 @@ use Symfony\Component\Yaml\Yaml;
 class RecipeValidator
 {
     private string $recipeDir;
+
     private array $errors = [];
+
     private array $warnings = [];
 
     public function __construct(string $recipeDir)
@@ -49,17 +51,19 @@ class RecipeValidator
     private function validateManifest(): void
     {
         $manifestPath = $this->recipeDir . '/manifest.json';
-        
+
         if (!file_exists($manifestPath)) {
             $this->errors[] = 'manifest.json is missing';
+
             return;
         }
 
-        $content = file_get_contents($manifestPath);
+        $content  = file_get_contents($manifestPath);
         $manifest = json_decode($content, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             $this->errors[] = 'manifest.json is not valid JSON: ' . json_last_error_msg();
+
             return;
         }
 
@@ -86,7 +90,7 @@ class RecipeValidator
                 'FHIR_CACHE_DIRECTORY',
                 'FHIR_DEFAULT_VERSION',
                 'FHIR_VALIDATION_ENABLED',
-                'FHIR_VALIDATION_STRICT_MODE'
+                'FHIR_VALIDATION_STRICT_MODE',
             ];
 
             foreach ($requiredEnvVars as $envVar) {
@@ -103,12 +107,12 @@ class RecipeValidator
             'config/packages/fhir.yaml',
             'config/packages/dev/fhir.yaml',
             'config/packages/prod/fhir.yaml',
-            'config/packages/test/fhir.yaml'
+            'config/packages/test/fhir.yaml',
         ];
 
         foreach ($configFiles as $configFile) {
             $fullPath = $this->recipeDir . '/' . $configFile;
-            
+
             if (!file_exists($fullPath)) {
                 $this->errors[] = "Configuration file {$configFile} is missing";
                 continue;
@@ -116,7 +120,7 @@ class RecipeValidator
 
             try {
                 $config = Yaml::parseFile($fullPath);
-                
+
                 if (!is_array($config) || !isset($config['fhir'])) {
                     $this->errors[] = "Configuration file {$configFile} is invalid or missing 'fhir' key";
                 }
@@ -129,7 +133,7 @@ class RecipeValidator
         $mainConfigPath = $this->recipeDir . '/config/packages/fhir.yaml';
         if (file_exists($mainConfigPath)) {
             try {
-                $config = Yaml::parseFile($mainConfigPath);
+                $config     = Yaml::parseFile($mainConfigPath);
                 $fhirConfig = $config['fhir'] ?? [];
 
                 $requiredKeys = ['output_directory', 'cache_directory', 'default_version', 'validation', 'packages'];
@@ -163,12 +167,12 @@ class RecipeValidator
         $docFiles = [
             'README.md',
             'post-install.txt',
-            'INSTALLATION.md'
+            'INSTALLATION.md',
         ];
 
         foreach ($docFiles as $docFile) {
             $fullPath = $this->recipeDir . '/' . $docFile;
-            
+
             if (!file_exists($fullPath)) {
                 $this->warnings[] = "Documentation file {$docFile} is missing";
                 continue;
@@ -188,7 +192,7 @@ class RecipeValidator
             'config/packages',
             'config/packages/dev',
             'config/packages/prod',
-            'config/packages/test'
+            'config/packages/test',
         ];
 
         foreach ($requiredDirs as $dir) {
@@ -209,11 +213,11 @@ if (!is_dir($recipeDir)) {
 }
 
 $validator = new RecipeValidator($recipeDir);
-$isValid = $validator->validate();
+$isValid   = $validator->validate();
 
 echo "🔍 Validating FHIR Bundle Symfony Flex Recipe...\n\n";
 
-$errors = $validator->getErrors();
+$errors   = $validator->getErrors();
 $warnings = $validator->getWarnings();
 
 if (!empty($errors)) {

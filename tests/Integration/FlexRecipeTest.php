@@ -27,12 +27,12 @@ class FlexRecipeTest extends TestCase
     public function testManifestExists(): void
     {
         $manifestPath = $this->recipeDir . '/manifest.json';
-        
+
         self::assertFileExists($manifestPath, 'Recipe manifest.json should exist');
-        
+
         $content = file_get_contents($manifestPath);
         self::assertNotFalse($content, 'Should be able to read manifest.json');
-        
+
         $manifest = json_decode($content, true);
         self::assertIsArray($manifest, 'Manifest should be valid JSON');
         self::assertArrayHasKey('bundles', $manifest, 'Manifest should have bundles key');
@@ -46,8 +46,8 @@ class FlexRecipeTest extends TestCase
     public function testBundleRegistration(): void
     {
         $manifestPath = $this->recipeDir . '/manifest.json';
-        $manifest = json_decode(file_get_contents($manifestPath), true);
-        
+        $manifest     = json_decode(file_get_contents($manifestPath), true);
+
         $expectedBundle = 'Ardenexal\\FHIRTools\\Bundle\\FHIRBundle\\FHIRBundle';
         self::assertArrayHasKey($expectedBundle, $manifest['bundles']);
         self::assertEquals(['all'], $manifest['bundles'][$expectedBundle]);
@@ -59,16 +59,16 @@ class FlexRecipeTest extends TestCase
     public function testEnvironmentVariables(): void
     {
         $manifestPath = $this->recipeDir . '/manifest.json';
-        $manifest = json_decode(file_get_contents($manifestPath), true);
-        
+        $manifest     = json_decode(file_get_contents($manifestPath), true);
+
         $requiredEnvVars = [
             'FHIR_OUTPUT_DIRECTORY',
             'FHIR_CACHE_DIRECTORY',
             'FHIR_DEFAULT_VERSION',
             'FHIR_VALIDATION_ENABLED',
-            'FHIR_VALIDATION_STRICT_MODE'
+            'FHIR_VALIDATION_STRICT_MODE',
         ];
-        
+
         foreach ($requiredEnvVars as $envVar) {
             self::assertArrayHasKey($envVar, $manifest['env'], "Environment variable {$envVar} should be defined");
         }
@@ -83,17 +83,17 @@ class FlexRecipeTest extends TestCase
             'config/packages/fhir.yaml',
             'config/packages/dev/fhir.yaml',
             'config/packages/prod/fhir.yaml',
-            'config/packages/test/fhir.yaml'
+            'config/packages/test/fhir.yaml',
         ];
-        
+
         foreach ($configFiles as $configFile) {
             $fullPath = $this->recipeDir . '/' . $configFile;
             self::assertFileExists($fullPath, "Configuration file {$configFile} should exist");
-            
+
             // Validate YAML syntax
             $content = file_get_contents($fullPath);
             self::assertNotFalse($content, "Should be able to read {$configFile}");
-            
+
             $yaml = Yaml::parse($content);
             self::assertIsArray($yaml, "Configuration file {$configFile} should be valid YAML");
             self::assertArrayHasKey('fhir', $yaml, "Configuration file {$configFile} should have fhir key");
@@ -106,20 +106,20 @@ class FlexRecipeTest extends TestCase
     public function testMainConfigurationStructure(): void
     {
         $configPath = $this->recipeDir . '/config/packages/fhir.yaml';
-        $config = Yaml::parseFile($configPath);
-        
+        $config     = Yaml::parseFile($configPath);
+
         $fhirConfig = $config['fhir'];
-        
+
         // Test required top-level keys
         $requiredKeys = ['output_directory', 'cache_directory', 'default_version', 'validation', 'packages'];
         foreach ($requiredKeys as $key) {
             self::assertArrayHasKey($key, $fhirConfig, "Main config should have {$key} key");
         }
-        
+
         // Test validation structure
         self::assertArrayHasKey('enabled', $fhirConfig['validation']);
         self::assertArrayHasKey('strict_mode', $fhirConfig['validation']);
-        
+
         // Test packages structure
         self::assertIsArray($fhirConfig['packages']);
         self::assertNotEmpty($fhirConfig['packages'], 'Should have at least one package configured');
@@ -132,13 +132,13 @@ class FlexRecipeTest extends TestCase
     {
         $docFiles = [
             'README.md',
-            'post-install.txt'
+            'post-install.txt',
         ];
-        
+
         foreach ($docFiles as $docFile) {
             $fullPath = $this->recipeDir . '/' . $docFile;
             self::assertFileExists($fullPath, "Documentation file {$docFile} should exist");
-            
+
             $content = file_get_contents($fullPath);
             self::assertNotEmpty($content, "Documentation file {$docFile} should not be empty");
         }
@@ -150,8 +150,8 @@ class FlexRecipeTest extends TestCase
     public function testGitignoreEntries(): void
     {
         $manifestPath = $this->recipeDir . '/manifest.json';
-        $manifest = json_decode(file_get_contents($manifestPath), true);
-        
+        $manifest     = json_decode(file_get_contents($manifestPath), true);
+
         self::assertArrayHasKey('gitignore', $manifest);
         self::assertContains('/output/', $manifest['gitignore']);
         self::assertContains('/var/cache/fhir/', $manifest['gitignore']);
@@ -163,8 +163,8 @@ class FlexRecipeTest extends TestCase
     public function testAliases(): void
     {
         $manifestPath = $this->recipeDir . '/manifest.json';
-        $manifest = json_decode(file_get_contents($manifestPath), true);
-        
+        $manifest     = json_decode(file_get_contents($manifestPath), true);
+
         self::assertArrayHasKey('aliases', $manifest);
         self::assertContains('fhir', $manifest['aliases']);
         self::assertContains('fhir-tools', $manifest['aliases']);
