@@ -127,7 +127,7 @@
   - **Property 20: CodeGeneration test coverage**
   - **Validates: Requirements 7.4**
 
-- [ ] 7. Migrate existing code to Serialization component
+- [-] 7. Migrate existing code to Serialization component
   - Move all Serialization/ directory classes to Serialization component
   - Move FHIR serialization services and normalizers
   - Move validation and schema validation classes
@@ -135,7 +135,7 @@
   - Update all import statements and class references
   - _Requirements: 6.3, 8.1, 8.2_
 
-- [ ] 7.1 Create Serialization component interfaces and Symfony integration
+- [-] 7.1 Create Serialization component interfaces and Symfony integration
   - Define clear interfaces for serialization functionality
   - Implement Symfony Serializer integration with normalizers and denormalizers
   - Create FHIR validation capabilities within the component
