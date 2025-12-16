@@ -1,0 +1,12 @@
+fhir:
+    # Development-specific FHIR configuration
+    validation:
+        # Disable strict mode in development for faster iteration
+        strict_mode: false
+    
+    # Enable auto-update for development packages
+    packages:
+        'hl7.fhir.r4b.core':
+            auto_update: true
+        'hl7.fhir.r5.core':
+            auto_update: true

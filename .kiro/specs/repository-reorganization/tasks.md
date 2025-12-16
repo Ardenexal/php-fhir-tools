@@ -89,7 +89,7 @@
   - **Property 12: Deprecation handling**
   - **Validates: Requirements 3.5**
 
-- [ ] 4. Create Symfony Flex recipe for automatic configuration
+- [x] 4. Create Symfony Flex recipe for automatic configuration
   - Create config/recipes/fhir-bundle/ directory structure
   - Write manifest.json with bundle registration and file copying instructions
   - Create default config/packages/fhir.yaml configuration file
