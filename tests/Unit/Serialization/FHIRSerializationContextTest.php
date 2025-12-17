@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Tests\Unit\Serialization;
 
-use Ardenexal\FHIRTools\Serialization\FHIRSerializationContext;
+use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
 use Eris\TestTrait;
 use Eris\Generator;
 use PHPUnit\Framework\TestCase;

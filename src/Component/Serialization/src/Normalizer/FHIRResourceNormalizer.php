@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Serialization;
+namespace Ardenexal\FHIRTools\Component\Serialization\Normalizer;
 
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -10,6 +10,10 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Ardenexal\FHIRTools\Attributes\FhirResource;
 use Ardenexal\FHIRTools\Exception\FHIRSerializationException;
+use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
+use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationDebugInfo;
+use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface;
 
 /**
  * Normalizer for FHIR resource classes with resourceType handling.

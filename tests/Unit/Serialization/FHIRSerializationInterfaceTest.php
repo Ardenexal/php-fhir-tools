@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Tests\Unit\Serialization;
 
-use Ardenexal\FHIRTools\Serialization\FHIRMetadataExtractorInterface;
-use Ardenexal\FHIRTools\Serialization\FHIRNormalizerInterface;
-use Ardenexal\FHIRTools\Serialization\FHIRTypeResolverInterface;
+use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRNormalizerInterface;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface;
 use Ardenexal\FHIRTools\Tests\Utilities\FHIRTestDataGenerator;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 use Eris\TestTrait;

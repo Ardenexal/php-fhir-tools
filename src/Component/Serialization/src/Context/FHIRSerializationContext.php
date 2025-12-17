@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Serialization;
+namespace Ardenexal\FHIRTools\Component\Serialization\Context;
 
 /**
  * Configuration context for FHIR serialization operations.

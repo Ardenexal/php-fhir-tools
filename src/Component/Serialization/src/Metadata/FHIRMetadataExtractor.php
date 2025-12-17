@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Serialization;
+namespace Ardenexal\FHIRTools\Component\Serialization\Metadata;
 
 use Ardenexal\FHIRTools\Attributes\FhirResource;
 use Ardenexal\FHIRTools\Attributes\FHIRComplexType;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Serialization;
+namespace Ardenexal\FHIRTools\Component\Serialization\Metadata;
 
 /**
  * Interface for extracting FHIR metadata from PHP objects using attributes

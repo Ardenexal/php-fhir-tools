@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Serialization;
+namespace Ardenexal\FHIRTools\Component\Serialization\Metadata;
 
 /**
  * Cache for FHIR metadata to improve performance by avoiding repeated reflection operations.

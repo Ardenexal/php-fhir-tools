@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Tests\Unit\Serialization;
 
-use Ardenexal\FHIRTools\Serialization\FHIRComplexTypeNormalizer;
-use Ardenexal\FHIRTools\Serialization\FHIRMetadataExtractor;
-use Ardenexal\FHIRTools\Serialization\FHIRTypeResolver;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRComplexTypeNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolver;
 use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRHumanName;
 use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRAddress;
 use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRReference;

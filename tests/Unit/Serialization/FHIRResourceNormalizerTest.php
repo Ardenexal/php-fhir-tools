@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Tests\Unit\Serialization;
 
-use Ardenexal\FHIRTools\Serialization\FHIRResourceNormalizer;
-use Ardenexal\FHIRTools\Serialization\FHIRMetadataExtractor;
-use Ardenexal\FHIRTools\Serialization\FHIRTypeResolver;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRResourceNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolver;
 use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRPatient;
 use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRObservation;
 use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRString;

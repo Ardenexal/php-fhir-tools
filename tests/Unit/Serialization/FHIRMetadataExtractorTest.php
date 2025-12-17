@@ -8,7 +8,7 @@ use Ardenexal\FHIRTools\Attributes\FhirResource;
 use Ardenexal\FHIRTools\Attributes\FHIRComplexType;
 use Ardenexal\FHIRTools\Attributes\FHIRPrimitive;
 use Ardenexal\FHIRTools\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Serialization\FHIRMetadataExtractor;
+use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 
 /**

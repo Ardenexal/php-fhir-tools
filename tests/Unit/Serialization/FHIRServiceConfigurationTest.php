@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Tests\Unit\Serialization;
 
-use Ardenexal\FHIRTools\Serialization\FHIRSerializationService;
-use Ardenexal\FHIRTools\Serialization\FHIRSerializationContextFactory;
-use Ardenexal\FHIRTools\Serialization\FHIRMetadataExtractor;
-use Ardenexal\FHIRTools\Serialization\FHIRTypeResolver;
-use Ardenexal\FHIRTools\Serialization\FHIRMetadataCache;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContextFactory;
+use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolver;
+use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataCache;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
-use Ardenexal\FHIRTools\Serialization\FHIRMetadataExtractorInterface;
-use Ardenexal\FHIRTools\Serialization\FHIRSerializationDebugInfo;
+use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
+use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationDebugInfo;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**

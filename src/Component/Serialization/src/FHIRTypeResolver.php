@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Serialization;
+namespace Ardenexal\FHIRTools\Component\Serialization;
 
 /**
  * Comprehensive FHIR discriminator map resolver for polymorphic type resolution.
