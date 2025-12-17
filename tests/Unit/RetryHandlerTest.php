@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Tests\Unit;
 
-use Ardenexal\FHIRTools\RetryHandler;
-use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Package\RetryHandler;
 use Ardenexal\FHIRTools\Exception\PackageException;
+use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 
 /**
  * Unit tests for RetryHandler functionality

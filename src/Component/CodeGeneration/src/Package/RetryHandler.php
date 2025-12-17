@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools;
+namespace Ardenexal\FHIRTools\Component\CodeGeneration\Package;
 
 use Ardenexal\FHIRTools\Exception\FHIRToolsException;
 use Psr\Log\LoggerInterface;

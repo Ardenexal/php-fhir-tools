@@ -2,26 +2,21 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools;
+namespace Ardenexal\FHIRTools\Component\CodeGeneration\Package;
 
-use Ardenexal\FHIRTools\Exception\PackageException;
-use Ardenexal\FHIRTools\Package\CacheIntegrityManager;
-use Ardenexal\FHIRTools\Package\DependencyResolver;
-use Ardenexal\FHIRTools\Package\PackageMetadata;
-use Ardenexal\FHIRTools\Package\SemanticVersionResolver;
-use Ardenexal\FHIRTools\Package\VersionIsolationManager;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\PackageException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * Enhanced FHIR package loader with comprehensive management capabilities

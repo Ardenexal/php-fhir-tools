@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Tests\Unit;
 
-use Ardenexal\FHIRTools\PackageLoader;
+use Ardenexal\FHIRTools\BuilderContext;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Ardenexal\FHIRTools\BuilderContext;
 
 /**
  * Unit tests for PackageLoader functionality

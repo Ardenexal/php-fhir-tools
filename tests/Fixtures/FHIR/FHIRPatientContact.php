@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Tests\Fixtures\FHIR;
 
-use Ardenexal\FHIRTools\Attributes\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
 
 /**
  * Test FHIR Patient.contact backbone element for testing serialization

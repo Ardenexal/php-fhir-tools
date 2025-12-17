@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Attributes;
+namespace Ardenexal\FHIRTools\Component\CodeGeneration\Attributes;
 
 /**
  * Attribute for FHIR complex type classes with type name information

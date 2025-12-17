@@ -242,7 +242,7 @@ $context = new FHIRSerializationContext(
 ### Exception Types
 
 ```php
-use Ardenexal\FHIRTools\Exception\FHIRSerializationException;
+use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
 
 try {
     $result = $serializer->serialize($invalidObject, 'json');

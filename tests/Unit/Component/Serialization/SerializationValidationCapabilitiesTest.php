@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Component\Serialization;
 
-use Ardenexal\FHIRTools\Component\Serialization\Validator\FHIRValidator;
-use Ardenexal\FHIRTools\Component\Serialization\Validator\FHIRSchemaValidator;
+use Ardenexal\FHIRTools\Component\Serialization\Exception\ValidationException;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
-use Ardenexal\FHIRTools\Exception\ValidationException;
+use Ardenexal\FHIRTools\Component\Serialization\Validator\FHIRSchemaValidator;
+use Ardenexal\FHIRTools\Component\Serialization\Validator\FHIRValidator;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 use Eris\Generator;
 use Eris\TestTrait;
@@ -16,7 +16,7 @@ use Eris\TestTrait;
  * Property-based tests for Serialization component validation capabilities.
  *
  * **Feature: repository-reorganization, Property 23: Serialization validation capabilities**
- * 
+ *
  * Tests that the Serialization component provides complete FHIR validation functionality.
  *
  * @author Kiro AI Assistant
@@ -27,7 +27,7 @@ class SerializationValidationCapabilitiesTest extends TestCase
 
     /**
      * Test that FHIR validator can validate objects and return errors.
-     * 
+     *
      * **Feature: repository-reorganization, Property 23: Serialization validation capabilities**
      * **Validates: Requirements 8.4**
      */
@@ -39,29 +39,29 @@ class SerializationValidationCapabilitiesTest extends TestCase
         )->then(function (bool $isValidObject, string $objectType): void {
             // Create mock metadata extractor
             $metadataExtractor = $this->createMock(FHIRMetadataExtractorInterface::class);
-            
+
             // Configure mock based on object type
             $metadataExtractor->method('isResource')->willReturn($objectType === 'resource');
             $metadataExtractor->method('isComplexType')->willReturn($objectType === 'complex');
             $metadataExtractor->method('isPrimitiveType')->willReturn($objectType === 'primitive');
             $metadataExtractor->method('isBackboneElement')->willReturn($objectType === 'backbone');
-            
+
             if ($objectType === 'resource') {
                 $metadataExtractor->method('extractResourceType')->willReturn($isValidObject ? 'Patient' : null);
             }
-            
+
             // Create validator
             $validator = new FHIRValidator($metadataExtractor);
-            
+
             // Create test object
             $testObject = new \stdClass();
-            
+
             // Validate the object
             $errors = $validator->validate($testObject);
-            
+
             // Verify validation behavior
             self::assertIsArray($errors);
-            
+
             if ($objectType === 'unknown') {
                 // Unknown objects should have validation errors
                 self::assertNotEmpty($errors);
@@ -79,7 +79,7 @@ class SerializationValidationCapabilitiesTest extends TestCase
 
     /**
      * Test that FHIR validator can throw exceptions for invalid objects.
-     * 
+     *
      * **Feature: repository-reorganization, Property 23: Serialization validation capabilities**
      * **Validates: Requirements 8.4**
      */
@@ -90,7 +90,7 @@ class SerializationValidationCapabilitiesTest extends TestCase
         )->then(function (bool $shouldThrowException): void {
             // Create mock metadata extractor
             $metadataExtractor = $this->createMock(FHIRMetadataExtractorInterface::class);
-            
+
             if ($shouldThrowException) {
                 // Configure to return invalid object
                 $metadataExtractor->method('isResource')->willReturn(false);
@@ -102,13 +102,13 @@ class SerializationValidationCapabilitiesTest extends TestCase
                 $metadataExtractor->method('isResource')->willReturn(true);
                 $metadataExtractor->method('extractResourceType')->willReturn('Patient');
             }
-            
+
             // Create validator
             $validator = new FHIRValidator($metadataExtractor);
-            
+
             // Create test object
             $testObject = new \stdClass();
-            
+
             if ($shouldThrowException) {
                 // Should throw ValidationException for invalid objects
                 $this->expectException(ValidationException::class);
@@ -124,7 +124,7 @@ class SerializationValidationCapabilitiesTest extends TestCase
 
     /**
      * Test that FHIR schema validator can validate XML and return errors.
-     * 
+     *
      * **Feature: repository-reorganization, Property 23: Serialization validation capabilities**
      * **Validates: Requirements 8.4**
      */
@@ -139,15 +139,15 @@ class SerializationValidationCapabilitiesTest extends TestCase
             ])
         )->then(function (string $xmlData): void {
             $validator = new FHIRSchemaValidator();
-            
+
             // Test well-formed check
             $wellFormedErrors = $validator->checkWellFormed($xmlData);
             self::assertIsArray($wellFormedErrors);
-            
+
             // Test schema validation (will return error about missing schema)
             $schemaErrors = $validator->validateXml($xmlData);
             self::assertIsArray($schemaErrors);
-            
+
             // Verify error behavior based on XML content
             if (str_contains($xmlData, '<unclosed>') || $xmlData === 'not xml at all') {
                 // Invalid XML should have well-formed errors
@@ -164,7 +164,7 @@ class SerializationValidationCapabilitiesTest extends TestCase
 
     /**
      * Test that FHIR schema validator can throw exceptions for invalid XML.
-     * 
+     *
      * **Feature: repository-reorganization, Property 23: Serialization validation capabilities**
      * **Validates: Requirements 8.4**
      */
@@ -177,7 +177,7 @@ class SerializationValidationCapabilitiesTest extends TestCase
             ])
         )->then(function (string $xmlData): void {
             $validator = new FHIRSchemaValidator();
-            
+
             if (str_contains($xmlData, '<unclosed>')) {
                 // Should throw ValidationException for invalid XML
                 $this->expectException(ValidationException::class);
@@ -194,7 +194,7 @@ class SerializationValidationCapabilitiesTest extends TestCase
 
     /**
      * Test that validation components can be instantiated independently.
-     * 
+     *
      * **Feature: repository-reorganization, Property 23: Serialization validation capabilities**
      * **Validates: Requirements 8.4**
      */
@@ -208,13 +208,13 @@ class SerializationValidationCapabilitiesTest extends TestCase
         )->then(function (string $validatorClass): void {
             // Verify class exists and can be reflected
             self::assertTrue(class_exists($validatorClass), "Validator class {$validatorClass} should exist");
-            
+
             $reflection = new \ReflectionClass($validatorClass);
             self::assertTrue($reflection->isInstantiable());
-            
+
             // Verify namespace is correct for component independence
             self::assertStringStartsWith('Ardenexal\\FHIRTools\\Component\\Serialization\\Validator', $validatorClass);
-            
+
             // Test instantiation
             if ($validatorClass === FHIRValidator::class) {
                 $metadataExtractor = $this->createMock(FHIRMetadataExtractorInterface::class);

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Tests\Fixtures\FHIR;
 
-use Ardenexal\FHIRTools\Attributes\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
 
 /**
  * Test FHIR Reference complex type for testing polymorphic references

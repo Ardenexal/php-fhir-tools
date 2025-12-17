@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Tests\Unit\Serialization;
 
-use Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRResourceNormalizer;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor;
+use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolver;
-use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRPatient;
+use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRResourceNormalizer;
 use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRObservation;
+use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRPatient;
 use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRString;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 use Eris\Generator;
 use Eris\TestTrait;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
-use Ardenexal\FHIRTools\Exception\FHIRSerializationException;
 
 /**
  * Property-based tests for FHIRResourceNormalizer

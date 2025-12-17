@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Normalizer;
 
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface;
+use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Ardenexal\FHIRTools\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
-use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * Normalizer for FHIR complex type classes (Address, HumanName, etc.).

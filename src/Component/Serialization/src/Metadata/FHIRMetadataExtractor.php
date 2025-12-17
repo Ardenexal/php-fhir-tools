@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Metadata;
 
-use Ardenexal\FHIRTools\Attributes\FhirResource;
-use Ardenexal\FHIRTools\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Attributes\FHIRPrimitive;
-use Ardenexal\FHIRTools\Attributes\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRPrimitive;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
 
 /**
  * Extracts FHIR metadata from PHP objects using attributes and reflection.

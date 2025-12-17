@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Tests\Unit\Package;
 
+use Ardenexal\FHIRTools\Component\CodeGeneration\Package\CacheIntegrityManager;
+use Ardenexal\FHIRTools\Component\Package\PackageMetadata;
 use Ardenexal\FHIRTools\Exception\PackageException;
-use Ardenexal\FHIRTools\Package\CacheIntegrityManager;
-use Ardenexal\FHIRTools\Package\PackageMetadata;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\Filesystem\Filesystem;

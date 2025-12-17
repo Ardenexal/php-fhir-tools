@@ -93,8 +93,8 @@ class Symfony64CompatibilityTest extends TestCase
                 // Verify that essential services are still registered
                 $essentialServices = [
                     'Ardenexal\FHIRTools\FHIRModelGenerator',
-                    'Ardenexal\FHIRTools\PackageLoader',
-                    'Ardenexal\FHIRTools\ErrorCollector',
+                    'Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader',
+                    'Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector',
                 ];
 
                 foreach ($essentialServices as $serviceId) {

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Validator;
 
-use Ardenexal\FHIRTools\Exception\ValidationException;
+use Ardenexal\FHIRTools\Component\Serialization\Exception\ValidationException;
 
 /**
  * FHIR schema validator for validating FHIR XML against XSD schemas.

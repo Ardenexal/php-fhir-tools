@@ -152,8 +152,8 @@ class ConfigurationCompatibilityTest extends TestCase
             // Verify that services are registered consistently
             $essentialServices = [
                 'Ardenexal\FHIRTools\FHIRModelGenerator',
-                'Ardenexal\FHIRTools\PackageLoader',
-                'Ardenexal\FHIRTools\ErrorCollector',
+                'Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader',
+                'Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector',
             ];
 
             foreach ($essentialServices as $serviceId) {

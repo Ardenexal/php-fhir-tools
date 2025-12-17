@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools;
+namespace Ardenexal\FHIRTools\Component\CodeGeneration\Generator;
 
-use Ardenexal\FHIRTools\Exception\ValidationException;
+use Ardenexal\FHIRTools\Component\Serialization\Exception\ValidationException;
 
 /**
  * Collects and aggregates validation errors with detailed context

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Package;
+namespace Ardenexal\FHIRTools\Component\CodeGeneration\Package;
 
-use Ardenexal\FHIRTools\Exception\PackageException;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\PackageException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Filesystem\Filesystem;

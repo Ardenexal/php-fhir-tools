@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Attributes;
+namespace Ardenexal\FHIRTools\Component\CodeGeneration\Attributes;
 
 /**
  * Unified attribute for FHIR resource classes containing metadata for both generation and serialization

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Tests;
 
-use Ardenexal\FHIRTools\ErrorCollector;
-use Ardenexal\FHIRTools\Exception\ValidationException;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector;
+use Ardenexal\FHIRTools\Component\Serialization\Exception\ValidationException;
 use PHPUnit\Framework\TestCase;
 
 /**

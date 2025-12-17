@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Tests\Unit\Bundle\FHIRBundle;
 
 use Ardenexal\FHIRTools\Bundle\FHIRBundle\FHIRBundle;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader;
 use Ardenexal\FHIRTools\FHIRModelGenerator;
-use Ardenexal\FHIRTools\PackageLoader;
 use Ardenexal\FHIRTools\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Serialization\FHIRValidator;
 use Eris\Generator;
@@ -71,11 +71,11 @@ class FHIRBundleServiceRegistrationTest extends TestCase
             // Verify essential FHIR services are registered (before compilation)
             $essentialServices = [
                 'Ardenexal\FHIRTools\FHIRModelGenerator',
-                'Ardenexal\FHIRTools\PackageLoader',
+                'Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader',
                 'Ardenexal\FHIRTools\Serialization\FHIRSerializationService',
                 'Ardenexal\FHIRTools\Serialization\FHIRValidator',
-                'Ardenexal\FHIRTools\ErrorCollector',
-                'Ardenexal\FHIRTools\RetryHandler',
+                'Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector',
+                'Ardenexal\FHIRTools\Component\CodeGeneration\Package\RetryHandler',
             ];
 
             foreach ($essentialServices as $serviceId) {

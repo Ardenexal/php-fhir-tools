@@ -2,13 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools;
+namespace Ardenexal\FHIRTools\Component\CodeGeneration\Command;
 
+use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\GenerationException;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRValueSetGenerator;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\EnumType;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\Printer;
-use Ardenexal\FHIRTools\Exception\GenerationException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Attribute\Ask;
 use Symfony\Component\Console\Attribute\Option;
@@ -17,7 +22,6 @@ use Symfony\Component\Console\Helper\ProgressIndicator;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
-
 use function Symfony\Component\String\s;
 
 /**
@@ -226,7 +230,7 @@ class FHIRModelGeneratorCommand extends Command
             }
 
             $output->writeln("Generating model class for {$structureDefinition['name']}");
-            $generator = new FHIRModelGenerator($this->context);
+            $generator = new FHIRModelGenerator();
 
             $class = $generator->generateModelClassWithErrorHandling($structureDefinition, $version, $this->errorCollector);
 
@@ -322,14 +326,14 @@ class FHIRModelGeneratorCommand extends Command
             try {
                 $output->writeln("Generating enum for {$valueset['name']}");
 
-                $enumGenerator  = new FHIRValueSetGenerator($this->context);
-                $classGenerator = new FHIRModelGenerator($this->context);
+                $enumGenerator  = new FHIRValueSetGenerator();
+                $classGenerator = new FHIRModelGenerator();
 
-                $enumType = $enumGenerator->generateEnum($valueset, $version);
+                $enumType = $enumGenerator->generateEnum($valueset, $version, $this->context);
                 $this->context->getEnumNamespace($version)->add($enumType);
                 $this->context->addEnum($url, $enumType);
 
-                $codeType = $classGenerator->generateModelCodeType($enumType, $version);
+                $codeType = $classGenerator->generateModelCodeType($enumType, $version, $this->context);
                 $this->context->addType($url, $codeType);
                 $this->context->removePendingType($url);
                 $this->context->removePendingEnum($url);

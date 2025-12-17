@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Tests\Unit\Package;
 
+use Ardenexal\FHIRTools\Component\Package\DependencyResolver;
+use Ardenexal\FHIRTools\Component\Package\PackageMetadata;
+use Ardenexal\FHIRTools\Component\Package\SemanticVersionResolver;
 use Ardenexal\FHIRTools\Exception\PackageException;
-use Ardenexal\FHIRTools\Package\DependencyResolver;
-use Ardenexal\FHIRTools\Package\PackageMetadata;
-use Ardenexal\FHIRTools\Package\SemanticVersionResolver;
 use PHPUnit\Framework\TestCase;
 
 /**

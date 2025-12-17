@@ -68,11 +68,11 @@ class FHIRBundleServiceAccessibilityTest extends TestCase
             // Verify public services are marked as public
             $publicServices = [
                 'Ardenexal\FHIRTools\FHIRModelGenerator',
-                'Ardenexal\FHIRTools\PackageLoader',
+                'Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader',
                 'Ardenexal\FHIRTools\Serialization\FHIRSerializationService',
                 'Ardenexal\FHIRTools\Serialization\FHIRValidator',
-                'Ardenexal\FHIRTools\ErrorCollector',
-                'Ardenexal\FHIRTools\RetryHandler',
+                'Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector',
+                'Ardenexal\FHIRTools\Component\CodeGeneration\Package\RetryHandler',
             ];
 
             foreach ($publicServices as $serviceId) {
@@ -106,8 +106,8 @@ class FHIRBundleServiceAccessibilityTest extends TestCase
             // Verify that services have proper autowiring configuration
             $autowiredServices = [
                 'Ardenexal\FHIRTools\BuilderContext',
-                'Ardenexal\FHIRTools\ErrorCollector',
-                'Ardenexal\FHIRTools\RetryHandler',
+                'Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector',
+                'Ardenexal\FHIRTools\Component\CodeGeneration\Package\RetryHandler',
             ];
 
             foreach ($autowiredServices as $serviceId) {

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization;
 
-use Symfony\Component\Serializer\SerializerInterface;
-use Ardenexal\FHIRTools\Exception\FHIRSerializationException;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContextFactory;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationDebugInfo;
+use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * High-level FHIR serialization service providing convenient methods for FHIR data conversion.

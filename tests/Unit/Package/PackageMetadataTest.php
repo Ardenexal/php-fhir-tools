@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Tests\Unit\Package;
 
-use Ardenexal\FHIRTools\Package\PackageMetadata;
+use Ardenexal\FHIRTools\Component\Package\PackageMetadata;
 use PHPUnit\Framework\TestCase;
 
 /**

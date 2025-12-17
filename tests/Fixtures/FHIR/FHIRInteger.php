@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Tests\Fixtures\FHIR;
 
-use Ardenexal\FHIRTools\Attributes\FHIRPrimitive;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRPrimitive;
 
 /**
  * Test FHIR Integer primitive for testing serialization
