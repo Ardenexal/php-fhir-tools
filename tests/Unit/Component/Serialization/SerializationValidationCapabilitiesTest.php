@@ -35,8 +35,8 @@ class SerializationValidationCapabilitiesTest extends TestCase
     {
         $this->forAll(
             Generator\bool(), // isValidObject
-            Generator\elements(['resource', 'complex', 'primitive', 'backbone', 'unknown'])
-        )->then(function (bool $isValidObject, string $objectType): void {
+            Generator\elements(['resource', 'complex', 'primitive', 'backbone', 'unknown']),
+        )->then(function(bool $isValidObject, string $objectType): void {
             // Create mock metadata extractor
             $metadataExtractor = $this->createMock(FHIRMetadataExtractorInterface::class);
 
@@ -86,8 +86,8 @@ class SerializationValidationCapabilitiesTest extends TestCase
     public function testFHIRValidatorCanThrowExceptionsForInvalidObjects(): void
     {
         $this->forAll(
-            Generator\bool() // shouldThrowException
-        )->then(function (bool $shouldThrowException): void {
+            Generator\bool(), // shouldThrowException
+        )->then(function(bool $shouldThrowException): void {
             // Create mock metadata extractor
             $metadataExtractor = $this->createMock(FHIRMetadataExtractorInterface::class);
 
@@ -135,9 +135,9 @@ class SerializationValidationCapabilitiesTest extends TestCase
                 '<?xml version="1.0"?><Patient><name>Test</name></Patient>',
                 '<?xml version="1.0"?><InvalidXML><unclosed>',
                 '<Patient><name>Test</name></Patient>',
-                'not xml at all'
-            ])
-        )->then(function (string $xmlData): void {
+                'not xml at all',
+            ]),
+        )->then(function(string $xmlData): void {
             $validator = new FHIRSchemaValidator();
 
             // Test well-formed check
@@ -173,9 +173,9 @@ class SerializationValidationCapabilitiesTest extends TestCase
         $this->forAll(
             Generator\elements([
                 '<?xml version="1.0"?><Patient><name>Test</name></Patient>',
-                '<?xml version="1.0"?><InvalidXML><unclosed>'
-            ])
-        )->then(function (string $xmlData): void {
+                '<?xml version="1.0"?><InvalidXML><unclosed>',
+            ]),
+        )->then(function(string $xmlData): void {
             $validator = new FHIRSchemaValidator();
 
             if (str_contains($xmlData, '<unclosed>')) {
@@ -203,9 +203,9 @@ class SerializationValidationCapabilitiesTest extends TestCase
         $this->forAll(
             Generator\elements([
                 FHIRValidator::class,
-                FHIRSchemaValidator::class
-            ])
-        )->then(function (string $validatorClass): void {
+                FHIRSchemaValidator::class,
+            ]),
+        )->then(function(string $validatorClass): void {
             // Verify class exists and can be reflected
             self::assertTrue(class_exists($validatorClass), "Validator class {$validatorClass} should exist");
 
@@ -218,7 +218,7 @@ class SerializationValidationCapabilitiesTest extends TestCase
             // Test instantiation
             if ($validatorClass === FHIRValidator::class) {
                 $metadataExtractor = $this->createMock(FHIRMetadataExtractorInterface::class);
-                $validator = new FHIRValidator($metadataExtractor);
+                $validator         = new FHIRValidator($metadataExtractor);
                 self::assertInstanceOf(FHIRValidator::class, $validator);
             } else {
                 $validator = new FHIRSchemaValidator();

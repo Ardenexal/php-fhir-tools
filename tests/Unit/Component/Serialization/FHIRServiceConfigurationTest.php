@@ -85,18 +85,18 @@ class FHIRServiceConfigurationTest extends TestCase
     public function testServiceConfigurationFilesExist(): void
     {
         // Verify that the configuration files exist
-        self::assertFileExists(__DIR__ . '/../../../config/packages/serializer.yaml');
-        self::assertFileExists(__DIR__ . '/../../../config/services/fhir_serialization.yaml');
+        self::assertFileExists(__DIR__ . '/../../../../config/packages/serializer.yaml');
+        self::assertFileExists(__DIR__ . '/../../../../config/services/fhir_serialization.yaml');
 
         // Verify the main services.yaml imports the FHIR configuration
-        $servicesContent = file_get_contents(__DIR__ . '/../../../config/services.yaml');
+        $servicesContent = file_get_contents(__DIR__ . '/../../../../config/services.yaml');
         self::assertStringContainsString('imports:', $servicesContent);
         self::assertStringContainsString('services/fhir_serialization.yaml', $servicesContent);
     }
 
     public function testSerializerConfigurationIsValid(): void
     {
-        $configContent = file_get_contents(__DIR__ . '/../../../config/packages/serializer.yaml');
+        $configContent = file_get_contents(__DIR__ . '/../../../../config/packages/serializer.yaml');
 
         // Check that serializer is enabled
         self::assertStringContainsString('enabled: true', $configContent);

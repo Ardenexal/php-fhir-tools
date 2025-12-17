@@ -7,7 +7,7 @@ namespace Ardenexal\FHIRTools\Tests\Integration;
 use Ardenexal\FHIRTools\BuilderContext;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Command\FHIRModelGeneratorCommand;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader;
-use Ardenexal\FHIRTools\Component\Package\PackageMetadata;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageMetadata;
 use Ardenexal\FHIRTools\Exception\PackageException;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 use Nette\PhpGenerator\PhpNamespace;

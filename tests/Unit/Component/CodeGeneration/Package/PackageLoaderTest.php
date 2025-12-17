@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Tests\Unit;
+namespace Ardenexal\FHIRTools\Tests\Unit\Component\CodeGeneration\Package;
 
-use Ardenexal\FHIRTools\BuilderContext;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 use Symfony\Component\Filesystem\Filesystem;

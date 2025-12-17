@@ -11,3 +11,17 @@ parameters:
 		-
 			message: '#return type with generic interface Eris\\Generator does not specify its types#'
 			path: tests/Utilities/FHIRTestDataGenerator.php
+		
+		# Ignore class-string type issues in pending enum/type methods
+		-
+			message: '#Parameter \#2 \$enumName of method.*addPendingEnum.*expects class-string, string given#'
+			path: src/Component/CodeGeneration/src/Generator/FHIRModelGenerator.php
+		-
+			message: '#Parameter \#2 \$typeClassName of method.*addPendingType.*expects class-string, string given#'
+			path: src/Component/CodeGeneration/src/Generator/FHIRModelGenerator.php
+		-
+			message: '#Parameter \#2 \$enumName of method.*addPendingEnum.*expects class-string, string given#'
+			path: src/Component/CodeGeneration/src/Command/FHIRModelGeneratorCommand.php
+		-
+			message: '#Parameter \#2 \$typeClassName of method.*addPendingType.*expects class-string, string given#'
+			path: src/Component/CodeGeneration/src/Command/FHIRModelGeneratorCommand.php

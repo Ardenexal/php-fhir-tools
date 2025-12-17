@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Tests\Unit\Package;
+namespace Ardenexal\FHIRTools\Tests\Unit\Component\CodeGeneration\Package;
 
-use Ardenexal\FHIRTools\Component\Package\PackageMetadata;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageMetadata;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -14,6 +14,9 @@ use PHPUnit\Framework\TestCase;
  */
 class PackageMetadataTest extends TestCase
 {
+    /**
+     * Test constructor and getter methods
+     */
     public function testConstructorAndGetters(): void
     {
         $metadata = new PackageMetadata(
@@ -43,6 +46,9 @@ class PackageMetadataTest extends TestCase
         self::assertSame(['custom' => 'value'], $metadata->getAdditionalData());
     }
 
+    /**
+     * Test fromPackageData factory method
+     */
     public function testFromPackageData(): void
     {
         $packageData = [
@@ -66,6 +72,9 @@ class PackageMetadataTest extends TestCase
         self::assertSame(['custom_field' => 'custom_value'], $metadata->getAdditionalData());
     }
 
+    /**
+     * Test supportsFhirVersion method
+     */
     public function testSupportsFhirVersion(): void
     {
         $metadata = new PackageMetadata(
@@ -85,6 +94,9 @@ class PackageMetadataTest extends TestCase
         self::assertFalse($metadata->supportsFhirVersion('R5'));
     }
 
+    /**
+     * Test hasDependencies method
+     */
     public function testHasDependencies(): void
     {
         $withDeps = new PackageMetadata(
@@ -115,6 +127,9 @@ class PackageMetadataTest extends TestCase
         self::assertFalse($withoutDeps->hasDependencies());
     }
 
+    /**
+     * Test getDependencyConstraint method
+     */
     public function testGetDependencyConstraint(): void
     {
         $metadata = new PackageMetadata(
@@ -134,6 +149,9 @@ class PackageMetadataTest extends TestCase
         self::assertNull($metadata->getDependencyConstraint('nonexistent'));
     }
 
+    /**
+     * Test hasDependency method
+     */
     public function testHasDependency(): void
     {
         $metadata = new PackageMetadata(
@@ -152,6 +170,9 @@ class PackageMetadataTest extends TestCase
         self::assertFalse($metadata->hasDependency('nonexistent'));
     }
 
+    /**
+     * Test getIdentifier method
+     */
     public function testGetIdentifier(): void
     {
         $metadata = new PackageMetadata(
@@ -169,6 +190,9 @@ class PackageMetadataTest extends TestCase
         self::assertSame('test-package@1.0.0', $metadata->getIdentifier());
     }
 
+    /**
+     * Test toArray method
+     */
     public function testToArray(): void
     {
         $metadata = new PackageMetadata(

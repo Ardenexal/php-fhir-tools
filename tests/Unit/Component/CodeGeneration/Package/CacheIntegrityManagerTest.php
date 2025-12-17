@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Tests\Unit\Package;
+namespace Ardenexal\FHIRTools\Tests\Unit\Component\CodeGeneration\Package;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Package\CacheIntegrityManager;
-use Ardenexal\FHIRTools\Component\Package\PackageMetadata;
-use Ardenexal\FHIRTools\Exception\PackageException;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageMetadata;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\PackageException;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\Filesystem\Filesystem;
@@ -39,6 +39,9 @@ class CacheIntegrityManagerTest extends TestCase
         }
     }
 
+    /**
+     * Test that generateChecksum returns a valid checksum for existing files
+     */
     public function testGenerateChecksumForExistingFile(): void
     {
         $filePath = $this->tempDir . '/test-file.txt';
@@ -51,6 +54,9 @@ class CacheIntegrityManagerTest extends TestCase
         self::assertSame(64, strlen($checksum));
     }
 
+    /**
+     * Test that generateChecksum throws exception for non-existent files
+     */
     public function testGenerateChecksumThrowsExceptionForNonExistentFile(): void
     {
         $filePath = $this->tempDir . '/nonexistent-file.txt';
@@ -61,6 +67,9 @@ class CacheIntegrityManagerTest extends TestCase
         $this->manager->generateChecksum($filePath);
     }
 
+    /**
+     * Test that generateChecksum throws exception for unsupported algorithms
+     */
     public function testGenerateChecksumThrowsExceptionForUnsupportedAlgorithm(): void
     {
         $filePath = $this->tempDir . '/test-file.txt';
@@ -72,6 +81,9 @@ class CacheIntegrityManagerTest extends TestCase
         $this->manager->generateChecksum($filePath, 'unsupported-algorithm');
     }
 
+    /**
+     * Test that verifyChecksum returns true for valid checksums
+     */
     public function testVerifyChecksumWithValidChecksum(): void
     {
         $filePath = $this->tempDir . '/test-file.txt';

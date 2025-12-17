@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\PackageException;
  * from various sources (local files, remote URLs, package registries).
  *
  * @author FHIR Tools
+ *
  * @since 1.0.0
  */
 interface PackageLoaderInterface
@@ -20,8 +21,8 @@ interface PackageLoaderInterface
     /**
      * Load a FHIR package by name and version
      *
-     * @param string $packageName The package name (e.g., 'hl7.fhir.r4.core')
-     * @param string|null $version The package version (null for latest)
+     * @param string      $packageName The package name (e.g., 'hl7.fhir.r4.core')
+     * @param string|null $version     The package version (null for latest)
      *
      * @return PackageInterface The loaded package
      *
@@ -32,8 +33,8 @@ interface PackageLoaderInterface
     /**
      * Check if a package is available
      *
-     * @param string $packageName The package name
-     * @param string|null $version The package version (null for any version)
+     * @param string      $packageName The package name
+     * @param string|null $version     The package version (null for any version)
      *
      * @return bool True if the package is available
      */

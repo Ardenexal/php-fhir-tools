@@ -45,14 +45,14 @@ class SemanticVersionResolver
         }
 
         // Find versions that satisfy the constraint
-        $satisfyingVersions = array_filter($availableVersions, fn($version) => $this->satisfies($version, $constraint));
+        $satisfyingVersions = array_filter($availableVersions, fn ($version) => $this->satisfies($version, $constraint));
 
         if (empty($satisfyingVersions)) {
             throw PackageException::packageNotFound('unknown', $constraint);
         }
 
         // Sort versions in descending order (highest first)
-        usort($satisfyingVersions, [$this, 'compare']);
+        usort($satisfyingVersions, fn ($a, $b) => $this->compare($b, $a));
 
         return $satisfyingVersions[0];
     }
@@ -120,7 +120,7 @@ class SemanticVersionResolver
         $v2Parts = $this->parseVersion($version2);
 
         // Compare major, minor, patch
-        for ($i = 0; $i < 3; $i++) {
+        for ($i = 0; $i < 3; ++$i) {
             $v1Part = $v1Parts[$i] ?? 0;
             $v2Part = $v2Parts[$i] ?? 0;
 
@@ -152,7 +152,7 @@ class SemanticVersionResolver
 
         // Sort versions in descending order (highest first)
         $sortedVersions = $versions;
-        usort($sortedVersions, [$this, 'compare']);
+        usort($sortedVersions, fn ($a, $b) => $this->compare($b, $a));
 
         return $sortedVersions[0];
     }
@@ -189,14 +189,14 @@ class SemanticVersionResolver
     /**
      * Check if version satisfies caret constraint (^1.2.3)
      *
-     * @param string $version Version to check
+     * @param string $version    Version to check
      * @param string $constraint Base version for caret constraint
      *
      * @return bool True if version satisfies constraint
      */
     private function satisfiesCaretConstraint(string $version, string $constraint): bool
     {
-        $versionParts = $this->parseVersion($version);
+        $versionParts    = $this->parseVersion($version);
         $constraintParts = $this->parseVersion($constraint);
 
         // Major version must match
@@ -211,14 +211,14 @@ class SemanticVersionResolver
     /**
      * Check if version satisfies tilde constraint (~1.2.3)
      *
-     * @param string $version Version to check
+     * @param string $version    Version to check
      * @param string $constraint Base version for tilde constraint
      *
      * @return bool True if version satisfies constraint
      */
     private function satisfiesTildeConstraint(string $version, string $constraint): bool
     {
-        $versionParts = $this->parseVersion($version);
+        $versionParts    = $this->parseVersion($version);
         $constraintParts = $this->parseVersion($constraint);
 
         // Major and minor versions must match
@@ -240,12 +240,17 @@ class SemanticVersionResolver
     private function parseVersion(string $version): array
     {
         // Remove any pre-release or build metadata
-        $version = preg_replace('/[-+].*$/', '', $version);
-        
-        $parts = explode('.', $version);
-        
+        $cleanedVersion = preg_replace('/[-+].*$/', '', $version);
+
+        // Ensure we have a valid string after regex replacement
+        if ($cleanedVersion === null) {
+            $cleanedVersion = $version;
+        }
+
+        $parts = explode('.', $cleanedVersion);
+
         return [
-            (int) ($parts[0] ?? 0),
+            (int) $parts[0],
             (int) ($parts[1] ?? 0),
             (int) ($parts[2] ?? 0),
         ];

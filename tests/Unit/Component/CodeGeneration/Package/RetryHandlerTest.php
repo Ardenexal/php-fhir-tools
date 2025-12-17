@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Tests\Unit;
+namespace Ardenexal\FHIRTools\Tests\Unit\Component\CodeGeneration\Package;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Package\RetryHandler;
-use Ardenexal\FHIRTools\Exception\PackageException;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\PackageException;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 
 /**

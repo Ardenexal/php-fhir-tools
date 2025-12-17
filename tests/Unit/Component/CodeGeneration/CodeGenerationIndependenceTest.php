@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Tests\Unit\Component\CodeGeneration;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\GenerationException;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\PackageException;
-use Ardenexal\FHIRTools\Tests\Utilities\FHIRTestDataGenerator;
 use Eris\Generator;
 use Eris\TestTrait;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 
 /**
  * Property-based test for CodeGeneration component independence.
@@ -41,19 +38,19 @@ class CodeGenerationIndependenceTest extends TestCase
                 'Ardenexal\\FHIRTools\\Component\\CodeGeneration\\Context\\BuilderContext',
                 'Ardenexal\\FHIRTools\\Component\\CodeGeneration\\Exception\\GenerationException',
                 'Ardenexal\\FHIRTools\\Component\\CodeGeneration\\Exception\\PackageException',
-            ])
-        )->then(function (string $className): void {
+            ]),
+        )->then(function(string $className): void {
             // Verify the class exists and can be loaded
             self::assertTrue(
                 class_exists($className) || interface_exists($className),
-                "CodeGeneration component class {$className} should exist and be loadable"
+                "CodeGeneration component class {$className} should exist and be loadable",
             );
 
-            $reflection = new ReflectionClass($className);
-            
+            $reflection = new \ReflectionClass($className);
+
             // Get all dependencies from constructor parameters, method parameters, and use statements
             $dependencies = $this->extractClassDependencies($reflection);
-            
+
             // Define allowed dependencies for CodeGeneration component
             $allowedDependencyPrefixes = [
                 'Ardenexal\\FHIRTools\\Component\\CodeGeneration\\', // Own namespace
@@ -77,8 +74,8 @@ class CodeGenerationIndependenceTest extends TestCase
             ];
 
             // Filter out PHP keywords and built-in constructs
-            $phpKeywords = ['self', 'parent', 'static', 'true', 'false', 'null', 'callable', 'iterable', 'object'];
-            $dependencies = array_filter($dependencies, fn($dep) => !in_array($dep, $phpKeywords, true));
+            $phpKeywords  = ['self', 'parent', 'static', 'true', 'false', 'null', 'callable', 'iterable', 'object'];
+            $dependencies = array_filter($dependencies, fn ($dep) => !in_array($dep, $phpKeywords, true));
 
             foreach ($dependencies as $dependency) {
                 $isAllowed = false;
@@ -92,7 +89,7 @@ class CodeGenerationIndependenceTest extends TestCase
                 self::assertTrue(
                     $isAllowed,
                     "CodeGeneration component class {$className} should not depend on external class {$dependency}. " .
-                    "Only minimal dependencies are allowed: " . implode(', ', $allowedDependencyPrefixes)
+                    'Only minimal dependencies are allowed: ' . implode(', ', $allowedDependencyPrefixes),
                 );
             }
         });
@@ -113,24 +110,24 @@ class CodeGenerationIndependenceTest extends TestCase
             Generator\elements([
                 GenerationException::class,
                 PackageException::class,
-            ])
-        )->then(function (string $exceptionClass): void {
-            $reflection = new ReflectionClass($exceptionClass);
-            
+            ]),
+        )->then(function(string $exceptionClass): void {
+            $reflection = new \ReflectionClass($exceptionClass);
+
             // Verify exception extends from standard Exception
             self::assertTrue(
                 $reflection->isSubclassOf(\Exception::class),
-                "CodeGeneration exception {$exceptionClass} should extend standard Exception"
+                "CodeGeneration exception {$exceptionClass} should extend standard Exception",
             );
 
             // Verify exception doesn't depend on external FHIR tools classes
             $dependencies = $this->extractClassDependencies($reflection);
-            
+
             foreach ($dependencies as $dependency) {
                 self::assertFalse(
-                    str_starts_with($dependency, 'Ardenexal\\FHIRTools\\') && 
-                    !str_starts_with($dependency, 'Ardenexal\\FHIRTools\\Component\\CodeGeneration\\'),
-                    "CodeGeneration exception {$exceptionClass} should not depend on external FHIR tools class {$dependency}"
+                    str_starts_with($dependency, 'Ardenexal\\FHIRTools\\')
+                    && !str_starts_with($dependency, 'Ardenexal\\FHIRTools\\Component\\CodeGeneration\\'),
+                    "CodeGeneration exception {$exceptionClass} should not depend on external FHIR tools class {$dependency}",
                 );
             }
         });
@@ -156,19 +153,19 @@ class CodeGenerationIndependenceTest extends TestCase
                 'Ardenexal\\FHIRTools\\Component\\CodeGeneration\\Service\\CodeGenerationServiceInterface',
                 'Ardenexal\\FHIRTools\\Component\\CodeGeneration\\Service\\GenerationResultInterface',
                 'Ardenexal\\FHIRTools\\Component\\CodeGeneration\\Configuration\\GenerationConfigurationInterface',
-            ])
-        )->then(function (string $interfaceName): void {
+            ]),
+        )->then(function(string $interfaceName): void {
             self::assertTrue(
                 interface_exists($interfaceName),
-                "CodeGeneration component interface {$interfaceName} should exist"
+                "CodeGeneration component interface {$interfaceName} should exist",
             );
 
-            $reflection = new ReflectionClass($interfaceName);
-            
+            $reflection = new \ReflectionClass($interfaceName);
+
             // Verify interface is properly defined
             self::assertTrue(
                 $reflection->isInterface(),
-                "{$interfaceName} should be an interface"
+                "{$interfaceName} should be an interface",
             );
 
             // Check that interface methods have proper type hints
@@ -178,13 +175,13 @@ class CodeGenerationIndependenceTest extends TestCase
                     $type = $parameter->getType();
                     if ($type !== null) {
                         $typeName = $type instanceof \ReflectionNamedType ? $type->getName() : (string) $type;
-                        
+
                         // Ensure type hints don't reference external FHIR tools classes
                         self::assertFalse(
-                            str_starts_with($typeName, 'Ardenexal\\FHIRTools\\') && 
-                            !str_starts_with($typeName, 'Ardenexal\\FHIRTools\\Component\\CodeGeneration\\'),
+                            str_starts_with($typeName, 'Ardenexal\\FHIRTools\\')
+                            && !str_starts_with($typeName, 'Ardenexal\\FHIRTools\\Component\\CodeGeneration\\'),
                             "Interface {$interfaceName} method {$method->getName()} parameter {$parameter->getName()} " .
-                            "should not reference external FHIR tools class {$typeName}"
+                            "should not reference external FHIR tools class {$typeName}",
                         );
                     }
                 }
@@ -193,12 +190,12 @@ class CodeGenerationIndependenceTest extends TestCase
                 $returnType = $method->getReturnType();
                 if ($returnType !== null) {
                     $returnTypeName = $returnType instanceof \ReflectionNamedType ? $returnType->getName() : (string) $returnType;
-                    
+
                     self::assertFalse(
-                        str_starts_with($returnTypeName, 'Ardenexal\\FHIRTools\\') && 
-                        !str_starts_with($returnTypeName, 'Ardenexal\\FHIRTools\\Component\\CodeGeneration\\'),
+                        str_starts_with($returnTypeName, 'Ardenexal\\FHIRTools\\')
+                        && !str_starts_with($returnTypeName, 'Ardenexal\\FHIRTools\\Component\\CodeGeneration\\'),
                         "Interface {$interfaceName} method {$method->getName()} return type " .
-                        "should not reference external FHIR tools class {$returnTypeName}"
+                        "should not reference external FHIR tools class {$returnTypeName}",
                     );
                 }
             }
@@ -208,10 +205,11 @@ class CodeGenerationIndependenceTest extends TestCase
     /**
      * Extract all class dependencies from reflection
      *
-     * @param ReflectionClass $reflection
+     * @param \ReflectionClass $reflection
+     *
      * @return array<string>
      */
-    private function extractClassDependencies(ReflectionClass $reflection): array
+    private function extractClassDependencies(\ReflectionClass $reflection): array
     {
         $dependencies = [];
 

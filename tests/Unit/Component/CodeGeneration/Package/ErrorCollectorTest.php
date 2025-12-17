@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Tests;
+namespace Ardenexal\FHIRTools\Tests\Unit\Component\CodeGeneration\Package;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\ValidationException;

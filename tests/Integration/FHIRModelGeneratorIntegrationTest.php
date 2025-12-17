@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Tests\Integration;
 
-use Ardenexal\FHIRTools\BuilderContext;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector;
-use Ardenexal\FHIRTools\FHIRModelGenerator;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 use Nette\PhpGenerator\PhpNamespace;
 
@@ -51,7 +51,7 @@ class FHIRModelGeneratorIntegrationTest extends TestCase
         // Create temporary output directory
         $this->tempOutputDir = $this->createTempDirectory();
 
-        $this->generator = new FHIRModelGenerator($context);
+        $this->generator = new FHIRModelGenerator();
     }
 
     protected function tearDown(): void

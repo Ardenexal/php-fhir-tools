@@ -22,6 +22,7 @@ use Symfony\Component\Console\Helper\ProgressIndicator;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
+
 use function Symfony\Component\String\s;
 
 /**
@@ -232,7 +233,7 @@ class FHIRModelGeneratorCommand extends Command
             $output->writeln("Generating model class for {$structureDefinition['name']}");
             $generator = new FHIRModelGenerator();
 
-            $class = $generator->generateModelClassWithErrorHandling($structureDefinition, $version, $this->errorCollector);
+            $class = $generator->generateModelClassWithErrorHandling($structureDefinition, $version, $this->errorCollector, $this->context);
 
             if ($class !== null) {
                 $this->context->addType($structureDefinition['url'], $class);
@@ -423,7 +424,6 @@ class FHIRModelGeneratorCommand extends Command
 
 
         $this->buildElementClasses($output, $namedVersion, $elementNamespace);
-
 
         $this->buildEnumsForValuesSets($output, $namedVersion);
         $this->outputFiles($output, $namedVersion);

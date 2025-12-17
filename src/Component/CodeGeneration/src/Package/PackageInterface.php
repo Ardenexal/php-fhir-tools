@@ -11,6 +11,7 @@ namespace Ardenexal\FHIRTools\Component\CodeGeneration\Package;
  * structure definitions, value sets, and other resources.
  *
  * @author FHIR Tools
+ *
  * @since 1.0.0
  */
 interface PackageInterface
@@ -54,6 +55,7 @@ interface PackageInterface
      * Get a specific structure definition by URL
      *
      * @param string $url The structure definition URL
+     *
      * @return array<string, mixed>|null The structure definition or null if not found
      */
     public function getStructureDefinition(string $url): ?array;
@@ -69,6 +71,7 @@ interface PackageInterface
      * Get a specific value set by URL
      *
      * @param string $url The value set URL
+     *
      * @return array<string, mixed>|null The value set or null if not found
      */
     public function getValueSet(string $url): ?array;
@@ -84,6 +87,7 @@ interface PackageInterface
      * Get a specific code system by URL
      *
      * @param string $url The code system URL
+     *
      * @return array<string, mixed>|null The code system or null if not found
      */
     public function getCodeSystem(string $url): ?array;
@@ -92,6 +96,7 @@ interface PackageInterface
      * Get all resources of a specific type
      *
      * @param string $resourceType The resource type (e.g., 'StructureDefinition', 'ValueSet')
+     *
      * @return array<string, array<string, mixed>> Resources keyed by URL
      */
     public function getResourcesByType(string $resourceType): array;
@@ -100,6 +105,7 @@ interface PackageInterface
      * Check if the package contains a resource with the given URL
      *
      * @param string $url The resource URL
+     *
      * @return bool True if the resource exists
      */
     public function hasResource(string $url): bool;
@@ -108,6 +114,7 @@ interface PackageInterface
      * Get a resource by URL
      *
      * @param string $url The resource URL
+     *
      * @return array<string, mixed>|null The resource or null if not found
      */
     public function getResource(string $url): ?array;

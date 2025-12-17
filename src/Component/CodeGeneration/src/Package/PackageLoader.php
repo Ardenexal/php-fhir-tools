@@ -351,7 +351,7 @@ class PackageLoader
             $response = $this->httpClient->request('GET', $url);
 
             if ($response->getStatusCode() !== 200) {
-                throw PackageException::downloadFailed($packageName, $version, $response->getStatusCode());
+                throw PackageException::downloadFailed($packageName, $url, (string) $response->getStatusCode());
             }
 
             $packageZip = $response->getContent();

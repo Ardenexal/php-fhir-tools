@@ -11,6 +11,7 @@ namespace Ardenexal\FHIRTools\Component\CodeGeneration\Configuration;
  * including output settings, naming conventions, and generation options.
  *
  * @author FHIR Tools
+ *
  * @since 1.0.0
  */
 interface GenerationConfigurationInterface
@@ -67,8 +68,9 @@ interface GenerationConfigurationInterface
     /**
      * Get a specific option value
      *
-     * @param string $key The option key
-     * @param mixed $default The default value if option is not set
+     * @param string $key     The option key
+     * @param mixed  $default The default value if option is not set
+     *
      * @return mixed The option value
      */
     public function getOption(string $key, mixed $default = null): mixed;
@@ -77,6 +79,7 @@ interface GenerationConfigurationInterface
      * Check if an option is set
      *
      * @param string $key The option key
+     *
      * @return bool True if the option is set
      */
     public function hasOption(string $key): bool;
@@ -85,6 +88,7 @@ interface GenerationConfigurationInterface
      * Get the namespace for element classes
      *
      * @param string $fhirVersion The FHIR version
+     *
      * @return string The element namespace
      */
     public function getElementNamespace(string $fhirVersion): string;
@@ -93,6 +97,7 @@ interface GenerationConfigurationInterface
      * Get the namespace for enum classes
      *
      * @param string $fhirVersion The FHIR version
+     *
      * @return string The enum namespace
      */
     public function getEnumNamespace(string $fhirVersion): string;

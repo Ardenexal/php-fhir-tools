@@ -91,9 +91,9 @@ class FHIRValueSetGenerator implements GeneratorInterface
     /**
      * Generate PHP code from FHIR definition
      *
-     * @param array<string, mixed> $definition The FHIR definition to generate code from
-     * @param string $version The FHIR version
-     * @param BuilderContextInterface $context The builder context for managing generated types
+     * @param array<string, mixed>    $definition The FHIR definition to generate code from
+     * @param string                  $version    The FHIR version
+     * @param BuilderContextInterface $context    The builder context for managing generated types
      *
      * @return EnumType The generated PHP enum
      *
@@ -105,8 +105,8 @@ class FHIRValueSetGenerator implements GeneratorInterface
     }
 
     /**
-     * @param array<string,mixed> $valueSet
-     * @param string              $version
+     * @param array<string,mixed>     $valueSet
+     * @param string                  $version
      * @param BuilderContextInterface $builderContext
      *
      * @return EnumType
@@ -146,8 +146,8 @@ class FHIRValueSetGenerator implements GeneratorInterface
     }
 
     /**
-     * @param array<string,mixed> $include
-     * @param EnumType            $enum
+     * @param array<string,mixed>     $include
+     * @param EnumType                $enum
      * @param BuilderContextInterface $builderContext
      *
      * @return void

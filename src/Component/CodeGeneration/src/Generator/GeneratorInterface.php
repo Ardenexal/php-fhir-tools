@@ -15,6 +15,7 @@ use Nette\PhpGenerator\ClassLike;
  * Implementations should handle specific types of FHIR resources or structures.
  *
  * @author FHIR Tools
+ *
  * @since 1.0.0
  */
 interface GeneratorInterface
@@ -22,9 +23,9 @@ interface GeneratorInterface
     /**
      * Generate PHP code from FHIR definition
      *
-     * @param array<string, mixed> $definition The FHIR definition to generate code from
-     * @param string $version The FHIR version
-     * @param BuilderContextInterface $context The builder context for managing generated types
+     * @param array<string, mixed>    $definition The FHIR definition to generate code from
+     * @param string                  $version    The FHIR version
+     * @param BuilderContextInterface $context    The builder context for managing generated types
      *
      * @return ClassLike The generated PHP class or enum
      *

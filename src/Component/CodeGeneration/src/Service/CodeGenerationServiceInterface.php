@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageInterface;
  * the generation of PHP code from FHIR packages and definitions.
  *
  * @author FHIR Tools
+ *
  * @since 1.0.0
  */
 interface CodeGenerationServiceInterface
@@ -22,9 +23,9 @@ interface CodeGenerationServiceInterface
     /**
      * Generate PHP code from a FHIR package
      *
-     * @param PackageInterface $package The FHIR package to generate code from
-     * @param string $outputDirectory The directory to write generated files to
-     * @param array<string, mixed> $options Generation options
+     * @param PackageInterface     $package         The FHIR package to generate code from
+     * @param string               $outputDirectory The directory to write generated files to
+     * @param array<string, mixed> $options         Generation options
      *
      * @return GenerationResultInterface The generation result
      *
@@ -39,10 +40,10 @@ interface CodeGenerationServiceInterface
     /**
      * Generate PHP code from specific FHIR definitions
      *
-     * @param array<string, array<string, mixed>> $definitions The FHIR definitions to generate code from
-     * @param string $fhirVersion The FHIR version
-     * @param string $outputDirectory The directory to write generated files to
-     * @param array<string, mixed> $options Generation options
+     * @param array<string, array<string, mixed>> $definitions     The FHIR definitions to generate code from
+     * @param string                              $fhirVersion     The FHIR version
+     * @param string                              $outputDirectory The directory to write generated files to
+     * @param array<string, mixed>                $options         Generation options
      *
      * @return GenerationResultInterface The generation result
      *

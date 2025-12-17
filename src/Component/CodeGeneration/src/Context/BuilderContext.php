@@ -26,6 +26,7 @@ use Nette\PhpGenerator\PhpNamespace;
  * and that dependencies between types are correctly resolved.
  *
  * @author FHIR Tools
+ *
  * @since 1.0.0
  */
 class BuilderContext implements BuilderContextInterface

@@ -11,6 +11,7 @@ namespace Ardenexal\FHIRTools\Component\CodeGeneration\Service;
  * including generated files, statistics, and any errors or warnings.
  *
  * @author FHIR Tools
+ *
  * @since 1.0.0
  */
 interface GenerationResultInterface

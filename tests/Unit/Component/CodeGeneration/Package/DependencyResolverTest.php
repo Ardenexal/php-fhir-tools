@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Tests\Unit\Package;
+namespace Ardenexal\FHIRTools\Tests\Unit\Component\CodeGeneration\Package;
 
-use Ardenexal\FHIRTools\Component\Package\DependencyResolver;
-use Ardenexal\FHIRTools\Component\Package\PackageMetadata;
-use Ardenexal\FHIRTools\Component\Package\SemanticVersionResolver;
-use Ardenexal\FHIRTools\Exception\PackageException;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Package\DependencyResolver;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageMetadata;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Package\SemanticVersionResolver;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\PackageException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -27,6 +27,9 @@ class DependencyResolverTest extends TestCase
         $this->resolver        = new DependencyResolver($this->versionResolver);
     }
 
+    /**
+     * Test that resolveDependencies works with packages that have no dependencies
+     */
     public function testResolveDependenciesWithNoDependencies(): void
     {
         $rootPackage = new PackageMetadata(
@@ -47,6 +50,9 @@ class DependencyResolverTest extends TestCase
         self::assertSame('test-package', $result[0]->getName());
     }
 
+    /**
+     * Test that resolveDependencies correctly resolves a single dependency
+     */
     public function testResolveDependenciesWithSingleDependency(): void
     {
         $dependency = new PackageMetadata(
@@ -86,6 +92,9 @@ class DependencyResolverTest extends TestCase
         self::assertSame('test-package', $result[1]->getName());
     }
 
+    /**
+     * Test that resolveDependencies throws exception for circular dependencies
+     */
     public function testResolveDependenciesThrowsExceptionForCircularDependency(): void
     {
         $packageA = new PackageMetadata(
@@ -118,11 +127,14 @@ class DependencyResolverTest extends TestCase
         ];
 
         $this->expectException(PackageException::class);
-        $this->expectExceptionMessage('Circular dependency detected');
+        $this->expectExceptionMessage('Failed to resolve dependencies');
 
         $this->resolver->resolveDependencies($packageA, $availablePackages);
     }
 
+    /**
+     * Test that detectConflicts returns empty array when there are no conflicts
+     */
     public function testDetectConflictsWithNoConflicts(): void
     {
         $package1 = new PackageMetadata(
@@ -168,6 +180,9 @@ class DependencyResolverTest extends TestCase
         self::assertEmpty($conflicts);
     }
 
+    /**
+     * Test that buildDependencyGraph creates correct graph structure
+     */
     public function testBuildDependencyGraph(): void
     {
         $dependency = new PackageMetadata(

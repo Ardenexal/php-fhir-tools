@@ -220,7 +220,7 @@ class RetryHandler
             [
                 'Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface',
                 'Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface',
-                'Ardenexal\FHIRTools\Exception\PackageException',
+                'Ardenexal\FHIRTools\Component\CodeGeneration\Exception\PackageException',
             ],
         );
     }
