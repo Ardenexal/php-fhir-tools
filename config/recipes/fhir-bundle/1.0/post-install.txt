@@ -1,0 +1,24 @@
+<bg=blue;fg=white>                                      </>
+<bg=blue;fg=white>  FHIR Bundle successfully installed  </>
+<bg=blue;fg=white>                                      </>
+
+  * <fg=green>Configuration</fg>: The bundle has been configured in <comment>config/packages/fhir.yaml</comment>
+  * <fg=green>Environment</fg>: Environment variables have been added to <comment>.env</comment>
+  * <fg=green>Output Directory</fg>: Generated FHIR classes will be stored in <comment>output/</comment>
+  * <fg=green>Cache Directory</fg>: FHIR packages will be cached in <comment>var/cache/fhir/</comment>
+
+<fg=yellow>Next steps:</>
+  1. Run <comment>php bin/console fhir:generate --help</comment> to see available commands
+  2. Generate FHIR classes: <comment>php bin/console fhir:generate R4B</comment>
+  3. Customize configuration in <comment>config/packages/fhir.yaml</comment>
+
+<fg=yellow>Documentation:</>
+  * Bundle documentation: <comment>https://github.com/ardenexal/fhir-tools</comment>
+  * FHIR specification: <comment>https://hl7.org/fhir/</comment>
+
+<fg=yellow>Environment Variables:</>
+  * <comment>FHIR_OUTPUT_DIRECTORY</comment>: Directory for generated classes
+  * <comment>FHIR_CACHE_DIRECTORY</comment>: Directory for package cache
+  * <comment>FHIR_DEFAULT_VERSION</comment>: Default FHIR version (R4, R4B, R5)
+  * <comment>FHIR_VALIDATION_ENABLED</comment>: Enable/disable validation
+  * <comment>FHIR_VALIDATION_STRICT_MODE</comment>: Enable/disable strict validation

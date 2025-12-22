@@ -13,31 +13,31 @@
         "amphp/http-client": "^5.3.4",
         "composer/semver": "^3.4.4",
         "nette/php-generator": "^4.2.0",
-        "symfony/console": "^7.4.1",
-        "symfony/dotenv": "^7.4",
-        "symfony/filesystem": "^7.4",
+        "symfony/console": "^6.4|^7.4",
+        "symfony/dotenv": "^6.4|^7.4",
+        "symfony/filesystem": "^6.4|^7.4",
         "symfony/flex": "^2.10",
-        "symfony/framework-bundle": "^7.4.1",
-        "symfony/http-client": "^7.4.1",
-        "symfony/intl": "^7.4",
+        "symfony/framework-bundle": "^6.4|^7.4",
+        "symfony/http-client": "^6.4|^7.4",
+        "symfony/intl": "^6.4|^7.4",
         "symfony/polyfill-php84": "^v1.33.0",
         "symfony/polyfill-php85": "^v1.33.0",
-        "symfony/runtime": "^7.4.1",
-        "symfony/serializer": "7.4.*",
-        "symfony/validator": "^7.4.2",
-        "symfony/yaml": "^7.4.1"
+        "symfony/runtime": "^6.4|^7.4",
+        "symfony/serializer": "^6.4|^7.4",
+        "symfony/validator": "^6.4|^7.4",
+        "symfony/yaml": "^6.4|^7.4"
     },
     "require-dev": {
         "laravel/pint": "^1.26",
         "phpstan/phpstan": "^2.1.33",
         "roave/security-advisories": "dev-latest",
-        "phpunit/phpunit": "^12.5.3",
+        "phpunit/phpunit": "^11.0|^12.5.4",
         "giorgiosironi/eris": "^1.0",
-        "symfony/browser-kit": "^7.4",
-        "symfony/css-selector": "^7.4",
-        "symfony/dom-crawler": "^7.4.1",
+        "symfony/browser-kit": "^6.4|^7.4",
+        "symfony/css-selector": "^6.4|^7.4",
+        "symfony/dom-crawler": "^6.4|^7.4",
         "symfony/maker-bundle": "^1.65.1",
-        "symfony/phpunit-bridge": "^7.4"
+        "symfony/phpunit-bridge": "^6.4|^7.4"
     },
     "config": {
         "allow-plugins": {
@@ -50,7 +50,9 @@
     },
     "autoload": {
         "psr-4": {
-            "Ardenexal\\FHIRTools\\": "src/"
+            "Ardenexal\\FHIRTools\\": "src/",
+            "Ardenexal\\FHIRTools\\Component\\CodeGeneration\\": "src/Component/CodeGeneration/src/",
+            "Ardenexal\\FHIRTools\\Component\\Serialization\\": "src/Component/Serialization/src/"
         }
     },
     "autoload-dev": {
@@ -81,13 +83,56 @@
             "@auto-scripts"
         ],
         "phpstan": "php ./vendor/bin/phpstan.phar analyse --configuration=phpstan.neon --memory-limit=-1 -v",
+        "phpstan:bundle": "php ./vendor/bin/phpstan.phar analyse src/Bundle/ --configuration=phpstan.neon --memory-limit=-1 -v",
+        "phpstan:codegen": "php ./vendor/bin/phpstan.phar analyse src/Component/CodeGeneration/ --configuration=phpstan.neon --memory-limit=-1 -v",
+        "phpstan:serialization": "php ./vendor/bin/phpstan.phar analyse src/Component/Serialization/ --configuration=phpstan.neon --memory-limit=-1 -v",
         "lint": "php ./vendor/bin/pint -v --parallel --max-processes=4",
+        "lint:bundle": "php ./vendor/bin/pint src/Bundle/ -v --parallel --max-processes=4",
+        "lint:codegen": "php ./vendor/bin/pint src/Component/CodeGeneration/ -v --parallel --max-processes=4",
+        "lint:serialization": "php ./vendor/bin/pint src/Component/Serialization/ -v --parallel --max-processes=4",
         "test": "php ./vendor/phpunit/phpunit/phpunit",
         "test-coverage": "php ./vendor/phpunit/phpunit/phpunit --coverage-html coverage",
         "test-unit": "php ./vendor/phpunit/phpunit/phpunit --testsuite=unit",
         "test-integration": "php ./vendor/phpunit/phpunit/phpunit --testsuite=integration",
         "test-fhir": "php ./vendor/phpunit/phpunit/phpunit --testsuite=fhir",
-        "generate-models": "php ./bin/console fhir:generate -vvv"
+        "test:bundle": "php ./vendor/phpunit/phpunit/phpunit tests/Unit/Bundle/",
+        "test:codegen": "php ./vendor/phpunit/phpunit/phpunit tests/Unit/Component/CodeGeneration/",
+        "test:serialization": "php ./vendor/phpunit/phpunit/phpunit tests/Unit/Component/Serialization/",
+        "test:components": [
+            "@test:bundle",
+            "@test:codegen",
+            "@test:serialization"
+        ],
+        "quality:all": [
+            "@lint",
+            "@phpstan",
+            "@test"
+        ],
+        "quality:bundle": [
+            "@lint:bundle",
+            "@phpstan:bundle",
+            "@test:bundle"
+        ],
+        "quality:codegen": [
+            "@lint:codegen",
+            "@phpstan:codegen",
+            "@test:codegen"
+        ],
+        "quality:serialization": [
+            "@lint:serialization",
+            "@phpstan:serialization",
+            "@test:serialization"
+        ],
+        "quality:components": [
+            "@quality:bundle",
+            "@quality:codegen",
+            "@quality:serialization"
+        ],
+        "generate-models": "php ./bin/console fhir:generate -vvv",
+        "fix-newlines": "powershell -ExecutionPolicy Bypass -File scripts/fix-newlines.ps1",
+        "validate-recipe": "php scripts/validate-recipe.php",
+        "test-recipe": "php ./vendor/phpunit/phpunit/phpunit tests/Integration/FlexRecipeTest.php",
+        "test-package-installation": "php scripts/test-package-installation.php"
     },
     "conflict": {
         "symfony/symfony": "*"
@@ -95,7 +140,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "7.4.*"
+            "require": "^6.4|^7.4"
         }
     }
 }

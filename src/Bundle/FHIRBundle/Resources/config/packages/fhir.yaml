@@ -1,0 +1,14 @@
+fhir:
+    output_directory: '%kernel.project_dir%/output'
+    cache_directory: '%kernel.cache_dir%/fhir'
+    default_version: 'R4B'
+    validation:
+        enabled: true
+        strict_mode: false
+    packages:
+        'hl7.fhir.r4b.core':
+            version: '4.3.0'
+            auto_update: false
+        'hl7.fhir.r5.core':
+            version: '5.0.0'
+            auto_update: false

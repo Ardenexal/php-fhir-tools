@@ -4,30 +4,30 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Tests\Integration;
 
-use Ardenexal\FHIRTools\Serialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
+use Ardenexal\FHIRTools\Serialization\FHIRBackboneElementNormalizer;
+use Ardenexal\FHIRTools\Serialization\FHIRComplexTypeNormalizer;
+use Ardenexal\FHIRTools\Serialization\FHIRMetadataExtractor;
+use Ardenexal\FHIRTools\Serialization\FHIRPrimitiveTypeNormalizer;
+use Ardenexal\FHIRTools\Serialization\FHIRResourceNormalizer;
+use Ardenexal\FHIRTools\Serialization\FHIRSchemaValidator;
 use Ardenexal\FHIRTools\Serialization\FHIRSerializationContext;
 use Ardenexal\FHIRTools\Serialization\FHIRSerializationContextFactory;
-use Ardenexal\FHIRTools\Serialization\FHIRResourceNormalizer;
-use Ardenexal\FHIRTools\Serialization\FHIRComplexTypeNormalizer;
-use Ardenexal\FHIRTools\Serialization\FHIRPrimitiveTypeNormalizer;
-use Ardenexal\FHIRTools\Serialization\FHIRBackboneElementNormalizer;
-use Ardenexal\FHIRTools\Serialization\FHIRMetadataExtractor;
-use Ardenexal\FHIRTools\Serialization\FHIRTypeResolver;
-use Ardenexal\FHIRTools\Serialization\FHIRSchemaValidator;
-use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRPatient;
-use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRObservation;
-use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRString;
-use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRHumanName;
-use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRAddress;
-use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRReference;
-use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRExtension;
-use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
-use Ardenexal\FHIRTools\Tests\Utilities\FHIRTestCaseRepository;
-use Ardenexal\FHIRTools\Exception\FHIRSerializationException;
-use Symfony\Component\Serializer\Serializer;
 use Ardenexal\FHIRTools\Serialization\FHIRSerializationDebugInfo;
+use Ardenexal\FHIRTools\Serialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Serialization\FHIRTypeResolver;
+use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRAddress;
+use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRExtension;
+use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRHumanName;
+use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRObservation;
+use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRPatient;
+use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRReference;
+use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRString;
+use Ardenexal\FHIRTools\Tests\Utilities\FHIRTestCaseRepository;
+use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * Integration tests for FHIR serialization with official FHIR test data

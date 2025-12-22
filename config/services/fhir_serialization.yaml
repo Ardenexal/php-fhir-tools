@@ -4,56 +4,51 @@
 services:
     # FHIR Serialization Context Factory
     fhir.serialization_context_factory:
-        class: Ardenexal\FHIRTools\Serialization\FHIRSerializationContextFactory
+        class: Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContextFactory
         public: false
 
     # FHIR Serialization Debug Info Service
     fhir.serialization_debug_info:
-        class: Ardenexal\FHIRTools\Serialization\FHIRSerializationDebugInfo
+        class: Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationDebugInfo
         public: false
 
     # High-level FHIR Serialization Service
     fhir.serialization_service:
-        class: Ardenexal\FHIRTools\Serialization\FHIRSerializationService
+        class: Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService
         arguments:
             $serializer: '@serializer'
-            $metadataExtractor: '@fhir.metadata_extractor'
             $contextFactory: '@fhir.serialization_context_factory'
             $debugInfo: '@fhir.serialization_debug_info'
         public: true
 
     # Service aliases for backward compatibility and easy access
-    Ardenexal\FHIRTools\Serialization\FHIRSerializationService: '@fhir.serialization_service'
+    Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService: '@fhir.serialization_service'
 
     # Version-specific serialization services
     fhir.r4b.serialization_service:
-        class: Ardenexal\FHIRTools\Serialization\FHIRSerializationService
+        class: Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService
         arguments:
             $serializer: '@serializer'
-            $metadataExtractor: '@fhir.metadata_extractor'
             $contextFactory: '@fhir.serialization_context_factory'
             $debugInfo: '@fhir.serialization_debug_info'
-            $defaultVersion: 'R4B'
         public: true
 
     fhir.r5.serialization_service:
-        class: Ardenexal\FHIRTools\Serialization\FHIRSerializationService
+        class: Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService
         arguments:
             $serializer: '@serializer'
-            $metadataExtractor: '@fhir.metadata_extractor'
             $contextFactory: '@fhir.serialization_context_factory'
             $debugInfo: '@fhir.serialization_debug_info'
-            $defaultVersion: 'R5'
         public: true
 
     # FHIR Validation Services (for future use)
     fhir.validator:
-        class: Ardenexal\FHIRTools\Serialization\FHIRValidator
+        class: Ardenexal\FHIRTools\Component\Serialization\Validator\FHIRValidator
         arguments:
             $metadataExtractor: '@fhir.metadata_extractor'
         public: false
 
     # FHIR Schema Validator (for XML validation)
     fhir.schema_validator:
-        class: Ardenexal\FHIRTools\Serialization\FHIRSchemaValidator
+        class: Ardenexal\FHIRTools\Component\Serialization\Validator\FHIRSchemaValidator
         public: false

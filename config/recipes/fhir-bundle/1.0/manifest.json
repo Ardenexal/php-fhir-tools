@@ -1,0 +1,26 @@
+{
+    "bundles": {
+        "Ardenexal\\FHIRTools\\Bundle\\FHIRBundle\\FHIRBundle": [
+            "all"
+        ]
+    },
+    "copy-from-recipe": {
+        "config/": "%CONFIG_DIR%/"
+    },
+    "env": {
+        "FHIR_OUTPUT_DIRECTORY": "%kernel.project_dir%/output",
+        "FHIR_CACHE_DIRECTORY": "%kernel.cache_dir%/fhir",
+        "FHIR_DEFAULT_VERSION": "R4B",
+        "FHIR_VALIDATION_ENABLED": "true",
+        "FHIR_VALIDATION_STRICT_MODE": "false"
+    },
+    "gitignore": [
+        "/output/",
+        "/var/cache/fhir/"
+    ],
+    "aliases": [
+        "fhir",
+        "fhir-tools",
+        "fhir-bundle"
+    ]
+}

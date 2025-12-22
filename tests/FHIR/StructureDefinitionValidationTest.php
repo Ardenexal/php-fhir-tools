@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Tests\FHIR;
 
-use Ardenexal\FHIRTools\ErrorCollector;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector;
 use Ardenexal\FHIRTools\Tests\Utilities\FHIRTestDataGenerator;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 use Eris\TestTrait;

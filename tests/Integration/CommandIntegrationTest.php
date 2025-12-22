@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Tests\Integration;
 
-use Ardenexal\FHIRTools\FHIRModelGeneratorCommand;
-use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Tester\CommandTester;
 use Ardenexal\FHIRTools\BuilderContext;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Command\FHIRModelGeneratorCommand;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageMetadata;
 use Ardenexal\FHIRTools\Exception\PackageException;
-use Ardenexal\FHIRTools\PackageLoader;
-use Ardenexal\FHIRTools\Package\PackageMetadata;
+use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 use Nette\PhpGenerator\PhpNamespace;
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**

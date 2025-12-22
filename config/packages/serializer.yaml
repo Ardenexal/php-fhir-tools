@@ -5,7 +5,7 @@ framework:
         # Enable attribute mapping for FHIR classes
         mapping:
             paths:
-                - '%kernel.project_dir%/src/Attributes'
+                - '%kernel.project_dir%/src/Component/CodeGeneration/src/Attributes'
         # Configure default context for FHIR serialization
         default_context:
             # Enable circular reference handling for FHIR resources
@@ -33,19 +33,19 @@ services:
 
     # FHIR Metadata Cache - Singleton service for performance
     fhir.metadata_cache:
-        class: Ardenexal\FHIRTools\Serialization\FHIRMetadataCache
+        class: Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataCache
         public: false
 
     # FHIR Metadata Extractor
     fhir.metadata_extractor:
-        class: Ardenexal\FHIRTools\Serialization\FHIRMetadataExtractor
+        class: Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor
         arguments:
             $cache: '@fhir.metadata_cache'
         public: false
 
     # FHIR Type Resolver with default mappings
     fhir.type_resolver:
-        class: Ardenexal\FHIRTools\Serialization\FHIRTypeResolver
+        class: Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolver
         arguments:
             $resourceTypeMapping: '%fhir.resource_type_mapping%'
             $choiceElementMapping: '%fhir.choice_element_mapping%'
@@ -56,7 +56,7 @@ services:
 
     # FHIR Resource Normalizer
     fhir.normalizer.resource:
-        class: Ardenexal\FHIRTools\Serialization\FHIRResourceNormalizer
+        class: Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRResourceNormalizer
         arguments:
             $metadataExtractor: '@fhir.metadata_extractor'
             $typeResolver: '@fhir.type_resolver'
@@ -66,7 +66,7 @@ services:
 
     # FHIR Complex Type Normalizer
     fhir.normalizer.complex_type:
-        class: Ardenexal\FHIRTools\Serialization\FHIRComplexTypeNormalizer
+        class: Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRComplexTypeNormalizer
         arguments:
             $metadataExtractor: '@fhir.metadata_extractor'
             $typeResolver: '@fhir.type_resolver'
@@ -76,7 +76,7 @@ services:
 
     # FHIR Primitive Type Normalizer
     fhir.normalizer.primitive:
-        class: Ardenexal\FHIRTools\Serialization\FHIRPrimitiveTypeNormalizer
+        class: Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRPrimitiveTypeNormalizer
         arguments:
             $metadataExtractor: '@fhir.metadata_extractor'
         tags:
@@ -85,7 +85,7 @@ services:
 
     # FHIR Backbone Element Normalizer
     fhir.normalizer.backbone_element:
-        class: Ardenexal\FHIRTools\Serialization\FHIRBackboneElementNormalizer
+        class: Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRBackboneElementNormalizer
         arguments:
             $metadataExtractor: '@fhir.metadata_extractor'
         tags:
@@ -93,14 +93,14 @@ services:
         public: false
 
     # Service aliases for easy access
-    Ardenexal\FHIRTools\Serialization\FHIRMetadataExtractorInterface: '@fhir.metadata_extractor'
-    Ardenexal\FHIRTools\Serialization\FHIRTypeResolverInterface: '@fhir.type_resolver'
-    Ardenexal\FHIRTools\Serialization\FHIRMetadataCache: '@fhir.metadata_cache'
+    Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface: '@fhir.metadata_extractor'
+    Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface: '@fhir.type_resolver'
+    Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataCache: '@fhir.metadata_cache'
 
     # Version-specific service configurations
     # R4B Configuration
     fhir.r4b.type_resolver:
-        class: Ardenexal\FHIRTools\Serialization\FHIRTypeResolver
+        class: Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolver
         arguments:
             $resourceTypeMapping: '%fhir.r4b.resource_type_mapping%'
             $choiceElementMapping: '%fhir.r4b.choice_element_mapping%'
@@ -110,7 +110,7 @@ services:
         public: false
 
     fhir.r4b.normalizer.resource:
-        class: Ardenexal\FHIRTools\Serialization\FHIRResourceNormalizer
+        class: Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRResourceNormalizer
         arguments:
             $metadataExtractor: '@fhir.metadata_extractor'
             $typeResolver: '@fhir.r4b.type_resolver'
@@ -120,7 +120,7 @@ services:
 
     # R5 Configuration (future support)
     fhir.r5.type_resolver:
-        class: Ardenexal\FHIRTools\Serialization\FHIRTypeResolver
+        class: Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolver
         arguments:
             $resourceTypeMapping: '%fhir.r5.resource_type_mapping%'
             $choiceElementMapping: '%fhir.r5.choice_element_mapping%'
@@ -130,7 +130,7 @@ services:
         public: false
 
     fhir.r5.normalizer.resource:
-        class: Ardenexal\FHIRTools\Serialization\FHIRResourceNormalizer
+        class: Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRResourceNormalizer
         arguments:
             $metadataExtractor: '@fhir.metadata_extractor'
             $typeResolver: '@fhir.r5.type_resolver'

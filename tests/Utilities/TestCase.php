@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Tests\Utilities;
 
-use Ardenexal\FHIRTools\ErrorCollector;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;

@@ -30,10 +30,10 @@ jobs:
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress --no-suggest
     
-    - name: Run linting (Pint)
+    - name: Run linting (Pint) - All Components
       run: composer run lint
     
-    - name: Run PHPStan static analysis
+    - name: Run PHPStan static analysis - All Components
       run: composer run phpstan
     
     - name: Run PHPUnit tests with coverage
@@ -58,9 +58,37 @@ jobs:
           exit 1
         fi
 
-  integration-test:
+  component-tests:
     runs-on: ubuntu-latest
     needs: quality-gate
+    strategy:
+      matrix:
+        component: [bundle, codegen, serialization]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+        extensions: ctype, iconv, zip
+    
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress --no-suggest
+    
+    - name: Run component-specific linting
+      run: composer run lint:${{ matrix.component }}
+    
+    - name: Run component-specific PHPStan
+      run: composer run phpstan:${{ matrix.component }}
+    
+    - name: Run component-specific tests
+      run: composer run test:${{ matrix.component }}
+
+  integration-test:
+    runs-on: ubuntu-latest
+    needs: [quality-gate, component-tests]
     
     steps:
     - uses: actions/checkout@v4
@@ -85,3 +113,37 @@ jobs:
         # Test that the generate command works
         php bin/console list | grep fhir:generate
         echo "FHIR generation command is available"
+    
+    - name: Test Symfony Flex recipe
+      run: composer run test-recipe
+    
+    - name: Validate recipe configuration
+      run: composer run validate-recipe
+
+  cross-version-test:
+    runs-on: ubuntu-latest
+    needs: quality-gate
+    strategy:
+      matrix:
+        php-version: ['8.3', '8.4']
+        symfony-version: ['6.4.*', '7.4.*']
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup PHP ${{ matrix.php-version }}
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-version }}
+        extensions: ctype, iconv, zip
+    
+    - name: Install dependencies with Symfony ${{ matrix.symfony-version }}
+      run: |
+        composer require --dev symfony/framework-bundle:${{ matrix.symfony-version }} --no-update
+        composer install --prefer-dist --no-progress --no-suggest
+    
+    - name: Run component tests
+      run: composer run test:components
+    
+    - name: Test bundle integration
+      run: composer run test:bundle
