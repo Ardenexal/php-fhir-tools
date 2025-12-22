@@ -7,6 +7,9 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    env:
+      XDEBUG_MODE: off
+      COMPOSER_NO_INTERACTION: 1
     
     steps:
     - uses: actions/checkout@v4
@@ -42,13 +45,13 @@ jobs:
       run: composer run phpstan
     
     - name: Run unit tests
-      run: composer run test-unit
+      run: composer run test-unit -- --no-coverage
     
     - name: Run integration tests
-      run: composer run test-integration
+      run: composer run test-integration -- --no-coverage
     
     - name: Run FHIR tests
-      run: composer run test-fhir
+      run: composer run test-fhir -- --no-coverage
     
     - name: Security audit
       run: composer audit
