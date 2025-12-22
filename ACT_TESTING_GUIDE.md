@@ -37,6 +37,18 @@ choco install act-cli
 # https://github.com/nektos/act/releases
 ```
 
+### Important: Commit Changes Before Testing
+
+The workflow checks for uncommitted changes after running the linter. You must commit all changes before running `act`:
+
+```bash
+# Stage all changes
+git add composer.json phpunit.dist.xml .github/workflows/pr.yml
+
+# Commit with conventional commit format
+git commit -S -m "fix: update symfony version constraints and ci configuration for 7.4.0 compatibility"
+```
+
 ### Running the PR Workflow
 
 ```bash
@@ -121,5 +133,26 @@ If you encounter issues with `act`:
 2. **Permission Issues**: Run `act` with appropriate permissions
 3. **Memory Issues**: Use `act --container-architecture linux/amd64` if needed
 4. **Network Issues**: Check if Docker can pull the required images
+
+### Common Code Style Issues
+
+If you get "Files that need formatting" errors:
+
+1. **Missing newline at end of file**: Ensure all files end with a newline
+   ```bash
+   # Fix missing newline in composer.json (common issue)
+   echo "" >> composer.json
+   ```
+
+2. **Run the linter to fix all issues**:
+   ```bash
+   composer run lint
+   ```
+
+3. **Commit the formatting changes**:
+   ```bash
+   git add .
+   git commit -S -m "style: fix code formatting issues"
+   ```
 
 The workflow should now pass all validation steps in both local `act` testing and GitHub Actions.
