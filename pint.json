@@ -1,7 +1,9 @@
 {
     "preset": "symfony",
     "exclude": [
-        "var"
+        "var",
+        "src/Component/*/output",
+        "src/Component/*/tests/fixtures"
     ],
     "rules": {
         "@PSR12": true,

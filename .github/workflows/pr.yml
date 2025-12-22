@@ -35,10 +35,10 @@ jobs:
     - name: Validate composer files
       run: composer validate --strict
     
-    - name: Check code style (Pint)
+    - name: Check code style (Pint) - All Components
       run: composer run lint
     
-    - name: Run PHPStan static analysis
+    - name: Run PHPStan static analysis - All Components
       run: composer run phpstan
     
     - name: Run unit tests
@@ -82,6 +82,28 @@ jobs:
     #     done
     #     echo "✅ All commit messages follow conventional commits format"
 
+  component-quality:
+    runs-on: ubuntu-latest
+    needs: validate
+    strategy:
+      matrix:
+        component: [bundle, codegen, serialization]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+        extensions: ctype, iconv, zip
+    
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress --no-suggest
+    
+    - name: Run ${{ matrix.component }} quality checks
+      run: composer run quality:${{ matrix.component }}
+
   performance:
     runs-on: ubuntu-latest
     needs: validate
@@ -104,9 +126,31 @@ jobs:
         time php bin/console list > /dev/null
         echo "✅ Command execution completed successfully"
 
-  fhir-generation-test:
+  recipe-validation:
     runs-on: ubuntu-latest
     needs: validate
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+        extensions: ctype, iconv, zip
+    
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress --no-suggest
+    
+    - name: Validate Symfony Flex recipe
+      run: composer run validate-recipe
+    
+    - name: Test recipe installation
+      run: composer run test-recipe
+
+  fhir-generation-test:
+    runs-on: ubuntu-latest
+    needs: [validate, component-quality]
     permissions:
       pull-requests: write
       contents: read

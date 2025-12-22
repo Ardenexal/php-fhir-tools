@@ -7,8 +7,12 @@ parameters:
         - bin/
         - config/
         - public/
-        - src/
+        - src/Bundle/FHIRBundle/
+        - src/Component/CodeGeneration/src/
+        - src/Component/Serialization/src/
     excludePaths:
         - */vendor/*
+        - src/Component/*/tests/*
+        - src/Component/*/output/*
     parallel:
         maximumNumberOfProcesses: 4

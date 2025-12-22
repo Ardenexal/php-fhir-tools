@@ -83,13 +83,55 @@
             "@auto-scripts"
         ],
         "phpstan": "php ./vendor/bin/phpstan.phar analyse --configuration=phpstan.neon --memory-limit=-1 -v",
+        "phpstan:bundle": "php ./vendor/bin/phpstan.phar analyse src/Bundle/ --configuration=phpstan.neon --memory-limit=-1 -v",
+        "phpstan:codegen": "php ./vendor/bin/phpstan.phar analyse src/Component/CodeGeneration/ --configuration=phpstan.neon --memory-limit=-1 -v",
+        "phpstan:serialization": "php ./vendor/bin/phpstan.phar analyse src/Component/Serialization/ --configuration=phpstan.neon --memory-limit=-1 -v",
         "lint": "php ./vendor/bin/pint -v --parallel --max-processes=4",
+        "lint:bundle": "php ./vendor/bin/pint src/Bundle/ -v --parallel --max-processes=4",
+        "lint:codegen": "php ./vendor/bin/pint src/Component/CodeGeneration/ -v --parallel --max-processes=4",
+        "lint:serialization": "php ./vendor/bin/pint src/Component/Serialization/ -v --parallel --max-processes=4",
         "test": "php ./vendor/phpunit/phpunit/phpunit",
         "test-coverage": "php ./vendor/phpunit/phpunit/phpunit --coverage-html coverage",
         "test-unit": "php ./vendor/phpunit/phpunit/phpunit --testsuite=unit",
         "test-integration": "php ./vendor/phpunit/phpunit/phpunit --testsuite=integration",
         "test-fhir": "php ./vendor/phpunit/phpunit/phpunit --testsuite=fhir",
-        "generate-models": "php ./bin/console fhir:generate -vvv"
+        "test:bundle": "php ./vendor/phpunit/phpunit/phpunit tests/Unit/Bundle/",
+        "test:codegen": "php ./vendor/phpunit/phpunit/phpunit tests/Unit/Component/CodeGeneration/",
+        "test:serialization": "php ./vendor/phpunit/phpunit/phpunit tests/Unit/Component/Serialization/",
+        "test:components": [
+            "@test:bundle",
+            "@test:codegen",
+            "@test:serialization"
+        ],
+        "quality:all": [
+            "@lint",
+            "@phpstan",
+            "@test"
+        ],
+        "quality:bundle": [
+            "@lint:bundle",
+            "@phpstan:bundle",
+            "@test:bundle"
+        ],
+        "quality:codegen": [
+            "@lint:codegen",
+            "@phpstan:codegen",
+            "@test:codegen"
+        ],
+        "quality:serialization": [
+            "@lint:serialization",
+            "@phpstan:serialization",
+            "@test:serialization"
+        ],
+        "quality:components": [
+            "@quality:bundle",
+            "@quality:codegen",
+            "@quality:serialization"
+        ],
+        "generate-models": "php ./bin/console fhir:generate -vvv",
+        "validate-recipe": "php scripts/validate-recipe.php",
+        "test-recipe": "php ./vendor/phpunit/phpunit/phpunit tests/Integration/FlexRecipeTest.php",
+        "test-package-installation": "php scripts/test-package-installation.php"
     },
     "conflict": {
         "symfony/symfony": "*"
