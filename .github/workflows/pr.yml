@@ -58,6 +58,9 @@ jobs:
     
     - name: Check for code style violations
       run: |
+        # Remove composer.lock if it was generated during install (libraries shouldn't commit this)
+        rm -f composer.lock
+        
         if [ -n "$(git status --porcelain)" ]; then
           echo "❌ Code style issues found. Please run 'composer run lint' locally and commit the changes."
           echo ""

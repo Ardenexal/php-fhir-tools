@@ -144,12 +144,18 @@ If you get "Files that need formatting" errors:
    echo "" >> composer.json
    ```
 
-2. **Run the linter to fix all issues**:
+2. **composer.lock file detected**: Libraries shouldn't commit composer.lock
+   ```bash
+   # Remove composer.lock (it's now in .gitignore)
+   rm -f composer.lock
+   ```
+
+3. **Run the linter to fix all issues**:
    ```bash
    composer run lint
    ```
 
-3. **Commit the formatting changes**:
+4. **Commit the formatting changes**:
    ```bash
    git add .
    git commit -S -m "style: fix code formatting issues"
