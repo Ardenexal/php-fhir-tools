@@ -5,11 +5,7 @@ parameters:
 			message: '#Function Eris\\Generator\\.*#'
 			path: tests/Utilities/FHIRTestDataGenerator.php
 		
-		# Ignore parameter type issues in integration tests (placeholder code)
-		-
-			message: '#Parameter.*expects.*given#'
-			paths:
-				- tests/Integration/FHIRModelGeneratorIntegrationTest.php
+
 		
 		# Ignore generic type issues with Eris
 		-

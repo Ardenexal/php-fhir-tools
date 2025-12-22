@@ -15,9 +15,10 @@ inclusion: always
 ### PHPUnit Standards
 - **Version**: Use PHPUnit 12+ features and syntax
 - **Assertions**: Always use `self::assert*()` methods, never `$this->assert*()`
-- **Return Types**: Do not use `void` return types on test methods
+- **Return Types**: Use `void` return types on test methods
 - **Setup/Teardown**: Use `setUp()` and `tearDown()` methods appropriately
 - **Data Providers**: Use data providers for parameterized tests
+- **Documentation**: Tests should have a doc block explain what the test should achieve.
 
 ### Test Naming Conventions
 - **Method Names**: Use descriptive names like `testGeneratesFHIRClassFromValidStructureDefinition()`

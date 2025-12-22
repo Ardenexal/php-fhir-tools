@@ -150,15 +150,14 @@ class FHIRTestCaseRepository
     }
 
     /**
-     * Download test cases from FHIR repository (mock implementation)
+     * Download test cases from FHIR repository (uses local official examples)
      *
      * @return array<string, mixed>
      */
     private function downloadTestCases(string $resourceType, string $fhirVersion): array
     {
-        // In a real implementation, this would download from the FHIR test repository
-        // For now, return mock test cases
-        return $this->generateMockTestCases($resourceType, $fhirVersion);
+        // Load official FHIR examples from fixtures
+        return $this->loadOfficialFHIRExamples($resourceType, $fhirVersion);
     }
 
     /**
@@ -438,5 +437,95 @@ class FHIRTestCaseRepository
             'large_array'  => ['items' => array_fill(0, 1000, 'item')],
             'large_object' => array_fill_keys(range(0, 999), 'value'),
         ];
+    }
+
+    /**
+     * Load official FHIR examples from fixtures
+     *
+     * @return array<string, mixed>
+     */
+    private function loadOfficialFHIRExamples(string $resourceType, string $fhirVersion): array
+    {
+        $fixturesDir = __DIR__ . '/../Fixtures/OfficialFHIR/';
+
+        $validExamples   = [];
+        $invalidExamples = [];
+
+        switch ($resourceType) {
+            case 'Patient':
+                // Load valid Patient examples
+                $validExamples = [
+                    [
+                        'name'             => 'Official Patient Example',
+                        'resource'         => $this->loadOfficialFixture($fixturesDir . 'patient-example.json'),
+                        'expected_outcome' => 'success',
+                    ],
+                    [
+                        'name'             => 'Patient with Extensions Example',
+                        'resource'         => $this->loadOfficialFixture($fixturesDir . 'patient-example-with-extensions.json'),
+                        'expected_outcome' => 'success',
+                    ],
+                ];
+
+                // Load invalid Patient examples
+                $invalidExamples = [
+                    [
+                        'name'             => 'Patient Missing Required Fields',
+                        'resource'         => $this->loadOfficialFixture($fixturesDir . 'patient-invalid-missing-required.json'),
+                        'expected_outcome' => 'validation_error',
+                        'expected_errors'  => ['Missing required field'],
+                    ],
+                ];
+                break;
+
+            case 'Observation':
+                // Load valid Observation examples
+                $validExamples = [
+                    [
+                        'name'             => 'Official Observation Example',
+                        'resource'         => $this->loadOfficialFixture($fixturesDir . 'observation-example.json'),
+                        'expected_outcome' => 'success',
+                    ],
+                ];
+
+                // Generate some invalid examples
+                $invalidExamples = [
+                    [
+                        'name'             => 'Observation Missing Status',
+                        'resource'         => $this->generateInvalidResource('Observation', 'missing_required'),
+                        'expected_outcome' => 'validation_error',
+                        'expected_errors'  => ['Missing required field: status'],
+                    ],
+                ];
+                break;
+
+            default:
+                // Fall back to generated mock test cases
+                return $this->generateMockTestCases($resourceType, $fhirVersion);
+        }
+
+        return [
+            'valid_examples'   => $validExamples,
+            'invalid_examples' => $invalidExamples,
+        ];
+    }
+
+    /**
+     * Load official fixture file
+     *
+     * @return array<string, mixed>
+     */
+    private function loadOfficialFixture(string $path): array
+    {
+        if (!file_exists($path)) {
+            throw new \RuntimeException("Official fixture file not found: {$path}");
+        }
+
+        $content = file_get_contents($path);
+        if ($content === false) {
+            throw new \RuntimeException("Failed to read official fixture file: {$path}");
+        }
+
+        return json_decode($content, true, 512, JSON_THROW_ON_ERROR);
     }
 }

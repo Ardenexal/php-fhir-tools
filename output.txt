@@ -1,0 +1,1253 @@
+ ------ ------------------------------------------------------------------------------------------- 
+  Line   tests\Fixtures\FHIR\FHIRBoolean.php                                                        
+ ------ ------------------------------------------------------------------------------------------- 
+  20     Method Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRBoolean::__construct() has parameter    
+         $extension with no value type specified in iterable type array.                            
+         🪪  missingType.iterableValue                                                              
+         💡  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type  
+ ------ ------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------------- 
+  Line   tests\Fixtures\FHIR\FHIRDecimal.php                                                        
+ ------ ------------------------------------------------------------------------------------------- 
+  20     Method Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRDecimal::__construct() has parameter    
+         $extension with no value type specified in iterable type array.                            
+         🪪  missingType.iterableValue                                                              
+         💡  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type  
+ ------ ------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------------- 
+  Line   tests\Fixtures\FHIR\FHIRInteger.php                                                        
+ ------ ------------------------------------------------------------------------------------------- 
+  20     Method Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRInteger::__construct() has parameter    
+         $extension with no value type specified in iterable type array.                            
+         🪪  missingType.iterableValue                                                              
+         💡  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type  
+ ------ ------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------------- 
+  Line   tests\Fixtures\FHIR\FHIRObservation.php                                                    
+ ------ ------------------------------------------------------------------------------------------- 
+  22     Method Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRObservation::__construct() has          
+         parameter $code with no value type specified in iterable type array.                       
+         🪪  missingType.iterableValue                                                              
+         💡  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type  
+  22     Method Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRObservation::__construct() has          
+         parameter $extension with no value type specified in iterable type array.                  
+         🪪  missingType.iterableValue                                                              
+         💡  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type  
+  22     Method Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRObservation::__construct() has          
+         parameter $modifierExtension with no value type specified in iterable type array.          
+         🪪  missingType.iterableValue                                                              
+         💡  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type  
+  22     Method Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRObservation::__construct() has          
+         parameter $subject with no value type specified in iterable type array.                    
+         🪪  missingType.iterableValue                                                              
+         💡  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type  
+ ------ ------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------------- 
+  Line   tests\Fixtures\FHIR\FHIRPatient.php                                                        
+ ------ ------------------------------------------------------------------------------------------- 
+  22     Method Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRPatient::__construct() has parameter    
+         $extension with no value type specified in iterable type array.                            
+         🪪  missingType.iterableValue                                                              
+         💡  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type  
+  22     Method Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRPatient::__construct() has parameter    
+         $identifier with no value type specified in iterable type array.                           
+         🪪  missingType.iterableValue                                                              
+         💡  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type  
+  22     Method Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRPatient::__construct() has parameter    
+         $modifierExtension with no value type specified in iterable type array.                    
+         🪪  missingType.iterableValue                                                              
+         💡  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type  
+  22     Method Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRPatient::__construct() has parameter    
+         $name with no value type specified in iterable type array.                                 
+         🪪  missingType.iterableValue                                                              
+         💡  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type  
+ ------ ------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------------- 
+  Line   tests\Fixtures\FHIR\FHIRString.php                                                         
+ ------ ------------------------------------------------------------------------------------------- 
+  20     Method Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRString::__construct() has parameter     
+         $extension with no value type specified in iterable type array.                            
+         🪪  missingType.iterableValue                                                              
+         💡  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type  
+ ------ ------------------------------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------------------------------- 
+  Line   tests\Integration\FHIRModelGeneratorIntegrationTest.php                               
+ ------ -------------------------------------------------------------------------------------- 
+  252    Parameter #1 $className of method                                                     
+         Ardenexal\FHIRTools\Tests\Utilities\TestCase::assertPsr12ClassName() expects string,  
+         string|null given.                                                                    
+         🪪  argument.type                                                                     
+ ------ -------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------------- 
+  Line   tests\Unit\Serialization\FHIRBackboneElementNormalizerTest.php                             
+ ------ ------------------------------------------------------------------------------------------- 
+  105    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRBackboneElementNormalizerTest::generateB  
+         ackboneElement() return type with generic interface Eris\Generator does not specify its    
+         types: T                                                                                   
+         🪪  missingType.generics                                                                   
+  113    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRBackboneElementNormalizerTest::generateN  
+         estedBackboneElement() return type with generic interface Eris\Generator does not specify  
+         its types: T                                                                               
+         🪪  missingType.generics                                                                   
+  121    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRBackboneElementNormalizerTest::generateP  
+         atientContact() return type with generic interface Eris\Generator does not specify its     
+         types: T                                                                                   
+         🪪  missingType.generics                                                                   
+  123    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  124    Function Eris\Generator\choose not found.                                                  
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  126    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  127    Function Eris\Generator\choose not found.                                                  
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  129    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  130    Function Eris\Generator\choose not found.                                                  
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  140    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  156    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRBackboneElementNormalizerTest::generateP  
+         atientContactWithNesting() return type with generic interface Eris\Generator does not      
+         specify its types: T                                                                       
+         🪪  missingType.generics                                                                   
+  158    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  159    Function Eris\Generator\choose not found.                                                  
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  161    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  162    Function Eris\Generator\choose not found.                                                  
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  177    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  218    Call to static method PHPUnit\Framework\Assert::assertTrue() with true and                 
+         non-falsy-string will always evaluate to true.                                             
+         🪪  staticMethod.alreadyNarrowedType                                                       
+  221    Call to static method PHPUnit\Framework\Assert::assertIsArray() with array<mixed, mixed>   
+         and non-falsy-string will always evaluate to true.                                         
+         🪪  staticMethod.alreadyNarrowedType                                                       
+ ------ ------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------------- 
+  Line   tests\Unit\Serialization\FHIRComplexTypeNormalizerTest.php                                 
+ ------ ------------------------------------------------------------------------------------------- 
+  56     Function Eris\Generator\oneOf not found.                                                   
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  76     Parameter #2 $type of method                                                               
+         Ardenexal\FHIRTools\Serialization\FHIRComplexTypeNormalizer::supportsDenormalization()     
+         expects string, class-string|false given.                                                  
+         🪪  argument.type                                                                          
+  98     Argument of an invalid type array<string, mixed>|ArrayObject<string, mixed>|bool|float|in  
+         t|string|null supplied for foreach, only iterables are supported.                          
+         🪪  foreach.nonIterable                                                                    
+  160    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRComplexTypeNormalizerTest::generateHuman  
+         Name() return type with generic interface Eris\Generator does not specify its types: T     
+         🪪  missingType.generics                                                                   
+  162    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  163    Function Eris\Generator\oneOf not found.                                                   
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  164    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  165    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  165    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  165    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  165    Function Eris\Generator\oneOf not found.                                                   
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  168    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  169    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  169    Function Eris\Generator\oneOf not found.                                                   
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  169    Function Eris\Generator\string not found.                                                  
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  171    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  172    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  172    Function Eris\Generator\oneOf not found.                                                   
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  172    Function Eris\Generator\string not found.                                                  
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  174    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  175    Function Eris\Generator\oneOf not found.                                                   
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  176    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  177    Function Eris\Generator\seq not found.                                                     
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  177    Function Eris\Generator\string not found.                                                  
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  180    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  196    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRComplexTypeNormalizerTest::generateAddre  
+         ss() return type with generic interface Eris\Generator does not specify its types: T       
+         🪪  missingType.generics                                                                   
+  198    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  199    Function Eris\Generator\oneOf not found.                                                   
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  200    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  201    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  201    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  201    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  201    Function Eris\Generator\oneOf not found.                                                   
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  204    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  205    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  205    Function Eris\Generator\oneOf not found.                                                   
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  205    Function Eris\Generator\string not found.                                                  
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  207    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  208    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  208    Function Eris\Generator\oneOf not found.                                                   
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  208    Function Eris\Generator\string not found.                                                  
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  210    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  223    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRComplexTypeNormalizerTest::generateRefer  
+         ence() return type with generic interface Eris\Generator does not specify its types: T     
+         🪪  missingType.generics                                                                   
+  225    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  226    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  226    Function Eris\Generator\oneOf not found.                                                   
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  226    Function Eris\Generator\string not found.                                                  
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  228    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  229    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  229    Function Eris\Generator\oneOf not found.                                                   
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  229    Function Eris\Generator\string not found.                                                  
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  231    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  241    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRComplexTypeNormalizerTest::generateExten  
+         sion() return type with generic interface Eris\Generator does not specify its types: T     
+         🪪  missingType.generics                                                                   
+  243    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  244    Function Eris\Generator\string not found.                                                  
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  246    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  251    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRComplexTypeNormalizerTest::generateExten  
+         sionWithChoiceElements() return type with generic interface Eris\Generator does not        
+         specify its types: T                                                                       
+         🪪  missingType.generics                                                                   
+  253    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  254    Function Eris\Generator\string not found.                                                  
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  256    Function Eris\Generator\oneOf not found.                                                   
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  257    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  258    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  259    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  260    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  266    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRComplexTypeNormalizerTest::generatePolym  
+         orphicReference() return type with generic interface Eris\Generator does not specify its   
+         types: T                                                                                   
+         🪪  missingType.generics                                                                   
+  268    Function Eris\Generator\oneOf not found.                                                   
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  270    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  276    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  282    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+ ------ ------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------------- 
+  Line   tests\Unit\Serialization\FHIRMetadataCacheTest.php                                         
+ ------ ------------------------------------------------------------------------------------------- 
+  29     Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataCacheTest::testResourceMetadataC  
+         aching() has no return type specified.                                                     
+         🪪  missingType.return                                                                     
+  48     Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataCacheTest::testComplexTypeMetada  
+         taCaching() has no return type specified.                                                  
+         🪪  missingType.return                                                                     
+  66     Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataCacheTest::testPrimitiveTypeMeta  
+         dataCaching() has no return type specified.                                                
+         🪪  missingType.return                                                                     
+  85     Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataCacheTest::testBackboneElementMe  
+         tadataCaching() has no return type specified.                                              
+         🪪  missingType.return                                                                     
+  104    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataCacheTest::testFHIRTypeMetadataC  
+         aching() has no return type specified.                                                     
+         🪪  missingType.return                                                                     
+  119    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataCacheTest::testFHIRVersionMetada  
+         taCaching() has no return type specified.                                                  
+         🪪  missingType.return                                                                     
+  134    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataCacheTest::testStructureTypeMeta  
+         dataCaching() has no return type specified.                                                
+         🪪  missingType.return                                                                     
+  149    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataCacheTest::testCacheNullValues()  
+         has no return type specified.                                                              
+         🪪  missingType.return                                                                     
+  166    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataCacheTest::testInvalidateCache()  
+         has no return type specified.                                                              
+         🪪  missingType.return                                                                     
+  187    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataCacheTest::testInvalidateClass()  
+         has no return type specified.                                                              
+         🪪  missingType.return                                                                     
+  210    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataCacheTest::testGetCacheStats()    
+         has no return type specified.                                                              
+         🪪  missingType.return                                                                     
+  238    Method Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataCacheTest::testIsEmpty()   
+         has no return type specified.                                                              
+         🪪  missingType.return                                                                     
+ ------ ------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------------- 
+  Line   tests\Unit\Serialization\FHIRMetadataExtractorTest.php                                     
+ ------ ------------------------------------------------------------------------------------------- 
+  29     Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataExtractorTest::testExtractResour  
+         ceTypeFromResourceClass() has no return type specified.                                    
+         🪪  missingType.return                                                                     
+  38     Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataExtractorTest::testExtractResour  
+         ceTypeFromNonResourceClass() has no return type specified.                                 
+         🪪  missingType.return                                                                     
+  47     Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataExtractorTest::testExtractFHIRTy  
+         peFromResourceClass() has no return type specified.                                        
+         🪪  missingType.return                                                                     
+  56     Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataExtractorTest::testExtractFHIRTy  
+         peFromComplexTypeClass() has no return type specified.                                     
+         🪪  missingType.return                                                                     
+  65     Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataExtractorTest::testExtractFHIRTy  
+         peFromPrimitiveTypeClass() has no return type specified.                                   
+         🪪  missingType.return                                                                     
+  74     Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataExtractorTest::testExtractFHIRTy  
+         peFromBackboneElementClass() has no return type specified.                                 
+         🪪  missingType.return                                                                     
+  83     Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataExtractorTest::testIsResourceRet  
+         urnsTrueForResourceClass() has no return type specified.                                   
+         🪪  missingType.return                                                                     
+  92     Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataExtractorTest::testIsResourceRet  
+         urnsFalseForNonResourceClass() has no return type specified.                               
+         🪪  missingType.return                                                                     
+  101    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataExtractorTest::testIsComplexType  
+         ReturnsTrueForComplexTypeClass() has no return type specified.                             
+         🪪  missingType.return                                                                     
+  110    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataExtractorTest::testIsComplexType  
+         ReturnsFalseForNonComplexTypeClass() has no return type specified.                         
+         🪪  missingType.return                                                                     
+  119    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataExtractorTest::testIsPrimitiveTy  
+         peReturnsTrueForPrimitiveTypeClass() has no return type specified.                         
+         🪪  missingType.return                                                                     
+  128    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataExtractorTest::testIsPrimitiveTy  
+         peReturnsFalseForNonPrimitiveTypeClass() has no return type specified.                     
+         🪪  missingType.return                                                                     
+  137    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataExtractorTest::testIsBackboneEle  
+         mentReturnsTrueForBackboneElementClass() has no return type specified.                     
+         🪪  missingType.return                                                                     
+  146    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataExtractorTest::testIsBackboneEle  
+         mentReturnsFalseForNonBackboneElementClass() has no return type specified.                 
+         🪪  missingType.return                                                                     
+  155    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataExtractorTest::testExtractFHIRVe  
+         rsionFromResourceClass() has no return type specified.                                     
+         🪪  missingType.return                                                                     
+  164    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataExtractorTest::testExtractFHIRVe  
+         rsionFromComplexTypeClass() has no return type specified.                                  
+         🪪  missingType.return                                                                     
+  173    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataExtractorTest::testExtractParent  
+         ResourceFromBackboneElement() has no return type specified.                                
+         🪪  missingType.return                                                                     
+  182    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataExtractorTest::testExtractParent  
+         ResourceFromNonBackboneElement() has no return type specified.                             
+         🪪  missingType.return                                                                     
+  191    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataExtractorTest::testExtractElemen  
+         tPathFromBackboneElement() has no return type specified.                                   
+         🪪  missingType.return                                                                     
+  200    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataExtractorTest::testExtractElemen  
+         tPathFromNonBackboneElement() has no return type specified.                                
+         🪪  missingType.return                                                                     
+  209    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataExtractorTest::testCachingBehavi  
+         or() has no return type specified.                                                         
+         🪪  missingType.return                                                                     
+  227    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataExtractorTest::testClearCache()   
+         has no return type specified.                                                              
+         🪪  missingType.return                                                                     
+  245    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRMetadataExtractorTest::testHandlesClassW  
+         ithoutAttributes() has no return type specified.                                           
+         🪪  missingType.return                                                                     
+ ------ ------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------------- 
+  Line   tests\Unit\Serialization\FHIRPrimitiveTypeNormalizerTest.php                               
+ ------ ------------------------------------------------------------------------------------------- 
+  37     Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRPrimitiveTypeNormalizerTest::testPrimiti  
+         veExtensionUnderscoreNotation() has no return type specified.                              
+         🪪  missingType.return                                                                     
+  57     Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRPrimitiveTypeNormalizerTest::testPrimiti  
+         veExtensionDeserialization() has no return type specified.                                 
+         🪪  missingType.return                                                                     
+  82     Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRPrimitiveTypeNormalizerTest::testPrimiti  
+         veTypeNormalizerSelection() has no return type specified.                                  
+         🪪  missingType.return                                                                     
+  127    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRPrimitiveTypeNormalizerTest::testXMLPrim  
+         itiveExtensionSerialization() has no return type specified.                                
+         🪪  missingType.return                                                                     
+  161    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRPrimitiveTypeNormalizerTest::testPrimiti  
+         veExtensionRoundTrip() has no return type specified.                                       
+         🪪  missingType.return                                                                     
+  202    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRPrimitiveTypeNormalizerTest::testSupport  
+         sNormalization() has no return type specified.                                             
+         🪪  missingType.return                                                                     
+ ------ ------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------------- 
+  Line   tests\Unit\Serialization\FHIRResourceNormalizerTest.php                                    
+ ------ ------------------------------------------------------------------------------------------- 
+  62     Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::testFHIRJSONSpec  
+         ificationCompliance() has no return type specified.                                        
+         🪪  missingType.return                                                                     
+  94     Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::generateFHIRReso  
+         urce() return type with generic interface Eris\Generator does not specify its types: T     
+         🪪  missingType.generics                                                                   
+  96     Function Eris\Generator\oneOf not found.                                                   
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  105    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::generatePatientR  
+         esource() return type with generic interface Eris\Generator does not specify its types: T  
+         🪪  missingType.generics                                                                   
+  107    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  108    Function Eris\Generator\choose not found.                                                  
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  109    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  110    Function Eris\Generator\elements not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  111    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  112    Function Eris\Generator\elements not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  113    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  133    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::generateObservat  
+         ionResource() return type with generic interface Eris\Generator does not specify its       
+         types: T                                                                                   
+         🪪  missingType.generics                                                                   
+  135    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  136    Function Eris\Generator\choose not found.                                                  
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  137    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  138    Function Eris\Generator\elements not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  139    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  140    Function Eris\Generator\oneOf not found.                                                   
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  141    Function Eris\Generator\string not found.                                                  
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  142    Function Eris\Generator\int not found.                                                     
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  144    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  167    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::assertNoNullValu  
+         es() has parameter $data with no value type specified in iterable type array.              
+         🪪  missingType.iterableValue                                                              
+         💡  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type  
+  181    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::assertNoEmptyArr  
+         ays() has parameter $data with no value type specified in iterable type array.             
+         🪪  missingType.iterableValue                                                              
+         💡  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type  
+  198    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::testResourceType  
+         Inclusion() has no return type specified.                                                  
+         🪪  missingType.return                                                                     
+  206    Parameter #2 $array of static method PHPUnit\Framework\Assert::assertArrayHasKey()         
+         expects array<mixed>|ArrayAccess<(int|string), mixed>, array<string, mixed>|ArrayObject<s  
+         tring, mixed>|bool|float|int|string|null given.                                            
+         🪪  argument.type                                                                          
+  209    Cannot access offset 'resourceType' on array<string, mixed>|ArrayObject<string, mixed>|bo  
+         ol|float|int|string|null.                                                                  
+         🪪  offsetAccess.nonOffsetAccessible                                                       
+  219    Parameter #1 $array of function array_keys expects array, array<string, mixed>|ArrayObjec  
+         t<string, mixed> given.                                                                    
+         🪪  argument.type                                                                          
+  231    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::testCorrectClass  
+         Instantiation() has no return type specified.                                              
+         🪪  missingType.return                                                                     
+  247    Parameter #1 $expected of static method PHPUnit\Framework\Assert::assertInstanceOf()       
+         expects class-string<object>, string given.                                                
+         🪪  argument.type                                                                          
+  261    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::generateValidFHI  
+         RJSON() return type with generic interface Eris\Generator does not specify its types: T    
+         🪪  missingType.generics                                                                   
+  263    Function Eris\Generator\oneOf not found.                                                   
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  272    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::generatePatientJ  
+         SON() return type with generic interface Eris\Generator does not specify its types: T      
+         🪪  missingType.generics                                                                   
+  274    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  275    Function Eris\Generator\choose not found.                                                  
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  276    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  277    Function Eris\Generator\elements not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  278    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  296    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::generateObservat  
+         ionJSON() return type with generic interface Eris\Generator does not specify its types: T  
+         🪪  missingType.generics                                                                   
+  298    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  299    Function Eris\Generator\choose not found.                                                  
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  300    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  301    Function Eris\Generator\elements not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  302    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  326    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::testResourceType  
+         BasedClassResolution() has no return type specified.                                       
+         🪪  missingType.return                                                                     
+  329    Function Eris\Generator\elements not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  330    Function Eris\Generator\choose not found.                                                  
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  350    Parameter #1 $expected of static method PHPUnit\Framework\Assert::assertInstanceOf()       
+         expects class-string<object>, string given.                                                
+         🪪  argument.type                                                                          
+  353    Access to an undefined property object::$resourceType.                                     
+         🪪  property.notFound                                                                      
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property      
+  368    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::testResourceNorm  
+         alizerSelection() has no return type specified.                                            
+         🪪  missingType.return                                                                     
+  394    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::testResourceNorm  
+         alizerRejectsNonResources() has no return type specified.                                  
+         🪪  missingType.return                                                                     
+  397    Function Eris\Generator\oneOf not found.                                                   
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  398    Function Eris\Generator\string not found.                                                  
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  399    Function Eris\Generator\int not found.                                                     
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  400    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  401    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  419    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::testDiscriminato  
+         rMapTypeResolution() has no return type specified.                                         
+         🪪  missingType.return                                                                     
+  422    Function Eris\Generator\elements not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  423    Function Eris\Generator\choose not found.                                                  
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  435    Call to static method PHPUnit\Framework\Assert::assertIsArray() with array<string, string  
+         > will always evaluate to true.                                                            
+         🪪  staticMethod.alreadyNarrowedType                                                       
+  449    Parameter #1 $expected of static method PHPUnit\Framework\Assert::assertInstanceOf()       
+         expects class-string<object>, string given.                                                
+         🪪  argument.type                                                                          
+  450    Access to an undefined property object::$resourceType.                                     
+         🪪  property.notFound                                                                      
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property      
+  458    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::testChoiceElemen  
+         tTypeResolution() has no return type specified.                                            
+         🪪  missingType.return                                                                     
+  461    Function Eris\Generator\elements not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  462    Function Eris\Generator\oneOf not found.                                                   
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  463    Function Eris\Generator\string not found.                                                  
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  464    Function Eris\Generator\int not found.                                                     
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  465    Function Eris\Generator\bool not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  484    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::testReferenceTyp  
+         eResolution() has no return type specified.                                                
+         🪪  missingType.return                                                                     
+  487    Function Eris\Generator\elements not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  488    Function Eris\Generator\choose not found.                                                  
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  531    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::testSparseExtens  
+         ionArrayHandling() has no return type specified.                                           
+         🪪  missingType.return                                                                     
+  548    Parameter #2 $array of static method PHPUnit\Framework\Assert::assertArrayHasKey()         
+         expects array<mixed>|ArrayAccess<(int|string), mixed>, array<string, mixed>|ArrayObject<s  
+         tring, mixed>|bool|float|int|string|null given.                                            
+         🪪  argument.type                                                                          
+  549    Cannot access offset 'name' on array<string, mixed>|ArrayObject<string, mixed>|bool|float  
+         |int|string|null.                                                                          
+         🪪  offsetAccess.nonOffsetAccessible                                                       
+  559    Function Eris\Generator\choose not found.                                                  
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  575    Parameter #2 $array of static method PHPUnit\Framework\Assert::assertArrayHasKey()         
+         expects array<mixed>|ArrayAccess<(int|string), mixed>, array<string, mixed>|ArrayObject<s  
+         tring, mixed>|bool|float|int|string|null given.                                            
+         🪪  argument.type                                                                          
+  576    Cannot access offset 'name' on array<string, mixed>|ArrayObject<string, mixed>|bool|float  
+         |int|string|null.                                                                          
+         🪪  offsetAccess.nonOffsetAccessible                                                       
+  589    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::generateArrayWit  
+         hSparseExtensions() is unused.                                                             
+         🪪  method.unused                                                                          
+  589    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::generateArrayWit  
+         hSparseExtensions() return type with generic interface Eris\Generator does not specify     
+         its types: T                                                                               
+         🪪  missingType.generics                                                                   
+  591    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  592    Function Eris\Generator\choose not found.                                                  
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  593    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  594    Function Eris\Generator\oneOf not found.                                                   
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  594    Function Eris\Generator\seq not found.                                                     
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  595    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  596    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  597    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  599    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  600    Function Eris\Generator\oneOf not found.                                                   
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  600    Function Eris\Generator\seq not found.                                                     
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  601    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  602    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  604    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  620    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::testNullValueOmi  
+         ssion() has no return type specified.                                                      
+         🪪  missingType.return                                                                     
+  628    Parameter #1 $data of method                                                               
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::assertNoNullValu  
+         es() expects array, array<string, mixed>|ArrayObject<string, mixed>|bool|float|int|string  
+         |null given.                                                                               
+         🪪  argument.type                                                                          
+  631    Parameter #1 $data of method                                                               
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::assertNoEmptyArr  
+         ays() expects array, array<string, mixed>|ArrayObject<string, mixed>|bool|float|int|strin  
+         g|null given.                                                                              
+         🪪  argument.type                                                                          
+  634    Parameter #1 $data of method                                                               
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::assertNoEmptyStr  
+         ings() expects array, array<string, mixed>|ArrayObject<string, mixed>|bool|float|int|stri  
+         ng|null given.                                                                             
+         🪪  argument.type                                                                          
+  637    Parameter #2 $array of static method PHPUnit\Framework\Assert::assertArrayHasKey()         
+         expects array<mixed>|ArrayAccess<(int|string), mixed>, array<string, mixed>|ArrayObject<s  
+         tring, mixed>|bool|float|int|string|null given.                                            
+         🪪  argument.type                                                                          
+  638    Cannot access offset 'resourceType' on array<string, mixed>|ArrayObject<string, mixed>|bo  
+         ol|float|int|string|null.                                                                  
+         🪪  offsetAccess.nonOffsetAccessible                                                       
+  652    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::generateResource  
+         WithNullValues() return type with generic interface Eris\Generator does not specify its    
+         types: T                                                                                   
+         🪪  missingType.generics                                                                   
+  654    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  655    Function Eris\Generator\choose not found.                                                  
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  656    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  657    Function Eris\Generator\oneOf not found.                                                   
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  658    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  659    Function Eris\Generator\elements not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  661    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  662    Function Eris\Generator\oneOf not found.                                                   
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  663    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  664    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  665    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  667    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  668    Function Eris\Generator\oneOf not found.                                                   
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  669    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  670    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  671    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  673    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  689    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::assertNoEmptyStr  
+         ings() has parameter $data with no value type specified in iterable type array.            
+         🪪  missingType.iterableValue                                                              
+         💡  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type  
+  707    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::testConfigurable  
+         UnknownPropertyHandling() has no return type specified.                                    
+         🪪  missingType.return                                                                     
+  711    Function Eris\Generator\elements not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  724    Parameter #1 $expected of static method PHPUnit\Framework\Assert::assertInstanceOf()       
+         expects class-string<object>, string given.                                                
+         🪪  argument.type                                                                          
+  727    Access to an undefined property object::$resourceType.                                     
+         🪪  property.notFound                                                                      
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property      
+  729    Access to an undefined property object::$id.                                               
+         🪪  property.notFound                                                                      
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property      
+  745    Parameter #1 $expected of static method PHPUnit\Framework\Assert::assertInstanceOf()       
+         expects class-string<object>, string given.                                                
+         🪪  argument.type                                                                          
+  752    Parameter #1 $expected of static method PHPUnit\Framework\Assert::assertInstanceOf()       
+         expects class-string<object>, string given.                                                
+         🪪  argument.type                                                                          
+  755    Access to an undefined property object::$resourceType.                                     
+         🪪  property.notFound                                                                      
+         💡  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property      
+  764    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::generateJSONWith  
+         UnknownProperties() return type with generic interface Eris\Generator does not specify     
+         its types: T                                                                               
+         🪪  missingType.generics                                                                   
+  766    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  767    Function Eris\Generator\elements not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  768    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  769    Function Eris\Generator\choose not found.                                                  
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  770    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  771    Function Eris\Generator\bool not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  772    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  791    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::testInvalidJSONE  
+         xceptionHandling() has no return type specified.                                           
+         🪪  missingType.return                                                                     
+  821    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::generateInvalidJ  
+         SONData() return type with generic interface Eris\Generator does not specify its types: T  
+         🪪  missingType.generics                                                                   
+  823    Function Eris\Generator\oneOf not found.                                                   
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  825    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  828    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  831    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  834    Function Eris\Generator\string not found.                                                  
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  835    Function Eris\Generator\int not found.                                                     
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  836    Function Eris\Generator\bool not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  839    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  850    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::testAutomaticNor  
+         malizerSelection() has no return type specified.                                           
+         🪪  missingType.return                                                                     
+  853    Function Eris\Generator\oneOf not found.                                                   
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  880    Parameter #2 $type of method                                                               
+         Ardenexal\FHIRTools\Serialization\FHIRResourceNormalizer::supportsDenormalization()        
+         expects string, class-string|false given.                                                  
+         🪪  argument.type                                                                          
+  889    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::generateFHIRComp  
+         lexType() return type with generic interface Eris\Generator does not specify its types: T  
+         🪪  missingType.generics                                                                   
+  891    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  897    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::generateFHIRPrim  
+         itive() return type with generic interface Eris\Generator does not specify its types: T    
+         🪪  missingType.generics                                                                   
+  899    Function Eris\Generator\bind not found.                                                    
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  900    Function Eris\Generator\string not found.                                                  
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  901    Function Eris\Generator\constant not found.                                                
+         🪪  function.notFound                                                                      
+         💡  Learn more at https://phpstan.org/user-guide/discovering-symbols                       
+  908    Method                                                                                     
+         Ardenexal\FHIRTools\Tests\Unit\Serialization\FHIRResourceNormalizerTest::assertValidFHIRE  
+         lementNames() has parameter $data with no value type specified in iterable type array.     
+         🪪  missingType.iterableValue                                                              
+         💡  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type  
+ ------ ------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------------- 
+  Line   tests\Unit\Serialization\FHIRSerializationInterfaceTest.php                                
+ ------ ------------------------------------------------------------------------------------------- 
+  81     Call to function method_exists() with                                                      
+         Ardenexal\FHIRTools\Serialization\FHIRNormalizerInterface and 'supportsNormalizati…' will  
+         always evaluate to true.                                                                   
+         🪪  function.alreadyNarrowedType                                                           
+  82     Call to function method_exists() with                                                      
+         Ardenexal\FHIRTools\Serialization\FHIRNormalizerInterface and 'supportsDenormaliza…' will  
+         always evaluate to true.                                                                   
+         🪪  function.alreadyNarrowedType                                                           
+  83     Call to function method_exists() with                                                      
+         Ardenexal\FHIRTools\Serialization\FHIRNormalizerInterface and 'getSupportedTypes' will     
+         always evaluate to true.                                                                   
+         🪪  function.alreadyNarrowedType                                                           
+  84     Call to function method_exists() with                                                      
+         Ardenexal\FHIRTools\Serialization\FHIRNormalizerInterface and 'normalize' will always      
+         evaluate to true.                                                                          
+         🪪  function.alreadyNarrowedType                                                           
+  85     Call to function method_exists() with                                                      
+         Ardenexal\FHIRTools\Serialization\FHIRNormalizerInterface and 'denormalize' will always    
+         evaluate to true.                                                                          
+         🪪  function.alreadyNarrowedType                                                           
+  89     Call to static method PHPUnit\Framework\Assert::assertIsArray() with array<string, bool>   
+         and 'getSupportedTypes…' will always evaluate to true.                                     
+         🪪  staticMethod.alreadyNarrowedType                                                       
+  104    Call to function method_exists() with                                                      
+         Ardenexal\FHIRTools\Serialization\FHIRTypeResolverInterface and 'resolveType' will always  
+         evaluate to true.                                                                          
+         🪪  function.alreadyNarrowedType                                                           
+  105    Call to function method_exists() with                                                      
+         Ardenexal\FHIRTools\Serialization\FHIRTypeResolverInterface and 'getDiscriminatorPro…'     
+         will always evaluate to true.                                                              
+         🪪  function.alreadyNarrowedType                                                           
+  106    Call to function method_exists() with                                                      
+         Ardenexal\FHIRTools\Serialization\FHIRTypeResolverInterface and 'getTypeMapping' will      
+         always evaluate to true.                                                                   
+         🪪  function.alreadyNarrowedType                                                           
+  107    Call to function method_exists() with                                                      
+         Ardenexal\FHIRTools\Serialization\FHIRTypeResolverInterface and 'resolveResourceType'      
+         will always evaluate to true.                                                              
+         🪪  function.alreadyNarrowedType                                                           
+  108    Call to function method_exists() with                                                      
+         Ardenexal\FHIRTools\Serialization\FHIRTypeResolverInterface and 'resolveChoiceElemen…'     
+         will always evaluate to true.                                                              
+         🪪  function.alreadyNarrowedType                                                           
+  109    Call to function method_exists() with                                                      
+         Ardenexal\FHIRTools\Serialization\FHIRTypeResolverInterface and 'resolveReferenceType'     
+         will always evaluate to true.                                                              
+         🪪  function.alreadyNarrowedType                                                           
+  113    Call to static method PHPUnit\Framework\Assert::assertIsString() with string and           
+         'getDiscriminatorPro…' will always evaluate to true.                                       
+         🪪  staticMethod.alreadyNarrowedType                                                       
+  117    Call to static method PHPUnit\Framework\Assert::assertIsArray() with array<string, string  
+         > and 'getTypeMapping…' will always evaluate to true.                                      
+         🪪  staticMethod.alreadyNarrowedType                                                       
+  134    Call to function method_exists() with                                                      
+         Ardenexal\FHIRTools\Serialization\FHIRMetadataExtractorInterface and                       
+         'extractResourceType' will always evaluate to true.                                        
+         🪪  function.alreadyNarrowedType                                                           
+  135    Call to function method_exists() with                                                      
+         Ardenexal\FHIRTools\Serialization\FHIRMetadataExtractorInterface and 'extractFHIRType'     
+         will always evaluate to true.                                                              
+         🪪  function.alreadyNarrowedType                                                           
+  136    Call to function method_exists() with                                                      
+         Ardenexal\FHIRTools\Serialization\FHIRMetadataExtractorInterface and 'isResource' will     
+         always evaluate to true.                                                                   
+         🪪  function.alreadyNarrowedType                                                           
+  137    Call to function method_exists() with                                                      
+         Ardenexal\FHIRTools\Serialization\FHIRMetadataExtractorInterface and 'isComplexType' will  
+         always evaluate to true.                                                                   
+         🪪  function.alreadyNarrowedType                                                           
+  138    Call to function method_exists() with                                                      
+         Ardenexal\FHIRTools\Serialization\FHIRMetadataExtractorInterface and 'isPrimitiveType'     
+         will always evaluate to true.                                                              
+         🪪  function.alreadyNarrowedType                                                           
+  139    Call to function method_exists() with                                                      
+         Ardenexal\FHIRTools\Serialization\FHIRMetadataExtractorInterface and 'isBackboneElement'   
+         will always evaluate to true.                                                              
+         🪪  function.alreadyNarrowedType                                                           
+  140    Call to function method_exists() with                                                      
+         Ardenexal\FHIRTools\Serialization\FHIRMetadataExtractorInterface and 'extractFHIRVersion'  
+         will always evaluate to true.                                                              
+         🪪  function.alreadyNarrowedType                                                           
+  141    Call to function method_exists() with                                                      
+         Ardenexal\FHIRTools\Serialization\FHIRMetadataExtractorInterface and                       
+         'extractParentResour…' will always evaluate to true.                                       
+         🪪  function.alreadyNarrowedType                                                           
+  142    Call to function method_exists() with                                                      
+         Ardenexal\FHIRTools\Serialization\FHIRMetadataExtractorInterface and 'extractElementPath'  
+         will always evaluate to true.                                                              
+         🪪  function.alreadyNarrowedType                                                           
+  146    Call to function is_string() with string will always evaluate to true.                     
+         🪪  function.alreadyNarrowedType                                                           
+  146    Call to static method PHPUnit\Framework\Assert::assertTrue() with true will always         
+         evaluate to true.                                                                          
+         🪪  staticMethod.alreadyNarrowedType                                                       
+         💡  Because the type is coming from a PHPDoc, you can turn off this check by setting treat  
+         PhpDocTypesAsCertain: false in your phpstan.neon.                                          
+  146    Result of || is always true.                                                               
+         🪪  booleanOr.alwaysTrue                                                                   
+         💡  Because the type is coming from a PHPDoc, you can turn off this check by setting treat  
+         PhpDocTypesAsCertain: false in your phpstan.neon.                                          
+  149    Call to function is_string() with string will always evaluate to true.                     
+         🪪  function.alreadyNarrowedType                                                           
+  149    Call to static method PHPUnit\Framework\Assert::assertTrue() with true will always         
+         evaluate to true.                                                                          
+         🪪  staticMethod.alreadyNarrowedType                                                       
+         💡  Because the type is coming from a PHPDoc, you can turn off this check by setting treat  
+         PhpDocTypesAsCertain: false in your phpstan.neon.                                          
+  149    Result of || is always true.                                                               
+         🪪  booleanOr.alwaysTrue                                                                   
+         💡  Because the type is coming from a PHPDoc, you can turn off this check by setting treat  
+         PhpDocTypesAsCertain: false in your phpstan.neon.                                          
+  152    Call to static method PHPUnit\Framework\Assert::assertIsBool() with bool will always       
+         evaluate to true.                                                                          
+         🪪  staticMethod.alreadyNarrowedType                                                       
+  155    Call to function is_string() with string will always evaluate to true.                     
+         🪪  function.alreadyNarrowedType                                                           
+  155    Call to static method PHPUnit\Framework\Assert::assertTrue() with true will always         
+         evaluate to true.                                                                          
+         🪪  staticMethod.alreadyNarrowedType                                                       
+         💡  Because the type is coming from a PHPDoc, you can turn off this check by setting treat  
+         PhpDocTypesAsCertain: false in your phpstan.neon.                                          
+  155    Result of || is always true.                                                               
+         🪪  booleanOr.alwaysTrue                                                                   
+         💡  Because the type is coming from a PHPDoc, you can turn off this check by setting treat  
+         PhpDocTypesAsCertain: false in your phpstan.neon.                                          
+  184    Method                                                                                     
+         Ardenexal\FHIRTools\Serialization\FHIRNormalizerInterface@anonymous/tests/Unit/Serializat  
+         ion/FHIRSerializationInterfaceTest.php:164::normalize() never returns ArrayObject so it    
+         can be removed from the return type.                                                       
+         🪪  return.unusedType                                                                      
+  184    Method                                                                                     
+         Ardenexal\FHIRTools\Serialization\FHIRNormalizerInterface@anonymous/tests/Unit/Serializat  
+         ion/FHIRSerializationInterfaceTest.php:164::normalize() never returns bool so it can be    
+         removed from the return type.                                                              
+         🪪  return.unusedType                                                                      
+  184    Method                                                                                     
+         Ardenexal\FHIRTools\Serialization\FHIRNormalizerInterface@anonymous/tests/Unit/Serializat  
+         ion/FHIRSerializationInterfaceTest.php:164::normalize() never returns float so it can be   
+         removed from the return type.                                                              
+         🪪  return.unusedType                                                                      
+  184    Method                                                                                     
+         Ardenexal\FHIRTools\Serialization\FHIRNormalizerInterface@anonymous/tests/Unit/Serializat  
+         ion/FHIRSerializationInterfaceTest.php:164::normalize() never returns int so it can be     
+         removed from the return type.                                                              
+         🪪  return.unusedType                                                                      
+  184    Method                                                                                     
+         Ardenexal\FHIRTools\Serialization\FHIRNormalizerInterface@anonymous/tests/Unit/Serializat  
+         ion/FHIRSerializationInterfaceTest.php:164::normalize() never returns null so it can be    
+         removed from the return type.                                                              
+         🪪  return.unusedType                                                                      
+  184    Method                                                                                     
+         Ardenexal\FHIRTools\Serialization\FHIRNormalizerInterface@anonymous/tests/Unit/Serializat  
+         ion/FHIRSerializationInterfaceTest.php:164::normalize() never returns string so it can be  
+         removed from the return type.                                                              
+         🪪  return.unusedType                                                                      
+  184    Method                                                                                     
+         Ardenexal\FHIRTools\Serialization\FHIRNormalizerInterface@anonymous/tests/Unit/Serializat  
+         ion/FHIRSerializationInterfaceTest.php:164::normalize() return type has no value type      
+         specified in iterable type array.                                                          
+         🪪  missingType.iterableValue                                                              
+         💡  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type  
+  184    Method                                                                                     
+         Ardenexal\FHIRTools\Serialization\FHIRNormalizerInterface@anonymous/tests/Unit/Serializat  
+         ion/FHIRSerializationInterfaceTest.php:164::normalize() return type with generic class     
+         ArrayObject does not specify its types: TKey, TValue                                       
+         🪪  missingType.generics                                                                   
+  293    Method                                                                                     
+         Ardenexal\FHIRTools\Serialization\FHIRMetadataExtractorInterface@anonymous/tests/Unit/Ser  
+         ialization/FHIRSerializationInterfaceTest.php:258::extractFHIRVersion() never returns      
+         null so it can be removed from the return type.                                            
+         🪪  return.unusedType                                                                      
+ ------ ------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------------- 
+  Line   tests\Unit\Serialization\FHIRTypeResolverTest.php                                          
+ ------ ------------------------------------------------------------------------------------------- 
+  220    Call to static method PHPUnit\Framework\Assert::assertIsArray() with array<string, string  
+         > will always evaluate to true.                                                            
+         🪪  staticMethod.alreadyNarrowedType                                                       
+ ------ ------------------------------------------------------------------------------------------- 
+
+ [ERROR] Found 337 errors                                                                          
+

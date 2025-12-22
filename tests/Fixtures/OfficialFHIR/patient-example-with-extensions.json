@@ -1,0 +1,133 @@
+{
+    "resourceType": "Patient",
+    "id": "example-extensions",
+    "extension": [
+        {
+            "url": "http://hl7.org/fhir/StructureDefinition/patient-birthPlace",
+            "valueAddress": {
+                "city": "Boston",
+                "state": "MA",
+                "country": "USA"
+            }
+        },
+        {
+            "url": "http://hl7.org/fhir/StructureDefinition/patient-citizenship",
+            "extension": [
+                {
+                    "url": "code",
+                    "valueCodeableConcept": {
+                        "coding": [
+                            {
+                                "system": "urn:iso:std:iso:3166",
+                                "code": "US",
+                                "display": "United States of America"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "url": "period",
+                    "valuePeriod": {
+                        "start": "2000-01-01"
+                    }
+                }
+            ]
+        }
+    ],
+    "identifier": [
+        {
+            "use": "usual",
+            "type": {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                        "code": "MR"
+                    }
+                ]
+            },
+            "system": "urn:oid:1.2.36.146.595.217.0.1",
+            "value": "12345"
+        }
+    ],
+    "active": true,
+    "name": [
+        {
+            "use": "official",
+            "family": "Doe",
+            "_family": {
+                "extension": [
+                    {
+                        "url": "http://hl7.org/fhir/StructureDefinition/humanname-own-name",
+                        "valueString": "Doe"
+                    }
+                ]
+            },
+            "given": [
+                "John",
+                "Michael"
+            ],
+            "_given": [
+                {
+                    "extension": [
+                        {
+                            "url": "http://hl7.org/fhir/StructureDefinition/iso21090-EN-qualifier",
+                            "valueCode": "CL"
+                        }
+                    ]
+                },
+                null
+            ]
+        }
+    ],
+    "telecom": [
+        {
+            "system": "phone",
+            "value": "555-1234",
+            "use": "home",
+            "extension": [
+                {
+                    "url": "http://hl7.org/fhir/StructureDefinition/contactpoint-comment",
+                    "valueString": "Primary contact number"
+                }
+            ]
+        }
+    ],
+    "gender": "male",
+    "birthDate": "1980-01-01",
+    "_birthDate": {
+        "extension": [
+            {
+                "url": "http://hl7.org/fhir/StructureDefinition/patient-birthTime",
+                "valueDateTime": "1980-01-01T08:30:00-05:00"
+            }
+        ]
+    },
+    "address": [
+        {
+            "use": "home",
+            "type": "both",
+            "text": "123 Main St, Anytown, ST 12345",
+            "line": [
+                "123 Main St"
+            ],
+            "_line": [
+                {
+                    "extension": [
+                        {
+                            "url": "http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-houseNumber",
+                            "valueString": "123"
+                        },
+                        {
+                            "url": "http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-streetName",
+                            "valueString": "Main St"
+                        }
+                    ]
+                }
+            ],
+            "city": "Anytown",
+            "state": "ST",
+            "postalCode": "12345",
+            "country": "USA"
+        }
+    ]
+}

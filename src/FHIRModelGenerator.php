@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools;
 
 use Ardenexal\FHIRTools\Attributes\FhirResource;
+use Ardenexal\FHIRTools\Attributes\FHIRComplexType;
+use Ardenexal\FHIRTools\Attributes\FHIRPrimitive;
+use Ardenexal\FHIRTools\Attributes\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Exception\GenerationException;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\EnumType;
@@ -96,6 +99,7 @@ class FHIRModelGenerator
             $class->setExtends($namespace->getName() . '\\' . BuilderContext::DEFAULT_CLASS_PREFIX . u($parent)->pascal());
         }
 
+        // Add appropriate FHIR attributes based on the structure definition kind
         if ($structureDefinition['kind'] === 'resource') {
             $class->addAttribute(FhirResource::class, [
                 'type'        => $structureDefinition['name'],
@@ -103,6 +107,33 @@ class FHIRModelGenerator
                 'url'         => $structureDefinition['url'],
                 'fhirVersion' => $version,
             ]);
+        } elseif ($structureDefinition['kind'] === 'primitive-type') {
+            $class->addAttribute(FHIRPrimitive::class, [
+                'primitiveType' => $structureDefinition['name'],
+                'fhirVersion'   => $version,
+            ]);
+        } elseif ($structureDefinition['kind'] === 'complex-type') {
+            // Check if this is a backbone element by looking at the base definition
+            $isBackboneElement = isset($structureDefinition['baseDefinition'])
+                                && str_contains($structureDefinition['baseDefinition'], 'BackboneElement');
+
+            if ($isBackboneElement) {
+                // Extract parent resource and element path from the structure definition name
+                // For backbone elements, the name is typically like "Patient.contact" or "CapabilityStatement.implementation"
+                $elementPath    = $structureDefinition['name'];
+                $parentResource = explode('.', $elementPath)[0];
+
+                $class->addAttribute(FHIRBackboneElement::class, [
+                    'parentResource' => $parentResource,
+                    'elementPath'    => $elementPath,
+                    'fhirVersion'    => $version,
+                ]);
+            } else {
+                $class->addAttribute(FHIRComplexType::class, [
+                    'typeName'      => $structureDefinition['name'],
+                    'fhirVersion'   => $version,
+                ]);
+            }
         }
 
         if (isset($structureDefinition['publisher'])) {
@@ -170,7 +201,28 @@ class FHIRModelGenerator
                 $childClass->addMethod('__construct');
                 $this->builderContext->addType($element['path'], $childClass);
 
-                if (isset($element['base']) && isset($element['type'][0]['code']) && $element['type'][0]['code'] === 'Element') {
+                // Determine if this is a backbone element or regular element
+                $isBackboneElement = isset($element['type'][0]['code']) && $element['type'][0]['code'] === 'BackboneElement';
+                $isElement         = isset($element['type'][0]['code']) && $element['type'][0]['code'] === 'Element';
+
+                if ($isBackboneElement) {
+                    // Add FHIRBackboneElement attribute for backbone elements
+                    // Extract parent resource and element path from the element path
+                    $elementPath    = $element['path'];
+                    $parentResource = explode('.', $elementPath)[0];
+
+                    $childClass->addAttribute(FHIRBackboneElement::class, [
+                        'parentResource' => $parentResource,
+                        'elementPath'    => $elementPath,
+                        'fhirVersion'    => $version,
+                    ]);
+                    $childClass->setExtends($namespace->getName() . '\\' . BuilderContext::DEFAULT_CLASS_PREFIX . 'BackboneElement');
+                } elseif ($isElement) {
+                    // Add FHIRComplexType attribute for regular complex elements
+                    $childClass->addAttribute(FHIRComplexType::class, [
+                        'typeName'      => $element['path'],
+                        'fhirVersion'   => $version,
+                    ]);
                     $childClass->setExtends($namespace->getName() . '\\' . BuilderContext::DEFAULT_CLASS_PREFIX . 'Element');
                 }
 
@@ -378,6 +430,12 @@ class FHIRModelGenerator
         $structureDefinition = $this->builderContext->getDefinition('http://hl7.org/fhir/StructureDefinition/code');
         $className           = $enumType->getName() . 'Type';
         $class               = new ClassType($className, $elementNamespace);
+
+        // Add FHIRPrimitive attribute for code types (they are primitive types)
+        $class->addAttribute(FHIRPrimitive::class, [
+            'primitiveType' => 'code',
+            'fhirVersion'   => $version,
+        ]);
 
         $class->addComment('@author ' . $structureDefinition['publisher']);
         $class->addComment('@see ' . $structureDefinition['url']);

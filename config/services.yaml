@@ -15,6 +15,19 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     Ardenexal\FHIRTools\:
         resource: '../src/'
+        exclude:
+            - '../src/Serialization/*Normalizer.php'
+
+    # FHIR serialization services are configured in config/packages/serializer.yaml
+    # to ensure proper integration with Symfony's serializer component
+
+    # Import FHIR serialization service configuration
+    _instanceof:
+        Ardenexal\FHIRTools\Serialization\FHIRNormalizerInterface:
+            tags: ['serializer.normalizer']
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+imports:
+    - { resource: services/fhir_serialization.yaml }
