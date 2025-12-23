@@ -1,0 +1,33 @@
+<?php declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
+
+/**
+ * @fhir-backbone-element PlanDefinition.action.participant
+ * @description Indicates who should participate in performing the action described.
+ */
+class FHIRPlanDefinitionActionParticipant extends \Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRBackboneElement
+{
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRExtension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRString|string actorId What actor */
+		public \Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRString|string|null $actorId = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRActionParticipantTypeType type careteam | device | group | healthcareservice | location | organization | patient | practitioner | practitionerrole | relatedperson */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRActionParticipantTypeType $type = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRCanonical typeCanonical Who or what can participate */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRCanonical $typeCanonical = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRReference typeReference Who or what can participate */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRReference $typeReference = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRCodeableConcept role E.g. Nurse, Surgeon, Parent */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRCodeableConcept $role = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRCodeableConcept function E.g. Author, Reviewer, Witness, etc */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRCodeableConcept $function = null,
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
+}

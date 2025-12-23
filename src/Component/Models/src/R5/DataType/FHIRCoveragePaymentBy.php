@@ -1,0 +1,26 @@
+<?php declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
+
+/**
+ * @fhir-backbone-element Coverage.paymentBy
+ * @description Link to the paying party and optionally what specifically they will be responsible to pay.
+ */
+class FHIRCoveragePaymentBy extends \Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRBackboneElement
+{
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRExtension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRReference party Parties performing self-payment */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRReference $party = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRString|string responsibility Party's responsibility */
+		public \Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRString|string|null $responsibility = null,
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
+}

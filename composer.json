@@ -52,7 +52,8 @@
         "psr-4": {
             "Ardenexal\\FHIRTools\\": "src/",
             "Ardenexal\\FHIRTools\\Component\\CodeGeneration\\": "src/Component/CodeGeneration/src/",
-            "Ardenexal\\FHIRTools\\Component\\Serialization\\": "src/Component/Serialization/src/"
+            "Ardenexal\\FHIRTools\\Component\\Serialization\\": "src/Component/Serialization/src/",
+            "Ardenexal\\FHIRTools\\Component\\Models\\": "src/Component/Models/src/"
         }
     },
     "autoload-dev": {
@@ -129,6 +130,14 @@
             "@quality:serialization"
         ],
         "generate-models": "php ./bin/console fhir:generate -vvv",
+        "generate-models-all": [
+            "echo 'Generating FHIR R4 models...'",
+            "php ./bin/console fhir:generate --models-component --package=hl7.fhir.r4.core --package=hl7.fhir.r4b.core --package=hl7.fhir.r5.core -vvv",
+            "echo 'All FHIR models generated successfully!'"
+        ],
+        "generate-models-r4": "php ./bin/console fhir:generate --models-component --package=hl7.fhir.r4.core -vvv",
+        "generate-models-r4b": "php ./bin/console fhir:generate --models-component --package=hl7.fhir.r4b.core -vvv",
+        "generate-models-r5": "php ./bin/console fhir:generate --models-component --package=hl7.fhir.r5.core -vvv",
         "fix-newlines": "powershell -ExecutionPolicy Bypass -File scripts/fix-newlines.ps1",
         "validate-recipe": "php scripts/validate-recipe.php",
         "test-recipe": "php ./vendor/phpunit/phpunit/phpunit tests/Integration/FlexRecipeTest.php",
