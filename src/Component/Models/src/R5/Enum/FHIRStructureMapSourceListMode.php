@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,18 +12,18 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRStructureMapSourceListMode: string
 {
-	/** First */
-	case first = 'first';
+    /** First */
+    case first = 'first';
 
-	/** All but the first */
-	case allbutthefirst = 'not_first';
+    /** All but the first */
+    case allbutthefirst = 'not_first';
 
-	/** Last */
-	case last = 'last';
+    /** Last */
+    case last = 'last';
 
-	/** All but the last */
-	case allbutthelast = 'not_last';
+    /** All but the last */
+    case allbutthelast = 'not_last';
 
-	/** Enforce only one */
-	case enforceonlyone = 'only_one';
+    /** Enforce only one */
+    case enforceonlyone = 'only_one';
 }

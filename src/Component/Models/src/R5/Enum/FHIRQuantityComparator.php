@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,15 +12,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRQuantityComparator: string
 {
-	/** Less than */
-	case lessthan = '<';
+    /** Less than */
+    case lessthan = '<';
 
-	/** Less or Equal to */
-	case lessorequalto = '<=';
+    /** Less or Equal to */
+    case lessorequalto = '<=';
 
-	/** Greater or Equal to */
-	case greaterorequalto = '>=';
+    /** Greater or Equal to */
+    case greaterorequalto = '>=';
 
-	/** Greater than */
-	case greaterthan = '>';
+    /** Greater than */
+    case greaterthan = '>';
 }

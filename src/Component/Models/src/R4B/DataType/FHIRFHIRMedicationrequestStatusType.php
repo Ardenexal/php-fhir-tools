@@ -1,16 +1,22 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
+use Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRFHIRMedicationrequestStatus;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRCode;
+
 /**
  * @fhir-code-type FHIRMedicationrequestStatus
+ *
  * @description Code type wrapper for FHIRMedicationrequestStatus enum
  */
-class FHIRFHIRMedicationrequestStatusType extends \Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRCode
+class FHIRFHIRMedicationrequestStatusType extends FHIRCode
 {
-	public function __construct(
-		/** @var \Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRFHIRMedicationrequestStatus|string|null $value The code value */
-		public \Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRFHIRMedicationrequestStatus|string|null $value = null,
-	) {
-	}
+    public function __construct(
+        /** @var FHIRFHIRMedicationrequestStatus|string|null $value The code value */
+        public FHIRFHIRMedicationrequestStatus|string|null $value = null,
+    ) {
+    }
 }

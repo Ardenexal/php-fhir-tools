@@ -1,16 +1,22 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
+use Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRFHIRActionParticipantType;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRCode;
+
 /**
  * @fhir-code-type FHIRActionParticipantType
+ *
  * @description Code type wrapper for FHIRActionParticipantType enum
  */
-class FHIRFHIRActionParticipantTypeType extends \Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRCode
+class FHIRFHIRActionParticipantTypeType extends FHIRCode
 {
-	public function __construct(
-		/** @var \Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRFHIRActionParticipantType|string|null $value The code value */
-		public \Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRFHIRActionParticipantType|string|null $value = null,
-	) {
-	}
+    public function __construct(
+        /** @var FHIRFHIRActionParticipantType|string|null $value The code value */
+        public FHIRFHIRActionParticipantType|string|null $value = null,
+    ) {
+    }
 }

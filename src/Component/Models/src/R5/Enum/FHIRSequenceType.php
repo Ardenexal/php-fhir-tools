@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,12 +12,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRSequenceType: string
 {
-	/** AA Sequence */
-	case aasequence = 'aa';
+    /** AA Sequence */
+    case aasequence = 'aa';
 
-	/** DNA Sequence */
-	case dnasequence = 'dna';
+    /** DNA Sequence */
+    case dnasequence = 'dna';
 
-	/** RNA Sequence */
-	case rnasequence = 'rna';
+    /** RNA Sequence */
+    case rnasequence = 'rna';
 }

@@ -41,10 +41,14 @@ class SelectiveEnumGenerationEdgeCasesTest extends TestCase
         $this->builderContext = new BuilderContext();
 
         // Set up namespaces for testing
-        $elementNamespace = new PhpNamespace('Ardenexal\\FHIRTools\\Test\\Element');
-        $enumNamespace    = new PhpNamespace('Ardenexal\\FHIRTools\\Test\\Enum');
+        $elementNamespace   = new PhpNamespace('Ardenexal\\FHIRTools\\Test\\Element');
+        $enumNamespace      = new PhpNamespace('Ardenexal\\FHIRTools\\Test\\Enum');
+        $primitiveNamespace = new PhpNamespace('Ardenexal\\FHIRTools\\Test\\Primitive');
+        $datatypeNamespace  = new PhpNamespace('Ardenexal\\FHIRTools\\Test\\DataType');
         $this->builderContext->addElementNamespace('R4B', $elementNamespace);
         $this->builderContext->addEnumNamespace('R4B', $enumNamespace);
+        $this->builderContext->addPrimitiveNamespace('R4B', $primitiveNamespace);
+        $this->builderContext->addDatatypeNamespace('R4B', $datatypeNamespace);
     }
 
     /**

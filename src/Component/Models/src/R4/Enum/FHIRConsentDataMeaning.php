@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -10,15 +12,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum FHIRConsentDataMeaning: string
 {
-	/** Instance */
-	case instance = 'instance';
+    /** Instance */
+    case instance = 'instance';
 
-	/** Related */
-	case related = 'related';
+    /** Related */
+    case related = 'related';
 
-	/** Dependents */
-	case dependents = 'dependents';
+    /** Dependents */
+    case dependents = 'dependents';
 
-	/** AuthoredBy */
-	case authoredby = 'authoredby';
+    /** AuthoredBy */
+    case authoredby = 'authoredby';
 }

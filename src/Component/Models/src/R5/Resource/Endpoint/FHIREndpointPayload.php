@@ -1,0 +1,30 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
+
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
+
+/**
+ * @description The set of payloads that are provided/available at this endpoint.
+ */
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'Endpoint', elementPath: 'Endpoint.payload', fhirVersion: 'R5')]
+class FHIREndpointPayload extends FHIRBackboneElement
+{
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        public ?string $id = null,
+        /** @var array<FHIRExtension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        public array $modifierExtension = [],
+        /** @var array<FHIRCodeableConcept> type The type of content that may be used at this endpoint (e.g. XDS Discharge summaries) */
+        public array $type = [],
+        /** @var array<FHIRMimeTypesType> mimeType Mimetype to send. If not specified, the content could be anything (including no payload, if the connectionType defined this) */
+        public array $mimeType = [],
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
+}

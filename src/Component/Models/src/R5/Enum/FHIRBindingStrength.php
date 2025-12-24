@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,15 +12,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRBindingStrength: string
 {
-	/** Required */
-	case required = 'required';
+    /** Required */
+    case required = 'required';
 
-	/** Extensible */
-	case extensible = 'extensible';
+    /** Extensible */
+    case extensible = 'extensible';
 
-	/** Preferred */
-	case preferred = 'preferred';
+    /** Preferred */
+    case preferred = 'preferred';
 
-	/** Example */
-	case example = 'example';
+    /** Example */
+    case example = 'example';
 }

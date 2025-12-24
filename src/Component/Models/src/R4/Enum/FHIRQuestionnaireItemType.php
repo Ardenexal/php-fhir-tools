@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -10,12 +12,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum FHIRQuestionnaireItemType: string
 {
-	/** Group */
-	case group = 'group';
+    /** Group */
+    case group = 'group';
 
-	/** Display */
-	case display = 'display';
+    /** Display */
+    case display = 'display';
 
-	/** Question */
-	case question = 'question';
+    /** Question */
+    case question = 'question';
 }

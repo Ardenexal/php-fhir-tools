@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,12 +12,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRDetectedIssueSeverity: string
 {
-	/** High */
-	case high = 'high';
+    /** High */
+    case high = 'high';
 
-	/** Moderate */
-	case moderate = 'moderate';
+    /** Moderate */
+    case moderate = 'moderate';
 
-	/** Low */
-	case low = 'low';
+    /** Low */
+    case low = 'low';
 }

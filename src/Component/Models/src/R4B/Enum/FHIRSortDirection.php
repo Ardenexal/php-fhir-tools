@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,9 +12,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRSortDirection: string
 {
-	/** Ascending */
-	case ascending = 'ascending';
+    /** Ascending */
+    case ascending = 'ascending';
 
-	/** Descending */
-	case descending = 'descending';
+    /** Descending */
+    case descending = 'descending';
 }

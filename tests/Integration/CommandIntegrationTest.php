@@ -49,10 +49,14 @@ class CommandIntegrationTest extends TestCase
         $context    = new BuilderContext();
 
         // Set up namespaces for the context
-        $elementNamespace = new PhpNamespace('Ardenexal\\FHIRTools\\Test\\Element');
-        $enumNamespace    = new PhpNamespace('Ardenexal\\FHIRTools\\Test\\Enum');
+        $elementNamespace   = new PhpNamespace('Ardenexal\\FHIRTools\\Test\\Element');
+        $enumNamespace      = new PhpNamespace('Ardenexal\\FHIRTools\\Test\\Enum');
+        $primitiveNamespace = new PhpNamespace('Ardenexal\\FHIRTools\\Test\\Primitive');
+        $datatypeNamespace  = new PhpNamespace('Ardenexal\\FHIRTools\\Test\\DataType');
         $context->addElementNamespace('R4B', $elementNamespace);
         $context->addEnumNamespace('R4B', $enumNamespace);
+        $context->addPrimitiveNamespace('R4B', $primitiveNamespace);
+        $context->addDatatypeNamespace('R4B', $datatypeNamespace);
 
         // Mock the PackageLoader to avoid network calls
         $packageLoader = $this->createMock(PackageLoader::class);

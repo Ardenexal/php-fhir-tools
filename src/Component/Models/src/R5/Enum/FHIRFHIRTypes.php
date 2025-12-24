@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,6 +12,6 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRFHIRTypes: string
 {
-	/** Base */
-	case base = 'Base';
+    /** Base */
+    case base = 'Base';
 }

@@ -1,0 +1,39 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
+
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRIdentifier;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
+/**
+ * @description The official certifications, training, and licenses that authorize or otherwise pertain to the provision of care by the practitioner.  For example, a medical license issued by a medical board authorizing the practitioner to practice medicine within a certian locality.
+ */
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'Practitioner', elementPath: 'Practitioner.qualification', fhirVersion: 'R4B')]
+class FHIRPractitionerQualification extends FHIRBackboneElement
+{
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        public ?string $id = null,
+        /** @var array<FHIRExtension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        public array $modifierExtension = [],
+        /** @var array<FHIRIdentifier> identifier An identifier for this qualification for the practitioner */
+        public array $identifier = [],
+        /** @var FHIRCodeableConcept|null code Coded representation of the qualification */
+        #[NotBlank]
+        public ?FHIRCodeableConcept $code = null,
+        /** @var FHIRPeriod|null period Period during which the qualification is valid */
+        public ?FHIRPeriod $period = null,
+        /** @var FHIRReference|null issuer Organization that regulates and issues the qualification */
+        public ?FHIRReference $issuer = null,
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
+}

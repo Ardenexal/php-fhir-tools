@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,12 +12,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRResponseType: string
 {
-	/** OK */
-	case ok = 'ok';
+    /** OK */
+    case ok = 'ok';
 
-	/** Transient Error */
-	case transienterror = 'transient-error';
+    /** Transient Error */
+    case transienterror = 'transient-error';
 
-	/** Fatal Error */
-	case fatalerror = 'fatal-error';
+    /** Fatal Error */
+    case fatalerror = 'fatal-error';
 }

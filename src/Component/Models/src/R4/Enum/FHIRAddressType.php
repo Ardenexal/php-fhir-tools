@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -10,12 +12,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum FHIRAddressType: string
 {
-	/** Postal */
-	case postal = 'postal';
+    /** Postal */
+    case postal = 'postal';
 
-	/** Physical */
-	case physical = 'physical';
+    /** Physical */
+    case physical = 'physical';
 
-	/** Postal & Physical */
-	case postalandphysical = 'both';
+    /** Postal & Physical */
+    case postalandphysical = 'both';
 }

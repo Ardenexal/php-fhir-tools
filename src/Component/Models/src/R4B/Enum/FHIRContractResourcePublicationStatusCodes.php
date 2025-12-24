@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,48 +12,48 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRContractResourcePublicationStatusCodes: string
 {
-	/** Amended */
-	case amended = 'amended';
+    /** Amended */
+    case amended = 'amended';
 
-	/** Appended */
-	case appended = 'appended';
+    /** Appended */
+    case appended = 'appended';
 
-	/** Cancelled */
-	case cancelled = 'cancelled';
+    /** Cancelled */
+    case cancelled = 'cancelled';
 
-	/** Disputed */
-	case disputed = 'disputed';
+    /** Disputed */
+    case disputed = 'disputed';
 
-	/** Entered in Error */
-	case enteredinerror = 'entered-in-error';
+    /** Entered in Error */
+    case enteredinerror = 'entered-in-error';
 
-	/** Executable */
-	case executable = 'executable';
+    /** Executable */
+    case executable = 'executable';
 
-	/** Executed */
-	case executed = 'executed';
+    /** Executed */
+    case executed = 'executed';
 
-	/** Negotiable */
-	case negotiable = 'negotiable';
+    /** Negotiable */
+    case negotiable = 'negotiable';
 
-	/** Offered */
-	case offered = 'offered';
+    /** Offered */
+    case offered = 'offered';
 
-	/** Policy */
-	case policy = 'policy';
+    /** Policy */
+    case policy = 'policy';
 
-	/** Rejected */
-	case rejected = 'rejected';
+    /** Rejected */
+    case rejected = 'rejected';
 
-	/** Renewed */
-	case renewed = 'renewed';
+    /** Renewed */
+    case renewed = 'renewed';
 
-	/** Revoked */
-	case revoked = 'revoked';
+    /** Revoked */
+    case revoked = 'revoked';
 
-	/** Resolved */
-	case resolved = 'resolved';
+    /** Resolved */
+    case resolved = 'resolved';
 
-	/** Terminated */
-	case terminated = 'terminated';
+    /** Terminated */
+    case terminated = 'terminated';
 }

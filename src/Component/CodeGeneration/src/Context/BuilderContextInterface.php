@@ -142,6 +142,40 @@ interface BuilderContextInterface
     public function addEnumNamespace(string $version, PhpNamespace $namespace): void;
 
     /**
+     * Get the primitive namespace for a FHIR version
+     *
+     * @param string $version The FHIR version
+     *
+     * @return PhpNamespace The primitive namespace
+     */
+    public function getPrimitiveNamespace(string $version): PhpNamespace;
+
+    /**
+     * Add a primitive namespace for a FHIR version
+     *
+     * @param string       $version   The FHIR version
+     * @param PhpNamespace $namespace The primitive namespace
+     */
+    public function addPrimitiveNamespace(string $version, PhpNamespace $namespace): void;
+
+    /**
+     * Get the datatype namespace for a FHIR version
+     *
+     * @param string $version The FHIR version
+     *
+     * @return PhpNamespace The datatype namespace
+     */
+    public function getDatatypeNamespace(string $version): PhpNamespace;
+
+    /**
+     * Add a datatype namespace for a FHIR version
+     *
+     * @param string       $version   The FHIR version
+     * @param PhpNamespace $namespace The datatype namespace
+     */
+    public function addDatatypeNamespace(string $version, PhpNamespace $namespace): void;
+
+    /**
      * Add a pending enum for generation
      *
      * Tracks ValueSet URLs that require enum generation during the selective

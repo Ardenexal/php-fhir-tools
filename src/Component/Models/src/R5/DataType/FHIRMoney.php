@@ -1,25 +1,34 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDecimal;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRCurrenciesType;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRDataType;
+
 /**
  * @author HL7 FHIR Standard
+ *
  * @see http://hl7.org/fhir/StructureDefinition/Money
+ *
  * @description An amount of economic utility in some recognized currency.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType(typeName: 'Money', fhirVersion: 'R5')]
-class FHIRMoney extends \Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRDataType
+#[FHIRComplexType(typeName: 'Money', fhirVersion: 'R5')]
+class FHIRMoney extends FHIRDataType
 {
-	public function __construct(
-		/** @var null|string id Unique id for inter-element referencing */
-		public ?string $id = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRExtension> extension Additional content defined by implementations */
-		public array $extension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRDecimal value Numerical value (with implicit precision) */
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRDecimal $value = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRCurrenciesType currency ISO 4217 Currency Code */
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRCurrenciesType $currency = null,
-	) {
-		parent::__construct($id, $extension);
-	}
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        public ?string $id = null,
+        /** @var array<FHIRExtension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var FHIRDecimal|null value Numerical value (with implicit precision) */
+        public ?FHIRDecimal $value = null,
+        /** @var FHIRCurrenciesType|null currency ISO 4217 Currency Code */
+        public ?FHIRCurrenciesType $currency = null,
+    ) {
+        parent::__construct($id, $extension);
+    }
 }

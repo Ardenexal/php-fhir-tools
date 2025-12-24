@@ -1,30 +1,40 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCanonical;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRAggregationModeType;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRElement;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRReferenceVersionRulesType;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
 /**
- * @fhir-complex-type ElementDefinition.type
  * @description The data type or resource that the value of this element is permitted to be.
  */
-class FHIRElementDefinitionType extends \Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRElement
+#[FHIRComplexType(typeName: 'ElementDefinition.type', fhirVersion: 'R5')]
+class FHIRElementDefinitionType extends FHIRElement
 {
-	public function __construct(
-		/** @var null|string id Unique id for inter-element referencing */
-		public ?string $id = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRExtension> extension Additional content defined by implementations */
-		public array $extension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRUri code Data type or Resource (reference to definition) */
-		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRUri $code = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRCanonical> profile Profiles (StructureDefinition or IG) - one must apply */
-		public array $profile = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRCanonical> targetProfile Profile (StructureDefinition or IG) on the Reference/canonical target - one must apply */
-		public array $targetProfile = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRAggregationModeType> aggregation contained | referenced | bundled - how aggregated */
-		public array $aggregation = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRReferenceVersionRulesType versioning either | independent | specific */
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRReferenceVersionRulesType $versioning = null,
-	) {
-		parent::__construct($id, $extension);
-	}
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        public ?string $id = null,
+        /** @var array<FHIRExtension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var FHIRUri|null code Data type or Resource (reference to definition) */
+        #[NotBlank]
+        public ?FHIRUri $code = null,
+        /** @var array<FHIRCanonical> profile Profiles (StructureDefinition or IG) - one must apply */
+        public array $profile = [],
+        /** @var array<FHIRCanonical> targetProfile Profile (StructureDefinition or IG) on the Reference/canonical target - one must apply */
+        public array $targetProfile = [],
+        /** @var array<FHIRAggregationModeType> aggregation contained | referenced | bundled - how aggregated */
+        public array $aggregation = [],
+        /** @var FHIRReferenceVersionRulesType|null versioning either | independent | specific */
+        public ?FHIRReferenceVersionRulesType $versioning = null,
+    ) {
+        parent::__construct($id, $extension);
+    }
 }

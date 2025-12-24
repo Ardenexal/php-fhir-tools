@@ -1,0 +1,36 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
+
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCanonical;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRId;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
+/**
+ * @description Another implementation guide that this implementation depends on. Typically, an implementation guide uses value sets, profiles etc.defined in other implementation guides.
+ */
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'ImplementationGuide', elementPath: 'ImplementationGuide.dependsOn', fhirVersion: 'R4B')]
+class FHIRImplementationGuideDependsOn extends FHIRBackboneElement
+{
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        public ?string $id = null,
+        /** @var array<FHIRExtension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        public array $modifierExtension = [],
+        /** @var FHIRCanonical|null uri Identity of the IG that this depends on */
+        #[NotBlank]
+        public ?FHIRCanonical $uri = null,
+        /** @var FHIRId|null packageId NPM Package name for IG this depends on */
+        public ?FHIRId $packageId = null,
+        /** @var FHIRString|string|null version Version of the IG */
+        public FHIRString|string|null $version = null,
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
+}

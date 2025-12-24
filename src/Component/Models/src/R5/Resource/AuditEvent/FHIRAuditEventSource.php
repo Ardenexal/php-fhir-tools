@@ -1,0 +1,35 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
+
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
+/**
+ * @description The actor that is reporting the event.
+ */
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'AuditEvent', elementPath: 'AuditEvent.source', fhirVersion: 'R5')]
+class FHIRAuditEventSource extends FHIRBackboneElement
+{
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        public ?string $id = null,
+        /** @var array<FHIRExtension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        public array $modifierExtension = [],
+        /** @var FHIRReference|null site Logical source location within the enterprise */
+        public ?FHIRReference $site = null,
+        /** @var FHIRReference|null observer The identity of source detecting the event */
+        #[NotBlank]
+        public ?FHIRReference $observer = null,
+        /** @var array<FHIRCodeableConcept> type The type of source where event originated */
+        public array $type = [],
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
+}

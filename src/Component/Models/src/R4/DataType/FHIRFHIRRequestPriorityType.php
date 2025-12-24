@@ -1,16 +1,22 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
+use Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRFHIRRequestPriority;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRCode;
+
 /**
  * @fhir-code-type FHIRRequestPriority
+ *
  * @description Code type wrapper for FHIRRequestPriority enum
  */
-class FHIRFHIRRequestPriorityType extends \Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRCode
+class FHIRFHIRRequestPriorityType extends FHIRCode
 {
-	public function __construct(
-		/** @var \Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRFHIRRequestPriority|string|null $value The code value */
-		public \Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRFHIRRequestPriority|string|null $value = null,
-	) {
-	}
+    public function __construct(
+        /** @var FHIRFHIRRequestPriority|string|null $value The code value */
+        public FHIRFHIRRequestPriority|string|null $value = null,
+    ) {
+    }
 }

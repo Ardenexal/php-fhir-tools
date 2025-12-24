@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,9 +12,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRConceptMapRelationship: string
 {
-	/** Related To */
-	case relatedto = 'related-to';
+    /** Related To */
+    case relatedto = 'related-to';
 
-	/** Not Related To */
-	case notrelatedto = 'not-related-to';
+    /** Not Related To */
+    case notrelatedto = 'not-related-to';
 }

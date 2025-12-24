@@ -1,25 +1,30 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRElement;
+
 /**
- * @fhir-complex-type Dosage.doseAndRate
  * @description The amount of medication administered.
  */
-class FHIRDosageDoseAndRate extends \Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRElement
+#[FHIRComplexType(typeName: 'Dosage.doseAndRate', fhirVersion: 'R4B')]
+class FHIRDosageDoseAndRate extends FHIRElement
 {
-	public function __construct(
-		/** @var null|string id Unique id for inter-element referencing */
-		public ?string $id = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRExtension> extension Additional content defined by implementations */
-		public array $extension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRCodeableConcept type The kind of dose or rate specified */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRCodeableConcept $type = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRRange|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRQuantity doseX Amount of medication per dose */
-		public \Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRRange|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRQuantity|null $doseX = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRRatio|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRRange|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRQuantity rateX Amount of medication per unit of time */
-		public \Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRRatio|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRRange|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRQuantity|null $rateX = null,
-	) {
-		parent::__construct($id, $extension);
-	}
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        public ?string $id = null,
+        /** @var array<FHIRExtension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var FHIRCodeableConcept|null type The kind of dose or rate specified */
+        public ?FHIRCodeableConcept $type = null,
+        /** @var FHIRRange|FHIRQuantity|null doseX Amount of medication per dose */
+        public FHIRRange|FHIRQuantity|null $doseX = null,
+        /** @var FHIRRatio|FHIRRange|FHIRQuantity|null rateX Amount of medication per unit of time */
+        public FHIRRatio|FHIRRange|FHIRQuantity|null $rateX = null,
+    ) {
+        parent::__construct($id, $extension);
+    }
 }

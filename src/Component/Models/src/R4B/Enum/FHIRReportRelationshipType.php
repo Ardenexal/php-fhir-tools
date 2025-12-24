@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,27 +12,27 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRReportRelationshipType: string
 {
-	/** Replaces */
-	case replaces = 'replaces';
+    /** Replaces */
+    case replaces = 'replaces';
 
-	/** Amends */
-	case amends = 'amends';
+    /** Amends */
+    case amends = 'amends';
 
-	/** Appends */
-	case appends = 'appends';
+    /** Appends */
+    case appends = 'appends';
 
-	/** Transforms */
-	case transforms = 'transforms';
+    /** Transforms */
+    case transforms = 'transforms';
 
-	/** Replaced With */
-	case replacedwith = 'replacedWith';
+    /** Replaced With */
+    case replacedwith = 'replacedWith';
 
-	/** Amended With */
-	case amendedwith = 'amendedWith';
+    /** Amended With */
+    case amendedwith = 'amendedWith';
 
-	/** Appended With */
-	case appendedwith = 'appendedWith';
+    /** Appended With */
+    case appendedwith = 'appendedWith';
 
-	/** Transformed With */
-	case transformedwith = 'transformedWith';
+    /** Transformed With */
+    case transformedwith = 'transformedWith';
 }

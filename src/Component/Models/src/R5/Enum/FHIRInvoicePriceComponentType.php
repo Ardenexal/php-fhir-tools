@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,21 +12,21 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRInvoicePriceComponentType: string
 {
-	/** base price */
-	case baseprice = 'base';
+    /** base price */
+    case baseprice = 'base';
 
-	/** surcharge */
-	case surcharge = 'surcharge';
+    /** surcharge */
+    case surcharge = 'surcharge';
 
-	/** deduction */
-	case deduction = 'deduction';
+    /** deduction */
+    case deduction = 'deduction';
 
-	/** discount */
-	case discount = 'discount';
+    /** discount */
+    case discount = 'discount';
 
-	/** tax */
-	case tax = 'tax';
+    /** tax */
+    case tax = 'tax';
 
-	/** informational */
-	case informational = 'informational';
+    /** informational */
+    case informational = 'informational';
 }

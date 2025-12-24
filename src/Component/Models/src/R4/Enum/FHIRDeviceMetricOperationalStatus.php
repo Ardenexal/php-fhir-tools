@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -10,15 +12,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum FHIRDeviceMetricOperationalStatus: string
 {
-	/** On */
-	case on = 'on';
+    /** On */
+    case on = 'on';
 
-	/** Off */
-	case off = 'off';
+    /** Off */
+    case off = 'off';
 
-	/** Standby */
-	case standby = 'standby';
+    /** Standby */
+    case standby = 'standby';
 
-	/** Entered In Error */
-	case enteredinerror = 'entered-in-error';
+    /** Entered In Error */
+    case enteredinerror = 'entered-in-error';
 }

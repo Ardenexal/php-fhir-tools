@@ -1,16 +1,22 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
+use Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRFHIRDocumentReferenceStatus;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRCode;
+
 /**
  * @fhir-code-type FHIRDocumentReferenceStatus
+ *
  * @description Code type wrapper for FHIRDocumentReferenceStatus enum
  */
-class FHIRFHIRDocumentReferenceStatusType extends \Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRCode
+class FHIRFHIRDocumentReferenceStatusType extends FHIRCode
 {
-	public function __construct(
-		/** @var \Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRFHIRDocumentReferenceStatus|string|null $value The code value */
-		public \Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRFHIRDocumentReferenceStatus|string|null $value = null,
-	) {
-	}
+    public function __construct(
+        /** @var FHIRFHIRDocumentReferenceStatus|string|null $value The code value */
+        public FHIRFHIRDocumentReferenceStatus|string|null $value = null,
+    ) {
+    }
 }

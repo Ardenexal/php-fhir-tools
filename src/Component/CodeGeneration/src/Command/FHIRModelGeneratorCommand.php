@@ -104,9 +104,9 @@ class FHIRModelGeneratorCommand extends Command
         PackageLoader $packageLoader,
     ) {
         parent::__construct();
-        $this->filesystem = $filesystem;
-        $this->context = $context;
-        $this->packageLoader = $packageLoader;
+        $this->filesystem     = $filesystem;
+        $this->context        = $context;
+        $this->packageLoader  = $packageLoader;
         $this->errorCollector = new ErrorCollector();
     }
 
@@ -189,7 +189,7 @@ class FHIRModelGeneratorCommand extends Command
         }
 
         $loadingPackagesIndicator = new ProgressIndicator($output);
-        $progressMessage = $isModelsComponent
+        $progressMessage          = $isModelsComponent
             ? 'Loading FHIR Implementation Guide packages for Models component...'
             : 'Loading FHIR Implementation Guide packages...';
         $loadingPackagesIndicator->start($progressMessage);
@@ -201,8 +201,8 @@ class FHIRModelGeneratorCommand extends Command
 
         foreach ($packages as $package) {
             $packageParts = explode('#', $package);
-            $version = $packageParts[1] ?? null;
-            $package = $packageParts[0];
+            $version      = $packageParts[1] ?? null;
+            $package      = $packageParts[0];
 
             $loadingPackagesIndicator->setMessage('Loading package ' . $package . ($version ? " version $version" : ''));
 
@@ -219,8 +219,8 @@ class FHIRModelGeneratorCommand extends Command
                     'PACKAGE_PROCESSING_ERROR',
                     'error',
                     [
-                        'package_name' => $package,
-                        'version' => $version,
+                        'package_name'    => $package,
+                        'version'         => $version,
                         'exception_class' => get_class($e),
                     ],
                 );
@@ -297,12 +297,12 @@ class FHIRModelGeneratorCommand extends Command
         $this->packageLoader->loadPackageToContext($packageMetaData, $detectedFhirVersion);
 
         // Map FHIR version names to version numbers
-        $fhirVersions = $packageMetaData->getFhirVersions();
+        $fhirVersions    = $packageMetaData->getFhirVersions();
         $fhirVersionName = $fhirVersions[0] ?? $detectedFhirVersion;
-        $versionNumber = match ($fhirVersionName) {
-            'R4' => '4.0.1',
-            'R4B' => '4.3.0',
-            'R5' => '5.0.0',
+        $versionNumber   = match ($fhirVersionName) {
+            'R4'    => '4.0.1',
+            'R4B'   => '4.3.0',
+            'R5'    => '5.0.0',
             default => '4.3.0',
         };
 
@@ -329,12 +329,12 @@ class FHIRModelGeneratorCommand extends Command
         );
 
         // Map FHIR version names to version numbers expected by generateClassesForPackage
-        $fhirVersions = $packageMetaData->getFhirVersions();
+        $fhirVersions    = $packageMetaData->getFhirVersions();
         $fhirVersionName = $fhirVersions[0] ?? 'R4B';
-        $versionNumber = match ($fhirVersionName) {
-            'R4' => '4.0.1',
-            'R4B' => '4.3.0',
-            'R5' => '5.0.0',
+        $versionNumber   = match ($fhirVersionName) {
+            'R4'    => '4.0.1',
+            'R4B'   => '4.3.0',
+            'R5'    => '5.0.0',
             default => '4.3.0', // Default to R4B
         };
 
@@ -415,14 +415,16 @@ class FHIRModelGeneratorCommand extends Command
         $baseNamespace = "Ardenexal\\FHIRTools\\Component\\Models\\{$fhirVersionName}";
 
         // Create namespaces for different types
-        $resourceNamespace = new PhpNamespace("{$baseNamespace}\\Resource");
-        $dataTypeNamespace = new PhpNamespace("{$baseNamespace}\\DataType");
+        $resourceNamespace  = new PhpNamespace("{$baseNamespace}\\Resource");
+        $dataTypeNamespace  = new PhpNamespace("{$baseNamespace}\\DataType");
         $primitiveNamespace = new PhpNamespace("{$baseNamespace}\\Primitive");
-        $enumNamespace = new PhpNamespace("{$baseNamespace}\\Enum");
+        $enumNamespace      = new PhpNamespace("{$baseNamespace}\\Enum");
 
-        // Set a default element namespace (we'll override this during output)
+        // Set up all namespaces in the context
         $this->context->addElementNamespace($fhirVersionName, $resourceNamespace);
         $this->context->addEnumNamespace($fhirVersionName, $enumNamespace);
+        $this->context->addPrimitiveNamespace($fhirVersionName, $primitiveNamespace);
+        $this->context->addDatatypeNamespace($fhirVersionName, $dataTypeNamespace);
 
         // Build different types of classes
         $this->buildModelsComponentClasses($output, $fhirVersionName, $resourceNamespace, $dataTypeNamespace, $primitiveNamespace);
@@ -438,7 +440,7 @@ class FHIRModelGeneratorCommand extends Command
                 'warning',
                 [
                     'exception_class' => get_class($e),
-                    'package_name' => $package,
+                    'package_name'    => $package,
                 ],
             );
             $output->writeln('<comment>Warning: Enum generation failed but continuing with class generation</comment>');
@@ -461,7 +463,7 @@ class FHIRModelGeneratorCommand extends Command
 
         foreach ($this->context->getTypes() as $type) {
             // Determine the correct namespace based on the class attributes
-            $namespace = $this->determineModelsComponentNamespace($type, $baseNamespace);
+            $namespace     = $this->determineModelsComponentNamespace($type, $baseNamespace);
             $classContents = self::asPhpFile($type, $namespace);
 
             // Determine output path based on type and backbone element status
@@ -643,7 +645,7 @@ class FHIRModelGeneratorCommand extends Command
 
         // Extract the type category from namespace
         $namespaceParts = explode('\\', $namespace->getName());
-        $typeCategory = end($namespaceParts); // Resource, DataType, Primitive, or Enum
+        $typeCategory   = end($namespaceParts); // Resource, DataType, Primitive, or Enum
 
         // Handle backbone elements - they should go in resource subdirectories
         $typeName = $type->getName();
@@ -882,21 +884,21 @@ class FHIRModelGeneratorCommand extends Command
     private function generateBackboneElement(array $structureDefinition, string $version, PhpNamespace $namespace): ?ClassType
     {
         // Extract parent resource and element path from the structure definition
-        $elementPath = $structureDefinition['name'];
-        $pathParts = explode('.', $elementPath);
+        $elementPath    = $structureDefinition['name'];
+        $pathParts      = explode('.', $elementPath);
         $parentResource = $pathParts[0];
-        $elementName = end($pathParts);
+        $elementName    = end($pathParts);
 
         // Generate the backbone element class
         $generator = new FHIRModelGenerator();
-        $class = $generator->generateModelClassWithErrorHandling($structureDefinition, $version, $this->errorCollector, $this->context);
+        $class     = $generator->generateModelClassWithErrorHandling($structureDefinition, $version, $this->errorCollector, $this->context);
 
         if ($class !== null) {
             // Ensure the class is properly attributed as a backbone element
             $class->addAttribute('Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement', [
                 'parentResource' => $parentResource,
-                'elementPath' => $elementPath,
-                'fhirVersion' => $version,
+                'elementPath'    => $elementPath,
+                'fhirVersion'    => $version,
             ]);
 
             // Add to the appropriate resource namespace
@@ -926,8 +928,8 @@ class FHIRModelGeneratorCommand extends Command
     {
         $output->writeln('Generating Models component classes...');
 
-        $resourceCount = 0;
-        $dataTypeCount = 0;
+        $resourceCount  = 0;
+        $dataTypeCount  = 0;
         $primitiveCount = 0;
 
         foreach ($this->context->getDefinitions() as $structureDefinition) {
@@ -945,10 +947,10 @@ class FHIRModelGeneratorCommand extends Command
 
             // Determine which namespace to use based on the StructureDefinition kind
             $targetNamespace = match ($kind) {
-                'resource' => $resourceNamespace,
-                'complex-type' => $dataTypeNamespace,
+                'resource'       => $resourceNamespace,
+                'complex-type'   => $dataTypeNamespace,
                 'primitive-type' => $primitiveNamespace,
-                default => null
+                default          => null
             };
 
             if ($targetNamespace === null) {
@@ -967,10 +969,10 @@ class FHIRModelGeneratorCommand extends Command
 
                 // Count generated classes by type
                 match ($kind) {
-                    'resource' => $resourceCount++,
-                    'complex-type' => $dataTypeCount++,
+                    'resource'       => $resourceCount++,
+                    'complex-type'   => $dataTypeCount++,
                     'primitive-type' => $primitiveCount++,
-                    default => null
+                    default          => null
                 };
             } else {
                 $output->writeln("<error>Failed to generate class for {$name}</error>");
@@ -1043,8 +1045,8 @@ class FHIRModelGeneratorCommand extends Command
     {
         foreach ($this->context->getTypes() as $type) {
             $elementNamespace = $this->context->getElementNamespace($version);
-            $classContents = self::asPhpFile($type, $elementNamespace);
-            $path = Path::canonicalize(__DIR__ . '/../output/' . $elementNamespace->getName() . '/' . $type->getName() . '.php');
+            $classContents    = self::asPhpFile($type, $elementNamespace);
+            $path             = Path::canonicalize(__DIR__ . '/../output/' . $elementNamespace->getName() . '/' . $type->getName() . '.php');
             $this->filesystem->dumpFile($path, $classContents);
             $output->writeln("Generated model class for {$type->getName()}");
         }
@@ -1052,7 +1054,7 @@ class FHIRModelGeneratorCommand extends Command
         foreach ($this->context->getEnums() as $type) {
             $enumNamespace = $this->context->getEnumNamespace($version);
             $classContents = self::asPhpFile($type, $enumNamespace);
-            $path = Path::canonicalize(__DIR__ . '/../output/' . $enumNamespace->getName() . '/' . $type->getName() . '.php');
+            $path          = Path::canonicalize(__DIR__ . '/../output/' . $enumNamespace->getName() . '/' . $type->getName() . '.php');
             $this->filesystem->dumpFile($path, $classContents);
             $output->writeln("Generated model class for {$type->getName()}");
         }
@@ -1116,14 +1118,14 @@ class FHIRModelGeneratorCommand extends Command
             try {
                 $output->writeln("Generating enum for {$valueset['name']}");
 
-                $enumGenerator = new FHIRValueSetGenerator();
+                $enumGenerator  = new FHIRValueSetGenerator();
                 $classGenerator = new FHIRModelGenerator();
 
                 $enumType = $enumGenerator->generateEnum($valueset, $version, $this->context);
 
                 // Add enum to namespace safely
                 $enumNamespace = $this->context->getEnumNamespace($version);
-                $enumTypeName = $enumType->getName();
+                $enumTypeName  = $enumType->getName();
                 if ($enumTypeName !== null) {
                     // Use hasClass to check existence instead of getClass
                     $hasClass = false;
@@ -1151,7 +1153,7 @@ class FHIRModelGeneratorCommand extends Command
 
                 // Add code type to namespace safely
                 $elementNamespace = $this->context->getElementNamespace($version);
-                $codeTypeName = $codeType->getName();
+                $codeTypeName     = $codeType->getName();
                 if ($codeTypeName !== null) {
                     // Use hasClass to check existence instead of getClass
                     $hasClass = false;
@@ -1183,7 +1185,7 @@ class FHIRModelGeneratorCommand extends Command
                     'error',
                     [
                         'exception_class' => get_class($e),
-                        'valueset_name' => $valueset['name'] ?? 'unknown',
+                        'valueset_name'   => $valueset['name'] ?? 'unknown',
                     ],
                 );
                 $output->writeln("<error>Unexpected error generating enum for {$valueset['name']}</error>");
@@ -1217,8 +1219,6 @@ class FHIRModelGeneratorCommand extends Command
         }
     }
 
-
-
     /**
      * @param OutputInterface $output
      * @param string          $package
@@ -1231,24 +1231,32 @@ class FHIRModelGeneratorCommand extends Command
     private function generateClassesForPackage(OutputInterface $output, string $package, ?string $version): void
     {
         $namespaceParts = s($package)->split('.');
-        $parts = [];
+        $parts          = [];
         foreach ($namespaceParts as $namespace) {
             $parts[] = $namespace->pascal();
         }
-        $namespace = s('\\')->join($parts);
+        $namespace    = s('\\')->join($parts);
         $namedVersion = match ($version) {
             '4.0.1' => 'R4',
             '4.3.0' => 'R4B',
             '5.0.0' => 'R5',
             default => throw GenerationException::unsupportedFhirVersion($version ?? 'unknown'),
         };
-        $targetNamespace = "Ardenexal\\FHIRTools\\$namespace\\Element";
+        $targetNamespace  = "Ardenexal\\FHIRTools\\$namespace\\Element";
         $elementNamespace = new PhpNamespace($targetNamespace);
         $this->context->addElementNamespace($namedVersion, $elementNamespace);
 
         $targetNamespace = "Ardenexal\\FHIRTools\\$namespace\\Enum";
-        $enumNamespace = new PhpNamespace($targetNamespace);
+        $enumNamespace   = new PhpNamespace($targetNamespace);
         $this->context->addEnumNamespace($namedVersion, $enumNamespace);
+
+        $targetNamespace    = "Ardenexal\\FHIRTools\\$namespace\\Primitive";
+        $primitiveNamespace = new PhpNamespace($targetNamespace);
+        $this->context->addPrimitiveNamespace($namedVersion, $primitiveNamespace);
+
+        $targetNamespace   = "Ardenexal\\FHIRTools\\$namespace\\DataType";
+        $datatypeNamespace = new PhpNamespace($targetNamespace);
+        $this->context->addDatatypeNamespace($namedVersion, $datatypeNamespace);
 
 
         $this->buildElementClasses($output, $namedVersion, $elementNamespace);

@@ -1,116 +1,140 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRContactDetail;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRIdentifier;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRMeta;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRNarrative;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRRelatedArtifact;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRUsageContext;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBoolean;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCanonical;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDate;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRMarkdown;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUri;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
 /**
  * @author Health Level Seven International (Clinical Quality Information)
+ *
  * @see http://hl7.org/fhir/StructureDefinition/Measure
+ *
  * @description The Measure resource provides the definition of a quality measure.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(type: 'Measure', version: '4.0.1', url: 'http://hl7.org/fhir/StructureDefinition/Measure', fhirVersion: 'R4')]
+#[FhirResource(type: 'Measure', version: '4.0.1', url: 'http://hl7.org/fhir/StructureDefinition/Measure', fhirVersion: 'R4')]
 class FHIRMeasure extends FHIRDomainResource
 {
-	public function __construct(
-		/** @var null|string id Logical id of this artifact */
-		public ?string $id = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRMeta meta Metadata about the resource */
-		public ?FHIRMeta $meta = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRUri implicitRules A set of rules under which this content was created */
-		public ?FHIRUri $implicitRules = null,
-		/** @var null|string language Language of the resource content */
-		public ?string $language = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRNarrative text Text summary of the resource, for human interpretation */
-		public ?FHIRNarrative $text = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRResource> contained Contained, inline Resources */
-		public array $contained = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRExtension> extension Additional content defined by implementations */
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRExtension> modifierExtension Extensions that cannot be ignored */
-		public array $modifierExtension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRUri url Canonical identifier for this measure, represented as a URI (globally unique) */
-		public ?FHIRUri $url = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRIdentifier> identifier Additional identifier for the measure */
-		public array $identifier = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRString|string version Business version of the measure */
-		public FHIRString|string|null $version = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRString|string name Name for this measure (computer friendly) */
-		public FHIRString|string|null $name = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRString|string title Name for this measure (human friendly) */
-		public FHIRString|string|null $title = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRString|string subtitle Subordinate title of the measure */
-		public FHIRString|string|null $subtitle = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRPublicationStatusType status draft | active | retired | unknown */
-		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public ?FHIRPublicationStatusType $status = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRBoolean experimental For testing purposes, not real usage */
-		public ?FHIRBoolean $experimental = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRCodeableConcept|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRReference subjectX E.g. Patient, Practitioner, RelatedPerson, Organization, Location, Device */
-		public FHIRCodeableConcept|FHIRReference|null $subjectX = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRDateTime date Date last changed */
-		public ?FHIRDateTime $date = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRString|string publisher Name of the publisher (organization or individual) */
-		public FHIRString|string|null $publisher = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRContactDetail> contact Contact details for the publisher */
-		public array $contact = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRMarkdown description Natural language description of the measure */
-		public ?FHIRMarkdown $description = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRUsageContext> useContext The context that the content is intended to support */
-		public array $useContext = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRCodeableConcept> jurisdiction Intended jurisdiction for measure (if applicable) */
-		public array $jurisdiction = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRMarkdown purpose Why this measure is defined */
-		public ?FHIRMarkdown $purpose = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRString|string usage Describes the clinical usage of the measure */
-		public FHIRString|string|null $usage = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRMarkdown copyright Use and/or publishing restrictions */
-		public ?FHIRMarkdown $copyright = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRDate approvalDate When the measure was approved by publisher */
-		public ?FHIRDate $approvalDate = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRDate lastReviewDate When the measure was last reviewed */
-		public ?FHIRDate $lastReviewDate = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRPeriod effectivePeriod When the measure is expected to be used */
-		public ?FHIRPeriod $effectivePeriod = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRCodeableConcept> topic The category of the measure, such as Education, Treatment, Assessment, etc. */
-		public array $topic = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRContactDetail> author Who authored the content */
-		public array $author = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRContactDetail> editor Who edited the content */
-		public array $editor = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRContactDetail> reviewer Who reviewed the content */
-		public array $reviewer = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRContactDetail> endorser Who endorsed the content */
-		public array $endorser = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRRelatedArtifact> relatedArtifact Additional documentation, citations, etc. */
-		public array $relatedArtifact = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRCanonical> library Logic used by the measure */
-		public array $library = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRMarkdown disclaimer Disclaimer for use of the measure or its referenced content */
-		public ?FHIRMarkdown $disclaimer = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRCodeableConcept scoring proportion | ratio | continuous-variable | cohort */
-		public ?FHIRCodeableConcept $scoring = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRCodeableConcept compositeScoring opportunity | all-or-nothing | linear | weighted */
-		public ?FHIRCodeableConcept $compositeScoring = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRCodeableConcept> type process | outcome | structure | patient-reported-outcome | composite */
-		public array $type = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRString|string riskAdjustment How risk adjustment is applied for this measure */
-		public FHIRString|string|null $riskAdjustment = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRString|string rateAggregation How is rate aggregation performed for this measure */
-		public FHIRString|string|null $rateAggregation = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRMarkdown rationale Detailed description of why the measure exists */
-		public ?FHIRMarkdown $rationale = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRMarkdown clinicalRecommendationStatement Summary of clinical guidelines */
-		public ?FHIRMarkdown $clinicalRecommendationStatement = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRCodeableConcept improvementNotation increase | decrease */
-		public ?FHIRCodeableConcept $improvementNotation = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRMarkdown> definition Defined terms used in the measure documentation */
-		public array $definition = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRMarkdown guidance Additional guidance for implementers */
-		public ?FHIRMarkdown $guidance = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRMeasureGroup> group Population criteria group */
-		public array $group = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRMeasureSupplementalData> supplementalData What other data should be reported with the measure */
-		public array $supplementalData = [],
-	) {
-		parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Logical id of this artifact */
+        public ?string $id = null,
+        /** @var FHIRMeta|null meta Metadata about the resource */
+        public ?FHIRMeta $meta = null,
+        /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
+        public ?FHIRUri $implicitRules = null,
+        /** @var string|null language Language of the resource content */
+        public ?string $language = null,
+        /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
+        public ?FHIRNarrative $text = null,
+        /** @var array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRResource> contained Contained, inline Resources */
+        public array $contained = [],
+        /** @var array<FHIRExtension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored */
+        public array $modifierExtension = [],
+        /** @var FHIRUri|null url Canonical identifier for this measure, represented as a URI (globally unique) */
+        public ?FHIRUri $url = null,
+        /** @var array<FHIRIdentifier> identifier Additional identifier for the measure */
+        public array $identifier = [],
+        /** @var FHIRString|string|null version Business version of the measure */
+        public FHIRString|string|null $version = null,
+        /** @var FHIRString|string|null name Name for this measure (computer friendly) */
+        public FHIRString|string|null $name = null,
+        /** @var FHIRString|string|null title Name for this measure (human friendly) */
+        public FHIRString|string|null $title = null,
+        /** @var FHIRString|string|null subtitle Subordinate title of the measure */
+        public FHIRString|string|null $subtitle = null,
+        /** @var FHIRPublicationStatusType|null status draft | active | retired | unknown */
+        #[NotBlank]
+        public ?FHIRPublicationStatusType $status = null,
+        /** @var FHIRBoolean|null experimental For testing purposes, not real usage */
+        public ?FHIRBoolean $experimental = null,
+        /** @var FHIRCodeableConcept|FHIRReference|null subjectX E.g. Patient, Practitioner, RelatedPerson, Organization, Location, Device */
+        public FHIRCodeableConcept|FHIRReference|null $subjectX = null,
+        /** @var FHIRDateTime|null date Date last changed */
+        public ?FHIRDateTime $date = null,
+        /** @var FHIRString|string|null publisher Name of the publisher (organization or individual) */
+        public FHIRString|string|null $publisher = null,
+        /** @var array<FHIRContactDetail> contact Contact details for the publisher */
+        public array $contact = [],
+        /** @var FHIRMarkdown|null description Natural language description of the measure */
+        public ?FHIRMarkdown $description = null,
+        /** @var array<FHIRUsageContext> useContext The context that the content is intended to support */
+        public array $useContext = [],
+        /** @var array<FHIRCodeableConcept> jurisdiction Intended jurisdiction for measure (if applicable) */
+        public array $jurisdiction = [],
+        /** @var FHIRMarkdown|null purpose Why this measure is defined */
+        public ?FHIRMarkdown $purpose = null,
+        /** @var FHIRString|string|null usage Describes the clinical usage of the measure */
+        public FHIRString|string|null $usage = null,
+        /** @var FHIRMarkdown|null copyright Use and/or publishing restrictions */
+        public ?FHIRMarkdown $copyright = null,
+        /** @var FHIRDate|null approvalDate When the measure was approved by publisher */
+        public ?FHIRDate $approvalDate = null,
+        /** @var FHIRDate|null lastReviewDate When the measure was last reviewed */
+        public ?FHIRDate $lastReviewDate = null,
+        /** @var FHIRPeriod|null effectivePeriod When the measure is expected to be used */
+        public ?FHIRPeriod $effectivePeriod = null,
+        /** @var array<FHIRCodeableConcept> topic The category of the measure, such as Education, Treatment, Assessment, etc. */
+        public array $topic = [],
+        /** @var array<FHIRContactDetail> author Who authored the content */
+        public array $author = [],
+        /** @var array<FHIRContactDetail> editor Who edited the content */
+        public array $editor = [],
+        /** @var array<FHIRContactDetail> reviewer Who reviewed the content */
+        public array $reviewer = [],
+        /** @var array<FHIRContactDetail> endorser Who endorsed the content */
+        public array $endorser = [],
+        /** @var array<FHIRRelatedArtifact> relatedArtifact Additional documentation, citations, etc. */
+        public array $relatedArtifact = [],
+        /** @var array<FHIRCanonical> library Logic used by the measure */
+        public array $library = [],
+        /** @var FHIRMarkdown|null disclaimer Disclaimer for use of the measure or its referenced content */
+        public ?FHIRMarkdown $disclaimer = null,
+        /** @var FHIRCodeableConcept|null scoring proportion | ratio | continuous-variable | cohort */
+        public ?FHIRCodeableConcept $scoring = null,
+        /** @var FHIRCodeableConcept|null compositeScoring opportunity | all-or-nothing | linear | weighted */
+        public ?FHIRCodeableConcept $compositeScoring = null,
+        /** @var array<FHIRCodeableConcept> type process | outcome | structure | patient-reported-outcome | composite */
+        public array $type = [],
+        /** @var FHIRString|string|null riskAdjustment How risk adjustment is applied for this measure */
+        public FHIRString|string|null $riskAdjustment = null,
+        /** @var FHIRString|string|null rateAggregation How is rate aggregation performed for this measure */
+        public FHIRString|string|null $rateAggregation = null,
+        /** @var FHIRMarkdown|null rationale Detailed description of why the measure exists */
+        public ?FHIRMarkdown $rationale = null,
+        /** @var FHIRMarkdown|null clinicalRecommendationStatement Summary of clinical guidelines */
+        public ?FHIRMarkdown $clinicalRecommendationStatement = null,
+        /** @var FHIRCodeableConcept|null improvementNotation increase | decrease */
+        public ?FHIRCodeableConcept $improvementNotation = null,
+        /** @var array<FHIRMarkdown> definition Defined terms used in the measure documentation */
+        public array $definition = [],
+        /** @var FHIRMarkdown|null guidance Additional guidance for implementers */
+        public ?FHIRMarkdown $guidance = null,
+        /** @var array<FHIRMeasureGroup> group Population criteria group */
+        public array $group = [],
+        /** @var array<FHIRMeasureSupplementalData> supplementalData What other data should be reported with the measure */
+        public array $supplementalData = [],
+    ) {
+        parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
+    }
 }

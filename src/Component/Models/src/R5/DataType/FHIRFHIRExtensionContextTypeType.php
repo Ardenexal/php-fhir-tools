@@ -1,16 +1,22 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
+use Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRFHIRExtensionContextType;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRCode;
+
 /**
  * @fhir-code-type FHIRExtensionContextType
+ *
  * @description Code type wrapper for FHIRExtensionContextType enum
  */
-class FHIRFHIRExtensionContextTypeType extends \Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRCode
+class FHIRFHIRExtensionContextTypeType extends FHIRCode
 {
-	public function __construct(
-		/** @var \Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRFHIRExtensionContextType|string|null $value The code value */
-		public \Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRFHIRExtensionContextType|string|null $value = null,
-	) {
-	}
+    public function __construct(
+        /** @var FHIRFHIRExtensionContextType|string|null $value The code value */
+        public FHIRFHIRExtensionContextType|string|null $value = null,
+    ) {
+    }
 }

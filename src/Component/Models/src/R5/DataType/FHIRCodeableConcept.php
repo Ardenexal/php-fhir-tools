@@ -1,25 +1,33 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRDataType;
+
 /**
  * @author HL7 FHIR Standard
+ *
  * @see http://hl7.org/fhir/StructureDefinition/CodeableConcept
+ *
  * @description A concept that may be defined by a formal reference to a terminology or ontology or may be provided by text.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType(typeName: 'CodeableConcept', fhirVersion: 'R5')]
-class FHIRCodeableConcept extends \Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRDataType
+#[FHIRComplexType(typeName: 'CodeableConcept', fhirVersion: 'R5')]
+class FHIRCodeableConcept extends FHIRDataType
 {
-	public function __construct(
-		/** @var null|string id Unique id for inter-element referencing */
-		public ?string $id = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRExtension> extension Additional content defined by implementations */
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRCoding> coding Code defined by a terminology system */
-		public array $coding = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRString|string text Plain text representation of the concept */
-		public \Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRString|string|null $text = null,
-	) {
-		parent::__construct($id, $extension);
-	}
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        public ?string $id = null,
+        /** @var array<FHIRExtension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var array<FHIRCoding> coding Code defined by a terminology system */
+        public array $coding = [],
+        /** @var FHIRString|string|null text Plain text representation of the concept */
+        public FHIRString|string|null $text = null,
+    ) {
+        parent::__construct($id, $extension);
+    }
 }

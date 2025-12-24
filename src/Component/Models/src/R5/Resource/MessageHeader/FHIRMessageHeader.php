@@ -1,55 +1,70 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCoding;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRMeta;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRNarrative;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCanonical;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
 /**
  * @author Health Level Seven International (Infrastructure And Messaging)
+ *
  * @see http://hl7.org/fhir/StructureDefinition/MessageHeader
+ *
  * @description The header for a message exchange that is either requesting or responding to an action.  The reference(s) that are the subject of the action as well as other information related to the action are typically transmitted in a bundle in which the MessageHeader resource instance is the first resource in the bundle.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(type: 'MessageHeader', version: '5.0.0', url: 'http://hl7.org/fhir/StructureDefinition/MessageHeader', fhirVersion: 'R5')]
+#[FhirResource(type: 'MessageHeader', version: '5.0.0', url: 'http://hl7.org/fhir/StructureDefinition/MessageHeader', fhirVersion: 'R5')]
 class FHIRMessageHeader extends FHIRDomainResource
 {
-	public function __construct(
-		/** @var null|string id Logical id of this artifact */
-		public ?string $id = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRMeta meta Metadata about the resource */
-		public ?FHIRMeta $meta = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRUri implicitRules A set of rules under which this content was created */
-		public ?FHIRUri $implicitRules = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRAllLanguagesType language Language of the resource content */
-		public ?FHIRAllLanguagesType $language = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRNarrative text Text summary of the resource, for human interpretation */
-		public ?FHIRNarrative $text = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRResource> contained Contained, inline Resources */
-		public array $contained = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRExtension> extension Additional content defined by implementations */
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRExtension> modifierExtension Extensions that cannot be ignored */
-		public array $modifierExtension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRCoding|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRCanonical eventX Event code or link to EventDefinition */
-		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public FHIRCoding|FHIRCanonical|null $eventX = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRMessageHeaderDestination> destination Message destination application(s) */
-		public array $destination = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRReference sender Real world sender of the message */
-		public ?FHIRReference $sender = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRReference author The source of the decision */
-		public ?FHIRReference $author = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRMessageHeaderSource source Message source application */
-		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public ?FHIRMessageHeaderSource $source = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRReference responsible Final responsibility for event */
-		public ?FHIRReference $responsible = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRCodeableConcept reason Cause of event */
-		public ?FHIRCodeableConcept $reason = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRMessageHeaderResponse response If this is a reply to prior message */
-		public ?FHIRMessageHeaderResponse $response = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRReference> focus The actual content of the message */
-		public array $focus = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRCanonical definition Link to the definition for this message */
-		public ?FHIRCanonical $definition = null,
-	) {
-		parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Logical id of this artifact */
+        public ?string $id = null,
+        /** @var FHIRMeta|null meta Metadata about the resource */
+        public ?FHIRMeta $meta = null,
+        /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
+        public ?FHIRUri $implicitRules = null,
+        /** @var FHIRAllLanguagesType|null language Language of the resource content */
+        public ?FHIRAllLanguagesType $language = null,
+        /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
+        public ?FHIRNarrative $text = null,
+        /** @var array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRResource> contained Contained, inline Resources */
+        public array $contained = [],
+        /** @var array<FHIRExtension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored */
+        public array $modifierExtension = [],
+        /** @var FHIRCoding|FHIRCanonical|null eventX Event code or link to EventDefinition */
+        #[NotBlank]
+        public FHIRCoding|FHIRCanonical|null $eventX = null,
+        /** @var array<FHIRMessageHeaderDestination> destination Message destination application(s) */
+        public array $destination = [],
+        /** @var FHIRReference|null sender Real world sender of the message */
+        public ?FHIRReference $sender = null,
+        /** @var FHIRReference|null author The source of the decision */
+        public ?FHIRReference $author = null,
+        /** @var FHIRMessageHeaderSource|null source Message source application */
+        #[NotBlank]
+        public ?FHIRMessageHeaderSource $source = null,
+        /** @var FHIRReference|null responsible Final responsibility for event */
+        public ?FHIRReference $responsible = null,
+        /** @var FHIRCodeableConcept|null reason Cause of event */
+        public ?FHIRCodeableConcept $reason = null,
+        /** @var FHIRMessageHeaderResponse|null response If this is a reply to prior message */
+        public ?FHIRMessageHeaderResponse $response = null,
+        /** @var array<FHIRReference> focus The actual content of the message */
+        public array $focus = [],
+        /** @var FHIRCanonical|null definition Link to the definition for this message */
+        public ?FHIRCanonical $definition = null,
+    ) {
+        parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
+    }
 }

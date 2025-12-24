@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,24 +12,24 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRUnitsOfTime: string
 {
-	/** second */
-	case second = 's';
+    /** second */
+    case second = 's';
 
-	/** minute */
-	case minute = 'min';
+    /** minute */
+    case minute = 'min';
 
-	/** hour */
-	case hour = 'h';
+    /** hour */
+    case hour = 'h';
 
-	/** day */
-	case day = 'd';
+    /** day */
+    case day = 'd';
 
-	/** week */
-	case week = 'wk';
+    /** week */
+    case week = 'wk';
 
-	/** month */
-	case month = 'mo';
+    /** month */
+    case month = 'mo';
 
-	/** year */
-	case year = 'a';
+    /** year */
+    case year = 'a';
 }

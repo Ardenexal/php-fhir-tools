@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,12 +12,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRObservationRangeCategory: string
 {
-	/** reference range */
-	case referencerange = 'reference';
+    /** reference range */
+    case referencerange = 'reference';
 
-	/** critical range */
-	case criticalrange = 'critical';
+    /** critical range */
+    case criticalrange = 'critical';
 
-	/** absolute range */
-	case absoluterange = 'absolute';
+    /** absolute range */
+    case absoluterange = 'absolute';
 }

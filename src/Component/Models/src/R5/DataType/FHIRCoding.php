@@ -1,31 +1,42 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCode;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRDataType;
+
 /**
  * @author HL7 FHIR Standard
+ *
  * @see http://hl7.org/fhir/StructureDefinition/Coding
+ *
  * @description A reference to a code defined by a terminology system.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType(typeName: 'Coding', fhirVersion: 'R5')]
-class FHIRCoding extends \Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRDataType
+#[FHIRComplexType(typeName: 'Coding', fhirVersion: 'R5')]
+class FHIRCoding extends FHIRDataType
 {
-	public function __construct(
-		/** @var null|string id Unique id for inter-element referencing */
-		public ?string $id = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRExtension> extension Additional content defined by implementations */
-		public array $extension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRUri system Identity of the terminology system */
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRUri $system = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRString|string version Version of the system - if relevant */
-		public \Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRString|string|null $version = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRCode code Symbol in syntax defined by the system */
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRCode $code = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRString|string display Representation defined by the system */
-		public \Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRString|string|null $display = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRBoolean userSelected If this coding was chosen directly by the user */
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRBoolean $userSelected = null,
-	) {
-		parent::__construct($id, $extension);
-	}
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        public ?string $id = null,
+        /** @var array<FHIRExtension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var FHIRUri|null system Identity of the terminology system */
+        public ?FHIRUri $system = null,
+        /** @var FHIRString|string|null version Version of the system - if relevant */
+        public FHIRString|string|null $version = null,
+        /** @var FHIRCode|null code Symbol in syntax defined by the system */
+        public ?FHIRCode $code = null,
+        /** @var FHIRString|string|null display Representation defined by the system */
+        public FHIRString|string|null $display = null,
+        /** @var FHIRBoolean|null userSelected If this coding was chosen directly by the user */
+        public ?FHIRBoolean $userSelected = null,
+    ) {
+        parent::__construct($id, $extension);
+    }
 }

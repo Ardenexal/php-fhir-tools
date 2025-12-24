@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -10,21 +12,21 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum FHIRNameUse: string
 {
-	/** Usual */
-	case usual = 'usual';
+    /** Usual */
+    case usual = 'usual';
 
-	/** Official */
-	case official = 'official';
+    /** Official */
+    case official = 'official';
 
-	/** Temp */
-	case temp = 'temp';
+    /** Temp */
+    case temp = 'temp';
 
-	/** Nickname */
-	case nickname = 'nickname';
+    /** Nickname */
+    case nickname = 'nickname';
 
-	/** Anonymous */
-	case anonymous = 'anonymous';
+    /** Anonymous */
+    case anonymous = 'anonymous';
 
-	/** Old */
-	case old = 'old';
+    /** Old */
+    case old = 'old';
 }

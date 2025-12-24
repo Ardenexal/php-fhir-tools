@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,15 +12,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRVisionBase: string
 {
-	/** Up */
-	case up = 'up';
+    /** Up */
+    case up = 'up';
 
-	/** Down */
-	case down = 'down';
+    /** Down */
+    case down = 'down';
 
-	/** In */
-	case in = 'in';
+    /** In */
+    case in = 'in';
 
-	/** Out */
-	case out = 'out';
+    /** Out */
+    case out = 'out';
 }

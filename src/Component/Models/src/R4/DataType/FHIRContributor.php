@@ -1,29 +1,39 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRContributorTypeType;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRElement;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
 /**
  * @author HL7 FHIR Standard
+ *
  * @see http://hl7.org/fhir/StructureDefinition/Contributor
+ *
  * @description A contributor to the content of a knowledge asset, including authors, editors, reviewers, and endorsers.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType(typeName: 'Contributor', fhirVersion: 'R4')]
-class FHIRContributor extends \Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRElement
+#[FHIRComplexType(typeName: 'Contributor', fhirVersion: 'R4')]
+class FHIRContributor extends FHIRElement
 {
-	public function __construct(
-		/** @var null|string id Unique id for inter-element referencing */
-		public ?string $id = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRExtension> extension Additional content defined by implementations */
-		public array $extension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRContributorTypeType type author | editor | reviewer | endorser */
-		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRContributorTypeType $type = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRString|string name Who contributed the content */
-		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public \Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRString|string|null $name = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRContactDetail> contact Contact details of the contributor */
-		public array $contact = [],
-	) {
-		parent::__construct($id, $extension);
-	}
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        public ?string $id = null,
+        /** @var array<FHIRExtension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var FHIRContributorTypeType|null type author | editor | reviewer | endorser */
+        #[NotBlank]
+        public ?FHIRContributorTypeType $type = null,
+        /** @var FHIRString|string|null name Who contributed the content */
+        #[NotBlank]
+        public FHIRString|string|null $name = null,
+        /** @var array<FHIRContactDetail> contact Contact details of the contributor */
+        public array $contact = [],
+    ) {
+        parent::__construct($id, $extension);
+    }
 }

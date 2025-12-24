@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,21 +12,21 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRImagingSelection3DGraphicType: string
 {
-	/** POINT */
-	case point = 'point';
+    /** POINT */
+    case point = 'point';
 
-	/** MULTIPOINT */
-	case multipoint = 'multipoint';
+    /** MULTIPOINT */
+    case multipoint = 'multipoint';
 
-	/** POLYLINE */
-	case polyline = 'polyline';
+    /** POLYLINE */
+    case polyline = 'polyline';
 
-	/** POLYGON */
-	case polygon = 'polygon';
+    /** POLYGON */
+    case polygon = 'polygon';
 
-	/** ELLIPSE */
-	case ellipse = 'ellipse';
+    /** ELLIPSE */
+    case ellipse = 'ellipse';
 
-	/** ELLIPSOID */
-	case ellipsoid = 'ellipsoid';
+    /** ELLIPSOID */
+    case ellipsoid = 'ellipsoid';
 }

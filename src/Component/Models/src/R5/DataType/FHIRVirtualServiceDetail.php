@@ -1,31 +1,41 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRPositiveInt;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUrl;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRDataType;
+
 /**
  * @author HL7 FHIR Standard
+ *
  * @see http://hl7.org/fhir/StructureDefinition/VirtualServiceDetail
+ *
  * @description Virtual Service Contact Details.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType(typeName: 'VirtualServiceDetail', fhirVersion: 'R5')]
-class FHIRVirtualServiceDetail extends \Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRDataType
+#[FHIRComplexType(typeName: 'VirtualServiceDetail', fhirVersion: 'R5')]
+class FHIRVirtualServiceDetail extends FHIRDataType
 {
-	public function __construct(
-		/** @var null|string id Unique id for inter-element referencing */
-		public ?string $id = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRExtension> extension Additional content defined by implementations */
-		public array $extension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRCoding channelType Channel Type */
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRCoding $channelType = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRUrl|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRString|string|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRContactPoint|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRExtendedContactDetail addressX Contact address/number */
-		public \Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRUrl|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRString|string|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRContactPoint|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRExtendedContactDetail|null $addressX = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRUrl> additionalInfo Address to see alternative connection details */
-		public array $additionalInfo = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRPositiveInt maxParticipants Maximum number of participants supported by the virtual service */
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRPositiveInt $maxParticipants = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRString|string sessionKey Session Key required by the virtual service */
-		public \Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRString|string|null $sessionKey = null,
-	) {
-		parent::__construct($id, $extension);
-	}
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        public ?string $id = null,
+        /** @var array<FHIRExtension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var FHIRCoding|null channelType Channel Type */
+        public ?FHIRCoding $channelType = null,
+        /** @var FHIRUrl|FHIRString|string|FHIRContactPoint|FHIRExtendedContactDetail|null addressX Contact address/number */
+        public FHIRUrl|FHIRString|string|FHIRContactPoint|FHIRExtendedContactDetail|null $addressX = null,
+        /** @var array<FHIRUrl> additionalInfo Address to see alternative connection details */
+        public array $additionalInfo = [],
+        /** @var FHIRPositiveInt|null maxParticipants Maximum number of participants supported by the virtual service */
+        public ?FHIRPositiveInt $maxParticipants = null,
+        /** @var FHIRString|string|null sessionKey Session Key required by the virtual service */
+        public FHIRString|string|null $sessionKey = null,
+    ) {
+        parent::__construct($id, $extension);
+    }
 }

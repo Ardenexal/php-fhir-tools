@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -10,12 +12,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum FHIRConceptMapGroupUnmappedMode: string
 {
-	/** Provided Code */
-	case providedcode = 'provided';
+    /** Provided Code */
+    case providedcode = 'provided';
 
-	/** Fixed Code */
-	case fixedcode = 'fixed';
+    /** Fixed Code */
+    case fixedcode = 'fixed';
 
-	/** Other Map */
-	case othermap = 'other-map';
+    /** Other Map */
+    case othermap = 'other-map';
 }

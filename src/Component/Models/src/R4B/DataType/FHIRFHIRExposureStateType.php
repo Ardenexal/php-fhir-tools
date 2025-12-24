@@ -1,16 +1,22 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
+use Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRFHIRExposureState;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRCode;
+
 /**
  * @fhir-code-type FHIRExposureState
+ *
  * @description Code type wrapper for FHIRExposureState enum
  */
-class FHIRFHIRExposureStateType extends \Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRCode
+class FHIRFHIRExposureStateType extends FHIRCode
 {
-	public function __construct(
-		/** @var \Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRFHIRExposureState|string|null $value The code value */
-		public \Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRFHIRExposureState|string|null $value = null,
-	) {
-	}
+    public function __construct(
+        /** @var FHIRFHIRExposureState|string|null $value The code value */
+        public FHIRFHIRExposureState|string|null $value = null,
+    ) {
+    }
 }

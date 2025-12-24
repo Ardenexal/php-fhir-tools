@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,33 +12,33 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRArtifactAssessmentWorkflowStatus: string
 {
-	/** Submitted */
-	case submitted = 'submitted';
+    /** Submitted */
+    case submitted = 'submitted';
 
-	/** Triaged */
-	case triaged = 'triaged';
+    /** Triaged */
+    case triaged = 'triaged';
 
-	/** Waiting for Input */
-	case waitingforinput = 'waiting-for-input';
+    /** Waiting for Input */
+    case waitingforinput = 'waiting-for-input';
 
-	/** Resolved - No Change */
-	case resolvednochange = 'resolved-no-change';
+    /** Resolved - No Change */
+    case resolvednochange = 'resolved-no-change';
 
-	/** Resolved - Change Required */
-	case resolvedchangerequired = 'resolved-change-required';
+    /** Resolved - Change Required */
+    case resolvedchangerequired = 'resolved-change-required';
 
-	/** Deferred */
-	case deferred = 'deferred';
+    /** Deferred */
+    case deferred = 'deferred';
 
-	/** Duplicate */
-	case duplicate = 'duplicate';
+    /** Duplicate */
+    case duplicate = 'duplicate';
 
-	/** Applied */
-	case applied = 'applied';
+    /** Applied */
+    case applied = 'applied';
 
-	/** Published */
-	case published = 'published';
+    /** Published */
+    case published = 'published';
 
-	/** Entered in Error */
-	case enteredinerror = 'entered-in-error';
+    /** Entered in Error */
+    case enteredinerror = 'entered-in-error';
 }

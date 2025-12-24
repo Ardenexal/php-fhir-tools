@@ -1,16 +1,22 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
+use Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRFHIRGuidePageGeneration;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRCode;
+
 /**
  * @fhir-code-type FHIRGuidePageGeneration
+ *
  * @description Code type wrapper for FHIRGuidePageGeneration enum
  */
-class FHIRFHIRGuidePageGenerationType extends \Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRCode
+class FHIRFHIRGuidePageGenerationType extends FHIRCode
 {
-	public function __construct(
-		/** @var \Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRFHIRGuidePageGeneration|string|null $value The code value */
-		public \Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRFHIRGuidePageGeneration|string|null $value = null,
-	) {
-	}
+    public function __construct(
+        /** @var FHIRFHIRGuidePageGeneration|string|null $value The code value */
+        public FHIRFHIRGuidePageGeneration|string|null $value = null,
+    ) {
+    }
 }

@@ -1,29 +1,38 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRDataType;
+
 /**
  * @author HL7 FHIR Standard
+ *
  * @see http://hl7.org/fhir/StructureDefinition/Reference
+ *
  * @description A reference from one resource to another.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType(typeName: 'Reference', fhirVersion: 'R5')]
-class FHIRReference extends \Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRDataType
+#[FHIRComplexType(typeName: 'Reference', fhirVersion: 'R5')]
+class FHIRReference extends FHIRDataType
 {
-	public function __construct(
-		/** @var null|string id Unique id for inter-element referencing */
-		public ?string $id = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRExtension> extension Additional content defined by implementations */
-		public array $extension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRString|string reference Literal reference, Relative, internal or absolute URL */
-		public \Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRString|string|null $reference = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRUri type Type the reference refers to (e.g. "Patient") - must be a resource in resources */
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRUri $type = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRIdentifier identifier Logical reference, when literal reference is not known */
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRIdentifier $identifier = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRString|string display Text alternative for the resource */
-		public \Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRString|string|null $display = null,
-	) {
-		parent::__construct($id, $extension);
-	}
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        public ?string $id = null,
+        /** @var array<FHIRExtension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var FHIRString|string|null reference Literal reference, Relative, internal or absolute URL */
+        public FHIRString|string|null $reference = null,
+        /** @var FHIRUri|null type Type the reference refers to (e.g. "Patient") - must be a resource in resources */
+        public ?FHIRUri $type = null,
+        /** @var FHIRIdentifier|null identifier Logical reference, when literal reference is not known */
+        public ?FHIRIdentifier $identifier = null,
+        /** @var FHIRString|string|null display Text alternative for the resource */
+        public FHIRString|string|null $display = null,
+    ) {
+        parent::__construct($id, $extension);
+    }
 }

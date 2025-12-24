@@ -1,0 +1,33 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
+
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
+/**
+ * @description The defined version of the cited artifact.
+ */
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'Citation', elementPath: 'Citation.citedArtifact.version', fhirVersion: 'R5')]
+class FHIRCitationCitedArtifactVersion extends FHIRBackboneElement
+{
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        public ?string $id = null,
+        /** @var array<FHIRExtension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        public array $modifierExtension = [],
+        /** @var FHIRString|string|null value The version number or other version identifier */
+        #[NotBlank]
+        public FHIRString|string|null $value = null,
+        /** @var FHIRReference|null baseCitation Citation for the main version of the cited artifact */
+        public ?FHIRReference $baseCitation = null,
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
+}

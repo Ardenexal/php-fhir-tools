@@ -1,25 +1,33 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRElement;
+
 /**
  * @author HL7 FHIR Standard
+ *
  * @see http://hl7.org/fhir/StructureDefinition/ContactDetail
+ *
  * @description Specifies contact information for a person or organization.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType(typeName: 'ContactDetail', fhirVersion: 'R4')]
-class FHIRContactDetail extends \Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRElement
+#[FHIRComplexType(typeName: 'ContactDetail', fhirVersion: 'R4')]
+class FHIRContactDetail extends FHIRElement
 {
-	public function __construct(
-		/** @var null|string id Unique id for inter-element referencing */
-		public ?string $id = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRExtension> extension Additional content defined by implementations */
-		public array $extension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRString|string name Name of an individual to contact */
-		public \Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRString|string|null $name = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRContactPoint> telecom Contact details for individual or organization */
-		public array $telecom = [],
-	) {
-		parent::__construct($id, $extension);
-	}
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        public ?string $id = null,
+        /** @var array<FHIRExtension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var FHIRString|string|null name Name of an individual to contact */
+        public FHIRString|string|null $name = null,
+        /** @var array<FHIRContactPoint> telecom Contact details for individual or organization */
+        public array $telecom = [],
+    ) {
+        parent::__construct($id, $extension);
+    }
 }
