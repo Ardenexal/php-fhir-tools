@@ -1,0 +1,366 @@
+name: Copilot Setup Steps for PHP FHIRTools
+description: Development environment setup and workflow guide for GitHub Copilot working with PHP FHIRTools project
+
+setup:
+  # PHP Environment Setup
+  php:
+    version: "8.3"
+    extensions:
+      - ctype
+      - iconv
+      - zip
+      - opcache
+      - xdebug (optional, for debugging)
+    
+  # Composer Dependencies
+  dependencies:
+    install: "composer install"
+    update: "composer update"
+    
+  # Project Structure
+  structure:
+    main_repo: /home/runner/work/php-fhir-tools/php-fhir-tools
+    components:
+      - src/Bundle/FHIRBundle/ (Symfony Bundle)
+      - src/Component/CodeGeneration/ (FHIR class generation)
+      - src/Component/Serialization/ (FHIR JSON serialization)
+      - src/Component/FHIRPath/ (FHIRPath 2.0 expression evaluation)
+    tests:
+      - tests/Unit/ (Unit tests)
+      - tests/Integration/ (Integration tests)
+      - tests/Fhir/ (FHIR-specific tests)
+
+workflows:
+  # Development Workflow
+  development:
+    1_install_dependencies:
+      command: "composer install"
+      description: "Install all PHP dependencies via Composer"
+      
+    2_run_linter:
+      command: "composer run lint"
+      description: "Run Laravel Pint code formatter (PSR-12 compliance)"
+      options:
+        - "composer run lint:bundle - Lint FHIRBundle only"
+        - "composer run lint:codegen - Lint CodeGeneration only"
+        - "composer run lint:serialization - Lint Serialization only"
+        
+    3_run_static_analysis:
+      command: "composer run phpstan"
+      description: "Run PHPStan static analysis (Level 9)"
+      options:
+        - "composer run phpstan:bundle - Analyze FHIRBundle only"
+        - "composer run phpstan:codegen - Analyze CodeGeneration only"
+        - "composer run phpstan:serialization - Analyze Serialization only"
+        
+    4_run_tests:
+      command: "composer run test"
+      description: "Run all PHPUnit tests"
+      options:
+        - "composer run test-unit - Unit tests only"
+        - "composer run test-integration - Integration tests only"
+        - "composer run test-fhir - FHIR tests only"
+        - "composer run test:bundle - FHIRBundle tests only"
+        - "composer run test:codegen - CodeGeneration tests only"
+        - "composer run test:serialization - Serialization tests only"
+        - "composer run test-coverage - Generate code coverage report"
+        
+    5_quality_checks:
+      command: "composer run quality:all"
+      description: "Run all quality checks (lint + phpstan + test)"
+      options:
+        - "composer run quality:bundle - All checks for FHIRBundle"
+        - "composer run quality:codegen - All checks for CodeGeneration"
+        - "composer run quality:serialization - All checks for Serialization"
+        - "composer run quality:components - All checks for all components"
+
+  # Component-Specific Testing
+  component_testing:
+    fhirpath_component:
+      location: "src/Component/FHIRPath/"
+      test_command: "php src/Component/FHIRPath/vendor/bin/phpunit -c src/Component/FHIRPath/phpunit.xml"
+      description: "Test FHIRPath component independently"
+      setup: "cd src/Component/FHIRPath && composer install"
+      
+    standalone_testing:
+      description: "Each component has its own composer.json and can be tested independently"
+      pattern: "cd src/Component/<ComponentName> && composer install && composer test"
+
+  # Code Generation
+  fhir_generation:
+    generate_models:
+      command: "composer run generate-models"
+      description: "Generate FHIR models from StructureDefinitions"
+      alternatives:
+        - "php bin/console fhir:generate R4B - Generate R4B version"
+        - "php bin/console fhir:generate R5 - Generate R5 version"
+
+coding_standards:
+  # PSR-12 Compliance
+  style_guide: "PSR-12"
+  formatter: "Laravel Pint"
+  
+  # File Requirements
+  file_header:
+    - "<?php"
+    - ""
+    - "declare(strict_types=1);"
+    - ""
+    - "namespace Ardenexal\\FHIRTools\\...;"
+    
+  # Documentation
+  documentation:
+    - "PHPDoc blocks for all public methods"
+    - "@author tags on all classes"
+    - "@param and @return type hints"
+    - "Clear description of purpose and behavior"
+    
+  # Type Safety
+  types:
+    - "Strict types enabled: declare(strict_types=1)"
+    - "Type hints for all parameters"
+    - "Return type declarations for all methods"
+    - "Readonly properties where applicable"
+    
+  # Naming Conventions
+  naming:
+    classes: "PascalCase"
+    methods: "camelCase"
+    constants: "UPPER_SNAKE_CASE"
+    variables: "camelCase"
+
+best_practices:
+  # Symfony Best Practices
+  symfony:
+    - "Use dependency injection (constructor injection preferred)"
+    - "Use Symfony Console helpers for commands"
+    - "Avoid using 'new' keyword in services and commands"
+    - "Follow Symfony naming conventions"
+    - "Use type hints and return types"
+    
+  # Testing
+  testing:
+    framework: "PHPUnit 11+ / 12.5+"
+    guidelines:
+      - "No void return types on test methods"
+      - "Use self::assert* methods (not $this->assert*)"
+      - "Comprehensive test coverage (90%+ target)"
+      - "Test both success and error cases"
+      - "Include edge cases and boundary conditions"
+      - "Use descriptive test method names"
+      
+  # Error Handling
+  exceptions:
+    - "Use project-specific exception classes"
+    - "Extend from base FHIRPathException where appropriate"
+    - "Include position tracking for parse/evaluation errors"
+    - "Provide helpful error messages with context"
+    - "Use factory methods for common error scenarios"
+    
+  # Security
+  security:
+    - "No sensitive data in logs or comments"
+    - "No secrets committed to source code"
+    - "Use proper input validation"
+    - "Follow secure coding practices"
+    - "Run security audits with roave/security-advisories"
+
+git_workflow:
+  # Commit Standards
+  commits:
+    format: "Conventional Commits"
+    types:
+      - "feat: New feature"
+      - "fix: Bug fix"
+      - "chore: Maintenance"
+      - "test: Test changes"
+      - "docs: Documentation"
+      - "refactor: Code refactoring"
+    rules:
+      - "Sign commits with GPG"
+      - "No AI mentions in commit messages or PRs"
+      - "Clear, descriptive commit messages"
+      - "Atomic commits (one logical change per commit)"
+      
+  # Branching
+  branches:
+    pattern: "copilot/<feature-name>"
+    main_branch: "main"
+    
+  # Pull Requests
+  pull_requests:
+    - "Follow PR template"
+    - "Include comprehensive description"
+    - "Link related issues"
+    - "Ensure CI passes before requesting review"
+    - "Update documentation as needed"
+
+common_commands:
+  # Quick Reference
+  quick_start:
+    - "composer install - Install dependencies"
+    - "composer run lint - Fix code style"
+    - "composer run phpstan - Run static analysis"
+    - "composer run test - Run all tests"
+    - "composer run quality:all - Run all quality checks"
+    
+  # Component Development
+  component_work:
+    - "cd src/Component/<Name> - Navigate to component"
+    - "composer install - Install component dependencies"
+    - "vendor/bin/phpunit - Run component tests"
+    
+  # Troubleshooting
+  troubleshooting:
+    clear_cache: "rm -rf var/cache/*"
+    reinstall_deps: "rm -rf vendor/ && composer install"
+    fix_permissions: "chmod -R 777 var/"
+
+ide_configuration:
+  # VS Code Settings
+  vscode:
+    extensions:
+      - "bmewburn.vscode-intelephense-client"
+      - "devsense.phptools-vscode"
+      - "xdebug.php-debug"
+    settings:
+      php.suggest.basic: false
+      intelephense.stubs:
+        - "apache"
+        - "bcmath"
+        - "bz2"
+        - "calendar"
+        - "Core"
+        - "ctype"
+        - "curl"
+        - "date"
+        - "dba"
+        - "dom"
+        - "enchant"
+        - "exif"
+        - "FFI"
+        - "fileinfo"
+        - "filter"
+        - "ftp"
+        - "gd"
+        - "gettext"
+        - "gmp"
+        - "hash"
+        - "iconv"
+        - "imap"
+        - "intl"
+        - "json"
+        - "ldap"
+        - "libxml"
+        - "mbstring"
+        - "meta"
+        - "mysqli"
+        - "oci8"
+        - "odbc"
+        - "openssl"
+        - "pcntl"
+        - "pcre"
+        - "PDO"
+        - "pdo_ibm"
+        - "pdo_mysql"
+        - "pdo_pgsql"
+        - "pdo_sqlite"
+        - "pgsql"
+        - "Phar"
+        - "posix"
+        - "pspell"
+        - "readline"
+        - "Reflection"
+        - "session"
+        - "shmop"
+        - "SimpleXML"
+        - "snmp"
+        - "soap"
+        - "sockets"
+        - "sodium"
+        - "SPL"
+        - "sqlite3"
+        - "standard"
+        - "superglobals"
+        - "sysvmsg"
+        - "sysvsem"
+        - "sysvshm"
+        - "tidy"
+        - "tokenizer"
+        - "xml"
+        - "xmlreader"
+        - "xmlrpc"
+        - "xmlwriter"
+        - "xsl"
+        - "Zend OPcache"
+        - "zip"
+        - "zlib"
+
+project_specific:
+  # FHIRPath Component (Current Work)
+  fhirpath:
+    status: "Phase 1-3 Complete"
+    location: "src/Component/FHIRPath/"
+    documentation:
+      - "docs/component-guides/fhir-path.md"
+      - "docs/architecture-fhirpath.md"
+      - "docs/FHIRPATH_IMPLEMENTATION_GUIDE.md"
+      - "docs/FHIRPATH_LANGUAGE_SPEC.md"
+      - "docs/FHIRPATH_QUICK_REFERENCE.md"
+      - "docs/FHIRPATH_REQUIREMENTS_INDEX.md"
+    completed_phases:
+      - "Phase 1: Project Setup"
+      - "Phase 2: Lexer Implementation"
+      - "Phase 3: Parser Implementation"
+    next_phases:
+      - "Phase 4: Evaluator Implementation"
+      - "Phase 5: Function Library"
+      - "Phase 6: Operator Implementation"
+      
+  # Multi-Component Architecture
+  architecture:
+    pattern: "Standalone components with Symfony integration"
+    components_as_packages:
+      - "ardenexal/fhir-bundle"
+      - "ardenexal/fhir-code-generation"
+      - "ardenexal/fhir-serialization"
+      - "ardenexal/fhir-path (in development)"
+    integration: "FHIRBundle registers services and console commands"
+
+troubleshooting_guide:
+  common_issues:
+    composer_issues:
+      problem: "Composer install fails"
+      solution: "Check PHP version (>=8.3), clear composer cache: composer clear-cache"
+      
+    test_failures:
+      problem: "Tests failing"
+      solution: "Run specific test: composer run test -- --filter=TestName, check PHPUnit version"
+      
+    lint_errors:
+      problem: "Code style issues"
+      solution: "Auto-fix with: composer run lint, manual fixes in pint.json"
+      
+    phpstan_errors:
+      problem: "Static analysis errors"
+      solution: "Fix type hints, add PHPDoc, check phpstan.neon configuration"
+      
+    namespace_issues:
+      problem: "Class not found"
+      solution: "composer dump-autoload, check PSR-4 autoload in composer.json"
+
+resources:
+  documentation:
+    - "README.md - Project overview"
+    - "AGENTS.md - AI agent guidelines"
+    - "docs/architecture.md - Multi-project architecture"
+    - "docs/migration-guide.md - Migration instructions"
+    - "docs/component-guides/ - Component-specific guides"
+    
+  external_references:
+    - "https://www.php.net/docs.php - PHP Documentation"
+    - "https://symfony.com/doc/current/index.html - Symfony Documentation"
+    - "https://www.hl7.org/fhir/ - FHIR Specification"
+    - "https://hl7.org/fhirpath/ - FHIRPath Specification"
+    - "https://phpstan.org/user-guide/getting-started - PHPStan Guide"
+    - "https://laravel.com/docs/pint - Laravel Pint Guide"
