@@ -21,5 +21,6 @@ phpstan.neon
 /phpunit.xml
 /.phpunit.cache/
 /coverage
+/phpunit.phar
 ###< phpunit/phpunit ###
 

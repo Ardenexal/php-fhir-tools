@@ -25,8 +25,8 @@ class FHIRPathExceptionTest extends TestCase
         );
 
         self::assertEquals('Test error', $exception->getMessage());
-        self::assertEquals(10, $exception->getLine());
-        self::assertEquals(5, $exception->getColumn());
+        self::assertEquals(10, $exception->getExpressionLine());
+        self::assertEquals(5, $exception->getExpressionColumn());
         self::assertEquals('test.expression', $exception->getExpressionContext());
         self::assertEquals('Try this instead', $exception->getSuggestion());
     }
@@ -66,8 +66,8 @@ class FHIRPathExceptionTest extends TestCase
         $exception = new FHIRPathException('Simple error');
 
         self::assertEquals('Simple error', $exception->getMessage());
-        self::assertEquals(0, $exception->getLine());
-        self::assertEquals(0, $exception->getColumn());
+        self::assertEquals(0, $exception->getExpressionLine());
+        self::assertEquals(0, $exception->getExpressionColumn());
         self::assertEquals('', $exception->getExpressionContext());
         self::assertNull($exception->getSuggestion());
     }

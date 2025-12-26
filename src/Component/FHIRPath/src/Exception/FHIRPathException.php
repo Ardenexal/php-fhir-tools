@@ -13,8 +13,8 @@ use RuntimeException;
  */
 class FHIRPathException extends RuntimeException
 {
-    protected int $line = 0;
-    protected int $column = 0;
+    protected int $expressionLine = 0;
+    protected int $expressionColumn = 0;
     protected string $expressionContext = '';
     protected ?string $suggestion = null;
 
@@ -22,8 +22,8 @@ class FHIRPathException extends RuntimeException
      * Create a FHIRPath exception.
      *
      * @param string $message The error message
-     * @param int $line The line number where the error occurred
-     * @param int $column The column number where the error occurred
+     * @param int $line The line number where the error occurred in the expression
+     * @param int $column The column number where the error occurred in the expression
      * @param string $expressionContext The expression context around the error
      * @param string|null $suggestion Optional suggestion for fixing the error
      */
@@ -35,26 +35,26 @@ class FHIRPathException extends RuntimeException
         ?string $suggestion = null
     ) {
         parent::__construct($message);
-        $this->line = $line;
-        $this->column = $column;
+        $this->expressionLine = $line;
+        $this->expressionColumn = $column;
         $this->expressionContext = $expressionContext;
         $this->suggestion = $suggestion;
     }
 
     /**
-     * Get the line number where the error occurred.
+     * Get the line number where the error occurred in the FHIRPath expression.
      */
-    public function getLine(): int
+    public function getExpressionLine(): int
     {
-        return $this->line;
+        return $this->expressionLine;
     }
 
     /**
-     * Get the column number where the error occurred.
+     * Get the column number where the error occurred in the FHIRPath expression.
      */
-    public function getColumn(): int
+    public function getExpressionColumn(): int
     {
-        return $this->column;
+        return $this->expressionColumn;
     }
 
     /**
@@ -80,8 +80,8 @@ class FHIRPathException extends RuntimeException
     {
         $message = $this->getMessage();
 
-        if ($this->line > 0) {
-            $message .= sprintf(' at line %d, column %d', $this->line, $this->column);
+        if ($this->expressionLine > 0) {
+            $message .= sprintf(' at line %d, column %d', $this->expressionLine, $this->expressionColumn);
         }
 
         if ($this->expressionContext !== '') {
@@ -103,8 +103,8 @@ class FHIRPathException extends RuntimeException
     public function getPosition(): array
     {
         return [
-            'line' => $this->line,
-            'column' => $this->column,
+            'line' => $this->expressionLine,
+            'column' => $this->expressionColumn,
         ];
     }
 }
