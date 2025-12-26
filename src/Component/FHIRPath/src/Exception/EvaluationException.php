@@ -104,4 +104,28 @@ class EvaluationException extends FHIRPathException
 
         return new self($message, 0, 0, $context, $suggestion);
     }
+
+    /**
+     * Create an evaluation exception for invalid function parameters.
+     *
+     * @param string $functionName The function name
+     * @param string $parameterName The parameter name
+     * @param string $expectedType The expected type/format
+     */
+    public static function invalidFunctionParameter(
+        string $functionName,
+        string $parameterName,
+        string $expectedType
+    ): self {
+        $message = sprintf(
+            "Function '%s' parameter '%s' must be %s",
+            $functionName,
+            $parameterName,
+            $expectedType
+        );
+
+        $suggestion = "Check the function documentation for the correct parameter types.";
+
+        return new self($message, 0, 0, '', $suggestion);
+    }
 }

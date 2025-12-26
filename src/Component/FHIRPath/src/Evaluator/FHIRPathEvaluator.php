@@ -50,6 +50,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         $this->context = $context ?? new EvaluationContext();
         $this->context->setRootResource($resource);
         $this->context->setVariable('this', $resource);
+        $this->context->setEvaluator($this);
         
         if ($resource !== null) {
             $this->context->setCurrentNode($resource);
@@ -125,12 +126,38 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      */
     public function visitFunctionCall(FunctionCallNode $node): Collection
     {
-        // Function dispatch will be implemented in Phase 5
-        throw new EvaluationException(
-            "Function '{$node->name}' not yet implemented",
-            $node->line,
-            $node->column
-        );
+        // Get the current collection (the input to the function)
+        $input = $this->context->getCurrentNode();
+        $inputCollection = $input !== null ? $this->wrapValue($input) : Collection::empty();
+        
+        // Get the function from the registry
+        $registry = \Ardenexal\FHIRTools\Component\FHIRPath\Function\FunctionRegistry::getInstance();
+        
+        if (!$registry->has($node->name)) {
+            throw new EvaluationException(
+                "Unknown function: {$node->name}",
+                $node->line,
+                $node->column
+            );
+        }
+        
+        $function = $registry->get($node->name);
+        
+        // Evaluate parameters - they can be expressions or literals
+        $evaluatedParams = [];
+        foreach ($node->parameters as $param) {
+            // Parameters can be expressions that need evaluation, or they can be passed as-is
+            // For criteria expressions (like in where(), exists(), all()), pass the AST node
+            if ($param instanceof \Ardenexal\FHIRTools\Component\FHIRPath\Expression\ExpressionNode) {
+                $evaluatedParams[] = $param;
+            } else {
+                $result = $param->accept($this);
+                $evaluatedParams[] = $result;
+            }
+        }
+        
+        // Execute the function
+        return $function->execute($inputCollection, $evaluatedParams, $this->context);
     }
 
     /**

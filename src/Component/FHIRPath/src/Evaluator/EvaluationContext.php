@@ -22,7 +22,8 @@ final class EvaluationContext
         private mixed $rootResource = null,
         private mixed $currentNode = null,
         private array $variables = [],
-        private array $externalConstants = []
+        private array $externalConstants = [],
+        private ?FHIRPathEvaluator $evaluator = null
     ) {
     }
 
@@ -43,6 +44,22 @@ final class EvaluationContext
     }
 
     /**
+     * Get the evaluator
+     */
+    public function getEvaluator(): ?FHIRPathEvaluator
+    {
+        return $this->evaluator;
+    }
+
+    /**
+     * Set the evaluator
+     */
+    public function setEvaluator(FHIRPathEvaluator $evaluator): void
+    {
+        $this->evaluator = $evaluator;
+    }
+
+    /**
      * Get the current evaluation node
      */
     public function getCurrentNode(): mixed
@@ -55,9 +72,21 @@ final class EvaluationContext
      */
     public function withCurrentNode(mixed $node): self
     {
-        $context = clone $this;
-        $context->currentNode = $node;
-        return $context;
+        return new self(
+            $this->rootResource,
+            $node,
+            $this->variables,
+            $this->externalConstants,
+            $this->evaluator
+        );
+    }
+
+    /**
+     * Set the current node (for mutable context)
+     */
+    public function setCurrentNode(mixed $node): void
+    {
+        $this->currentNode = $node;
     }
 
     /**
@@ -89,9 +118,15 @@ final class EvaluationContext
      */
     public function withVariable(string $name, mixed $value): self
     {
-        $context = clone $this;
-        $context->variables[$name] = $value;
-        return $context;
+        $variables = $this->variables;
+        $variables[$name] = $value;
+        return new self(
+            $this->rootResource,
+            $this->currentNode,
+            $variables,
+            $this->externalConstants,
+            $this->evaluator
+        );
     }
 
     /**
@@ -123,9 +158,15 @@ final class EvaluationContext
      */
     public function withExternalConstant(string $name, mixed $value): self
     {
-        $context = clone $this;
-        $context->externalConstants[$name] = $value;
-        return $context;
+        $externalConstants = $this->externalConstants;
+        $externalConstants[$name] = $value;
+        return new self(
+            $this->rootResource,
+            $this->currentNode,
+            $this->variables,
+            $externalConstants,
+            $this->evaluator
+        );
     }
 
     /**
@@ -133,11 +174,16 @@ final class EvaluationContext
      */
     public function withIterationVariables(mixed $item, int $index, int $total): self
     {
-        $context = clone $this;
-        $context->currentNode = $item;
-        $context->variables['this'] = $item;
-        $context->variables['index'] = $index;
-        $context->variables['total'] = $total;
-        return $context;
+        $variables = $this->variables;
+        $variables['this'] = $item;
+        $variables['index'] = $index;
+        $variables['total'] = $total;
+        return new self(
+            $this->rootResource,
+            $item,
+            $variables,
+            $this->externalConstants,
+            $this->evaluator
+        );
     }
 }

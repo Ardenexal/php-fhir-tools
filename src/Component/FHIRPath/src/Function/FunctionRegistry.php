@@ -26,6 +26,49 @@ final class FunctionRegistry
     private function __construct()
     {
         // Private constructor for singleton
+        $this->registerBuiltInFunctions();
+    }
+
+    /**
+     * Register all built-in FHIRPath functions.
+     */
+    private function registerBuiltInFunctions(): void
+    {
+        // Existence functions
+        $this->registerSafe(new EmptyFunction());
+        $this->registerSafe(new ExistsFunction());
+        $this->registerSafe(new AllFunction());
+        $this->registerSafe(new CountFunction());
+        
+        // Filtering functions
+        $this->registerSafe(new WhereFunction());
+        $this->registerSafe(new FirstFunction());
+        $this->registerSafe(new LastFunction());
+        $this->registerSafe(new TailFunction());
+        $this->registerSafe(new TakeFunction());
+        $this->registerSafe(new SkipFunction());
+        
+        // Subsetting functions
+        $this->registerSafe(new UnionFunction());
+        $this->registerSafe(new IntersectFunction());
+        
+        // String functions
+        $this->registerSafe(new SubstringFunction());
+        $this->registerSafe(new LengthFunction());
+        
+        // Math functions
+        $this->registerSafe(new SumFunction());
+    }
+
+    /**
+     * Register a function without throwing if it already exists.
+     */
+    private function registerSafe(FunctionInterface $function): void
+    {
+        $name = $function->getName();
+        if (!isset($this->functions[$name])) {
+            $this->functions[$name] = $function;
+        }
     }
 
     /**
@@ -54,7 +97,7 @@ final class FunctionRegistry
         $name = $function->getName();
 
         if (isset($this->functions[$name])) {
-            throw EvaluationException::create(
+            throw new EvaluationException(
                 sprintf('Function "%s" is already registered', $name),
                 0,
                 0
@@ -76,7 +119,7 @@ final class FunctionRegistry
     public function get(string $name): FunctionInterface
     {
         if (!isset($this->functions[$name])) {
-            throw EvaluationException::create(
+            throw new EvaluationException(
                 sprintf('Unknown function "%s"', $name),
                 0,
                 0
