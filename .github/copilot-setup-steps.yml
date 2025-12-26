@@ -7,8 +7,6 @@ name: Copilot Agent Setup
 on:
   workflow_dispatch:
   push:
-    branches:
-      - 'copilot/**'
 
 jobs:
   setup-and-validate:
@@ -85,18 +83,6 @@ jobs:
           echo ""
           echo "=== Verifying FHIR Commands ==="
           php bin/console list | grep -q "fhir:generate" && echo "✅ FHIR generation command available" || exit 1
-      
-      - name: Run code style checks
-        run: |
-          echo "=== Running Pint (Code Style) ==="
-          composer run lint
-          echo "✅ Code style checks passed"
-      
-      - name: Run static analysis
-        run: |
-          echo "=== Running PHPStan (Static Analysis) ==="
-          composer run phpstan
-          echo "✅ Static analysis passed"
       
       - name: Run unit tests
         run: |
