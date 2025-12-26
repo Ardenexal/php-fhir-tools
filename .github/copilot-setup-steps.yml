@@ -1,266 +1,138 @@
-# GitHub Copilot Setup Steps for PHP FHIRTools
-# This file provides setup instructions for GitHub Copilot Workspace agents
-# working on this PHP project.
+# GitHub Copilot Agent Setup Workflow
+# This workflow sets up the PHP development environment for GitHub Copilot agents
+# and validates that all project dependencies and tools are properly configured.
 
-name: PHP Development Environment Setup
+name: Copilot Agent Setup
 
-# Project metadata
-project:
-  name: PHP FHIRTools
-  type: php
-  framework: symfony
-  description: PHP toolkit for working with FHIR (Fast Healthcare Interoperability Resources)
-  
-# Required environment
-environment:
-  php:
-    version: "8.3"
-    extensions:
-      - ctype
-      - iconv
-      - zip
-      - curl
-      - intl
-    ini_settings:
-      memory_limit: "-1"
-      max_execution_time: "0"
-  
-  composer:
-    version: "latest"
-    flags: "--prefer-dist --no-interaction --optimize-autoloader"
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'copilot/**'
 
-# Setup steps that should be executed in order
-steps:
-  - name: Verify PHP Installation
-    description: Ensure PHP 8.3 or higher is installed with required extensions
-    commands:
-      - php -v
-      - php -m | grep -E "(ctype|iconv|zip|curl|intl)"
-    validation:
-      - command: 'php -r "exit(version_compare(PHP_VERSION, ''8.3.0'', ''>='') ? 0 : 1);"'
-        expected_exit_code: 0
-
-  - name: Install Composer Dependencies
-    description: Install all project dependencies using Composer
-    commands:
-      - composer install --prefer-dist --no-interaction
-    validation:
-      - path_exists: vendor/autoload.php
-      - path_exists: vendor/bin/phpunit
-      - path_exists: vendor/bin/phpstan.phar
-      - path_exists: vendor/bin/pint
-
-  - name: Create Required Directories
-    description: Ensure all necessary directories exist with proper permissions
-    commands:
-      - mkdir -p output var/cache var/log coverage
-      - chmod -R 755 bin/console
-      - chmod -R 777 var/ coverage/
-    validation:
-      - path_exists: output
-      - path_exists: var/cache
-      - path_exists: var/log
-
-  - name: Verify Symfony Console
-    description: Test that the Symfony Console application is working
-    commands:
-      - php bin/console --version
-      - php bin/console list
-    validation:
-      - command: php bin/console list | grep -q "fhir:generate"
-        expected_exit_code: 0
-
-  - name: Run Code Quality Checks
-    description: Verify code passes linting and static analysis
-    commands:
-      - composer run lint
-      - composer run phpstan
-    validation:
-      - command: composer run lint
-        expected_exit_code: 0
-      - command: composer run phpstan
-        expected_exit_code: 0
-
-  - name: Run Tests
-    description: Execute the test suite to ensure everything is working
-    commands:
-      - composer run test-unit -- --no-coverage
-    validation:
-      - command: composer run test-unit -- --no-coverage
-        expected_exit_code: 0
-
-# Available development commands
-commands:
-  test:
-    description: Run all tests
-    command: composer run test
-  
-  test_unit:
-    description: Run unit tests only
-    command: composer run test-unit
-  
-  test_integration:
-    description: Run integration tests
-    command: composer run test-integration
-  
-  test_coverage:
-    description: Run tests with coverage report
-    command: composer run test-coverage
-  
-  lint:
-    description: Fix code style issues with Pint
-    command: composer run lint
-  
-  phpstan:
-    description: Run static analysis with PHPStan
-    command: composer run phpstan
-  
-  generate_fhir:
-    description: Generate FHIR model classes
-    command: php bin/console fhir:generate
-    args:
-      - name: version
-        description: FHIR version (R4, R4B, R5)
-        required: true
-  
-  console:
-    description: Run Symfony console commands
-    command: php bin/console
-
-# Project structure
-structure:
-  source_directories:
-    - src/Bundle/FHIRBundle
-    - src/Component/CodeGeneration
-    - src/Component/Serialization
-  
-  test_directories:
-    - tests/Unit
-    - tests/Integration
-    - tests/Functional
-  
-  config_directories:
-    - config
-  
-  generated_directories:
-    - output
-    - var/cache
-  
-  important_files:
-    - composer.json: Dependency management and scripts
-    - phpstan.neon: Static analysis configuration
-    - pint.json: Code style configuration
-    - phpunit.dist.xml: Test configuration
-    - AGENTS.md: Agent behavior guidelines
-    - README.md: Project documentation
-
-# Development workflow
-workflow:
-  before_changes:
-    - Run tests to establish baseline
-    - Check code style compliance
-    - Run static analysis
-  
-  during_changes:
-    - Follow PSR-12 coding standards
-    - Add strict types declaration
-    - Write/update tests for changes
-    - Update documentation if needed
-  
-  after_changes:
-    - Run affected tests
-    - Run linting (composer run lint)
-    - Run static analysis (composer run phpstan)
-    - Verify no uncommitted changes to generated files
-    - Use conventional commit format
-
-# Code style and conventions
-conventions:
-  php_version: ">=8.3"
-  coding_standard: PSR-12
-  type_hints: strict
-  doc_blocks: required for public methods
-  test_framework: PHPUnit 12+
-  static_analysis: PHPStan level 9
-  
-  commit_format:
-    type: conventional
-    types:
-      - feat: New feature
-      - fix: Bug fix
-      - chore: Maintenance
-      - test: Test changes
-      - docs: Documentation
-      - refactor: Code refactoring
-  
-  rules:
-    - Always use declare(strict_types=1)
-    - Use dependency injection
-    - Avoid creating new instances in commands
-    - Follow Symfony best practices
-    - No breaking changes without approval
-    - Sign commits with GPG
-    - No AI mentions in commits
-
-# Testing guidelines
-testing:
-  unit_tests:
-    location: tests/Unit
-    command: composer run test-unit
-  
-  integration_tests:
-    location: tests/Integration
-    command: composer run test-integration
-  
-  component_tests:
-    bundle: composer run test:bundle
-    codegen: composer run test:codegen
-    serialization: composer run test:serialization
-  
-  coverage:
-    command: composer run test-coverage
-    reports_location: coverage/
-
-# Security considerations
-security:
-  audit_command: composer audit
-  sensitive_files:
-    - .env
-    - .env.local
-  
-  guidelines:
-    - No secrets in code or comments
-    - No sensitive data in logs
-    - Run security audit before committing
-    - Use parameterized queries
-    - Validate all inputs
-
-# Troubleshooting
-troubleshooting:
-  common_issues:
-    - issue: Composer dependencies fail
-      solution: Run 'composer install --no-interaction'
+jobs:
+  setup-and-validate:
+    name: Setup PHP Environment for Copilot Agent
+    runs-on: ubuntu-latest
+    env:
+      XDEBUG_MODE: off
+      COMPOSER_NO_INTERACTION: 1
     
-    - issue: Tests fail
-      solution: Check that all required directories exist and have proper permissions
-    
-    - issue: PHPStan errors
-      solution: Review phpstan.neon and phpstan-baseline.neon, ensure strict types are used
-    
-    - issue: Code style violations
-      solution: Run 'composer run lint' to auto-fix
-    
-    - issue: FHIR generation fails
-      solution: Ensure output directory exists and is writable
-
-# Additional resources
-resources:
-  documentation:
-    - AGENTS.md: AI agent behavior guidelines
-    - README.md: Project overview and usage
-    - docs/architecture.md: Multi-project architecture
-    - docs/FHIR-Serialization-Guide.md: Serialization documentation
-  
-  workflows:
-    - .github/workflows/pr.yml: Pull request validation
-    - .github/workflows/main.yml: Main branch quality gates
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: ctype, iconv, zip, curl, intl
+          ini-values: memory_limit=-1, max_execution_time=0
+          coverage: none
+      
+      - name: Verify PHP installation
+        run: |
+          echo "=== PHP Version ==="
+          php -v
+          echo ""
+          echo "=== PHP Extensions ==="
+          php -m | grep -E "(ctype|iconv|zip|curl|intl)" || exit 1
+          echo ""
+          echo "=== PHP Configuration ==="
+          php -i | grep -E "(memory_limit|max_execution_time)"
+      
+      - name: Validate Composer
+        run: composer --version
+      
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-8.3-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-8.3-
+      
+      - name: Install Composer dependencies
+        run: |
+          composer install --prefer-dist --no-interaction --optimize-autoloader
+          echo "✅ Composer dependencies installed successfully"
+      
+      - name: Verify required tools are installed
+        run: |
+          echo "=== Checking for required tools ==="
+          test -f vendor/autoload.php && echo "✅ Autoloader found" || exit 1
+          test -f vendor/bin/phpunit && echo "✅ PHPUnit found" || exit 1
+          test -f vendor/bin/phpstan.phar && echo "✅ PHPStan found" || exit 1
+          test -f vendor/bin/pint && echo "✅ Pint found" || exit 1
+          echo "All required tools are available"
+      
+      - name: Create required directories
+        run: |
+          mkdir -p output var/cache var/log coverage
+          chmod -R 755 bin/console
+          chmod -R 777 var/ coverage/
+          echo "✅ Required directories created"
+      
+      - name: Verify Symfony Console
+        run: |
+          echo "=== Symfony Console Version ==="
+          php bin/console --version
+          echo ""
+          echo "=== Available Commands ==="
+          php bin/console list
+          echo ""
+          echo "=== Verifying FHIR Commands ==="
+          php bin/console list | grep -q "fhir:generate" && echo "✅ FHIR generation command available" || exit 1
+      
+      - name: Run code style checks
+        run: |
+          echo "=== Running Pint (Code Style) ==="
+          composer run lint
+          echo "✅ Code style checks passed"
+      
+      - name: Run static analysis
+        run: |
+          echo "=== Running PHPStan (Static Analysis) ==="
+          composer run phpstan
+          echo "✅ Static analysis passed"
+      
+      - name: Run unit tests
+        run: |
+          echo "=== Running Unit Tests ==="
+          composer run test-unit -- --no-coverage
+          echo "✅ Unit tests passed"
+      
+      - name: Display project information
+        if: always()
+        run: |
+          echo ""
+          echo "=========================================="
+          echo "  Copilot Agent Setup Complete"
+          echo "=========================================="
+          echo ""
+          echo "Project: PHP FHIRTools"
+          echo "Type: Symfony PHP Application"
+          echo "PHP Version: $(php -r 'echo PHP_VERSION;')"
+          echo ""
+          echo "Available Commands:"
+          echo "  - composer run test          # Run all tests"
+          echo "  - composer run test-unit     # Run unit tests"
+          echo "  - composer run test-integration  # Run integration tests"
+          echo "  - composer run lint          # Fix code style"
+          echo "  - composer run phpstan       # Run static analysis"
+          echo "  - php bin/console fhir:generate  # Generate FHIR models"
+          echo ""
+          echo "Key Directories:"
+          echo "  - src/Bundle/FHIRBundle      # Symfony Bundle"
+          echo "  - src/Component/CodeGeneration  # Code generation component"
+          echo "  - src/Component/Serialization   # Serialization component"
+          echo "  - tests/                     # Test files"
+          echo ""
+          echo "Documentation:"
+          echo "  - AGENTS.md                  # Agent behavior guidelines"
+          echo "  - README.md                  # Project overview"
+          echo "  - docs/                      # Additional documentation"
+          echo ""
+          echo "=========================================="
