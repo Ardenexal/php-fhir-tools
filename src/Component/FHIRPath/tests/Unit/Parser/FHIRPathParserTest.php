@@ -274,7 +274,7 @@ class FHIRPathParserTest extends TestCase
 
     public function testParseComplexPathExpression(): void
     {
-        $tokens = $this->lexer->tokenize('Patient.name.where(use = "official").given.first()');
+        $tokens = $this->lexer->tokenize("Patient.name.where(use = 'official').given.first()");
         $ast = $this->parser->parse($tokens);
 
         // Should parse without throwing exceptions
@@ -292,7 +292,7 @@ class FHIRPathParserTest extends TestCase
 
     public function testParseLogicalExpression(): void
     {
-        $tokens = $this->lexer->tokenize('age > 18 and status = "active"');
+        $tokens = $this->lexer->tokenize("age > 18 and status = 'active'");
         $ast = $this->parser->parse($tokens);
 
         self::assertInstanceOf(BinaryOperatorNode::class, $ast);

@@ -329,7 +329,7 @@ class FHIRPathLexerTest extends TestCase
 
     public function testTokenizeLogicalExpression(): void
     {
-        $tokens = $this->lexer->tokenize('age > 18 and status = "active"');
+        $tokens = $this->lexer->tokenize("age > 18 and status = 'active'");
 
         self::assertEquals(TokenType::IDENTIFIER, $tokens[0]->type);
         self::assertEquals(TokenType::GREATER_THAN, $tokens[1]->type);
@@ -407,7 +407,7 @@ class FHIRPathLexerTest extends TestCase
 
     public function testWhitespaceOnlyExpression(): void
     {
-        $tokens = $this->lexer->tokenize('   \n\t  ');
+        $tokens = $this->lexer->tokenize("   \n\t  ");
 
         self::assertCount(1, $tokens); // Just EOF
         self::assertEquals(TokenType::EOF, $tokens[0]->type);

@@ -175,7 +175,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             TokenType::PLUS => $this->evaluateArithmetic($left, $right, fn($a, $b) => $a + $b),
             TokenType::MINUS => $this->evaluateArithmetic($left, $right, fn($a, $b) => $a - $b),
             TokenType::MULTIPLY => $this->evaluateArithmetic($left, $right, fn($a, $b) => $a * $b),
-            TokenType::DIVIDE => $this->evaluateArithmetic($left, $right, fn($a, $b) => $a / $b),
+            TokenType::DIVIDE => $this->evaluateArithmetic($left, $right, fn($a, $b) => (float)($a / $b)),
             TokenType::DIV => $this->evaluateArithmetic($left, $right, fn($a, $b) => intdiv((int)$a, (int)$b)),
             TokenType::MOD => $this->evaluateArithmetic($left, $right, fn($a, $b) => $a % $b),
             
@@ -330,8 +330,13 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         if (is_object($node)) {
             // Try direct property access
             if (property_exists($node, $propertyName)) {
-                $value = $node->$propertyName;
-                return $this->wrapValue($value);
+                try {
+                    $value = $node->$propertyName;
+                    return $this->wrapValue($value);
+                } catch (\Error $e) {
+                    // Property exists but is not accessible (e.g., private/protected)
+                    // Fall through to try getter method
+                }
             }
 
             // Try getter method
@@ -492,7 +497,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             return Collection::empty();
         }
 
-        $result = $leftBool xor $rightBool;
+        $result = ($leftBool xor $rightBool);
         return Collection::single($result);
     }
 
