@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Evaluator;
 
-use Arden
-
-exal\FHIRTools\Component\FHIRPath\Expression\BinaryOperatorNode;
+use Ardenexal\FHIRTools\Component\FHIRPath\Expression\BinaryOperatorNode;
 use Ardenexal\FHIRTools\Component\FHIRPath\Expression\CollectionLiteralNode;
 use Ardenexal\FHIRTools\Component\FHIRPath\Expression\ExpressionNode;
 use Ardenexal\FHIRTools\Component\FHIRPath\Expression\ExpressionVisitor;
