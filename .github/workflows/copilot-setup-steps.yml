@@ -7,7 +7,6 @@ name: Copilot Agent Setup
 on:
   workflow_dispatch:
   push:
-
 jobs:
    copilot-setup-steps:
     name: Setup PHP Environment for Copilot Agent
@@ -15,7 +14,8 @@ jobs:
     env:
       XDEBUG_MODE: off
       COMPOSER_NO_INTERACTION: 1
-    
+    permissions:
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
