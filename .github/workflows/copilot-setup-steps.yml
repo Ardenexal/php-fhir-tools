@@ -9,7 +9,7 @@ on:
   push:
 
 jobs:
-  setup-and-validate:
+  copilot-setup-steps:
     name: Setup PHP Environment for Copilot Agent
     runs-on: ubuntu-latest
     env:
