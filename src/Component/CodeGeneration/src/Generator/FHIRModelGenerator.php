@@ -694,8 +694,12 @@ class FHIRModelGenerator implements GeneratorInterface
             return $builderContext->getPrimitiveNamespace($version)->getName();
         }
 
-        // Base types that should use the DataType namespace
-        // Check these first as they are more fundamental
+        // Base FHIR types that belong to the DataType namespace
+        // These are fundamental building blocks in FHIR that all other complex types extend from.
+        // Element: Base definition for all elements in a resource
+        // BackboneElement: Base for all elements defined inside a resource (not at root level)
+        // Note: While these types are foundational, they are physically located in the DataType
+        // directory structure, not the Resource directory, hence they must use getDatatypeNamespace()
         $dataTypes = [
             'Element',
             'BackboneElement',
@@ -705,8 +709,21 @@ class FHIRModelGenerator implements GeneratorInterface
         if (in_array($code, $dataTypes, true)) {
             try {
                 return $builderContext->getDatatypeNamespace($version)->getName();
-            } catch (GenerationException) {
-                // Fallback to element namespace if datatype namespace is not available
+            } catch (GenerationException $e) {
+                // This should not happen in normal operation as the DataType namespace
+                // is always initialized. If it does occur, it indicates a configuration issue.
+                // Log the error and fall back to element namespace to avoid generation failure.
+                error_log(
+                    sprintf(
+                        'Warning: DataType namespace not available for version %s when resolving base type %s. ' .
+                        'Falling back to Element namespace. This may cause incorrect import statements. ' .
+                        'Exception: %s',
+                        $version,
+                        $code,
+                        $e->getMessage(),
+                    ),
+                );
+
                 return $builderContext->getElementNamespace($version)->getName();
             }
         }
