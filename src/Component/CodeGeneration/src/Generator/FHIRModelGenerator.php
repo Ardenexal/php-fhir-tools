@@ -194,7 +194,8 @@ class FHIRModelGenerator implements GeneratorInterface
         $class     = new ClassType($className, $namespace);
 
         // Extend FHIRCode base type
-        $class->setExtends($namespace->getName() . '\\' . self::DEFAULT_CLASS_PREFIX . 'Code');
+        $codeNamespace = $this->getNamespaceForFhirType('code', $version, $builderContext);
+        $class->setExtends($codeNamespace . '\\' . self::DEFAULT_CLASS_PREFIX . 'Code');
 
         // Add documentation
         $class->addComment('@fhir-code-type ' . $enumType->getName());
@@ -227,8 +228,9 @@ class FHIRModelGenerator implements GeneratorInterface
             $class->setAbstract();
         }
         if (isset($structureDefinition['baseDefinition'])) {
-            $parent = str_replace('http://hl7.org/fhir/StructureDefinition/', '', $structureDefinition['baseDefinition']);
-            $class->setExtends($namespace->getName() . '\\' . self::DEFAULT_CLASS_PREFIX . u($parent)->pascal());
+            $parent          = str_replace('http://hl7.org/fhir/StructureDefinition/', '', $structureDefinition['baseDefinition']);
+            $parentNamespace = $this->getNamespaceForFhirType($parent, $version, $builderContext);
+            $class->setExtends($parentNamespace . '\\' . self::DEFAULT_CLASS_PREFIX . u($parent)->pascal());
         }
 
         // Add appropriate FHIR attributes based on the structure definition kind
@@ -353,14 +355,16 @@ class FHIRModelGenerator implements GeneratorInterface
                         'elementPath'    => $elementPath,
                         'fhirVersion'    => $version,
                     ]);
-                    $childClass->setExtends(name: $namespace->getName() . '\\' . self::DEFAULT_CLASS_PREFIX . 'BackboneElement');
+                    $backboneElementNamespace = $this->getNamespaceForFhirType('BackboneElement', $version, $builderContext);
+                    $childClass->setExtends(name: $backboneElementNamespace . '\\' . self::DEFAULT_CLASS_PREFIX . 'BackboneElement');
                 } elseif ($isElement) {
                     // Add comment for regular complex elements
                     $childClass->addAttribute('Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType', [
                         'typeName'    => $element['path'],
                         'fhirVersion' => $version,
                     ]);
-                    $childClass->setExtends($namespace->getName() . '\\' . self::DEFAULT_CLASS_PREFIX . 'Element');
+                    $elementNamespace = $this->getNamespaceForFhirType('Element', $version, $builderContext);
+                    $childClass->setExtends($elementNamespace . '\\' . self::DEFAULT_CLASS_PREFIX . 'Element');
                 }
 
                 if (isset($element['definition'])) {
@@ -690,6 +694,40 @@ class FHIRModelGenerator implements GeneratorInterface
             return $builderContext->getPrimitiveNamespace($version)->getName();
         }
 
+        // Base FHIR types that belong to the DataType namespace
+        // These are fundamental building blocks in FHIR that all other complex types extend from.
+        // Element: Base definition for all elements in a resource
+        // BackboneElement: Base for all elements defined inside a resource (not at root level)
+        // Note: While these types are foundational, they are physically located in the DataType
+        // directory structure, not the Resource directory, hence they must use getDatatypeNamespace()
+        $dataTypes = [
+            'Element',
+            'BackboneElement',
+        ];
+
+        // Check if it's a base data type
+        if (in_array($code, $dataTypes, true)) {
+            try {
+                return $builderContext->getDatatypeNamespace($version)->getName();
+            } catch (GenerationException $e) {
+                // This should not happen in normal operation as the DataType namespace
+                // is always initialized. If it does occur, it indicates a configuration issue.
+                // Log the error and fall back to element namespace to avoid generation failure.
+                error_log(
+                    sprintf(
+                        'Warning: DataType namespace not available for version %s when resolving base type %s. ' .
+                        'Falling back to Element namespace. This may cause incorrect import statements. ' .
+                        'Exception: %s',
+                        $version,
+                        $code,
+                        $e->getMessage(),
+                    ),
+                );
+
+                return $builderContext->getElementNamespace($version)->getName();
+            }
+        }
+
         // List of known FHIR resource types
         $resourceTypes = [
             'Patient',
@@ -723,8 +761,6 @@ class FHIRModelGenerator implements GeneratorInterface
             'Basic',
             'DomainResource',
             'Resource',
-            'Element',
-            'BackboneElement',
         ];
 
         // Check if it's a resource type
