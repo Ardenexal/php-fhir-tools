@@ -19,11 +19,11 @@ class BinaryOperatorNode extends ExpressionNode
     /**
      * Create a new binary operator node.
      *
-     * @param ExpressionNode $left The left operand
-     * @param TokenType $operator The operator
-     * @param ExpressionNode $right The right operand
-     * @param int $line The line number
-     * @param int $column The column number
+     * @param ExpressionNode $left     The left operand
+     * @param TokenType      $operator The operator
+     * @param ExpressionNode $right    The right operand
+     * @param int            $line     The line number
+     * @param int            $column   The column number
      */
     public function __construct(
         private readonly ExpressionNode $left,
@@ -73,29 +73,29 @@ class BinaryOperatorNode extends ExpressionNode
     public function toString(): string
     {
         $operatorStr = match ($this->operator) {
-            TokenType::AND => ' and ',
-            TokenType::OR => ' or ',
-            TokenType::XOR => ' xor ',
-            TokenType::IMPLIES => ' implies ',
-            TokenType::EQUALS => ' = ',
-            TokenType::NOT_EQUALS => ' != ',
-            TokenType::EQUIVALENT => ' ~ ',
+            TokenType::AND            => ' and ',
+            TokenType::OR             => ' or ',
+            TokenType::XOR            => ' xor ',
+            TokenType::IMPLIES        => ' implies ',
+            TokenType::EQUALS         => ' = ',
+            TokenType::NOT_EQUALS     => ' != ',
+            TokenType::EQUIVALENT     => ' ~ ',
             TokenType::NOT_EQUIVALENT => ' !~ ',
-            TokenType::GREATER_THAN => ' > ',
-            TokenType::LESS_THAN => ' < ',
-            TokenType::GREATER_EQUAL => ' >= ',
-            TokenType::LESS_EQUAL => ' <= ',
-            TokenType::PLUS => ' + ',
-            TokenType::MINUS => ' - ',
-            TokenType::MULTIPLY => ' * ',
-            TokenType::DIVIDE => ' / ',
-            TokenType::DIV => ' div ',
-            TokenType::MOD => ' mod ',
-            TokenType::PIPE => ' | ',
-            TokenType::AMPERSAND => ' & ',
-            TokenType::IN => ' in ',
-            TokenType::CONTAINS => ' contains ',
-            default => ' ' . $this->operator->value . ' ',
+            TokenType::GREATER_THAN   => ' > ',
+            TokenType::LESS_THAN      => ' < ',
+            TokenType::GREATER_EQUAL  => ' >= ',
+            TokenType::LESS_EQUAL     => ' <= ',
+            TokenType::PLUS           => ' + ',
+            TokenType::MINUS          => ' - ',
+            TokenType::MULTIPLY       => ' * ',
+            TokenType::DIVIDE         => ' / ',
+            TokenType::DIV            => ' div ',
+            TokenType::MOD            => ' mod ',
+            TokenType::PIPE           => ' | ',
+            TokenType::AMPERSAND      => ' & ',
+            TokenType::IN             => ' in ',
+            TokenType::CONTAINS       => ' contains ',
+            default                   => ' ' . $this->operator->value . ' ',
         };
 
         return '(' . $this->left->toString() . $operatorStr . $this->right->toString() . ')';

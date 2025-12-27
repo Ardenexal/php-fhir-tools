@@ -12,7 +12,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
  * Manages registration and lookup of all available FHIRPath functions.
  * Uses singleton pattern to ensure single registry instance.
  *
- * @author Copilot
+ * @author Ardenexal <https://github.com/Ardenexal>
  */
 final class FunctionRegistry
 {
@@ -39,7 +39,7 @@ final class FunctionRegistry
         $this->registerSafe(new ExistsFunction());
         $this->registerSafe(new AllFunction());
         $this->registerSafe(new CountFunction());
-        
+
         // Filtering functions
         $this->registerSafe(new WhereFunction());
         $this->registerSafe(new FirstFunction());
@@ -47,15 +47,15 @@ final class FunctionRegistry
         $this->registerSafe(new TailFunction());
         $this->registerSafe(new TakeFunction());
         $this->registerSafe(new SkipFunction());
-        
+
         // Subsetting functions
         $this->registerSafe(new UnionFunction());
         $this->registerSafe(new IntersectFunction());
-        
+
         // String functions
         $this->registerSafe(new SubstringFunction());
         $this->registerSafe(new LengthFunction());
-        
+
         // Math functions
         $this->registerSafe(new SumFunction());
     }
@@ -97,11 +97,7 @@ final class FunctionRegistry
         $name = $function->getName();
 
         if (isset($this->functions[$name])) {
-            throw new EvaluationException(
-                sprintf('Function "%s" is already registered', $name),
-                0,
-                0
-            );
+            throw new EvaluationException(sprintf('Function "%s" is already registered', $name), 0, 0);
         }
 
         $this->functions[$name] = $function;
@@ -119,11 +115,7 @@ final class FunctionRegistry
     public function get(string $name): FunctionInterface
     {
         if (!isset($this->functions[$name])) {
-            throw new EvaluationException(
-                sprintf('Unknown function "%s"', $name),
-                0,
-                0
-            );
+            throw new EvaluationException(sprintf('Unknown function "%s"', $name), 0, 0);
         }
 
         return $this->functions[$name];

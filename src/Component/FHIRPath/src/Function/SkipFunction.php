@@ -23,35 +23,35 @@ final class SkipFunction extends AbstractFunction
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection
     {
         $this->validateParameterCount($parameters, 1);
-        
+
         $numCollection = $parameters[0];
         if (!($numCollection instanceof Collection) || $numCollection->isEmpty()) {
             throw EvaluationException::invalidFunctionParameter('skip', 'num', 'non-empty integer collection');
         }
-        
+
         $num = $numCollection->first();
         if (!is_int($num) || $num < 0) {
             throw EvaluationException::invalidFunctionParameter('skip', 'num', 'non-negative integer');
         }
-        
+
         if ($num === 0) {
             return $input;
         }
-        
+
         if ($input->isEmpty()) {
             return Collection::empty();
         }
-        
+
         $items = [];
         $count = 0;
         foreach ($input as $item) {
             if ($count < $num) {
-                $count++;
+                ++$count;
                 continue;
             }
             $items[] = $item;
         }
-        
+
         return Collection::from($items);
     }
 }

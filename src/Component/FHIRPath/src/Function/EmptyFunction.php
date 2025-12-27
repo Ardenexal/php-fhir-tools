@@ -22,7 +22,7 @@ final class EmptyFunction extends AbstractFunction
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection
     {
         $this->validateParameterCount($parameters, 0);
-        
+
         return Collection::single($input->isEmpty());
     }
 }

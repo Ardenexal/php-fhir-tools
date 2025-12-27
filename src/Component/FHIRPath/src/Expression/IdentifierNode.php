@@ -17,9 +17,9 @@ class IdentifierNode extends ExpressionNode
     /**
      * Create a new identifier node.
      *
-     * @param string $name The identifier name
-     * @param int $line The line number
-     * @param int $column The column number
+     * @param string $name   The identifier name
+     * @param int    $line   The line number
+     * @param int    $column The column number
      */
     public function __construct(
         private readonly string $name,

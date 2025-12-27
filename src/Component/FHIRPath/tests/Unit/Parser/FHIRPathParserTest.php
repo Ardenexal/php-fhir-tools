@@ -28,11 +28,12 @@ use PHPUnit\Framework\TestCase;
 class FHIRPathParserTest extends TestCase
 {
     private FHIRPathLexer $lexer;
+
     private FHIRPathParser $parser;
 
     protected function setUp(): void
     {
-        $this->lexer = new FHIRPathLexer();
+        $this->lexer  = new FHIRPathLexer();
         $this->parser = new FHIRPathParser();
     }
 
@@ -41,7 +42,7 @@ class FHIRPathParserTest extends TestCase
     public function testParseStringLiteral(): void
     {
         $tokens = $this->lexer->tokenize("'hello'");
-        $ast = $this->parser->parse($tokens);
+        $ast    = $this->parser->parse($tokens);
 
         self::assertInstanceOf(LiteralNode::class, $ast);
         self::assertEquals('hello', $ast->getValue());
@@ -51,7 +52,7 @@ class FHIRPathParserTest extends TestCase
     public function testParseNumberLiteral(): void
     {
         $tokens = $this->lexer->tokenize('42');
-        $ast = $this->parser->parse($tokens);
+        $ast    = $this->parser->parse($tokens);
 
         self::assertInstanceOf(LiteralNode::class, $ast);
         self::assertEquals(42, $ast->getValue());
@@ -60,7 +61,7 @@ class FHIRPathParserTest extends TestCase
     public function testParseDecimalLiteral(): void
     {
         $tokens = $this->lexer->tokenize('3.14');
-        $ast = $this->parser->parse($tokens);
+        $ast    = $this->parser->parse($tokens);
 
         self::assertInstanceOf(LiteralNode::class, $ast);
         self::assertEquals(3.14, $ast->getValue());
@@ -69,7 +70,7 @@ class FHIRPathParserTest extends TestCase
     public function testParseBooleanLiteral(): void
     {
         $tokens = $this->lexer->tokenize('true');
-        $ast = $this->parser->parse($tokens);
+        $ast    = $this->parser->parse($tokens);
 
         self::assertInstanceOf(LiteralNode::class, $ast);
         self::assertTrue($ast->getValue());
@@ -80,7 +81,7 @@ class FHIRPathParserTest extends TestCase
     public function testParseSimpleIdentifier(): void
     {
         $tokens = $this->lexer->tokenize('name');
-        $ast = $this->parser->parse($tokens);
+        $ast    = $this->parser->parse($tokens);
 
         self::assertInstanceOf(IdentifierNode::class, $ast);
         self::assertEquals('name', $ast->getName());
@@ -91,7 +92,7 @@ class FHIRPathParserTest extends TestCase
     public function testParseMemberAccess(): void
     {
         $tokens = $this->lexer->tokenize('Patient.name');
-        $ast = $this->parser->parse($tokens);
+        $ast    = $this->parser->parse($tokens);
 
         self::assertInstanceOf(MemberAccessNode::class, $ast);
         self::assertInstanceOf(IdentifierNode::class, $ast->getObject());
@@ -103,7 +104,7 @@ class FHIRPathParserTest extends TestCase
     public function testParseChainedMemberAccess(): void
     {
         $tokens = $this->lexer->tokenize('Patient.name.given');
-        $ast = $this->parser->parse($tokens);
+        $ast    = $this->parser->parse($tokens);
 
         self::assertInstanceOf(MemberAccessNode::class, $ast);
         // The structure should be: (Patient.name).given
@@ -116,7 +117,7 @@ class FHIRPathParserTest extends TestCase
     public function testParseFunctionCallNoParams(): void
     {
         $tokens = $this->lexer->tokenize('first()');
-        $ast = $this->parser->parse($tokens);
+        $ast    = $this->parser->parse($tokens);
 
         self::assertInstanceOf(FunctionCallNode::class, $ast);
         self::assertEquals('first', $ast->getName());
@@ -126,7 +127,7 @@ class FHIRPathParserTest extends TestCase
     public function testParseFunctionCallWithOneParam(): void
     {
         $tokens = $this->lexer->tokenize('where(active)');
-        $ast = $this->parser->parse($tokens);
+        $ast    = $this->parser->parse($tokens);
 
         self::assertInstanceOf(FunctionCallNode::class, $ast);
         self::assertEquals('where', $ast->getName());
@@ -137,7 +138,7 @@ class FHIRPathParserTest extends TestCase
     public function testParseFunctionCallWithMultipleParams(): void
     {
         $tokens = $this->lexer->tokenize('substring(1, 5)');
-        $ast = $this->parser->parse($tokens);
+        $ast    = $this->parser->parse($tokens);
 
         self::assertInstanceOf(FunctionCallNode::class, $ast);
         self::assertEquals('substring', $ast->getName());
@@ -149,7 +150,7 @@ class FHIRPathParserTest extends TestCase
     public function testParseAddition(): void
     {
         $tokens = $this->lexer->tokenize('1 + 2');
-        $ast = $this->parser->parse($tokens);
+        $ast    = $this->parser->parse($tokens);
 
         self::assertInstanceOf(BinaryOperatorNode::class, $ast);
         self::assertEquals(TokenType::PLUS, $ast->getOperator());
@@ -158,7 +159,7 @@ class FHIRPathParserTest extends TestCase
     public function testParseComparison(): void
     {
         $tokens = $this->lexer->tokenize('age > 18');
-        $ast = $this->parser->parse($tokens);
+        $ast    = $this->parser->parse($tokens);
 
         self::assertInstanceOf(BinaryOperatorNode::class, $ast);
         self::assertEquals(TokenType::GREATER_THAN, $ast->getOperator());
@@ -167,7 +168,7 @@ class FHIRPathParserTest extends TestCase
     public function testParseLogicalAnd(): void
     {
         $tokens = $this->lexer->tokenize('active and verified');
-        $ast = $this->parser->parse($tokens);
+        $ast    = $this->parser->parse($tokens);
 
         self::assertInstanceOf(BinaryOperatorNode::class, $ast);
         self::assertEquals(TokenType::AND, $ast->getOperator());
@@ -176,7 +177,7 @@ class FHIRPathParserTest extends TestCase
     public function testParseEquality(): void
     {
         $tokens = $this->lexer->tokenize("status = 'active'");
-        $ast = $this->parser->parse($tokens);
+        $ast    = $this->parser->parse($tokens);
 
         self::assertInstanceOf(BinaryOperatorNode::class, $ast);
         self::assertEquals(TokenType::EQUALS, $ast->getOperator());
@@ -187,7 +188,7 @@ class FHIRPathParserTest extends TestCase
     public function testParseUnaryMinus(): void
     {
         $tokens = $this->lexer->tokenize('-5');
-        $ast = $this->parser->parse($tokens);
+        $ast    = $this->parser->parse($tokens);
 
         self::assertInstanceOf(UnaryOperatorNode::class, $ast);
         self::assertEquals(TokenType::MINUS, $ast->getOperator());
@@ -199,7 +200,7 @@ class FHIRPathParserTest extends TestCase
     public function testParseIndexer(): void
     {
         $tokens = $this->lexer->tokenize('name[0]');
-        $ast = $this->parser->parse($tokens);
+        $ast    = $this->parser->parse($tokens);
 
         self::assertInstanceOf(IndexerNode::class, $ast);
         self::assertInstanceOf(IdentifierNode::class, $ast->getCollection());
@@ -211,7 +212,7 @@ class FHIRPathParserTest extends TestCase
     public function testParseTypeIs(): void
     {
         $tokens = $this->lexer->tokenize('value is Integer');
-        $ast = $this->parser->parse($tokens);
+        $ast    = $this->parser->parse($tokens);
 
         self::assertInstanceOf(TypeExpressionNode::class, $ast);
         self::assertEquals(TokenType::IS, $ast->getOperator());
@@ -221,7 +222,7 @@ class FHIRPathParserTest extends TestCase
     public function testParseTypeAs(): void
     {
         $tokens = $this->lexer->tokenize('value as Patient');
-        $ast = $this->parser->parse($tokens);
+        $ast    = $this->parser->parse($tokens);
 
         self::assertInstanceOf(TypeExpressionNode::class, $ast);
         self::assertEquals(TokenType::AS, $ast->getOperator());
@@ -233,7 +234,7 @@ class FHIRPathParserTest extends TestCase
     public function testParseExternalConstant(): void
     {
         $tokens = $this->lexer->tokenize('%ucum');
-        $ast = $this->parser->parse($tokens);
+        $ast    = $this->parser->parse($tokens);
 
         self::assertInstanceOf(ExternalConstantNode::class, $ast);
         self::assertEquals('ucum', $ast->getName());
@@ -244,7 +245,7 @@ class FHIRPathParserTest extends TestCase
     public function testParseEmptyCollection(): void
     {
         $tokens = $this->lexer->tokenize('{}');
-        $ast = $this->parser->parse($tokens);
+        $ast    = $this->parser->parse($tokens);
 
         self::assertInstanceOf(CollectionLiteralNode::class, $ast);
         self::assertEmpty($ast->getElements());
@@ -253,7 +254,7 @@ class FHIRPathParserTest extends TestCase
     public function testParseCollectionLiteral(): void
     {
         $tokens = $this->lexer->tokenize('{1, 2, 3}');
-        $ast = $this->parser->parse($tokens);
+        $ast    = $this->parser->parse($tokens);
 
         self::assertInstanceOf(CollectionLiteralNode::class, $ast);
         self::assertCount(3, $ast->getElements());
@@ -264,7 +265,7 @@ class FHIRPathParserTest extends TestCase
     public function testParseParenthesizedExpression(): void
     {
         $tokens = $this->lexer->tokenize('(1 + 2)');
-        $ast = $this->parser->parse($tokens);
+        $ast    = $this->parser->parse($tokens);
 
         self::assertInstanceOf(BinaryOperatorNode::class, $ast);
         self::assertEquals(TokenType::PLUS, $ast->getOperator());
@@ -274,8 +275,8 @@ class FHIRPathParserTest extends TestCase
 
     public function testParseComplexPathExpression(): void
     {
-        $tokens = $this->lexer->tokenize('Patient.name.where(use = "official").given.first()');
-        $ast = $this->parser->parse($tokens);
+        $tokens = $this->lexer->tokenize("Patient.name.where(use = 'official').given.first()");
+        $ast    = $this->parser->parse($tokens);
 
         // Should parse without throwing exceptions
         self::assertNotNull($ast);
@@ -284,7 +285,7 @@ class FHIRPathParserTest extends TestCase
     public function testParseMemberAccessWithFunctionCall(): void
     {
         $tokens = $this->lexer->tokenize('name.first()');
-        $ast = $this->parser->parse($tokens);
+        $ast    = $this->parser->parse($tokens);
 
         self::assertInstanceOf(MemberAccessNode::class, $ast);
         self::assertInstanceOf(FunctionCallNode::class, $ast->getMember());
@@ -292,8 +293,8 @@ class FHIRPathParserTest extends TestCase
 
     public function testParseLogicalExpression(): void
     {
-        $tokens = $this->lexer->tokenize('age > 18 and status = "active"');
-        $ast = $this->parser->parse($tokens);
+        $tokens = $this->lexer->tokenize("age > 18 and status = 'active'");
+        $ast    = $this->parser->parse($tokens);
 
         self::assertInstanceOf(BinaryOperatorNode::class, $ast);
         self::assertEquals(TokenType::AND, $ast->getOperator());
@@ -302,7 +303,7 @@ class FHIRPathParserTest extends TestCase
     public function testParseUnionOperator(): void
     {
         $tokens = $this->lexer->tokenize('name | telecom');
-        $ast = $this->parser->parse($tokens);
+        $ast    = $this->parser->parse($tokens);
 
         self::assertInstanceOf(BinaryOperatorNode::class, $ast);
         self::assertEquals(TokenType::PIPE, $ast->getOperator());
@@ -313,7 +314,7 @@ class FHIRPathParserTest extends TestCase
     public function testParseReservedIdentifiers(): void
     {
         $tokens = $this->lexer->tokenize('$this');
-        $ast = $this->parser->parse($tokens);
+        $ast    = $this->parser->parse($tokens);
 
         self::assertInstanceOf(IdentifierNode::class, $ast);
         self::assertEquals('$this', $ast->getName());
@@ -358,7 +359,7 @@ class FHIRPathParserTest extends TestCase
     public function testToStringForSimpleExpression(): void
     {
         $tokens = $this->lexer->tokenize('name');
-        $ast = $this->parser->parse($tokens);
+        $ast    = $this->parser->parse($tokens);
 
         self::assertEquals('name', $ast->toString());
     }
@@ -366,7 +367,7 @@ class FHIRPathParserTest extends TestCase
     public function testToStringForBinaryOperator(): void
     {
         $tokens = $this->lexer->tokenize('a + b');
-        $ast = $this->parser->parse($tokens);
+        $ast    = $this->parser->parse($tokens);
 
         self::assertStringContainsString('+', $ast->toString());
     }

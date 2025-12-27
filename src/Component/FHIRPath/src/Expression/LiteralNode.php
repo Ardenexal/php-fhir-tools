@@ -19,10 +19,10 @@ class LiteralNode extends ExpressionNode
     /**
      * Create a new literal node.
      *
-     * @param mixed $value The literal value
-     * @param TokenType $type The type of literal
-     * @param int $line The line number
-     * @param int $column The column number
+     * @param mixed     $value  The literal value
+     * @param TokenType $type   The type of literal
+     * @param int       $line   The line number
+     * @param int       $column The column number
      */
     public function __construct(
         private readonly mixed $value,
@@ -63,10 +63,10 @@ class LiteralNode extends ExpressionNode
     public function toString(): string
     {
         return match ($this->type) {
-            TokenType::STRING => "'" . addslashes((string) $this->value) . "'",
+            TokenType::STRING  => "'" . addslashes((string) $this->value) . "'",
             TokenType::BOOLEAN => $this->value ? 'true' : 'false',
-            TokenType::NULL => 'null',
-            default => (string) $this->value,
+            TokenType::NULL    => 'null',
+            default            => (string) $this->value,
         };
     }
 }

@@ -20,10 +20,10 @@ class SyntaxException extends ParseException
      * Create a syntax exception for an unexpected token.
      *
      * @param string $expected Description of what was expected
-     * @param string $found Description of what was found
-     * @param int $line The line number
-     * @param int $column The column number
-     * @param string $context The expression context
+     * @param string $found    Description of what was found
+     * @param int    $line     The line number
+     * @param int    $column   The column number
+     * @param string $context  The expression context
      */
     public static function unexpectedToken(
         string $expected,
@@ -32,8 +32,8 @@ class SyntaxException extends ParseException
         int $column,
         string $context = ''
     ): self {
-        $message = sprintf('Expected %s but found %s', $expected, $found);
-        $suggestion = "Check the expression syntax and ensure all parts are correctly formed.";
+        $message    = sprintf('Expected %s but found %s', $expected, $found);
+        $suggestion = 'Check the expression syntax and ensure all parts are correctly formed.';
 
         return new self($message, $line, $column, $context, $suggestion);
     }
@@ -42,9 +42,9 @@ class SyntaxException extends ParseException
      * Create a syntax exception for unexpected end of expression.
      *
      * @param string $expected Description of what was expected
-     * @param int $line The line number
-     * @param int $column The column number
-     * @param string $context The expression context
+     * @param int    $line     The line number
+     * @param int    $column   The column number
+     * @param string $context  The expression context
      */
     public static function unexpectedEnd(
         string $expected,
@@ -52,8 +52,8 @@ class SyntaxException extends ParseException
         int $column,
         string $context = ''
     ): self {
-        $message = sprintf('Unexpected end of expression; expected %s', $expected);
-        $suggestion = "Complete the expression or remove incomplete parts.";
+        $message    = sprintf('Unexpected end of expression; expected %s', $expected);
+        $suggestion = 'Complete the expression or remove incomplete parts.';
 
         return new self($message, $line, $column, $context, $suggestion);
     }
@@ -62,8 +62,8 @@ class SyntaxException extends ParseException
      * Create a syntax exception for invalid expression structure.
      *
      * @param string $details Details about the structural error
-     * @param int $line The line number
-     * @param int $column The column number
+     * @param int    $line    The line number
+     * @param int    $column  The column number
      * @param string $context The expression context
      */
     public static function invalidStructure(
@@ -72,8 +72,8 @@ class SyntaxException extends ParseException
         int $column,
         string $context = ''
     ): self {
-        $message = sprintf('Invalid expression structure: %s', $details);
-        $suggestion = "Review the FHIRPath grammar and ensure the expression follows the correct structure.";
+        $message    = sprintf('Invalid expression structure: %s', $details);
+        $suggestion = 'Review the FHIRPath grammar and ensure the expression follows the correct structure.';
 
         return new self($message, $line, $column, $context, $suggestion);
     }

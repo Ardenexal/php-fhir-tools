@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Tests for FunctionRegistry.
  *
- * @author Copilot
+ * @author Ardenexal <https://github.com/Ardenexal>
  */
 final class FunctionRegistryTest extends TestCase
 {
@@ -93,7 +93,7 @@ final class FunctionRegistryTest extends TestCase
 
     private function createMockFunction(string $name): FunctionInterface
     {
-        return new class($name) implements FunctionInterface {
+        return new class ($name) implements FunctionInterface {
             public function __construct(private readonly string $name)
             {
             }

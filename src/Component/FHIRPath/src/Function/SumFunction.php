@@ -22,18 +22,18 @@ final class SumFunction extends AbstractFunction
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection
     {
         $this->validateParameterCount($parameters, 0);
-        
+
         if ($input->isEmpty()) {
             return Collection::empty();
         }
-        
+
         $sum = 0;
         foreach ($input as $item) {
             if (is_int($item) || is_float($item)) {
                 $sum += $item;
             }
         }
-        
+
         return Collection::single($sum);
     }
 }

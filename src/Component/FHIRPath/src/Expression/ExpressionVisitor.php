@@ -18,6 +18,7 @@ interface ExpressionVisitor
      * Visit a literal node.
      *
      * @param LiteralNode $node The literal node to visit
+     *
      * @return mixed The result of visiting the node
      */
     public function visitLiteral(LiteralNode $node): mixed;
@@ -26,6 +27,7 @@ interface ExpressionVisitor
      * Visit an identifier node.
      *
      * @param IdentifierNode $node The identifier node to visit
+     *
      * @return mixed The result of visiting the node
      */
     public function visitIdentifier(IdentifierNode $node): mixed;
@@ -34,6 +36,7 @@ interface ExpressionVisitor
      * Visit a binary operator node.
      *
      * @param BinaryOperatorNode $node The binary operator node to visit
+     *
      * @return mixed The result of visiting the node
      */
     public function visitBinaryOperator(BinaryOperatorNode $node): mixed;
@@ -42,6 +45,7 @@ interface ExpressionVisitor
      * Visit a unary operator node.
      *
      * @param UnaryOperatorNode $node The unary operator node to visit
+     *
      * @return mixed The result of visiting the node
      */
     public function visitUnaryOperator(UnaryOperatorNode $node): mixed;
@@ -50,6 +54,7 @@ interface ExpressionVisitor
      * Visit a function call node.
      *
      * @param FunctionCallNode $node The function call node to visit
+     *
      * @return mixed The result of visiting the node
      */
     public function visitFunctionCall(FunctionCallNode $node): mixed;
@@ -58,6 +63,7 @@ interface ExpressionVisitor
      * Visit a member access node.
      *
      * @param MemberAccessNode $node The member access node to visit
+     *
      * @return mixed The result of visiting the node
      */
     public function visitMemberAccess(MemberAccessNode $node): mixed;
@@ -66,6 +72,7 @@ interface ExpressionVisitor
      * Visit an indexer node.
      *
      * @param IndexerNode $node The indexer node to visit
+     *
      * @return mixed The result of visiting the node
      */
     public function visitIndexer(IndexerNode $node): mixed;
@@ -74,6 +81,7 @@ interface ExpressionVisitor
      * Visit a type expression node (is/as).
      *
      * @param TypeExpressionNode $node The type expression node to visit
+     *
      * @return mixed The result of visiting the node
      */
     public function visitTypeExpression(TypeExpressionNode $node): mixed;
@@ -82,6 +90,7 @@ interface ExpressionVisitor
      * Visit an external constant node.
      *
      * @param ExternalConstantNode $node The external constant node to visit
+     *
      * @return mixed The result of visiting the node
      */
     public function visitExternalConstant(ExternalConstantNode $node): mixed;
@@ -90,6 +99,7 @@ interface ExpressionVisitor
      * Visit a collection literal node.
      *
      * @param CollectionLiteralNode $node The collection literal node to visit
+     *
      * @return mixed The result of visiting the node
      */
     public function visitCollectionLiteral(CollectionLiteralNode $node): mixed;

@@ -21,7 +21,7 @@ class FHIRPathExceptionTest extends TestCase
             10,
             5,
             'test.expression',
-            'Try this instead'
+            'Try this instead',
         );
 
         self::assertEquals('Test error', $exception->getMessage());
@@ -38,7 +38,7 @@ class FHIRPathExceptionTest extends TestCase
             10,
             5,
             'name.where(invalid)',
-            'Check the syntax'
+            'Check the syntax',
         );
 
         $fullMessage = $exception->getFullMessage();

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
+use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
 
 /**
  * Interface for FHIRPath functions.
@@ -13,7 +14,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
  * All FHIRPath functions must implement this interface to be registered
  * and executed by the evaluator.
  *
- * @author Copilot
+ * @author Ardenexal <https://github.com/Ardenexal>
  */
 interface FunctionInterface
 {
@@ -27,13 +28,13 @@ interface FunctionInterface
     /**
      * Execute the function with given input collection and parameters.
      *
-     * @param Collection $input The input collection to operate on
+     * @param Collection        $input      The input collection to operate on
      * @param array<int, mixed> $parameters Function parameters (expressions or values)
-     * @param EvaluationContext $context The evaluation context
+     * @param EvaluationContext $context    The evaluation context
      *
      * @return Collection The result collection
      *
-     * @throws \Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException
+     * @throws EvaluationException
      */
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection;
 }

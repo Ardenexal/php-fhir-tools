@@ -10,6 +10,7 @@ parameters:
         - src/Bundle/FHIRBundle/
         - src/Component/CodeGeneration/src/
         - src/Component/Serialization/src/
+        - src/Component/FHIRPath/src/
     excludePaths:
         - */vendor/*
         - src/Component/*/tests/*

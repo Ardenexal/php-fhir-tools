@@ -1,0 +1,124 @@
+# GitHub Copilot Agent Setup Workflow
+# This workflow sets up the PHP development environment for GitHub Copilot agents
+# and validates that all project dependencies and tools are properly configured.
+
+name: Copilot Agent Setup
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  copilot-setup-steps:
+    name: Setup PHP Environment for Copilot Agent
+    runs-on: ubuntu-latest
+    env:
+      XDEBUG_MODE: off
+      COMPOSER_NO_INTERACTION: 1
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: ctype, iconv, zip, curl, intl
+          ini-values: memory_limit=-1, max_execution_time=0
+          coverage: none
+      
+      - name: Verify PHP installation
+        run: |
+          echo "=== PHP Version ==="
+          php -v
+          echo ""
+          echo "=== PHP Extensions ==="
+          php -m | grep -E "(ctype|iconv|zip|curl|intl)" || exit 1
+          echo ""
+          echo "=== PHP Configuration ==="
+          php -i | grep -E "(memory_limit|max_execution_time)"
+      
+      - name: Validate Composer
+        run: composer --version
+      
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-8.3-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-8.3-
+      
+      - name: Install Composer dependencies
+        run: |
+          composer install --prefer-dist --no-interaction --optimize-autoloader
+          echo "✅ Composer dependencies installed successfully"
+      
+      - name: Verify required tools are installed
+        run: |
+          echo "=== Checking for required tools ==="
+          test -f vendor/autoload.php && echo "✅ Autoloader found" || exit 1
+          test -f vendor/bin/phpunit && echo "✅ PHPUnit found" || exit 1
+          test -f vendor/bin/phpstan.phar && echo "✅ PHPStan found" || exit 1
+          test -f vendor/bin/pint && echo "✅ Pint found" || exit 1
+          echo "All required tools are available"
+      
+      - name: Create required directories
+        run: |
+          mkdir -p output var/cache var/log coverage
+          chmod -R 755 bin/console
+          chmod -R 777 var/ coverage/
+          echo "✅ Required directories created"
+      
+      - name: Verify Symfony Console
+        run: |
+          echo "=== Symfony Console Version ==="
+          php bin/console --version
+          echo ""
+          echo "=== Available Commands ==="
+          php bin/console list
+          echo ""
+          echo "=== Verifying FHIR Commands ==="
+          php bin/console list | grep -q "fhir:generate" && echo "✅ FHIR generation command available" || exit 1
+      
+      - name: Run unit tests
+        run: |
+          echo "=== Running Unit Tests ==="
+          composer run test-unit -- --no-coverage
+          echo "✅ Unit tests passed"
+      
+      - name: Display project information
+        if: always()
+        run: |
+          echo ""
+          echo "=============================="
+          echo "  Copilot Agent Setup Complete"
+          echo "=============================="
+          echo ""
+          echo "Project: PHP FHIRTools"
+          echo "Type: Symfony PHP Application"
+          echo "PHP Version: $(php -r 'echo PHP_VERSION;')"
+          echo ""
+          echo "Available Commands:"
+          echo "  - composer run test     # Run all tests"
+          echo "  - composer run test-unit    # Run unit tests"
+          echo "  - composer run test-integration  # Run integration tests"
+          echo "  - composer run lint          # Fix code style"
+          echo "  - composer run phpstan       # Run static analysis"
+          echo "  - php bin/console fhir:generate   # Generate FHIR models"
+          echo ""
+          echo "Key Directories:"
+          echo "  - src/Bundle/FHIRBundle        # Symfony Bundle"
+          echo "  - src/Component/CodeGeneration   # Code generation component"
+          echo "  - src/Component/Serialization    # Serialization component"
+          echo "  - tests/                  # Test files"
+          echo ""
+          echo "Documentation:"
+          echo "  - AGENTS.md                 # Agent behavior guidelines"
+          echo "  - README.md                 # Project overview"
+          echo "  - docs/                     # Additional documentation"
+          echo ""
+          echo "=============================="

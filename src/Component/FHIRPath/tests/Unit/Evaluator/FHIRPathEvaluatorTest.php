@@ -17,20 +17,23 @@ use PHPUnit\Framework\TestCase;
 final class FHIRPathEvaluatorTest extends TestCase
 {
     private FHIRPathLexer $lexer;
+
     private FHIRPathParser $parser;
+
     private FHIRPathEvaluator $evaluator;
 
     protected function setUp(): void
     {
-        $this->lexer = new FHIRPathLexer();
-        $this->parser = new FHIRPathParser();
+        $this->lexer     = new FHIRPathLexer();
+        $this->parser    = new FHIRPathParser();
         $this->evaluator = new FHIRPathEvaluator();
     }
 
     private function evaluate(string $expression, mixed $resource): Collection
     {
         $tokens = $this->lexer->tokenize($expression);
-        $ast = $this->parser->parse($tokens);
+        $ast    = $this->parser->parse($tokens);
+
         return $this->evaluator->evaluate($ast, $resource);
     }
 
@@ -52,7 +55,7 @@ final class FHIRPathEvaluatorTest extends TestCase
 
     public function testEvaluateLiteralBoolean(): void
     {
-        $resultTrue = $this->evaluate('true', null);
+        $resultTrue  = $this->evaluate('true', null);
         $resultFalse = $this->evaluate('false', null);
 
         self::assertTrue($resultTrue->first());
@@ -62,7 +65,7 @@ final class FHIRPathEvaluatorTest extends TestCase
     public function testSimplePropertyAccess(): void
     {
         $resource = ['name' => 'John'];
-        $result = $this->evaluate('name', $resource);
+        $result   = $this->evaluate('name', $resource);
 
         self::assertSame(1, $result->count());
         self::assertSame('John', $result->first());
@@ -72,8 +75,8 @@ final class FHIRPathEvaluatorTest extends TestCase
     {
         $resource = [
             'name' => [
-                'given' => 'John'
-            ]
+                'given' => 'John',
+            ],
         ];
         $result = $this->evaluate('name.given', $resource);
 
@@ -86,8 +89,8 @@ final class FHIRPathEvaluatorTest extends TestCase
         $resource = [
             'name' => [
                 ['given' => 'John'],
-                ['given' => 'Jane']
-            ]
+                ['given' => 'Jane'],
+            ],
         ];
         $result = $this->evaluate('name.given', $resource);
 
@@ -98,7 +101,7 @@ final class FHIRPathEvaluatorTest extends TestCase
     public function testMissingPropertyReturnsEmpty(): void
     {
         $resource = ['name' => 'John'];
-        $result = $this->evaluate('age', $resource);
+        $result   = $this->evaluate('age', $resource);
 
         self::assertTrue($result->isEmpty());
     }
@@ -106,7 +109,7 @@ final class FHIRPathEvaluatorTest extends TestCase
     public function testEmptyPropagation(): void
     {
         $resource = [];
-        $result = $this->evaluate('name.given.first', $resource);
+        $result   = $this->evaluate('name.given.first', $resource);
 
         self::assertTrue($result->isEmpty());
     }
@@ -330,7 +333,7 @@ final class FHIRPathEvaluatorTest extends TestCase
     public function testIndexer(): void
     {
         $resource = ['items' => ['a', 'b', 'c']];
-        $result = $this->evaluate('items[1]', $resource);
+        $result   = $this->evaluate('items[1]', $resource);
 
         self::assertSame('b', $result->first());
     }
@@ -338,7 +341,7 @@ final class FHIRPathEvaluatorTest extends TestCase
     public function testIndexerOutOfBounds(): void
     {
         $resource = ['items' => ['a', 'b']];
-        $result = $this->evaluate('items[5]', $resource);
+        $result   = $this->evaluate('items[5]', $resource);
 
         self::assertTrue($result->isEmpty());
     }
@@ -346,11 +349,11 @@ final class FHIRPathEvaluatorTest extends TestCase
     public function testReservedIdentifierThis(): void
     {
         $resource = ['value' => 42];
-        $context = new EvaluationContext();
+        $context  = new EvaluationContext();
         $context->setVariable('this', $resource);
 
         $tokens = $this->lexer->tokenize('$this');
-        $ast = $this->parser->parse($tokens);
+        $ast    = $this->parser->parse($tokens);
         $result = $this->evaluator->evaluate($ast, $resource, $context);
 
         self::assertSame($resource, $result->first());
@@ -362,7 +365,7 @@ final class FHIRPathEvaluatorTest extends TestCase
         $context->setExternalConstant('ucum', 'http://unitsofmeasure.org');
 
         $tokens = $this->lexer->tokenize('%ucum');
-        $ast = $this->parser->parse($tokens);
+        $ast    = $this->parser->parse($tokens);
         $result = $this->evaluator->evaluate($ast, null, $context);
 
         self::assertSame('http://unitsofmeasure.org', $result->first());
@@ -373,14 +376,14 @@ final class FHIRPathEvaluatorTest extends TestCase
         $resource = [
             'name' => [
                 [
-                    'use' => 'official',
-                    'given' => ['John', 'Q']
+                    'use'   => 'official',
+                    'given' => ['John', 'Q'],
                 ],
                 [
-                    'use' => 'nickname',
-                    'given' => ['Johnny']
-                ]
-            ]
+                    'use'   => 'nickname',
+                    'given' => ['Johnny'],
+                ],
+            ],
         ];
 
         $result = $this->evaluate('name.given', $resource);
@@ -394,7 +397,7 @@ final class FHIRPathEvaluatorTest extends TestCase
 
     public function testObjectPropertyAccess(): void
     {
-        $object = new class {
+        $object = new class () {
             public string $name = 'Test';
         };
 
@@ -405,9 +408,9 @@ final class FHIRPathEvaluatorTest extends TestCase
 
     public function testObjectGetterMethod(): void
     {
-        $object = new class {
+        $object = new class () {
             private string $name = 'Test';
-            
+
             public function getName(): string
             {
                 return $this->name;

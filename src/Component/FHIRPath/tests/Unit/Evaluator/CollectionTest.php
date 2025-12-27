@@ -62,7 +62,7 @@ final class CollectionTest extends TestCase
     public function testMap(): void
     {
         $collection = Collection::from([1, 2, 3]);
-        $result = $collection->map(fn($x) => $x * 2);
+        $result     = $collection->map(fn ($x) => $x * 2);
 
         self::assertSame([2, 4, 6], $result->toArray());
     }
@@ -70,7 +70,7 @@ final class CollectionTest extends TestCase
     public function testFilter(): void
     {
         $collection = Collection::from([1, 2, 3, 4, 5]);
-        $result = $collection->filter(fn($x) => $x % 2 === 0);
+        $result     = $collection->filter(fn ($x) => $x % 2 === 0);
 
         self::assertSame([2, 4], $result->toArray());
     }
@@ -79,7 +79,7 @@ final class CollectionTest extends TestCase
     {
         $collection1 = Collection::from([1, 2, 3]);
         $collection2 = Collection::from([3, 4, 5]);
-        $result = $collection1->union($collection2);
+        $result      = $collection1->union($collection2);
 
         self::assertSame([1, 2, 3, 4, 5], $result->toArray());
     }
@@ -88,7 +88,7 @@ final class CollectionTest extends TestCase
     {
         $collection1 = Collection::from([1, 2, 3, 4]);
         $collection2 = Collection::from([3, 4, 5, 6]);
-        $result = $collection1->intersect($collection2);
+        $result      = $collection1->intersect($collection2);
 
         self::assertSame([3, 4], $result->toArray());
     }
@@ -97,7 +97,7 @@ final class CollectionTest extends TestCase
     {
         $collection1 = Collection::from([1, 2]);
         $collection2 = Collection::from([3, 4]);
-        $result = $collection1->concat($collection2);
+        $result      = $collection1->concat($collection2);
 
         self::assertSame([1, 2, 3, 4], $result->toArray());
     }
@@ -106,7 +106,7 @@ final class CollectionTest extends TestCase
     {
         $collection1 = Collection::from([1, 2, 3]);
         $collection2 = Collection::from([3, 4, 5]);
-        $result = $collection1->concat($collection2);
+        $result      = $collection1->concat($collection2);
 
         self::assertSame([1, 2, 3, 3, 4, 5], $result->toArray());
     }
@@ -115,22 +115,22 @@ final class CollectionTest extends TestCase
     {
         $collection = Collection::from([2, 4, 6]);
 
-        self::assertTrue($collection->all(fn($x) => $x % 2 === 0));
-        self::assertFalse($collection->all(fn($x) => $x > 5));
+        self::assertTrue($collection->all(fn ($x) => $x % 2 === 0));
+        self::assertFalse($collection->all(fn ($x) => $x > 5));
     }
 
     public function testAny(): void
     {
         $collection = Collection::from([1, 2, 3]);
 
-        self::assertTrue($collection->any(fn($x) => $x === 2));
-        self::assertFalse($collection->any(fn($x) => $x > 5));
+        self::assertTrue($collection->any(fn ($x) => $x === 2));
+        self::assertFalse($collection->any(fn ($x) => $x > 5));
     }
 
     public function testFlatten(): void
     {
-        $inner1 = Collection::from([1, 2]);
-        $inner2 = Collection::from([3, 4]);
+        $inner1     = Collection::from([1, 2]);
+        $inner2     = Collection::from([3, 4]);
         $collection = Collection::from([$inner1, 5, $inner2]);
 
         $result = $collection->flatten();
@@ -141,7 +141,7 @@ final class CollectionTest extends TestCase
     public function testIterator(): void
     {
         $collection = Collection::from(['a', 'b', 'c']);
-        $items = [];
+        $items      = [];
 
         foreach ($collection as $item) {
             $items[] = $item;

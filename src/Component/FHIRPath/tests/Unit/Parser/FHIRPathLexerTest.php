@@ -112,7 +112,7 @@ class FHIRPathLexerTest extends TestCase
 
     public function testTokenizeDelimiters(): void
     {
-        $tokens = $this->lexer->tokenize('()[]{},.'); 
+        $tokens = $this->lexer->tokenize('()[]{},.');
 
         self::assertEquals(TokenType::LPAREN, $tokens[0]->type);
         self::assertEquals(TokenType::RPAREN, $tokens[1]->type);
@@ -329,7 +329,7 @@ class FHIRPathLexerTest extends TestCase
 
     public function testTokenizeLogicalExpression(): void
     {
-        $tokens = $this->lexer->tokenize('age > 18 and status = "active"');
+        $tokens = $this->lexer->tokenize("age > 18 and status = 'active'");
 
         self::assertEquals(TokenType::IDENTIFIER, $tokens[0]->type);
         self::assertEquals(TokenType::GREATER_THAN, $tokens[1]->type);
@@ -407,7 +407,7 @@ class FHIRPathLexerTest extends TestCase
 
     public function testWhitespaceOnlyExpression(): void
     {
-        $tokens = $this->lexer->tokenize('   \n\t  ');
+        $tokens = $this->lexer->tokenize("   \n\t  ");
 
         self::assertCount(1, $tokens); // Just EOF
         self::assertEquals(TokenType::EOF, $tokens[0]->type);
@@ -433,7 +433,7 @@ class FHIRPathLexerTest extends TestCase
     public function testComplexFHIRPathExpression(): void
     {
         $expression = "Patient.name.where(use = 'official').given.first()";
-        $tokens = $this->lexer->tokenize($expression);
+        $tokens     = $this->lexer->tokenize($expression);
 
         self::assertGreaterThan(10, count($tokens));
         self::assertEquals(TokenType::IDENTIFIER, $tokens[0]->type);
@@ -443,7 +443,7 @@ class FHIRPathLexerTest extends TestCase
     public function testFHIRPathWithQuantity(): void
     {
         $expression = "Observation.value > 5 'mg'";
-        $tokens = $this->lexer->tokenize($expression);
+        $tokens     = $this->lexer->tokenize($expression);
 
         self::assertEquals(TokenType::IDENTIFIER, $tokens[0]->type);
         self::assertEquals(TokenType::DOT, $tokens[1]->type);

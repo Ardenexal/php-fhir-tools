@@ -17,9 +17,9 @@ class ExternalConstantNode extends ExpressionNode
     /**
      * Create a new external constant node.
      *
-     * @param string $name The constant name (without the % prefix)
-     * @param int $line The line number
-     * @param int $column The column number
+     * @param string $name   The constant name (without the % prefix)
+     * @param int    $line   The line number
+     * @param int    $column The column number
      */
     public function __construct(
         private readonly string $name,

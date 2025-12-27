@@ -4,11 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Evaluator;
 
-use ArrayIterator;
-use Countable;
-use IteratorAggregate;
-use Traversable;
-
 /**
  * Immutable collection abstraction for FHIRPath evaluation
  *
@@ -17,9 +12,9 @@ use Traversable;
  *
  * @author Ardenexal <https://github.com/Ardenexal>
  *
- * @implements IteratorAggregate<int, mixed>
+ * @implements \IteratorAggregate<int, mixed>
  */
-final readonly class Collection implements IteratorAggregate, Countable
+final readonly class Collection implements \IteratorAggregate, \Countable
 {
     /**
      * @param array<int, mixed> $items
@@ -93,6 +88,7 @@ final readonly class Collection implements IteratorAggregate, Countable
     public function last(): mixed
     {
         $count = count($this->items);
+
         return $count > 0 ? $this->items[$count - 1] : null;
     }
 
@@ -170,6 +166,7 @@ final readonly class Collection implements IteratorAggregate, Countable
                 return false;
             }
         }
+
         return true;
     }
 
@@ -185,6 +182,7 @@ final readonly class Collection implements IteratorAggregate, Countable
                 return true;
             }
         }
+
         return false;
     }
 
@@ -204,16 +202,17 @@ final readonly class Collection implements IteratorAggregate, Countable
                 $result[] = $item;
             }
         }
+
         return new self($result);
     }
 
     /**
      * Get an iterator for the collection
      *
-     * @return Traversable<int, mixed>
+     * @return \Traversable<int, mixed>
      */
-    public function getIterator(): Traversable
+    public function getIterator(): \Traversable
     {
-        return new ArrayIterator($this->items);
+        return new \ArrayIterator($this->items);
     }
 }

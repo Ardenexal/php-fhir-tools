@@ -20,11 +20,11 @@ class EvaluationException extends FHIRPathException
     /**
      * Create an evaluation exception with detailed error information.
      *
-     * @param string $message The error message
-     * @param int $line The line number where evaluation failed
-     * @param int $column The column number where evaluation failed
-     * @param string $expressionContext The expression context around the error
-     * @param string|null $suggestion Optional suggestion for fixing the error
+     * @param string      $message           The error message
+     * @param int         $line              The line number where evaluation failed
+     * @param int         $column            The column number where evaluation failed
+     * @param string      $expressionContext The expression context around the error
+     * @param string|null $suggestion        Optional suggestion for fixing the error
      */
     public function __construct(
         string $message,
@@ -40,8 +40,8 @@ class EvaluationException extends FHIRPathException
      * Create an evaluation exception for type mismatches.
      *
      * @param string $expectedType The expected type
-     * @param string $actualType The actual type found
-     * @param string $context The expression context
+     * @param string $actualType   The actual type found
+     * @param string $context      The expression context
      */
     public static function typeMismatch(
         string $expectedType,
@@ -51,10 +51,10 @@ class EvaluationException extends FHIRPathException
         $message = sprintf(
             'Type mismatch: expected %s but got %s',
             $expectedType,
-            $actualType
+            $actualType,
         );
 
-        $suggestion = "Ensure the expression operates on the correct types or use type conversion functions.";
+        $suggestion = 'Ensure the expression operates on the correct types or use type conversion functions.';
 
         return new self($message, 0, 0, $context, $suggestion);
     }
@@ -63,8 +63,8 @@ class EvaluationException extends FHIRPathException
      * Create an evaluation exception for invalid operations.
      *
      * @param string $operation The operation that failed
-     * @param string $reason The reason for failure
-     * @param string $context The expression context
+     * @param string $reason    The reason for failure
+     * @param string $context   The expression context
      */
     public static function invalidOperation(
         string $operation,
@@ -74,10 +74,10 @@ class EvaluationException extends FHIRPathException
         $message = sprintf(
             'Invalid operation %s: %s',
             $operation,
-            $reason
+            $reason,
         );
 
-        $suggestion = "Check that the operation is applicable to the current data.";
+        $suggestion = 'Check that the operation is applicable to the current data.';
 
         return new self($message, 0, 0, $context, $suggestion);
     }
@@ -85,8 +85,8 @@ class EvaluationException extends FHIRPathException
     /**
      * Create an evaluation exception for navigation failures.
      *
-     * @param string $path The path that failed
-     * @param string $reason The reason for failure
+     * @param string $path    The path that failed
+     * @param string $reason  The reason for failure
      * @param string $context The expression context
      */
     public static function navigationFailed(
@@ -97,10 +97,10 @@ class EvaluationException extends FHIRPathException
         $message = sprintf(
             'Navigation failed for path "%s": %s',
             $path,
-            $reason
+            $reason,
         );
 
-        $suggestion = "Verify that the path exists in the FHIR resource structure.";
+        $suggestion = 'Verify that the path exists in the FHIR resource structure.';
 
         return new self($message, 0, 0, $context, $suggestion);
     }
@@ -108,9 +108,9 @@ class EvaluationException extends FHIRPathException
     /**
      * Create an evaluation exception for invalid function parameters.
      *
-     * @param string $functionName The function name
+     * @param string $functionName  The function name
      * @param string $parameterName The parameter name
-     * @param string $expectedType The expected type/format
+     * @param string $expectedType  The expected type/format
      */
     public static function invalidFunctionParameter(
         string $functionName,
@@ -121,10 +121,10 @@ class EvaluationException extends FHIRPathException
             "Function '%s' parameter '%s' must be %s",
             $functionName,
             $parameterName,
-            $expectedType
+            $expectedType,
         );
 
-        $suggestion = "Check the function documentation for the correct parameter types.";
+        $suggestion = 'Check the function documentation for the correct parameter types.';
 
         return new self($message, 0, 0, '', $suggestion);
     }
