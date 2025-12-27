@@ -12,7 +12,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
  * Manages registration and lookup of all available FHIRPath functions.
  * Uses singleton pattern to ensure single registry instance.
  *
- * @author Copilot
+ * @author Ardenexal <https://github.com/Ardenexal>
  */
 final class FunctionRegistry
 {

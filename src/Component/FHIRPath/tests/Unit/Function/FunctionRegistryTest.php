@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Tests for FunctionRegistry.
  *
- * @author Copilot
+ * @author Ardenexal <https://github.com/Ardenexal>
  */
 final class FunctionRegistryTest extends TestCase
 {

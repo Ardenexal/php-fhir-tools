@@ -13,7 +13,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
  * All FHIRPath functions must implement this interface to be registered
  * and executed by the evaluator.
  *
- * @author Copilot
+ * @author Ardenexal <https://github.com/Ardenexal>
  */
 interface FunctionInterface
 {

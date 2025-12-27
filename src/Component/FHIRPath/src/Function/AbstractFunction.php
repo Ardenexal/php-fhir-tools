@@ -11,7 +11,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
  *
  * Provides common functionality for parameter validation and utilities.
  *
- * @author Copilot
+ * @author Ardenexal <https://github.com/Ardenexal>
  */
 abstract class AbstractFunction implements FunctionInterface
 {
