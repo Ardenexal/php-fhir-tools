@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
+use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Expression\ExpressionNode;
 
 /**
@@ -33,9 +34,14 @@ final class ExistsFunction extends AbstractFunction
         /** @var ExpressionNode $criteriaExpr */
         $criteriaExpr = $parameters[0];
 
+        $evaluator = $context->getEvaluator();
+        if ($evaluator === null) {
+            throw new EvaluationException('Evaluator not set in context', 0, 0);
+        }
+
         foreach ($input as $item) {
             $itemContext = $context->withCurrentNode($item);
-            $result      = $criteriaExpr->accept($context->getEvaluator());
+            $result      = $criteriaExpr->accept($evaluator);
 
             if (!$result->isEmpty() && $result->first() === true) {
                 return Collection::single(true);

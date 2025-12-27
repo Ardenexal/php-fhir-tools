@@ -310,7 +310,7 @@ class FHIRPathLexer
             $hex .= $this->advance();
         }
 
-        return mb_chr(hexdec($hex), 'UTF-8');
+        return mb_chr((int) hexdec($hex), 'UTF-8');
     }
 
     /**

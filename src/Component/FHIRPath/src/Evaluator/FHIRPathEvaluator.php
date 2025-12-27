@@ -144,14 +144,9 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         // Evaluate parameters - they can be expressions or literals
         $evaluatedParams = [];
         foreach ($node->getParameters() as $param) {
-            // Parameters can be expressions that need evaluation, or they can be passed as-is
-            // For criteria expressions (like in where(), exists(), all()), pass the AST node
-            if ($param instanceof ExpressionNode) {
-                $evaluatedParams[] = $param;
-            } else {
-                $result            = $param->accept($this);
-                $evaluatedParams[] = $result;
-            }
+            // Parameters are expression nodes that can be passed as-is to functions
+            // Functions like where(), exists(), all() will evaluate them themselves
+            $evaluatedParams[] = $param;
         }
 
         // Execute the function

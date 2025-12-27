@@ -47,10 +47,10 @@ abstract class AbstractFunction implements FunctionInterface
 
         if ($count < $expected || $count > $max) {
             if ($expected === $max) {
-                throw EvaluationException::create(sprintf('Function %s() expects exactly %d parameter(s), %d given', $this->name, $expected, $count), 0, 0);
+                throw new EvaluationException(sprintf('Function %s() expects exactly %d parameter(s), %d given', $this->name, $expected, $count), 0, 0);
             }
 
-            throw EvaluationException::create(sprintf('Function %s() expects %d-%d parameter(s), %d given', $this->name, $expected, $max, $count), 0, 0);
+            throw new EvaluationException(sprintf('Function %s() expects %d-%d parameter(s), %d given', $this->name, $expected, $max, $count), 0, 0);
         }
     }
 
@@ -67,7 +67,7 @@ abstract class AbstractFunction implements FunctionInterface
         $count = count($parameters);
 
         if ($count < $min) {
-            throw EvaluationException::create(sprintf('Function %s() expects at least %d parameter(s), %d given', $this->name, $min, $count), 0, 0);
+            throw new EvaluationException(sprintf('Function %s() expects at least %d parameter(s), %d given', $this->name, $min, $count), 0, 0);
         }
     }
 }

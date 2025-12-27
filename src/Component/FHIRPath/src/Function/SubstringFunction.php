@@ -59,6 +59,6 @@ final class SubstringFunction extends AbstractFunction
 
         $result = $length !== null ? substr($str, $start, $length) : substr($str, $start);
 
-        return Collection::single($result !== false ? $result : '');
+        return Collection::single($result);
     }
 }
