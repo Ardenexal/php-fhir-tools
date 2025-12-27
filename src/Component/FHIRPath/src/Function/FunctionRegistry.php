@@ -39,25 +39,46 @@ final class FunctionRegistry
         $this->registerSafe(new ExistsFunction());
         $this->registerSafe(new AllFunction());
         $this->registerSafe(new CountFunction());
+        $this->registerSafe(new AllTrueFunction());
+        $this->registerSafe(new AnyTrueFunction());
+        $this->registerSafe(new AllFalseFunction());
+        $this->registerSafe(new AnyFalseFunction());
 
         // Filtering functions
         $this->registerSafe(new WhereFunction());
+        $this->registerSafe(new SelectFunction());
         $this->registerSafe(new FirstFunction());
         $this->registerSafe(new LastFunction());
         $this->registerSafe(new TailFunction());
         $this->registerSafe(new TakeFunction());
         $this->registerSafe(new SkipFunction());
+        $this->registerSafe(new SingleFunction());
+        $this->registerSafe(new DistinctFunction());
 
         // Subsetting functions
         $this->registerSafe(new UnionFunction());
         $this->registerSafe(new IntersectFunction());
+        $this->registerSafe(new ExcludeFunction());
 
         // String functions
         $this->registerSafe(new SubstringFunction());
         $this->registerSafe(new LengthFunction());
+        $this->registerSafe(new StartsWithFunction());
+        $this->registerSafe(new EndsWithFunction());
+        $this->registerSafe(new ContainsStringFunction());
+        $this->registerSafe(new IndexOfFunction());
+        $this->registerSafe(new UpperFunction());
+        $this->registerSafe(new LowerFunction());
+        $this->registerSafe(new ReplaceFunction());
+        $this->registerSafe(new MatchesFunction());
+        $this->registerSafe(new TrimFunction());
+        $this->registerSafe(new SplitFunction());
 
         // Math functions
         $this->registerSafe(new SumFunction());
+        $this->registerSafe(new AbsFunction());
+        $this->registerSafe(new CeilingFunction());
+        $this->registerSafe(new FloorFunction());
     }
 
     /**
