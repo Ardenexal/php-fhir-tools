@@ -22,7 +22,7 @@ class TokenTest extends TestCase
             'name',
             10,
             5,
-            42
+            42,
         );
 
         self::assertEquals(TokenType::IDENTIFIER, $token->type);

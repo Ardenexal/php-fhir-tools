@@ -20,10 +20,10 @@ class TypeExpressionNode extends ExpressionNode
      * Create a new type expression node.
      *
      * @param ExpressionNode $expression The expression to check/cast
-     * @param TokenType $operator The operator (IS or AS)
-     * @param string $typeName The type name to check/cast to
-     * @param int $line The line number
-     * @param int $column The column number
+     * @param TokenType      $operator   The operator (IS or AS)
+     * @param string         $typeName   The type name to check/cast to
+     * @param int            $line       The line number
+     * @param int            $column     The column number
      */
     public function __construct(
         private readonly ExpressionNode $expression,
@@ -73,6 +73,7 @@ class TypeExpressionNode extends ExpressionNode
     public function toString(): string
     {
         $operator = $this->operator === TokenType::IS ? ' is ' : ' as ';
+
         return '(' . $this->expression->toString() . $operator . $this->typeName . ')';
     }
 }

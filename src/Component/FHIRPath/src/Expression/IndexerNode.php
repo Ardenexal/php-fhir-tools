@@ -18,9 +18,9 @@ class IndexerNode extends ExpressionNode
      * Create a new indexer node.
      *
      * @param ExpressionNode $collection The collection being indexed
-     * @param ExpressionNode $index The index expression
-     * @param int $line The line number
-     * @param int $column The column number
+     * @param ExpressionNode $index      The index expression
+     * @param int            $line       The line number
+     * @param int            $column     The column number
      */
     public function __construct(
         private readonly ExpressionNode $collection,

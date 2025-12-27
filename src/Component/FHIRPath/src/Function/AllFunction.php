@@ -23,25 +23,25 @@ final class AllFunction extends AbstractFunction
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection
     {
         $this->validateParameterCount($parameters, 1);
-        
+
         /** @var ExpressionNode $criteriaExpr */
         $criteriaExpr = $parameters[0];
-        
+
         // Empty collection returns true (vacuous truth)
         if ($input->isEmpty()) {
             return Collection::single(true);
         }
-        
+
         foreach ($input as $item) {
             $itemContext = $context->withCurrentNode($item);
-            $result = $criteriaExpr->accept($context->getEvaluator());
-            
+            $result      = $criteriaExpr->accept($context->getEvaluator());
+
             // If any item doesn't match (false or empty), return false
             if ($result->isEmpty() || $result->first() !== true) {
                 return Collection::single(false);
             }
         }
-        
+
         return Collection::single(true);
     }
 }

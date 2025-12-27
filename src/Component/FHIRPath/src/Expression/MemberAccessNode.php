@@ -19,8 +19,8 @@ class MemberAccessNode extends ExpressionNode
      *
      * @param ExpressionNode $object The object/expression to access
      * @param ExpressionNode $member The member being accessed
-     * @param int $line The line number
-     * @param int $column The column number
+     * @param int            $line   The line number
+     * @param int            $column The column number
      */
     public function __construct(
         private readonly ExpressionNode $object,

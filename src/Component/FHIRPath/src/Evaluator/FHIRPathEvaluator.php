@@ -18,6 +18,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Expression\TypeExpressionNode;
 use Ardenexal\FHIRTools\Component\FHIRPath\Expression\UnaryOperatorNode;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\TokenType;
+use Ardenexal\FHIRTools\Component\FHIRPath\Function\FunctionRegistry;
 
 /**
  * FHIRPath expression evaluator
@@ -40,9 +41,9 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     /**
      * Evaluate an expression against a resource
      *
-     * @param ExpressionNode $expression The parsed expression (AST)
-     * @param mixed $resource The FHIR resource or data to evaluate against
-     * @param EvaluationContext|null $context Optional evaluation context
+     * @param ExpressionNode         $expression The parsed expression (AST)
+     * @param mixed                  $resource   The FHIR resource or data to evaluate against
+     * @param EvaluationContext|null $context    Optional evaluation context
      */
     public function evaluate(ExpressionNode $expression, mixed $resource, ?EvaluationContext $context = null): Collection
     {
@@ -50,7 +51,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         $this->context->setRootResource($resource);
         $this->context->setVariable('this', $resource);
         $this->context->setEvaluator($this);
-        
+
         if ($resource !== null) {
             $this->context->setCurrentNode($resource);
         }
@@ -78,8 +79,10 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             $variableName = ltrim($name, '$');
             if ($this->context->hasVariable($variableName)) {
                 $value = $this->context->getVariable($variableName);
+
                 return $value !== null ? Collection::single($value) : Collection::empty();
             }
+
             return Collection::empty();
         }
 
@@ -108,12 +111,12 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         // Navigate each item in the collection and flatten results
         $results = [];
         foreach ($objectResult as $item) {
-            $oldContext = $this->context;
+            $oldContext    = $this->context;
             $this->context = $this->context->withCurrentNode($item);
-            
+
             $memberResult = $node->getMember()->accept($this);
-            $results = [...$results, ...$memberResult->toArray()];
-            
+            $results      = [...$results, ...$memberResult->toArray()];
+
             $this->context = $oldContext;
         }
 
@@ -126,35 +129,31 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     public function visitFunctionCall(FunctionCallNode $node): Collection
     {
         // Get the current collection (the input to the function)
-        $input = $this->context->getCurrentNode();
+        $input           = $this->context->getCurrentNode();
         $inputCollection = $input !== null ? $this->wrapValue($input) : Collection::empty();
-        
+
         // Get the function from the registry
-        $registry = \Ardenexal\FHIRTools\Component\FHIRPath\Function\FunctionRegistry::getInstance();
-        
+        $registry = FunctionRegistry::getInstance();
+
         if (!$registry->has($node->getName())) {
-            throw new EvaluationException(
-                "Unknown function: {$node->getName()}",
-                $node->getLine(),
-                $node->getColumn()
-            );
+            throw new EvaluationException("Unknown function: {$node->getName()}", $node->getLine(), $node->getColumn());
         }
-        
+
         $function = $registry->get($node->getName());
-        
+
         // Evaluate parameters - they can be expressions or literals
         $evaluatedParams = [];
         foreach ($node->getParameters() as $param) {
             // Parameters can be expressions that need evaluation, or they can be passed as-is
             // For criteria expressions (like in where(), exists(), all()), pass the AST node
-            if ($param instanceof \Ardenexal\FHIRTools\Component\FHIRPath\Expression\ExpressionNode) {
+            if ($param instanceof ExpressionNode) {
                 $evaluatedParams[] = $param;
             } else {
-                $result = $param->accept($this);
+                $result            = $param->accept($this);
                 $evaluatedParams[] = $result;
             }
         }
-        
+
         // Execute the function
         return $function->execute($inputCollection, $evaluatedParams, $this->context);
     }
@@ -164,50 +163,42 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      */
     public function visitBinaryOperator(BinaryOperatorNode $node): Collection
     {
-        $left = $node->getLeft()->accept($this);
+        $left  = $node->getLeft()->accept($this);
         $right = $node->getRight()->accept($this);
 
         return match ($node->getOperator()) {
             // Union operator
             TokenType::PIPE => $left->union($right),
-            
+
             // Arithmetic operators (require single values)
-            TokenType::PLUS => $this->evaluateArithmetic($left, $right, fn($a, $b) => $a + $b),
-            TokenType::MINUS => $this->evaluateArithmetic($left, $right, fn($a, $b) => $a - $b),
-            TokenType::MULTIPLY => $this->evaluateArithmetic($left, $right, fn($a, $b) => $a * $b),
-            TokenType::DIVIDE => $this->evaluateArithmetic($left, $right, fn($a, $b) => (float)($a / $b)),
-            TokenType::DIV => $this->evaluateArithmetic($left, $right, fn($a, $b) => intdiv((int)$a, (int)$b)),
-            TokenType::MOD => $this->evaluateArithmetic($left, $right, fn($a, $b) => $a % $b),
-            
+            TokenType::PLUS     => $this->evaluateArithmetic($left, $right, fn ($a, $b) => $a + $b),
+            TokenType::MINUS    => $this->evaluateArithmetic($left, $right, fn ($a, $b) => $a - $b),
+            TokenType::MULTIPLY => $this->evaluateArithmetic($left, $right, fn ($a, $b) => $a * $b),
+            TokenType::DIVIDE   => $this->evaluateArithmetic($left, $right, fn ($a, $b) => (float) ($a / $b)),
+            TokenType::DIV      => $this->evaluateArithmetic($left, $right, fn ($a, $b) => intdiv((int) $a, (int) $b)),
+            TokenType::MOD      => $this->evaluateArithmetic($left, $right, fn ($a, $b) => $a % $b),
+
             // Comparison operators
-            TokenType::EQUALS => $this->evaluateComparison($left, $right, fn($a, $b) => $a == $b),
-            TokenType::NOT_EQUALS => $this->evaluateComparison($left, $right, fn($a, $b) => $a != $b),
-            TokenType::LESS_THAN => $this->evaluateComparison($left, $right, fn($a, $b) => $a < $b),
-            TokenType::GREATER_THAN => $this->evaluateComparison($left, $right, fn($a, $b) => $a > $b),
-            TokenType::LESS_EQUAL => $this->evaluateComparison($left, $right, fn($a, $b) => $a <= $b),
-            TokenType::GREATER_EQUAL => $this->evaluateComparison($left, $right, fn($a, $b) => $a >= $b),
-            
+            TokenType::EQUALS        => $this->evaluateComparison($left, $right, fn ($a, $b) => $a == $b),
+            TokenType::NOT_EQUALS    => $this->evaluateComparison($left, $right, fn ($a, $b) => $a != $b),
+            TokenType::LESS_THAN     => $this->evaluateComparison($left, $right, fn ($a, $b) => $a < $b),
+            TokenType::GREATER_THAN  => $this->evaluateComparison($left, $right, fn ($a, $b) => $a > $b),
+            TokenType::LESS_EQUAL    => $this->evaluateComparison($left, $right, fn ($a, $b) => $a <= $b),
+            TokenType::GREATER_EQUAL => $this->evaluateComparison($left, $right, fn ($a, $b) => $a >= $b),
+
             // String concatenation
             TokenType::AMPERSAND => $this->evaluateStringConcat($left, $right),
-            
+
             // Logical operators
-            TokenType::AND => $this->evaluateLogicalAnd($left, $right),
-            TokenType::OR => $this->evaluateLogicalOr($left, $right),
-            TokenType::XOR => $this->evaluateLogicalXor($left, $right),
+            TokenType::AND     => $this->evaluateLogicalAnd($left, $right),
+            TokenType::OR      => $this->evaluateLogicalOr($left, $right),
+            TokenType::XOR     => $this->evaluateLogicalXor($left, $right),
             TokenType::IMPLIES => $this->evaluateImplies($left, $right),
-            
+
             // Membership operators (to be fully implemented later)
-            TokenType::IN, TokenType::CONTAINS => throw new EvaluationException(
-                "Operator '{$node->getOperator()->value}' not yet fully implemented",
-                $node->getLine(),
-                $node->getColumn()
-            ),
-            
-            default => throw new EvaluationException(
-                "Unknown operator: {$node->getOperator()->value}",
-                $node->getLine(),
-                $node->getColumn()
-            ),
+            TokenType::IN, TokenType::CONTAINS => throw new EvaluationException("Operator '{$node->getOperator()->value}' not yet fully implemented", $node->getLine(), $node->getColumn()),
+
+            default => throw new EvaluationException("Unknown operator: {$node->getOperator()->value}", $node->getLine(), $node->getColumn()),
         };
     }
 
@@ -223,23 +214,15 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         }
 
         if (!$operand->isSingle()) {
-            throw new EvaluationException(
-                "Unary operator requires a single value",
-                $node->getLine(),
-                $node->getColumn()
-            );
+            throw new EvaluationException('Unary operator requires a single value', $node->getLine(), $node->getColumn());
         }
 
         $value = $operand->first();
 
         return match ($node->getOperator()) {
             TokenType::MINUS => Collection::single(-$value),
-            TokenType::PLUS => Collection::single(+$value),
-            default => throw new EvaluationException(
-                "Unknown unary operator: {$node->getOperator()->value}",
-                $node->getLine(),
-                $node->getColumn()
-            ),
+            TokenType::PLUS  => Collection::single(+$value),
+            default          => throw new EvaluationException("Unknown unary operator: {$node->getOperator()->value}", $node->getLine(), $node->getColumn()),
         };
     }
 
@@ -248,7 +231,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      */
     public function visitIndexer(IndexerNode $node): Collection
     {
-        $collection = $node->getCollection()->accept($this);
+        $collection  = $node->getCollection()->accept($this);
         $indexResult = $node->getIndex()->accept($this);
 
         if ($indexResult->isEmpty() || !$indexResult->isSingle()) {
@@ -261,6 +244,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         }
 
         $item = $collection->get($index);
+
         return $item !== null ? Collection::single($item) : Collection::empty();
     }
 
@@ -270,11 +254,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     public function visitTypeExpression(TypeExpressionNode $node): Collection
     {
         // Type operations will be fully implemented in Phase 7
-        throw new EvaluationException(
-            "Type operations not yet fully implemented",
-            $node->getLine(),
-            $node->getColumn()
-        );
+        throw new EvaluationException('Type operations not yet fully implemented', $node->getLine(), $node->getColumn());
     }
 
     /**
@@ -284,14 +264,11 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     {
         if ($this->context->hasExternalConstant($node->getName())) {
             $value = $this->context->getExternalConstant($node->getName());
+
             return $value !== null ? Collection::single($value) : Collection::empty();
         }
 
-        throw new EvaluationException(
-            "External constant '%{$node->getName()}' not found",
-            $node->getLine(),
-            $node->getColumn()
-        );
+        throw new EvaluationException("External constant '%{$node->getName()}' not found", $node->getLine(), $node->getColumn());
     }
 
     /**
@@ -306,7 +283,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         $items = [];
         foreach ($node->getElements() as $itemNode) {
             $result = $itemNode->accept($this);
-            $items = [...$items, ...$result->toArray()];
+            $items  = [...$items, ...$result->toArray()];
         }
 
         return Collection::from($items);
@@ -321,8 +298,10 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         if (is_array($node)) {
             if (array_key_exists($propertyName, $node)) {
                 $value = $node[$propertyName];
+
                 return $this->wrapValue($value);
             }
+
             return Collection::empty();
         }
 
@@ -332,6 +311,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             if (property_exists($node, $propertyName)) {
                 try {
                     $value = $node->$propertyName;
+
                     return $this->wrapValue($value);
                 } catch (\Error $e) {
                     // Property exists but is not accessible (e.g., private/protected)
@@ -343,6 +323,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             $getter = 'get' . ucfirst($propertyName);
             if (method_exists($node, $getter)) {
                 $value = $node->$getter();
+
                 return $this->wrapValue($value);
             }
 
@@ -374,6 +355,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             if (array_is_list($value)) {
                 return Collection::from($value);
             }
+
             return Collection::single($value);
         }
 
@@ -392,10 +374,10 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         }
 
         if (!$left->isSingle() || !$right->isSingle()) {
-            throw new EvaluationException("Arithmetic operators require single values");
+            throw new EvaluationException('Arithmetic operators require single values');
         }
 
-        $leftValue = $left->first();
+        $leftValue  = $left->first();
         $rightValue = $right->first();
 
         if (!is_numeric($leftValue) || !is_numeric($rightValue)) {
@@ -421,6 +403,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         }
 
         $result = $operation($left->first(), $right->first());
+
         return Collection::single($result);
     }
 
@@ -437,7 +420,8 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             return Collection::empty();
         }
 
-        $result = (string)$left->first() . (string)$right->first();
+        $result = (string) $left->first() . (string) $right->first();
+
         return Collection::single($result);
     }
 
@@ -446,7 +430,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      */
     private function evaluateLogicalAnd(Collection $left, Collection $right): Collection
     {
-        $leftBool = $this->toBoolean($left);
+        $leftBool  = $this->toBoolean($left);
         $rightBool = $this->toBoolean($right);
 
         // Three-valued logic: false and anything = false
@@ -468,7 +452,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      */
     private function evaluateLogicalOr(Collection $left, Collection $right): Collection
     {
-        $leftBool = $this->toBoolean($left);
+        $leftBool  = $this->toBoolean($left);
         $rightBool = $this->toBoolean($right);
 
         // Three-valued logic: true or anything = true
@@ -490,7 +474,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      */
     private function evaluateLogicalXor(Collection $left, Collection $right): Collection
     {
-        $leftBool = $this->toBoolean($left);
+        $leftBool  = $this->toBoolean($left);
         $rightBool = $this->toBoolean($right);
 
         if ($leftBool === null || $rightBool === null) {
@@ -498,6 +482,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         }
 
         $result = ($leftBool xor $rightBool);
+
         return Collection::single($result);
     }
 
@@ -506,7 +491,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      */
     private function evaluateImplies(Collection $left, Collection $right): Collection
     {
-        $leftBool = $this->toBoolean($left);
+        $leftBool  = $this->toBoolean($left);
         $rightBool = $this->toBoolean($right);
 
         // Three-valued logic for implies

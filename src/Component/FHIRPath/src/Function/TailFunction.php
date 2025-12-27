@@ -22,11 +22,11 @@ final class TailFunction extends AbstractFunction
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection
     {
         $this->validateParameterCount($parameters, 0);
-        
+
         if ($input->isEmpty()) {
             return Collection::empty();
         }
-        
+
         $items = [];
         $first = true;
         foreach ($input as $item) {
@@ -36,7 +36,7 @@ final class TailFunction extends AbstractFunction
             }
             $items[] = $item;
         }
-        
+
         return Collection::from($items);
     }
 }

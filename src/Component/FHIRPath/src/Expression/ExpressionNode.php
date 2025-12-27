@@ -17,7 +17,7 @@ abstract class ExpressionNode
     /**
      * Create a new expression node.
      *
-     * @param int $line The line number where this expression appears
+     * @param int $line   The line number where this expression appears
      * @param int $column The column number where this expression starts
      */
     public function __construct(
@@ -49,6 +49,7 @@ abstract class ExpressionNode
      * operations to be performed on the AST without modifying the node classes.
      *
      * @param ExpressionVisitor $visitor The visitor to accept
+     *
      * @return mixed The result of the visitor's visit method
      */
     abstract public function accept(ExpressionVisitor $visitor): mixed;

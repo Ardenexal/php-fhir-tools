@@ -15,63 +15,63 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Parser;
 enum TokenType: string
 {
     // Literals
-    case STRING = 'STRING';
-    case NUMBER = 'NUMBER';
-    case BOOLEAN = 'BOOLEAN';
-    case NULL = 'NULL';
+    case STRING   = 'STRING';
+    case NUMBER   = 'NUMBER';
+    case BOOLEAN  = 'BOOLEAN';
+    case NULL     = 'NULL';
     case DATETIME = 'DATETIME';
-    case TIME = 'TIME';
+    case TIME     = 'TIME';
     case QUANTITY = 'QUANTITY';
 
     // Identifiers and Keywords
     case IDENTIFIER = 'IDENTIFIER';
-    case AND = 'AND';
-    case OR = 'OR';
-    case XOR = 'XOR';
-    case IMPLIES = 'IMPLIES';
-    case AS = 'AS';
-    case IS = 'IS';
-    case IN = 'IN';
-    case CONTAINS = 'CONTAINS';
-    case DIV = 'DIV';
-    case MOD = 'MOD';
+    case AND        = 'AND';
+    case OR         = 'OR';
+    case XOR        = 'XOR';
+    case IMPLIES    = 'IMPLIES';
+    case AS         = 'AS';
+    case IS         = 'IS';
+    case IN         = 'IN';
+    case CONTAINS   = 'CONTAINS';
+    case DIV        = 'DIV';
+    case MOD        = 'MOD';
 
     // Reserved Identifiers
-    case THIS = 'THIS';           // $this
+    case THIS  = 'THIS';           // $this
     case INDEX = 'INDEX';         // $index
     case TOTAL = 'TOTAL';         // $total
 
     // Comparison Operators
-    case EQUALS = 'EQUALS';                  // =
-    case NOT_EQUALS = 'NOT_EQUALS';          // !=
-    case EQUIVALENT = 'EQUIVALENT';          // ~
+    case EQUALS         = 'EQUALS';                  // =
+    case NOT_EQUALS     = 'NOT_EQUALS';          // !=
+    case EQUIVALENT     = 'EQUIVALENT';          // ~
     case NOT_EQUIVALENT = 'NOT_EQUIVALENT';  // !~
-    case GREATER_THAN = 'GREATER_THAN';      // >
-    case LESS_THAN = 'LESS_THAN';            // <
-    case GREATER_EQUAL = 'GREATER_EQUAL';    // >=
-    case LESS_EQUAL = 'LESS_EQUAL';          // <=
+    case GREATER_THAN   = 'GREATER_THAN';      // >
+    case LESS_THAN      = 'LESS_THAN';            // <
+    case GREATER_EQUAL  = 'GREATER_EQUAL';    // >=
+    case LESS_EQUAL     = 'LESS_EQUAL';          // <=
 
     // Arithmetic Operators
-    case PLUS = 'PLUS';                      // +
-    case MINUS = 'MINUS';                    // -
+    case PLUS     = 'PLUS';                      // +
+    case MINUS    = 'MINUS';                    // -
     case MULTIPLY = 'MULTIPLY';              // *
-    case DIVIDE = 'DIVIDE';                  // /
+    case DIVIDE   = 'DIVIDE';                  // /
 
     // Delimiters
-    case DOT = 'DOT';                        // .
-    case COMMA = 'COMMA';                    // ,
-    case LPAREN = 'LPAREN';                  // (
-    case RPAREN = 'RPAREN';                  // )
+    case DOT      = 'DOT';                        // .
+    case COMMA    = 'COMMA';                    // ,
+    case LPAREN   = 'LPAREN';                  // (
+    case RPAREN   = 'RPAREN';                  // )
     case LBRACKET = 'LBRACKET';              // [
     case RBRACKET = 'RBRACKET';              // ]
-    case LBRACE = 'LBRACE';                  // {
-    case RBRACE = 'RBRACE';                  // }
+    case LBRACE   = 'LBRACE';                  // {
+    case RBRACE   = 'RBRACE';                  // }
 
     // Special
-    case PIPE = 'PIPE';                      // |
+    case PIPE      = 'PIPE';                      // |
     case AMPERSAND = 'AMPERSAND';            // &
-    case PERCENT = 'PERCENT';                // % (external constant prefix)
-    case DOLLAR = 'DOLLAR';                  // $ (reserved identifier prefix)
+    case PERCENT   = 'PERCENT';                // % (external constant prefix)
+    case DOLLAR    = 'DOLLAR';                  // $ (reserved identifier prefix)
 
     // End of file
     case EOF = 'EOF';

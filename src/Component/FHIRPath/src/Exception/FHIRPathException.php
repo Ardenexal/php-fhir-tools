@@ -4,28 +4,29 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Exception;
 
-use RuntimeException;
-
 /**
  * Base exception for all FHIRPath-related errors.
  *
  * @author FHIR Tools Contributors
  */
-class FHIRPathException extends RuntimeException
+class FHIRPathException extends \RuntimeException
 {
     protected int $expressionLine = 0;
+
     protected int $expressionColumn = 0;
+
     protected string $expressionContext = '';
+
     protected ?string $suggestion = null;
 
     /**
      * Create a FHIRPath exception.
      *
-     * @param string $message The error message
-     * @param int $line The line number where the error occurred in the expression
-     * @param int $column The column number where the error occurred in the expression
-     * @param string $expressionContext The expression context around the error
-     * @param string|null $suggestion Optional suggestion for fixing the error
+     * @param string      $message           The error message
+     * @param int         $line              The line number where the error occurred in the expression
+     * @param int         $column            The column number where the error occurred in the expression
+     * @param string      $expressionContext The expression context around the error
+     * @param string|null $suggestion        Optional suggestion for fixing the error
      */
     public function __construct(
         string $message,
@@ -35,10 +36,10 @@ class FHIRPathException extends RuntimeException
         ?string $suggestion = null
     ) {
         parent::__construct($message);
-        $this->expressionLine = $line;
-        $this->expressionColumn = $column;
+        $this->expressionLine    = $line;
+        $this->expressionColumn  = $column;
         $this->expressionContext = $expressionContext;
-        $this->suggestion = $suggestion;
+        $this->suggestion        = $suggestion;
     }
 
     /**
@@ -103,7 +104,7 @@ class FHIRPathException extends RuntimeException
     public function getPosition(): array
     {
         return [
-            'line' => $this->expressionLine,
+            'line'   => $this->expressionLine,
             'column' => $this->expressionColumn,
         ];
     }

@@ -23,25 +23,25 @@ final class ExistsFunction extends AbstractFunction
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection
     {
         $this->validateParameterCount($parameters, 0, 1);
-        
+
         // No criteria - check if any items exist
         if (count($parameters) === 0) {
             return Collection::single(!$input->isEmpty());
         }
-        
+
         // With criteria - check if any item matches
         /** @var ExpressionNode $criteriaExpr */
         $criteriaExpr = $parameters[0];
-        
+
         foreach ($input as $item) {
             $itemContext = $context->withCurrentNode($item);
-            $result = $criteriaExpr->accept($context->getEvaluator());
-            
+            $result      = $criteriaExpr->accept($context->getEvaluator());
+
             if (!$result->isEmpty() && $result->first() === true) {
                 return Collection::single(true);
             }
         }
-        
+
         return Collection::single(false);
     }
 }

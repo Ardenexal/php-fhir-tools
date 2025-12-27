@@ -93,7 +93,7 @@ final class FunctionRegistryTest extends TestCase
 
     private function createMockFunction(string $name): FunctionInterface
     {
-        return new class($name) implements FunctionInterface {
+        return new class ($name) implements FunctionInterface {
             public function __construct(private readonly string $name)
             {
             }

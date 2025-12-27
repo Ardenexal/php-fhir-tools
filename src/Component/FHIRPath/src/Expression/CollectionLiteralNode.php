@@ -18,8 +18,8 @@ class CollectionLiteralNode extends ExpressionNode
      * Create a new collection literal node.
      *
      * @param array<ExpressionNode> $elements The elements in the collection
-     * @param int $line The line number
-     * @param int $column The column number
+     * @param int                   $line     The line number
+     * @param int                   $column   The column number
      */
     public function __construct(
         private readonly array $elements,
@@ -57,6 +57,7 @@ class CollectionLiteralNode extends ExpressionNode
         }
 
         $elements = array_map(fn (ExpressionNode $e) => $e->toString(), $this->elements);
+
         return '{' . implode(', ', $elements) . '}';
     }
 }

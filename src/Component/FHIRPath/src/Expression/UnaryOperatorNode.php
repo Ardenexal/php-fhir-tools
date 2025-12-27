@@ -18,10 +18,10 @@ class UnaryOperatorNode extends ExpressionNode
     /**
      * Create a new unary operator node.
      *
-     * @param TokenType $operator The operator (PLUS or MINUS)
-     * @param ExpressionNode $operand The operand
-     * @param int $line The line number
-     * @param int $column The column number
+     * @param TokenType      $operator The operator (PLUS or MINUS)
+     * @param ExpressionNode $operand  The operand
+     * @param int            $line     The line number
+     * @param int            $column   The column number
      */
     public function __construct(
         private readonly TokenType $operator,
@@ -62,6 +62,7 @@ class UnaryOperatorNode extends ExpressionNode
     public function toString(): string
     {
         $operatorStr = $this->operator === TokenType::MINUS ? '-' : '+';
+
         return '(' . $operatorStr . $this->operand->toString() . ')';
     }
 }

@@ -22,12 +22,12 @@ final class UnionFunction extends AbstractFunction
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection
     {
         $this->validateParameterCount($parameters, 1);
-        
+
         $otherCollection = $parameters[0];
         if (!($otherCollection instanceof Collection)) {
             return $input;
         }
-        
+
         return $input->union($otherCollection);
     }
 }

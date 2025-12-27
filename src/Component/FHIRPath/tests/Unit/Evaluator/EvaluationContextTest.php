@@ -22,7 +22,7 @@ final class EvaluationContextTest extends TestCase
 
     public function testSetAndGetRootResource(): void
     {
-        $context = new EvaluationContext();
+        $context  = new EvaluationContext();
         $resource = ['resourceType' => 'Patient'];
 
         $context->setRootResource($resource);
@@ -33,7 +33,7 @@ final class EvaluationContextTest extends TestCase
     public function testWithCurrentNode(): void
     {
         $context = new EvaluationContext();
-        $node = ['name' => 'Test'];
+        $node    = ['name' => 'Test'];
 
         $newContext = $context->withCurrentNode($node);
 
@@ -57,7 +57,7 @@ final class EvaluationContextTest extends TestCase
 
     public function testWithVariable(): void
     {
-        $context = new EvaluationContext();
+        $context    = new EvaluationContext();
         $newContext = $context->withVariable('test', 'value');
 
         self::assertNotSame($context, $newContext);
@@ -81,7 +81,7 @@ final class EvaluationContextTest extends TestCase
 
     public function testWithExternalConstant(): void
     {
-        $context = new EvaluationContext();
+        $context    = new EvaluationContext();
         $newContext = $context->withExternalConstant('ucum', 'http://unitsofmeasure.org');
 
         self::assertNotSame($context, $newContext);
@@ -92,7 +92,7 @@ final class EvaluationContextTest extends TestCase
     public function testWithIterationVariables(): void
     {
         $context = new EvaluationContext();
-        $item = ['name' => 'Test'];
+        $item    = ['name' => 'Test'];
 
         $newContext = $context->withIterationVariables($item, 0, 5);
 

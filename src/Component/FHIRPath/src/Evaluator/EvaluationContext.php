@@ -15,7 +15,7 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Evaluator;
 final class EvaluationContext
 {
     /**
-     * @param array<string, mixed> $variables Variable storage ($this, $index, $total)
+     * @param array<string, mixed> $variables         Variable storage ($this, $index, $total)
      * @param array<string, mixed> $externalConstants External constants (%)
      */
     public function __construct(
@@ -77,7 +77,7 @@ final class EvaluationContext
             $node,
             $this->variables,
             $this->externalConstants,
-            $this->evaluator
+            $this->evaluator,
         );
     }
 
@@ -118,14 +118,15 @@ final class EvaluationContext
      */
     public function withVariable(string $name, mixed $value): self
     {
-        $variables = $this->variables;
+        $variables        = $this->variables;
         $variables[$name] = $value;
+
         return new self(
             $this->rootResource,
             $this->currentNode,
             $variables,
             $this->externalConstants,
-            $this->evaluator
+            $this->evaluator,
         );
     }
 
@@ -158,14 +159,15 @@ final class EvaluationContext
      */
     public function withExternalConstant(string $name, mixed $value): self
     {
-        $externalConstants = $this->externalConstants;
+        $externalConstants        = $this->externalConstants;
         $externalConstants[$name] = $value;
+
         return new self(
             $this->rootResource,
             $this->currentNode,
             $this->variables,
             $externalConstants,
-            $this->evaluator
+            $this->evaluator,
         );
     }
 
@@ -174,16 +176,17 @@ final class EvaluationContext
      */
     public function withIterationVariables(mixed $item, int $index, int $total): self
     {
-        $variables = $this->variables;
-        $variables['this'] = $item;
+        $variables          = $this->variables;
+        $variables['this']  = $item;
         $variables['index'] = $index;
         $variables['total'] = $total;
+
         return new self(
             $this->rootResource,
             $item,
             $variables,
             $this->externalConstants,
-            $this->evaluator
+            $this->evaluator,
         );
     }
 }

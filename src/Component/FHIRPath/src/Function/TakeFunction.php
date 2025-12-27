@@ -23,21 +23,21 @@ final class TakeFunction extends AbstractFunction
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection
     {
         $this->validateParameterCount($parameters, 1);
-        
+
         $numCollection = $parameters[0];
         if (!($numCollection instanceof Collection) || $numCollection->isEmpty()) {
             throw EvaluationException::invalidFunctionParameter('take', 'num', 'non-empty integer collection');
         }
-        
+
         $num = $numCollection->first();
         if (!is_int($num) || $num < 0) {
             throw EvaluationException::invalidFunctionParameter('take', 'num', 'non-negative integer');
         }
-        
+
         if ($num === 0 || $input->isEmpty()) {
             return Collection::empty();
         }
-        
+
         $items = [];
         $count = 0;
         foreach ($input as $item) {
@@ -45,9 +45,9 @@ final class TakeFunction extends AbstractFunction
                 break;
             }
             $items[] = $item;
-            $count++;
+            ++$count;
         }
-        
+
         return Collection::from($items);
     }
 }

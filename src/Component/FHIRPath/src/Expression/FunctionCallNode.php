@@ -16,10 +16,10 @@ class FunctionCallNode extends ExpressionNode
     /**
      * Create a new function call node.
      *
-     * @param string $name The function name
+     * @param string                $name       The function name
      * @param array<ExpressionNode> $parameters The function parameters
-     * @param int $line The line number
-     * @param int $column The column number
+     * @param int                   $line       The line number
+     * @param int                   $column     The column number
      */
     public function __construct(
         private readonly string $name,
@@ -62,6 +62,7 @@ class FunctionCallNode extends ExpressionNode
     public function toString(): string
     {
         $params = array_map(fn (ExpressionNode $p) => $p->toString(), $this->parameters);
+
         return $this->name . '(' . implode(', ', $params) . ')';
     }
 }

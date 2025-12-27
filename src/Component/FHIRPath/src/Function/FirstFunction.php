@@ -22,11 +22,11 @@ final class FirstFunction extends AbstractFunction
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection
     {
         $this->validateParameterCount($parameters, 0);
-        
+
         if ($input->isEmpty()) {
             return Collection::empty();
         }
-        
+
         return Collection::single($input->first());
     }
 }
