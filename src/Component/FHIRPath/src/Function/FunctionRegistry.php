@@ -79,6 +79,31 @@ final class FunctionRegistry
         $this->registerSafe(new AbsFunction());
         $this->registerSafe(new CeilingFunction());
         $this->registerSafe(new FloorFunction());
+        $this->registerSafe(new TruncateFunction());
+        $this->registerSafe(new RoundFunction());
+        $this->registerSafe(new ExpFunction());
+        $this->registerSafe(new LnFunction());
+        $this->registerSafe(new LogFunction());
+        $this->registerSafe(new PowerFunction());
+        $this->registerSafe(new SqrtFunction());
+        $this->registerSafe(new MinFunction());
+        $this->registerSafe(new MaxFunction());
+        $this->registerSafe(new AvgFunction());
+
+        // Date/Time functions
+        $this->registerSafe(new NowFunction());
+        $this->registerSafe(new TimeOfDayFunction());
+        $this->registerSafe(new TodayFunction());
+        $this->registerSafe(new ToMillisecondsFunction());
+        $this->registerSafe(new ToSecondsFunction());
+
+        // Type functions
+        $this->registerSafe(new OfTypeFunction());
+        $this->registerSafe(new HasValueFunction());
+
+        // Combining functions
+        $this->registerSafe(new CombineFunction());
+        $this->registerSafe(new IifFunction());
     }
 
     /**
