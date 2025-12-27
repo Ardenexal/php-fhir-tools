@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Expression\MemberAccessNode;
 use Ardenexal\FHIRTools\Component\FHIRPath\Expression\TypeExpressionNode;
 use Ardenexal\FHIRTools\Component\FHIRPath\Expression\UnaryOperatorNode;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
+use Ardenexal\FHIRTools\Component\FHIRPath\Parser\TokenType;
 
 /**
  * FHIRPath expression evaluator
@@ -62,7 +63,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      */
     public function visitLiteral(LiteralNode $node): Collection
     {
-        return Collection::single($node->value);
+        return Collection::single($node->getValue());
     }
 
     /**
@@ -70,10 +71,10 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      */
     public function visitIdentifier(IdentifierNode $node): Collection
     {
-        $name = $node->name;
+        $name = $node->getName();
 
         // Handle reserved identifiers ($this, $index, $total)
-        if ($node->isReserved) {
+        if (str_starts_with($name, '$')) {
             $variableName = ltrim($name, '$');
             if ($this->context->hasVariable($variableName)) {
                 $value = $this->context->getVariable($variableName);
@@ -97,7 +98,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     public function visitMemberAccess(MemberAccessNode $node): Collection
     {
         // Evaluate the object expression
-        $objectResult = $node->object->accept($this);
+        $objectResult = $node->getObject()->accept($this);
 
         // If object result is empty, return empty (empty propagation)
         if ($objectResult->isEmpty()) {
@@ -110,7 +111,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             $oldContext = $this->context;
             $this->context = $this->context->withCurrentNode($item);
             
-            $memberResult = $node->member->accept($this);
+            $memberResult = $node->getMember()->accept($this);
             $results = [...$results, ...$memberResult->toArray()];
             
             $this->context = $oldContext;
@@ -131,19 +132,19 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         // Get the function from the registry
         $registry = \Ardenexal\FHIRTools\Component\FHIRPath\Function\FunctionRegistry::getInstance();
         
-        if (!$registry->has($node->name)) {
+        if (!$registry->has($node->getName())) {
             throw new EvaluationException(
-                "Unknown function: {$node->name}",
-                $node->line,
-                $node->column
+                "Unknown function: {$node->getName()}",
+                $node->getLine(),
+                $node->getColumn()
             );
         }
         
-        $function = $registry->get($node->name);
+        $function = $registry->get($node->getName());
         
         // Evaluate parameters - they can be expressions or literals
         $evaluatedParams = [];
-        foreach ($node->parameters as $param) {
+        foreach ($node->getParameters() as $param) {
             // Parameters can be expressions that need evaluation, or they can be passed as-is
             // For criteria expressions (like in where(), exists(), all()), pass the AST node
             if ($param instanceof \Ardenexal\FHIRTools\Component\FHIRPath\Expression\ExpressionNode) {
@@ -163,49 +164,49 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      */
     public function visitBinaryOperator(BinaryOperatorNode $node): Collection
     {
-        $left = $node->left->accept($this);
-        $right = $node->right->accept($this);
+        $left = $node->getLeft()->accept($this);
+        $right = $node->getRight()->accept($this);
 
-        return match ($node->operator) {
+        return match ($node->getOperator()) {
             // Union operator
-            '|' => $left->union($right),
+            TokenType::PIPE => $left->union($right),
             
             // Arithmetic operators (require single values)
-            '+' => $this->evaluateArithmetic($left, $right, fn($a, $b) => $a + $b),
-            '-' => $this->evaluateArithmetic($left, $right, fn($a, $b) => $a - $b),
-            '*' => $this->evaluateArithmetic($left, $right, fn($a, $b) => $a * $b),
-            '/' => $this->evaluateArithmetic($left, $right, fn($a, $b) => $a / $b),
-            'div' => $this->evaluateArithmetic($left, $right, fn($a, $b) => intdiv((int)$a, (int)$b)),
-            'mod' => $this->evaluateArithmetic($left, $right, fn($a, $b) => $a % $b),
+            TokenType::PLUS => $this->evaluateArithmetic($left, $right, fn($a, $b) => $a + $b),
+            TokenType::MINUS => $this->evaluateArithmetic($left, $right, fn($a, $b) => $a - $b),
+            TokenType::MULTIPLY => $this->evaluateArithmetic($left, $right, fn($a, $b) => $a * $b),
+            TokenType::DIVIDE => $this->evaluateArithmetic($left, $right, fn($a, $b) => $a / $b),
+            TokenType::DIV => $this->evaluateArithmetic($left, $right, fn($a, $b) => intdiv((int)$a, (int)$b)),
+            TokenType::MOD => $this->evaluateArithmetic($left, $right, fn($a, $b) => $a % $b),
             
             // Comparison operators
-            '=' => $this->evaluateComparison($left, $right, fn($a, $b) => $a == $b),
-            '!=' => $this->evaluateComparison($left, $right, fn($a, $b) => $a != $b),
-            '<' => $this->evaluateComparison($left, $right, fn($a, $b) => $a < $b),
-            '>' => $this->evaluateComparison($left, $right, fn($a, $b) => $a > $b),
-            '<=' => $this->evaluateComparison($left, $right, fn($a, $b) => $a <= $b),
-            '>=' => $this->evaluateComparison($left, $right, fn($a, $b) => $a >= $b),
+            TokenType::EQUALS => $this->evaluateComparison($left, $right, fn($a, $b) => $a == $b),
+            TokenType::NOT_EQUALS => $this->evaluateComparison($left, $right, fn($a, $b) => $a != $b),
+            TokenType::LESS_THAN => $this->evaluateComparison($left, $right, fn($a, $b) => $a < $b),
+            TokenType::GREATER_THAN => $this->evaluateComparison($left, $right, fn($a, $b) => $a > $b),
+            TokenType::LESS_EQUAL => $this->evaluateComparison($left, $right, fn($a, $b) => $a <= $b),
+            TokenType::GREATER_EQUAL => $this->evaluateComparison($left, $right, fn($a, $b) => $a >= $b),
             
             // String concatenation
-            '&' => $this->evaluateStringConcat($left, $right),
+            TokenType::AMPERSAND => $this->evaluateStringConcat($left, $right),
             
             // Logical operators
-            'and' => $this->evaluateLogicalAnd($left, $right),
-            'or' => $this->evaluateLogicalOr($left, $right),
-            'xor' => $this->evaluateLogicalXor($left, $right),
-            'implies' => $this->evaluateImplies($left, $right),
+            TokenType::AND => $this->evaluateLogicalAnd($left, $right),
+            TokenType::OR => $this->evaluateLogicalOr($left, $right),
+            TokenType::XOR => $this->evaluateLogicalXor($left, $right),
+            TokenType::IMPLIES => $this->evaluateImplies($left, $right),
             
             // Membership operators (to be fully implemented later)
-            'in', 'contains' => throw new EvaluationException(
-                "Operator '{$node->operator}' not yet fully implemented",
-                $node->line,
-                $node->column
+            TokenType::IN, TokenType::CONTAINS => throw new EvaluationException(
+                "Operator '{$node->getOperator()->value}' not yet fully implemented",
+                $node->getLine(),
+                $node->getColumn()
             ),
             
             default => throw new EvaluationException(
-                "Unknown operator: {$node->operator}",
-                $node->line,
-                $node->column
+                "Unknown operator: {$node->getOperator()->value}",
+                $node->getLine(),
+                $node->getColumn()
             ),
         };
     }
@@ -215,7 +216,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      */
     public function visitUnaryOperator(UnaryOperatorNode $node): Collection
     {
-        $operand = $node->operand->accept($this);
+        $operand = $node->getOperand()->accept($this);
 
         if ($operand->isEmpty()) {
             return Collection::empty();
@@ -224,20 +225,20 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         if (!$operand->isSingle()) {
             throw new EvaluationException(
                 "Unary operator requires a single value",
-                $node->line,
-                $node->column
+                $node->getLine(),
+                $node->getColumn()
             );
         }
 
         $value = $operand->first();
 
-        return match ($node->operator) {
-            '-' => Collection::single(-$value),
-            '+' => Collection::single(+$value),
+        return match ($node->getOperator()) {
+            TokenType::MINUS => Collection::single(-$value),
+            TokenType::PLUS => Collection::single(+$value),
             default => throw new EvaluationException(
-                "Unknown unary operator: {$node->operator}",
-                $node->line,
-                $node->column
+                "Unknown unary operator: {$node->getOperator()->value}",
+                $node->getLine(),
+                $node->getColumn()
             ),
         };
     }
@@ -247,8 +248,8 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      */
     public function visitIndexer(IndexerNode $node): Collection
     {
-        $collection = $node->collection->accept($this);
-        $indexResult = $node->index->accept($this);
+        $collection = $node->getCollection()->accept($this);
+        $indexResult = $node->getIndex()->accept($this);
 
         if ($indexResult->isEmpty() || !$indexResult->isSingle()) {
             return Collection::empty();
@@ -271,8 +272,8 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         // Type operations will be fully implemented in Phase 7
         throw new EvaluationException(
             "Type operations not yet fully implemented",
-            $node->line,
-            $node->column
+            $node->getLine(),
+            $node->getColumn()
         );
     }
 
@@ -281,15 +282,15 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      */
     public function visitExternalConstant(ExternalConstantNode $node): Collection
     {
-        if ($this->context->hasExternalConstant($node->name)) {
-            $value = $this->context->getExternalConstant($node->name);
+        if ($this->context->hasExternalConstant($node->getName())) {
+            $value = $this->context->getExternalConstant($node->getName());
             return $value !== null ? Collection::single($value) : Collection::empty();
         }
 
         throw new EvaluationException(
-            "External constant '%{$node->name}' not found",
-            $node->line,
-            $node->column
+            "External constant '%{$node->getName()}' not found",
+            $node->getLine(),
+            $node->getColumn()
         );
     }
 
@@ -298,12 +299,12 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      */
     public function visitCollectionLiteral(CollectionLiteralNode $node): Collection
     {
-        if (empty($node->items)) {
+        if (empty($node->getElements())) {
             return Collection::empty();
         }
 
         $items = [];
-        foreach ($node->items as $itemNode) {
+        foreach ($node->getElements() as $itemNode) {
             $result = $itemNode->accept($this);
             $items = [...$items, ...$result->toArray()];
         }
