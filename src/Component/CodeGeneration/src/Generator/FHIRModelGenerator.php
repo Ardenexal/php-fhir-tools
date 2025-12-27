@@ -694,6 +694,23 @@ class FHIRModelGenerator implements GeneratorInterface
             return $builderContext->getPrimitiveNamespace($version)->getName();
         }
 
+        // Base types that should use the DataType namespace
+        // Check these first as they are more fundamental
+        $dataTypes = [
+            'Element',
+            'BackboneElement',
+        ];
+
+        // Check if it's a base data type
+        if (in_array($code, $dataTypes, true)) {
+            try {
+                return $builderContext->getDatatypeNamespace($version)->getName();
+            } catch (GenerationException) {
+                // Fallback to element namespace if datatype namespace is not available
+                return $builderContext->getElementNamespace($version)->getName();
+            }
+        }
+
         // List of known FHIR resource types
         $resourceTypes = [
             'Patient',
@@ -732,22 +749,6 @@ class FHIRModelGenerator implements GeneratorInterface
         // Check if it's a resource type
         if (in_array($code, $resourceTypes, true)) {
             return $builderContext->getElementNamespace($version)->getName();
-        }
-
-        // Base types that should use the DataType namespace
-        $dataTypes = [
-            'Element',
-            'BackboneElement',
-        ];
-
-        // Check if it's a base data type
-        if (in_array($code, $dataTypes, true)) {
-            try {
-                return $builderContext->getDatatypeNamespace($version)->getName();
-            } catch (GenerationException) {
-                // Fallback to element namespace if datatype namespace is not available
-                return $builderContext->getElementNamespace($version)->getName();
-            }
         }
 
         // For complex data types, try to use datatype namespace if available
