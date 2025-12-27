@@ -40,11 +40,7 @@
             <directory>tests/Unit/Component/Serialization</directory>
         </testsuite>
         <testsuite name="fhirpath">
-            <directory>src/Component/FHIRPath/tests</directory>
-        </testsuite>
-        <testsuite name="all">
-            <directory>tests</directory>
-            <directory>src/Component/FHIRPath/tests</directory>
+            <directory>src/Component/FHIRPath/tests/Unit</directory>
         </testsuite>
     </testsuites>
 
