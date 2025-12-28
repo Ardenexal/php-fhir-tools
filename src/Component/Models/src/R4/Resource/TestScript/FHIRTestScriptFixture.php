@@ -1,0 +1,37 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
+
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBoolean;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
+/**
+ * @description Fixture in the test script - by reference (uri). All fixtures are required for the test script to execute.
+ */
+#[FHIRBackboneElement(parentResource: 'TestScript', elementPath: 'TestScript.fixture', fhirVersion: 'R4')]
+class FHIRTestScriptFixture extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRBackboneElement
+{
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        public ?string $id = null,
+        /** @var array<FHIRExtension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        public array $modifierExtension = [],
+        /** @var FHIRBoolean|null autocreate Whether or not to implicitly create the fixture during setup */
+        #[NotBlank]
+        public ?FHIRBoolean $autocreate = null,
+        /** @var FHIRBoolean|null autodelete Whether or not to implicitly delete the fixture during teardown */
+        #[NotBlank]
+        public ?FHIRBoolean $autodelete = null,
+        /** @var FHIRReference|null resource Reference of the resource */
+        public ?FHIRReference $resource = null,
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
+}

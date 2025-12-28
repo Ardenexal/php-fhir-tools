@@ -1,0 +1,22 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
+
+use Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRFHIRTestScriptRequestMethodCode;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCode;
+
+/**
+ * @fhir-code-type FHIRTestScriptRequestMethodCode
+ *
+ * @description Code type wrapper for FHIRTestScriptRequestMethodCode enum
+ */
+class FHIRFHIRTestScriptRequestMethodCodeType extends FHIRCode
+{
+    public function __construct(
+        /** @var FHIRFHIRTestScriptRequestMethodCode|string|null $value The code value */
+        public FHIRFHIRTestScriptRequestMethodCode|string|null $value = null,
+    ) {
+    }
+}

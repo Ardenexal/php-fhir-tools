@@ -197,8 +197,10 @@ class FHIRModelGenerator implements GeneratorInterface
         $codeNamespace = $this->getNamespaceForFhirType('code', $version, $builderContext);
         $codeFqcn      = $codeNamespace . '\\' . self::DEFAULT_CLASS_PREFIX . 'Code';
         $class->setExtends($codeFqcn);
-        // Add use statement for the parent class
-        $namespace->addUse($codeFqcn);
+        // Add use statement for the parent class only if it's in a different namespace
+        if ($codeNamespace !== $namespace->getName()) {
+            $namespace->addUse($codeFqcn);
+        }
 
         // Add documentation
         $class->addComment('@fhir-code-type ' . $enumType->getName());
@@ -235,8 +237,10 @@ class FHIRModelGenerator implements GeneratorInterface
             $parentNamespace = $this->getNamespaceForFhirType($parent, $version, $builderContext);
             $parentFqcn      = $parentNamespace . '\\' . self::DEFAULT_CLASS_PREFIX . u($parent)->pascal();
             $class->setExtends($parentFqcn);
-            // Add use statement for the parent class
-            $namespace->addUse($parentFqcn);
+            // Add use statement for the parent class only if it's in a different namespace
+            if ($parentNamespace !== $namespace->getName()) {
+                $namespace->addUse($parentFqcn);
+            }
         }
 
         // Add appropriate FHIR attributes based on the structure definition kind
@@ -364,8 +368,10 @@ class FHIRModelGenerator implements GeneratorInterface
                     $backboneElementNamespace = $this->getNamespaceForFhirType('BackboneElement', $version, $builderContext);
                     $backboneElementFqcn      = $backboneElementNamespace . '\\' . self::DEFAULT_CLASS_PREFIX . 'BackboneElement';
                     $childClass->setExtends(name: $backboneElementFqcn);
-                    // Add use statement for the parent class
-                    $namespace->addUse($backboneElementFqcn);
+                    // Add use statement for the parent class only if it's in a different namespace
+                    if ($backboneElementNamespace !== $namespace->getName()) {
+                        $namespace->addUse($backboneElementFqcn);
+                    }
                 } elseif ($isElement) {
                     // Add comment for regular complex elements
                     $childClass->addAttribute('Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType', [
@@ -375,8 +381,10 @@ class FHIRModelGenerator implements GeneratorInterface
                     $elementNamespace = $this->getNamespaceForFhirType('Element', $version, $builderContext);
                     $elementFqcn      = $elementNamespace . '\\' . self::DEFAULT_CLASS_PREFIX . 'Element';
                     $childClass->setExtends($elementFqcn);
-                    // Add use statement for the parent class
-                    $namespace->addUse($elementFqcn);
+                    // Add use statement for the parent class only if it's in a different namespace
+                    if ($elementNamespace !== $namespace->getName()) {
+                        $namespace->addUse($elementFqcn);
+                    }
                 }
 
                 if (isset($element['definition'])) {
