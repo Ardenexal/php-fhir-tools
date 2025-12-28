@@ -46,7 +46,7 @@
 composer require ardenexal/fhir-bundle
 
 # Generate FHIR classes
-php bin/console fhir:generate R4B
+composer run generate-models-all
 
 # Use in your Symfony services
 public function __construct(
@@ -74,7 +74,7 @@ $serializer = new FHIRSerializationService();
 ### Testing
 ```bash
 composer run test
-composer run generate-models
+composer run generate-models-all
 ```
 
 ### Code Quality
