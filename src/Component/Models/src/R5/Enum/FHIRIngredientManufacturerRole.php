@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -12,12 +10,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRIngredientManufacturerRole: string
 {
-    /** Manufacturer is specifically allowed for this ingredient */
-    case manufacturerisspecificallyallowedforthisingredient = 'allowed';
+	/** Manufacturer is specifically allowed for this ingredient */
+	case manufacturerisspecificallyallowedforthisingredient = 'allowed';
 
-    /** Manufacturer is known to make this ingredient in general */
-    case manufacturerisknowntomakethisingredientingeneral = 'possible';
+	/** Manufacturer is known to make this ingredient in general */
+	case manufacturerisknowntomakethisingredientingeneral = 'possible';
 
-    /** Manufacturer actually makes this particular ingredient */
-    case manufactureractuallymakesthisparticularingredient = 'actual';
+	/** Manufacturer actually makes this particular ingredient */
+	case manufactureractuallymakesthisparticularingredient = 'actual';
 }

@@ -192,7 +192,8 @@ class FHIRModelGenerator implements GeneratorInterface
         // Enum names already have the FHIR prefix, so don't add it again
         $enumName  = $enumType->getName();
         $className = $enumName . 'Type';
-        $namespace = $builderContext->getElementNamespace($version);
+        // Code type wrappers should be in DataType namespace since they extend FHIRCode (a primitive)
+        $namespace = $builderContext->getDatatypeNamespace($version);
         $class     = new ClassType($className, $namespace);
 
         // Extend FHIRCode base type
@@ -667,34 +668,20 @@ class FHIRModelGenerator implements GeneratorInterface
         $isNullable = $minValue === 0 && $isArray === false;
 
         // Add use statements for all fully qualified class names in $types
-        // and convert them to short names for use in type hints
-        $shortTypes = [];
+        // Keep the fully qualified names for setType() - Nette will resolve them to short names
         foreach ($types as $type) {
-            // Only add use statement for fully qualified class names (starting with \)
-            // and skip built-in types like string, int, bool, array, etc.
+            // Only process fully qualified class names (starting with \)
             if (str_starts_with($type, '\\') && !str_contains($type, 'DateTimeInterface')) {
                 $fqcn = ltrim($type, '\\');
                 // Extract the namespace part from the FQCN
                 $lastBackslash = strrpos($fqcn, '\\');
                 if ($lastBackslash !== false) {
                     $typeNamespace = substr($fqcn, 0, $lastBackslash);
-                    $className     = substr($fqcn, $lastBackslash + 1);
                     // Only add use statement if the type is from a different namespace
                     if ($typeNamespace !== $namespace->getName()) {
                         $namespace->addUse($fqcn);
-                        // Use short name since we added a use statement
-                        $shortTypes[] = $className;
-                    } else {
-                        // Same namespace, use short name without use statement
-                        $shortTypes[] = $className;
                     }
-                } else {
-                    // No namespace separator, just use as-is
-                    $shortTypes[] = $type;
                 }
-            } else {
-                // Built-in type or non-FQ class name, use as-is
-                $shortTypes[] = $type;
             }
         }
 
@@ -704,11 +691,11 @@ class FHIRModelGenerator implements GeneratorInterface
                 $method->addPromotedParameter($parameterName, [])
                     ->setNullable(false)
                     ->setType('array')
-                    ->addComment('@var  array<' . implode('|', $shortTypes) . '> ' . $parameterName . ' ' . $shortDescription);
+                    ->addComment('@var  array<' . implode('|', $types) . '> ' . $parameterName . ' ' . $shortDescription);
             } else {
                 $parameter = $method->addPromotedParameter($parameterName, null)
-                    ->setType(implode('|', $shortTypes))
-                    ->addComment('@var null|' . implode('|', $shortTypes) . ' ' . $parameterName . ' ' . $shortDescription);
+                    ->setType(implode('|', $types))
+                    ->addComment('@var null|' . implode('|', $types) . ' ' . $parameterName . ' ' . $shortDescription);
                 if ($isNullable === false) {
                     $parameter->addAttribute(NotBlank::class);
                 }
@@ -874,11 +861,14 @@ class FHIRModelGenerator implements GeneratorInterface
         string $version,
         string $targetElementNamespace
     ): string {
+        // Code type wrappers are in DataType namespace since they extend FHIRCode
+        $dataTypeNamespace = $builderContext->getDatatypeNamespace($version)->getName();
+
         // Check if enum already exists
         $enum = $builderContext->getEnum($valueSetUrl);
         if ($enum !== null) {
             // Enum name already includes FHIR prefix, just add 'Type' suffix
-            return '\\' . $targetElementNamespace . '\\' . $enum->getName() . 'Type';
+            return '\\' . $dataTypeNamespace . '\\' . $enum->getName() . 'Type';
         }
 
         // Handle versioned ValueSet URLs by extracting base URL for resolution
@@ -895,7 +885,7 @@ class FHIRModelGenerator implements GeneratorInterface
             $builderContext->addPendingEnum($baseValueSetUrl, $enumClassName);
             $builderContext->addPendingType($baseValueSetUrl, $codeTypeClassName);
 
-            return '\\' . $targetElementNamespace . '\\' . $codeTypeClassName;
+            return '\\' . $dataTypeNamespace . '\\' . $codeTypeClassName;
         }
 
         // Fallback to string type when ValueSet cannot be resolved

@@ -1,22 +1,16 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
-use Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRNameUse;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCode;
-
 /**
  * @fhir-code-type FHIRNameUse
- *
  * @description Code type wrapper for FHIRNameUse enum
  */
-class FHIRNameUseType extends FHIRCode
+class FHIRNameUseType extends \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCode
 {
-    public function __construct(
-        /** @var FHIRNameUse|string|null $value The code value */
-        public FHIRNameUse|string|null $value = null,
-    ) {
-    }
+	public function __construct(
+		/** @var \Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRNameUse|string|null $value The code value */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRNameUse|string|null $value = null,
+	) {
+	}
 }

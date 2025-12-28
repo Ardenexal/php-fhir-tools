@@ -1,61 +1,56 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * @description The operation to perform.
  */
-#[FHIRBackboneElement(parentResource: 'TestScript', elementPath: 'TestScript.setup.action.operation', fhirVersion: 'R4B')]
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'TestScript', elementPath: 'TestScript.setup.action.operation', fhirVersion: 'R4B')]
 class FHIRTestScriptSetupActionOperation extends \Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRBackboneElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<FHIRExtension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        public array $modifierExtension = [],
-        /** @var FHIRCoding|null type The operation code type that will be executed */
-        public ?\FHIRCoding $type = null,
-        /** @var FHIRFHIRDefinedTypeType|null resource Resource type */
-        public ?\FHIRFHIRDefinedTypeType $resource = null,
-        /** @var FHIRString|string|null label Tracking/logging operation label */
-        public \FHIRString|string|null $label = null,
-        /** @var FHIRString|string|null description Tracking/reporting operation description */
-        public \FHIRString|string|null $description = null,
-        /** @var FHIRMimeTypesType|null accept Mime type to accept in the payload of the response, with charset etc. */
-        public ?\FHIRMimeTypesType $accept = null,
-        /** @var FHIRMimeTypesType|null contentType Mime type of the request payload contents, with charset etc. */
-        public ?\FHIRMimeTypesType $contentType = null,
-        /** @var FHIRInteger|null destination Server responding to the request */
-        public ?\FHIRInteger $destination = null,
-        /** @var FHIRBoolean|null encodeRequestUrl Whether or not to send the request url in encoded format */
-        #[NotBlank]
-        public ?\FHIRBoolean $encodeRequestUrl = null,
-        /** @var FHIRTestScriptRequestMethodCodeType|null method delete | get | options | patch | post | put | head */
-        public ?\FHIRTestScriptRequestMethodCodeType $method = null,
-        /** @var FHIRInteger|null origin Server initiating the request */
-        public ?\FHIRInteger $origin = null,
-        /** @var FHIRString|string|null params Explicitly defined path parameters */
-        public \FHIRString|string|null $params = null,
-        /** @var array<FHIRTestScriptSetupActionOperationRequestHeader> requestHeader Each operation can have one or more header elements */
-        public array $requestHeader = [],
-        /** @var FHIRId|null requestId Fixture Id of mapped request */
-        public ?\FHIRId $requestId = null,
-        /** @var FHIRId|null responseId Fixture Id of mapped response */
-        public ?\FHIRId $responseId = null,
-        /** @var FHIRId|null sourceId Fixture Id of body for PUT and POST requests */
-        public ?\FHIRId $sourceId = null,
-        /** @var FHIRId|null targetId Id of fixture used for extracting the [id],  [type], and [vid] for GET requests */
-        public ?\FHIRId $targetId = null,
-        /** @var FHIRString|string|null url Request URL */
-        public \FHIRString|string|null $url = null,
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCoding type The operation code type that will be executed */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCoding $type = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRFHIRDefinedTypeType resource Resource type */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRFHIRDefinedTypeType $resource = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string label Tracking/logging operation label */
+		public \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string|null $label = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string description Tracking/reporting operation description */
+		public \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string|null $description = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMimeTypesType accept Mime type to accept in the payload of the response, with charset etc. */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMimeTypesType $accept = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMimeTypesType contentType Mime type of the request payload contents, with charset etc. */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMimeTypesType $contentType = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRInteger destination Server responding to the request */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRInteger $destination = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean encodeRequestUrl Whether or not to send the request url in encoded format */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean $encodeRequestUrl = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRTestScriptRequestMethodCodeType method delete | get | options | patch | post | put | head */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRTestScriptRequestMethodCodeType $method = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRInteger origin Server initiating the request */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRInteger $origin = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string params Explicitly defined path parameters */
+		public \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string|null $params = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRTestScriptSetupActionOperationRequestHeader> requestHeader Each operation can have one or more header elements */
+		public array $requestHeader = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRId requestId Fixture Id of mapped request */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRId $requestId = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRId responseId Fixture Id of mapped response */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRId $responseId = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRId sourceId Fixture Id of body for PUT and POST requests */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRId $sourceId = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRId targetId Id of fixture used for extracting the [id],  [type], and [vid] for GET requests */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRId $targetId = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string url Request URL */
+		public \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string|null $url = null,
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }

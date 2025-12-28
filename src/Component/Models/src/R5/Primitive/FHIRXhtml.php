@@ -1,30 +1,22 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Primitive;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRPrimitive;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRElement;
-use Symfony\Component\Validator\Constraints\NotBlank;
-
 /**
  * @author HL7 FHIR Standard
- *
  * @see http://hl7.org/fhir/StructureDefinition/xhtml
- *
  * @description XHTML
  */
-#[FHIRPrimitive(primitiveType: 'xhtml', fhirVersion: 'R5')]
-class FHIRXhtml extends FHIRElement
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRPrimitive(primitiveType: 'xhtml', fhirVersion: 'R5')]
+class FHIRXhtml extends \Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRElement
 {
-    public function __construct(
-        /** @var string|null id xml:id (or equivalent in JSON) */
-        public ?string $id = null,
-        /** @var string|null value Actual xhtml */
-        #[NotBlank]
-        public ?string $value = null,
-    ) {
-        parent::__construct($id);
-    }
+	public function __construct(
+		/** @var null|string id xml:id (or equivalent in JSON) */
+		public ?string $id = null,
+		/** @var null|string value Actual xhtml */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?string $value = null,
+	) {
+		parent::__construct($id);
+	}
 }

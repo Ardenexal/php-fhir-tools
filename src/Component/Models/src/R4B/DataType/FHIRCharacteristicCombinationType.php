@@ -1,22 +1,16 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
-use Ardenexal\FHIRTools\Component\Models\R4B\Enum\FHIRCharacteristicCombination;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCode;
-
 /**
  * @fhir-code-type FHIRCharacteristicCombination
- *
  * @description Code type wrapper for FHIRCharacteristicCombination enum
  */
-class FHIRCharacteristicCombinationType extends FHIRCode
+class FHIRCharacteristicCombinationType extends \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCode
 {
-    public function __construct(
-        /** @var FHIRCharacteristicCombination|string|null $value The code value */
-        public FHIRCharacteristicCombination|string|null $value = null,
-    ) {
-    }
+	public function __construct(
+		/** @var \Ardenexal\FHIRTools\Component\Models\R4B\Enum\FHIRCharacteristicCombination|string|null $value The code value */
+		public \Ardenexal\FHIRTools\Component\Models\R4B\Enum\FHIRCharacteristicCombination|string|null $value = null,
+	) {
+	}
 }

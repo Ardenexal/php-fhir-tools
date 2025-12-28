@@ -1,35 +1,31 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
 
 /**
  * @description Conveys instance-level information about this product item. One or several physical, countable instances or occurrences of the product.
  */
-#[FHIRBackboneElement(parentResource: 'NutritionProduct', elementPath: 'NutritionProduct.instance', fhirVersion: 'R4B')]
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'NutritionProduct', elementPath: 'NutritionProduct.instance', fhirVersion: 'R4B')]
 class FHIRNutritionProductInstance extends \Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRBackboneElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<FHIRExtension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        public array $modifierExtension = [],
-        /** @var FHIRQuantity|null quantity The amount of items or instances */
-        public ?\FHIRQuantity $quantity = null,
-        /** @var array<FHIRIdentifier> identifier The identifier for the physical instance, typically a serial number */
-        public array $identifier = [],
-        /** @var FHIRString|string|null lotNumber The identification of the batch or lot of the product */
-        public \FHIRString|string|null $lotNumber = null,
-        /** @var FHIRDateTime|null expiry The expiry date or date and time for the product */
-        public ?\FHIRDateTime $expiry = null,
-        /** @var FHIRDateTime|null useBy The date until which the product is expected to be good for consumption */
-        public ?\FHIRDateTime $useBy = null,
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity quantity The amount of items or instances */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity $quantity = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRIdentifier> identifier The identifier for the physical instance, typically a serial number */
+		public array $identifier = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string lotNumber The identification of the batch or lot of the product */
+		public \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string|null $lotNumber = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime expiry The expiry date or date and time for the product */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime $expiry = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime useBy The date until which the product is expected to be good for consumption */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime $useBy = null,
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }

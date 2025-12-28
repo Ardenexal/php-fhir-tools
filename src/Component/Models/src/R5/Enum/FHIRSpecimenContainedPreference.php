@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -12,9 +10,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRSpecimenContainedPreference: string
 {
-    /** Preferred */
-    case preferred = 'preferred';
+	/** Preferred */
+	case preferred = 'preferred';
 
-    /** Alternate */
-    case alternate = 'alternate';
+	/** Alternate */
+	case alternate = 'alternate';
 }

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -12,9 +10,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRConsentProvisionType: string
 {
-    /** Opt Out */
-    case optout = 'deny';
+	/** Opt Out */
+	case optout = 'deny';
 
-    /** Opt In */
-    case optin = 'permit';
+	/** Opt In */
+	case optin = 'permit';
 }

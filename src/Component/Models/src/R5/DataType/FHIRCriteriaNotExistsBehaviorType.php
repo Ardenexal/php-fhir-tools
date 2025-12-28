@@ -1,22 +1,16 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
-use Ardenexal\FHIRTools\Component\Models\R4B\Enum\FHIRCriteriaNotExistsBehavior;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCode;
-
 /**
  * @fhir-code-type FHIRCriteriaNotExistsBehavior
- *
  * @description Code type wrapper for FHIRCriteriaNotExistsBehavior enum
  */
-class FHIRCriteriaNotExistsBehaviorType extends FHIRCode
+class FHIRCriteriaNotExistsBehaviorType extends \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCode
 {
-    public function __construct(
-        /** @var FHIRCriteriaNotExistsBehavior|string|null $value The code value */
-        public FHIRCriteriaNotExistsBehavior|string|null $value = null,
-    ) {
-    }
+	public function __construct(
+		/** @var \Ardenexal\FHIRTools\Component\Models\R4B\Enum\FHIRCriteriaNotExistsBehavior|string|null $value The code value */
+		public \Ardenexal\FHIRTools\Component\Models\R4B\Enum\FHIRCriteriaNotExistsBehavior|string|null $value = null,
+	) {
+	}
 }

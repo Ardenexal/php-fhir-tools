@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -12,15 +10,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIREncounterLocationStatus: string
 {
-    /** Planned */
-    case planned = 'planned';
+	/** Planned */
+	case planned = 'planned';
 
-    /** Active */
-    case active = 'active';
+	/** Active */
+	case active = 'active';
 
-    /** Reserved */
-    case reserved = 'reserved';
+	/** Reserved */
+	case reserved = 'reserved';
 
-    /** Completed */
-    case completed = 'completed';
+	/** Completed */
+	case completed = 'completed';
 }

@@ -1,39 +1,34 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * @description A concept from the target value set that this concept maps to.
  */
-#[FHIRBackboneElement(parentResource: 'ConceptMap', elementPath: 'ConceptMap.group.element.target', fhirVersion: 'R4B')]
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'ConceptMap', elementPath: 'ConceptMap.group.element.target', fhirVersion: 'R4B')]
 class FHIRConceptMapGroupElementTarget extends \Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRBackboneElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<FHIRExtension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        public array $modifierExtension = [],
-        /** @var FHIRCode|null code Code that identifies the target element */
-        public ?\FHIRCode $code = null,
-        /** @var FHIRString|string|null display Display for the code */
-        public \FHIRString|string|null $display = null,
-        /** @var FHIRConceptMapEquivalenceType|null equivalence relatedto | equivalent | equal | wider | subsumes | narrower | specializes | inexact | unmatched | disjoint */
-        #[NotBlank]
-        public ?\FHIRConceptMapEquivalenceType $equivalence = null,
-        /** @var FHIRString|string|null comment Description of status/issues in mapping */
-        public \FHIRString|string|null $comment = null,
-        /** @var array<FHIRConceptMapGroupElementTargetDependsOn> dependsOn Other elements required for this mapping (from context) */
-        public array $dependsOn = [],
-        /** @var array<FHIRConceptMapGroupElementTargetDependsOn> product Other concepts that this mapping also produces */
-        public array $product = [],
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCode code Code that identifies the target element */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCode $code = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string display Display for the code */
+		public \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string|null $display = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRConceptMapEquivalenceType equivalence relatedto | equivalent | equal | wider | subsumes | narrower | specializes | inexact | unmatched | disjoint */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRConceptMapEquivalenceType $equivalence = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string comment Description of status/issues in mapping */
+		public \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string|null $comment = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRConceptMapGroupElementTargetDependsOn> dependsOn Other elements required for this mapping (from context) */
+		public array $dependsOn = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRConceptMapGroupElementTargetDependsOn> product Other concepts that this mapping also produces */
+		public array $product = [],
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }

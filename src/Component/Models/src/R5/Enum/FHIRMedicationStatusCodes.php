@@ -1,23 +1,21 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
 /**
- * ValueSet: Medication  status  codes
+ * ValueSet: Medication Status Codes
  * URL: http://hl7.org/fhir/ValueSet/medication-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Medication Status Codes
  */
 enum FHIRMedicationStatusCodes: string
 {
-    /** Active */
-    case active = 'active';
+	/** Active */
+	case active = 'active';
 
-    /** Inactive */
-    case inactive = 'inactive';
+	/** Inactive */
+	case inactive = 'inactive';
 
-    /** Entered in Error */
-    case enteredinerror = 'entered-in-error';
+	/** Entered in Error */
+	case enteredinerror = 'entered-in-error';
 }

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -12,24 +10,24 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRDiagnosticReportStatus: string
 {
-    /** Registered */
-    case registered = 'registered';
+	/** Registered */
+	case registered = 'registered';
 
-    /** Partial */
-    case partial = 'partial';
+	/** Partial */
+	case partial = 'partial';
 
-    /** Final */
-    case final = 'final';
+	/** Final */
+	case final = 'final';
 
-    /** Amended */
-    case amended = 'amended';
+	/** Amended */
+	case amended = 'amended';
 
-    /** Cancelled */
-    case cancelled = 'cancelled';
+	/** Cancelled */
+	case cancelled = 'cancelled';
 
-    /** Entered in Error */
-    case enteredinerror = 'entered-in-error';
+	/** Entered in Error */
+	case enteredinerror = 'entered-in-error';
 
-    /** Unknown */
-    case unknown = 'unknown';
+	/** Unknown */
+	case unknown = 'unknown';
 }

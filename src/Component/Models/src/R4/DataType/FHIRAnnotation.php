@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRMarkdown;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -23,12 +26,12 @@ class FHIRAnnotation extends FHIRElement
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
         /** @var FHIRReference|FHIRString|string|null authorX Individual responsible for the annotation */
-        public \FHIRReference|\FHIRString|string|null $authorX = null,
+        public FHIRReference|FHIRString|string|null $authorX = null,
         /** @var FHIRDateTime|null time When the annotation was made */
-        public ?\FHIRDateTime $time = null,
+        public ?FHIRDateTime $time = null,
         /** @var FHIRMarkdown|null text The annotation  - text content (as markdown) */
         #[NotBlank]
-        public ?\FHIRMarkdown $text = null,
+        public ?FHIRMarkdown $text = null,
     ) {
         parent::__construct($id, $extension);
     }

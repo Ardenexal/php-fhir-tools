@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -12,15 +10,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRAllergyIntoleranceCategory: string
 {
-    /** Food */
-    case food = 'food';
+	/** Food */
+	case food = 'food';
 
-    /** Medication */
-    case medication = 'medication';
+	/** Medication */
+	case medication = 'medication';
 
-    /** Environment */
-    case environment = 'environment';
+	/** Environment */
+	case environment = 'environment';
 
-    /** Biologic */
-    case biologic = 'biologic';
+	/** Biologic */
+	case biologic = 'biologic';
 }

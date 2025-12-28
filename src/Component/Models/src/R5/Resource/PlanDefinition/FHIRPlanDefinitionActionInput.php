@@ -1,31 +1,27 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
 
 /**
  * @description Defines input data requirements for the action.
  */
-#[FHIRBackboneElement(parentResource: 'PlanDefinition', elementPath: 'PlanDefinition.action.input', fhirVersion: 'R5')]
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'PlanDefinition', elementPath: 'PlanDefinition.action.input', fhirVersion: 'R5')]
 class FHIRPlanDefinitionActionInput extends \Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRBackboneElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<FHIRExtension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        public array $modifierExtension = [],
-        /** @var FHIRString|string|null title User-visible title */
-        public \FHIRString|string|null $title = null,
-        /** @var FHIRDataRequirement|null requirement What data is provided */
-        public ?\FHIRDataRequirement $requirement = null,
-        /** @var FHIRId|null relatedData What data is provided */
-        public ?\FHIRId $relatedData = null,
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString|string title User-visible title */
+		public \Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString|string|null $title = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRDataRequirement requirement What data is provided */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRDataRequirement $requirement = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRId relatedData What data is provided */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRId $relatedData = null,
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }

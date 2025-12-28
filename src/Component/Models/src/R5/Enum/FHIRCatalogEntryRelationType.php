@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -12,9 +10,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRCatalogEntryRelationType: string
 {
-    /** Triggers */
-    case triggers = 'triggers';
+	/** Triggers */
+	case triggers = 'triggers';
 
-    /** Replaced By */
-    case replacedby = 'is-replaced-by';
+	/** Replaced By */
+	case replacedby = 'is-replaced-by';
 }

@@ -1,22 +1,16 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
-use Ardenexal\FHIRTools\Component\Models\R5\Enum\FHIRPermissionStatus;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCode;
-
 /**
  * @fhir-code-type FHIRPermissionStatus
- *
  * @description Code type wrapper for FHIRPermissionStatus enum
  */
-class FHIRPermissionStatusType extends FHIRCode
+class FHIRPermissionStatusType extends \Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCode
 {
-    public function __construct(
-        /** @var FHIRPermissionStatus|string|null $value The code value */
-        public FHIRPermissionStatus|string|null $value = null,
-    ) {
-    }
+	public function __construct(
+		/** @var \Ardenexal\FHIRTools\Component\Models\R5\Enum\FHIRPermissionStatus|string|null $value The code value */
+		public \Ardenexal\FHIRTools\Component\Models\R5\Enum\FHIRPermissionStatus|string|null $value = null,
+	) {
+	}
 }

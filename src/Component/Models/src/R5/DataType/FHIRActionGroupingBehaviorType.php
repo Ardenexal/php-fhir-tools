@@ -1,22 +1,16 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
-use Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRActionGroupingBehavior;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCode;
-
 /**
  * @fhir-code-type FHIRActionGroupingBehavior
- *
  * @description Code type wrapper for FHIRActionGroupingBehavior enum
  */
-class FHIRActionGroupingBehaviorType extends FHIRCode
+class FHIRActionGroupingBehaviorType extends \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCode
 {
-    public function __construct(
-        /** @var FHIRActionGroupingBehavior|string|null $value The code value */
-        public FHIRActionGroupingBehavior|string|null $value = null,
-    ) {
-    }
+	public function __construct(
+		/** @var \Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRActionGroupingBehavior|string|null $value The code value */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRActionGroupingBehavior|string|null $value = null,
+	) {
+	}
 }

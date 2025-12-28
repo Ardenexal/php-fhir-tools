@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -12,12 +10,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRQuestionnaireAnswerConstraint: string
 {
-    /** Options only */
-    case optionsonly = 'optionsOnly';
+	/** Options only */
+	case optionsonly = 'optionsOnly';
 
-    /** Options or 'type' */
-    case optionsortype = 'optionsOrType';
+	/** Options or 'type' */
+	case optionsortype = 'optionsOrType';
 
-    /** Options or string */
-    case optionsorstring = 'optionsOrString';
+	/** Options or string */
+	case optionsorstring = 'optionsOrString';
 }

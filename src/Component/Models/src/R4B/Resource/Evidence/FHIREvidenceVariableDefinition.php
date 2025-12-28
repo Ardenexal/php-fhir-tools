@@ -1,39 +1,34 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * @description Evidence variable such as population, exposure, or outcome.
  */
-#[FHIRBackboneElement(parentResource: 'Evidence', elementPath: 'Evidence.variableDefinition', fhirVersion: 'R4B')]
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'Evidence', elementPath: 'Evidence.variableDefinition', fhirVersion: 'R4B')]
 class FHIREvidenceVariableDefinition extends \Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRBackboneElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<FHIRExtension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        public array $modifierExtension = [],
-        /** @var FHIRMarkdown|null description A text description or summary of the variable */
-        public ?\FHIRMarkdown $description = null,
-        /** @var array<FHIRAnnotation> note Footnotes and/or explanatory notes */
-        public array $note = [],
-        /** @var FHIRCodeableConcept|null variableRole population | subpopulation | exposure | referenceExposure | measuredVariable | confounder */
-        #[NotBlank]
-        public ?\FHIRCodeableConcept $variableRole = null,
-        /** @var FHIRReference|null observed Definition of the actual variable related to the statistic(s) */
-        public ?\FHIRReference $observed = null,
-        /** @var FHIRReference|null intended Definition of the intended variable related to the Evidence */
-        public ?\FHIRReference $intended = null,
-        /** @var FHIRCodeableConcept|null directnessMatch low | moderate | high | exact */
-        public ?\FHIRCodeableConcept $directnessMatch = null,
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRMarkdown description A text description or summary of the variable */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRMarkdown $description = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRAnnotation> note Footnotes and/or explanatory notes */
+		public array $note = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept variableRole population | subpopulation | exposure | referenceExposure | measuredVariable | confounder */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept $variableRole = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference observed Definition of the actual variable related to the statistic(s) */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference $observed = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference intended Definition of the intended variable related to the Evidence */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference $intended = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept directnessMatch low | moderate | high | exact */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept $directnessMatch = null,
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }

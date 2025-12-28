@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -12,54 +10,54 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRStructureMapTransform: string
 {
-    /** create */
-    case create = 'create';
+	/** create */
+	case create = 'create';
 
-    /** copy */
-    case copy = 'copy';
+	/** copy */
+	case copy = 'copy';
 
-    /** truncate */
-    case truncate = 'truncate';
+	/** truncate */
+	case truncate = 'truncate';
 
-    /** escape */
-    case escape = 'escape';
+	/** escape */
+	case escape = 'escape';
 
-    /** cast */
-    case cast = 'cast';
+	/** cast */
+	case cast = 'cast';
 
-    /** append */
-    case append = 'append';
+	/** append */
+	case append = 'append';
 
-    /** translate */
-    case translate = 'translate';
+	/** translate */
+	case translate = 'translate';
 
-    /** reference */
-    case reference = 'reference';
+	/** reference */
+	case reference = 'reference';
 
-    /** dateOp */
-    case dateop = 'dateOp';
+	/** dateOp */
+	case dateop = 'dateOp';
 
-    /** uuid */
-    case uuid = 'uuid';
+	/** uuid */
+	case uuid = 'uuid';
 
-    /** pointer */
-    case pointer = 'pointer';
+	/** pointer */
+	case pointer = 'pointer';
 
-    /** evaluate */
-    case evaluate = 'evaluate';
+	/** evaluate */
+	case evaluate = 'evaluate';
 
-    /** cc */
-    case cc = 'cc';
+	/** cc */
+	case cc = 'cc';
 
-    /** c */
-    case c = 'c';
+	/** c */
+	case c = 'c';
 
-    /** qty */
-    case qty = 'qty';
+	/** qty */
+	case qty = 'qty';
 
-    /** id */
-    case id = 'id';
+	/** id */
+	case id = 'id';
 
-    /** cp */
-    case cp = 'cp';
+	/** cp */
+	case cp = 'cp';
 }

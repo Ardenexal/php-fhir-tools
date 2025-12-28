@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -12,9 +10,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRVisionEyes: string
 {
-    /** Right Eye */
-    case righteye = 'right';
+	/** Right Eye */
+	case righteye = 'right';
 
-    /** Left Eye */
-    case lefteye = 'left';
+	/** Left Eye */
+	case lefteye = 'left';
 }

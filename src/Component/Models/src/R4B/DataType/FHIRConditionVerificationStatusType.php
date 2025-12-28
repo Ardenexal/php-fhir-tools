@@ -1,22 +1,16 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
-use Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRConditionVerificationStatus;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCode;
-
 /**
  * @fhir-code-type FHIRConditionVerificationStatus
- *
  * @description Code type wrapper for FHIRConditionVerificationStatus enum
  */
-class FHIRConditionVerificationStatusType extends FHIRCode
+class FHIRConditionVerificationStatusType extends \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCode
 {
-    public function __construct(
-        /** @var FHIRConditionVerificationStatus|string|null $value The code value */
-        public FHIRConditionVerificationStatus|string|null $value = null,
-    ) {
-    }
+	public function __construct(
+		/** @var \Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRConditionVerificationStatus|string|null $value The code value */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRConditionVerificationStatus|string|null $value = null,
+	) {
+	}
 }

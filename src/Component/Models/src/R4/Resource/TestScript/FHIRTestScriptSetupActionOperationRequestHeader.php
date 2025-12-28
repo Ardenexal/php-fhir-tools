@@ -1,32 +1,27 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * @description Header elements would be used to set HTTP headers.
  */
-#[FHIRBackboneElement(parentResource: 'TestScript', elementPath: 'TestScript.setup.action.operation.requestHeader', fhirVersion: 'R4')]
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'TestScript', elementPath: 'TestScript.setup.action.operation.requestHeader', fhirVersion: 'R4')]
 class FHIRTestScriptSetupActionOperationRequestHeader extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRBackboneElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<FHIRExtension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        public array $modifierExtension = [],
-        /** @var FHIRString|string|null field HTTP header field name */
-        #[NotBlank]
-        public \FHIRString|string|null $field = null,
-        /** @var FHIRString|string|null value HTTP headerfield value */
-        #[NotBlank]
-        public \FHIRString|string|null $value = null,
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string field HTTP header field name */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string|null $field = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string value HTTP headerfield value */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string|null $value = null,
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }

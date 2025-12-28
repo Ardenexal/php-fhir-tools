@@ -1,65 +1,60 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * @description Second-tier of goods and services.
  */
-#[FHIRBackboneElement(parentResource: 'ExplanationOfBenefit', elementPath: 'ExplanationOfBenefit.item.detail', fhirVersion: 'R5')]
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'ExplanationOfBenefit', elementPath: 'ExplanationOfBenefit.item.detail', fhirVersion: 'R5')]
 class FHIRExplanationOfBenefitItemDetail extends \Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRBackboneElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<FHIRExtension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        public array $modifierExtension = [],
-        /** @var FHIRPositiveInt|null sequence Product or service provided */
-        #[NotBlank]
-        public ?\FHIRPositiveInt $sequence = null,
-        /** @var array<FHIRIdentifier> traceNumber Number for tracking */
-        public array $traceNumber = [],
-        /** @var FHIRCodeableConcept|null revenue Revenue or cost center code */
-        public ?\FHIRCodeableConcept $revenue = null,
-        /** @var FHIRCodeableConcept|null category Benefit classification */
-        public ?\FHIRCodeableConcept $category = null,
-        /** @var FHIRCodeableConcept|null productOrService Billing, service, product, or drug code */
-        public ?\FHIRCodeableConcept $productOrService = null,
-        /** @var FHIRCodeableConcept|null productOrServiceEnd End of a range of codes */
-        public ?\FHIRCodeableConcept $productOrServiceEnd = null,
-        /** @var array<FHIRCodeableConcept> modifier Service/Product billing modifiers */
-        public array $modifier = [],
-        /** @var array<FHIRCodeableConcept> programCode Program the product or service is provided under */
-        public array $programCode = [],
-        /** @var FHIRMoney|null patientPaid Paid by the patient */
-        public ?\FHIRMoney $patientPaid = null,
-        /** @var FHIRQuantity|null quantity Count of products or services */
-        public ?\FHIRQuantity $quantity = null,
-        /** @var FHIRMoney|null unitPrice Fee, charge or cost per item */
-        public ?\FHIRMoney $unitPrice = null,
-        /** @var FHIRDecimal|null factor Price scaling factor */
-        public ?\FHIRDecimal $factor = null,
-        /** @var FHIRMoney|null tax Total tax */
-        public ?\FHIRMoney $tax = null,
-        /** @var FHIRMoney|null net Total item cost */
-        public ?\FHIRMoney $net = null,
-        /** @var array<FHIRReference> udi Unique device identifier */
-        public array $udi = [],
-        /** @var array<FHIRPositiveInt> noteNumber Applicable note numbers */
-        public array $noteNumber = [],
-        /** @var FHIRExplanationOfBenefitItemReviewOutcome|null reviewOutcome Detail level adjudication results */
-        public ?\FHIRExplanationOfBenefitItemReviewOutcome $reviewOutcome = null,
-        /** @var array<FHIRExplanationOfBenefitItemAdjudication> adjudication Detail level adjudication details */
-        public array $adjudication = [],
-        /** @var array<FHIRExplanationOfBenefitItemDetailSubDetail> subDetail Additional items */
-        public array $subDetail = [],
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRPositiveInt sequence Product or service provided */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRPositiveInt $sequence = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRIdentifier> traceNumber Number for tracking */
+		public array $traceNumber = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept revenue Revenue or cost center code */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept $revenue = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept category Benefit classification */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept $category = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept productOrService Billing, service, product, or drug code */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept $productOrService = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept productOrServiceEnd End of a range of codes */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept $productOrServiceEnd = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept> modifier Service/Product billing modifiers */
+		public array $modifier = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept> programCode Program the product or service is provided under */
+		public array $programCode = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRMoney patientPaid Paid by the patient */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRMoney $patientPaid = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRQuantity quantity Count of products or services */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRQuantity $quantity = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRMoney unitPrice Fee, charge or cost per item */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRMoney $unitPrice = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDecimal factor Price scaling factor */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDecimal $factor = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRMoney tax Total tax */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRMoney $tax = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRMoney net Total item cost */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRMoney $net = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference> udi Unique device identifier */
+		public array $udi = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRPositiveInt> noteNumber Applicable note numbers */
+		public array $noteNumber = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRExplanationOfBenefitItemReviewOutcome reviewOutcome Detail level adjudication results */
+		public ?FHIRExplanationOfBenefitItemReviewOutcome $reviewOutcome = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRExplanationOfBenefitItemAdjudication> adjudication Detail level adjudication details */
+		public array $adjudication = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRExplanationOfBenefitItemDetailSubDetail> subDetail Additional items */
+		public array $subDetail = [],
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }

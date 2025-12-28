@@ -1,22 +1,16 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
-use Ardenexal\FHIRTools\Component\Models\R5\Enum\FHIRFormularyItemStatusCodes;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCode;
-
 /**
  * @fhir-code-type FHIRFormularyItemStatusCodes
- *
  * @description Code type wrapper for FHIRFormularyItemStatusCodes enum
  */
-class FHIRFormularyItemStatusCodesType extends FHIRCode
+class FHIRFormularyItemStatusCodesType extends \Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCode
 {
-    public function __construct(
-        /** @var FHIRFormularyItemStatusCodes|string|null $value The code value */
-        public FHIRFormularyItemStatusCodes|string|null $value = null,
-    ) {
-    }
+	public function __construct(
+		/** @var \Ardenexal\FHIRTools\Component\Models\R5\Enum\FHIRFormularyItemStatusCodes|string|null $value The code value */
+		public \Ardenexal\FHIRTools\Component\Models\R5\Enum\FHIRFormularyItemStatusCodes|string|null $value = null,
+	) {
+	}
 }

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -12,12 +10,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRQualityType: string
 {
-    /** INDEL Comparison */
-    case indelcomparison = 'indel';
+	/** INDEL Comparison */
+	case indelcomparison = 'indel';
 
-    /** SNP Comparison */
-    case snpcomparison = 'snp';
+	/** SNP Comparison */
+	case snpcomparison = 'snp';
 
-    /** UNKNOWN Comparison */
-    case unknowncomparison = 'unknown';
+	/** UNKNOWN Comparison */
+	case unknowncomparison = 'unknown';
 }

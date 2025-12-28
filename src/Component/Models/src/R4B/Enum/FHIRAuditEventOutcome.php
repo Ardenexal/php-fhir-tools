@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -12,15 +10,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRAuditEventOutcome: string
 {
-    /** Success */
-    case success = '0';
+	/** Success */
+	case success = '0';
 
-    /** Minor failure */
-    case minorfailure = '4';
+	/** Minor failure */
+	case minorfailure = '4';
 
-    /** Serious failure */
-    case seriousfailure = '8';
+	/** Serious failure */
+	case seriousfailure = '8';
 
-    /** Major failure */
-    case majorfailure = '12';
+	/** Major failure */
+	case majorfailure = '12';
 }

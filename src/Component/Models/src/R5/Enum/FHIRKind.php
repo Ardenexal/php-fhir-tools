@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -12,12 +10,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRKind: string
 {
-    /** Insurance */
-    case insurance = 'insurance';
+	/** Insurance */
+	case insurance = 'insurance';
 
-    /** Self-pay */
-    case selfpay = 'self-pay';
+	/** Self-pay */
+	case selfpay = 'self-pay';
 
-    /** Other */
-    case other = 'other';
+	/** Other */
+	case other = 'other';
 }

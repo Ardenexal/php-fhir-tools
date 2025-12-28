@@ -1,22 +1,16 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
-use Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRCodeSystemHierarchyMeaning;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCode;
-
 /**
  * @fhir-code-type FHIRCodeSystemHierarchyMeaning
- *
  * @description Code type wrapper for FHIRCodeSystemHierarchyMeaning enum
  */
-class FHIRCodeSystemHierarchyMeaningType extends FHIRCode
+class FHIRCodeSystemHierarchyMeaningType extends \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCode
 {
-    public function __construct(
-        /** @var FHIRCodeSystemHierarchyMeaning|string|null $value The code value */
-        public FHIRCodeSystemHierarchyMeaning|string|null $value = null,
-    ) {
-    }
+	public function __construct(
+		/** @var \Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRCodeSystemHierarchyMeaning|string|null $value The code value */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRCodeSystemHierarchyMeaning|string|null $value = null,
+	) {
+	}
 }

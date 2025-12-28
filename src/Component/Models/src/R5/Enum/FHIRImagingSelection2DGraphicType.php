@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -12,18 +10,18 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRImagingSelection2DGraphicType: string
 {
-    /** POINT */
-    case point = 'point';
+	/** POINT */
+	case point = 'point';
 
-    /** POLYLINE */
-    case polyline = 'polyline';
+	/** POLYLINE */
+	case polyline = 'polyline';
 
-    /** INTERPOLATED */
-    case interpolated = 'interpolated';
+	/** INTERPOLATED */
+	case interpolated = 'interpolated';
 
-    /** CIRCLE */
-    case circle = 'circle';
+	/** CIRCLE */
+	case circle = 'circle';
 
-    /** ELLIPSE */
-    case ellipse = 'ellipse';
+	/** ELLIPSE */
+	case ellipse = 'ellipse';
 }

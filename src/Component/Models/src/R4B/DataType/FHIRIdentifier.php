@@ -1,39 +1,33 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-
 /**
  * @author HL7 FHIR Standard
- *
  * @see http://hl7.org/fhir/StructureDefinition/Identifier
- *
  * @description An identifier - identifies some entity uniquely and unambiguously. Typically this is used for business identifiers.
  */
-#[FHIRComplexType(typeName: 'Identifier', fhirVersion: 'R4B')]
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType(typeName: 'Identifier', fhirVersion: 'R4B')]
 class FHIRIdentifier extends FHIRElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<FHIRExtension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var FHIRIdentifierUseType|null use usual | official | temp | secondary | old (If known) */
-        public ?\FHIRIdentifierUseType $use = null,
-        /** @var FHIRCodeableConcept|null type Description of identifier */
-        public ?\FHIRCodeableConcept $type = null,
-        /** @var FHIRUri|null system The namespace for the identifier value */
-        public ?\FHIRUri $system = null,
-        /** @var FHIRString|string|null value The value that is unique */
-        public \FHIRString|string|null $value = null,
-        /** @var FHIRPeriod|null period Time period when id is/was valid for use */
-        public ?\FHIRPeriod $period = null,
-        /** @var FHIRReference|null assigner Organization that issued id (may be just text) */
-        public ?\FHIRReference $assigner = null,
-    ) {
-        parent::__construct($id, $extension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRIdentifierUseType use usual | official | temp | secondary | old (If known) */
+		public ?FHIRIdentifierUseType $use = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept type Description of identifier */
+		public ?FHIRCodeableConcept $type = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri system The namespace for the identifier value */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri $system = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string value The value that is unique */
+		public \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string|null $value = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod period Time period when id is/was valid for use */
+		public ?FHIRPeriod $period = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference assigner Organization that issued id (may be just text) */
+		public ?FHIRReference $assigner = null,
+	) {
+		parent::__construct($id, $extension);
+	}
 }

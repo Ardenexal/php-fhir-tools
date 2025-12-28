@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -12,18 +10,18 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRSubscriptionNotificationType: string
 {
-    /** Handshake */
-    case handshake = 'handshake';
+	/** Handshake */
+	case handshake = 'handshake';
 
-    /** Heartbeat */
-    case heartbeat = 'heartbeat';
+	/** Heartbeat */
+	case heartbeat = 'heartbeat';
 
-    /** Event Notification */
-    case eventnotification = 'event-notification';
+	/** Event Notification */
+	case eventnotification = 'event-notification';
 
-    /** Query Status */
-    case querystatus = 'query-status';
+	/** Query Status */
+	case querystatus = 'query-status';
 
-    /** Query Event */
-    case queryevent = 'query-event';
+	/** Query Event */
+	case queryevent = 'query-event';
 }

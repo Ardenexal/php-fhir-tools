@@ -1,22 +1,16 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
-use Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRGuidanceResponseStatus;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCode;
-
 /**
  * @fhir-code-type FHIRGuidanceResponseStatus
- *
  * @description Code type wrapper for FHIRGuidanceResponseStatus enum
  */
-class FHIRGuidanceResponseStatusType extends FHIRCode
+class FHIRGuidanceResponseStatusType extends \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCode
 {
-    public function __construct(
-        /** @var FHIRGuidanceResponseStatus|string|null $value The code value */
-        public FHIRGuidanceResponseStatus|string|null $value = null,
-    ) {
-    }
+	public function __construct(
+		/** @var \Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRGuidanceResponseStatus|string|null $value The code value */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRGuidanceResponseStatus|string|null $value = null,
+	) {
+	}
 }

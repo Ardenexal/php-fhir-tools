@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -12,33 +10,33 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRAdditionalBindingPurposeVS: string
 {
-    /** Maximum Binding */
-    case maximumbinding = 'maximum';
+	/** Maximum Binding */
+	case maximumbinding = 'maximum';
 
-    /** Minimum Binding */
-    case minimumbinding = 'minimum';
+	/** Minimum Binding */
+	case minimumbinding = 'minimum';
 
-    /** Required Binding */
-    case requiredbinding = 'required';
+	/** Required Binding */
+	case requiredbinding = 'required';
 
-    /** Conformance Binding */
-    case conformancebinding = 'extensible';
+	/** Conformance Binding */
+	case conformancebinding = 'extensible';
 
-    /** Candidate Binding */
-    case candidatebinding = 'candidate';
+	/** Candidate Binding */
+	case candidatebinding = 'candidate';
 
-    /** Current Binding */
-    case currentbinding = 'current';
+	/** Current Binding */
+	case currentbinding = 'current';
 
-    /** Preferred Binding */
-    case preferredbinding = 'preferred';
+	/** Preferred Binding */
+	case preferredbinding = 'preferred';
 
-    /** UI Suggested Binding */
-    case uisuggestedbinding = 'ui';
+	/** UI Suggested Binding */
+	case uisuggestedbinding = 'ui';
 
-    /** Starter Binding */
-    case starterbinding = 'starter';
+	/** Starter Binding */
+	case starterbinding = 'starter';
 
-    /** Component Binding */
-    case componentbinding = 'component';
+	/** Component Binding */
+	case componentbinding = 'component';
 }

@@ -1,73 +1,67 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
-use Symfony\Component\Validator\Constraints\NotBlank;
-
 /**
  * @author Health Level Seven International (Orders and Observations)
- *
  * @see http://hl7.org/fhir/StructureDefinition/DeviceUseStatement
- *
  * @description A record of a device being used by a patient where the record is the result of a report from the patient or another clinician.
  */
 #[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(
-    type: 'DeviceUseStatement',
-    version: '4.3.0',
-    url: 'http://hl7.org/fhir/StructureDefinition/DeviceUseStatement',
-    fhirVersion: 'R5',
+	type: 'DeviceUseStatement',
+	version: '4.3.0',
+	url: 'http://hl7.org/fhir/StructureDefinition/DeviceUseStatement',
+	fhirVersion: 'R5',
 )]
 class FHIRDeviceUseStatement extends FHIRDomainResource
 {
-    public function __construct(
-        /** @var string|null id Logical id of this artifact */
-        public ?string $id = null,
-        /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?\FHIRMeta $meta = null,
-        /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?\FHIRUri $implicitRules = null,
-        /** @var string|null language Language of the resource content */
-        public ?string $language = null,
-        /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
-        public ?\FHIRNarrative $text = null,
-        /** @var array<FHIRResource> contained Contained, inline Resources */
-        public array $contained = [],
-        /** @var array<FHIRExtension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored */
-        public array $modifierExtension = [],
-        /** @var array<FHIRIdentifier> identifier External identifier for this record */
-        public array $identifier = [],
-        /** @var array<FHIRReference> basedOn Fulfills plan, proposal or order */
-        public array $basedOn = [],
-        /** @var FHIRDeviceUseStatementStatusType|null status active | completed | entered-in-error + */
-        #[NotBlank]
-        public ?\FHIRDeviceUseStatementStatusType $status = null,
-        /** @var FHIRReference|null subject Patient using device */
-        #[NotBlank]
-        public ?\FHIRReference $subject = null,
-        /** @var array<FHIRReference> derivedFrom Supporting information */
-        public array $derivedFrom = [],
-        /** @var FHIRTiming|FHIRPeriod|FHIRDateTime|null timingX How often  the device was used */
-        public \FHIRTiming|\FHIRPeriod|\FHIRDateTime|null $timingX = null,
-        /** @var FHIRDateTime|null recordedOn When statement was recorded */
-        public ?\FHIRDateTime $recordedOn = null,
-        /** @var FHIRReference|null source Who made the statement */
-        public ?\FHIRReference $source = null,
-        /** @var FHIRReference|null device Reference to device used */
-        #[NotBlank]
-        public ?\FHIRReference $device = null,
-        /** @var array<FHIRCodeableConcept> reasonCode Why device was used */
-        public array $reasonCode = [],
-        /** @var array<FHIRReference> reasonReference Why was DeviceUseStatement performed? */
-        public array $reasonReference = [],
-        /** @var FHIRCodeableConcept|null bodySite Target body site */
-        public ?\FHIRCodeableConcept $bodySite = null,
-        /** @var array<FHIRAnnotation> note Addition details (comments, instructions) */
-        public array $note = [],
-    ) {
-        parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Logical id of this artifact */
+		public ?string $id = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRMeta meta Metadata about the resource */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRMeta $meta = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri implicitRules A set of rules under which this content was created */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri $implicitRules = null,
+		/** @var null|string language Language of the resource content */
+		public ?string $language = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRNarrative text Text summary of the resource, for human interpretation */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRNarrative $text = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRResource> contained Contained, inline Resources */
+		public array $contained = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored */
+		public array $modifierExtension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRIdentifier> identifier External identifier for this record */
+		public array $identifier = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference> basedOn Fulfills plan, proposal or order */
+		public array $basedOn = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRDeviceUseStatementStatusType status active | completed | entered-in-error + */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRDeviceUseStatementStatusType $status = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference subject Patient using device */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference $subject = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference> derivedFrom Supporting information */
+		public array $derivedFrom = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRTiming|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime timingX How often  the device was used */
+		public \Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRTiming|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime|null $timingX = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime recordedOn When statement was recorded */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime $recordedOn = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference source Who made the statement */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference $source = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference device Reference to device used */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference $device = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept> reasonCode Why device was used */
+		public array $reasonCode = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference> reasonReference Why was DeviceUseStatement performed? */
+		public array $reasonReference = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept bodySite Target body site */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept $bodySite = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRAnnotation> note Addition details (comments, instructions) */
+		public array $note = [],
+	) {
+		parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
+	}
 }

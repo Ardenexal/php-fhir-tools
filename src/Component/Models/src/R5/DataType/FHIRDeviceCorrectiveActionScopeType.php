@@ -1,22 +1,16 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
-use Ardenexal\FHIRTools\Component\Models\R5\Enum\FHIRDeviceCorrectiveActionScope;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCode;
-
 /**
  * @fhir-code-type FHIRDeviceCorrectiveActionScope
- *
  * @description Code type wrapper for FHIRDeviceCorrectiveActionScope enum
  */
-class FHIRDeviceCorrectiveActionScopeType extends FHIRCode
+class FHIRDeviceCorrectiveActionScopeType extends \Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCode
 {
-    public function __construct(
-        /** @var FHIRDeviceCorrectiveActionScope|string|null $value The code value */
-        public FHIRDeviceCorrectiveActionScope|string|null $value = null,
-    ) {
-    }
+	public function __construct(
+		/** @var \Ardenexal\FHIRTools\Component\Models\R5\Enum\FHIRDeviceCorrectiveActionScope|string|null $value The code value */
+		public \Ardenexal\FHIRTools\Component\Models\R5\Enum\FHIRDeviceCorrectiveActionScope|string|null $value = null,
+	) {
+	}
 }

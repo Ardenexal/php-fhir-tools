@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -12,30 +10,30 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRBundleType: string
 {
-    /** Document */
-    case document = 'document';
+	/** Document */
+	case document = 'document';
 
-    /** Message */
-    case message = 'message';
+	/** Message */
+	case message = 'message';
 
-    /** Transaction */
-    case transaction = 'transaction';
+	/** Transaction */
+	case transaction = 'transaction';
 
-    /** Transaction Response */
-    case transactionresponse = 'transaction-response';
+	/** Transaction Response */
+	case transactionresponse = 'transaction-response';
 
-    /** Batch */
-    case batch = 'batch';
+	/** Batch */
+	case batch = 'batch';
 
-    /** Batch Response */
-    case batchresponse = 'batch-response';
+	/** Batch Response */
+	case batchresponse = 'batch-response';
 
-    /** History List */
-    case historylist = 'history';
+	/** History List */
+	case historylist = 'history';
 
-    /** Search Results */
-    case searchresults = 'searchset';
+	/** Search Results */
+	case searchresults = 'searchset';
 
-    /** Collection */
-    case collection = 'collection';
+	/** Collection */
+	case collection = 'collection';
 }

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -12,9 +10,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRStrandType: string
 {
-    /** Watson strand of referenceSeq */
-    case watsonstrandofreferenceseq = 'watson';
+	/** Watson strand of referenceSeq */
+	case watsonstrandofreferenceseq = 'watson';
 
-    /** Crick strand of referenceSeq */
-    case crickstrandofreferenceseq = 'crick';
+	/** Crick strand of referenceSeq */
+	case crickstrandofreferenceseq = 'crick';
 }

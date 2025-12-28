@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -12,12 +10,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRMessageSignificanceCategory: string
 {
-    /** Consequence */
-    case consequence = 'consequence';
+	/** Consequence */
+	case consequence = 'consequence';
 
-    /** Currency */
-    case currency = 'currency';
+	/** Currency */
+	case currency = 'currency';
 
-    /** Notification */
-    case notification = 'notification';
+	/** Notification */
+	case notification = 'notification';
 }

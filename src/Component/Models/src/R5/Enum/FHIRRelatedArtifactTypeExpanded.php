@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -12,117 +10,117 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRRelatedArtifactTypeExpanded: string
 {
-    /** Documentation */
-    case documentation = 'documentation';
+	/** Documentation */
+	case documentation = 'documentation';
 
-    /** Justification */
-    case justification = 'justification';
+	/** Justification */
+	case justification = 'justification';
 
-    /** Citation */
-    case citation = 'citation';
+	/** Citation */
+	case citation = 'citation';
 
-    /** Predecessor */
-    case predecessor = 'predecessor';
+	/** Predecessor */
+	case predecessor = 'predecessor';
 
-    /** Successor */
-    case successor = 'successor';
+	/** Successor */
+	case successor = 'successor';
 
-    /** Derived From */
-    case derivedfrom = 'derived-from';
+	/** Derived From */
+	case derivedfrom = 'derived-from';
 
-    /** Depends On */
-    case dependson = 'depends-on';
+	/** Depends On */
+	case dependson = 'depends-on';
 
-    /** Composed Of */
-    case composedof = 'composed-of';
+	/** Composed Of */
+	case composedof = 'composed-of';
 
-    /** Part Of */
-    case partof = 'part-of';
+	/** Part Of */
+	case partof = 'part-of';
 
-    /** Amends */
-    case amends = 'amends';
+	/** Amends */
+	case amends = 'amends';
 
-    /** Amended With */
-    case amendedwith = 'amended-with';
+	/** Amended With */
+	case amendedwith = 'amended-with';
 
-    /** Appends */
-    case appends = 'appends';
+	/** Appends */
+	case appends = 'appends';
 
-    /** Appended With */
-    case appendedwith = 'appended-with';
+	/** Appended With */
+	case appendedwith = 'appended-with';
 
-    /** Cites */
-    case cites = 'cites';
+	/** Cites */
+	case cites = 'cites';
 
-    /** Cited By */
-    case citedby = 'cited-by';
+	/** Cited By */
+	case citedby = 'cited-by';
 
-    /** Is Comment On */
-    case iscommenton = 'comments-on';
+	/** Is Comment On */
+	case iscommenton = 'comments-on';
 
-    /** Has Comment In */
-    case hascommentin = 'comment-in';
+	/** Has Comment In */
+	case hascommentin = 'comment-in';
 
-    /** Contains */
-    case contains = 'contains';
+	/** Contains */
+	case contains = 'contains';
 
-    /** Contained In */
-    case containedin = 'contained-in';
+	/** Contained In */
+	case containedin = 'contained-in';
 
-    /** Corrects */
-    case corrects = 'corrects';
+	/** Corrects */
+	case corrects = 'corrects';
 
-    /** Correction In */
-    case correctionin = 'correction-in';
+	/** Correction In */
+	case correctionin = 'correction-in';
 
-    /** Replaces */
-    case replaces = 'replaces';
+	/** Replaces */
+	case replaces = 'replaces';
 
-    /** Replaced With */
-    case replacedwith = 'replaced-with';
+	/** Replaced With */
+	case replacedwith = 'replaced-with';
 
-    /** Retracts */
-    case retracts = 'retracts';
+	/** Retracts */
+	case retracts = 'retracts';
 
-    /** Retracted By */
-    case retractedby = 'retracted-by';
+	/** Retracted By */
+	case retractedby = 'retracted-by';
 
-    /** Signs */
-    case signs = 'signs';
+	/** Signs */
+	case signs = 'signs';
 
-    /** Similar To */
-    case similarto = 'similar-to';
+	/** Similar To */
+	case similarto = 'similar-to';
 
-    /** Supports */
-    case supports = 'supports';
+	/** Supports */
+	case supports = 'supports';
 
-    /** Supported With */
-    case supportedwith = 'supported-with';
+	/** Supported With */
+	case supportedwith = 'supported-with';
 
-    /** Transforms */
-    case transforms = 'transforms';
+	/** Transforms */
+	case transforms = 'transforms';
 
-    /** Transformed Into */
-    case transformedinto = 'transformed-into';
+	/** Transformed Into */
+	case transformedinto = 'transformed-into';
 
-    /** Transformed With */
-    case transformedwith = 'transformed-with';
+	/** Transformed With */
+	case transformedwith = 'transformed-with';
 
-    /** Documents */
-    case documents = 'documents';
+	/** Documents */
+	case documents = 'documents';
 
-    /** Specification Of */
-    case specificationof = 'specification-of';
+	/** Specification Of */
+	case specificationof = 'specification-of';
 
-    /** Created With */
-    case createdwith = 'created-with';
+	/** Created With */
+	case createdwith = 'created-with';
 
-    /** Cite As */
-    case citeas = 'cite-as';
+	/** Cite As */
+	case citeas = 'cite-as';
 
-    /** Reprint */
-    case reprint = 'reprint';
+	/** Reprint */
+	case reprint = 'reprint';
 
-    /** Reprint Of */
-    case reprintof = 'reprint-of';
+	/** Reprint Of */
+	case reprintof = 'reprint-of';
 }

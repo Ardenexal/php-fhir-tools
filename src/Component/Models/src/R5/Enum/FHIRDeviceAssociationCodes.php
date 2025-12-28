@@ -1,29 +1,27 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
 /**
- * ValueSet: DeviceAssociation Status Reason Codes
- * URL: http://hl7.org/fhir/ValueSet/deviceassociation-status-reason
+ * ValueSet: DeviceAssociation Status Codes
+ * URL: http://hl7.org/fhir/ValueSet/deviceassociation-status
  * Version: 5.0.0
- * Description: DeviceAssociation Status Reason Codes
+ * Description: DeviceAssociation Status Codes
  */
 enum FHIRDeviceAssociationCodes: string
 {
-    /** Attached */
-    case attached = 'attached';
+	/** Implanted */
+	case implanted = 'implanted';
 
-    /** Disconnected */
-    case disconnected = 'disconnected';
+	/** Explanted */
+	case explanted = 'explanted';
 
-    /** Failed */
-    case failed = 'failed';
+	/** Entered in Error */
+	case enteredinerror = 'entered-in-error';
 
-    /** placed */
-    case placed = 'placed';
+	/** Attached */
+	case attached = 'attached';
 
-    /** Replaced */
-    case replaced = 'replaced';
+	/** Unknown */
+	case unknown = 'unknown';
 }

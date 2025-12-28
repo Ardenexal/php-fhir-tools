@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -12,9 +10,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum FHIRLocationMode: string
 {
-    /** Instance */
-    case instance = 'instance';
+	/** Instance */
+	case instance = 'instance';
 
-    /** Kind */
-    case kind = 'kind';
+	/** Kind */
+	case kind = 'kind';
 }

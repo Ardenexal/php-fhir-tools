@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -12,12 +10,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum FHIRNamingSystemType: string
 {
-    /** Code System */
-    case codesystem = 'codesystem';
+	/** Code System */
+	case codesystem = 'codesystem';
 
-    /** Identifier */
-    case identifier = 'identifier';
+	/** Identifier */
+	case identifier = 'identifier';
 
-    /** Root */
-    case root = 'root';
+	/** Root */
+	case root = 'root';
 }

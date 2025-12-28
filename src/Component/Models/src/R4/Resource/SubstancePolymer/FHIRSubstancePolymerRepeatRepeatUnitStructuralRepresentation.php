@@ -1,35 +1,31 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
 
 /**
  * @description Todo.
  */
-#[FHIRBackboneElement(
-    parentResource: 'SubstancePolymer',
-    elementPath: 'SubstancePolymer.repeat.repeatUnit.structuralRepresentation',
-    fhirVersion: 'R4',
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(
+	parentResource: 'SubstancePolymer',
+	elementPath: 'SubstancePolymer.repeat.repeatUnit.structuralRepresentation',
+	fhirVersion: 'R4',
 )]
 class FHIRSubstancePolymerRepeatRepeatUnitStructuralRepresentation extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRBackboneElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<FHIRExtension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        public array $modifierExtension = [],
-        /** @var FHIRCodeableConcept|null type Todo */
-        public ?\FHIRCodeableConcept $type = null,
-        /** @var FHIRString|string|null representation Todo */
-        public \FHIRString|string|null $representation = null,
-        /** @var FHIRAttachment|null attachment Todo */
-        public ?\FHIRAttachment $attachment = null,
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept type Todo */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept $type = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string representation Todo */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string|null $representation = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRAttachment attachment Todo */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRAttachment $attachment = null,
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }

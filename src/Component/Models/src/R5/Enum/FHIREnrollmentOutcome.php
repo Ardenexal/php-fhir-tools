@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -12,15 +10,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIREnrollmentOutcome: string
 {
-    /** Queued */
-    case queued = 'queued';
+	/** Queued */
+	case queued = 'queued';
 
-    /** Processing Complete */
-    case processingcomplete = 'complete';
+	/** Processing Complete */
+	case processingcomplete = 'complete';
 
-    /** Error */
-    case error = 'error';
+	/** Error */
+	case error = 'error';
 
-    /** Partial Processing */
-    case partialprocessing = 'partial';
+	/** Partial Processing */
+	case partialprocessing = 'partial';
 }

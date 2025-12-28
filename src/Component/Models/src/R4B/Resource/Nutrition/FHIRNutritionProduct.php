@@ -1,65 +1,59 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
-use Symfony\Component\Validator\Constraints\NotBlank;
-
 /**
  * @author Health Level Seven International (Orders and Observations)
- *
  * @see http://hl7.org/fhir/StructureDefinition/NutritionProduct
- *
  * @description A food or fluid product that is consumed by patients.
  */
 #[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(
-    type: 'NutritionProduct',
-    version: '4.3.0',
-    url: 'http://hl7.org/fhir/StructureDefinition/NutritionProduct',
-    fhirVersion: 'R4B',
+	type: 'NutritionProduct',
+	version: '4.3.0',
+	url: 'http://hl7.org/fhir/StructureDefinition/NutritionProduct',
+	fhirVersion: 'R4B',
 )]
 class FHIRNutritionProduct extends FHIRDomainResource
 {
-    public function __construct(
-        /** @var string|null id Logical id of this artifact */
-        public ?string $id = null,
-        /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?\FHIRMeta $meta = null,
-        /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?\FHIRUri $implicitRules = null,
-        /** @var string|null language Language of the resource content */
-        public ?string $language = null,
-        /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
-        public ?\FHIRNarrative $text = null,
-        /** @var array<FHIRResource> contained Contained, inline Resources */
-        public array $contained = [],
-        /** @var array<FHIRExtension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored */
-        public array $modifierExtension = [],
-        /** @var FHIRNutritionProductStatusType|null status active | inactive | entered-in-error */
-        #[NotBlank]
-        public ?\FHIRNutritionProductStatusType $status = null,
-        /** @var array<FHIRCodeableConcept> category A category or class of the nutrition product (halal, kosher, gluten free, vegan, etc) */
-        public array $category = [],
-        /** @var FHIRCodeableConcept|null code A code designating a specific type of nutritional product */
-        public ?\FHIRCodeableConcept $code = null,
-        /** @var array<FHIRReference> manufacturer Manufacturer, representative or officially responsible for the product */
-        public array $manufacturer = [],
-        /** @var array<FHIRNutritionProductNutrient> nutrient The product's nutritional information expressed by the nutrients */
-        public array $nutrient = [],
-        /** @var array<FHIRNutritionProductIngredient> ingredient Ingredients contained in this product */
-        public array $ingredient = [],
-        /** @var array<FHIRCodeableReference> knownAllergen Known or suspected allergens that are a part of this product */
-        public array $knownAllergen = [],
-        /** @var array<FHIRNutritionProductProductCharacteristic> productCharacteristic Specifies descriptive properties of the nutrition product */
-        public array $productCharacteristic = [],
-        /** @var FHIRNutritionProductInstance|null instance One or several physical instances or occurrences of the nutrition product */
-        public ?\FHIRNutritionProductInstance $instance = null,
-        /** @var array<FHIRAnnotation> note Comments made about the product */
-        public array $note = [],
-    ) {
-        parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Logical id of this artifact */
+		public ?string $id = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMeta meta Metadata about the resource */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMeta $meta = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri implicitRules A set of rules under which this content was created */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri $implicitRules = null,
+		/** @var null|string language Language of the resource content */
+		public ?string $language = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRNarrative text Text summary of the resource, for human interpretation */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRNarrative $text = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRResource> contained Contained, inline Resources */
+		public array $contained = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRNutritionProductStatusType status active | inactive | entered-in-error */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRNutritionProductStatusType $status = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept> category A category or class of the nutrition product (halal, kosher, gluten free, vegan, etc) */
+		public array $category = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept code A code designating a specific type of nutritional product */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept $code = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference> manufacturer Manufacturer, representative or officially responsible for the product */
+		public array $manufacturer = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRNutritionProductNutrient> nutrient The product's nutritional information expressed by the nutrients */
+		public array $nutrient = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRNutritionProductIngredient> ingredient Ingredients contained in this product */
+		public array $ingredient = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableReference> knownAllergen Known or suspected allergens that are a part of this product */
+		public array $knownAllergen = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRNutritionProductProductCharacteristic> productCharacteristic Specifies descriptive properties of the nutrition product */
+		public array $productCharacteristic = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRNutritionProductInstance instance One or several physical instances or occurrences of the nutrition product */
+		public ?FHIRNutritionProductInstance $instance = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRAnnotation> note Comments made about the product */
+		public array $note = [],
+	) {
+		parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
+	}
 }

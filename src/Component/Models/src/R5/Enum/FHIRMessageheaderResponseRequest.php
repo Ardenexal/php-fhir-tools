@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -12,15 +10,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRMessageheaderResponseRequest: string
 {
-    /** Always */
-    case always = 'always';
+	/** Always */
+	case always = 'always';
 
-    /** Error/reject conditions only */
-    case errorrejectconditionsonly = 'on-error';
+	/** Error/reject conditions only */
+	case errorrejectconditionsonly = 'on-error';
 
-    /** Never */
-    case never = 'never';
+	/** Never */
+	case never = 'never';
 
-    /** Successful completion only */
-    case successfulcompletiononly = 'on-success';
+	/** Successful completion only */
+	case successfulcompletiononly = 'on-success';
 }

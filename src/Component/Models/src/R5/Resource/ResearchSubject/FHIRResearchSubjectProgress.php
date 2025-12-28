@@ -1,37 +1,33 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
 
 /**
  * @description The current state (status) of the subject and resons for status change where appropriate.
  */
-#[FHIRBackboneElement(parentResource: 'ResearchSubject', elementPath: 'ResearchSubject.progress', fhirVersion: 'R5')]
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'ResearchSubject', elementPath: 'ResearchSubject.progress', fhirVersion: 'R5')]
 class FHIRResearchSubjectProgress extends \Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRBackboneElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<FHIRExtension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        public array $modifierExtension = [],
-        /** @var FHIRCodeableConcept|null type state | milestone */
-        public ?\FHIRCodeableConcept $type = null,
-        /** @var FHIRCodeableConcept|null subjectState candidate | eligible | follow-up | ineligible | not-registered | off-study | on-study | on-study-intervention | on-study-observation | pending-on-study | potential-candidate | screening | withdrawn */
-        public ?\FHIRCodeableConcept $subjectState = null,
-        /** @var FHIRCodeableConcept|null milestone SignedUp | Screened | Randomized */
-        public ?\FHIRCodeableConcept $milestone = null,
-        /** @var FHIRCodeableConcept|null reason State change reason */
-        public ?\FHIRCodeableConcept $reason = null,
-        /** @var FHIRDateTime|null startDate State change date */
-        public ?\FHIRDateTime $startDate = null,
-        /** @var FHIRDateTime|null endDate State change date */
-        public ?\FHIRDateTime $endDate = null,
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept type state | milestone */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept $type = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept subjectState candidate | eligible | follow-up | ineligible | not-registered | off-study | on-study | on-study-intervention | on-study-observation | pending-on-study | potential-candidate | screening | withdrawn */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept $subjectState = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept milestone SignedUp | Screened | Randomized */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept $milestone = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept reason State change reason */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept $reason = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime startDate State change date */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime $startDate = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime endDate State change date */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime $endDate = null,
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }

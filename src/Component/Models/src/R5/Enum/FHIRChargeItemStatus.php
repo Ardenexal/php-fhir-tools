@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -12,24 +10,24 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRChargeItemStatus: string
 {
-    /** Planned */
-    case planned = 'planned';
+	/** Planned */
+	case planned = 'planned';
 
-    /** Billable */
-    case billable = 'billable';
+	/** Billable */
+	case billable = 'billable';
 
-    /** Not billable */
-    case notbillable = 'not-billable';
+	/** Not billable */
+	case notbillable = 'not-billable';
 
-    /** Aborted */
-    case aborted = 'aborted';
+	/** Aborted */
+	case aborted = 'aborted';
 
-    /** Billed */
-    case billed = 'billed';
+	/** Billed */
+	case billed = 'billed';
 
-    /** Entered in Error */
-    case enteredinerror = 'entered-in-error';
+	/** Entered in Error */
+	case enteredinerror = 'entered-in-error';
 
-    /** Unknown */
-    case unknown = 'unknown';
+	/** Unknown */
+	case unknown = 'unknown';
 }

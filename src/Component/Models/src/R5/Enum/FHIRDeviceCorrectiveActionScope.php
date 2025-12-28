@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -12,12 +10,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRDeviceCorrectiveActionScope: string
 {
-    /** Model */
-    case model = 'model';
+	/** Model */
+	case model = 'model';
 
-    /** Lot Numbers */
-    case lotnumbers = 'lot-numbers';
+	/** Lot Numbers */
+	case lotnumbers = 'lot-numbers';
 
-    /** Serial Numbers */
-    case serialnumbers = 'serial-numbers';
+	/** Serial Numbers */
+	case serialnumbers = 'serial-numbers';
 }

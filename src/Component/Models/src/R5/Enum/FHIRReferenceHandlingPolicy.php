@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -12,18 +10,18 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRReferenceHandlingPolicy: string
 {
-    /** Literal References */
-    case literalreferences = 'literal';
+	/** Literal References */
+	case literalreferences = 'literal';
 
-    /** Logical References */
-    case logicalreferences = 'logical';
+	/** Logical References */
+	case logicalreferences = 'logical';
 
-    /** Resolves References */
-    case resolvesreferences = 'resolves';
+	/** Resolves References */
+	case resolvesreferences = 'resolves';
 
-    /** Reference Integrity Enforced */
-    case referenceintegrityenforced = 'enforced';
+	/** Reference Integrity Enforced */
+	case referenceintegrityenforced = 'enforced';
 
-    /** Local References Only */
-    case localreferencesonly = 'local';
+	/** Local References Only */
+	case localreferencesonly = 'local';
 }

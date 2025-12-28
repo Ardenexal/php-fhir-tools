@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -12,9 +10,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum FHIRConceptMapEquivalence: string
 {
-    /** Related To */
-    case relatedto = 'relatedto';
+	/** Related To */
+	case relatedto = 'relatedto';
 
-    /** Unmatched */
-    case unmatched = 'unmatched';
+	/** Unmatched */
+	case unmatched = 'unmatched';
 }

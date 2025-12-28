@@ -1,22 +1,16 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
-use Ardenexal\FHIRTools\Component\Models\R5\Enum\FHIRConceptMapAttributeType;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCode;
-
 /**
  * @fhir-code-type FHIRConceptMapAttributeType
- *
  * @description Code type wrapper for FHIRConceptMapAttributeType enum
  */
-class FHIRConceptMapAttributeTypeType extends FHIRCode
+class FHIRConceptMapAttributeTypeType extends \Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCode
 {
-    public function __construct(
-        /** @var FHIRConceptMapAttributeType|string|null $value The code value */
-        public FHIRConceptMapAttributeType|string|null $value = null,
-    ) {
-    }
+	public function __construct(
+		/** @var \Ardenexal\FHIRTools\Component\Models\R5\Enum\FHIRConceptMapAttributeType|string|null $value The code value */
+		public \Ardenexal\FHIRTools\Component\Models\R5\Enum\FHIRConceptMapAttributeType|string|null $value = null,
+	) {
+	}
 }

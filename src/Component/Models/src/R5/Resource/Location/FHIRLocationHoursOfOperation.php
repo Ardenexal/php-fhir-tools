@@ -1,33 +1,29 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
 
 /**
  * @description What days/times during a week is this location usually open.
  */
-#[FHIRBackboneElement(parentResource: 'Location', elementPath: 'Location.hoursOfOperation', fhirVersion: 'R4B')]
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'Location', elementPath: 'Location.hoursOfOperation', fhirVersion: 'R4B')]
 class FHIRLocationHoursOfOperation extends \Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRBackboneElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<FHIRExtension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        public array $modifierExtension = [],
-        /** @var array<FHIRDaysOfWeekType> daysOfWeek mon | tue | wed | thu | fri | sat | sun */
-        public array $daysOfWeek = [],
-        /** @var FHIRBoolean|null allDay The Location is open all day */
-        public ?\FHIRBoolean $allDay = null,
-        /** @var FHIRTime|null openingTime Time that the Location opens */
-        public ?\FHIRTime $openingTime = null,
-        /** @var FHIRTime|null closingTime Time that the Location closes */
-        public ?\FHIRTime $closingTime = null,
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRDaysOfWeekType> daysOfWeek mon | tue | wed | thu | fri | sat | sun */
+		public array $daysOfWeek = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean allDay The Location is open all day */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean $allDay = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRTime openingTime Time that the Location opens */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRTime $openingTime = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRTime closingTime Time that the Location closes */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRTime $closingTime = null,
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }
