@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRAttachment;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCoding;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,9 +22,9 @@ class FHIRDocumentReferenceContent extends \Ardenexal\FHIRTools\Component\Models
         public array $modifierExtension = [],
         /** @var FHIRAttachment|null attachment Where to access the document */
         #[NotBlank]
-        public ?FHIRAttachment $attachment = null,
+        public ?\FHIRAttachment $attachment = null,
         /** @var FHIRCoding|null format Format/content rules for the document */
-        public ?FHIRCoding $format = null,
+        public ?\FHIRCoding $format = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

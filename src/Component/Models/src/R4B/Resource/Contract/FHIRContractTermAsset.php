@@ -5,13 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCoding;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUnsignedInt;
 
 /**
  * @description Contract Term Asset List.
@@ -27,7 +20,7 @@ class FHIRContractTermAsset extends \Ardenexal\FHIRTools\Component\Models\R4B\Da
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null scope Range of asset */
-        public ?FHIRCodeableConcept $scope = null,
+        public ?\FHIRCodeableConcept $scope = null,
         /** @var array<FHIRCodeableConcept> type Asset category */
         public array $type = [],
         /** @var array<FHIRReference> typeReference Associated entities */
@@ -35,11 +28,11 @@ class FHIRContractTermAsset extends \Ardenexal\FHIRTools\Component\Models\R4B\Da
         /** @var array<FHIRCodeableConcept> subtype Asset sub-category */
         public array $subtype = [],
         /** @var FHIRCoding|null relationship Kinship of the asset */
-        public ?FHIRCoding $relationship = null,
+        public ?\FHIRCoding $relationship = null,
         /** @var array<FHIRContractTermAssetContext> context Circumstance of the asset */
         public array $context = [],
         /** @var FHIRString|string|null condition Quality desctiption of asset */
-        public FHIRString|string|null $condition = null,
+        public \FHIRString|string|null $condition = null,
         /** @var array<FHIRCodeableConcept> periodType Asset availability types */
         public array $periodType = [],
         /** @var array<FHIRPeriod> period Time period of the asset */
@@ -47,7 +40,7 @@ class FHIRContractTermAsset extends \Ardenexal\FHIRTools\Component\Models\R4B\Da
         /** @var array<FHIRPeriod> usePeriod Time period */
         public array $usePeriod = [],
         /** @var FHIRString|string|null text Asset clause or question text */
-        public FHIRString|string|null $text = null,
+        public \FHIRString|string|null $text = null,
         /** @var array<FHIRString|string> linkId Pointer to asset text */
         public array $linkId = [],
         /** @var array<FHIRContractTermOfferAnswer> answer Response to assets */

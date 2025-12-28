@@ -5,12 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInteger;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -28,21 +22,21 @@ class FHIRTestScriptMetadataCapability extends \Ardenexal\FHIRTools\Component\Mo
         public array $modifierExtension = [],
         /** @var FHIRBoolean|null required Are the capabilities required? */
         #[NotBlank]
-        public ?FHIRBoolean $required = null,
+        public ?\FHIRBoolean $required = null,
         /** @var FHIRBoolean|null validated Are the capabilities validated? */
         #[NotBlank]
-        public ?FHIRBoolean $validated = null,
+        public ?\FHIRBoolean $validated = null,
         /** @var FHIRString|string|null description The expected capabilities of the server */
-        public FHIRString|string|null $description = null,
+        public \FHIRString|string|null $description = null,
         /** @var array<FHIRInteger> origin Which origin server these requirements apply to */
         public array $origin = [],
         /** @var FHIRInteger|null destination Which server these requirements apply to */
-        public ?FHIRInteger $destination = null,
+        public ?\FHIRInteger $destination = null,
         /** @var array<FHIRUri> link Links to the FHIR specification */
         public array $link = [],
         /** @var FHIRCanonical|null capabilities Required Capability Statement */
         #[NotBlank]
-        public ?FHIRCanonical $capabilities = null,
+        public ?\FHIRCanonical $capabilities = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

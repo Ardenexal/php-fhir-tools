@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRPositiveInt;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -28,9 +26,9 @@ class FHIREvidenceVariableCharacteristicDefinitionByCombination extends \Ardenex
         public array $modifierExtension = [],
         /** @var FHIRCharacteristicCombinationType|null code all-of | any-of | at-least | at-most | statistical | net-effect | dataset */
         #[NotBlank]
-        public ?FHIRCharacteristicCombinationType $code = null,
+        public ?\FHIRCharacteristicCombinationType $code = null,
         /** @var FHIRPositiveInt|null threshold Provides the value of "n" when "at-least" or "at-most" codes are used */
-        public ?FHIRPositiveInt $threshold = null,
+        public ?\FHIRPositiveInt $threshold = null,
         /** @var array<FHIREvidenceVariableCharacteristic> characteristic A defining factor of the characteristic */
         public array $characteristic = [],
     ) {

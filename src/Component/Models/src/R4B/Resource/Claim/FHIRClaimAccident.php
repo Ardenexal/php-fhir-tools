@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRAddress;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDate;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,11 +22,11 @@ class FHIRClaimAccident extends \Ardenexal\FHIRTools\Component\Models\R4B\DataTy
         public array $modifierExtension = [],
         /** @var FHIRDate|null date When the incident occurred */
         #[NotBlank]
-        public ?FHIRDate $date = null,
+        public ?\FHIRDate $date = null,
         /** @var FHIRCodeableConcept|null type The nature of the accident */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRAddress|FHIRReference|null locationX Where the event occurred */
-        public FHIRAddress|FHIRReference|null $locationX = null,
+        public \FHIRAddress|\FHIRReference|null $locationX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

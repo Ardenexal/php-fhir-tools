@@ -5,14 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCoding;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDate;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInteger;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRTime;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -30,9 +22,9 @@ class FHIRQuestionnaireItemAnswerOption extends \Ardenexal\FHIRTools\Component\M
         public array $modifierExtension = [],
         /** @var FHIRInteger|FHIRDate|FHIRTime|FHIRString|string|FHIRCoding|FHIRReference|null valueX Answer value */
         #[NotBlank]
-        public FHIRInteger|FHIRDate|FHIRTime|FHIRString|string|FHIRCoding|FHIRReference|null $valueX = null,
+        public \FHIRInteger|\FHIRDate|\FHIRTime|\FHIRString|string|\FHIRCoding|\FHIRReference|null $valueX = null,
         /** @var FHIRBoolean|null initialSelected Whether option is selected by default */
-        public ?FHIRBoolean $initialSelected = null,
+        public ?\FHIRBoolean $initialSelected = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

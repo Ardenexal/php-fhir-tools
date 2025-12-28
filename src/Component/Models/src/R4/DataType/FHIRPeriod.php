@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime;
 
 /**
  * @author HL7 FHIR Standard
@@ -23,9 +22,9 @@ class FHIRPeriod extends FHIRElement
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
         /** @var FHIRDateTime|null start Starting time with inclusive boundary */
-        public ?FHIRDateTime $start = null,
+        public ?\FHIRDateTime $start = null,
         /** @var FHIRDateTime|null end End time with inclusive boundary, if not ongoing */
-        public ?FHIRDateTime $end = null,
+        public ?\FHIRDateTime $end = null,
     ) {
         parent::__construct($id, $extension);
     }

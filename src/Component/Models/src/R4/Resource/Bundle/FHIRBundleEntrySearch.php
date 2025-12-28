@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDecimal;
 
 /**
  * @description Information about the search process that lead to the creation of this entry.
@@ -22,9 +20,9 @@ class FHIRBundleEntrySearch extends \Ardenexal\FHIRTools\Component\Models\R4\Dat
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRSearchEntryModeType|null mode match | include | outcome - why this is in the result set */
-        public ?FHIRSearchEntryModeType $mode = null,
+        public ?\FHIRSearchEntryModeType $mode = null,
         /** @var FHIRDecimal|null score Search ranking (between 0 and 1) */
-        public ?FHIRDecimal $score = null,
+        public ?\FHIRDecimal $score = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -4,14 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMeta;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRNarrative;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri;
-
 /**
  * @author Health Level Seven International (Biomedical Research and Regulation)
  *
@@ -19,7 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri;
  *
  * @description Todo.
  */
-#[FhirResource(
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(
     type: 'SubstancePolymer',
     version: '4.0.1',
     url: 'http://hl7.org/fhir/StructureDefinition/SubstancePolymer',
@@ -31,23 +23,23 @@ class FHIRSubstancePolymer extends FHIRDomainResource
         /** @var string|null id Logical id of this artifact */
         public ?string $id = null,
         /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?FHIRMeta $meta = null,
+        public ?\FHIRMeta $meta = null,
         /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?FHIRUri $implicitRules = null,
+        public ?\FHIRUri $implicitRules = null,
         /** @var string|null language Language of the resource content */
         public ?string $language = null,
         /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
-        public ?FHIRNarrative $text = null,
-        /** @var array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRResource> contained Contained, inline Resources */
+        public ?\FHIRNarrative $text = null,
+        /** @var array<FHIRResource> contained Contained, inline Resources */
         public array $contained = [],
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null class Todo */
-        public ?FHIRCodeableConcept $class = null,
+        public ?\FHIRCodeableConcept $class = null,
         /** @var FHIRCodeableConcept|null geometry Todo */
-        public ?FHIRCodeableConcept $geometry = null,
+        public ?\FHIRCodeableConcept $geometry = null,
         /** @var array<FHIRCodeableConcept> copolymerConnectivity Todo */
         public array $copolymerConnectivity = [],
         /** @var array<FHIRString|string> modification Todo */

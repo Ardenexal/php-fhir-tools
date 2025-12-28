@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRContributorTypeType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,10 +24,10 @@ class FHIRContributor extends FHIRElement
         public array $extension = [],
         /** @var FHIRContributorTypeType|null type author | editor | reviewer | endorser */
         #[NotBlank]
-        public ?FHIRContributorTypeType $type = null,
+        public ?\FHIRContributorTypeType $type = null,
         /** @var FHIRString|string|null name Who contributed the content */
         #[NotBlank]
-        public FHIRString|string|null $name = null,
+        public \FHIRString|string|null $name = null,
         /** @var array<FHIRContactDetail> contact Contact details of the contributor */
         public array $contact = [],
     ) {

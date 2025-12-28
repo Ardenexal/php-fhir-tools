@@ -5,13 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDuration;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime;
 
 /**
  * @description Details concerning the specimen collection.
@@ -27,19 +20,19 @@ class FHIRSpecimenCollection extends \Ardenexal\FHIRTools\Component\Models\R4\Da
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRReference|null collector Who collected the specimen */
-        public ?FHIRReference $collector = null,
+        public ?\FHIRReference $collector = null,
         /** @var FHIRDateTime|FHIRPeriod|null collectedX Collection time */
-        public FHIRDateTime|FHIRPeriod|null $collectedX = null,
+        public \FHIRDateTime|\FHIRPeriod|null $collectedX = null,
         /** @var FHIRDuration|null duration How long it took to collect specimen */
-        public ?FHIRDuration $duration = null,
+        public ?\FHIRDuration $duration = null,
         /** @var FHIRQuantity|null quantity The quantity of specimen collected */
-        public ?FHIRQuantity $quantity = null,
+        public ?\FHIRQuantity $quantity = null,
         /** @var FHIRCodeableConcept|null method Technique used to perform collection */
-        public ?FHIRCodeableConcept $method = null,
+        public ?\FHIRCodeableConcept $method = null,
         /** @var FHIRCodeableConcept|null bodySite Anatomical collection site */
-        public ?FHIRCodeableConcept $bodySite = null,
+        public ?\FHIRCodeableConcept $bodySite = null,
         /** @var FHIRCodeableConcept|FHIRDuration|null fastingStatusX Whether or how long patient abstained from food and/or drink */
-        public FHIRCodeableConcept|FHIRDuration|null $fastingStatusX = null,
+        public \FHIRCodeableConcept|\FHIRDuration|null $fastingStatusX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

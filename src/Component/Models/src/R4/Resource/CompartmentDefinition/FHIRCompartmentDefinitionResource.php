@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,11 +22,11 @@ class FHIRCompartmentDefinitionResource extends \Ardenexal\FHIRTools\Component\M
         public array $modifierExtension = [],
         /** @var FHIRResourceTypeType|null code Name of resource type */
         #[NotBlank]
-        public ?FHIRResourceTypeType $code = null,
+        public ?\FHIRResourceTypeType $code = null,
         /** @var array<FHIRString|string> param Search Parameter Name, or chained parameters */
         public array $param = [],
         /** @var FHIRString|string|null documentation Additional documentation about the resource and compartment */
-        public FHIRString|string|null $documentation = null,
+        public \FHIRString|string|null $documentation = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

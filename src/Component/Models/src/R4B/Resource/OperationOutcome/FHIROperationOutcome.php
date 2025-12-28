@@ -4,12 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMeta;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRNarrative;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri;
-
 /**
  * @author Health Level Seven International (FHIR Infrastructure)
  *
@@ -17,7 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri;
  *
  * @description A collection of error, warning, or information messages that result from a system action.
  */
-#[FhirResource(
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(
     type: 'OperationOutcome',
     version: '4.3.0',
     url: 'http://hl7.org/fhir/StructureDefinition/OperationOutcome',
@@ -29,14 +23,14 @@ class FHIROperationOutcome extends FHIRDomainResource
         /** @var string|null id Logical id of this artifact */
         public ?string $id = null,
         /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?FHIRMeta $meta = null,
+        public ?\FHIRMeta $meta = null,
         /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?FHIRUri $implicitRules = null,
+        public ?\FHIRUri $implicitRules = null,
         /** @var string|null language Language of the resource content */
         public ?string $language = null,
         /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
-        public ?FHIRNarrative $text = null,
-        /** @var array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRResource> contained Contained, inline Resources */
+        public ?\FHIRNarrative $text = null,
+        /** @var array<FHIRResource> contained Contained, inline Resources */
         public array $contained = [],
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],

@@ -5,15 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRAnnotation;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
 
 /**
  * @description The details about a specific analysis that was performed in this GenomicStudy.
@@ -35,23 +26,23 @@ class FHIRGenomicStudyAnalysis extends \Ardenexal\FHIRTools\Component\Models\R5\
         /** @var array<FHIRCodeableConcept> changeType Type of the genomic changes studied in the analysis (e.g., DNA, RNA, or AA change) */
         public array $changeType = [],
         /** @var FHIRCodeableConcept|null genomeBuild Genome build that is used in this analysis */
-        public ?FHIRCodeableConcept $genomeBuild = null,
+        public ?\FHIRCodeableConcept $genomeBuild = null,
         /** @var FHIRCanonical|null instantiatesCanonical The defined protocol that describes the analysis */
-        public ?FHIRCanonical $instantiatesCanonical = null,
+        public ?\FHIRCanonical $instantiatesCanonical = null,
         /** @var FHIRUri|null instantiatesUri The URL pointing to an externally maintained protocol that describes the analysis */
-        public ?FHIRUri $instantiatesUri = null,
+        public ?\FHIRUri $instantiatesUri = null,
         /** @var FHIRString|string|null title Name of the analysis event (human friendly) */
-        public FHIRString|string|null $title = null,
+        public \FHIRString|string|null $title = null,
         /** @var array<FHIRReference> focus What the genomic analysis is about, when it is not about the subject of record */
         public array $focus = [],
         /** @var array<FHIRReference> specimen The specimen used in the analysis event */
         public array $specimen = [],
         /** @var FHIRDateTime|null date The date of the analysis event */
-        public ?FHIRDateTime $date = null,
+        public ?\FHIRDateTime $date = null,
         /** @var array<FHIRAnnotation> note Any notes capture with the analysis event */
         public array $note = [],
         /** @var FHIRReference|null protocolPerformed The protocol that was performed for the analysis event */
-        public ?FHIRReference $protocolPerformed = null,
+        public ?\FHIRReference $protocolPerformed = null,
         /** @var array<FHIRReference> regionsStudied The genomic regions to be studied in the analysis (BED file) */
         public array $regionsStudied = [],
         /** @var array<FHIRReference> regionsCalled Genomic regions actually called in the analysis event (BED file) */

@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRId;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,14 +22,14 @@ class FHIRStructureMapGroup extends \Ardenexal\FHIRTools\Component\Models\R4\Dat
         public array $modifierExtension = [],
         /** @var FHIRId|null name Human-readable label */
         #[NotBlank]
-        public ?FHIRId $name = null,
+        public ?\FHIRId $name = null,
         /** @var FHIRId|null extends Another group that this group adds rules to */
-        public ?FHIRId $extends = null,
+        public ?\FHIRId $extends = null,
         /** @var FHIRStructureMapGroupTypeModeType|null typeMode none | types | type-and-types */
         #[NotBlank]
-        public ?FHIRStructureMapGroupTypeModeType $typeMode = null,
+        public ?\FHIRStructureMapGroupTypeModeType $typeMode = null,
         /** @var FHIRString|string|null documentation Additional description/explanation for group */
-        public FHIRString|string|null $documentation = null,
+        public \FHIRString|string|null $documentation = null,
         /** @var array<FHIRStructureMapGroupInput> input Named instance provided when invoking the map */
         public array $input = [],
         /** @var array<FHIRStructureMapGroupRule> rule Transform Rule from source to target */

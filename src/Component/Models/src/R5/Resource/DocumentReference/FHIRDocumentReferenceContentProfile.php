@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCoding;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,7 +22,7 @@ class FHIRDocumentReferenceContentProfile extends \Ardenexal\FHIRTools\Component
         public array $modifierExtension = [],
         /** @var FHIRCoding|FHIRUri|FHIRCanonical|null valueX Code|uri|canonical */
         #[NotBlank]
-        public FHIRCoding|FHIRUri|FHIRCanonical|null $valueX = null,
+        public \FHIRCoding|\FHIRUri|\FHIRCanonical|null $valueX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

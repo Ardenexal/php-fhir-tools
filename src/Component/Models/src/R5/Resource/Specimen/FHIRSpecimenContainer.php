@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,11 +22,11 @@ class FHIRSpecimenContainer extends \Ardenexal\FHIRTools\Component\Models\R5\Dat
         public array $modifierExtension = [],
         /** @var FHIRReference|null device Device resource for the container */
         #[NotBlank]
-        public ?FHIRReference $device = null,
+        public ?\FHIRReference $device = null,
         /** @var FHIRReference|null location Where the container is */
-        public ?FHIRReference $location = null,
+        public ?\FHIRReference $location = null,
         /** @var FHIRQuantity|null specimenQuantity Quantity of specimen within container */
-        public ?FHIRQuantity $specimenQuantity = null,
+        public ?\FHIRQuantity $specimenQuantity = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

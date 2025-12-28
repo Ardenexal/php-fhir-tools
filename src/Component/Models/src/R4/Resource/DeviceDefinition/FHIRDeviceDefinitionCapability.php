@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,7 +22,7 @@ class FHIRDeviceDefinitionCapability extends \Ardenexal\FHIRTools\Component\Mode
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null type Type of capability */
         #[NotBlank]
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var array<FHIRCodeableConcept> description Description of capability */
         public array $description = [],
     ) {

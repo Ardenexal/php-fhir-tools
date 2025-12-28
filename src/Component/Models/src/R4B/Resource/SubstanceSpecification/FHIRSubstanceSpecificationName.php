@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,13 +22,13 @@ class FHIRSubstanceSpecificationName extends \Ardenexal\FHIRTools\Component\Mode
         public array $modifierExtension = [],
         /** @var FHIRString|string|null name The actual name */
         #[NotBlank]
-        public FHIRString|string|null $name = null,
+        public \FHIRString|string|null $name = null,
         /** @var FHIRCodeableConcept|null type Name type */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRCodeableConcept|null status The status of the name */
-        public ?FHIRCodeableConcept $status = null,
+        public ?\FHIRCodeableConcept $status = null,
         /** @var FHIRBoolean|null preferred If this is the preferred name for this substance */
-        public ?FHIRBoolean $preferred = null,
+        public ?\FHIRBoolean $preferred = null,
         /** @var array<FHIRCodeableConcept> language Language of the name */
         public array $language = [],
         /** @var array<FHIRCodeableConcept> domain The use context of this name for example if there is a different name a drug active ingredient as opposed to a food colour additive */

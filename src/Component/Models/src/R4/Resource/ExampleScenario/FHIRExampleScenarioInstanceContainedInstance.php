@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,9 +22,9 @@ class FHIRExampleScenarioInstanceContainedInstance extends \Ardenexal\FHIRTools\
         public array $modifierExtension = [],
         /** @var FHIRString|string|null resourceId Each resource contained in the instance */
         #[NotBlank]
-        public FHIRString|string|null $resourceId = null,
+        public \FHIRString|string|null $resourceId = null,
         /** @var FHIRString|string|null versionId A specific version of a resource contained in the instance */
-        public FHIRString|string|null $versionId = null,
+        public \FHIRString|string|null $versionId = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

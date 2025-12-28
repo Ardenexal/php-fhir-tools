@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,12 +22,12 @@ class FHIRMessageHeaderResponse extends \Ardenexal\FHIRTools\Component\Models\R5
         public array $modifierExtension = [],
         /** @var FHIRIdentifier|null identifier Bundle.identifier of original message */
         #[NotBlank]
-        public ?FHIRIdentifier $identifier = null,
+        public ?\FHIRIdentifier $identifier = null,
         /** @var FHIRResponseTypeType|null code ok | transient-error | fatal-error */
         #[NotBlank]
-        public ?FHIRResponseTypeType $code = null,
+        public ?\FHIRResponseTypeType $code = null,
         /** @var FHIRReference|null details Specific list of hints/warnings/errors */
-        public ?FHIRReference $details = null,
+        public ?\FHIRReference $details = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

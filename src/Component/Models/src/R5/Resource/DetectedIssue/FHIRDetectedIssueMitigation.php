@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRAnnotation;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,11 +22,11 @@ class FHIRDetectedIssueMitigation extends \Ardenexal\FHIRTools\Component\Models\
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null action What mitigation? */
         #[NotBlank]
-        public ?FHIRCodeableConcept $action = null,
+        public ?\FHIRCodeableConcept $action = null,
         /** @var FHIRDateTime|null date Date committed */
-        public ?FHIRDateTime $date = null,
+        public ?\FHIRDateTime $date = null,
         /** @var FHIRReference|null author Who is committing? */
-        public ?FHIRReference $author = null,
+        public ?\FHIRReference $author = null,
         /** @var array<FHIRAnnotation> note Additional notes about the mitigation */
         public array $note = [],
     ) {

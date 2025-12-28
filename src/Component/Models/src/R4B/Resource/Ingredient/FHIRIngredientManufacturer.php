@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -23,10 +21,10 @@ class FHIRIngredientManufacturer extends \Ardenexal\FHIRTools\Component\Models\R
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRIngredientManufacturerRoleType|null role allowed | possible | actual */
-        public ?FHIRIngredientManufacturerRoleType $role = null,
+        public ?\FHIRIngredientManufacturerRoleType $role = null,
         /** @var FHIRReference|null manufacturer An organization that manufactures this ingredient */
         #[NotBlank]
-        public ?FHIRReference $manufacturer = null,
+        public ?\FHIRReference $manufacturer = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

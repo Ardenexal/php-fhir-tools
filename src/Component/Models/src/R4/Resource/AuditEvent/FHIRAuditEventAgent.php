@@ -5,13 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCoding;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -28,26 +21,26 @@ class FHIRAuditEventAgent extends \Ardenexal\FHIRTools\Component\Models\R4\DataT
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null type How agent participated */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var array<FHIRCodeableConcept> role Agent role in the event */
         public array $role = [],
         /** @var FHIRReference|null who Identifier of who */
-        public ?FHIRReference $who = null,
+        public ?\FHIRReference $who = null,
         /** @var FHIRString|string|null altId Alternative User identity */
-        public FHIRString|string|null $altId = null,
+        public \FHIRString|string|null $altId = null,
         /** @var FHIRString|string|null name Human friendly name for the agent */
-        public FHIRString|string|null $name = null,
+        public \FHIRString|string|null $name = null,
         /** @var FHIRBoolean|null requestor Whether user is initiator */
         #[NotBlank]
-        public ?FHIRBoolean $requestor = null,
+        public ?\FHIRBoolean $requestor = null,
         /** @var FHIRReference|null location Where */
-        public ?FHIRReference $location = null,
+        public ?\FHIRReference $location = null,
         /** @var array<FHIRUri> policy Policy that authorized event */
         public array $policy = [],
         /** @var FHIRCoding|null media Type of media */
-        public ?FHIRCoding $media = null,
+        public ?\FHIRCoding $media = null,
         /** @var FHIRAuditEventAgentNetwork|null network Logical network location for application activity */
-        public ?FHIRAuditEventAgentNetwork $network = null,
+        public ?\FHIRAuditEventAgentNetwork $network = null,
         /** @var array<FHIRCodeableConcept> purposeOfUse Reason given for this user */
         public array $purposeOfUse = [],
     ) {

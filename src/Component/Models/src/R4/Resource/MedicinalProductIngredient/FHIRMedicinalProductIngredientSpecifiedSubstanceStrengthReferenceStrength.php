@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRRatio;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -29,14 +25,14 @@ class FHIRMedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength 
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null substance Relevant reference substance */
-        public ?FHIRCodeableConcept $substance = null,
+        public ?\FHIRCodeableConcept $substance = null,
         /** @var FHIRRatio|null strength Strength expressed in terms of a reference substance */
         #[NotBlank]
-        public ?FHIRRatio $strength = null,
+        public ?\FHIRRatio $strength = null,
         /** @var FHIRRatio|null strengthLowLimit Strength expressed in terms of a reference substance */
-        public ?FHIRRatio $strengthLowLimit = null,
+        public ?\FHIRRatio $strengthLowLimit = null,
         /** @var FHIRString|string|null measurementPoint For when strength is measured at a particular point or distance */
-        public FHIRString|string|null $measurementPoint = null,
+        public \FHIRString|string|null $measurementPoint = null,
         /** @var array<FHIRCodeableConcept> country The country or countries for which the strength range applies */
         public array $country = [],
     ) {

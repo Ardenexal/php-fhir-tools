@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRBindingStrengthType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -23,11 +20,11 @@ class FHIRElementDefinitionBinding extends FHIRElement
         public array $extension = [],
         /** @var FHIRBindingStrengthType|null strength required | extensible | preferred | example */
         #[NotBlank]
-        public ?FHIRBindingStrengthType $strength = null,
+        public ?\FHIRBindingStrengthType $strength = null,
         /** @var FHIRString|string|null description Human explanation of the value set */
-        public FHIRString|string|null $description = null,
+        public \FHIRString|string|null $description = null,
         /** @var FHIRCanonical|null valueSet Source of value set */
-        public ?FHIRCanonical $valueSet = null,
+        public ?\FHIRCanonical $valueSet = null,
     ) {
         parent::__construct($id, $extension);
     }

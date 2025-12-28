@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri;
 
 /**
  * @description An entry in a bundle resource - will either contain a resource or information about a resource (transactions and history only).
@@ -24,15 +22,15 @@ class FHIRBundleEntry extends \Ardenexal\FHIRTools\Component\Models\R4B\DataType
         /** @var array<FHIRBundleLink> link Links related to this entry */
         public array $link = [],
         /** @var FHIRUri|null fullUrl URI for resource (Absolute URL server address or URI for UUID/OID) */
-        public ?FHIRUri $fullUrl = null,
+        public ?\FHIRUri $fullUrl = null,
         /** @var FHIRResource|null resource A resource in the bundle */
-        public ?FHIRResource $resource = null,
+        public ?\FHIRResource $resource = null,
         /** @var FHIRBundleEntrySearch|null search Search related information */
-        public ?FHIRBundleEntrySearch $search = null,
+        public ?\FHIRBundleEntrySearch $search = null,
         /** @var FHIRBundleEntryRequest|null request Additional execution information (transaction/batch/history) */
-        public ?FHIRBundleEntryRequest $request = null,
+        public ?\FHIRBundleEntryRequest $request = null,
         /** @var FHIRBundleEntryResponse|null response Results of execution (transaction/batch/history) */
-        public ?FHIRBundleEntryResponse $response = null,
+        public ?\FHIRBundleEntryResponse $response = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

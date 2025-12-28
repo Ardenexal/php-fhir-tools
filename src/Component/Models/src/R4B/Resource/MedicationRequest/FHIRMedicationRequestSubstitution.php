@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,9 +22,9 @@ class FHIRMedicationRequestSubstitution extends \Ardenexal\FHIRTools\Component\M
         public array $modifierExtension = [],
         /** @var FHIRBoolean|FHIRCodeableConcept|null allowedX Whether substitution is allowed or not */
         #[NotBlank]
-        public FHIRBoolean|FHIRCodeableConcept|null $allowedX = null,
+        public \FHIRBoolean|\FHIRCodeableConcept|null $allowedX = null,
         /** @var FHIRCodeableConcept|null reason Why should (not) substitution be made */
-        public ?FHIRCodeableConcept $reason = null,
+        public ?\FHIRCodeableConcept $reason = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

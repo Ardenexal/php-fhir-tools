@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRAttachment;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRMarkdown;
 
 /**
  * @description General specifications for this substance.
@@ -24,11 +20,11 @@ class FHIRSubstanceDefinitionCharacterization extends \Ardenexal\FHIRTools\Compo
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null technique The method used to find the characterization e.g. HPLC */
-        public ?FHIRCodeableConcept $technique = null,
+        public ?\FHIRCodeableConcept $technique = null,
         /** @var FHIRCodeableConcept|null form Describes the nature of the chemical entity and explains, for instance, whether this is a base or a salt form */
-        public ?FHIRCodeableConcept $form = null,
+        public ?\FHIRCodeableConcept $form = null,
         /** @var FHIRMarkdown|null description The description or justification in support of the interpretation of the data file */
-        public ?FHIRMarkdown $description = null,
+        public ?\FHIRMarkdown $description = null,
         /** @var array<FHIRAttachment> file The data produced by the analytical instrument or a pictorial representation of that data. Examples: a JCAMP, JDX, or ADX file, or a chromatogram or spectrum analysis */
         public array $file = [],
     ) {

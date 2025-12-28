@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,12 +22,12 @@ class FHIRCoverageClass extends \Ardenexal\FHIRTools\Component\Models\R4\DataTyp
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null type Type of class such as 'group' or 'plan' */
         #[NotBlank]
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRString|string|null value Value associated with the type */
         #[NotBlank]
-        public FHIRString|string|null $value = null,
+        public \FHIRString|string|null $value = null,
         /** @var FHIRString|string|null name Human readable description of the type and value */
-        public FHIRString|string|null $name = null,
+        public \FHIRString|string|null $name = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

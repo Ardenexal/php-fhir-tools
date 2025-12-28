@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,7 +22,7 @@ class FHIRSubscriptionTopicNotificationShape extends \Ardenexal\FHIRTools\Compon
         public array $modifierExtension = [],
         /** @var FHIRUri|null resource URL of the Resource that is the focus (main) resource in a notification shape */
         #[NotBlank]
-        public ?FHIRUri $resource = null,
+        public ?\FHIRUri $resource = null,
         /** @var array<FHIRString|string> include Include directives, rooted in the resource for this shape */
         public array $include = [],
         /** @var array<FHIRString|string> revInclude Reverse include directives, rooted in the resource for this shape */

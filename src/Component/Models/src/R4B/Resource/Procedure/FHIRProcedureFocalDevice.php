@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,10 +21,10 @@ class FHIRProcedureFocalDevice extends \Ardenexal\FHIRTools\Component\Models\R4B
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null action Kind of change to device */
-        public ?FHIRCodeableConcept $action = null,
+        public ?\FHIRCodeableConcept $action = null,
         /** @var FHIRReference|null manipulated Device that was changed */
         #[NotBlank]
-        public ?FHIRReference $manipulated = null,
+        public ?\FHIRReference $manipulated = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

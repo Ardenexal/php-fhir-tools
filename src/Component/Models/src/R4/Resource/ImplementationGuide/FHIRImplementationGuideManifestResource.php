@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUrl;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,11 +22,11 @@ class FHIRImplementationGuideManifestResource extends \Ardenexal\FHIRTools\Compo
         public array $modifierExtension = [],
         /** @var FHIRReference|null reference Location of the resource */
         #[NotBlank]
-        public ?FHIRReference $reference = null,
+        public ?\FHIRReference $reference = null,
         /** @var FHIRBoolean|FHIRCanonical|null exampleX Is an example/What is this an example of? */
-        public FHIRBoolean|FHIRCanonical|null $exampleX = null,
+        public \FHIRBoolean|\FHIRCanonical|null $exampleX = null,
         /** @var FHIRUrl|null relativePath Relative path for page in IG */
-        public ?FHIRUrl $relativePath = null,
+        public ?\FHIRUrl $relativePath = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

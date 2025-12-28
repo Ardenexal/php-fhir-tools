@@ -5,12 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCode;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInteger;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRMarkdown;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -28,30 +22,30 @@ class FHIROperationDefinitionParameter extends \Ardenexal\FHIRTools\Component\Mo
         public array $modifierExtension = [],
         /** @var FHIRCode|null name Name in Parameters.parameter.name or in URL */
         #[NotBlank]
-        public ?FHIRCode $name = null,
+        public ?\FHIRCode $name = null,
         /** @var FHIROperationParameterUseType|null use in | out */
         #[NotBlank]
-        public ?FHIROperationParameterUseType $use = null,
+        public ?\FHIROperationParameterUseType $use = null,
         /** @var array<FHIROperationParameterScopeType> scope instance | type | system */
         public array $scope = [],
         /** @var FHIRInteger|null min Minimum Cardinality */
         #[NotBlank]
-        public ?FHIRInteger $min = null,
+        public ?\FHIRInteger $min = null,
         /** @var FHIRString|string|null max Maximum Cardinality (a number or *) */
         #[NotBlank]
-        public FHIRString|string|null $max = null,
+        public \FHIRString|string|null $max = null,
         /** @var FHIRMarkdown|null documentation Description of meaning/use */
-        public ?FHIRMarkdown $documentation = null,
+        public ?\FHIRMarkdown $documentation = null,
         /** @var FHIRFHIRTypesType|null type What type this parameter has */
-        public ?FHIRFHIRTypesType $type = null,
+        public ?\FHIRFHIRTypesType $type = null,
         /** @var array<FHIRFHIRTypesType> allowedType Allowed sub-type this parameter can have (if type is abstract) */
         public array $allowedType = [],
         /** @var array<FHIRCanonical> targetProfile If type is Reference | canonical, allowed targets. If type is 'Resource', then this constrains the allowed resource types */
         public array $targetProfile = [],
         /** @var FHIRSearchParamTypeType|null searchType number | date | string | token | reference | composite | quantity | uri | special */
-        public ?FHIRSearchParamTypeType $searchType = null,
+        public ?\FHIRSearchParamTypeType $searchType = null,
         /** @var FHIROperationDefinitionParameterBinding|null binding ValueSet details if this is coded */
-        public ?FHIROperationDefinitionParameterBinding $binding = null,
+        public ?\FHIROperationDefinitionParameterBinding $binding = null,
         /** @var array<FHIROperationDefinitionParameterReferencedFrom> referencedFrom References to this parameter */
         public array $referencedFrom = [],
         /** @var array<FHIROperationDefinitionParameter> part Parts of a nested Parameter */

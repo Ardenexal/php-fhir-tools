@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,9 +22,9 @@ class FHIRPractitionerRoleNotAvailable extends \Ardenexal\FHIRTools\Component\Mo
         public array $modifierExtension = [],
         /** @var FHIRString|string|null description Reason presented to the user explaining why time not available */
         #[NotBlank]
-        public FHIRString|string|null $description = null,
+        public \FHIRString|string|null $description = null,
         /** @var FHIRPeriod|null during Service not available from this date */
-        public ?FHIRPeriod $during = null,
+        public ?\FHIRPeriod $during = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

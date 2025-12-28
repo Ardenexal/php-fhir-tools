@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRPositiveInt;
 
 /**
  * @description Information about weekly recurring appointments.
@@ -23,21 +20,21 @@ class FHIRAppointmentRecurrenceTemplateWeeklyTemplate extends \Ardenexal\FHIRToo
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRBoolean|null monday Recurs on Mondays */
-        public ?FHIRBoolean $monday = null,
+        public ?\FHIRBoolean $monday = null,
         /** @var FHIRBoolean|null tuesday Recurs on Tuesday */
-        public ?FHIRBoolean $tuesday = null,
+        public ?\FHIRBoolean $tuesday = null,
         /** @var FHIRBoolean|null wednesday Recurs on Wednesday */
-        public ?FHIRBoolean $wednesday = null,
+        public ?\FHIRBoolean $wednesday = null,
         /** @var FHIRBoolean|null thursday Recurs on Thursday */
-        public ?FHIRBoolean $thursday = null,
+        public ?\FHIRBoolean $thursday = null,
         /** @var FHIRBoolean|null friday Recurs on Friday */
-        public ?FHIRBoolean $friday = null,
+        public ?\FHIRBoolean $friday = null,
         /** @var FHIRBoolean|null saturday Recurs on Saturday */
-        public ?FHIRBoolean $saturday = null,
+        public ?\FHIRBoolean $saturday = null,
         /** @var FHIRBoolean|null sunday Recurs on Sunday */
-        public ?FHIRBoolean $sunday = null,
+        public ?\FHIRBoolean $sunday = null,
         /** @var FHIRPositiveInt|null weekInterval Recurs every nth week */
-        public ?FHIRPositiveInt $weekInterval = null,
+        public ?\FHIRPositiveInt $weekInterval = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

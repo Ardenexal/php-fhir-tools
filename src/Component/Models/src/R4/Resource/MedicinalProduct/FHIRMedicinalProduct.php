@@ -4,18 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCoding;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRMarketingStatus;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRMeta;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRNarrative;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUri;
-
 /**
  * @author Health Level Seven International (Biomedical Research and Regulation)
  *
@@ -23,7 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUri;
  *
  * @description Detailed definition of a medicinal product, typically for uses other than direct patient care (e.g. regulatory use).
  */
-#[FhirResource(
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(
     type: 'MedicinalProduct',
     version: '4.0.1',
     url: 'http://hl7.org/fhir/StructureDefinition/MedicinalProduct',
@@ -35,14 +23,14 @@ class FHIRMedicinalProduct extends FHIRDomainResource
         /** @var string|null id Logical id of this artifact */
         public ?string $id = null,
         /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?FHIRMeta $meta = null,
+        public ?\FHIRMeta $meta = null,
         /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?FHIRUri $implicitRules = null,
+        public ?\FHIRUri $implicitRules = null,
         /** @var string|null language Language of the resource content */
         public ?string $language = null,
         /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
-        public ?FHIRNarrative $text = null,
-        /** @var array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRResource> contained Contained, inline Resources */
+        public ?\FHIRNarrative $text = null,
+        /** @var array<FHIRResource> contained Contained, inline Resources */
         public array $contained = [],
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
@@ -51,19 +39,19 @@ class FHIRMedicinalProduct extends FHIRDomainResource
         /** @var array<FHIRIdentifier> identifier Business identifier for this product. Could be an MPID */
         public array $identifier = [],
         /** @var FHIRCodeableConcept|null type Regulatory type, e.g. Investigational or Authorized */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRCoding|null domain If this medicine applies to human or veterinary uses */
-        public ?FHIRCoding $domain = null,
+        public ?\FHIRCoding $domain = null,
         /** @var FHIRCodeableConcept|null combinedPharmaceuticalDoseForm The dose form for a single part product, or combined form of a multiple part product */
-        public ?FHIRCodeableConcept $combinedPharmaceuticalDoseForm = null,
+        public ?\FHIRCodeableConcept $combinedPharmaceuticalDoseForm = null,
         /** @var FHIRCodeableConcept|null legalStatusOfSupply The legal status of supply of the medicinal product as classified by the regulator */
-        public ?FHIRCodeableConcept $legalStatusOfSupply = null,
+        public ?\FHIRCodeableConcept $legalStatusOfSupply = null,
         /** @var FHIRCodeableConcept|null additionalMonitoringIndicator Whether the Medicinal Product is subject to additional monitoring for regulatory reasons */
-        public ?FHIRCodeableConcept $additionalMonitoringIndicator = null,
+        public ?\FHIRCodeableConcept $additionalMonitoringIndicator = null,
         /** @var array<FHIRString|string> specialMeasures Whether the Medicinal Product is subject to special measures for regulatory reasons */
         public array $specialMeasures = [],
         /** @var FHIRCodeableConcept|null paediatricUseIndicator If authorised for use in children */
-        public ?FHIRCodeableConcept $paediatricUseIndicator = null,
+        public ?\FHIRCodeableConcept $paediatricUseIndicator = null,
         /** @var array<FHIRCodeableConcept> productClassification Allows the product to be classified by various systems */
         public array $productClassification = [],
         /** @var array<FHIRMarketingStatus> marketingStatus Marketing status of the medicinal product, in contrast to marketing authorizaton */

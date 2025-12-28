@@ -5,13 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRProductShelfLife;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInteger;
 
 /**
  * @description A packaging item, as a container for medically related items, possibly with other packaging items within, or a packaging component, such as bottle cap (which is not a device or a medication manufactured item).
@@ -29,11 +22,11 @@ class FHIRPackagedProductDefinitionPackaging extends \Ardenexal\FHIRTools\Compon
         /** @var array<FHIRIdentifier> identifier An identifier that is specific to this particular part of the packaging. Including possibly a Data Carrier Identifier */
         public array $identifier = [],
         /** @var FHIRCodeableConcept|null type The physical type of the container of the items */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRBoolean|null componentPart Is this a part of the packaging (e.g. a cap or bottle stopper), rather than the packaging itself (e.g. a bottle or vial) */
-        public ?FHIRBoolean $componentPart = null,
+        public ?\FHIRBoolean $componentPart = null,
         /** @var FHIRInteger|null quantity The quantity of this level of packaging in the package that contains it (with the outermost level being 1) */
-        public ?FHIRInteger $quantity = null,
+        public ?\FHIRInteger $quantity = null,
         /** @var array<FHIRCodeableConcept> material Material type of the package item */
         public array $material = [],
         /** @var array<FHIRCodeableConcept> alternateMaterial A possible alternate material for this part of the packaging, that is allowed to be used instead of the usual material */

@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRMarkdown;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUrl;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRRelatedArtifactTypeType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -29,19 +24,19 @@ class FHIRRelatedArtifact extends FHIRElement
         public array $extension = [],
         /** @var FHIRRelatedArtifactTypeType|null type documentation | justification | citation | predecessor | successor | derived-from | depends-on | composed-of */
         #[NotBlank]
-        public ?FHIRRelatedArtifactTypeType $type = null,
+        public ?\FHIRRelatedArtifactTypeType $type = null,
         /** @var FHIRString|string|null label Short label */
-        public FHIRString|string|null $label = null,
+        public \FHIRString|string|null $label = null,
         /** @var FHIRString|string|null display Brief description of the related artifact */
-        public FHIRString|string|null $display = null,
+        public \FHIRString|string|null $display = null,
         /** @var FHIRMarkdown|null citation Bibliographic citation for the artifact */
-        public ?FHIRMarkdown $citation = null,
+        public ?\FHIRMarkdown $citation = null,
         /** @var FHIRUrl|null url Where the artifact can be accessed */
-        public ?FHIRUrl $url = null,
+        public ?\FHIRUrl $url = null,
         /** @var FHIRAttachment|null document What document is being referenced */
-        public ?FHIRAttachment $document = null,
+        public ?\FHIRAttachment $document = null,
         /** @var FHIRCanonical|null resource What resource is being referenced */
-        public ?FHIRCanonical $resource = null,
+        public ?\FHIRCanonical $resource = null,
     ) {
         parent::__construct($id, $extension);
     }

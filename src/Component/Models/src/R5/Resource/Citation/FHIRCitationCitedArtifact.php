@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRAnnotation;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime;
 
 /**
  * @description The article or artifact being described.
@@ -29,9 +24,9 @@ class FHIRCitationCitedArtifact extends \Ardenexal\FHIRTools\Component\Models\R5
         /** @var array<FHIRIdentifier> relatedIdentifier Identifier not unique to the cited artifact. May include trial registry identifiers */
         public array $relatedIdentifier = [],
         /** @var FHIRDateTime|null dateAccessed When the cited artifact was accessed */
-        public ?FHIRDateTime $dateAccessed = null,
+        public ?\FHIRDateTime $dateAccessed = null,
         /** @var FHIRCitationCitedArtifactVersion|null version The defined version of the cited artifact */
-        public ?FHIRCitationCitedArtifactVersion $version = null,
+        public ?\FHIRCitationCitedArtifactVersion $version = null,
         /** @var array<FHIRCodeableConcept> currentState The status of the cited artifact */
         public array $currentState = [],
         /** @var array<FHIRCitationCitedArtifactStatusDate> statusDate An effective date or period for a status of the cited artifact */
@@ -41,7 +36,7 @@ class FHIRCitationCitedArtifact extends \Ardenexal\FHIRTools\Component\Models\R5
         /** @var array<FHIRCitationCitedArtifactAbstract> abstract Summary of the article or artifact */
         public array $abstract = [],
         /** @var FHIRCitationCitedArtifactPart|null part The component of the article or artifact */
-        public ?FHIRCitationCitedArtifactPart $part = null,
+        public ?\FHIRCitationCitedArtifactPart $part = null,
         /** @var array<FHIRCitationCitedArtifactRelatesTo> relatesTo The artifact related to the cited artifact */
         public array $relatesTo = [],
         /** @var array<FHIRCitationCitedArtifactPublicationForm> publicationForm If multiple, used to represent alternative forms of the article that are not separate citations */
@@ -51,7 +46,7 @@ class FHIRCitationCitedArtifact extends \Ardenexal\FHIRTools\Component\Models\R5
         /** @var array<FHIRCitationCitedArtifactClassification> classification The assignment to an organizing scheme */
         public array $classification = [],
         /** @var FHIRCitationCitedArtifactContributorship|null contributorship Attribution of authors and other contributors */
-        public ?FHIRCitationCitedArtifactContributorship $contributorship = null,
+        public ?\FHIRCitationCitedArtifactContributorship $contributorship = null,
         /** @var array<FHIRAnnotation> note Any additional information or content for the article or artifact */
         public array $note = [],
     ) {

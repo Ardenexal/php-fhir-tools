@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCode;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,11 +22,11 @@ class FHIRCodeSystemConcept extends \Ardenexal\FHIRTools\Component\Models\R5\Dat
         public array $modifierExtension = [],
         /** @var FHIRCode|null code Code that identifies concept */
         #[NotBlank]
-        public ?FHIRCode $code = null,
+        public ?\FHIRCode $code = null,
         /** @var FHIRString|string|null display Text to display to the user */
-        public FHIRString|string|null $display = null,
+        public \FHIRString|string|null $display = null,
         /** @var FHIRString|string|null definition Formal definition */
-        public FHIRString|string|null $definition = null,
+        public \FHIRString|string|null $definition = null,
         /** @var array<FHIRCodeSystemConceptDesignation> designation Additional representations for the concept */
         public array $designation = [],
         /** @var array<FHIRCodeSystemConceptProperty> property Property value for the concept */

@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,9 +22,9 @@ class FHIRDeviceDefinitionSpecialization extends \Ardenexal\FHIRTools\Component\
         public array $modifierExtension = [],
         /** @var FHIRString|string|null systemType The standard that is used to operate and communicate */
         #[NotBlank]
-        public FHIRString|string|null $systemType = null,
+        public \FHIRString|string|null $systemType = null,
         /** @var FHIRString|string|null version The version of the standard that is used to operate and communicate */
-        public FHIRString|string|null $version = null,
+        public \FHIRString|string|null $version = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

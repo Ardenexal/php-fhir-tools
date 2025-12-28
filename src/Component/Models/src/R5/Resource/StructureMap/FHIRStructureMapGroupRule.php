@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRId;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 
 /**
  * @description Transform Rule from source to target.
@@ -23,7 +20,7 @@ class FHIRStructureMapGroupRule extends \Ardenexal\FHIRTools\Component\Models\R5
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRId|null name Name of the rule for internal references */
-        public ?FHIRId $name = null,
+        public ?\FHIRId $name = null,
         /** @var array<FHIRStructureMapGroupRuleSource> source Source inputs to the mapping */
         public array $source = [],
         /** @var array<FHIRStructureMapGroupRuleTarget> target Content to create because of this mapping rule */
@@ -33,7 +30,7 @@ class FHIRStructureMapGroupRule extends \Ardenexal\FHIRTools\Component\Models\R5
         /** @var array<FHIRStructureMapGroupRuleDependent> dependent Which other rules to apply in the context of this rule */
         public array $dependent = [],
         /** @var FHIRString|string|null documentation Documentation for this instance of data */
-        public FHIRString|string|null $documentation = null,
+        public \FHIRString|string|null $documentation = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

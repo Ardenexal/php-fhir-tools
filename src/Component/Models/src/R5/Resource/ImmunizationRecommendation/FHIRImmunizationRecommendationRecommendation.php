@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRMarkdown;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -37,19 +32,19 @@ class FHIRImmunizationRecommendationRecommendation extends \Ardenexal\FHIRTools\
         public array $contraindicatedVaccineCode = [],
         /** @var FHIRCodeableConcept|null forecastStatus Vaccine recommendation status */
         #[NotBlank]
-        public ?FHIRCodeableConcept $forecastStatus = null,
+        public ?\FHIRCodeableConcept $forecastStatus = null,
         /** @var array<FHIRCodeableConcept> forecastReason Vaccine administration status reason */
         public array $forecastReason = [],
         /** @var array<FHIRImmunizationRecommendationRecommendationDateCriterion> dateCriterion Dates governing proposed immunization */
         public array $dateCriterion = [],
         /** @var FHIRMarkdown|null description Protocol details */
-        public ?FHIRMarkdown $description = null,
+        public ?\FHIRMarkdown $description = null,
         /** @var FHIRString|string|null series Name of vaccination series */
-        public FHIRString|string|null $series = null,
+        public \FHIRString|string|null $series = null,
         /** @var FHIRString|string|null doseNumber Recommended dose number within series */
-        public FHIRString|string|null $doseNumber = null,
+        public \FHIRString|string|null $doseNumber = null,
         /** @var FHIRString|string|null seriesDoses Recommended number of doses for immunity */
-        public FHIRString|string|null $seriesDoses = null,
+        public \FHIRString|string|null $seriesDoses = null,
         /** @var array<FHIRReference> supportingImmunization Past immunizations supporting recommendation */
         public array $supportingImmunization = [],
         /** @var array<FHIRReference> supportingPatientInformation Patient observations supporting recommendation */

@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRMoney;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUnsignedInt;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -31,11 +26,11 @@ class FHIRCoverageEligibilityResponseInsuranceItemBenefit extends \Ardenexal\FHI
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null type Benefit classification */
         #[NotBlank]
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRUnsignedInt|FHIRString|string|FHIRMoney|null allowedX Benefits allowed */
-        public FHIRUnsignedInt|FHIRString|string|FHIRMoney|null $allowedX = null,
+        public \FHIRUnsignedInt|\FHIRString|string|\FHIRMoney|null $allowedX = null,
         /** @var FHIRUnsignedInt|FHIRString|string|FHIRMoney|null usedX Benefits used */
-        public FHIRUnsignedInt|FHIRString|string|FHIRMoney|null $usedX = null,
+        public \FHIRUnsignedInt|\FHIRString|string|\FHIRMoney|null $usedX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

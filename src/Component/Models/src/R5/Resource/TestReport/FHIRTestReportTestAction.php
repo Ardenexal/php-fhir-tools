@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
 
 /**
  * @description Action would contain either an operation or an assertion.
@@ -21,9 +20,9 @@ class FHIRTestReportTestAction extends \Ardenexal\FHIRTools\Component\Models\R5\
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRTestReportSetupActionOperation|null operation The operation performed */
-        public ?FHIRTestReportSetupActionOperation $operation = null,
+        public ?\FHIRTestReportSetupActionOperation $operation = null,
         /** @var FHIRTestReportSetupActionAssert|null assert The assertion performed */
-        public ?FHIRTestReportSetupActionAssert $assert = null,
+        public ?\FHIRTestReportSetupActionAssert $assert = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

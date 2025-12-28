@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRTime;
-use Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRDaysOfWeekType;
 
 /**
  * @description A collection of times that the Service Site is available.
@@ -26,11 +22,11 @@ class FHIRHealthcareServiceAvailableTime extends \Ardenexal\FHIRTools\Component\
         /** @var array<FHIRDaysOfWeekType> daysOfWeek mon | tue | wed | thu | fri | sat | sun */
         public array $daysOfWeek = [],
         /** @var FHIRBoolean|null allDay Always available? e.g. 24 hour service */
-        public ?FHIRBoolean $allDay = null,
+        public ?\FHIRBoolean $allDay = null,
         /** @var FHIRTime|null availableStartTime Opening time of day (ignored if allDay = true) */
-        public ?FHIRTime $availableStartTime = null,
+        public ?\FHIRTime $availableStartTime = null,
         /** @var FHIRTime|null availableEndTime Closing time of day (ignored if allDay = true) */
-        public ?FHIRTime $availableEndTime = null,
+        public ?\FHIRTime $availableEndTime = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

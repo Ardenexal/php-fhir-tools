@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,7 +24,7 @@ class FHIRContractTermOfferParty extends \Ardenexal\FHIRTools\Component\Models\R
         public array $reference = [],
         /** @var FHIRCodeableConcept|null role Participant engagement type */
         #[NotBlank]
-        public ?FHIRCodeableConcept $role = null,
+        public ?\FHIRCodeableConcept $role = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

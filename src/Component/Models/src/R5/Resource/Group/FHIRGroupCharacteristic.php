@@ -5,13 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRRange;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -29,15 +22,15 @@ class FHIRGroupCharacteristic extends \Ardenexal\FHIRTools\Component\Models\R5\D
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null code Kind of characteristic */
         #[NotBlank]
-        public ?FHIRCodeableConcept $code = null,
+        public ?\FHIRCodeableConcept $code = null,
         /** @var FHIRCodeableConcept|FHIRBoolean|FHIRQuantity|FHIRRange|FHIRReference|null valueX Value held by characteristic */
         #[NotBlank]
-        public FHIRCodeableConcept|FHIRBoolean|FHIRQuantity|FHIRRange|FHIRReference|null $valueX = null,
+        public \FHIRCodeableConcept|\FHIRBoolean|\FHIRQuantity|\FHIRRange|\FHIRReference|null $valueX = null,
         /** @var FHIRBoolean|null exclude Group includes or excludes */
         #[NotBlank]
-        public ?FHIRBoolean $exclude = null,
+        public ?\FHIRBoolean $exclude = null,
         /** @var FHIRPeriod|null period Period over which characteristic is tested */
-        public ?FHIRPeriod $period = null,
+        public ?\FHIRPeriod $period = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

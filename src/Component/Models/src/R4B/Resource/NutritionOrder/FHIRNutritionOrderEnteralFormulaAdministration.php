@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRRatio;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRTiming;
 
 /**
  * @description Formula administration instructions as structured data.  This repeating structure allows for changing the administration rate or volume over time for both bolus and continuous feeding.  An example of this would be an instruction to increase the rate of continuous feeding every 2 hours.
@@ -24,11 +20,11 @@ class FHIRNutritionOrderEnteralFormulaAdministration extends \Ardenexal\FHIRTool
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRTiming|null schedule Scheduled frequency of enteral feeding */
-        public ?FHIRTiming $schedule = null,
+        public ?\FHIRTiming $schedule = null,
         /** @var FHIRQuantity|null quantity The volume of formula to provide */
-        public ?FHIRQuantity $quantity = null,
+        public ?\FHIRQuantity $quantity = null,
         /** @var FHIRQuantity|FHIRRatio|null rateX Speed with which the formula is provided per period of time */
-        public FHIRQuantity|FHIRRatio|null $rateX = null,
+        public \FHIRQuantity|\FHIRRatio|null $rateX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

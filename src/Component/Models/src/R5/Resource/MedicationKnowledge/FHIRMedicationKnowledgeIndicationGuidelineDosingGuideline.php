@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
 
 /**
  * @description The guidelines for the dosage of the medication for the indication.
@@ -26,11 +24,11 @@ class FHIRMedicationKnowledgeIndicationGuidelineDosingGuideline extends \Ardenex
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null treatmentIntent Intention of the treatment */
-        public ?FHIRCodeableConcept $treatmentIntent = null,
+        public ?\FHIRCodeableConcept $treatmentIntent = null,
         /** @var array<FHIRMedicationKnowledgeIndicationGuidelineDosingGuidelineDosage> dosage Dosage for the medication for the specific guidelines */
         public array $dosage = [],
         /** @var FHIRCodeableConcept|null administrationTreatment Type of treatment the guideline applies to */
-        public ?FHIRCodeableConcept $administrationTreatment = null,
+        public ?\FHIRCodeableConcept $administrationTreatment = null,
         /** @var array<FHIRMedicationKnowledgeIndicationGuidelineDosingGuidelinePatientCharacteristic> patientCharacteristic Characteristics of the patient that are relevant to the administration guidelines */
         public array $patientCharacteristic = [],
     ) {

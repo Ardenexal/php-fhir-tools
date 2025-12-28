@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRMarkdown;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,14 +22,14 @@ class FHIRExampleScenarioInstance extends \Ardenexal\FHIRTools\Component\Models\
         public array $modifierExtension = [],
         /** @var FHIRString|string|null resourceId The id of the resource for referencing */
         #[NotBlank]
-        public FHIRString|string|null $resourceId = null,
+        public \FHIRString|string|null $resourceId = null,
         /** @var FHIRResourceTypeType|null resourceType The type of the resource */
         #[NotBlank]
-        public ?FHIRResourceTypeType $resourceType = null,
+        public ?\FHIRResourceTypeType $resourceType = null,
         /** @var FHIRString|string|null name A short name for the resource instance */
-        public FHIRString|string|null $name = null,
+        public \FHIRString|string|null $name = null,
         /** @var FHIRMarkdown|null description Human-friendly description of the resource instance */
-        public ?FHIRMarkdown $description = null,
+        public ?\FHIRMarkdown $description = null,
         /** @var array<FHIRExampleScenarioInstanceVersion> version A specific version of the resource */
         public array $version = [],
         /** @var array<FHIRExampleScenarioInstanceContainedInstance> containedInstance Resources contained in the instance */

@@ -4,20 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRAnnotation;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableReference;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRMeta;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRNarrative;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRTiming;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,7 +13,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  *
  * @description Describes the event of a patient consuming or otherwise being administered a medication.  This may be as simple as swallowing a tablet or it may be a long running infusion.  Related resources tie this event to the authorizing prescription, and the specific encounter between patient and health care practitioner.
  */
-#[FhirResource(
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(
     type: 'MedicationAdministration',
     version: '5.0.0',
     url: 'http://hl7.org/fhir/StructureDefinition/MedicationAdministration',
@@ -39,14 +25,14 @@ class FHIRMedicationAdministration extends FHIRDomainResource
         /** @var string|null id Logical id of this artifact */
         public ?string $id = null,
         /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?FHIRMeta $meta = null,
+        public ?\FHIRMeta $meta = null,
         /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?FHIRUri $implicitRules = null,
+        public ?\FHIRUri $implicitRules = null,
         /** @var FHIRAllLanguagesType|null language Language of the resource content */
-        public ?FHIRAllLanguagesType $language = null,
+        public ?\FHIRAllLanguagesType $language = null,
         /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
-        public ?FHIRNarrative $text = null,
-        /** @var array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRResource> contained Contained, inline Resources */
+        public ?\FHIRNarrative $text = null,
+        /** @var array<FHIRResource> contained Contained, inline Resources */
         public array $contained = [],
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
@@ -60,28 +46,28 @@ class FHIRMedicationAdministration extends FHIRDomainResource
         public array $partOf = [],
         /** @var FHIRMedicationAdministrationStatusCodesType|null status in-progress | not-done | on-hold | completed | entered-in-error | stopped | unknown */
         #[NotBlank]
-        public ?FHIRMedicationAdministrationStatusCodesType $status = null,
+        public ?\FHIRMedicationAdministrationStatusCodesType $status = null,
         /** @var array<FHIRCodeableConcept> statusReason Reason administration not performed */
         public array $statusReason = [],
         /** @var array<FHIRCodeableConcept> category Type of medication administration */
         public array $category = [],
         /** @var FHIRCodeableReference|null medication What was administered */
         #[NotBlank]
-        public ?FHIRCodeableReference $medication = null,
+        public ?\FHIRCodeableReference $medication = null,
         /** @var FHIRReference|null subject Who received medication */
         #[NotBlank]
-        public ?FHIRReference $subject = null,
+        public ?\FHIRReference $subject = null,
         /** @var FHIRReference|null encounter Encounter administered as part of */
-        public ?FHIRReference $encounter = null,
+        public ?\FHIRReference $encounter = null,
         /** @var array<FHIRReference> supportingInformation Additional information to support administration */
         public array $supportingInformation = [],
         /** @var FHIRDateTime|FHIRPeriod|FHIRTiming|null occurenceX Specific date/time or interval of time during which the administration took place (or did not take place) */
         #[NotBlank]
-        public FHIRDateTime|FHIRPeriod|FHIRTiming|null $occurenceX = null,
+        public \FHIRDateTime|\FHIRPeriod|\FHIRTiming|null $occurenceX = null,
         /** @var FHIRDateTime|null recorded When the MedicationAdministration was first captured in the subject's record */
-        public ?FHIRDateTime $recorded = null,
+        public ?\FHIRDateTime $recorded = null,
         /** @var FHIRBoolean|null isSubPotent Full dose was not administered */
-        public ?FHIRBoolean $isSubPotent = null,
+        public ?\FHIRBoolean $isSubPotent = null,
         /** @var array<FHIRCodeableConcept> subPotentReason Reason full dose was not administered */
         public array $subPotentReason = [],
         /** @var array<FHIRMedicationAdministrationPerformer> performer Who or what performed the medication administration and what type of performance they did */
@@ -89,13 +75,13 @@ class FHIRMedicationAdministration extends FHIRDomainResource
         /** @var array<FHIRCodeableReference> reason Concept, condition or observation that supports why the medication was administered */
         public array $reason = [],
         /** @var FHIRReference|null request Request administration performed against */
-        public ?FHIRReference $request = null,
+        public ?\FHIRReference $request = null,
         /** @var array<FHIRCodeableReference> device Device used to administer */
         public array $device = [],
         /** @var array<FHIRAnnotation> note Information about the administration */
         public array $note = [],
         /** @var FHIRMedicationAdministrationDosage|null dosage Details of how medication was taken */
-        public ?FHIRMedicationAdministrationDosage $dosage = null,
+        public ?\FHIRMedicationAdministrationDosage $dosage = null,
         /** @var array<FHIRReference> eventHistory A list of events of interest in the lifecycle */
         public array $eventHistory = [],
     ) {

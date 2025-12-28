@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
 
 /**
  * @description The clinical context in which the document was prepared.
@@ -28,13 +24,13 @@ class FHIRDocumentReferenceContext extends \Ardenexal\FHIRTools\Component\Models
         /** @var array<FHIRCodeableConcept> event Main clinical acts documented */
         public array $event = [],
         /** @var FHIRPeriod|null period Time of service that is being documented */
-        public ?FHIRPeriod $period = null,
+        public ?\FHIRPeriod $period = null,
         /** @var FHIRCodeableConcept|null facilityType Kind of facility where patient was seen */
-        public ?FHIRCodeableConcept $facilityType = null,
+        public ?\FHIRCodeableConcept $facilityType = null,
         /** @var FHIRCodeableConcept|null practiceSetting Additional details about where the content was created (e.g. clinical specialty) */
-        public ?FHIRCodeableConcept $practiceSetting = null,
+        public ?\FHIRCodeableConcept $practiceSetting = null,
         /** @var FHIRReference|null sourcePatientInfo Patient demographics from source */
-        public ?FHIRReference $sourcePatientInfo = null,
+        public ?\FHIRReference $sourcePatientInfo = null,
         /** @var array<FHIRReference> related Related identifiers or resources */
         public array $related = [],
     ) {

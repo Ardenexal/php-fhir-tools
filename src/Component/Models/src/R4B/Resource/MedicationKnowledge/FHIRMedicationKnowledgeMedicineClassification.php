@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,7 +22,7 @@ class FHIRMedicationKnowledgeMedicineClassification extends \Ardenexal\FHIRTools
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null type The type of category for the medication (for example, therapeutic classification, therapeutic sub-classification) */
         #[NotBlank]
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var array<FHIRCodeableConcept> classification Specific category assigned to the medication */
         public array $classification = [],
     ) {

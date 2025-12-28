@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInteger;
 
 /**
  * @description The individual test cases that are part of this plan, when they they are made explicit.
@@ -23,7 +20,7 @@ class FHIRTestPlanTestCase extends \Ardenexal\FHIRTools\Component\Models\R5\Data
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRInteger|null sequence Sequence of test case in the test plan */
-        public ?FHIRInteger $sequence = null,
+        public ?\FHIRInteger $sequence = null,
         /** @var array<FHIRReference> scope The scope or artifact covered by the case */
         public array $scope = [],
         /** @var array<FHIRTestPlanTestCaseDependency> dependency Required criteria to execute the test case */

@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRPositiveInt;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,7 +22,7 @@ class FHIRClaimResponseItem extends \Ardenexal\FHIRTools\Component\Models\R4B\Da
         public array $modifierExtension = [],
         /** @var FHIRPositiveInt|null itemSequence Claim item instance identifier */
         #[NotBlank]
-        public ?FHIRPositiveInt $itemSequence = null,
+        public ?\FHIRPositiveInt $itemSequence = null,
         /** @var array<FHIRPositiveInt> noteNumber Applicable note numbers */
         public array $noteNumber = [],
         /** @var array<FHIRClaimResponseItemAdjudication> adjudication Adjudication details */

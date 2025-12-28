@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBase64Binary;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,18 +22,18 @@ class FHIRDeviceUdiCarrier extends \Ardenexal\FHIRTools\Component\Models\R5\Data
         public array $modifierExtension = [],
         /** @var FHIRString|string|null deviceIdentifier Mandatory fixed portion of UDI */
         #[NotBlank]
-        public FHIRString|string|null $deviceIdentifier = null,
+        public \FHIRString|string|null $deviceIdentifier = null,
         /** @var FHIRUri|null issuer UDI Issuing Organization */
         #[NotBlank]
-        public ?FHIRUri $issuer = null,
+        public ?\FHIRUri $issuer = null,
         /** @var FHIRUri|null jurisdiction Regional UDI authority */
-        public ?FHIRUri $jurisdiction = null,
+        public ?\FHIRUri $jurisdiction = null,
         /** @var FHIRBase64Binary|null carrierAIDC UDI Machine Readable Barcode String */
-        public ?FHIRBase64Binary $carrierAIDC = null,
+        public ?\FHIRBase64Binary $carrierAIDC = null,
         /** @var FHIRString|string|null carrierHRF UDI Human Readable Barcode String */
-        public FHIRString|string|null $carrierHRF = null,
+        public \FHIRString|string|null $carrierHRF = null,
         /** @var FHIRUDIEntryTypeType|null entryType barcode | rfid | manual | card | self-reported | electronic-transmission | unknown */
-        public ?FHIRUDIEntryTypeType $entryType = null,
+        public ?\FHIRUDIEntryTypeType $entryType = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRMoney;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRPositiveInt;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
 
 /**
  * @description Overall costs associated with the plan.
@@ -25,13 +20,13 @@ class FHIRInsurancePlanPlanGeneralCost extends \Ardenexal\FHIRTools\Component\Mo
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null type Type of cost */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRPositiveInt|null groupSize Number of enrollees */
-        public ?FHIRPositiveInt $groupSize = null,
+        public ?\FHIRPositiveInt $groupSize = null,
         /** @var FHIRMoney|null cost Cost value */
-        public ?FHIRMoney $cost = null,
+        public ?\FHIRMoney $cost = null,
         /** @var FHIRString|string|null comment Additional cost information */
-        public FHIRString|string|null $comment = null,
+        public \FHIRString|string|null $comment = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

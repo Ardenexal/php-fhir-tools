@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRElementDefinition;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
 
 /**
  * @description A snapshot view is expressed in a standalone form that can be used and interpreted without considering the base StructureDefinition.

@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMoney;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDate;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,18 +22,18 @@ class FHIRClaimResponsePayment extends \Ardenexal\FHIRTools\Component\Models\R4B
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null type Partial or complete payment */
         #[NotBlank]
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRMoney|null adjustment Payment adjustment for non-claim issues */
-        public ?FHIRMoney $adjustment = null,
+        public ?\FHIRMoney $adjustment = null,
         /** @var FHIRCodeableConcept|null adjustmentReason Explanation for the adjustment */
-        public ?FHIRCodeableConcept $adjustmentReason = null,
+        public ?\FHIRCodeableConcept $adjustmentReason = null,
         /** @var FHIRDate|null date Expected date of payment */
-        public ?FHIRDate $date = null,
+        public ?\FHIRDate $date = null,
         /** @var FHIRMoney|null amount Payable amount after adjustment */
         #[NotBlank]
-        public ?FHIRMoney $amount = null,
+        public ?\FHIRMoney $amount = null,
         /** @var FHIRIdentifier|null identifier Business identifier for the payment */
-        public ?FHIRIdentifier $identifier = null,
+        public ?\FHIRIdentifier $identifier = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,12 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRAttachment;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -28,12 +22,12 @@ class FHIRCitationRelatesTo extends \Ardenexal\FHIRTools\Component\Models\R4B\Da
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null relationshipType How the Citation resource relates to the target artifact */
         #[NotBlank]
-        public ?FHIRCodeableConcept $relationshipType = null,
+        public ?\FHIRCodeableConcept $relationshipType = null,
         /** @var array<FHIRCodeableConcept> targetClassifier The clasification of the related artifact */
         public array $targetClassifier = [],
         /** @var FHIRUri|FHIRIdentifier|FHIRReference|FHIRAttachment|null targetX The article or artifact that the Citation Resource is related to */
         #[NotBlank]
-        public FHIRUri|FHIRIdentifier|FHIRReference|FHIRAttachment|null $targetX = null,
+        public \FHIRUri|\FHIRIdentifier|\FHIRReference|\FHIRAttachment|null $targetX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

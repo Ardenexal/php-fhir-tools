@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCanonical;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,10 +22,10 @@ class FHIRImplementationGuideGlobal extends \Ardenexal\FHIRTools\Component\Model
         public array $modifierExtension = [],
         /** @var FHIRResourceTypeType|null type Type this profile applies to */
         #[NotBlank]
-        public ?FHIRResourceTypeType $type = null,
+        public ?\FHIRResourceTypeType $type = null,
         /** @var FHIRCanonical|null profile Profile that all resources must conform to */
         #[NotBlank]
-        public ?FHIRCanonical $profile = null,
+        public ?\FHIRCanonical $profile = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

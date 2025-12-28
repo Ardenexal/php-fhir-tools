@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRId;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRMimeTypesType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -23,14 +20,14 @@ class FHIRElementDefinitionMapping extends FHIRElement
         public array $extension = [],
         /** @var FHIRId|null identity Reference to mapping declaration */
         #[NotBlank]
-        public ?FHIRId $identity = null,
+        public ?\FHIRId $identity = null,
         /** @var FHIRMimeTypesType|null language Computable language of mapping */
-        public ?FHIRMimeTypesType $language = null,
+        public ?\FHIRMimeTypesType $language = null,
         /** @var FHIRString|string|null map Details of the mapping */
         #[NotBlank]
-        public FHIRString|string|null $map = null,
+        public \FHIRString|string|null $map = null,
         /** @var FHIRString|string|null comment Comments about the mapping or its use */
-        public FHIRString|string|null $comment = null,
+        public \FHIRString|string|null $comment = null,
     ) {
         parent::__construct($id, $extension);
     }

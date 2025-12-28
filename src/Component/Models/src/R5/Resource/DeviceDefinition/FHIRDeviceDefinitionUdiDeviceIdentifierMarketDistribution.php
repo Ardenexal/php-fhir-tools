@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -29,10 +26,10 @@ class FHIRDeviceDefinitionUdiDeviceIdentifierMarketDistribution extends \Ardenex
         public array $modifierExtension = [],
         /** @var FHIRPeriod|null marketPeriod Begin and end dates for the commercial distribution of the device */
         #[NotBlank]
-        public ?FHIRPeriod $marketPeriod = null,
+        public ?\FHIRPeriod $marketPeriod = null,
         /** @var FHIRUri|null subJurisdiction National state or territory where the device is commercialized */
         #[NotBlank]
-        public ?FHIRUri $subJurisdiction = null,
+        public ?\FHIRUri $subJurisdiction = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRTiming;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
 
 /**
  * @description Diet given orally in contrast to enteral (tube) feeding.
@@ -34,7 +30,7 @@ class FHIRNutritionOrderOralDiet extends \Ardenexal\FHIRTools\Component\Models\R
         /** @var array<FHIRCodeableConcept> fluidConsistencyType The required consistency of fluids and liquids provided to the patient */
         public array $fluidConsistencyType = [],
         /** @var FHIRString|string|null instruction Instructions or additional information about the oral diet */
-        public FHIRString|string|null $instruction = null,
+        public \FHIRString|string|null $instruction = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDecimal;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRInteger;
 
 /**
  * @description Receiver Operator Characteristic (ROC) Curve  to give sensitivity/specificity tradeoff.

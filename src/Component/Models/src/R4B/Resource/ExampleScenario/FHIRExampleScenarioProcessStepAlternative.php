@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRMarkdown;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,9 +22,9 @@ class FHIRExampleScenarioProcessStepAlternative extends \Ardenexal\FHIRTools\Com
         public array $modifierExtension = [],
         /** @var FHIRString|string|null title Label for alternative */
         #[NotBlank]
-        public FHIRString|string|null $title = null,
+        public \FHIRString|string|null $title = null,
         /** @var FHIRMarkdown|null description A human-readable description of each option */
-        public ?FHIRMarkdown $description = null,
+        public ?\FHIRMarkdown $description = null,
         /** @var array<FHIRExampleScenarioProcessStep> step What happens in each alternative option */
         public array $step = [],
     ) {

@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
 
 /**
  * @description Feeding provided through the gastrointestinal tract via a tube, catheter, or stoma that delivers nutrition distal to the oral cavity.
@@ -24,23 +20,23 @@ class FHIRNutritionOrderEnteralFormula extends \Ardenexal\FHIRTools\Component\Mo
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null baseFormulaType Type of enteral or infant formula */
-        public ?FHIRCodeableConcept $baseFormulaType = null,
+        public ?\FHIRCodeableConcept $baseFormulaType = null,
         /** @var FHIRString|string|null baseFormulaProductName Product or brand name of the enteral or infant formula */
-        public FHIRString|string|null $baseFormulaProductName = null,
+        public \FHIRString|string|null $baseFormulaProductName = null,
         /** @var FHIRCodeableConcept|null additiveType Type of modular component to add to the feeding */
-        public ?FHIRCodeableConcept $additiveType = null,
+        public ?\FHIRCodeableConcept $additiveType = null,
         /** @var FHIRString|string|null additiveProductName Product or brand name of the modular additive */
-        public FHIRString|string|null $additiveProductName = null,
+        public \FHIRString|string|null $additiveProductName = null,
         /** @var FHIRQuantity|null caloricDensity Amount of energy per specified volume that is required */
-        public ?FHIRQuantity $caloricDensity = null,
+        public ?\FHIRQuantity $caloricDensity = null,
         /** @var FHIRCodeableConcept|null routeofAdministration How the formula should enter the patient's gastrointestinal tract */
-        public ?FHIRCodeableConcept $routeofAdministration = null,
+        public ?\FHIRCodeableConcept $routeofAdministration = null,
         /** @var array<FHIRNutritionOrderEnteralFormulaAdministration> administration Formula feeding instruction as structured data */
         public array $administration = [],
         /** @var FHIRQuantity|null maxVolumeToDeliver Upper limit on formula volume per unit of time */
-        public ?FHIRQuantity $maxVolumeToDeliver = null,
+        public ?\FHIRQuantity $maxVolumeToDeliver = null,
         /** @var FHIRString|string|null administrationInstruction Formula feeding instructions expressed as text */
-        public FHIRString|string|null $administrationInstruction = null,
+        public \FHIRString|string|null $administrationInstruction = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

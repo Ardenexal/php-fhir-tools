@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRId;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInteger;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,27 +22,27 @@ class FHIRStructureMapGroupRuleSource extends \Ardenexal\FHIRTools\Component\Mod
         public array $modifierExtension = [],
         /** @var FHIRId|null context Type or variable this rule applies to */
         #[NotBlank]
-        public ?FHIRId $context = null,
+        public ?\FHIRId $context = null,
         /** @var FHIRInteger|null min Specified minimum cardinality */
-        public ?FHIRInteger $min = null,
+        public ?\FHIRInteger $min = null,
         /** @var FHIRString|string|null max Specified maximum cardinality (number or *) */
-        public FHIRString|string|null $max = null,
+        public \FHIRString|string|null $max = null,
         /** @var FHIRString|string|null type Rule only applies if source has this type */
-        public FHIRString|string|null $type = null,
+        public \FHIRString|string|null $type = null,
         /** @var FHIRString|string|null defaultValue Default value if no value exists */
-        public FHIRString|string|null $defaultValue = null,
+        public \FHIRString|string|null $defaultValue = null,
         /** @var FHIRString|string|null element Optional field for this source */
-        public FHIRString|string|null $element = null,
+        public \FHIRString|string|null $element = null,
         /** @var FHIRStructureMapSourceListModeType|null listMode first | not_first | last | not_last | only_one */
-        public ?FHIRStructureMapSourceListModeType $listMode = null,
+        public ?\FHIRStructureMapSourceListModeType $listMode = null,
         /** @var FHIRId|null variable Named context for field, if a field is specified */
-        public ?FHIRId $variable = null,
+        public ?\FHIRId $variable = null,
         /** @var FHIRString|string|null condition FHIRPath expression  - must be true or the rule does not apply */
-        public FHIRString|string|null $condition = null,
+        public \FHIRString|string|null $condition = null,
         /** @var FHIRString|string|null check FHIRPath expression  - must be true or the mapping engine throws an error instead of completing */
-        public FHIRString|string|null $check = null,
+        public \FHIRString|string|null $check = null,
         /** @var FHIRString|string|null logMessage Message to put in log if source exists (FHIRPath) */
-        public FHIRString|string|null $logMessage = null,
+        public \FHIRString|string|null $logMessage = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

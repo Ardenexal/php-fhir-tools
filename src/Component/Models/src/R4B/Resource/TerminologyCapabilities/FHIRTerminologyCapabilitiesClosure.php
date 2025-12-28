@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean;
 
 /**
  * @description Whether the $closure operation is supported.
@@ -22,7 +20,7 @@ class FHIRTerminologyCapabilitiesClosure extends \Ardenexal\FHIRTools\Component\
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRBoolean|null translation If cross-system closure is supported */
-        public ?FHIRBoolean $translation = null,
+        public ?\FHIRBoolean $translation = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

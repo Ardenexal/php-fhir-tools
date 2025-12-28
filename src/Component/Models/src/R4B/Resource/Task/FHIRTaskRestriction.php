@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRPositiveInt;
 
 /**
  * @description If the Task.focus is a request resource and the task is seeking fulfillment (i.e. is asking for the request to be actioned), this element identifies any limitations on what parts of the referenced request should be actioned.
@@ -24,9 +20,9 @@ class FHIRTaskRestriction extends \Ardenexal\FHIRTools\Component\Models\R4B\Data
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRPositiveInt|null repetitions How many times to repeat */
-        public ?FHIRPositiveInt $repetitions = null,
+        public ?\FHIRPositiveInt $repetitions = null,
         /** @var FHIRPeriod|null period When fulfillment sought */
-        public ?FHIRPeriod $period = null,
+        public ?\FHIRPeriod $period = null,
         /** @var array<FHIRReference> recipient For whom is fulfillment sought? */
         public array $recipient = [],
     ) {

@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,12 +22,12 @@ class FHIRTestReportParticipant extends \Ardenexal\FHIRTools\Component\Models\R4
         public array $modifierExtension = [],
         /** @var FHIRTestReportParticipantTypeType|null type test-engine | client | server */
         #[NotBlank]
-        public ?FHIRTestReportParticipantTypeType $type = null,
+        public ?\FHIRTestReportParticipantTypeType $type = null,
         /** @var FHIRUri|null uri The uri of the participant. An absolute URL is preferred */
         #[NotBlank]
-        public ?FHIRUri $uri = null,
+        public ?\FHIRUri $uri = null,
         /** @var FHIRString|string|null display The display name of the participant */
-        public FHIRString|string|null $display = null,
+        public \FHIRString|string|null $display = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

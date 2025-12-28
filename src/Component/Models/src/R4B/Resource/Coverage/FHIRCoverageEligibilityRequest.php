@@ -4,17 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMeta;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRNarrative;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDate;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,7 +13,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  *
  * @description The CoverageEligibilityRequest provides patient and insurance coverage information to an insurer for them to respond, in the form of an CoverageEligibilityResponse, with information regarding whether the stated coverage is valid and in-force and optionally to provide the insurance details of the policy.
  */
-#[FhirResource(
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(
     type: 'CoverageEligibilityRequest',
     version: '4.3.0',
     url: 'http://hl7.org/fhir/StructureDefinition/CoverageEligibilityRequest',
@@ -36,14 +25,14 @@ class FHIRCoverageEligibilityRequest extends FHIRDomainResource
         /** @var string|null id Logical id of this artifact */
         public ?string $id = null,
         /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?FHIRMeta $meta = null,
+        public ?\FHIRMeta $meta = null,
         /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?FHIRUri $implicitRules = null,
+        public ?\FHIRUri $implicitRules = null,
         /** @var string|null language Language of the resource content */
         public ?string $language = null,
         /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
-        public ?FHIRNarrative $text = null,
-        /** @var array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRResource> contained Contained, inline Resources */
+        public ?\FHIRNarrative $text = null,
+        /** @var array<FHIRResource> contained Contained, inline Resources */
         public array $contained = [],
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
@@ -53,28 +42,28 @@ class FHIRCoverageEligibilityRequest extends FHIRDomainResource
         public array $identifier = [],
         /** @var FHIRFinancialResourceStatusCodesType|null status active | cancelled | draft | entered-in-error */
         #[NotBlank]
-        public ?FHIRFinancialResourceStatusCodesType $status = null,
+        public ?\FHIRFinancialResourceStatusCodesType $status = null,
         /** @var FHIRCodeableConcept|null priority Desired processing priority */
-        public ?FHIRCodeableConcept $priority = null,
+        public ?\FHIRCodeableConcept $priority = null,
         /** @var array<FHIREligibilityRequestPurposeType> purpose auth-requirements | benefits | discovery | validation */
         public array $purpose = [],
         /** @var FHIRReference|null patient Intended recipient of products and services */
         #[NotBlank]
-        public ?FHIRReference $patient = null,
+        public ?\FHIRReference $patient = null,
         /** @var FHIRDate|FHIRPeriod|null servicedX Estimated date or dates of service */
-        public FHIRDate|FHIRPeriod|null $servicedX = null,
+        public \FHIRDate|\FHIRPeriod|null $servicedX = null,
         /** @var FHIRDateTime|null created Creation date */
         #[NotBlank]
-        public ?FHIRDateTime $created = null,
+        public ?\FHIRDateTime $created = null,
         /** @var FHIRReference|null enterer Author */
-        public ?FHIRReference $enterer = null,
+        public ?\FHIRReference $enterer = null,
         /** @var FHIRReference|null provider Party responsible for the request */
-        public ?FHIRReference $provider = null,
+        public ?\FHIRReference $provider = null,
         /** @var FHIRReference|null insurer Coverage issuer */
         #[NotBlank]
-        public ?FHIRReference $insurer = null,
+        public ?\FHIRReference $insurer = null,
         /** @var FHIRReference|null facility Servicing facility */
-        public ?FHIRReference $facility = null,
+        public ?\FHIRReference $facility = null,
         /** @var array<FHIRCoverageEligibilityRequestSupportingInfo> supportingInfo Supporting information */
         public array $supportingInfo = [],
         /** @var array<FHIRCoverageEligibilityRequestInsurance> insurance Patient insurance information */

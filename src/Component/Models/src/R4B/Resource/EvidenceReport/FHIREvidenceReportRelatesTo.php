@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,10 +22,10 @@ class FHIREvidenceReportRelatesTo extends \Ardenexal\FHIRTools\Component\Models\
         public array $modifierExtension = [],
         /** @var FHIRReportRelationshipTypeType|null code replaces | amends | appends | transforms | replacedWith | amendedWith | appendedWith | transformedWith */
         #[NotBlank]
-        public ?FHIRReportRelationshipTypeType $code = null,
+        public ?\FHIRReportRelationshipTypeType $code = null,
         /** @var FHIRIdentifier|FHIRReference|null targetX Target of the relationship */
         #[NotBlank]
-        public FHIRIdentifier|FHIRReference|null $targetX = null,
+        public \FHIRIdentifier|\FHIRReference|null $targetX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

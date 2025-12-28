@@ -4,16 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMeta;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRNarrative;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRInstant;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -23,7 +13,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  *
  * @description A reply to an appointment request for a patient and/or practitioner(s), such as a confirmation or rejection.
  */
-#[FhirResource(
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(
     type: 'AppointmentResponse',
     version: '4.3.0',
     url: 'http://hl7.org/fhir/StructureDefinition/AppointmentResponse',
@@ -35,14 +25,14 @@ class FHIRAppointmentResponse extends FHIRDomainResource
         /** @var string|null id Logical id of this artifact */
         public ?string $id = null,
         /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?FHIRMeta $meta = null,
+        public ?\FHIRMeta $meta = null,
         /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?FHIRUri $implicitRules = null,
+        public ?\FHIRUri $implicitRules = null,
         /** @var string|null language Language of the resource content */
         public ?string $language = null,
         /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
-        public ?FHIRNarrative $text = null,
-        /** @var array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRResource> contained Contained, inline Resources */
+        public ?\FHIRNarrative $text = null,
+        /** @var array<FHIRResource> contained Contained, inline Resources */
         public array $contained = [],
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
@@ -52,20 +42,20 @@ class FHIRAppointmentResponse extends FHIRDomainResource
         public array $identifier = [],
         /** @var FHIRReference|null appointment Appointment this response relates to */
         #[NotBlank]
-        public ?FHIRReference $appointment = null,
+        public ?\FHIRReference $appointment = null,
         /** @var FHIRInstant|null start Time from appointment, or requested new start time */
-        public ?FHIRInstant $start = null,
+        public ?\FHIRInstant $start = null,
         /** @var FHIRInstant|null end Time from appointment, or requested new end time */
-        public ?FHIRInstant $end = null,
+        public ?\FHIRInstant $end = null,
         /** @var array<FHIRCodeableConcept> participantType Role of participant in the appointment */
         public array $participantType = [],
         /** @var FHIRReference|null actor Person, Location, HealthcareService, or Device */
-        public ?FHIRReference $actor = null,
+        public ?\FHIRReference $actor = null,
         /** @var FHIRParticipationStatusType|null participantStatus accepted | declined | tentative | needs-action */
         #[NotBlank]
-        public ?FHIRParticipationStatusType $participantStatus = null,
+        public ?\FHIRParticipationStatusType $participantStatus = null,
         /** @var FHIRString|string|null comment Additional comments */
-        public FHIRString|string|null $comment = null,
+        public \FHIRString|string|null $comment = null,
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
     }

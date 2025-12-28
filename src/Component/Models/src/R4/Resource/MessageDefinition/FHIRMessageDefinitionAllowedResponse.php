@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRMarkdown;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,9 +22,9 @@ class FHIRMessageDefinitionAllowedResponse extends \Ardenexal\FHIRTools\Componen
         public array $modifierExtension = [],
         /** @var FHIRCanonical|null message Reference to allowed message definition response */
         #[NotBlank]
-        public ?FHIRCanonical $message = null,
+        public ?\FHIRCanonical $message = null,
         /** @var FHIRMarkdown|null situation When should this response be used */
-        public ?FHIRMarkdown $situation = null,
+        public ?\FHIRMarkdown $situation = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

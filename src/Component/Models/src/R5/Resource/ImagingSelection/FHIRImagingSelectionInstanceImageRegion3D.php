@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDecimal;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,7 +22,7 @@ class FHIRImagingSelectionInstanceImageRegion3D extends \Ardenexal\FHIRTools\Com
         public array $modifierExtension = [],
         /** @var FHIRImagingSelection3DGraphicTypeType|null regionType point | multipoint | polyline | polygon | ellipse | ellipsoid */
         #[NotBlank]
-        public ?FHIRImagingSelection3DGraphicTypeType $regionType = null,
+        public ?\FHIRImagingSelection3DGraphicTypeType $regionType = null,
         /** @var array<FHIRDecimal> coordinate Specifies the coordinates that define the image region */
         public array $coordinate = [],
     ) {

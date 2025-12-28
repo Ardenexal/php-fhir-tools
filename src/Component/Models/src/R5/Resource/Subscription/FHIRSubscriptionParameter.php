@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,10 +22,10 @@ class FHIRSubscriptionParameter extends \Ardenexal\FHIRTools\Component\Models\R5
         public array $modifierExtension = [],
         /** @var FHIRString|string|null name Name (key) of the parameter */
         #[NotBlank]
-        public FHIRString|string|null $name = null,
+        public \FHIRString|string|null $name = null,
         /** @var FHIRString|string|null value Value of the parameter to use or pass through */
         #[NotBlank]
-        public FHIRString|string|null $value = null,
+        public \FHIRString|string|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBoolean;
 
 /**
  * @description Each step of the process.
@@ -24,9 +22,9 @@ class FHIRExampleScenarioProcessStep extends \Ardenexal\FHIRTools\Component\Mode
         /** @var array<FHIRExampleScenarioProcess> process Nested process */
         public array $process = [],
         /** @var FHIRBoolean|null pause If there is a pause in the flow */
-        public ?FHIRBoolean $pause = null,
+        public ?\FHIRBoolean $pause = null,
         /** @var FHIRExampleScenarioProcessStepOperation|null operation Each interaction or action */
-        public ?FHIRExampleScenarioProcessStepOperation $operation = null,
+        public ?\FHIRExampleScenarioProcessStepOperation $operation = null,
         /** @var array<FHIRExampleScenarioProcessStepAlternative> alternative Alternate non-typical step action */
         public array $alternative = [],
     ) {

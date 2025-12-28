@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
 
 /**
  * @description The information needed by an IG publisher tool to publish the whole implementation guide.
@@ -25,7 +24,7 @@ class FHIRImplementationGuideDefinition extends \Ardenexal\FHIRTools\Component\M
         /** @var array<FHIRImplementationGuideDefinitionResource> resource Resource in the implementation guide */
         public array $resource = [],
         /** @var FHIRImplementationGuideDefinitionPage|null page Page/Section in the Guide */
-        public ?FHIRImplementationGuideDefinitionPage $page = null,
+        public ?\FHIRImplementationGuideDefinitionPage $page = null,
         /** @var array<FHIRImplementationGuideDefinitionParameter> parameter Defines how IG is built by tools */
         public array $parameter = [],
         /** @var array<FHIRImplementationGuideDefinitionTemplate> template A template for building resources */

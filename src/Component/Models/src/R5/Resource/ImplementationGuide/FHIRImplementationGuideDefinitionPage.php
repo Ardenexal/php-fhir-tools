@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRMarkdown;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUrl;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,16 +21,16 @@ class FHIRImplementationGuideDefinitionPage extends \Ardenexal\FHIRTools\Compone
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRUrl|FHIRString|string|FHIRMarkdown|null sourceX Source for page */
-        public FHIRUrl|FHIRString|string|FHIRMarkdown|null $sourceX = null,
+        public \FHIRUrl|\FHIRString|string|\FHIRMarkdown|null $sourceX = null,
         /** @var FHIRUrl|null name Name of the page when published */
         #[NotBlank]
-        public ?FHIRUrl $name = null,
+        public ?\FHIRUrl $name = null,
         /** @var FHIRString|string|null title Short title shown for navigational assistance */
         #[NotBlank]
-        public FHIRString|string|null $title = null,
+        public \FHIRString|string|null $title = null,
         /** @var FHIRGuidePageGenerationType|null generation html | markdown | xml | generated */
         #[NotBlank]
-        public ?FHIRGuidePageGenerationType $generation = null,
+        public ?\FHIRGuidePageGenerationType $generation = null,
         /** @var array<FHIRImplementationGuideDefinitionPage> page Nested Pages / Sections */
         public array $page = [],
     ) {

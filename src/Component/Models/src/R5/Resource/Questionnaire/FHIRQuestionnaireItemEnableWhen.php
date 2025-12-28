@@ -5,17 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCoding;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDate;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDecimal;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInteger;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRTime;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -33,13 +22,13 @@ class FHIRQuestionnaireItemEnableWhen extends \Ardenexal\FHIRTools\Component\Mod
         public array $modifierExtension = [],
         /** @var FHIRString|string|null question The linkId of question that determines whether item is enabled/disabled */
         #[NotBlank]
-        public FHIRString|string|null $question = null,
+        public \FHIRString|string|null $question = null,
         /** @var FHIRQuestionnaireItemOperatorType|null operator exists | = | != | > | < | >= | <= */
         #[NotBlank]
-        public ?FHIRQuestionnaireItemOperatorType $operator = null,
+        public ?\FHIRQuestionnaireItemOperatorType $operator = null,
         /** @var FHIRBoolean|FHIRDecimal|FHIRInteger|FHIRDate|FHIRDateTime|FHIRTime|FHIRString|string|FHIRCoding|FHIRQuantity|FHIRReference|null answerX Value for question comparison based on operator */
         #[NotBlank]
-        public FHIRBoolean|FHIRDecimal|FHIRInteger|FHIRDate|FHIRDateTime|FHIRTime|FHIRString|string|FHIRCoding|FHIRQuantity|FHIRReference|null $answerX = null,
+        public \FHIRBoolean|\FHIRDecimal|\FHIRInteger|\FHIRDate|\FHIRDateTime|\FHIRTime|\FHIRString|string|\FHIRCoding|\FHIRQuantity|\FHIRReference|null $answerX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

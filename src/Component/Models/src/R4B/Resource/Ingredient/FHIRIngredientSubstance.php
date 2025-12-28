@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,7 +22,7 @@ class FHIRIngredientSubstance extends \Ardenexal\FHIRTools\Component\Models\R4B\
         public array $modifierExtension = [],
         /** @var FHIRCodeableReference|null code A code or full resource that represents the ingredient substance */
         #[NotBlank]
-        public ?FHIRCodeableReference $code = null,
+        public ?\FHIRCodeableReference $code = null,
         /** @var array<FHIRIngredientSubstanceStrength> strength The quantity of substance, per presentation, or per volume or mass, and type of quantity */
         public array $strength = [],
     ) {

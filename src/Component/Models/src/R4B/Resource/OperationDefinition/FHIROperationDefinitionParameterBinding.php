@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCanonical;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,10 +22,10 @@ class FHIROperationDefinitionParameterBinding extends \Ardenexal\FHIRTools\Compo
         public array $modifierExtension = [],
         /** @var FHIRBindingStrengthType|null strength required | extensible | preferred | example */
         #[NotBlank]
-        public ?FHIRBindingStrengthType $strength = null,
+        public ?\FHIRBindingStrengthType $strength = null,
         /** @var FHIRCanonical|null valueSet Source of value set */
         #[NotBlank]
-        public ?FHIRCanonical $valueSet = null,
+        public ?\FHIRCanonical $valueSet = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

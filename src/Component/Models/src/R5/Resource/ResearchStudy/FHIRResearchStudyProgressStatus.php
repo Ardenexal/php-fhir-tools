@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,11 +22,11 @@ class FHIRResearchStudyProgressStatus extends \Ardenexal\FHIRTools\Component\Mod
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null state Label for status or state (e.g. recruitment status) */
         #[NotBlank]
-        public ?FHIRCodeableConcept $state = null,
+        public ?\FHIRCodeableConcept $state = null,
         /** @var FHIRBoolean|null actual Actual if true else anticipated */
-        public ?FHIRBoolean $actual = null,
+        public ?\FHIRBoolean $actual = null,
         /** @var FHIRPeriod|null period Date range */
-        public ?FHIRPeriod $period = null,
+        public ?\FHIRPeriod $period = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

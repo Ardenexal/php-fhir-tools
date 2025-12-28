@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInstant;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,15 +22,15 @@ class FHIRBundleEntryResponse extends \Ardenexal\FHIRTools\Component\Models\R5\D
         public array $modifierExtension = [],
         /** @var FHIRString|string|null status Status response code (text optional) */
         #[NotBlank]
-        public FHIRString|string|null $status = null,
+        public \FHIRString|string|null $status = null,
         /** @var FHIRUri|null location The location (if the operation returns a location) */
-        public ?FHIRUri $location = null,
+        public ?\FHIRUri $location = null,
         /** @var FHIRString|string|null etag The Etag for the resource (if relevant) */
-        public FHIRString|string|null $etag = null,
+        public \FHIRString|string|null $etag = null,
         /** @var FHIRInstant|null lastModified Server's date time modified */
-        public ?FHIRInstant $lastModified = null,
+        public ?\FHIRInstant $lastModified = null,
         /** @var FHIRResource|null outcome OperationOutcome with hints and warnings (for batch/transaction) */
-        public ?FHIRResource $outcome = null,
+        public ?\FHIRResource $outcome = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

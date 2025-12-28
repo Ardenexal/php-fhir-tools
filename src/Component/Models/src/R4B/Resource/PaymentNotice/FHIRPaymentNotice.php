@@ -4,17 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMeta;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMoney;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRNarrative;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDate;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,7 +13,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  *
  * @description This resource provides the status of the payment for goods and services rendered, and the request and response resource references.
  */
-#[FhirResource(
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(
     type: 'PaymentNotice',
     version: '4.3.0',
     url: 'http://hl7.org/fhir/StructureDefinition/PaymentNotice',
@@ -36,14 +25,14 @@ class FHIRPaymentNotice extends FHIRDomainResource
         /** @var string|null id Logical id of this artifact */
         public ?string $id = null,
         /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?FHIRMeta $meta = null,
+        public ?\FHIRMeta $meta = null,
         /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?FHIRUri $implicitRules = null,
+        public ?\FHIRUri $implicitRules = null,
         /** @var string|null language Language of the resource content */
         public ?string $language = null,
         /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
-        public ?FHIRNarrative $text = null,
-        /** @var array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRResource> contained Contained, inline Resources */
+        public ?\FHIRNarrative $text = null,
+        /** @var array<FHIRResource> contained Contained, inline Resources */
         public array $contained = [],
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
@@ -53,31 +42,31 @@ class FHIRPaymentNotice extends FHIRDomainResource
         public array $identifier = [],
         /** @var FHIRFinancialResourceStatusCodesType|null status active | cancelled | draft | entered-in-error */
         #[NotBlank]
-        public ?FHIRFinancialResourceStatusCodesType $status = null,
+        public ?\FHIRFinancialResourceStatusCodesType $status = null,
         /** @var FHIRReference|null request Request reference */
-        public ?FHIRReference $request = null,
+        public ?\FHIRReference $request = null,
         /** @var FHIRReference|null response Response reference */
-        public ?FHIRReference $response = null,
+        public ?\FHIRReference $response = null,
         /** @var FHIRDateTime|null created Creation date */
         #[NotBlank]
-        public ?FHIRDateTime $created = null,
+        public ?\FHIRDateTime $created = null,
         /** @var FHIRReference|null provider Responsible practitioner */
-        public ?FHIRReference $provider = null,
+        public ?\FHIRReference $provider = null,
         /** @var FHIRReference|null payment Payment reference */
         #[NotBlank]
-        public ?FHIRReference $payment = null,
+        public ?\FHIRReference $payment = null,
         /** @var FHIRDate|null paymentDate Payment or clearing date */
-        public ?FHIRDate $paymentDate = null,
+        public ?\FHIRDate $paymentDate = null,
         /** @var FHIRReference|null payee Party being paid */
-        public ?FHIRReference $payee = null,
+        public ?\FHIRReference $payee = null,
         /** @var FHIRReference|null recipient Party being notified */
         #[NotBlank]
-        public ?FHIRReference $recipient = null,
+        public ?\FHIRReference $recipient = null,
         /** @var FHIRMoney|null amount Monetary amount of the payment */
         #[NotBlank]
-        public ?FHIRMoney $amount = null,
+        public ?\FHIRMoney $amount = null,
         /** @var FHIRCodeableConcept|null paymentStatus Issued or cleared Status of the payment */
-        public ?FHIRCodeableConcept $paymentStatus = null,
+        public ?\FHIRCodeableConcept $paymentStatus = null,
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
     }

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Primitive;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRPrimitive;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRPrimitiveType;
 
 /**

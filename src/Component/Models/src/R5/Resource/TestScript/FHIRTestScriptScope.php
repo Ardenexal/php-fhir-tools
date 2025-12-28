@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCanonical;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,11 +22,11 @@ class FHIRTestScriptScope extends \Ardenexal\FHIRTools\Component\Models\R5\DataT
         public array $modifierExtension = [],
         /** @var FHIRCanonical|null artifact The specific conformance artifact being tested */
         #[NotBlank]
-        public ?FHIRCanonical $artifact = null,
+        public ?\FHIRCanonical $artifact = null,
         /** @var FHIRCodeableConcept|null conformance required | optional | strict */
-        public ?FHIRCodeableConcept $conformance = null,
+        public ?\FHIRCodeableConcept $conformance = null,
         /** @var FHIRCodeableConcept|null phase unit | integration | production */
-        public ?FHIRCodeableConcept $phase = null,
+        public ?\FHIRCodeableConcept $phase = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

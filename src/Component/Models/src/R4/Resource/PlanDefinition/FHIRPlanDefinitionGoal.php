@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRRelatedArtifact;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,14 +21,14 @@ class FHIRPlanDefinitionGoal extends \Ardenexal\FHIRTools\Component\Models\R4\Da
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null category E.g. Treatment, dietary, behavioral */
-        public ?FHIRCodeableConcept $category = null,
+        public ?\FHIRCodeableConcept $category = null,
         /** @var FHIRCodeableConcept|null description Code or text describing the goal */
         #[NotBlank]
-        public ?FHIRCodeableConcept $description = null,
+        public ?\FHIRCodeableConcept $description = null,
         /** @var FHIRCodeableConcept|null priority high-priority | medium-priority | low-priority */
-        public ?FHIRCodeableConcept $priority = null,
+        public ?\FHIRCodeableConcept $priority = null,
         /** @var FHIRCodeableConcept|null start When goal pursuit begins */
-        public ?FHIRCodeableConcept $start = null,
+        public ?\FHIRCodeableConcept $start = null,
         /** @var array<FHIRCodeableConcept> addresses What does the goal address */
         public array $addresses = [],
         /** @var array<FHIRRelatedArtifact> documentation Supporting documentation for the goal */

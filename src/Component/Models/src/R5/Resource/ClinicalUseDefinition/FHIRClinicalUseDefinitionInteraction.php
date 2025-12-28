@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableReference;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
 
 /**
  * @description Specifics for when this is an interaction.
@@ -25,11 +22,11 @@ class FHIRClinicalUseDefinitionInteraction extends \Ardenexal\FHIRTools\Componen
         /** @var array<FHIRClinicalUseDefinitionInteractionInteractant> interactant The specific medication, product, food etc. or laboratory test that interacts */
         public array $interactant = [],
         /** @var FHIRCodeableConcept|null type The type of the interaction e.g. drug-drug interaction, drug-lab test interaction */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRCodeableReference|null effect The effect of the interaction, for example "reduced gastric absorption of primary medication" */
-        public ?FHIRCodeableReference $effect = null,
+        public ?\FHIRCodeableReference $effect = null,
         /** @var FHIRCodeableConcept|null incidence The incidence of the interaction, e.g. theoretical, observed */
-        public ?FHIRCodeableConcept $incidence = null,
+        public ?\FHIRCodeableConcept $incidence = null,
         /** @var array<FHIRCodeableConcept> management Actions for managing the interaction */
         public array $management = [],
     ) {

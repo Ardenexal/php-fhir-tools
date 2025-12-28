@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRPositiveInt;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,11 +22,11 @@ class FHIREncounterDiagnosis extends \Ardenexal\FHIRTools\Component\Models\R4\Da
         public array $modifierExtension = [],
         /** @var FHIRReference|null condition The diagnosis or procedure relevant to the encounter */
         #[NotBlank]
-        public ?FHIRReference $condition = null,
+        public ?\FHIRReference $condition = null,
         /** @var FHIRCodeableConcept|null use Role that this diagnosis has within the encounter (e.g. admission, billing, discharge …) */
-        public ?FHIRCodeableConcept $use = null,
+        public ?\FHIRCodeableConcept $use = null,
         /** @var FHIRPositiveInt|null rank Ranking of the diagnosis (for each role type) */
-        public ?FHIRPositiveInt $rank = null,
+        public ?\FHIRPositiveInt $rank = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

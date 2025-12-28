@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,13 +22,13 @@ class FHIRMedicationKnowledgeRegulatory extends \Ardenexal\FHIRTools\Component\M
         public array $modifierExtension = [],
         /** @var FHIRReference|null regulatoryAuthority Specifies the authority of the regulation */
         #[NotBlank]
-        public ?FHIRReference $regulatoryAuthority = null,
+        public ?\FHIRReference $regulatoryAuthority = null,
         /** @var array<FHIRMedicationKnowledgeRegulatorySubstitution> substitution Specifies if changes are allowed when dispensing a medication from a regulatory perspective */
         public array $substitution = [],
         /** @var array<FHIRCodeableConcept> schedule Specifies the schedule of a medication in jurisdiction */
         public array $schedule = [],
         /** @var FHIRMedicationKnowledgeRegulatoryMaxDispense|null maxDispense The maximum number of units of the medication that can be dispensed in a period */
-        public ?FHIRMedicationKnowledgeRegulatoryMaxDispense $maxDispense = null,
+        public ?\FHIRMedicationKnowledgeRegulatoryMaxDispense $maxDispense = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

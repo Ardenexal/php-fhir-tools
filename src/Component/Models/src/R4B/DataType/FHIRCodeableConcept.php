@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
 
 /**
  * @author HL7 FHIR Standard
@@ -25,7 +24,7 @@ class FHIRCodeableConcept extends FHIRElement
         /** @var array<FHIRCoding> coding Code defined by a terminology system */
         public array $coding = [],
         /** @var FHIRString|string|null text Plain text representation of the concept */
-        public FHIRString|string|null $text = null,
+        public \FHIRString|string|null $text = null,
     ) {
         parent::__construct($id, $extension);
     }

@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRDataRequirement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRId;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 
 /**
  * @description Defines input data requirements for the action.
@@ -24,11 +20,11 @@ class FHIRPlanDefinitionActionInput extends \Ardenexal\FHIRTools\Component\Model
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRString|string|null title User-visible title */
-        public FHIRString|string|null $title = null,
+        public \FHIRString|string|null $title = null,
         /** @var FHIRDataRequirement|null requirement What data is provided */
-        public ?FHIRDataRequirement $requirement = null,
+        public ?\FHIRDataRequirement $requirement = null,
         /** @var FHIRId|null relatedData What data is provided */
-        public ?FHIRId $relatedData = null,
+        public ?\FHIRId $relatedData = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

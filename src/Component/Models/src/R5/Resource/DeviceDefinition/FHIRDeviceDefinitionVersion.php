@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,12 +21,12 @@ class FHIRDeviceDefinitionVersion extends \Ardenexal\FHIRTools\Component\Models\
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null type The type of the device version, e.g. manufacturer, approved, internal */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRIdentifier|null component The hardware or software module of the device to which the version applies */
-        public ?FHIRIdentifier $component = null,
+        public ?\FHIRIdentifier $component = null,
         /** @var FHIRString|string|null value The version text */
         #[NotBlank]
-        public FHIRString|string|null $value = null,
+        public \FHIRString|string|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCoding;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,10 +22,10 @@ class FHIREncounterClassHistory extends \Ardenexal\FHIRTools\Component\Models\R4
         public array $modifierExtension = [],
         /** @var FHIRCoding|null class inpatient | outpatient | ambulatory | emergency + */
         #[NotBlank]
-        public ?FHIRCoding $class = null,
+        public ?\FHIRCoding $class = null,
         /** @var FHIRPeriod|null period The time that the episode was in the specified class */
         #[NotBlank]
-        public ?FHIRPeriod $period = null,
+        public ?\FHIRPeriod $period = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

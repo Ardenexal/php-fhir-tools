@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExpression;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,9 +22,9 @@ class FHIRPlanDefinitionActionCondition extends \Ardenexal\FHIRTools\Component\M
         public array $modifierExtension = [],
         /** @var FHIRActionConditionKindType|null kind applicability | start | stop */
         #[NotBlank]
-        public ?FHIRActionConditionKindType $kind = null,
+        public ?\FHIRActionConditionKindType $kind = null,
         /** @var FHIRExpression|null expression Boolean-valued expression */
-        public ?FHIRExpression $expression = null,
+        public ?\FHIRExpression $expression = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

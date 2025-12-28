@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity;
 
 /**
  * @description The molecular weight or weight range (for proteins, polymers or nucleic acids).
@@ -27,11 +24,11 @@ class FHIRSubstanceSpecificationStructureIsotopeMolecularWeight extends \Ardenex
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null method The method by which the molecular weight was determined */
-        public ?FHIRCodeableConcept $method = null,
+        public ?\FHIRCodeableConcept $method = null,
         /** @var FHIRCodeableConcept|null type Type of molecular weight such as exact, average (also known as. number average), weight average */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRQuantity|null amount Used to capture quantitative values for a variety of elements. If only limits are given, the arithmetic mean would be the average. If only a single definite value for a given element is given, it would be captured in this field */
-        public ?FHIRQuantity $amount = null,
+        public ?\FHIRQuantity $amount = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

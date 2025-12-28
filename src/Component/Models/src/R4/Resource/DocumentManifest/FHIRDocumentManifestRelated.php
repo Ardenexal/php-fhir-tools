@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
 
 /**
  * @description Related identifiers or resources associated with the DocumentManifest.
@@ -23,9 +20,9 @@ class FHIRDocumentManifestRelated extends \Ardenexal\FHIRTools\Component\Models\
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRIdentifier|null identifier Identifiers of things that are related */
-        public ?FHIRIdentifier $identifier = null,
+        public ?\FHIRIdentifier $identifier = null,
         /** @var FHIRReference|null ref Related Resource */
-        public ?FHIRReference $ref = null,
+        public ?\FHIRReference $ref = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

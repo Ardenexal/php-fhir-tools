@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -29,11 +24,11 @@ class FHIRPractitionerQualification extends \Ardenexal\FHIRTools\Component\Model
         public array $identifier = [],
         /** @var FHIRCodeableConcept|null code Coded representation of the qualification */
         #[NotBlank]
-        public ?FHIRCodeableConcept $code = null,
+        public ?\FHIRCodeableConcept $code = null,
         /** @var FHIRPeriod|null period Period during which the qualification is valid */
-        public ?FHIRPeriod $period = null,
+        public ?\FHIRPeriod $period = null,
         /** @var FHIRReference|null issuer Organization that regulates and issues the qualification */
-        public ?FHIRReference $issuer = null,
+        public ?\FHIRReference $issuer = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

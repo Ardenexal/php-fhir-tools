@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,10 +22,10 @@ class FHIRDeviceDefinitionDeviceName extends \Ardenexal\FHIRTools\Component\Mode
         public array $modifierExtension = [],
         /** @var FHIRString|string|null name A name that is used to refer to the device */
         #[NotBlank]
-        public FHIRString|string|null $name = null,
+        public \FHIRString|string|null $name = null,
         /** @var FHIRDeviceNameTypeType|null type registered-name | user-friendly-name | patient-reported-name */
         #[NotBlank]
-        public ?FHIRDeviceNameTypeType $type = null,
+        public ?\FHIRDeviceNameTypeType $type = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

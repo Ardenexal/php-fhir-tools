@@ -4,18 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMeta;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRNarrative;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRTiming;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,7 +13,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  *
  * @description A record of a request for a medication, substance or device used in the healthcare setting.
  */
-#[FhirResource(
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(
     type: 'SupplyRequest',
     version: '4.3.0',
     url: 'http://hl7.org/fhir/StructureDefinition/SupplyRequest',
@@ -37,14 +25,14 @@ class FHIRSupplyRequest extends FHIRDomainResource
         /** @var string|null id Logical id of this artifact */
         public ?string $id = null,
         /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?FHIRMeta $meta = null,
+        public ?\FHIRMeta $meta = null,
         /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?FHIRUri $implicitRules = null,
+        public ?\FHIRUri $implicitRules = null,
         /** @var string|null language Language of the resource content */
         public ?string $language = null,
         /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
-        public ?FHIRNarrative $text = null,
-        /** @var array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRResource> contained Contained, inline Resources */
+        public ?\FHIRNarrative $text = null,
+        /** @var array<FHIRResource> contained Contained, inline Resources */
         public array $contained = [],
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
@@ -53,25 +41,25 @@ class FHIRSupplyRequest extends FHIRDomainResource
         /** @var array<FHIRIdentifier> identifier Business Identifier for SupplyRequest */
         public array $identifier = [],
         /** @var FHIRSupplyRequestStatusType|null status draft | active | suspended + */
-        public ?FHIRSupplyRequestStatusType $status = null,
+        public ?\FHIRSupplyRequestStatusType $status = null,
         /** @var FHIRCodeableConcept|null category The kind of supply (central, non-stock, etc.) */
-        public ?FHIRCodeableConcept $category = null,
+        public ?\FHIRCodeableConcept $category = null,
         /** @var FHIRRequestPriorityType|null priority routine | urgent | asap | stat */
-        public ?FHIRRequestPriorityType $priority = null,
+        public ?\FHIRRequestPriorityType $priority = null,
         /** @var FHIRCodeableConcept|FHIRReference|null itemX Medication, Substance, or Device requested to be supplied */
         #[NotBlank]
-        public FHIRCodeableConcept|FHIRReference|null $itemX = null,
+        public \FHIRCodeableConcept|\FHIRReference|null $itemX = null,
         /** @var FHIRQuantity|null quantity The requested amount of the item indicated */
         #[NotBlank]
-        public ?FHIRQuantity $quantity = null,
+        public ?\FHIRQuantity $quantity = null,
         /** @var array<FHIRSupplyRequestParameter> parameter Ordered item details */
         public array $parameter = [],
         /** @var FHIRDateTime|FHIRPeriod|FHIRTiming|null occurrenceX When the request should be fulfilled */
-        public FHIRDateTime|FHIRPeriod|FHIRTiming|null $occurrenceX = null,
+        public \FHIRDateTime|\FHIRPeriod|\FHIRTiming|null $occurrenceX = null,
         /** @var FHIRDateTime|null authoredOn When the request was made */
-        public ?FHIRDateTime $authoredOn = null,
+        public ?\FHIRDateTime $authoredOn = null,
         /** @var FHIRReference|null requester Individual making the request */
-        public ?FHIRReference $requester = null,
+        public ?\FHIRReference $requester = null,
         /** @var array<FHIRReference> supplier Who is intended to fulfill the request */
         public array $supplier = [],
         /** @var array<FHIRCodeableConcept> reasonCode The reason why the supply item was requested */
@@ -79,9 +67,9 @@ class FHIRSupplyRequest extends FHIRDomainResource
         /** @var array<FHIRReference> reasonReference The reason why the supply item was requested */
         public array $reasonReference = [],
         /** @var FHIRReference|null deliverFrom The origin of the supply */
-        public ?FHIRReference $deliverFrom = null,
+        public ?\FHIRReference $deliverFrom = null,
         /** @var FHIRReference|null deliverTo The destination of the supply */
-        public ?FHIRReference $deliverTo = null,
+        public ?\FHIRReference $deliverTo = null,
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
     }

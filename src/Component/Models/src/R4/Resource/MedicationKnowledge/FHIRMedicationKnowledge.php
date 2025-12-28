@@ -4,17 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRMeta;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRNarrative;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRMarkdown;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUri;
-
 /**
  * @author Health Level Seven International (Pharmacy)
  *
@@ -22,7 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUri;
  *
  * @description Information about a medication that is used to support knowledge.
  */
-#[FhirResource(
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(
     type: 'MedicationKnowledge',
     version: '4.0.1',
     url: 'http://hl7.org/fhir/StructureDefinition/MedicationKnowledge',
@@ -34,29 +23,29 @@ class FHIRMedicationKnowledge extends FHIRDomainResource
         /** @var string|null id Logical id of this artifact */
         public ?string $id = null,
         /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?FHIRMeta $meta = null,
+        public ?\FHIRMeta $meta = null,
         /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?FHIRUri $implicitRules = null,
+        public ?\FHIRUri $implicitRules = null,
         /** @var string|null language Language of the resource content */
         public ?string $language = null,
         /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
-        public ?FHIRNarrative $text = null,
-        /** @var array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRResource> contained Contained, inline Resources */
+        public ?\FHIRNarrative $text = null,
+        /** @var array<FHIRResource> contained Contained, inline Resources */
         public array $contained = [],
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null code Code that identifies this medication */
-        public ?FHIRCodeableConcept $code = null,
+        public ?\FHIRCodeableConcept $code = null,
         /** @var FHIRMedicationKnowledgeStatusCodesType|null status active | inactive | entered-in-error */
-        public ?FHIRMedicationKnowledgeStatusCodesType $status = null,
+        public ?\FHIRMedicationKnowledgeStatusCodesType $status = null,
         /** @var FHIRReference|null manufacturer Manufacturer of the item */
-        public ?FHIRReference $manufacturer = null,
+        public ?\FHIRReference $manufacturer = null,
         /** @var FHIRCodeableConcept|null doseForm powder | tablets | capsule + */
-        public ?FHIRCodeableConcept $doseForm = null,
+        public ?\FHIRCodeableConcept $doseForm = null,
         /** @var FHIRQuantity|null amount Amount of drug in package */
-        public ?FHIRQuantity $amount = null,
+        public ?\FHIRQuantity $amount = null,
         /** @var array<FHIRString|string> synonym Additional names for a medication */
         public array $synonym = [],
         /** @var array<FHIRMedicationKnowledgeRelatedMedicationKnowledge> relatedMedicationKnowledge Associated or related medication information */
@@ -70,7 +59,7 @@ class FHIRMedicationKnowledge extends FHIRDomainResource
         /** @var array<FHIRMedicationKnowledgeIngredient> ingredient Active or inactive ingredient */
         public array $ingredient = [],
         /** @var FHIRMarkdown|null preparationInstruction The instructions for preparing the medication */
-        public ?FHIRMarkdown $preparationInstruction = null,
+        public ?\FHIRMarkdown $preparationInstruction = null,
         /** @var array<FHIRCodeableConcept> intendedRoute The intended or approved route of administration */
         public array $intendedRoute = [],
         /** @var array<FHIRMedicationKnowledgeCost> cost The pricing of the medication */
@@ -82,7 +71,7 @@ class FHIRMedicationKnowledge extends FHIRDomainResource
         /** @var array<FHIRMedicationKnowledgeMedicineClassification> medicineClassification Categorization of the medication within a formulary or classification system */
         public array $medicineClassification = [],
         /** @var FHIRMedicationKnowledgePackaging|null packaging Details about packaged medications */
-        public ?FHIRMedicationKnowledgePackaging $packaging = null,
+        public ?\FHIRMedicationKnowledgePackaging $packaging = null,
         /** @var array<FHIRMedicationKnowledgeDrugCharacteristic> drugCharacteristic Specifies descriptive properties of the medicine */
         public array $drugCharacteristic = [],
         /** @var array<FHIRReference> contraindication Potential clinical issue with or between medication(s) */

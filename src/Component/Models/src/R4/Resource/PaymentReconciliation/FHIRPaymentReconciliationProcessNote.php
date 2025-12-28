@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
 
 /**
  * @description A note that describes or explains the processing in a human readable form.
@@ -22,9 +20,9 @@ class FHIRPaymentReconciliationProcessNote extends \Ardenexal\FHIRTools\Componen
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRNoteTypeType|null type display | print | printoper */
-        public ?FHIRNoteTypeType $type = null,
+        public ?\FHIRNoteTypeType $type = null,
         /** @var FHIRString|string|null text Note explanatory text */
-        public FHIRString|string|null $text = null,
+        public \FHIRString|string|null $text = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

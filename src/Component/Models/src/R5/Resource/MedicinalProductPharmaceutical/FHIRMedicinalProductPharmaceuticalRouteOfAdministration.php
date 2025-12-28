@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRDuration;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRRatio;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -31,17 +26,17 @@ class FHIRMedicinalProductPharmaceuticalRouteOfAdministration extends \Ardenexal
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null code Coded expression for the route */
         #[NotBlank]
-        public ?FHIRCodeableConcept $code = null,
+        public ?\FHIRCodeableConcept $code = null,
         /** @var FHIRQuantity|null firstDose The first dose (dose quantity) administered in humans can be specified, for a product under investigation, using a numerical value and its unit of measurement */
-        public ?FHIRQuantity $firstDose = null,
+        public ?\FHIRQuantity $firstDose = null,
         /** @var FHIRQuantity|null maxSingleDose The maximum single dose that can be administered as per the protocol of a clinical trial can be specified using a numerical value and its unit of measurement */
-        public ?FHIRQuantity $maxSingleDose = null,
+        public ?\FHIRQuantity $maxSingleDose = null,
         /** @var FHIRQuantity|null maxDosePerDay The maximum dose per day (maximum dose quantity to be administered in any one 24-h period) that can be administered as per the protocol referenced in the clinical trial authorisation */
-        public ?FHIRQuantity $maxDosePerDay = null,
+        public ?\FHIRQuantity $maxDosePerDay = null,
         /** @var FHIRRatio|null maxDosePerTreatmentPeriod The maximum dose per treatment period that can be administered as per the protocol referenced in the clinical trial authorisation */
-        public ?FHIRRatio $maxDosePerTreatmentPeriod = null,
+        public ?\FHIRRatio $maxDosePerTreatmentPeriod = null,
         /** @var FHIRDuration|null maxTreatmentPeriod The maximum treatment period during which an Investigational Medicinal Product can be administered as per the protocol referenced in the clinical trial authorisation */
-        public ?FHIRDuration $maxTreatmentPeriod = null,
+        public ?\FHIRDuration $maxTreatmentPeriod = null,
         /** @var array<FHIRMedicinalProductPharmaceuticalRouteOfAdministrationTargetSpecies> targetSpecies A species for which this route applies */
         public array $targetSpecies = [],
     ) {

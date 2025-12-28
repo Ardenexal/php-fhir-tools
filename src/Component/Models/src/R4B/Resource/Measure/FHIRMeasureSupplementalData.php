@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExpression;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,14 +21,14 @@ class FHIRMeasureSupplementalData extends \Ardenexal\FHIRTools\Component\Models\
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null code Meaning of the supplemental data */
-        public ?FHIRCodeableConcept $code = null,
+        public ?\FHIRCodeableConcept $code = null,
         /** @var array<FHIRCodeableConcept> usage supplemental-data | risk-adjustment-factor */
         public array $usage = [],
         /** @var FHIRString|string|null description The human readable description of this supplemental data */
-        public FHIRString|string|null $description = null,
+        public \FHIRString|string|null $description = null,
         /** @var FHIRExpression|null criteria Expression describing additional data to be reported */
         #[NotBlank]
-        public ?FHIRExpression $criteria = null,
+        public ?\FHIRExpression $criteria = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

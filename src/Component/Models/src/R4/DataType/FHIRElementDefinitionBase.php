@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUnsignedInt;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -22,13 +20,13 @@ class FHIRElementDefinitionBase extends FHIRElement
         public array $extension = [],
         /** @var FHIRString|string|null path Path that identifies the base element */
         #[NotBlank]
-        public FHIRString|string|null $path = null,
+        public \FHIRString|string|null $path = null,
         /** @var FHIRUnsignedInt|null min Min cardinality of the base element */
         #[NotBlank]
-        public ?FHIRUnsignedInt $min = null,
+        public ?\FHIRUnsignedInt $min = null,
         /** @var FHIRString|string|null max Max cardinality of the base element */
         #[NotBlank]
-        public FHIRString|string|null $max = null,
+        public \FHIRString|string|null $max = null,
     ) {
         parent::__construct($id, $extension);
     }

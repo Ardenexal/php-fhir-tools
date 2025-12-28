@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRId;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRMarkdown;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,13 +22,13 @@ class FHIRImplementationGuideDependsOn extends \Ardenexal\FHIRTools\Component\Mo
         public array $modifierExtension = [],
         /** @var FHIRCanonical|null uri Identity of the IG that this depends on */
         #[NotBlank]
-        public ?FHIRCanonical $uri = null,
+        public ?\FHIRCanonical $uri = null,
         /** @var FHIRId|null packageId NPM Package name for IG this depends on */
-        public ?FHIRId $packageId = null,
+        public ?\FHIRId $packageId = null,
         /** @var FHIRString|string|null version Version of the IG */
-        public FHIRString|string|null $version = null,
+        public \FHIRString|string|null $version = null,
         /** @var FHIRMarkdown|null reason Why dependency exists */
-        public ?FHIRMarkdown $reason = null,
+        public ?\FHIRMarkdown $reason = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

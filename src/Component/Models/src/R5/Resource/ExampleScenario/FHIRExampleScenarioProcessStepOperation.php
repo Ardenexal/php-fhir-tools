@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCoding;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRMarkdown;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,24 +21,24 @@ class FHIRExampleScenarioProcessStepOperation extends \Ardenexal\FHIRTools\Compo
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCoding|null type Kind of action */
-        public ?FHIRCoding $type = null,
+        public ?\FHIRCoding $type = null,
         /** @var FHIRString|string|null title Label for step */
         #[NotBlank]
-        public FHIRString|string|null $title = null,
+        public \FHIRString|string|null $title = null,
         /** @var FHIRString|string|null initiator Who starts the operation */
-        public FHIRString|string|null $initiator = null,
+        public \FHIRString|string|null $initiator = null,
         /** @var FHIRString|string|null receiver Who receives the operation */
-        public FHIRString|string|null $receiver = null,
+        public \FHIRString|string|null $receiver = null,
         /** @var FHIRMarkdown|null description Human-friendly description of the operation */
-        public ?FHIRMarkdown $description = null,
+        public ?\FHIRMarkdown $description = null,
         /** @var FHIRBoolean|null initiatorActive Initiator stays active? */
-        public ?FHIRBoolean $initiatorActive = null,
+        public ?\FHIRBoolean $initiatorActive = null,
         /** @var FHIRBoolean|null receiverActive Receiver stays active? */
-        public ?FHIRBoolean $receiverActive = null,
+        public ?\FHIRBoolean $receiverActive = null,
         /** @var FHIRExampleScenarioInstanceContainedInstance|null request Instance transmitted on invocation */
-        public ?FHIRExampleScenarioInstanceContainedInstance $request = null,
+        public ?\FHIRExampleScenarioInstanceContainedInstance $request = null,
         /** @var FHIRExampleScenarioInstanceContainedInstance|null response Instance transmitted on invocation response */
-        public ?FHIRExampleScenarioInstanceContainedInstance $response = null,
+        public ?\FHIRExampleScenarioInstanceContainedInstance $response = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBoolean;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,7 +22,7 @@ class FHIRTerminologyCapabilitiesTranslation extends \Ardenexal\FHIRTools\Compon
         public array $modifierExtension = [],
         /** @var FHIRBoolean|null needsMap Whether the client must identify the map */
         #[NotBlank]
-        public ?FHIRBoolean $needsMap = null,
+        public ?\FHIRBoolean $needsMap = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

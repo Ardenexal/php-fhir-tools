@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableReference;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRRatio;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,7 +22,7 @@ class FHIRNutritionProductIngredient extends \Ardenexal\FHIRTools\Component\Mode
         public array $modifierExtension = [],
         /** @var FHIRCodeableReference|null item The ingredient contained in the product */
         #[NotBlank]
-        public ?FHIRCodeableReference $item = null,
+        public ?\FHIRCodeableReference $item = null,
         /** @var array<FHIRRatio> amount The amount of ingredient that is in the product */
         public array $amount = [],
     ) {

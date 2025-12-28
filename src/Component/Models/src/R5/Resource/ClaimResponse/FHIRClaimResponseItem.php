@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRPositiveInt;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,13 +22,13 @@ class FHIRClaimResponseItem extends \Ardenexal\FHIRTools\Component\Models\R5\Dat
         public array $modifierExtension = [],
         /** @var FHIRPositiveInt|null itemSequence Claim item instance identifier */
         #[NotBlank]
-        public ?FHIRPositiveInt $itemSequence = null,
+        public ?\FHIRPositiveInt $itemSequence = null,
         /** @var array<FHIRIdentifier> traceNumber Number for tracking */
         public array $traceNumber = [],
         /** @var array<FHIRPositiveInt> noteNumber Applicable note numbers */
         public array $noteNumber = [],
         /** @var FHIRClaimResponseItemReviewOutcome|null reviewOutcome Adjudication results */
-        public ?FHIRClaimResponseItemReviewOutcome $reviewOutcome = null,
+        public ?\FHIRClaimResponseItemReviewOutcome $reviewOutcome = null,
         /** @var array<FHIRClaimResponseItemAdjudication> adjudication Adjudication details */
         public array $adjudication = [],
         /** @var array<FHIRClaimResponseItemDetail> detail Adjudication for claim details */

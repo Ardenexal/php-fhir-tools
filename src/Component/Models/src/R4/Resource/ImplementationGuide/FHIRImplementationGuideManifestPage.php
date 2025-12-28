@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,9 +22,9 @@ class FHIRImplementationGuideManifestPage extends \Ardenexal\FHIRTools\Component
         public array $modifierExtension = [],
         /** @var FHIRString|string|null name HTML page name */
         #[NotBlank]
-        public FHIRString|string|null $name = null,
+        public \FHIRString|string|null $name = null,
         /** @var FHIRString|string|null title Title of the page, for references */
-        public FHIRString|string|null $title = null,
+        public \FHIRString|string|null $title = null,
         /** @var array<FHIRString|string> anchor Anchor available on the page */
         public array $anchor = [],
     ) {

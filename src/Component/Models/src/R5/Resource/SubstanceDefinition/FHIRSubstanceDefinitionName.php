@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,13 +22,13 @@ class FHIRSubstanceDefinitionName extends \Ardenexal\FHIRTools\Component\Models\
         public array $modifierExtension = [],
         /** @var FHIRString|string|null name The actual name */
         #[NotBlank]
-        public FHIRString|string|null $name = null,
+        public \FHIRString|string|null $name = null,
         /** @var FHIRCodeableConcept|null type Name type e.g. 'systematic',  'scientific, 'brand' */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRCodeableConcept|null status The status of the name e.g. 'current', 'proposed' */
-        public ?FHIRCodeableConcept $status = null,
+        public ?\FHIRCodeableConcept $status = null,
         /** @var FHIRBoolean|null preferred If this is the preferred name for this substance */
-        public ?FHIRBoolean $preferred = null,
+        public ?\FHIRBoolean $preferred = null,
         /** @var array<FHIRCodeableConcept> language Human language that the name is written in */
         public array $language = [],
         /** @var array<FHIRCodeableConcept> domain The use context of this name e.g. as an active ingredient or as a food colour additive */

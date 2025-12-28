@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,9 +22,9 @@ class FHIRCoveragePaymentBy extends \Ardenexal\FHIRTools\Component\Models\R5\Dat
         public array $modifierExtension = [],
         /** @var FHIRReference|null party Parties performing self-payment */
         #[NotBlank]
-        public ?FHIRReference $party = null,
+        public ?\FHIRReference $party = null,
         /** @var FHIRString|string|null responsibility Party's responsibility */
-        public FHIRString|string|null $responsibility = null,
+        public \FHIRString|string|null $responsibility = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

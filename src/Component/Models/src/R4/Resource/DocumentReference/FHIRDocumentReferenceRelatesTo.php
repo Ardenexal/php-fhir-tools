@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,10 +22,10 @@ class FHIRDocumentReferenceRelatesTo extends \Ardenexal\FHIRTools\Component\Mode
         public array $modifierExtension = [],
         /** @var FHIRDocumentRelationshipTypeType|null code replaces | transforms | signs | appends */
         #[NotBlank]
-        public ?FHIRDocumentRelationshipTypeType $code = null,
+        public ?\FHIRDocumentRelationshipTypeType $code = null,
         /** @var FHIRReference|null target Target of the relationship */
         #[NotBlank]
-        public ?FHIRReference $target = null,
+        public ?\FHIRReference $target = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

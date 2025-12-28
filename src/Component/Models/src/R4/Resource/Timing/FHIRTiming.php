@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime;
 
 /**
  * @author HL7 FHIR Standard
@@ -29,9 +26,9 @@ class FHIRTiming extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRB
         /** @var array<FHIRDateTime> event When the event occurs */
         public array $event = [],
         /** @var FHIRTimingRepeat|null repeat When the event is to occur */
-        public ?FHIRTimingRepeat $repeat = null,
+        public ?\FHIRTimingRepeat $repeat = null,
         /** @var FHIRCodeableConcept|null code BID | TID | QID | AM | PM | QD | QOD | + */
-        public ?FHIRCodeableConcept $code = null,
+        public ?\FHIRCodeableConcept $code = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

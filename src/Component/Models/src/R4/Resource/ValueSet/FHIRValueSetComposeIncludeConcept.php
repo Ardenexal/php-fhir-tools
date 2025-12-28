@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCode;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,9 +22,9 @@ class FHIRValueSetComposeIncludeConcept extends \Ardenexal\FHIRTools\Component\M
         public array $modifierExtension = [],
         /** @var FHIRCode|null code Code or expression from system */
         #[NotBlank]
-        public ?FHIRCode $code = null,
+        public ?\FHIRCode $code = null,
         /** @var FHIRString|string|null display Text to display for this code for this value set in this valueset */
-        public FHIRString|string|null $display = null,
+        public \FHIRString|string|null $display = null,
         /** @var array<FHIRValueSetComposeIncludeConceptDesignation> designation Additional representations for this concept */
         public array $designation = [],
     ) {

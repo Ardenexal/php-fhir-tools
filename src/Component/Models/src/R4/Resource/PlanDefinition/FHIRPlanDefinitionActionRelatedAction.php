@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDuration;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRRange;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRId;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,12 +22,12 @@ class FHIRPlanDefinitionActionRelatedAction extends \Ardenexal\FHIRTools\Compone
         public array $modifierExtension = [],
         /** @var FHIRId|null actionId What action is this related to */
         #[NotBlank]
-        public ?FHIRId $actionId = null,
+        public ?\FHIRId $actionId = null,
         /** @var FHIRActionRelationshipTypeType|null relationship before-start | before | before-end | concurrent-with-start | concurrent | concurrent-with-end | after-start | after | after-end */
         #[NotBlank]
-        public ?FHIRActionRelationshipTypeType $relationship = null,
+        public ?\FHIRActionRelationshipTypeType $relationship = null,
         /** @var FHIRDuration|FHIRRange|null offsetX Time offset for the relationship */
-        public FHIRDuration|FHIRRange|null $offsetX = null,
+        public \FHIRDuration|\FHIRRange|null $offsetX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

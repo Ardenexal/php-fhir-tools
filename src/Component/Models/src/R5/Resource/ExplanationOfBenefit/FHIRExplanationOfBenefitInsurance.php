@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,10 +22,10 @@ class FHIRExplanationOfBenefitInsurance extends \Ardenexal\FHIRTools\Component\M
         public array $modifierExtension = [],
         /** @var FHIRBoolean|null focal Coverage to be used for adjudication */
         #[NotBlank]
-        public ?FHIRBoolean $focal = null,
+        public ?\FHIRBoolean $focal = null,
         /** @var FHIRReference|null coverage Insurance information */
         #[NotBlank]
-        public ?FHIRReference $coverage = null,
+        public ?\FHIRReference $coverage = null,
         /** @var array<FHIRString|string> preAuthRef Prior authorization reference number */
         public array $preAuthRef = [],
     ) {

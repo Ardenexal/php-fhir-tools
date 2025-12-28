@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRPositiveInt;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,10 +21,10 @@ class FHIRInvoiceLineItem extends \Ardenexal\FHIRTools\Component\Models\R4\DataT
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRPositiveInt|null sequence Sequence number of line item */
-        public ?FHIRPositiveInt $sequence = null,
+        public ?\FHIRPositiveInt $sequence = null,
         /** @var FHIRReference|FHIRCodeableConcept|null chargeItemX Reference to ChargeItem containing details of this line item or an inline billing code */
         #[NotBlank]
-        public FHIRReference|FHIRCodeableConcept|null $chargeItemX = null,
+        public \FHIRReference|\FHIRCodeableConcept|null $chargeItemX = null,
         /** @var array<FHIRInvoiceLineItemPriceComponent> priceComponent Components of total line item price */
         public array $priceComponent = [],
     ) {

@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRRatio;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,10 +21,10 @@ class FHIRSubstanceIngredient extends \Ardenexal\FHIRTools\Component\Models\R4B\
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRRatio|null quantity Optional amount (concentration) */
-        public ?FHIRRatio $quantity = null,
+        public ?\FHIRRatio $quantity = null,
         /** @var FHIRCodeableConcept|FHIRReference|null substanceX A component of the substance */
         #[NotBlank]
-        public FHIRCodeableConcept|FHIRReference|null $substanceX = null,
+        public \FHIRCodeableConcept|\FHIRReference|null $substanceX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,12 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRId;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRMarkdown;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRConstraintSeverityType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,21 +20,21 @@ class FHIRElementDefinitionConstraint extends FHIRElement
         public array $extension = [],
         /** @var FHIRId|null key Target of 'condition' reference above */
         #[NotBlank]
-        public ?FHIRId $key = null,
+        public ?\FHIRId $key = null,
         /** @var FHIRMarkdown|null requirements Why this constraint is necessary or appropriate */
-        public ?FHIRMarkdown $requirements = null,
+        public ?\FHIRMarkdown $requirements = null,
         /** @var FHIRConstraintSeverityType|null severity error | warning */
         #[NotBlank]
-        public ?FHIRConstraintSeverityType $severity = null,
+        public ?\FHIRConstraintSeverityType $severity = null,
         /** @var FHIRBoolean|null suppress Suppress warning or hint in profile */
-        public ?FHIRBoolean $suppress = null,
+        public ?\FHIRBoolean $suppress = null,
         /** @var FHIRString|string|null human Human description of constraint */
         #[NotBlank]
-        public FHIRString|string|null $human = null,
+        public \FHIRString|string|null $human = null,
         /** @var FHIRString|string|null expression FHIRPath expression of constraint */
-        public FHIRString|string|null $expression = null,
+        public \FHIRString|string|null $expression = null,
         /** @var FHIRCanonical|null source Reference to original source of constraint */
-        public ?FHIRCanonical $source = null,
+        public ?\FHIRCanonical $source = null,
     ) {
         parent::__construct($id, $extension);
     }

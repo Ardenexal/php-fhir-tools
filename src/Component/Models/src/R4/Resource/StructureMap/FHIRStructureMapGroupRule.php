@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRId;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,7 +22,7 @@ class FHIRStructureMapGroupRule extends \Ardenexal\FHIRTools\Component\Models\R4
         public array $modifierExtension = [],
         /** @var FHIRId|null name Name of the rule for internal references */
         #[NotBlank]
-        public ?FHIRId $name = null,
+        public ?\FHIRId $name = null,
         /** @var array<FHIRStructureMapGroupRuleSource> source Source inputs to the mapping */
         public array $source = [],
         /** @var array<FHIRStructureMapGroupRuleTarget> target Content to create because of this mapping rule */
@@ -35,7 +32,7 @@ class FHIRStructureMapGroupRule extends \Ardenexal\FHIRTools\Component\Models\R4
         /** @var array<FHIRStructureMapGroupRuleDependent> dependent Which other rules to apply in the context of this rule */
         public array $dependent = [],
         /** @var FHIRString|string|null documentation Documentation for this instance of data */
-        public FHIRString|string|null $documentation = null,
+        public \FHIRString|string|null $documentation = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

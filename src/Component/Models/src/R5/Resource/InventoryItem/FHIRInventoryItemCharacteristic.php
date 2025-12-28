@@ -5,20 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRAddress;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRAnnotation;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRDuration;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRRange;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRRatio;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDecimal;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInteger;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUrl;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -36,10 +22,10 @@ class FHIRInventoryItemCharacteristic extends \Ardenexal\FHIRTools\Component\Mod
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null characteristicType The characteristic that is being defined */
         #[NotBlank]
-        public ?FHIRCodeableConcept $characteristicType = null,
+        public ?\FHIRCodeableConcept $characteristicType = null,
         /** @var FHIRString|string|FHIRInteger|FHIRDecimal|FHIRBoolean|FHIRUrl|FHIRDateTime|FHIRQuantity|FHIRRange|FHIRRatio|FHIRAnnotation|FHIRAddress|FHIRDuration|FHIRCodeableConcept|null valueX The value of the attribute */
         #[NotBlank]
-        public FHIRString|string|FHIRInteger|FHIRDecimal|FHIRBoolean|FHIRUrl|FHIRDateTime|FHIRQuantity|FHIRRange|FHIRRatio|FHIRAnnotation|FHIRAddress|FHIRDuration|FHIRCodeableConcept|null $valueX = null,
+        public \FHIRString|string|\FHIRInteger|\FHIRDecimal|\FHIRBoolean|\FHIRUrl|\FHIRDateTime|\FHIRQuantity|\FHIRRange|\FHIRRatio|\FHIRAnnotation|\FHIRAddress|\FHIRDuration|\FHIRCodeableConcept|null $valueX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

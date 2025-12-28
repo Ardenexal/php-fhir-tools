@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInteger;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 
 /**
  * @description Changes in sequence from the starting sequence.
@@ -23,13 +20,13 @@ class FHIRMolecularSequenceRelativeEdit extends \Ardenexal\FHIRTools\Component\M
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRInteger|null start Start position of the edit on the starting sequence */
-        public ?FHIRInteger $start = null,
+        public ?\FHIRInteger $start = null,
         /** @var FHIRInteger|null end End position of the edit on the starting sequence */
-        public ?FHIRInteger $end = null,
+        public ?\FHIRInteger $end = null,
         /** @var FHIRString|string|null replacementSequence Allele that was observed */
-        public FHIRString|string|null $replacementSequence = null,
+        public \FHIRString|string|null $replacementSequence = null,
         /** @var FHIRString|string|null replacedSequence Allele in the starting sequence */
-        public FHIRString|string|null $replacedSequence = null,
+        public \FHIRString|string|null $replacedSequence = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

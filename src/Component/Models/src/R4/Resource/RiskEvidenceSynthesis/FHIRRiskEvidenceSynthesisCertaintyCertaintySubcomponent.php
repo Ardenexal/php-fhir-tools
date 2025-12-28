@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRAnnotation;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
 
 /**
  * @description A description of a component of the overall certainty.
@@ -27,7 +24,7 @@ class FHIRRiskEvidenceSynthesisCertaintyCertaintySubcomponent extends \Ardenexal
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null type Type of subcomponent of certainty rating */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var array<FHIRCodeableConcept> rating Subcomponent certainty rating */
         public array $rating = [],
         /** @var array<FHIRAnnotation> note Used for footnotes or explanatory notes */

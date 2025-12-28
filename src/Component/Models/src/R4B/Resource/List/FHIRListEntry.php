@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,14 +21,14 @@ class FHIRListEntry extends \Ardenexal\FHIRTools\Component\Models\R4B\DataType\F
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null flag Status/Workflow information about this item */
-        public ?FHIRCodeableConcept $flag = null,
+        public ?\FHIRCodeableConcept $flag = null,
         /** @var FHIRBoolean|null deleted If this item is actually marked as deleted */
-        public ?FHIRBoolean $deleted = null,
+        public ?\FHIRBoolean $deleted = null,
         /** @var FHIRDateTime|null date When item added to list */
-        public ?FHIRDateTime $date = null,
+        public ?\FHIRDateTime $date = null,
         /** @var FHIRReference|null item Actual entry */
         #[NotBlank]
-        public ?FHIRReference $item = null,
+        public ?\FHIRReference $item = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,10 +22,10 @@ class FHIREpisodeOfCareStatusHistory extends \Ardenexal\FHIRTools\Component\Mode
         public array $modifierExtension = [],
         /** @var FHIREpisodeOfCareStatusType|null status planned | waitlist | active | onhold | finished | cancelled | entered-in-error */
         #[NotBlank]
-        public ?FHIREpisodeOfCareStatusType $status = null,
+        public ?\FHIREpisodeOfCareStatusType $status = null,
         /** @var FHIRPeriod|null period Duration the EpisodeOfCare was in the specified status */
         #[NotBlank]
-        public ?FHIRPeriod $period = null,
+        public ?\FHIRPeriod $period = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

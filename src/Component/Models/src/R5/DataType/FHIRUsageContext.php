@@ -24,10 +24,10 @@ class FHIRUsageContext extends FHIRDataType
         public array $extension = [],
         /** @var FHIRCoding|null code Type of context being specified */
         #[NotBlank]
-        public ?FHIRCoding $code = null,
+        public ?\FHIRCoding $code = null,
         /** @var FHIRCodeableConcept|FHIRQuantity|FHIRRange|FHIRReference|null valueX Value that defines the context */
         #[NotBlank]
-        public FHIRCodeableConcept|FHIRQuantity|FHIRRange|FHIRReference|null $valueX = null,
+        public \FHIRCodeableConcept|\FHIRQuantity|\FHIRRange|\FHIRReference|null $valueX = null,
     ) {
         parent::__construct($id, $extension);
     }

@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCode;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,13 +22,13 @@ class FHIRConceptMapGroupUnmapped extends \Ardenexal\FHIRTools\Component\Models\
         public array $modifierExtension = [],
         /** @var FHIRConceptMapGroupUnmappedModeType|null mode provided | fixed | other-map */
         #[NotBlank]
-        public ?FHIRConceptMapGroupUnmappedModeType $mode = null,
+        public ?\FHIRConceptMapGroupUnmappedModeType $mode = null,
         /** @var FHIRCode|null code Fixed code when mode = fixed */
-        public ?FHIRCode $code = null,
+        public ?\FHIRCode $code = null,
         /** @var FHIRString|string|null display Display for the code */
-        public FHIRString|string|null $display = null,
+        public \FHIRString|string|null $display = null,
         /** @var FHIRCanonical|null url canonical reference to an additional ConceptMap to use for mapping if the source concept is unmapped */
-        public ?FHIRCanonical $url = null,
+        public ?\FHIRCanonical $url = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

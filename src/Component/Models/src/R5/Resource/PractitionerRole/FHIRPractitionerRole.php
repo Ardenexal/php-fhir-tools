@@ -4,19 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRAvailability;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtendedContactDetail;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRMeta;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRNarrative;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
-
 /**
  * @author Health Level Seven International (Patient Administration)
  *
@@ -24,7 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
  *
  * @description A specific set of Roles/Locations/specialties/services that a practitioner may perform at an organization for a period of time.
  */
-#[FhirResource(
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(
     type: 'PractitionerRole',
     version: '5.0.0',
     url: 'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
@@ -36,14 +23,14 @@ class FHIRPractitionerRole extends FHIRDomainResource
         /** @var string|null id Logical id of this artifact */
         public ?string $id = null,
         /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?FHIRMeta $meta = null,
+        public ?\FHIRMeta $meta = null,
         /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?FHIRUri $implicitRules = null,
+        public ?\FHIRUri $implicitRules = null,
         /** @var FHIRAllLanguagesType|null language Language of the resource content */
-        public ?FHIRAllLanguagesType $language = null,
+        public ?\FHIRAllLanguagesType $language = null,
         /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
-        public ?FHIRNarrative $text = null,
-        /** @var array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRResource> contained Contained, inline Resources */
+        public ?\FHIRNarrative $text = null,
+        /** @var array<FHIRResource> contained Contained, inline Resources */
         public array $contained = [],
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
@@ -52,13 +39,13 @@ class FHIRPractitionerRole extends FHIRDomainResource
         /** @var array<FHIRIdentifier> identifier Identifiers for a role/location */
         public array $identifier = [],
         /** @var FHIRBoolean|null active Whether this practitioner role record is in active use */
-        public ?FHIRBoolean $active = null,
+        public ?\FHIRBoolean $active = null,
         /** @var FHIRPeriod|null period The period during which the practitioner is authorized to perform in these role(s) */
-        public ?FHIRPeriod $period = null,
+        public ?\FHIRPeriod $period = null,
         /** @var FHIRReference|null practitioner Practitioner that provides services for the organization */
-        public ?FHIRReference $practitioner = null,
+        public ?\FHIRReference $practitioner = null,
         /** @var FHIRReference|null organization Organization where the roles are available */
-        public ?FHIRReference $organization = null,
+        public ?\FHIRReference $organization = null,
         /** @var array<FHIRCodeableConcept> code Roles which this practitioner may perform */
         public array $code = [],
         /** @var array<FHIRCodeableConcept> specialty Specific specialty of the practitioner */

@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRInteger;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
 
 /**
  * @description Todo.
@@ -24,11 +20,11 @@ class FHIRSubstancePolymerRepeat extends \Ardenexal\FHIRTools\Component\Models\R
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRInteger|null numberOfUnits Todo */
-        public ?FHIRInteger $numberOfUnits = null,
+        public ?\FHIRInteger $numberOfUnits = null,
         /** @var FHIRString|string|null averageMolecularFormula Todo */
-        public FHIRString|string|null $averageMolecularFormula = null,
+        public \FHIRString|string|null $averageMolecularFormula = null,
         /** @var FHIRCodeableConcept|null repeatUnitAmountType Todo */
-        public ?FHIRCodeableConcept $repeatUnitAmountType = null,
+        public ?\FHIRCodeableConcept $repeatUnitAmountType = null,
         /** @var array<FHIRSubstancePolymerRepeatRepeatUnit> repeatUnit Todo */
         public array $repeatUnit = [],
     ) {

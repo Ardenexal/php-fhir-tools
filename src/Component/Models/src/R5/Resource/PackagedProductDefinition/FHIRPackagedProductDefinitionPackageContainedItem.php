@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -29,9 +26,9 @@ class FHIRPackagedProductDefinitionPackageContainedItem extends \Ardenexal\FHIRT
         public array $modifierExtension = [],
         /** @var FHIRCodeableReference|null item The actual item(s) of medication, as manufactured, or a device, or other medically related item (food, biologicals, raw materials, medical fluids, gases etc.), as contained in the package */
         #[NotBlank]
-        public ?FHIRCodeableReference $item = null,
+        public ?\FHIRCodeableReference $item = null,
         /** @var FHIRQuantity|null amount The number of this type of item within this packaging */
-        public ?FHIRQuantity $amount = null,
+        public ?\FHIRQuantity $amount = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

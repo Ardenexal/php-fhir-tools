@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRInteger;
 
 /**
  * @description Structural variant inner.
@@ -22,9 +20,9 @@ class FHIRMolecularSequenceStructureVariantInner extends \Ardenexal\FHIRTools\Co
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRInteger|null start Structural variant inner start */
-        public ?FHIRInteger $start = null,
+        public ?\FHIRInteger $start = null,
         /** @var FHIRInteger|null end Structural variant inner end */
-        public ?FHIRInteger $end = null,
+        public ?\FHIRInteger $end = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRId;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInstant;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
 
 /**
  * @author HL7 FHIR Standard
@@ -26,11 +22,11 @@ class FHIRMeta extends FHIRDataType
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
         /** @var FHIRId|null versionId Version specific identifier */
-        public ?FHIRId $versionId = null,
+        public ?\FHIRId $versionId = null,
         /** @var FHIRInstant|null lastUpdated When the resource version last changed */
-        public ?FHIRInstant $lastUpdated = null,
+        public ?\FHIRInstant $lastUpdated = null,
         /** @var FHIRUri|null source Identifies where the resource comes from */
-        public ?FHIRUri $source = null,
+        public ?\FHIRUri $source = null,
         /** @var array<FHIRCanonical> profile Profiles this resource claims to conform to */
         public array $profile = [],
         /** @var array<FHIRCoding> security Security Labels applied to this resource */

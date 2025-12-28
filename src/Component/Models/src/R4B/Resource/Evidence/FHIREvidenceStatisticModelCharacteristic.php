@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,9 +22,9 @@ class FHIREvidenceStatisticModelCharacteristic extends \Ardenexal\FHIRTools\Comp
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null code Model specification */
         #[NotBlank]
-        public ?FHIRCodeableConcept $code = null,
+        public ?\FHIRCodeableConcept $code = null,
         /** @var FHIRQuantity|null value Numerical value to complete model specification */
-        public ?FHIRQuantity $value = null,
+        public ?\FHIRQuantity $value = null,
         /** @var array<FHIREvidenceStatisticModelCharacteristicVariable> variable A variable adjusted for in the adjusted analysis */
         public array $variable = [],
         /** @var array<FHIREvidenceStatisticAttributeEstimate> attributeEstimate An attribute of the statistic used as a model characteristic */

@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRContactPoint;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUrl;
 
 /**
  * @description The source application from which this message originated.
@@ -25,15 +20,15 @@ class FHIRMessageHeaderSource extends \Ardenexal\FHIRTools\Component\Models\R5\D
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRUrl|FHIRReference|null endpointX Actual source address or Endpoint resource */
-        public FHIRUrl|FHIRReference|null $endpointX = null,
+        public \FHIRUrl|\FHIRReference|null $endpointX = null,
         /** @var FHIRString|string|null name Name of system */
-        public FHIRString|string|null $name = null,
+        public \FHIRString|string|null $name = null,
         /** @var FHIRString|string|null software Name of software running the system */
-        public FHIRString|string|null $software = null,
+        public \FHIRString|string|null $software = null,
         /** @var FHIRString|string|null version Version of software running */
-        public FHIRString|string|null $version = null,
+        public \FHIRString|string|null $version = null,
         /** @var FHIRContactPoint|null contact Human contact for problems */
-        public ?FHIRContactPoint $contact = null,
+        public ?\FHIRContactPoint $contact = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

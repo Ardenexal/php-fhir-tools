@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInteger;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,16 +21,16 @@ class FHIRValueSetExpansion extends \Ardenexal\FHIRTools\Component\Models\R5\Dat
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRUri|null identifier Identifies the value set expansion (business identifier) */
-        public ?FHIRUri $identifier = null,
+        public ?\FHIRUri $identifier = null,
         /** @var FHIRUri|null next Opaque urls for paging through expansion results */
-        public ?FHIRUri $next = null,
+        public ?\FHIRUri $next = null,
         /** @var FHIRDateTime|null timestamp Time ValueSet expansion happened */
         #[NotBlank]
-        public ?FHIRDateTime $timestamp = null,
+        public ?\FHIRDateTime $timestamp = null,
         /** @var FHIRInteger|null total Total number of codes in the expansion */
-        public ?FHIRInteger $total = null,
+        public ?\FHIRInteger $total = null,
         /** @var FHIRInteger|null offset Offset at which this resource starts */
-        public ?FHIRInteger $offset = null,
+        public ?\FHIRInteger $offset = null,
         /** @var array<FHIRValueSetExpansionParameter> parameter Parameter that controlled the expansion process */
         public array $parameter = [],
         /** @var array<FHIRValueSetExpansionProperty> property Additional information supplied about each concept */

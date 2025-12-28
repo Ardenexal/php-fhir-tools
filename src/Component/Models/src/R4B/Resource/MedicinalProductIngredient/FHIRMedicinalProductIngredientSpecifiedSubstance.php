@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -28,12 +26,12 @@ class FHIRMedicinalProductIngredientSpecifiedSubstance extends \Ardenexal\FHIRTo
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null code The specified substance */
         #[NotBlank]
-        public ?FHIRCodeableConcept $code = null,
+        public ?\FHIRCodeableConcept $code = null,
         /** @var FHIRCodeableConcept|null group The group of specified substance, e.g. group 1 to 4 */
         #[NotBlank]
-        public ?FHIRCodeableConcept $group = null,
+        public ?\FHIRCodeableConcept $group = null,
         /** @var FHIRCodeableConcept|null confidentiality Confidentiality level of the specified substance as the ingredient */
-        public ?FHIRCodeableConcept $confidentiality = null,
+        public ?\FHIRCodeableConcept $confidentiality = null,
         /** @var array<FHIRMedicinalProductIngredientSpecifiedSubstanceStrength> strength Quantity of the substance or specified substance present in the manufactured item or pharmaceutical product */
         public array $strength = [],
     ) {

@@ -5,13 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExpression;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -28,20 +21,20 @@ class FHIREvidenceVariableCharacteristic extends \Ardenexal\FHIRTools\Component\
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRString|string|null description Natural language description of the characteristic */
-        public FHIRString|string|null $description = null,
+        public \FHIRString|string|null $description = null,
         /** @var FHIRReference|FHIRCanonical|FHIRCodeableConcept|FHIRExpression|null definitionX What code or expression defines members? */
         #[NotBlank]
-        public FHIRReference|FHIRCanonical|FHIRCodeableConcept|FHIRExpression|null $definitionX = null,
+        public \FHIRReference|\FHIRCanonical|\FHIRCodeableConcept|\FHIRExpression|null $definitionX = null,
         /** @var FHIRCodeableConcept|null method Method used for describing characteristic */
-        public ?FHIRCodeableConcept $method = null,
+        public ?\FHIRCodeableConcept $method = null,
         /** @var FHIRReference|null device Device used for determining characteristic */
-        public ?FHIRReference $device = null,
+        public ?\FHIRReference $device = null,
         /** @var FHIRBoolean|null exclude Whether the characteristic includes or excludes members */
-        public ?FHIRBoolean $exclude = null,
+        public ?\FHIRBoolean $exclude = null,
         /** @var FHIREvidenceVariableCharacteristicTimeFromStart|null timeFromStart Observation time from study start */
-        public ?FHIREvidenceVariableCharacteristicTimeFromStart $timeFromStart = null,
+        public ?\FHIREvidenceVariableCharacteristicTimeFromStart $timeFromStart = null,
         /** @var FHIRGroupMeasureType|null groupMeasure mean | median | mean-of-mean | mean-of-median | median-of-mean | median-of-median */
-        public ?FHIRGroupMeasureType $groupMeasure = null,
+        public ?\FHIRGroupMeasureType $groupMeasure = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

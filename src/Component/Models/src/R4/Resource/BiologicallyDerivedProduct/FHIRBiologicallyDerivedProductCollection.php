@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime;
 
 /**
  * @description How this product was collected.
@@ -24,11 +20,11 @@ class FHIRBiologicallyDerivedProductCollection extends \Ardenexal\FHIRTools\Comp
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRReference|null collector Individual performing collection */
-        public ?FHIRReference $collector = null,
+        public ?\FHIRReference $collector = null,
         /** @var FHIRReference|null source Who is product from */
-        public ?FHIRReference $source = null,
+        public ?\FHIRReference $source = null,
         /** @var FHIRDateTime|FHIRPeriod|null collectedX Time of product collection */
-        public FHIRDateTime|FHIRPeriod|null $collectedX = null,
+        public \FHIRDateTime|\FHIRPeriod|null $collectedX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

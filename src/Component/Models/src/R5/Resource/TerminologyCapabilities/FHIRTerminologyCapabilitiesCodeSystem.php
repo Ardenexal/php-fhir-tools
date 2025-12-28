@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCanonical;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,14 +21,14 @@ class FHIRTerminologyCapabilitiesCodeSystem extends \Ardenexal\FHIRTools\Compone
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCanonical|null uri Canonical identifier for the code system, represented as a URI */
-        public ?FHIRCanonical $uri = null,
+        public ?\FHIRCanonical $uri = null,
         /** @var array<FHIRTerminologyCapabilitiesCodeSystemVersion> version Version of Code System supported */
         public array $version = [],
         /** @var FHIRCodeSystemContentModeType|null content not-present | example | fragment | complete | supplement */
         #[NotBlank]
-        public ?FHIRCodeSystemContentModeType $content = null,
+        public ?\FHIRCodeSystemContentModeType $content = null,
         /** @var FHIRBoolean|null subsumption Whether subsumption is supported */
-        public ?FHIRBoolean $subsumption = null,
+        public ?\FHIRBoolean $subsumption = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

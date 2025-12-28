@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
 
 /**
  * @description A test executed from the test script.
@@ -22,9 +20,9 @@ class FHIRTestReportTest extends \Ardenexal\FHIRTools\Component\Models\R4\DataTy
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRString|string|null name Tracking/logging name of this test */
-        public FHIRString|string|null $name = null,
+        public \FHIRString|string|null $name = null,
         /** @var FHIRString|string|null description Tracking/reporting short description of the test */
-        public FHIRString|string|null $description = null,
+        public \FHIRString|string|null $description = null,
         /** @var array<FHIRTestReportTestAction> action A test operation or assert that was performed */
         public array $action = [],
     ) {

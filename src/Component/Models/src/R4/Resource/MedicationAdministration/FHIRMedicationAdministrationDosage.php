@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRRatio;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
 
 /**
  * @description Describes the medication dosage information details e.g. dose, rate, site, route, etc.
@@ -25,17 +20,17 @@ class FHIRMedicationAdministrationDosage extends \Ardenexal\FHIRTools\Component\
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRString|string|null text Free text dosage instructions e.g. SIG */
-        public FHIRString|string|null $text = null,
+        public \FHIRString|string|null $text = null,
         /** @var FHIRCodeableConcept|null site Body site administered to */
-        public ?FHIRCodeableConcept $site = null,
+        public ?\FHIRCodeableConcept $site = null,
         /** @var FHIRCodeableConcept|null route Path of substance into body */
-        public ?FHIRCodeableConcept $route = null,
+        public ?\FHIRCodeableConcept $route = null,
         /** @var FHIRCodeableConcept|null method How drug was administered */
-        public ?FHIRCodeableConcept $method = null,
+        public ?\FHIRCodeableConcept $method = null,
         /** @var FHIRQuantity|null dose Amount of medication per dose */
-        public ?FHIRQuantity $dose = null,
+        public ?\FHIRQuantity $dose = null,
         /** @var FHIRRatio|FHIRQuantity|null rateX Dose quantity per unit of time */
-        public FHIRRatio|FHIRQuantity|null $rateX = null,
+        public \FHIRRatio|\FHIRQuantity|null $rateX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

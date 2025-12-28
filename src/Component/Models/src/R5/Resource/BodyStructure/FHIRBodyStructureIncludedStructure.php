@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,9 +22,9 @@ class FHIRBodyStructureIncludedStructure extends \Ardenexal\FHIRTools\Component\
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null structure Code that represents the included structure */
         #[NotBlank]
-        public ?FHIRCodeableConcept $structure = null,
+        public ?\FHIRCodeableConcept $structure = null,
         /** @var FHIRCodeableConcept|null laterality Code that represents the included structure laterality */
-        public ?FHIRCodeableConcept $laterality = null,
+        public ?\FHIRCodeableConcept $laterality = null,
         /** @var array<FHIRBodyStructureIncludedStructureBodyLandmarkOrientation> bodyLandmarkOrientation Landmark relative location */
         public array $bodyLandmarkOrientation = [],
         /** @var array<FHIRReference> spatialReference Cartesian reference for structure */

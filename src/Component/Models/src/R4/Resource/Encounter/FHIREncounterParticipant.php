@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
 
 /**
  * @description The list of people responsible for providing the service.
@@ -26,9 +22,9 @@ class FHIREncounterParticipant extends \Ardenexal\FHIRTools\Component\Models\R4\
         /** @var array<FHIRCodeableConcept> type Role of participant in encounter */
         public array $type = [],
         /** @var FHIRPeriod|null period Period of time during the encounter that the participant participated */
-        public ?FHIRPeriod $period = null,
+        public ?\FHIRPeriod $period = null,
         /** @var FHIRReference|null individual Persons involved in the encounter other than the patient */
-        public ?FHIRReference $individual = null,
+        public ?\FHIRReference $individual = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

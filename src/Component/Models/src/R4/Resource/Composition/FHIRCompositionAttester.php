@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,11 +22,11 @@ class FHIRCompositionAttester extends \Ardenexal\FHIRTools\Component\Models\R4\D
         public array $modifierExtension = [],
         /** @var FHIRCompositionAttestationModeType|null mode personal | professional | legal | official */
         #[NotBlank]
-        public ?FHIRCompositionAttestationModeType $mode = null,
+        public ?\FHIRCompositionAttestationModeType $mode = null,
         /** @var FHIRDateTime|null time When the composition was attested */
-        public ?FHIRDateTime $time = null,
+        public ?\FHIRDateTime $time = null,
         /** @var FHIRReference|null party Who attested the composition */
-        public ?FHIRReference $party = null,
+        public ?\FHIRReference $party = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

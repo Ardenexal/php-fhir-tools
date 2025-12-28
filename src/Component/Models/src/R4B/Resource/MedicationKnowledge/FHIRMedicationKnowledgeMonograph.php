@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
 
 /**
  * @description Associated documentation about the medication.
@@ -23,9 +20,9 @@ class FHIRMedicationKnowledgeMonograph extends \Ardenexal\FHIRTools\Component\Mo
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null type The category of medication document */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRReference|null source Associated documentation about the medication */
-        public ?FHIRReference $source = null,
+        public ?\FHIRReference $source = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -18,9 +18,9 @@ class FHIRSubstanceAmountReferenceRange extends FHIRElement
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
         /** @var FHIRQuantity|null lowLimit Lower limit possible or expected */
-        public ?FHIRQuantity $lowLimit = null,
+        public ?\FHIRQuantity $lowLimit = null,
         /** @var FHIRQuantity|null highLimit Upper limit possible or expected */
-        public ?FHIRQuantity $highLimit = null,
+        public ?\FHIRQuantity $highLimit = null,
     ) {
         parent::__construct($id, $extension);
     }

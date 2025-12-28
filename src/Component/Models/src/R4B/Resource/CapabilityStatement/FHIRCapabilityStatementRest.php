@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRMarkdown;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,11 +22,11 @@ class FHIRCapabilityStatementRest extends \Ardenexal\FHIRTools\Component\Models\
         public array $modifierExtension = [],
         /** @var FHIRRestfulCapabilityModeType|null mode client | server */
         #[NotBlank]
-        public ?FHIRRestfulCapabilityModeType $mode = null,
+        public ?\FHIRRestfulCapabilityModeType $mode = null,
         /** @var FHIRMarkdown|null documentation General description of implementation */
-        public ?FHIRMarkdown $documentation = null,
+        public ?\FHIRMarkdown $documentation = null,
         /** @var FHIRCapabilityStatementRestSecurity|null security Information about security of implementation */
-        public ?FHIRCapabilityStatementRestSecurity $security = null,
+        public ?\FHIRCapabilityStatementRestSecurity $security = null,
         /** @var array<FHIRCapabilityStatementRestResource> resource Resource served on the REST interface */
         public array $resource = [],
         /** @var array<FHIRCapabilityStatementRestInteraction> interaction What operations are supported? */

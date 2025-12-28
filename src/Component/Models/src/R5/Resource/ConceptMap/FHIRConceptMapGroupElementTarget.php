@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCode;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,16 +21,16 @@ class FHIRConceptMapGroupElementTarget extends \Ardenexal\FHIRTools\Component\Mo
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCode|null code Code that identifies the target element */
-        public ?FHIRCode $code = null,
+        public ?\FHIRCode $code = null,
         /** @var FHIRString|string|null display Display for the code */
-        public FHIRString|string|null $display = null,
+        public \FHIRString|string|null $display = null,
         /** @var FHIRCanonical|null valueSet Identifies the set of target concepts */
-        public ?FHIRCanonical $valueSet = null,
+        public ?\FHIRCanonical $valueSet = null,
         /** @var FHIRConceptMapRelationshipType|null relationship related-to | equivalent | source-is-narrower-than-target | source-is-broader-than-target | not-related-to */
         #[NotBlank]
-        public ?FHIRConceptMapRelationshipType $relationship = null,
+        public ?\FHIRConceptMapRelationshipType $relationship = null,
         /** @var FHIRString|string|null comment Description of status/issues in mapping */
-        public FHIRString|string|null $comment = null,
+        public \FHIRString|string|null $comment = null,
         /** @var array<FHIRConceptMapGroupElementTargetProperty> property Property value for the source -> target mapping */
         public array $property = [],
         /** @var array<FHIRConceptMapGroupElementTargetDependsOn> dependsOn Other properties required for this mapping */

@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUrl;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,14 +21,14 @@ class FHIRMessageHeaderDestination extends \Ardenexal\FHIRTools\Component\Models
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRString|string|null name Name of system */
-        public FHIRString|string|null $name = null,
+        public \FHIRString|string|null $name = null,
         /** @var FHIRReference|null target Particular delivery destination within the destination */
-        public ?FHIRReference $target = null,
+        public ?\FHIRReference $target = null,
         /** @var FHIRUrl|null endpoint Actual destination address or id */
         #[NotBlank]
-        public ?FHIRUrl $endpoint = null,
+        public ?\FHIRUrl $endpoint = null,
         /** @var FHIRReference|null receiver Intended "real-world" recipient for the data */
-        public ?FHIRReference $receiver = null,
+        public ?\FHIRReference $receiver = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

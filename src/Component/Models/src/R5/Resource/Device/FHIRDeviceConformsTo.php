@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,12 +21,12 @@ class FHIRDeviceConformsTo extends \Ardenexal\FHIRTools\Component\Models\R5\Data
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null category Describes the common type of the standard, specification, or formal guidance.  communication | performance | measurement */
-        public ?FHIRCodeableConcept $category = null,
+        public ?\FHIRCodeableConcept $category = null,
         /** @var FHIRCodeableConcept|null specification Identifies the standard, specification, or formal guidance that the device adheres to */
         #[NotBlank]
-        public ?FHIRCodeableConcept $specification = null,
+        public ?\FHIRCodeableConcept $specification = null,
         /** @var FHIRString|string|null version Specific form or variant of the standard */
-        public FHIRString|string|null $version = null,
+        public \FHIRString|string|null $version = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

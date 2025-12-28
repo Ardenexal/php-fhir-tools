@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
 
 /**
  * @description The clinical service, such as a colonoscopy or an appendectomy, being documented.
@@ -26,7 +22,7 @@ class FHIRCompositionEvent extends \Ardenexal\FHIRTools\Component\Models\R4\Data
         /** @var array<FHIRCodeableConcept> code Code(s) that apply to the event being documented */
         public array $code = [],
         /** @var FHIRPeriod|null period The period covered by the documentation */
-        public ?FHIRPeriod $period = null,
+        public ?\FHIRPeriod $period = null,
         /** @var array<FHIRReference> detail The event(s) being documented */
         public array $detail = [],
     ) {

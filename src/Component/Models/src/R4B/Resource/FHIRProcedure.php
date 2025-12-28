@@ -4,21 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRAge;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRAnnotation;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMeta;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRNarrative;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRRange;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -28,21 +13,21 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  *
  * @description An action that is or was performed on or for a patient. This can be a physical intervention like an operation, or less invasive like long term services, counseling, or hypnotherapy.
  */
-#[FhirResource(type: 'Procedure', version: '4.3.0', url: 'http://hl7.org/fhir/StructureDefinition/Procedure', fhirVersion: 'R4B')]
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(type: 'Procedure', version: '4.3.0', url: 'http://hl7.org/fhir/StructureDefinition/Procedure', fhirVersion: 'R4B')]
 class FHIRProcedure extends FHIRDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
         public ?string $id = null,
         /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?FHIRMeta $meta = null,
+        public ?\FHIRMeta $meta = null,
         /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?FHIRUri $implicitRules = null,
+        public ?\FHIRUri $implicitRules = null,
         /** @var string|null language Language of the resource content */
         public ?string $language = null,
         /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
-        public ?FHIRNarrative $text = null,
-        /** @var array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRResource> contained Contained, inline Resources */
+        public ?\FHIRNarrative $text = null,
+        /** @var array<FHIRResource> contained Contained, inline Resources */
         public array $contained = [],
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
@@ -60,28 +45,28 @@ class FHIRProcedure extends FHIRDomainResource
         public array $partOf = [],
         /** @var FHIREventStatusType|null status preparation | in-progress | not-done | on-hold | stopped | completed | entered-in-error | unknown */
         #[NotBlank]
-        public ?FHIREventStatusType $status = null,
+        public ?\FHIREventStatusType $status = null,
         /** @var FHIRCodeableConcept|null statusReason Reason for current status */
-        public ?FHIRCodeableConcept $statusReason = null,
+        public ?\FHIRCodeableConcept $statusReason = null,
         /** @var FHIRCodeableConcept|null category Classification of the procedure */
-        public ?FHIRCodeableConcept $category = null,
+        public ?\FHIRCodeableConcept $category = null,
         /** @var FHIRCodeableConcept|null code Identification of the procedure */
-        public ?FHIRCodeableConcept $code = null,
+        public ?\FHIRCodeableConcept $code = null,
         /** @var FHIRReference|null subject Who the procedure was performed on */
         #[NotBlank]
-        public ?FHIRReference $subject = null,
+        public ?\FHIRReference $subject = null,
         /** @var FHIRReference|null encounter Encounter created as part of */
-        public ?FHIRReference $encounter = null,
+        public ?\FHIRReference $encounter = null,
         /** @var FHIRDateTime|FHIRPeriod|FHIRString|string|FHIRAge|FHIRRange|null performedX When the procedure was performed */
-        public FHIRDateTime|FHIRPeriod|FHIRString|string|FHIRAge|FHIRRange|null $performedX = null,
+        public \FHIRDateTime|\FHIRPeriod|\FHIRString|string|\FHIRAge|\FHIRRange|null $performedX = null,
         /** @var FHIRReference|null recorder Who recorded the procedure */
-        public ?FHIRReference $recorder = null,
+        public ?\FHIRReference $recorder = null,
         /** @var FHIRReference|null asserter Person who asserts this procedure */
-        public ?FHIRReference $asserter = null,
+        public ?\FHIRReference $asserter = null,
         /** @var array<FHIRProcedurePerformer> performer The people who performed the procedure */
         public array $performer = [],
         /** @var FHIRReference|null location Where the procedure happened */
-        public ?FHIRReference $location = null,
+        public ?\FHIRReference $location = null,
         /** @var array<FHIRCodeableConcept> reasonCode Coded reason procedure performed */
         public array $reasonCode = [],
         /** @var array<FHIRReference> reasonReference The justification that the procedure was performed */
@@ -89,7 +74,7 @@ class FHIRProcedure extends FHIRDomainResource
         /** @var array<FHIRCodeableConcept> bodySite Target body sites */
         public array $bodySite = [],
         /** @var FHIRCodeableConcept|null outcome The result of procedure */
-        public ?FHIRCodeableConcept $outcome = null,
+        public ?\FHIRCodeableConcept $outcome = null,
         /** @var array<FHIRReference> report Any report resulting from the procedure */
         public array $report = [],
         /** @var array<FHIRCodeableConcept> complication Complication following the procedure */

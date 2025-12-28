@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRAnnotation;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime;
 
 /**
  * @description Codes associated with the substance.
@@ -25,11 +20,11 @@ class FHIRSubstanceDefinitionCode extends \Ardenexal\FHIRTools\Component\Models\
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null code The specific code */
-        public ?FHIRCodeableConcept $code = null,
+        public ?\FHIRCodeableConcept $code = null,
         /** @var FHIRCodeableConcept|null status Status of the code assignment, for example 'provisional', 'approved' */
-        public ?FHIRCodeableConcept $status = null,
+        public ?\FHIRCodeableConcept $status = null,
         /** @var FHIRDateTime|null statusDate The date at which the code status was changed */
-        public ?FHIRDateTime $statusDate = null,
+        public ?\FHIRDateTime $statusDate = null,
         /** @var array<FHIRAnnotation> note Any comment can be provided in this field */
         public array $note = [],
         /** @var array<FHIRReference> source Supporting literature */

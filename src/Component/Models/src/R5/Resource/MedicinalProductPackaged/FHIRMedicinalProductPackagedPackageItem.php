@@ -5,13 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRProdCharacteristic;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRProductShelfLife;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -31,10 +24,10 @@ class FHIRMedicinalProductPackagedPackageItem extends \Ardenexal\FHIRTools\Compo
         public array $identifier = [],
         /** @var FHIRCodeableConcept|null type The physical type of the container of the medicine */
         #[NotBlank]
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRQuantity|null quantity The quantity of this package in the medicinal product, at the current level of packaging. The outermost is always 1 */
         #[NotBlank]
-        public ?FHIRQuantity $quantity = null,
+        public ?\FHIRQuantity $quantity = null,
         /** @var array<FHIRCodeableConcept> material Material type of the package item */
         public array $material = [],
         /** @var array<FHIRCodeableConcept> alternateMaterial A possible alternate material for the packaging */
@@ -46,7 +39,7 @@ class FHIRMedicinalProductPackagedPackageItem extends \Ardenexal\FHIRTools\Compo
         /** @var array<FHIRMedicinalProductPackagedPackageItem> packageItem Allows containers within containers */
         public array $packageItem = [],
         /** @var FHIRProdCharacteristic|null physicalCharacteristics Dimensions, color etc. */
-        public ?FHIRProdCharacteristic $physicalCharacteristics = null,
+        public ?\FHIRProdCharacteristic $physicalCharacteristics = null,
         /** @var array<FHIRCodeableConcept> otherCharacteristics Other codeable characteristics */
         public array $otherCharacteristics = [],
         /** @var array<FHIRProductShelfLife> shelfLifeStorage Shelf Life and storage information */

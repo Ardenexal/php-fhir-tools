@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
 
 /**
  * @description Identifies all people and organizations who are expected to be involved in the care team.
@@ -26,11 +22,11 @@ class FHIRCareTeamParticipant extends \Ardenexal\FHIRTools\Component\Models\R4\D
         /** @var array<FHIRCodeableConcept> role Type of involvement */
         public array $role = [],
         /** @var FHIRReference|null member Who is involved */
-        public ?FHIRReference $member = null,
+        public ?\FHIRReference $member = null,
         /** @var FHIRReference|null onBehalfOf Organization of the practitioner */
-        public ?FHIRReference $onBehalfOf = null,
+        public ?\FHIRReference $onBehalfOf = null,
         /** @var FHIRPeriod|null period Time period of participant */
-        public ?FHIRPeriod $period = null,
+        public ?\FHIRPeriod $period = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

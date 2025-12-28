@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,9 +22,9 @@ class FHIRMedicationStatementAdherence extends \Ardenexal\FHIRTools\Component\Mo
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null code Type of adherence */
         #[NotBlank]
-        public ?FHIRCodeableConcept $code = null,
+        public ?\FHIRCodeableConcept $code = null,
         /** @var FHIRCodeableConcept|null reason Details of the reason for the current use of the medication */
-        public ?FHIRCodeableConcept $reason = null,
+        public ?\FHIRCodeableConcept $reason = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

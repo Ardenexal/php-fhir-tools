@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity;
 
 /**
  * @description Class that defines the quantity and type of nutrient modifications (for example carbohydrate, fiber or sodium) required for the oral diet.
@@ -23,9 +20,9 @@ class FHIRNutritionOrderOralDietNutrient extends \Ardenexal\FHIRTools\Component\
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null modifier Type of nutrient that is being modified */
-        public ?FHIRCodeableConcept $modifier = null,
+        public ?\FHIRCodeableConcept $modifier = null,
         /** @var FHIRQuantity|null amount Quantity of the specified nutrient */
-        public ?FHIRQuantity $amount = null,
+        public ?\FHIRQuantity $amount = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

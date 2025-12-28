@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRAnnotation;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRMarkdown;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 
 /**
  * @description Assessment of certainty, confidence in the estimates, or quality of the evidence.
@@ -25,15 +20,15 @@ class FHIREvidenceCertainty extends \Ardenexal\FHIRTools\Component\Models\R5\Dat
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRMarkdown|null description Textual description of certainty */
-        public ?FHIRMarkdown $description = null,
+        public ?\FHIRMarkdown $description = null,
         /** @var array<FHIRAnnotation> note Footnotes and/or explanatory notes */
         public array $note = [],
         /** @var FHIRCodeableConcept|null type Aspect of certainty being rated */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRCodeableConcept|null rating Assessment or judgement of the aspect */
-        public ?FHIRCodeableConcept $rating = null,
+        public ?\FHIRCodeableConcept $rating = null,
         /** @var FHIRString|string|null rater Individual or group who did the rating */
-        public FHIRString|string|null $rater = null,
+        public \FHIRString|string|null $rater = null,
         /** @var array<FHIREvidenceCertainty> subcomponent A domain or subdomain of certainty */
         public array $subcomponent = [],
     ) {

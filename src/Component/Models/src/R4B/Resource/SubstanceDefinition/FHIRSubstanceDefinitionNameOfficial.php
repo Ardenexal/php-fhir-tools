@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime;
 
 /**
  * @description Details of the official nature of this name.
@@ -23,11 +20,11 @@ class FHIRSubstanceDefinitionNameOfficial extends \Ardenexal\FHIRTools\Component
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null authority Which authority uses this official name */
-        public ?FHIRCodeableConcept $authority = null,
+        public ?\FHIRCodeableConcept $authority = null,
         /** @var FHIRCodeableConcept|null status The status of the official name, for example 'draft', 'active' */
-        public ?FHIRCodeableConcept $status = null,
+        public ?\FHIRCodeableConcept $status = null,
         /** @var FHIRDateTime|null date Date of official name change */
-        public ?FHIRDateTime $date = null,
+        public ?\FHIRDateTime $date = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

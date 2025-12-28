@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,9 +22,9 @@ class FHIRActivityDefinitionParticipant extends \Ardenexal\FHIRTools\Component\M
         public array $modifierExtension = [],
         /** @var FHIRActionParticipantTypeType|null type patient | practitioner | related-person | device */
         #[NotBlank]
-        public ?FHIRActionParticipantTypeType $type = null,
+        public ?\FHIRActionParticipantTypeType $type = null,
         /** @var FHIRCodeableConcept|null role E.g. Nurse, Surgeon, Parent, etc. */
-        public ?FHIRCodeableConcept $role = null,
+        public ?\FHIRCodeableConcept $role = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

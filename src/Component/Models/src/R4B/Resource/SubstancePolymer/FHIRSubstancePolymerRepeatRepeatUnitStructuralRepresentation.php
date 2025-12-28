@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRAttachment;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
 
 /**
  * @description Todo.
@@ -28,11 +24,11 @@ class FHIRSubstancePolymerRepeatRepeatUnitStructuralRepresentation extends \Arde
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null type Todo */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRString|string|null representation Todo */
-        public FHIRString|string|null $representation = null,
+        public \FHIRString|string|null $representation = null,
         /** @var FHIRAttachment|null attachment Todo */
-        public ?FHIRAttachment $attachment = null,
+        public ?\FHIRAttachment $attachment = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

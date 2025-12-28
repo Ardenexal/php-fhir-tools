@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRMarkdown;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,14 +22,14 @@ class FHIRCapabilityStatementRestResourceSearchParam extends \Ardenexal\FHIRTool
         public array $modifierExtension = [],
         /** @var FHIRString|string|null name Name of search parameter */
         #[NotBlank]
-        public FHIRString|string|null $name = null,
+        public \FHIRString|string|null $name = null,
         /** @var FHIRCanonical|null definition Source of definition for parameter */
-        public ?FHIRCanonical $definition = null,
+        public ?\FHIRCanonical $definition = null,
         /** @var FHIRSearchParamTypeType|null type number | date | string | token | reference | composite | quantity | uri | special */
         #[NotBlank]
-        public ?FHIRSearchParamTypeType $type = null,
+        public ?\FHIRSearchParamTypeType $type = null,
         /** @var FHIRMarkdown|null documentation Server-specific usage */
-        public ?FHIRMarkdown $documentation = null,
+        public ?\FHIRMarkdown $documentation = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

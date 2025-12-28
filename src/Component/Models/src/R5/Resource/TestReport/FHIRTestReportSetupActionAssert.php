@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRMarkdown;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,11 +22,11 @@ class FHIRTestReportSetupActionAssert extends \Ardenexal\FHIRTools\Component\Mod
         public array $modifierExtension = [],
         /** @var FHIRTestReportActionResultType|null result pass | skip | fail | warning | error */
         #[NotBlank]
-        public ?FHIRTestReportActionResultType $result = null,
+        public ?\FHIRTestReportActionResultType $result = null,
         /** @var FHIRMarkdown|null message A message associated with the result */
-        public ?FHIRMarkdown $message = null,
+        public ?\FHIRMarkdown $message = null,
         /** @var FHIRString|string|null detail A link to further details on the result */
-        public FHIRString|string|null $detail = null,
+        public \FHIRString|string|null $detail = null,
         /** @var array<FHIRTestReportSetupActionAssertRequirement> requirement Links or references to the testing requirements */
         public array $requirement = [],
     ) {

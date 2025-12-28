@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRDiscriminatorTypeType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -22,10 +20,10 @@ class FHIRElementDefinitionSlicingDiscriminator extends FHIRElement
         public array $extension = [],
         /** @var FHIRDiscriminatorTypeType|null type value | exists | type | profile | position */
         #[NotBlank]
-        public ?FHIRDiscriminatorTypeType $type = null,
+        public ?\FHIRDiscriminatorTypeType $type = null,
         /** @var FHIRString|string|null path Path to element value */
         #[NotBlank]
-        public FHIRString|string|null $path = null,
+        public \FHIRString|string|null $path = null,
     ) {
         parent::__construct($id, $extension);
     }

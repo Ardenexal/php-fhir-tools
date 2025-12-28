@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUrl;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,11 +22,11 @@ class FHIRCapabilityStatementImplementation extends \Ardenexal\FHIRTools\Compone
         public array $modifierExtension = [],
         /** @var FHIRString|string|null description Describes this specific instance */
         #[NotBlank]
-        public FHIRString|string|null $description = null,
+        public \FHIRString|string|null $description = null,
         /** @var FHIRUrl|null url Base URL for the installation */
-        public ?FHIRUrl $url = null,
+        public ?\FHIRUrl $url = null,
         /** @var FHIRReference|null custodian Organization that manages the data */
-        public ?FHIRReference $custodian = null,
+        public ?\FHIRReference $custodian = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

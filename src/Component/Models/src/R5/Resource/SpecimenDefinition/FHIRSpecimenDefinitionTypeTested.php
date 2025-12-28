@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRDuration;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRMarkdown;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,20 +21,20 @@ class FHIRSpecimenDefinitionTypeTested extends \Ardenexal\FHIRTools\Component\Mo
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRBoolean|null isDerived Primary or secondary specimen */
-        public ?FHIRBoolean $isDerived = null,
+        public ?\FHIRBoolean $isDerived = null,
         /** @var FHIRCodeableConcept|null type Type of intended specimen */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRSpecimenContainedPreferenceType|null preference preferred | alternate */
         #[NotBlank]
-        public ?FHIRSpecimenContainedPreferenceType $preference = null,
+        public ?\FHIRSpecimenContainedPreferenceType $preference = null,
         /** @var FHIRSpecimenDefinitionTypeTestedContainer|null container The specimen's container */
-        public ?FHIRSpecimenDefinitionTypeTestedContainer $container = null,
+        public ?\FHIRSpecimenDefinitionTypeTestedContainer $container = null,
         /** @var FHIRMarkdown|null requirement Requirements for specimen delivery and special handling */
-        public ?FHIRMarkdown $requirement = null,
+        public ?\FHIRMarkdown $requirement = null,
         /** @var FHIRDuration|null retentionTime The usual time for retaining this kind of specimen */
-        public ?FHIRDuration $retentionTime = null,
+        public ?\FHIRDuration $retentionTime = null,
         /** @var FHIRBoolean|null singleUse Specimen for single use only */
-        public ?FHIRBoolean $singleUse = null,
+        public ?\FHIRBoolean $singleUse = null,
         /** @var array<FHIRCodeableConcept> rejectionCriterion Criterion specified for specimen rejection */
         public array $rejectionCriterion = [],
         /** @var array<FHIRSpecimenDefinitionTypeTestedHandling> handling Specimen handling before testing */

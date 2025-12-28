@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,17 +22,17 @@ class FHIRGraphDefinitionLinkCompartment extends \Ardenexal\FHIRTools\Component\
         public array $modifierExtension = [],
         /** @var FHIRGraphCompartmentUseType|null use where | requires */
         #[NotBlank]
-        public ?FHIRGraphCompartmentUseType $use = null,
+        public ?\FHIRGraphCompartmentUseType $use = null,
         /** @var FHIRGraphCompartmentRuleType|null rule identical | matching | different | custom */
         #[NotBlank]
-        public ?FHIRGraphCompartmentRuleType $rule = null,
+        public ?\FHIRGraphCompartmentRuleType $rule = null,
         /** @var FHIRCompartmentTypeType|null code Patient | Encounter | RelatedPerson | Practitioner | Device | EpisodeOfCare */
         #[NotBlank]
-        public ?FHIRCompartmentTypeType $code = null,
+        public ?\FHIRCompartmentTypeType $code = null,
         /** @var FHIRString|string|null expression Custom rule, as a FHIRPath expression */
-        public FHIRString|string|null $expression = null,
+        public \FHIRString|string|null $expression = null,
         /** @var FHIRString|string|null description Documentation for FHIRPath expression */
-        public FHIRString|string|null $description = null,
+        public \FHIRString|string|null $description = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCoding;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUnsignedInt;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,7 +24,7 @@ class FHIRContractTermSecurityLabel extends \Ardenexal\FHIRTools\Component\Model
         public array $number = [],
         /** @var FHIRCoding|null classification Confidentiality Protection */
         #[NotBlank]
-        public ?FHIRCoding $classification = null,
+        public ?\FHIRCoding $classification = null,
         /** @var array<FHIRCoding> category Applicable Policy */
         public array $category = [],
         /** @var array<FHIRCoding> control Handling Instructions */

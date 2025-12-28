@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 
 /**
  * @description Structural information.
@@ -24,15 +20,15 @@ class FHIRSubstanceDefinitionStructure extends \Ardenexal\FHIRTools\Component\Mo
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null stereochemistry Stereochemistry type */
-        public ?FHIRCodeableConcept $stereochemistry = null,
+        public ?\FHIRCodeableConcept $stereochemistry = null,
         /** @var FHIRCodeableConcept|null opticalActivity Optical activity type */
-        public ?FHIRCodeableConcept $opticalActivity = null,
+        public ?\FHIRCodeableConcept $opticalActivity = null,
         /** @var FHIRString|string|null molecularFormula An expression which states the number and type of atoms present in a molecule of a substance */
-        public FHIRString|string|null $molecularFormula = null,
+        public \FHIRString|string|null $molecularFormula = null,
         /** @var FHIRString|string|null molecularFormulaByMoiety Specified per moiety according to the Hill system */
-        public FHIRString|string|null $molecularFormulaByMoiety = null,
+        public \FHIRString|string|null $molecularFormulaByMoiety = null,
         /** @var FHIRSubstanceDefinitionMolecularWeight|null molecularWeight The molecular weight or weight range */
-        public ?FHIRSubstanceDefinitionMolecularWeight $molecularWeight = null,
+        public ?\FHIRSubstanceDefinitionMolecularWeight $molecularWeight = null,
         /** @var array<FHIRCodeableConcept> technique The method used to find the structure e.g. X-ray, NMR */
         public array $technique = [],
         /** @var array<FHIRReference> sourceDocument Source of information for the structure */

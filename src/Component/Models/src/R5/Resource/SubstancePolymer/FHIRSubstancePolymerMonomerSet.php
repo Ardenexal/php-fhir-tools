@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
 
 /**
  * @description Todo.
@@ -22,7 +20,7 @@ class FHIRSubstancePolymerMonomerSet extends \Ardenexal\FHIRTools\Component\Mode
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null ratioType Captures the type of ratio to the entire polymer, e.g. Monomer/Polymer ratio, SRU/Polymer Ratio */
-        public ?FHIRCodeableConcept $ratioType = null,
+        public ?\FHIRCodeableConcept $ratioType = null,
         /** @var array<FHIRSubstancePolymerMonomerSetStartingMaterial> startingMaterial The starting materials - monomer(s) used in the synthesis of the polymer */
         public array $startingMaterial = [],
     ) {

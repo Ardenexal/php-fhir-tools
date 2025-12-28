@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity;
 
 /**
  * @description Information that only applies to packages (not products).
@@ -23,9 +20,9 @@ class FHIRMedicationKnowledgePackaging extends \Ardenexal\FHIRTools\Component\Mo
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null type A code that defines the specific type of packaging that the medication can be found in */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRQuantity|null quantity The number of product units the package would contain if fully loaded */
-        public ?FHIRQuantity $quantity = null,
+        public ?\FHIRQuantity $quantity = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

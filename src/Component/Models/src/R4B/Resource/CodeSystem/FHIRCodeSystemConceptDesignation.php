@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCoding;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,10 +23,10 @@ class FHIRCodeSystemConceptDesignation extends \Ardenexal\FHIRTools\Component\Mo
         /** @var string|null language Human language of the designation */
         public ?string $language = null,
         /** @var FHIRCoding|null use Details how this designation would be used */
-        public ?FHIRCoding $use = null,
+        public ?\FHIRCoding $use = null,
         /** @var FHIRString|string|null value The text value for this designation */
         #[NotBlank]
-        public FHIRString|string|null $value = null,
+        public \FHIRString|string|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

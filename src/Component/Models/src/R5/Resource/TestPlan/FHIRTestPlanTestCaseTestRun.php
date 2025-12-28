@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRMarkdown;
 
 /**
  * @description The actual test to be executed.
@@ -22,9 +20,9 @@ class FHIRTestPlanTestCaseTestRun extends \Ardenexal\FHIRTools\Component\Models\
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRMarkdown|null narrative The narrative description of the tests */
-        public ?FHIRMarkdown $narrative = null,
+        public ?\FHIRMarkdown $narrative = null,
         /** @var FHIRTestPlanTestCaseTestRunScript|null script The test cases in a structured language e.g. gherkin, Postman, or FHIR TestScript */
-        public ?FHIRTestPlanTestCaseTestRunScript $script = null,
+        public ?\FHIRTestPlanTestCaseTestRunScript $script = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

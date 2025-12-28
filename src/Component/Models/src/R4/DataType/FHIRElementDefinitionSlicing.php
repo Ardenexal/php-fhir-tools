@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRElementDefinitionSlicingDiscriminator;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRSlicingRulesType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,12 +21,12 @@ class FHIRElementDefinitionSlicing extends FHIRElement
         /** @var array<FHIRElementDefinitionSlicingDiscriminator> discriminator Element values that are used to distinguish the slices */
         public array $discriminator = [],
         /** @var FHIRString|string|null description Text description of how slicing works (or not) */
-        public FHIRString|string|null $description = null,
+        public \FHIRString|string|null $description = null,
         /** @var FHIRBoolean|null ordered If elements must be in same order as slices */
-        public ?FHIRBoolean $ordered = null,
+        public ?\FHIRBoolean $ordered = null,
         /** @var FHIRSlicingRulesType|null rules closed | open | openAtEnd */
         #[NotBlank]
-        public ?FHIRSlicingRulesType $rules = null,
+        public ?\FHIRSlicingRulesType $rules = null,
     ) {
         parent::__construct($id, $extension);
     }

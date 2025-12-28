@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRAvailabilityAvailableTime;
-use Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRAvailabilityNotAvailableTime;
 
 /**
  * @author HL7 FHIR Standard

@@ -5,12 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableReference;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRPositiveInt;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,16 +21,16 @@ class FHIRAccountDiagnosis extends \Ardenexal\FHIRTools\Component\Models\R5\Data
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRPositiveInt|null sequence Ranking of the diagnosis (for each type) */
-        public ?FHIRPositiveInt $sequence = null,
+        public ?\FHIRPositiveInt $sequence = null,
         /** @var FHIRCodeableReference|null condition The diagnosis relevant to the account */
         #[NotBlank]
-        public ?FHIRCodeableReference $condition = null,
+        public ?\FHIRCodeableReference $condition = null,
         /** @var FHIRDateTime|null dateOfDiagnosis Date of the diagnosis (when coded diagnosis) */
-        public ?FHIRDateTime $dateOfDiagnosis = null,
+        public ?\FHIRDateTime $dateOfDiagnosis = null,
         /** @var array<FHIRCodeableConcept> type Type that this diagnosis has relevant to the account (e.g. admission, billing, discharge …) */
         public array $type = [],
         /** @var FHIRBoolean|null onAdmission Diagnosis present on Admission */
-        public ?FHIRBoolean $onAdmission = null,
+        public ?\FHIRBoolean $onAdmission = null,
         /** @var array<FHIRCodeableConcept> packageCode Package Code specific for billing */
         public array $packageCode = [],
     ) {

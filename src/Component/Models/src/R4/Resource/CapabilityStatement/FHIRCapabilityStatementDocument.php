@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRMarkdown;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,12 +22,12 @@ class FHIRCapabilityStatementDocument extends \Ardenexal\FHIRTools\Component\Mod
         public array $modifierExtension = [],
         /** @var FHIRDocumentModeType|null mode producer | consumer */
         #[NotBlank]
-        public ?FHIRDocumentModeType $mode = null,
+        public ?\FHIRDocumentModeType $mode = null,
         /** @var FHIRMarkdown|null documentation Description of document support */
-        public ?FHIRMarkdown $documentation = null,
+        public ?\FHIRMarkdown $documentation = null,
         /** @var FHIRCanonical|null profile Constraint on the resources used in the document */
         #[NotBlank]
-        public ?FHIRCanonical $profile = null,
+        public ?\FHIRCanonical $profile = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

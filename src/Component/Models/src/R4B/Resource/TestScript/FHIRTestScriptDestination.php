@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCoding;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRInteger;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,10 +22,10 @@ class FHIRTestScriptDestination extends \Ardenexal\FHIRTools\Component\Models\R4
         public array $modifierExtension = [],
         /** @var FHIRInteger|null index The index of the abstract destination server starting at 1 */
         #[NotBlank]
-        public ?FHIRInteger $index = null,
+        public ?\FHIRInteger $index = null,
         /** @var FHIRCoding|null profile FHIR-Server | FHIR-SDC-FormManager | FHIR-SDC-FormReceiver | FHIR-SDC-FormProcessor */
         #[NotBlank]
-        public ?FHIRCoding $profile = null,
+        public ?\FHIRCoding $profile = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

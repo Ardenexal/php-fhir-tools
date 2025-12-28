@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,11 +22,11 @@ class FHIRGroupMember extends \Ardenexal\FHIRTools\Component\Models\R5\DataType\
         public array $modifierExtension = [],
         /** @var FHIRReference|null entity Reference to the group member */
         #[NotBlank]
-        public ?FHIRReference $entity = null,
+        public ?\FHIRReference $entity = null,
         /** @var FHIRPeriod|null period Period member belonged to the group */
-        public ?FHIRPeriod $period = null,
+        public ?\FHIRPeriod $period = null,
         /** @var FHIRBoolean|null inactive If member is no longer in group */
-        public ?FHIRBoolean $inactive = null,
+        public ?\FHIRBoolean $inactive = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

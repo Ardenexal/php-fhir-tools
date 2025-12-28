@@ -6,7 +6,6 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Primitive;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
 
 /**
  * @author HL7 FHIR Standard

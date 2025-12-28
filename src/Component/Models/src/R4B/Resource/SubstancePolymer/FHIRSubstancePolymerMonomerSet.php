@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
 
 /**
  * @description Todo.
@@ -22,7 +20,7 @@ class FHIRSubstancePolymerMonomerSet extends \Ardenexal\FHIRTools\Component\Mode
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null ratioType Todo */
-        public ?FHIRCodeableConcept $ratioType = null,
+        public ?\FHIRCodeableConcept $ratioType = null,
         /** @var array<FHIRSubstancePolymerMonomerSetStartingMaterial> startingMaterial Todo */
         public array $startingMaterial = [],
     ) {

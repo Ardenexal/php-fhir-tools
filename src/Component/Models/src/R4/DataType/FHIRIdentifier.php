@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUri;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRIdentifierUseType;
 
 /**
  * @author HL7 FHIR Standard
@@ -25,17 +22,17 @@ class FHIRIdentifier extends FHIRElement
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
         /** @var FHIRIdentifierUseType|null use usual | official | temp | secondary | old (If known) */
-        public ?FHIRIdentifierUseType $use = null,
+        public ?\FHIRIdentifierUseType $use = null,
         /** @var FHIRCodeableConcept|null type Description of identifier */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRUri|null system The namespace for the identifier value */
-        public ?FHIRUri $system = null,
+        public ?\FHIRUri $system = null,
         /** @var FHIRString|string|null value The value that is unique */
-        public FHIRString|string|null $value = null,
+        public \FHIRString|string|null $value = null,
         /** @var FHIRPeriod|null period Time period when id is/was valid for use */
-        public ?FHIRPeriod $period = null,
+        public ?\FHIRPeriod $period = null,
         /** @var FHIRReference|null assigner Organization that issued id (may be just text) */
-        public ?FHIRReference $assigner = null,
+        public ?\FHIRReference $assigner = null,
     ) {
         parent::__construct($id, $extension);
     }

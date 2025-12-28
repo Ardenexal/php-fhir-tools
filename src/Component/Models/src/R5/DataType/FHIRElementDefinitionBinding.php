@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRMarkdown;
-use Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRBindingStrengthType;
-use Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRElementDefinitionBindingAdditional;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,11 +20,11 @@ class FHIRElementDefinitionBinding extends FHIRElement
         public array $extension = [],
         /** @var FHIRBindingStrengthType|null strength required | extensible | preferred | example */
         #[NotBlank]
-        public ?FHIRBindingStrengthType $strength = null,
+        public ?\FHIRBindingStrengthType $strength = null,
         /** @var FHIRMarkdown|null description Intended use of codes in the bound value set */
-        public ?FHIRMarkdown $description = null,
+        public ?\FHIRMarkdown $description = null,
         /** @var FHIRCanonical|null valueSet Source of value set */
-        public ?FHIRCanonical $valueSet = null,
+        public ?\FHIRCanonical $valueSet = null,
         /** @var array<FHIRElementDefinitionBindingAdditional> additional Additional Bindings - more rules about the binding */
         public array $additional = [],
     ) {

@@ -4,14 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRMeta;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRNarrative;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -21,7 +13,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  *
  * @description A pharmaceutical product described in terms of its composition and dose form.
  */
-#[FhirResource(
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(
     type: 'MedicinalProductPharmaceutical',
     version: '4.0.1',
     url: 'http://hl7.org/fhir/StructureDefinition/MedicinalProductPharmaceutical',
@@ -33,14 +25,14 @@ class FHIRMedicinalProductPharmaceutical extends FHIRDomainResource
         /** @var string|null id Logical id of this artifact */
         public ?string $id = null,
         /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?FHIRMeta $meta = null,
+        public ?\FHIRMeta $meta = null,
         /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?FHIRUri $implicitRules = null,
+        public ?\FHIRUri $implicitRules = null,
         /** @var string|null language Language of the resource content */
         public ?string $language = null,
         /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
-        public ?FHIRNarrative $text = null,
-        /** @var array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRResource> contained Contained, inline Resources */
+        public ?\FHIRNarrative $text = null,
+        /** @var array<FHIRResource> contained Contained, inline Resources */
         public array $contained = [],
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
@@ -50,9 +42,9 @@ class FHIRMedicinalProductPharmaceutical extends FHIRDomainResource
         public array $identifier = [],
         /** @var FHIRCodeableConcept|null administrableDoseForm The administrable dose form, after necessary reconstitution */
         #[NotBlank]
-        public ?FHIRCodeableConcept $administrableDoseForm = null,
+        public ?\FHIRCodeableConcept $administrableDoseForm = null,
         /** @var FHIRCodeableConcept|null unitOfPresentation Todo */
-        public ?FHIRCodeableConcept $unitOfPresentation = null,
+        public ?\FHIRCodeableConcept $unitOfPresentation = null,
         /** @var array<FHIRReference> ingredient Ingredient */
         public array $ingredient = [],
         /** @var array<FHIRReference> device Accompanying device */

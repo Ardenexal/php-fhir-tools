@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCoding;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRId;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUnsignedInt;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,11 +22,11 @@ class FHIRImagingSelectionInstance extends \Ardenexal\FHIRTools\Component\Models
         public array $modifierExtension = [],
         /** @var FHIRId|null uid DICOM SOP Instance UID */
         #[NotBlank]
-        public ?FHIRId $uid = null,
+        public ?\FHIRId $uid = null,
         /** @var FHIRUnsignedInt|null number DICOM Instance Number */
-        public ?FHIRUnsignedInt $number = null,
+        public ?\FHIRUnsignedInt $number = null,
         /** @var FHIRCoding|null sopClass DICOM SOP Class UID */
-        public ?FHIRCoding $sopClass = null,
+        public ?\FHIRCoding $sopClass = null,
         /** @var array<FHIRString|string> subset The selected subset of the SOP Instance */
         public array $subset = [],
         /** @var array<FHIRImagingSelectionInstanceImageRegion2D> imageRegion2D A specific 2D region in a DICOM image / frame */

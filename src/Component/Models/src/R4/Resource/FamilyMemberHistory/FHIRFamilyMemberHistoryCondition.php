@@ -5,14 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRAge;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRAnnotation;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRRange;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -30,13 +22,13 @@ class FHIRFamilyMemberHistoryCondition extends \Ardenexal\FHIRTools\Component\Mo
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null code Condition suffered by relation */
         #[NotBlank]
-        public ?FHIRCodeableConcept $code = null,
+        public ?\FHIRCodeableConcept $code = null,
         /** @var FHIRCodeableConcept|null outcome deceased | permanent disability | etc. */
-        public ?FHIRCodeableConcept $outcome = null,
+        public ?\FHIRCodeableConcept $outcome = null,
         /** @var FHIRBoolean|null contributedToDeath Whether the condition contributed to the cause of death */
-        public ?FHIRBoolean $contributedToDeath = null,
+        public ?\FHIRBoolean $contributedToDeath = null,
         /** @var FHIRAge|FHIRRange|FHIRPeriod|FHIRString|string|null onsetX When condition first manifested */
-        public FHIRAge|FHIRRange|FHIRPeriod|FHIRString|string|null $onsetX = null,
+        public \FHIRAge|\FHIRRange|\FHIRPeriod|\FHIRString|string|null $onsetX = null,
         /** @var array<FHIRAnnotation> note Extra information about condition */
         public array $note = [],
     ) {

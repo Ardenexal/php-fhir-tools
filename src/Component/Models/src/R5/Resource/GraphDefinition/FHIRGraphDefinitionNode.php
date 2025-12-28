@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRId;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,14 +22,14 @@ class FHIRGraphDefinitionNode extends \Ardenexal\FHIRTools\Component\Models\R5\D
         public array $modifierExtension = [],
         /** @var FHIRId|null nodeId Internal ID - target for link references */
         #[NotBlank]
-        public ?FHIRId $nodeId = null,
+        public ?\FHIRId $nodeId = null,
         /** @var FHIRString|string|null description Why this node is specified */
-        public FHIRString|string|null $description = null,
+        public \FHIRString|string|null $description = null,
         /** @var FHIRVersionIndependentResourceTypesAllType|null type Type of resource this link refers to */
         #[NotBlank]
-        public ?FHIRVersionIndependentResourceTypesAllType $type = null,
+        public ?\FHIRVersionIndependentResourceTypesAllType $type = null,
         /** @var FHIRCanonical|null profile Profile for the target resource */
-        public ?FHIRCanonical $profile = null,
+        public ?\FHIRCanonical $profile = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCode;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,12 +22,12 @@ class FHIRImplementationGuideDefinitionTemplate extends \Ardenexal\FHIRTools\Com
         public array $modifierExtension = [],
         /** @var FHIRCode|null code Type of template specified */
         #[NotBlank]
-        public ?FHIRCode $code = null,
+        public ?\FHIRCode $code = null,
         /** @var FHIRString|string|null source The source location for the template */
         #[NotBlank]
-        public FHIRString|string|null $source = null,
+        public \FHIRString|string|null $source = null,
         /** @var FHIRString|string|null scope The scope in which the template applies */
-        public FHIRString|string|null $scope = null,
+        public \FHIRString|string|null $scope = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

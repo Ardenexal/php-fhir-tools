@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,15 +22,15 @@ class FHIRCompartmentDefinitionResource extends \Ardenexal\FHIRTools\Component\M
         public array $modifierExtension = [],
         /** @var FHIRResourceTypeType|null code Name of resource type */
         #[NotBlank]
-        public ?FHIRResourceTypeType $code = null,
+        public ?\FHIRResourceTypeType $code = null,
         /** @var array<FHIRString|string> param Search Parameter Name, or chained parameters */
         public array $param = [],
         /** @var FHIRString|string|null documentation Additional documentation about the resource and compartment */
-        public FHIRString|string|null $documentation = null,
+        public \FHIRString|string|null $documentation = null,
         /** @var FHIRUri|null startParam Search Param for interpreting $everything.start */
-        public ?FHIRUri $startParam = null,
+        public ?\FHIRUri $startParam = null,
         /** @var FHIRUri|null endParam Search Param for interpreting $everything.end */
-        public ?FHIRUri $endParam = null,
+        public ?\FHIRUri $endParam = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

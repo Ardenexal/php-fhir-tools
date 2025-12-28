@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 
 /**
  * @description A depiction of the structure of the substance.
@@ -24,13 +20,13 @@ class FHIRSubstanceDefinitionStructureRepresentation extends \Ardenexal\FHIRTool
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null type The kind of structural representation (e.g. full, partial) */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRString|string|null representation The structural representation as a text string in a standard format */
-        public FHIRString|string|null $representation = null,
+        public \FHIRString|string|null $representation = null,
         /** @var FHIRCodeableConcept|null format The format of the representation e.g. InChI, SMILES, MOLFILE (note: not the physical file format) */
-        public ?FHIRCodeableConcept $format = null,
+        public ?\FHIRCodeableConcept $format = null,
         /** @var FHIRReference|null document An attachment with the structural representation e.g. a structure graphic or AnIML file */
-        public ?FHIRReference $document = null,
+        public ?\FHIRReference $document = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCode;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
 
 /**
  * @description Mappings for an individual concept in the source to one or more concepts in the target.
@@ -23,9 +20,9 @@ class FHIRConceptMapGroupElement extends \Ardenexal\FHIRTools\Component\Models\R
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCode|null code Identifies element being mapped */
-        public ?FHIRCode $code = null,
+        public ?\FHIRCode $code = null,
         /** @var FHIRString|string|null display Display for the code */
-        public FHIRString|string|null $display = null,
+        public \FHIRString|string|null $display = null,
         /** @var array<FHIRConceptMapGroupElementTarget> target Concept in target system for element */
         public array $target = [],
     ) {

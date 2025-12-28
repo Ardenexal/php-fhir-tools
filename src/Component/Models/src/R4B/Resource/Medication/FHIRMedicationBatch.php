@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
 
 /**
  * @description Information that only applies to packages (not products).
@@ -23,9 +20,9 @@ class FHIRMedicationBatch extends \Ardenexal\FHIRTools\Component\Models\R4B\Data
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRString|string|null lotNumber Identifier assigned to batch */
-        public FHIRString|string|null $lotNumber = null,
+        public \FHIRString|string|null $lotNumber = null,
         /** @var FHIRDateTime|null expirationDate When batch will expire */
-        public ?FHIRDateTime $expirationDate = null,
+        public ?\FHIRDateTime $expirationDate = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,13 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRId;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRMarkdown;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -29,19 +22,19 @@ class FHIRImplementationGuideDefinitionResource extends \Ardenexal\FHIRTools\Com
         public array $modifierExtension = [],
         /** @var FHIRReference|null reference Location of the resource */
         #[NotBlank]
-        public ?FHIRReference $reference = null,
+        public ?\FHIRReference $reference = null,
         /** @var array<FHIRFHIRVersionType> fhirVersion Versions this applies to (if different to IG) */
         public array $fhirVersion = [],
         /** @var FHIRString|string|null name Human readable name for the resource */
-        public FHIRString|string|null $name = null,
+        public \FHIRString|string|null $name = null,
         /** @var FHIRMarkdown|null description Reason why included in guide */
-        public ?FHIRMarkdown $description = null,
+        public ?\FHIRMarkdown $description = null,
         /** @var FHIRBoolean|null isExample Is this an example */
-        public ?FHIRBoolean $isExample = null,
+        public ?\FHIRBoolean $isExample = null,
         /** @var array<FHIRCanonical> profile Profile(s) this is an example of */
         public array $profile = [],
         /** @var FHIRId|null groupingId Grouping this is part of */
-        public ?FHIRId $groupingId = null,
+        public ?\FHIRId $groupingId = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

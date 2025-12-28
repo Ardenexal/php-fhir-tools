@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRPositiveInt;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRContactPointSystemType;
-use Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRContactPointUseType;
 
 /**
  * @author HL7 FHIR Standard
@@ -26,15 +22,15 @@ class FHIRContactPoint extends FHIRDataType
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
         /** @var FHIRContactPointSystemType|null system phone | fax | email | pager | url | sms | other */
-        public ?FHIRContactPointSystemType $system = null,
+        public ?\FHIRContactPointSystemType $system = null,
         /** @var FHIRString|string|null value The actual contact point details */
-        public FHIRString|string|null $value = null,
+        public \FHIRString|string|null $value = null,
         /** @var FHIRContactPointUseType|null use home | work | temp | old | mobile - purpose of this contact point */
-        public ?FHIRContactPointUseType $use = null,
+        public ?\FHIRContactPointUseType $use = null,
         /** @var FHIRPositiveInt|null rank Specify preferred order of use (1 = highest) */
-        public ?FHIRPositiveInt $rank = null,
+        public ?\FHIRPositiveInt $rank = null,
         /** @var FHIRPeriod|null period Time period when the contact point was/is in use */
-        public ?FHIRPeriod $period = null,
+        public ?\FHIRPeriod $period = null,
     ) {
         parent::__construct($id, $extension);
     }

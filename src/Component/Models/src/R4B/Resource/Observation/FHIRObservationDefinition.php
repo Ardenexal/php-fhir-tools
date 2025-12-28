@@ -4,16 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMeta;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRNarrative;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -23,7 +13,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  *
  * @description Set of definitional characteristics for a kind of observation or measurement produced or consumed by an orderable health care service.
  */
-#[FhirResource(
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(
     type: 'ObservationDefinition',
     version: '4.3.0',
     url: 'http://hl7.org/fhir/StructureDefinition/ObservationDefinition',
@@ -35,14 +25,14 @@ class FHIRObservationDefinition extends FHIRDomainResource
         /** @var string|null id Logical id of this artifact */
         public ?string $id = null,
         /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?FHIRMeta $meta = null,
+        public ?\FHIRMeta $meta = null,
         /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?FHIRUri $implicitRules = null,
+        public ?\FHIRUri $implicitRules = null,
         /** @var string|null language Language of the resource content */
         public ?string $language = null,
         /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
-        public ?FHIRNarrative $text = null,
-        /** @var array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRResource> contained Contained, inline Resources */
+        public ?\FHIRNarrative $text = null,
+        /** @var array<FHIRResource> contained Contained, inline Resources */
         public array $contained = [],
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
@@ -52,29 +42,29 @@ class FHIRObservationDefinition extends FHIRDomainResource
         public array $category = [],
         /** @var FHIRCodeableConcept|null code Type of observation (code / type) */
         #[NotBlank]
-        public ?FHIRCodeableConcept $code = null,
+        public ?\FHIRCodeableConcept $code = null,
         /** @var array<FHIRIdentifier> identifier Business identifier for this ObservationDefinition instance */
         public array $identifier = [],
         /** @var array<FHIRObservationDataTypeType> permittedDataType Quantity | CodeableConcept | string | boolean | integer | Range | Ratio | SampledData | time | dateTime | Period */
         public array $permittedDataType = [],
         /** @var FHIRBoolean|null multipleResultsAllowed Multiple results allowed */
-        public ?FHIRBoolean $multipleResultsAllowed = null,
+        public ?\FHIRBoolean $multipleResultsAllowed = null,
         /** @var FHIRCodeableConcept|null method Method used to produce the observation */
-        public ?FHIRCodeableConcept $method = null,
+        public ?\FHIRCodeableConcept $method = null,
         /** @var FHIRString|string|null preferredReportName Preferred report name */
-        public FHIRString|string|null $preferredReportName = null,
+        public \FHIRString|string|null $preferredReportName = null,
         /** @var FHIRObservationDefinitionQuantitativeDetails|null quantitativeDetails Characteristics of quantitative results */
-        public ?FHIRObservationDefinitionQuantitativeDetails $quantitativeDetails = null,
+        public ?\FHIRObservationDefinitionQuantitativeDetails $quantitativeDetails = null,
         /** @var array<FHIRObservationDefinitionQualifiedInterval> qualifiedInterval Qualified range for continuous and ordinal observation results */
         public array $qualifiedInterval = [],
         /** @var FHIRReference|null validCodedValueSet Value set of valid coded values for the observations conforming to this ObservationDefinition */
-        public ?FHIRReference $validCodedValueSet = null,
+        public ?\FHIRReference $validCodedValueSet = null,
         /** @var FHIRReference|null normalCodedValueSet Value set of normal coded values for the observations conforming to this ObservationDefinition */
-        public ?FHIRReference $normalCodedValueSet = null,
+        public ?\FHIRReference $normalCodedValueSet = null,
         /** @var FHIRReference|null abnormalCodedValueSet Value set of abnormal coded values for the observations conforming to this ObservationDefinition */
-        public ?FHIRReference $abnormalCodedValueSet = null,
+        public ?\FHIRReference $abnormalCodedValueSet = null,
         /** @var FHIRReference|null criticalCodedValueSet Value set of critical coded values for the observations conforming to this ObservationDefinition */
-        public ?FHIRReference $criticalCodedValueSet = null,
+        public ?\FHIRReference $criticalCodedValueSet = null,
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
     }

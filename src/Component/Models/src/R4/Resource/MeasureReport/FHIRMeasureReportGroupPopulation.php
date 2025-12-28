@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRInteger;
 
 /**
  * @description The populations that make up the population group, one for each type of population appropriate for the measure.
@@ -24,11 +20,11 @@ class FHIRMeasureReportGroupPopulation extends \Ardenexal\FHIRTools\Component\Mo
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null code initial-population | numerator | numerator-exclusion | denominator | denominator-exclusion | denominator-exception | measure-population | measure-population-exclusion | measure-observation */
-        public ?FHIRCodeableConcept $code = null,
+        public ?\FHIRCodeableConcept $code = null,
         /** @var FHIRInteger|null count Size of the population */
-        public ?FHIRInteger $count = null,
+        public ?\FHIRInteger $count = null,
         /** @var FHIRReference|null subjectResults For subject-list reports, the subject results in this population */
-        public ?FHIRReference $subjectResults = null,
+        public ?\FHIRReference $subjectResults = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

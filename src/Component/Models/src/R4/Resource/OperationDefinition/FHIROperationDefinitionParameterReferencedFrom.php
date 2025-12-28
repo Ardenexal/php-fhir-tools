@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,9 +22,9 @@ class FHIROperationDefinitionParameterReferencedFrom extends \Ardenexal\FHIRTool
         public array $modifierExtension = [],
         /** @var FHIRString|string|null source Referencing parameter */
         #[NotBlank]
-        public FHIRString|string|null $source = null,
+        public \FHIRString|string|null $source = null,
         /** @var FHIRString|string|null sourceId Element id of reference */
-        public FHIRString|string|null $sourceId = null,
+        public \FHIRString|string|null $sourceId = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

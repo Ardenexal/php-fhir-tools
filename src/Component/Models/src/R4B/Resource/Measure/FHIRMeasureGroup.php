@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
 
 /**
  * @description A group of population criteria for the measure.
@@ -23,9 +20,9 @@ class FHIRMeasureGroup extends \Ardenexal\FHIRTools\Component\Models\R4B\DataTyp
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null code Meaning of the group */
-        public ?FHIRCodeableConcept $code = null,
+        public ?\FHIRCodeableConcept $code = null,
         /** @var FHIRString|string|null description Summary description */
-        public FHIRString|string|null $description = null,
+        public \FHIRString|string|null $description = null,
         /** @var array<FHIRMeasureGroupPopulation> population Population criteria */
         public array $population = [],
         /** @var array<FHIRMeasureGroupStratifier> stratifier Stratifier criteria for the measure */

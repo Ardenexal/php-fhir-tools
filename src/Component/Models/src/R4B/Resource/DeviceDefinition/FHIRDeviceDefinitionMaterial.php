@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,11 +22,11 @@ class FHIRDeviceDefinitionMaterial extends \Ardenexal\FHIRTools\Component\Models
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null substance The substance */
         #[NotBlank]
-        public ?FHIRCodeableConcept $substance = null,
+        public ?\FHIRCodeableConcept $substance = null,
         /** @var FHIRBoolean|null alternate Indicates an alternative material of the device */
-        public ?FHIRBoolean $alternate = null,
+        public ?\FHIRBoolean $alternate = null,
         /** @var FHIRBoolean|null allergenicIndicator Whether the substance is a known or suspected allergen */
-        public ?FHIRBoolean $allergenicIndicator = null,
+        public ?\FHIRBoolean $allergenicIndicator = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRDuration;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRRange;
 
 /**
  * @description Indicates what should be done and within what timeframe.
@@ -25,11 +20,11 @@ class FHIRPlanDefinitionGoalTarget extends \Ardenexal\FHIRTools\Component\Models
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null measure The parameter whose value is to be tracked */
-        public ?FHIRCodeableConcept $measure = null,
+        public ?\FHIRCodeableConcept $measure = null,
         /** @var FHIRQuantity|FHIRRange|FHIRCodeableConcept|null detailX The target value to be achieved */
-        public FHIRQuantity|FHIRRange|FHIRCodeableConcept|null $detailX = null,
+        public \FHIRQuantity|\FHIRRange|\FHIRCodeableConcept|null $detailX = null,
         /** @var FHIRDuration|null due Reach goal within */
-        public ?FHIRDuration $due = null,
+        public ?\FHIRDuration $due = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

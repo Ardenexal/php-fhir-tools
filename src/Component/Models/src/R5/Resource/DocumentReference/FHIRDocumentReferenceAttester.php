@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,11 +22,11 @@ class FHIRDocumentReferenceAttester extends \Ardenexal\FHIRTools\Component\Model
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null mode personal | professional | legal | official */
         #[NotBlank]
-        public ?FHIRCodeableConcept $mode = null,
+        public ?\FHIRCodeableConcept $mode = null,
         /** @var FHIRDateTime|null time When the document was attested */
-        public ?FHIRDateTime $time = null,
+        public ?\FHIRDateTime $time = null,
         /** @var FHIRReference|null party Who attested the document */
-        public ?FHIRReference $party = null,
+        public ?\FHIRReference $party = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

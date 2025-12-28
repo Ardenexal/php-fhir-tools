@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,14 +21,14 @@ class FHIRProvenanceAgent extends \Ardenexal\FHIRTools\Component\Models\R4B\Data
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null type How the agent participated */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var array<FHIRCodeableConcept> role What the agents role was */
         public array $role = [],
         /** @var FHIRReference|null who Who participated */
         #[NotBlank]
-        public ?FHIRReference $who = null,
+        public ?\FHIRReference $who = null,
         /** @var FHIRReference|null onBehalfOf Who the agent is representing */
-        public ?FHIRReference $onBehalfOf = null,
+        public ?\FHIRReference $onBehalfOf = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

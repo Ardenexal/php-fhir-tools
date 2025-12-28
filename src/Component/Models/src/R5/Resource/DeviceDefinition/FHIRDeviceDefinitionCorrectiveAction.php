@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,12 +22,12 @@ class FHIRDeviceDefinitionCorrectiveAction extends \Ardenexal\FHIRTools\Componen
         public array $modifierExtension = [],
         /** @var FHIRBoolean|null recall Whether the corrective action was a recall */
         #[NotBlank]
-        public ?FHIRBoolean $recall = null,
+        public ?\FHIRBoolean $recall = null,
         /** @var FHIRDeviceCorrectiveActionScopeType|null scope model | lot-numbers | serial-numbers */
-        public ?FHIRDeviceCorrectiveActionScopeType $scope = null,
+        public ?\FHIRDeviceCorrectiveActionScopeType $scope = null,
         /** @var FHIRPeriod|null period Start and end dates of the  corrective action */
         #[NotBlank]
-        public ?FHIRPeriod $period = null,
+        public ?\FHIRPeriod $period = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

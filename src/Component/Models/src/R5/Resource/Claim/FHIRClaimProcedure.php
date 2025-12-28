@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRPositiveInt;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,14 +22,14 @@ class FHIRClaimProcedure extends \Ardenexal\FHIRTools\Component\Models\R5\DataTy
         public array $modifierExtension = [],
         /** @var FHIRPositiveInt|null sequence Procedure instance identifier */
         #[NotBlank]
-        public ?FHIRPositiveInt $sequence = null,
+        public ?\FHIRPositiveInt $sequence = null,
         /** @var array<FHIRCodeableConcept> type Category of Procedure */
         public array $type = [],
         /** @var FHIRDateTime|null date When the procedure was performed */
-        public ?FHIRDateTime $date = null,
+        public ?\FHIRDateTime $date = null,
         /** @var FHIRCodeableConcept|FHIRReference|null procedureX Specific clinical procedure */
         #[NotBlank]
-        public FHIRCodeableConcept|FHIRReference|null $procedureX = null,
+        public \FHIRCodeableConcept|\FHIRReference|null $procedureX = null,
         /** @var array<FHIRReference> udi Unique device identifier */
         public array $udi = [],
     ) {

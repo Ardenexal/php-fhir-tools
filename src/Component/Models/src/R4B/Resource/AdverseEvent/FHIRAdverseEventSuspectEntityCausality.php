@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
 
 /**
  * @description Information on the possible cause of the event.
@@ -24,13 +20,13 @@ class FHIRAdverseEventSuspectEntityCausality extends \Ardenexal\FHIRTools\Compon
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null assessment Assessment of if the entity caused the event */
-        public ?FHIRCodeableConcept $assessment = null,
+        public ?\FHIRCodeableConcept $assessment = null,
         /** @var FHIRString|string|null productRelatedness AdverseEvent.suspectEntity.causalityProductRelatedness */
-        public FHIRString|string|null $productRelatedness = null,
+        public \FHIRString|string|null $productRelatedness = null,
         /** @var FHIRReference|null author AdverseEvent.suspectEntity.causalityAuthor */
-        public ?FHIRReference $author = null,
+        public ?\FHIRReference $author = null,
         /** @var FHIRCodeableConcept|null method ProbabilityScale | Bayesian | Checklist */
-        public ?FHIRCodeableConcept $method = null,
+        public ?\FHIRCodeableConcept $method = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

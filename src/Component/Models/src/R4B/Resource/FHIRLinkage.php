@@ -4,14 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMeta;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRNarrative;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri;
-
 /**
  * @author Health Level Seven International (Patient Care)
  *
@@ -19,30 +11,30 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri;
  *
  * @description Identifies two or more records (resource instances) that refer to the same real-world "occurrence".
  */
-#[FhirResource(type: 'Linkage', version: '4.3.0', url: 'http://hl7.org/fhir/StructureDefinition/Linkage', fhirVersion: 'R4B')]
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(type: 'Linkage', version: '4.3.0', url: 'http://hl7.org/fhir/StructureDefinition/Linkage', fhirVersion: 'R4B')]
 class FHIRLinkage extends FHIRDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
         public ?string $id = null,
         /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?FHIRMeta $meta = null,
+        public ?\FHIRMeta $meta = null,
         /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?FHIRUri $implicitRules = null,
+        public ?\FHIRUri $implicitRules = null,
         /** @var string|null language Language of the resource content */
         public ?string $language = null,
         /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
-        public ?FHIRNarrative $text = null,
-        /** @var array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRResource> contained Contained, inline Resources */
+        public ?\FHIRNarrative $text = null,
+        /** @var array<FHIRResource> contained Contained, inline Resources */
         public array $contained = [],
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored */
         public array $modifierExtension = [],
         /** @var FHIRBoolean|null active Whether this linkage assertion is active or not */
-        public ?FHIRBoolean $active = null,
+        public ?\FHIRBoolean $active = null,
         /** @var FHIRReference|null author Who is responsible for linkages */
-        public ?FHIRReference $author = null,
+        public ?\FHIRReference $author = null,
         /** @var array<FHIRLinkageItem> item Item to be linked */
         public array $item = [],
     ) {

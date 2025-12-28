@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
 
 /**
  * @description Details about an insurance plan.
@@ -26,7 +22,7 @@ class FHIRInsurancePlanPlan extends \Ardenexal\FHIRTools\Component\Models\R4\Dat
         /** @var array<FHIRIdentifier> identifier Business Identifier for Product */
         public array $identifier = [],
         /** @var FHIRCodeableConcept|null type Type of plan */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var array<FHIRReference> coverageArea Where product applies */
         public array $coverageArea = [],
         /** @var array<FHIRReference> network What networks provide coverage */

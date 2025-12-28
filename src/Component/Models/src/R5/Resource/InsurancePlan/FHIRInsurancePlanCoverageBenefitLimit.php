@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRQuantity;
 
 /**
  * @description The specific limits on the benefit.
@@ -23,9 +20,9 @@ class FHIRInsurancePlanCoverageBenefitLimit extends \Ardenexal\FHIRTools\Compone
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRQuantity|null value Maximum value allowed */
-        public ?FHIRQuantity $value = null,
+        public ?\FHIRQuantity $value = null,
         /** @var FHIRCodeableConcept|null code Benefit limit details */
-        public ?FHIRCodeableConcept $code = null,
+        public ?\FHIRCodeableConcept $code = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

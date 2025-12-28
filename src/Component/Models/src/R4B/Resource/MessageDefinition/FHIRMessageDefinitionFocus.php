@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUnsignedInt;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,14 +22,14 @@ class FHIRMessageDefinitionFocus extends \Ardenexal\FHIRTools\Component\Models\R
         public array $modifierExtension = [],
         /** @var FHIRResourceTypeType|null code Type of resource */
         #[NotBlank]
-        public ?FHIRResourceTypeType $code = null,
+        public ?\FHIRResourceTypeType $code = null,
         /** @var FHIRCanonical|null profile Profile that must be adhered to by focus */
-        public ?FHIRCanonical $profile = null,
+        public ?\FHIRCanonical $profile = null,
         /** @var FHIRUnsignedInt|null min Minimum number of focuses of this type */
         #[NotBlank]
-        public ?FHIRUnsignedInt $min = null,
+        public ?\FHIRUnsignedInt $min = null,
         /** @var FHIRString|string|null max Maximum number of focuses of this type */
-        public FHIRString|string|null $max = null,
+        public \FHIRString|string|null $max = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

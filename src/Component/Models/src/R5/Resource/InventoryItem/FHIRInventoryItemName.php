@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCoding;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,13 +22,13 @@ class FHIRInventoryItemName extends \Ardenexal\FHIRTools\Component\Models\R5\Dat
         public array $modifierExtension = [],
         /** @var FHIRCoding|null nameType The type of name e.g. 'brand-name', 'functional-name', 'common-name' */
         #[NotBlank]
-        public ?FHIRCoding $nameType = null,
+        public ?\FHIRCoding $nameType = null,
         /** @var FHIRCommonLanguagesType|null language The language used to express the item name */
         #[NotBlank]
-        public ?FHIRCommonLanguagesType $language = null,
+        public ?\FHIRCommonLanguagesType $language = null,
         /** @var FHIRString|string|null name The name or designation of the item */
         #[NotBlank]
-        public FHIRString|string|null $name = null,
+        public \FHIRString|string|null $name = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

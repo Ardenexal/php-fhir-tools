@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCode;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,14 +22,14 @@ class FHIRCodeSystemFilter extends \Ardenexal\FHIRTools\Component\Models\R5\Data
         public array $modifierExtension = [],
         /** @var FHIRCode|null code Code that identifies the filter */
         #[NotBlank]
-        public ?FHIRCode $code = null,
+        public ?\FHIRCode $code = null,
         /** @var FHIRString|string|null description How or why the filter is used */
-        public FHIRString|string|null $description = null,
+        public \FHIRString|string|null $description = null,
         /** @var array<FHIRFilterOperatorType> operator = | is-a | descendent-of | is-not-a | regex | in | not-in | generalizes | child-of | descendent-leaf | exists */
         public array $operator = [],
         /** @var FHIRString|string|null value What to use for the value */
         #[NotBlank]
-        public FHIRString|string|null $value = null,
+        public \FHIRString|string|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

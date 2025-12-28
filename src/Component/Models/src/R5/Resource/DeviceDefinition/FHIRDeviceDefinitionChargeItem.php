@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableReference;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRUsageContext;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,12 +22,12 @@ class FHIRDeviceDefinitionChargeItem extends \Ardenexal\FHIRTools\Component\Mode
         public array $modifierExtension = [],
         /** @var FHIRCodeableReference|null chargeItemCode The code or reference for the charge item */
         #[NotBlank]
-        public ?FHIRCodeableReference $chargeItemCode = null,
+        public ?\FHIRCodeableReference $chargeItemCode = null,
         /** @var FHIRQuantity|null count Coefficient applicable to the billing code */
         #[NotBlank]
-        public ?FHIRQuantity $count = null,
+        public ?\FHIRQuantity $count = null,
         /** @var FHIRPeriod|null effectivePeriod A specific time period in which this charge item applies */
-        public ?FHIRPeriod $effectivePeriod = null,
+        public ?\FHIRPeriod $effectivePeriod = null,
         /** @var array<FHIRUsageContext> useContext The context to which this charge item applies */
         public array $useContext = [],
     ) {

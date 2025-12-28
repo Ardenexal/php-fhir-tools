@@ -5,12 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableReference;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRTiming;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -28,20 +22,20 @@ class FHIRNutritionIntakeConsumedItem extends \Ardenexal\FHIRTools\Component\Mod
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null type The type of food or fluid product */
         #[NotBlank]
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRCodeableReference|null nutritionProduct Code that identifies the food or fluid product that was consumed */
         #[NotBlank]
-        public ?FHIRCodeableReference $nutritionProduct = null,
+        public ?\FHIRCodeableReference $nutritionProduct = null,
         /** @var FHIRTiming|null schedule Scheduled frequency of consumption */
-        public ?FHIRTiming $schedule = null,
+        public ?\FHIRTiming $schedule = null,
         /** @var FHIRQuantity|null amount Quantity of the specified food */
-        public ?FHIRQuantity $amount = null,
+        public ?\FHIRQuantity $amount = null,
         /** @var FHIRQuantity|null rate Rate at which enteral feeding was administered */
-        public ?FHIRQuantity $rate = null,
+        public ?\FHIRQuantity $rate = null,
         /** @var FHIRBoolean|null notConsumed Flag to indicate if the food or fluid item was refused or otherwise not consumed */
-        public ?FHIRBoolean $notConsumed = null,
+        public ?\FHIRBoolean $notConsumed = null,
         /** @var FHIRCodeableConcept|null notConsumedReason Reason food or fluid was not consumed */
-        public ?FHIRCodeableConcept $notConsumedReason = null,
+        public ?\FHIRCodeableConcept $notConsumedReason = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

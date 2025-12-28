@@ -4,23 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRContactDetail;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRMeta;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRNarrative;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRUsageContext;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDate;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRMarkdown;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -30,7 +13,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  *
  * @description The ChargeItemDefinition resource provides the properties that apply to the (billing) codes necessary to calculate costs and prices. The properties may differ largely depending on type and realm, therefore this resource gives only a rough structure and requires profiling for each type of billing code system.
  */
-#[FhirResource(
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(
     type: 'ChargeItemDefinition',
     version: '4.0.1',
     url: 'http://hl7.org/fhir/StructureDefinition/ChargeItemDefinition',
@@ -42,14 +25,14 @@ class FHIRChargeItemDefinition extends FHIRDomainResource
         /** @var string|null id Logical id of this artifact */
         public ?string $id = null,
         /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?FHIRMeta $meta = null,
+        public ?\FHIRMeta $meta = null,
         /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?FHIRUri $implicitRules = null,
+        public ?\FHIRUri $implicitRules = null,
         /** @var string|null language Language of the resource content */
         public ?string $language = null,
         /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
-        public ?FHIRNarrative $text = null,
-        /** @var array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRResource> contained Contained, inline Resources */
+        public ?\FHIRNarrative $text = null,
+        /** @var array<FHIRResource> contained Contained, inline Resources */
         public array $contained = [],
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
@@ -57,13 +40,13 @@ class FHIRChargeItemDefinition extends FHIRDomainResource
         public array $modifierExtension = [],
         /** @var FHIRUri|null url Canonical identifier for this charge item definition, represented as a URI (globally unique) */
         #[NotBlank]
-        public ?FHIRUri $url = null,
+        public ?\FHIRUri $url = null,
         /** @var array<FHIRIdentifier> identifier Additional identifier for the charge item definition */
         public array $identifier = [],
         /** @var FHIRString|string|null version Business version of the charge item definition */
-        public FHIRString|string|null $version = null,
+        public \FHIRString|string|null $version = null,
         /** @var FHIRString|string|null title Name for this charge item definition (human friendly) */
-        public FHIRString|string|null $title = null,
+        public \FHIRString|string|null $title = null,
         /** @var array<FHIRUri> derivedFromUri Underlying externally-defined charge item definition */
         public array $derivedFromUri = [],
         /** @var array<FHIRCanonical> partOf A larger definition of which this particular definition is a component or step */
@@ -72,31 +55,31 @@ class FHIRChargeItemDefinition extends FHIRDomainResource
         public array $replaces = [],
         /** @var FHIRPublicationStatusType|null status draft | active | retired | unknown */
         #[NotBlank]
-        public ?FHIRPublicationStatusType $status = null,
+        public ?\FHIRPublicationStatusType $status = null,
         /** @var FHIRBoolean|null experimental For testing purposes, not real usage */
-        public ?FHIRBoolean $experimental = null,
+        public ?\FHIRBoolean $experimental = null,
         /** @var FHIRDateTime|null date Date last changed */
-        public ?FHIRDateTime $date = null,
+        public ?\FHIRDateTime $date = null,
         /** @var FHIRString|string|null publisher Name of the publisher (organization or individual) */
-        public FHIRString|string|null $publisher = null,
+        public \FHIRString|string|null $publisher = null,
         /** @var array<FHIRContactDetail> contact Contact details for the publisher */
         public array $contact = [],
         /** @var FHIRMarkdown|null description Natural language description of the charge item definition */
-        public ?FHIRMarkdown $description = null,
+        public ?\FHIRMarkdown $description = null,
         /** @var array<FHIRUsageContext> useContext The context that the content is intended to support */
         public array $useContext = [],
         /** @var array<FHIRCodeableConcept> jurisdiction Intended jurisdiction for charge item definition (if applicable) */
         public array $jurisdiction = [],
         /** @var FHIRMarkdown|null copyright Use and/or publishing restrictions */
-        public ?FHIRMarkdown $copyright = null,
+        public ?\FHIRMarkdown $copyright = null,
         /** @var FHIRDate|null approvalDate When the charge item definition was approved by publisher */
-        public ?FHIRDate $approvalDate = null,
+        public ?\FHIRDate $approvalDate = null,
         /** @var FHIRDate|null lastReviewDate When the charge item definition was last reviewed */
-        public ?FHIRDate $lastReviewDate = null,
+        public ?\FHIRDate $lastReviewDate = null,
         /** @var FHIRPeriod|null effectivePeriod When the charge item definition is expected to be used */
-        public ?FHIRPeriod $effectivePeriod = null,
+        public ?\FHIRPeriod $effectivePeriod = null,
         /** @var FHIRCodeableConcept|null code Billing codes or product types this definition applies to */
-        public ?FHIRCodeableConcept $code = null,
+        public ?\FHIRCodeableConcept $code = null,
         /** @var array<FHIRReference> instance Instances this definition applies to */
         public array $instance = [],
         /** @var array<FHIRChargeItemDefinitionApplicability> applicability Whether or not the billing code is applicable */

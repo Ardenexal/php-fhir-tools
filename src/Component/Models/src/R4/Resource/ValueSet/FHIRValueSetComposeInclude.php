@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUri;
 
 /**
  * @description Include one or more codes from a code system or other value set(s).
@@ -24,9 +20,9 @@ class FHIRValueSetComposeInclude extends \Ardenexal\FHIRTools\Component\Models\R
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRUri|null system The system the codes come from */
-        public ?FHIRUri $system = null,
+        public ?\FHIRUri $system = null,
         /** @var FHIRString|string|null version Specific version of the code system referred to */
-        public FHIRString|string|null $version = null,
+        public \FHIRString|string|null $version = null,
         /** @var array<FHIRValueSetComposeIncludeConcept> concept A concept defined in the system */
         public array $concept = [],
         /** @var array<FHIRValueSetComposeIncludeFilter> filter Select codes/concepts by their properties (including relationships) */

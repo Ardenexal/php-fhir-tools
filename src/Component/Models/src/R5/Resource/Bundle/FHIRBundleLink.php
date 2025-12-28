@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,10 +22,10 @@ class FHIRBundleLink extends \Ardenexal\FHIRTools\Component\Models\R5\DataType\F
         public array $modifierExtension = [],
         /** @var FHIRLinkRelationTypesType|null relation See http://www.iana.org/assignments/link-relations/link-relations.xhtml#link-relations-1 */
         #[NotBlank]
-        public ?FHIRLinkRelationTypesType $relation = null,
+        public ?\FHIRLinkRelationTypesType $relation = null,
         /** @var FHIRUri|null url Reference details for the link */
         #[NotBlank]
-        public ?FHIRUri $url = null,
+        public ?\FHIRUri $url = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

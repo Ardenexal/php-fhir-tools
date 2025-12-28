@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
 
 /**
  * @description Links or references providing traceability to the testing requirements for this assert.
@@ -23,7 +20,7 @@ class FHIRTestScriptSetupActionAssertRequirement extends \Ardenexal\FHIRTools\Co
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRUri|FHIRCanonical|null linkX Link or reference to the testing requirement */
-        public FHIRUri|FHIRCanonical|null $linkX = null,
+        public \FHIRUri|\FHIRCanonical|null $linkX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDecimal;
-use Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRCurrenciesType;
 
 /**
  * @author HL7 FHIR Standard
@@ -24,9 +22,9 @@ class FHIRMoney extends FHIRElement
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
         /** @var FHIRDecimal|null value Numerical value (with implicit precision) */
-        public ?FHIRDecimal $value = null,
+        public ?\FHIRDecimal $value = null,
         /** @var FHIRCurrenciesType|null currency ISO 4217 Currency Code */
-        public ?FHIRCurrenciesType $currency = null,
+        public ?\FHIRCurrenciesType $currency = null,
     ) {
         parent::__construct($id, $extension);
     }

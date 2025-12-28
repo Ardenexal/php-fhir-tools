@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,12 +21,12 @@ class FHIRSubstanceDefinitionMolecularWeight extends \Ardenexal\FHIRTools\Compon
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null method The method by which the weight was determined */
-        public ?FHIRCodeableConcept $method = null,
+        public ?\FHIRCodeableConcept $method = null,
         /** @var FHIRCodeableConcept|null type Type of molecular weight e.g. exact, average, weight average */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRQuantity|null amount Used to capture quantitative values for a variety of elements */
         #[NotBlank]
-        public ?FHIRQuantity $amount = null,
+        public ?\FHIRQuantity $amount = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

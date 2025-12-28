@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRPositiveInt;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,16 +21,16 @@ class FHIRImmunizationProtocolApplied extends \Ardenexal\FHIRTools\Component\Mod
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRString|string|null series Name of vaccine series */
-        public FHIRString|string|null $series = null,
+        public \FHIRString|string|null $series = null,
         /** @var FHIRReference|null authority Who is responsible for publishing the recommendations */
-        public ?FHIRReference $authority = null,
+        public ?\FHIRReference $authority = null,
         /** @var array<FHIRCodeableConcept> targetDisease Vaccine preventatable disease being targetted */
         public array $targetDisease = [],
         /** @var FHIRPositiveInt|FHIRString|string|null doseNumberX Dose number within series */
         #[NotBlank]
-        public FHIRPositiveInt|FHIRString|string|null $doseNumberX = null,
+        public \FHIRPositiveInt|\FHIRString|string|null $doseNumberX = null,
         /** @var FHIRPositiveInt|FHIRString|string|null seriesDosesX Recommended number of doses for immunity */
-        public FHIRPositiveInt|FHIRString|string|null $seriesDosesX = null,
+        public \FHIRPositiveInt|\FHIRString|string|null $seriesDosesX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

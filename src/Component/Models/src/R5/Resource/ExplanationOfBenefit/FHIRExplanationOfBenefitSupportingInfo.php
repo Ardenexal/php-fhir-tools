@@ -5,18 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRAttachment;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCoding;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDate;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRPositiveInt;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -34,18 +22,18 @@ class FHIRExplanationOfBenefitSupportingInfo extends \Ardenexal\FHIRTools\Compon
         public array $modifierExtension = [],
         /** @var FHIRPositiveInt|null sequence Information instance identifier */
         #[NotBlank]
-        public ?FHIRPositiveInt $sequence = null,
+        public ?\FHIRPositiveInt $sequence = null,
         /** @var FHIRCodeableConcept|null category Classification of the supplied information */
         #[NotBlank]
-        public ?FHIRCodeableConcept $category = null,
+        public ?\FHIRCodeableConcept $category = null,
         /** @var FHIRCodeableConcept|null code Type of information */
-        public ?FHIRCodeableConcept $code = null,
+        public ?\FHIRCodeableConcept $code = null,
         /** @var FHIRDate|FHIRPeriod|null timingX When it occurred */
-        public FHIRDate|FHIRPeriod|null $timingX = null,
+        public \FHIRDate|\FHIRPeriod|null $timingX = null,
         /** @var FHIRBoolean|FHIRString|string|FHIRQuantity|FHIRAttachment|FHIRReference|FHIRIdentifier|null valueX Data to be provided */
-        public FHIRBoolean|FHIRString|string|FHIRQuantity|FHIRAttachment|FHIRReference|FHIRIdentifier|null $valueX = null,
+        public \FHIRBoolean|\FHIRString|string|\FHIRQuantity|\FHIRAttachment|\FHIRReference|\FHIRIdentifier|null $valueX = null,
         /** @var FHIRCoding|null reason Explanation for the information */
-        public ?FHIRCoding $reason = null,
+        public ?\FHIRCoding $reason = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

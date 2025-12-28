@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRAnnotation;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
 
 /**
  * @description Identifies a planned action to occur as part of the plan.  For example, a medication to be used, lab tests to perform, self-monitoring, education, etc.
@@ -30,9 +26,9 @@ class FHIRCarePlanActivity extends \Ardenexal\FHIRTools\Component\Models\R4B\Dat
         /** @var array<FHIRAnnotation> progress Comments about the activity status/progress */
         public array $progress = [],
         /** @var FHIRReference|null reference Activity details defined in specific resource */
-        public ?FHIRReference $reference = null,
+        public ?\FHIRReference $reference = null,
         /** @var FHIRCarePlanActivityDetail|null detail In-line definition of activity */
-        public ?FHIRCarePlanActivityDetail $detail = null,
+        public ?\FHIRCarePlanActivityDetail $detail = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

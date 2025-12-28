@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCoding;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,11 +22,11 @@ class FHIRTestPlanTestCaseTestData extends \Ardenexal\FHIRTools\Component\Models
         public array $modifierExtension = [],
         /** @var FHIRCoding|null type The type of test data description, e.g. 'synthea' */
         #[NotBlank]
-        public ?FHIRCoding $type = null,
+        public ?\FHIRCoding $type = null,
         /** @var FHIRReference|null content The actual test resources when they exist */
-        public ?FHIRReference $content = null,
+        public ?\FHIRReference $content = null,
         /** @var FHIRString|string|FHIRReference|null sourceX Pointer to a definition of test resources - narrative or structured e.g. synthetic data generation, etc */
-        public FHIRString|string|FHIRReference|null $sourceX = null,
+        public \FHIRString|string|\FHIRReference|null $sourceX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

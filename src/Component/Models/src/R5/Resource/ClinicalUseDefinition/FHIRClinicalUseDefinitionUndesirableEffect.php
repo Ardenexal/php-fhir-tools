@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableReference;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
 
 /**
  * @description Describe the possible undesirable effects (negative outcomes) from the use of the medicinal product as treatment.
@@ -23,11 +20,11 @@ class FHIRClinicalUseDefinitionUndesirableEffect extends \Ardenexal\FHIRTools\Co
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableReference|null symptomConditionEffect The situation in which the undesirable effect may manifest */
-        public ?FHIRCodeableReference $symptomConditionEffect = null,
+        public ?\FHIRCodeableReference $symptomConditionEffect = null,
         /** @var FHIRCodeableConcept|null classification High level classification of the effect */
-        public ?FHIRCodeableConcept $classification = null,
+        public ?\FHIRCodeableConcept $classification = null,
         /** @var FHIRCodeableConcept|null frequencyOfOccurrence How often the effect is seen */
-        public ?FHIRCodeableConcept $frequencyOfOccurrence = null,
+        public ?\FHIRCodeableConcept $frequencyOfOccurrence = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -4,19 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRAttachment;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMeta;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRNarrative;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri;
-
 /**
  * @author Health Level Seven International (Financial Management)
  *
@@ -24,21 +11,21 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri;
  *
  * @description Legally enforceable, formally recorded unilateral or bilateral directive i.e., a policy or agreement.
  */
-#[FhirResource(type: 'Contract', version: '4.3.0', url: 'http://hl7.org/fhir/StructureDefinition/Contract', fhirVersion: 'R4B')]
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(type: 'Contract', version: '4.3.0', url: 'http://hl7.org/fhir/StructureDefinition/Contract', fhirVersion: 'R4B')]
 class FHIRContract extends FHIRDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
         public ?string $id = null,
         /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?FHIRMeta $meta = null,
+        public ?\FHIRMeta $meta = null,
         /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?FHIRUri $implicitRules = null,
+        public ?\FHIRUri $implicitRules = null,
         /** @var string|null language Language of the resource content */
         public ?string $language = null,
         /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
-        public ?FHIRNarrative $text = null,
-        /** @var array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRResource> contained Contained, inline Resources */
+        public ?\FHIRNarrative $text = null,
+        /** @var array<FHIRResource> contained Contained, inline Resources */
         public array $contained = [],
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
@@ -47,25 +34,25 @@ class FHIRContract extends FHIRDomainResource
         /** @var array<FHIRIdentifier> identifier Contract number */
         public array $identifier = [],
         /** @var FHIRUri|null url Basal definition */
-        public ?FHIRUri $url = null,
+        public ?\FHIRUri $url = null,
         /** @var FHIRString|string|null version Business edition */
-        public FHIRString|string|null $version = null,
+        public \FHIRString|string|null $version = null,
         /** @var FHIRContractResourceStatusCodesType|null status amended | appended | cancelled | disputed | entered-in-error | executable | executed | negotiable | offered | policy | rejected | renewed | revoked | resolved | terminated */
-        public ?FHIRContractResourceStatusCodesType $status = null,
+        public ?\FHIRContractResourceStatusCodesType $status = null,
         /** @var FHIRCodeableConcept|null legalState Negotiation status */
-        public ?FHIRCodeableConcept $legalState = null,
+        public ?\FHIRCodeableConcept $legalState = null,
         /** @var FHIRReference|null instantiatesCanonical Source Contract Definition */
-        public ?FHIRReference $instantiatesCanonical = null,
+        public ?\FHIRReference $instantiatesCanonical = null,
         /** @var FHIRUri|null instantiatesUri External Contract Definition */
-        public ?FHIRUri $instantiatesUri = null,
+        public ?\FHIRUri $instantiatesUri = null,
         /** @var FHIRCodeableConcept|null contentDerivative Content derived from the basal information */
-        public ?FHIRCodeableConcept $contentDerivative = null,
+        public ?\FHIRCodeableConcept $contentDerivative = null,
         /** @var FHIRDateTime|null issued When this Contract was issued */
-        public ?FHIRDateTime $issued = null,
+        public ?\FHIRDateTime $issued = null,
         /** @var FHIRPeriod|null applies Effective time */
-        public ?FHIRPeriod $applies = null,
+        public ?\FHIRPeriod $applies = null,
         /** @var FHIRCodeableConcept|null expirationType Contract cessation cause */
-        public ?FHIRCodeableConcept $expirationType = null,
+        public ?\FHIRCodeableConcept $expirationType = null,
         /** @var array<FHIRReference> subject Contract Target Entity */
         public array $subject = [],
         /** @var array<FHIRReference> authority Authority under which this Contract has standing */
@@ -75,25 +62,25 @@ class FHIRContract extends FHIRDomainResource
         /** @var array<FHIRReference> site Specific Location */
         public array $site = [],
         /** @var FHIRString|string|null name Computer friendly designation */
-        public FHIRString|string|null $name = null,
+        public \FHIRString|string|null $name = null,
         /** @var FHIRString|string|null title Human Friendly name */
-        public FHIRString|string|null $title = null,
+        public \FHIRString|string|null $title = null,
         /** @var FHIRString|string|null subtitle Subordinate Friendly name */
-        public FHIRString|string|null $subtitle = null,
+        public \FHIRString|string|null $subtitle = null,
         /** @var array<FHIRString|string> alias Acronym or short name */
         public array $alias = [],
         /** @var FHIRReference|null author Source of Contract */
-        public ?FHIRReference $author = null,
+        public ?\FHIRReference $author = null,
         /** @var FHIRCodeableConcept|null scope Range of Legal Concerns */
-        public ?FHIRCodeableConcept $scope = null,
+        public ?\FHIRCodeableConcept $scope = null,
         /** @var FHIRCodeableConcept|FHIRReference|null topicX Focus of contract interest */
-        public FHIRCodeableConcept|FHIRReference|null $topicX = null,
+        public \FHIRCodeableConcept|\FHIRReference|null $topicX = null,
         /** @var FHIRCodeableConcept|null type Legal instrument category */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var array<FHIRCodeableConcept> subType Subtype within the context of type */
         public array $subType = [],
         /** @var FHIRContractContentDefinition|null contentDefinition Contract precursor content */
-        public ?FHIRContractContentDefinition $contentDefinition = null,
+        public ?\FHIRContractContentDefinition $contentDefinition = null,
         /** @var array<FHIRContractTerm> term Contract Term List */
         public array $term = [],
         /** @var array<FHIRReference> supportingInfo Extra Information */
@@ -109,7 +96,7 @@ class FHIRContract extends FHIRDomainResource
         /** @var array<FHIRContractRule> rule Computable Contract Language */
         public array $rule = [],
         /** @var FHIRAttachment|FHIRReference|null legallyBindingX Binding Contract */
-        public FHIRAttachment|FHIRReference|null $legallyBindingX = null,
+        public \FHIRAttachment|\FHIRReference|null $legallyBindingX = null,
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
     }

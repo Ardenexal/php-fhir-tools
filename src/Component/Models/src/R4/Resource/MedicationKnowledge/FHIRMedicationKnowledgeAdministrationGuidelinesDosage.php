@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDosage;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -29,7 +26,7 @@ class FHIRMedicationKnowledgeAdministrationGuidelinesDosage extends \Ardenexal\F
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null type Type of dosage */
         #[NotBlank]
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var array<FHIRDosage> dosage Dosage for the medication for the specific guidelines */
         public array $dosage = [],
     ) {

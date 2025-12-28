@@ -5,19 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRAttachment;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCoding;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDate;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDecimal;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRInteger;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRTime;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUri;
 
 /**
  * @description The respondent's answer(s) to the question.
@@ -33,7 +20,7 @@ class FHIRQuestionnaireResponseItemAnswer extends \Ardenexal\FHIRTools\Component
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRBoolean|FHIRDecimal|FHIRInteger|FHIRDate|FHIRDateTime|FHIRTime|FHIRString|string|FHIRUri|FHIRAttachment|FHIRCoding|FHIRQuantity|FHIRReference|null valueX Single-valued answer to the question */
-        public FHIRBoolean|FHIRDecimal|FHIRInteger|FHIRDate|FHIRDateTime|FHIRTime|FHIRString|string|FHIRUri|FHIRAttachment|FHIRCoding|FHIRQuantity|FHIRReference|null $valueX = null,
+        public \FHIRBoolean|\FHIRDecimal|\FHIRInteger|\FHIRDate|\FHIRDateTime|\FHIRTime|\FHIRString|string|\FHIRUri|\FHIRAttachment|\FHIRCoding|\FHIRQuantity|\FHIRReference|null $valueX = null,
         /** @var array<FHIRQuestionnaireResponseItem> item Nested groups and questions */
         public array $item = [],
     ) {

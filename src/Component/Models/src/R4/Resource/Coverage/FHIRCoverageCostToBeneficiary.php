@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRMoney;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRQuantity;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,10 +21,10 @@ class FHIRCoverageCostToBeneficiary extends \Ardenexal\FHIRTools\Component\Model
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null type Cost category */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRQuantity|FHIRMoney|null valueX The amount or percentage due from the beneficiary */
         #[NotBlank]
-        public FHIRQuantity|FHIRMoney|null $valueX = null,
+        public \FHIRQuantity|\FHIRMoney|null $valueX = null,
         /** @var array<FHIRCoverageCostToBeneficiaryException> exception Exceptions for patient payments */
         public array $exception = [],
     ) {

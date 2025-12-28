@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,16 +22,16 @@ class FHIRNamingSystemUniqueId extends \Ardenexal\FHIRTools\Component\Models\R4B
         public array $modifierExtension = [],
         /** @var FHIRNamingSystemIdentifierTypeType|null type oid | uuid | uri | other */
         #[NotBlank]
-        public ?FHIRNamingSystemIdentifierTypeType $type = null,
+        public ?\FHIRNamingSystemIdentifierTypeType $type = null,
         /** @var FHIRString|string|null value The unique identifier */
         #[NotBlank]
-        public FHIRString|string|null $value = null,
+        public \FHIRString|string|null $value = null,
         /** @var FHIRBoolean|null preferred Is this the id that should be used for this type */
-        public ?FHIRBoolean $preferred = null,
+        public ?\FHIRBoolean $preferred = null,
         /** @var FHIRString|string|null comment Notes about identifier usage */
-        public FHIRString|string|null $comment = null,
+        public \FHIRString|string|null $comment = null,
         /** @var FHIRPeriod|null period When is identifier valid? */
-        public ?FHIRPeriod $period = null,
+        public ?\FHIRPeriod $period = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

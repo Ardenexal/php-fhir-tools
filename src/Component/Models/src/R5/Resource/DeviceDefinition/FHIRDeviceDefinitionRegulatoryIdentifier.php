@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,16 +22,16 @@ class FHIRDeviceDefinitionRegulatoryIdentifier extends \Ardenexal\FHIRTools\Comp
         public array $modifierExtension = [],
         /** @var FHIRDeviceDefinitionRegulatoryIdentifierTypeType|null type basic | master | license */
         #[NotBlank]
-        public ?FHIRDeviceDefinitionRegulatoryIdentifierTypeType $type = null,
+        public ?\FHIRDeviceDefinitionRegulatoryIdentifierTypeType $type = null,
         /** @var FHIRString|string|null deviceIdentifier The identifier itself */
         #[NotBlank]
-        public FHIRString|string|null $deviceIdentifier = null,
+        public \FHIRString|string|null $deviceIdentifier = null,
         /** @var FHIRUri|null issuer The organization that issued this identifier */
         #[NotBlank]
-        public ?FHIRUri $issuer = null,
+        public ?\FHIRUri $issuer = null,
         /** @var FHIRUri|null jurisdiction The jurisdiction to which the deviceIdentifier applies */
         #[NotBlank]
-        public ?FHIRUri $jurisdiction = null,
+        public ?\FHIRUri $jurisdiction = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

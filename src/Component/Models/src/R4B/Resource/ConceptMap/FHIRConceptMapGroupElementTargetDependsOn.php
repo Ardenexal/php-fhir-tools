@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,14 +22,14 @@ class FHIRConceptMapGroupElementTargetDependsOn extends \Ardenexal\FHIRTools\Com
         public array $modifierExtension = [],
         /** @var FHIRUri|null property Reference to property mapping depends on */
         #[NotBlank]
-        public ?FHIRUri $property = null,
+        public ?\FHIRUri $property = null,
         /** @var FHIRCanonical|null system Code System (if necessary) */
-        public ?FHIRCanonical $system = null,
+        public ?\FHIRCanonical $system = null,
         /** @var FHIRString|string|null value Value of the referenced element */
         #[NotBlank]
-        public FHIRString|string|null $value = null,
+        public \FHIRString|string|null $value = null,
         /** @var FHIRString|string|null display Display for the code (if value is a code) */
-        public FHIRString|string|null $display = null,
+        public \FHIRString|string|null $display = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

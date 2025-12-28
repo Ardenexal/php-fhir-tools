@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRRelatedArtifact;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,10 +21,10 @@ class FHIRDeviceDefinitionConformsTo extends \Ardenexal\FHIRTools\Component\Mode
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null category Describes the common type of the standard, specification, or formal guidance */
-        public ?FHIRCodeableConcept $category = null,
+        public ?\FHIRCodeableConcept $category = null,
         /** @var FHIRCodeableConcept|null specification Identifies the standard, specification, or formal guidance that the device adheres to the Device Specification type */
         #[NotBlank]
-        public ?FHIRCodeableConcept $specification = null,
+        public ?\FHIRCodeableConcept $specification = null,
         /** @var array<FHIRString|string> version The specific form or variant of the standard, specification or formal guidance */
         public array $version = [],
         /** @var array<FHIRRelatedArtifact> source Standard, regulation, certification, or guidance website, document, or other publication, or similar, supporting the conformance */

@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRDuration;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity;
 
 /**
  * @description Indicates the quantity or duration for the first dispense of the medication.
@@ -23,9 +20,9 @@ class FHIRMedicationRequestDispenseRequestInitialFill extends \Ardenexal\FHIRToo
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRQuantity|null quantity First fill quantity */
-        public ?FHIRQuantity $quantity = null,
+        public ?\FHIRQuantity $quantity = null,
         /** @var FHIRDuration|null duration First fill duration */
-        public ?FHIRDuration $duration = null,
+        public ?\FHIRDuration $duration = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

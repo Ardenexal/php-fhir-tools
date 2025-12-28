@@ -5,16 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRDuration;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRRange;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRRatio;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDate;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInteger;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 
 /**
  * @description Indicates what should be done by when.
@@ -30,11 +20,11 @@ class FHIRGoalTarget extends \Ardenexal\FHIRTools\Component\Models\R5\DataType\F
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null measure The parameter whose value is being tracked */
-        public ?FHIRCodeableConcept $measure = null,
+        public ?\FHIRCodeableConcept $measure = null,
         /** @var FHIRQuantity|FHIRRange|FHIRCodeableConcept|FHIRString|string|FHIRBoolean|FHIRInteger|FHIRRatio|null detailX The target value to be achieved */
-        public FHIRQuantity|FHIRRange|FHIRCodeableConcept|FHIRString|string|FHIRBoolean|FHIRInteger|FHIRRatio|null $detailX = null,
+        public \FHIRQuantity|\FHIRRange|\FHIRCodeableConcept|\FHIRString|string|\FHIRBoolean|\FHIRInteger|\FHIRRatio|null $detailX = null,
         /** @var FHIRDate|FHIRDuration|null dueX Reach goal on or before */
-        public FHIRDate|FHIRDuration|null $dueX = null,
+        public \FHIRDate|\FHIRDuration|null $dueX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
 
 /**
  * @description Logical network location for application activity, if the activity has a network location.
@@ -22,9 +20,9 @@ class FHIRAuditEventAgentNetwork extends \Ardenexal\FHIRTools\Component\Models\R
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRString|string|null address Identifier for the network access point of the user device */
-        public FHIRString|string|null $address = null,
+        public \FHIRString|string|null $address = null,
         /** @var FHIRAuditEventAgentNetworkTypeType|null type The type of network access point */
-        public ?FHIRAuditEventAgentNetworkTypeType $type = null,
+        public ?\FHIRAuditEventAgentNetworkTypeType $type = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
 
 /**
  * @description Patient diagnosis for which care is sought.
@@ -27,7 +24,7 @@ class FHIRCoverageEligibilityRequestItemDiagnosis extends \Ardenexal\FHIRTools\C
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|FHIRReference|null diagnosisX Nature of illness or problem */
-        public FHIRCodeableConcept|FHIRReference|null $diagnosisX = null,
+        public \FHIRCodeableConcept|\FHIRReference|null $diagnosisX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

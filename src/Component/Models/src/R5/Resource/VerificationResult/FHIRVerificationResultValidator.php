@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRSignature;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,11 +22,11 @@ class FHIRVerificationResultValidator extends \Ardenexal\FHIRTools\Component\Mod
         public array $modifierExtension = [],
         /** @var FHIRReference|null organization Reference to the organization validating information */
         #[NotBlank]
-        public ?FHIRReference $organization = null,
+        public ?\FHIRReference $organization = null,
         /** @var FHIRString|string|null identityCertificate A digital identity certificate associated with the validator */
-        public FHIRString|string|null $identityCertificate = null,
+        public \FHIRString|string|null $identityCertificate = null,
         /** @var FHIRSignature|null attestationSignature Validator signature (digital or image) */
-        public ?FHIRSignature $attestationSignature = null,
+        public ?\FHIRSignature $attestationSignature = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

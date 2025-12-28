@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCanonical;
 
 /**
  * @description Identifies a code system that is supported by the server. If there is a no code system URL, then this declares the general assumptions a client can make about support for any CodeSystem resource.
@@ -23,11 +20,11 @@ class FHIRTerminologyCapabilitiesCodeSystem extends \Ardenexal\FHIRTools\Compone
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCanonical|null uri URI for the Code System */
-        public ?FHIRCanonical $uri = null,
+        public ?\FHIRCanonical $uri = null,
         /** @var array<FHIRTerminologyCapabilitiesCodeSystemVersion> version Version of Code System supported */
         public array $version = [],
         /** @var FHIRBoolean|null subsumption Whether subsumption is supported */
-        public ?FHIRBoolean $subsumption = null,
+        public ?\FHIRBoolean $subsumption = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

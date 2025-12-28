@@ -5,12 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRId;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRMarkdown;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,18 +21,18 @@ class FHIRResearchStudyComparisonGroup extends \Ardenexal\FHIRTools\Component\Mo
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRId|null linkId Allows the comparisonGroup for the study and the comparisonGroup for the subject to be linked easily */
-        public ?FHIRId $linkId = null,
+        public ?\FHIRId $linkId = null,
         /** @var FHIRString|string|null name Label for study comparisonGroup */
         #[NotBlank]
-        public FHIRString|string|null $name = null,
+        public \FHIRString|string|null $name = null,
         /** @var FHIRCodeableConcept|null type Categorization of study comparisonGroup */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRMarkdown|null description Short explanation of study path */
-        public ?FHIRMarkdown $description = null,
+        public ?\FHIRMarkdown $description = null,
         /** @var array<FHIRReference> intendedExposure Interventions or exposures in this comparisonGroup or cohort */
         public array $intendedExposure = [],
         /** @var FHIRReference|null observedGroup Group of participants who were enrolled in study comparisonGroup */
-        public ?FHIRReference $observedGroup = null,
+        public ?\FHIRReference $observedGroup = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

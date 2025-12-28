@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,14 +22,14 @@ class FHIROperationOutcomeIssue extends \Ardenexal\FHIRTools\Component\Models\R5
         public array $modifierExtension = [],
         /** @var FHIRIssueSeverityType|null severity fatal | error | warning | information | success */
         #[NotBlank]
-        public ?FHIRIssueSeverityType $severity = null,
+        public ?\FHIRIssueSeverityType $severity = null,
         /** @var FHIRIssueTypeType|null code Error or warning code */
         #[NotBlank]
-        public ?FHIRIssueTypeType $code = null,
+        public ?\FHIRIssueTypeType $code = null,
         /** @var FHIRCodeableConcept|null details Additional details about the error */
-        public ?FHIRCodeableConcept $details = null,
+        public ?\FHIRCodeableConcept $details = null,
         /** @var FHIRString|string|null diagnostics Additional diagnostic information about the issue */
-        public FHIRString|string|null $diagnostics = null,
+        public \FHIRString|string|null $diagnostics = null,
         /** @var array<FHIRString|string> location Deprecated: Path of element(s) related to issue */
         public array $location = [],
         /** @var array<FHIRString|string> expression FHIRPath of element(s) related to issue */

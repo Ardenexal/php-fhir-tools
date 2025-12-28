@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRMoney;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,14 +23,14 @@ class FHIRAccountBalance extends \Ardenexal\FHIRTools\Component\Models\R5\DataTy
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null aggregate Who is expected to pay this part of the balance */
-        public ?FHIRCodeableConcept $aggregate = null,
+        public ?\FHIRCodeableConcept $aggregate = null,
         /** @var FHIRCodeableConcept|null term current | 30 | 60 | 90 | 120 */
-        public ?FHIRCodeableConcept $term = null,
+        public ?\FHIRCodeableConcept $term = null,
         /** @var FHIRBoolean|null estimate Estimated balance */
-        public ?FHIRBoolean $estimate = null,
+        public ?\FHIRBoolean $estimate = null,
         /** @var FHIRMoney|null amount Calculated amount */
         #[NotBlank]
-        public ?FHIRMoney $amount = null,
+        public ?\FHIRMoney $amount = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

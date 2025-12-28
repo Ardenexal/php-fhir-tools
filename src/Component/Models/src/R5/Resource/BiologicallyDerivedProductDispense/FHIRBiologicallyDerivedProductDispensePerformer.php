@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -28,10 +25,10 @@ class FHIRBiologicallyDerivedProductDispensePerformer extends \Ardenexal\FHIRToo
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null function Identifies the function of the performer during the dispense */
-        public ?FHIRCodeableConcept $function = null,
+        public ?\FHIRCodeableConcept $function = null,
         /** @var FHIRReference|null actor Who performed the action */
         #[NotBlank]
-        public ?FHIRReference $actor = null,
+        public ?\FHIRReference $actor = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

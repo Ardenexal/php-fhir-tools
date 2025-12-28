@@ -4,20 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRAnnotation;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRAttachment;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRMeta;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRNarrative;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInstant;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRMarkdown;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,7 +13,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  *
  * @description The findings and interpretation of diagnostic tests performed on patients, groups of patients, products, substances, devices, and locations, and/or specimens derived from these. The report includes clinical context such as requesting provider information, and some mix of atomic results, images, textual and coded interpretations, and formatted representation of diagnostic reports. The report also includes non-clinical context such as batch analysis and stability reporting of products and substances.
  */
-#[FhirResource(
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(
     type: 'DiagnosticReport',
     version: '5.0.0',
     url: 'http://hl7.org/fhir/StructureDefinition/DiagnosticReport',
@@ -39,14 +25,14 @@ class FHIRDiagnosticReport extends FHIRDomainResource
         /** @var string|null id Logical id of this artifact */
         public ?string $id = null,
         /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?FHIRMeta $meta = null,
+        public ?\FHIRMeta $meta = null,
         /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?FHIRUri $implicitRules = null,
+        public ?\FHIRUri $implicitRules = null,
         /** @var FHIRAllLanguagesType|null language Language of the resource content */
-        public ?FHIRAllLanguagesType $language = null,
+        public ?\FHIRAllLanguagesType $language = null,
         /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
-        public ?FHIRNarrative $text = null,
-        /** @var array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRResource> contained Contained, inline Resources */
+        public ?\FHIRNarrative $text = null,
+        /** @var array<FHIRResource> contained Contained, inline Resources */
         public array $contained = [],
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
@@ -58,20 +44,20 @@ class FHIRDiagnosticReport extends FHIRDomainResource
         public array $basedOn = [],
         /** @var FHIRDiagnosticReportStatusType|null status registered | partial | preliminary | modified | final | amended | corrected | appended | cancelled | entered-in-error | unknown */
         #[NotBlank]
-        public ?FHIRDiagnosticReportStatusType $status = null,
+        public ?\FHIRDiagnosticReportStatusType $status = null,
         /** @var array<FHIRCodeableConcept> category Service category */
         public array $category = [],
         /** @var FHIRCodeableConcept|null code Name/Code for this diagnostic report */
         #[NotBlank]
-        public ?FHIRCodeableConcept $code = null,
+        public ?\FHIRCodeableConcept $code = null,
         /** @var FHIRReference|null subject The subject of the report - usually, but not always, the patient */
-        public ?FHIRReference $subject = null,
+        public ?\FHIRReference $subject = null,
         /** @var FHIRReference|null encounter Health care event when test ordered */
-        public ?FHIRReference $encounter = null,
+        public ?\FHIRReference $encounter = null,
         /** @var FHIRDateTime|FHIRPeriod|null effectiveX Clinically relevant time/time-period for report */
-        public FHIRDateTime|FHIRPeriod|null $effectiveX = null,
+        public \FHIRDateTime|\FHIRPeriod|null $effectiveX = null,
         /** @var FHIRInstant|null issued DateTime this version was made */
-        public ?FHIRInstant $issued = null,
+        public ?\FHIRInstant $issued = null,
         /** @var array<FHIRReference> performer Responsible Diagnostic Service */
         public array $performer = [],
         /** @var array<FHIRReference> resultsInterpreter Primary result interpreter */
@@ -89,9 +75,9 @@ class FHIRDiagnosticReport extends FHIRDomainResource
         /** @var array<FHIRDiagnosticReportMedia> media Key images or data associated with this report */
         public array $media = [],
         /** @var FHIRReference|null composition Reference to a Composition resource for the DiagnosticReport structure */
-        public ?FHIRReference $composition = null,
+        public ?\FHIRReference $composition = null,
         /** @var FHIRMarkdown|null conclusion Clinical conclusion (interpretation) of test results */
-        public ?FHIRMarkdown $conclusion = null,
+        public ?\FHIRMarkdown $conclusion = null,
         /** @var array<FHIRCodeableConcept> conclusionCode Codes for the clinical conclusion of test results */
         public array $conclusionCode = [],
         /** @var array<FHIRAttachment> presentedForm Entire report as issued */

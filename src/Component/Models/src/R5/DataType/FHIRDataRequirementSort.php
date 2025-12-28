@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRSortDirectionType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -22,10 +20,10 @@ class FHIRDataRequirementSort extends FHIRElement
         public array $extension = [],
         /** @var FHIRString|string|null path The name of the attribute to perform the sort */
         #[NotBlank]
-        public FHIRString|string|null $path = null,
+        public \FHIRString|string|null $path = null,
         /** @var FHIRSortDirectionType|null direction ascending | descending */
         #[NotBlank]
-        public ?FHIRSortDirectionType $direction = null,
+        public ?\FHIRSortDirectionType $direction = null,
     ) {
         parent::__construct($id, $extension);
     }

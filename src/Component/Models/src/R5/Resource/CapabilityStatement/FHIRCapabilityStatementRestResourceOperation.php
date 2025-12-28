@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRMarkdown;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,12 +22,12 @@ class FHIRCapabilityStatementRestResourceOperation extends \Ardenexal\FHIRTools\
         public array $modifierExtension = [],
         /** @var FHIRString|string|null name Name by which the operation/query is invoked */
         #[NotBlank]
-        public FHIRString|string|null $name = null,
+        public \FHIRString|string|null $name = null,
         /** @var FHIRCanonical|null definition The defined operation/query */
         #[NotBlank]
-        public ?FHIRCanonical $definition = null,
+        public ?\FHIRCanonical $definition = null,
         /** @var FHIRMarkdown|null documentation Specific details about operation behavior */
-        public ?FHIRMarkdown $documentation = null,
+        public ?\FHIRMarkdown $documentation = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

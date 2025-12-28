@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRId;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,7 +22,7 @@ class FHIRStructureMapGroupRuleDependent extends \Ardenexal\FHIRTools\Component\
         public array $modifierExtension = [],
         /** @var FHIRId|null name Name of a rule or group to apply */
         #[NotBlank]
-        public ?FHIRId $name = null,
+        public ?\FHIRId $name = null,
         /** @var array<FHIRStructureMapGroupRuleTargetParameter> parameter Parameter to pass to the rule or group */
         public array $parameter = [],
     ) {

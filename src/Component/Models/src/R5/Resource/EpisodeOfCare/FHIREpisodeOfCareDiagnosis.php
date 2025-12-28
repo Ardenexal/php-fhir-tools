@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableReference;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
 
 /**
  * @description The list of medical conditions that were addressed during the episode of care.
@@ -25,7 +22,7 @@ class FHIREpisodeOfCareDiagnosis extends \Ardenexal\FHIRTools\Component\Models\R
         /** @var array<FHIRCodeableReference> condition The medical condition that was addressed during the episode of care */
         public array $condition = [],
         /** @var FHIRCodeableConcept|null use Role that this diagnosis has within the episode of care (e.g. admission, billing, discharge …) */
-        public ?FHIRCodeableConcept $use = null,
+        public ?\FHIRCodeableConcept $use = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

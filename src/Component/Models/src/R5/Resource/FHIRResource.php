@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRBase;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRMeta;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
 
 /**
  * @author Health Level Seven International (FHIR Infrastructure)
@@ -22,11 +20,11 @@ abstract class FHIRResource extends FHIRBase
         /** @var string|null id Logical id of this artifact */
         public ?string $id = null,
         /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?FHIRMeta $meta = null,
+        public ?\FHIRMeta $meta = null,
         /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?FHIRUri $implicitRules = null,
+        public ?\FHIRUri $implicitRules = null,
         /** @var FHIRAllLanguagesType|null language Language of the resource content */
-        public ?FHIRAllLanguagesType $language = null,
+        public ?\FHIRAllLanguagesType $language = null,
     ) {
     }
 }

@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInteger;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 
 /**
  * @description A description of the size of the sample involved in the synthesis.
@@ -23,11 +20,11 @@ class FHIREffectEvidenceSynthesisSampleSize extends \Ardenexal\FHIRTools\Compone
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRString|string|null description Description of sample size */
-        public FHIRString|string|null $description = null,
+        public \FHIRString|string|null $description = null,
         /** @var FHIRInteger|null numberOfStudies How many studies? */
-        public ?FHIRInteger $numberOfStudies = null,
+        public ?\FHIRInteger $numberOfStudies = null,
         /** @var FHIRInteger|null numberOfParticipants How many participants? */
-        public ?FHIRInteger $numberOfParticipants = null,
+        public ?\FHIRInteger $numberOfParticipants = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -29,16 +25,16 @@ class FHIRMarketingStatus extends \Ardenexal\FHIRTools\Component\Models\R4B\Data
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null country The country in which the marketing authorisation has been granted shall be specified It should be specified using the ISO 3166 ‑ 1 alpha-2 code elements */
-        public ?FHIRCodeableConcept $country = null,
+        public ?\FHIRCodeableConcept $country = null,
         /** @var FHIRCodeableConcept|null jurisdiction Where a Medicines Regulatory Agency has granted a marketing authorisation for which specific provisions within a jurisdiction apply, the jurisdiction can be specified using an appropriate controlled terminology The controlled term and the controlled term identifier shall be specified */
-        public ?FHIRCodeableConcept $jurisdiction = null,
+        public ?\FHIRCodeableConcept $jurisdiction = null,
         /** @var FHIRCodeableConcept|null status This attribute provides information on the status of the marketing of the medicinal product See ISO/TS 20443 for more information and examples */
         #[NotBlank]
-        public ?FHIRCodeableConcept $status = null,
+        public ?\FHIRCodeableConcept $status = null,
         /** @var FHIRPeriod|null dateRange The date when the Medicinal Product is placed on the market by the Marketing Authorisation Holder (or where applicable, the manufacturer/distributor) in a country and/or jurisdiction shall be provided A complete date consisting of day, month and year shall be specified using the ISO 8601 date format NOTE “Placed on the market” refers to the release of the Medicinal Product into the distribution chain */
-        public ?FHIRPeriod $dateRange = null,
+        public ?\FHIRPeriod $dateRange = null,
         /** @var FHIRDateTime|null restoreDate The date when the Medicinal Product is placed on the market by the Marketing Authorisation Holder (or where applicable, the manufacturer/distributor) in a country and/or jurisdiction shall be provided A complete date consisting of day, month and year shall be specified using the ISO 8601 date format NOTE “Placed on the market” refers to the release of the Medicinal Product into the distribution chain */
-        public ?FHIRDateTime $restoreDate = null,
+        public ?\FHIRDateTime $restoreDate = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

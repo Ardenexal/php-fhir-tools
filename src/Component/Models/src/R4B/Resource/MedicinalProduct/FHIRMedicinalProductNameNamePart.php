@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCoding;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,10 +22,10 @@ class FHIRMedicinalProductNameNamePart extends \Ardenexal\FHIRTools\Component\Mo
         public array $modifierExtension = [],
         /** @var FHIRString|string|null part A fragment of a product name */
         #[NotBlank]
-        public FHIRString|string|null $part = null,
+        public \FHIRString|string|null $part = null,
         /** @var FHIRCoding|null type Idenifying type for this part of the name (e.g. strength part) */
         #[NotBlank]
-        public ?FHIRCoding $type = null,
+        public ?\FHIRCoding $type = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

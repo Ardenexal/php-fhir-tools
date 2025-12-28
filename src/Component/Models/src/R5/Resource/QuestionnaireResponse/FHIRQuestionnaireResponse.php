@@ -4,15 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRMeta;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRNarrative;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -22,7 +13,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  *
  * @description A structured set of questions and their answers. The questions are ordered and grouped into coherent subsets, corresponding to the structure of the grouping of the questionnaire being responded to.
  */
-#[FhirResource(
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(
     type: 'QuestionnaireResponse',
     version: '5.0.0',
     url: 'http://hl7.org/fhir/StructureDefinition/QuestionnaireResponse',
@@ -34,14 +25,14 @@ class FHIRQuestionnaireResponse extends FHIRDomainResource
         /** @var string|null id Logical id of this artifact */
         public ?string $id = null,
         /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?FHIRMeta $meta = null,
+        public ?\FHIRMeta $meta = null,
         /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?FHIRUri $implicitRules = null,
+        public ?\FHIRUri $implicitRules = null,
         /** @var FHIRAllLanguagesType|null language Language of the resource content */
-        public ?FHIRAllLanguagesType $language = null,
+        public ?\FHIRAllLanguagesType $language = null,
         /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
-        public ?FHIRNarrative $text = null,
-        /** @var array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRResource> contained Contained, inline Resources */
+        public ?\FHIRNarrative $text = null,
+        /** @var array<FHIRResource> contained Contained, inline Resources */
         public array $contained = [],
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
@@ -55,20 +46,20 @@ class FHIRQuestionnaireResponse extends FHIRDomainResource
         public array $partOf = [],
         /** @var FHIRCanonical|null questionnaire Canonical URL of Questionnaire being answered */
         #[NotBlank]
-        public ?FHIRCanonical $questionnaire = null,
+        public ?\FHIRCanonical $questionnaire = null,
         /** @var FHIRQuestionnaireResponseStatusType|null status in-progress | completed | amended | entered-in-error | stopped */
         #[NotBlank]
-        public ?FHIRQuestionnaireResponseStatusType $status = null,
+        public ?\FHIRQuestionnaireResponseStatusType $status = null,
         /** @var FHIRReference|null subject The subject of the questions */
-        public ?FHIRReference $subject = null,
+        public ?\FHIRReference $subject = null,
         /** @var FHIRReference|null encounter Encounter the questionnaire response is part of */
-        public ?FHIRReference $encounter = null,
+        public ?\FHIRReference $encounter = null,
         /** @var FHIRDateTime|null authored Date the answers were gathered */
-        public ?FHIRDateTime $authored = null,
+        public ?\FHIRDateTime $authored = null,
         /** @var FHIRReference|null author The individual or device that received and recorded the answers */
-        public ?FHIRReference $author = null,
+        public ?\FHIRReference $author = null,
         /** @var FHIRReference|null source The individual or device that answered the questions */
-        public ?FHIRReference $source = null,
+        public ?\FHIRReference $source = null,
         /** @var array<FHIRQuestionnaireResponseItem> item Groups and questions */
         public array $item = [],
     ) {

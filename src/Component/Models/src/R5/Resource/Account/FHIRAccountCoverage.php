@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRPositiveInt;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,9 +22,9 @@ class FHIRAccountCoverage extends \Ardenexal\FHIRTools\Component\Models\R5\DataT
         public array $modifierExtension = [],
         /** @var FHIRReference|null coverage The party(s), such as insurances, that may contribute to the payment of this account */
         #[NotBlank]
-        public ?FHIRReference $coverage = null,
+        public ?\FHIRReference $coverage = null,
         /** @var FHIRPositiveInt|null priority The priority of the coverage in the context of this account */
-        public ?FHIRPositiveInt $priority = null,
+        public ?\FHIRPositiveInt $priority = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

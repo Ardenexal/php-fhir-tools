@@ -5,16 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRAttachment;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRRange;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRRatio;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInteger;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -32,10 +22,10 @@ class FHIRBiologicallyDerivedProductProperty extends \Ardenexal\FHIRTools\Compon
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null type Code that specifies the property */
         #[NotBlank]
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRBoolean|FHIRInteger|FHIRCodeableConcept|FHIRPeriod|FHIRQuantity|FHIRRange|FHIRRatio|FHIRString|string|FHIRAttachment|null valueX Property values */
         #[NotBlank]
-        public FHIRBoolean|FHIRInteger|FHIRCodeableConcept|FHIRPeriod|FHIRQuantity|FHIRRange|FHIRRatio|FHIRString|string|FHIRAttachment|null $valueX = null,
+        public \FHIRBoolean|\FHIRInteger|\FHIRCodeableConcept|\FHIRPeriod|\FHIRQuantity|\FHIRRange|\FHIRRatio|\FHIRString|string|\FHIRAttachment|null $valueX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

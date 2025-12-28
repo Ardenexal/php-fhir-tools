@@ -5,12 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMoney;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDecimal;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRPositiveInt;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -28,17 +22,17 @@ class FHIRExplanationOfBenefitAddItemDetailSubDetail extends \Ardenexal\FHIRTool
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null productOrService Billing, service, product, or drug code */
         #[NotBlank]
-        public ?FHIRCodeableConcept $productOrService = null,
+        public ?\FHIRCodeableConcept $productOrService = null,
         /** @var array<FHIRCodeableConcept> modifier Service/Product billing modifiers */
         public array $modifier = [],
         /** @var FHIRQuantity|null quantity Count of products or services */
-        public ?FHIRQuantity $quantity = null,
+        public ?\FHIRQuantity $quantity = null,
         /** @var FHIRMoney|null unitPrice Fee, charge or cost per item */
-        public ?FHIRMoney $unitPrice = null,
+        public ?\FHIRMoney $unitPrice = null,
         /** @var FHIRDecimal|null factor Price scaling factor */
-        public ?FHIRDecimal $factor = null,
+        public ?\FHIRDecimal $factor = null,
         /** @var FHIRMoney|null net Total item cost */
-        public ?FHIRMoney $net = null,
+        public ?\FHIRMoney $net = null,
         /** @var array<FHIRPositiveInt> noteNumber Applicable note numbers */
         public array $noteNumber = [],
         /** @var array<FHIRExplanationOfBenefitItemAdjudication> adjudication Added items adjudication */

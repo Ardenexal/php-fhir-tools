@@ -5,16 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRAddress;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMoney;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDate;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDecimal;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRPositiveInt;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -32,7 +22,7 @@ class FHIRClaimItem extends \Ardenexal\FHIRTools\Component\Models\R4B\DataType\F
         public array $modifierExtension = [],
         /** @var FHIRPositiveInt|null sequence Item instance identifier */
         #[NotBlank]
-        public ?FHIRPositiveInt $sequence = null,
+        public ?\FHIRPositiveInt $sequence = null,
         /** @var array<FHIRPositiveInt> careTeamSequence Applicable careTeam members */
         public array $careTeamSequence = [],
         /** @var array<FHIRPositiveInt> diagnosisSequence Applicable diagnoses */
@@ -42,32 +32,32 @@ class FHIRClaimItem extends \Ardenexal\FHIRTools\Component\Models\R4B\DataType\F
         /** @var array<FHIRPositiveInt> informationSequence Applicable exception and supporting information */
         public array $informationSequence = [],
         /** @var FHIRCodeableConcept|null revenue Revenue or cost center code */
-        public ?FHIRCodeableConcept $revenue = null,
+        public ?\FHIRCodeableConcept $revenue = null,
         /** @var FHIRCodeableConcept|null category Benefit classification */
-        public ?FHIRCodeableConcept $category = null,
+        public ?\FHIRCodeableConcept $category = null,
         /** @var FHIRCodeableConcept|null productOrService Billing, service, product, or drug code */
         #[NotBlank]
-        public ?FHIRCodeableConcept $productOrService = null,
+        public ?\FHIRCodeableConcept $productOrService = null,
         /** @var array<FHIRCodeableConcept> modifier Product or service billing modifiers */
         public array $modifier = [],
         /** @var array<FHIRCodeableConcept> programCode Program the product or service is provided under */
         public array $programCode = [],
         /** @var FHIRDate|FHIRPeriod|null servicedX Date or dates of service or product delivery */
-        public FHIRDate|FHIRPeriod|null $servicedX = null,
+        public \FHIRDate|\FHIRPeriod|null $servicedX = null,
         /** @var FHIRCodeableConcept|FHIRAddress|FHIRReference|null locationX Place of service or where product was supplied */
-        public FHIRCodeableConcept|FHIRAddress|FHIRReference|null $locationX = null,
+        public \FHIRCodeableConcept|\FHIRAddress|\FHIRReference|null $locationX = null,
         /** @var FHIRQuantity|null quantity Count of products or services */
-        public ?FHIRQuantity $quantity = null,
+        public ?\FHIRQuantity $quantity = null,
         /** @var FHIRMoney|null unitPrice Fee, charge or cost per item */
-        public ?FHIRMoney $unitPrice = null,
+        public ?\FHIRMoney $unitPrice = null,
         /** @var FHIRDecimal|null factor Price scaling factor */
-        public ?FHIRDecimal $factor = null,
+        public ?\FHIRDecimal $factor = null,
         /** @var FHIRMoney|null net Total item cost */
-        public ?FHIRMoney $net = null,
+        public ?\FHIRMoney $net = null,
         /** @var array<FHIRReference> udi Unique device identifier */
         public array $udi = [],
         /** @var FHIRCodeableConcept|null bodySite Anatomical location */
-        public ?FHIRCodeableConcept $bodySite = null,
+        public ?\FHIRCodeableConcept $bodySite = null,
         /** @var array<FHIRCodeableConcept> subSite Anatomical sub-location */
         public array $subSite = [],
         /** @var array<FHIRReference> encounter Encounters related to this billed item */

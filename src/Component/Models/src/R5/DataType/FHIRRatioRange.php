@@ -22,11 +22,11 @@ class FHIRRatioRange extends FHIRDataType
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
         /** @var FHIRQuantity|null lowNumerator Low Numerator limit */
-        public ?FHIRQuantity $lowNumerator = null,
+        public ?\FHIRQuantity $lowNumerator = null,
         /** @var FHIRQuantity|null highNumerator High Numerator limit */
-        public ?FHIRQuantity $highNumerator = null,
+        public ?\FHIRQuantity $highNumerator = null,
         /** @var FHIRQuantity|null denominator Denominator value */
-        public ?FHIRQuantity $denominator = null,
+        public ?\FHIRQuantity $denominator = null,
     ) {
         parent::__construct($id, $extension);
     }

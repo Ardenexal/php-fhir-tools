@@ -5,14 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRPositiveInt;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRDataRequirementCodeFilter;
-use Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRDataRequirementDateFilter;
-use Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRDataRequirementSort;
-use Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRDataRequirementValueFilter;
-use Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRFHIRTypesType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -32,11 +24,11 @@ class FHIRDataRequirement extends FHIRDataType
         public array $extension = [],
         /** @var FHIRFHIRTypesType|null type The type of the required data */
         #[NotBlank]
-        public ?FHIRFHIRTypesType $type = null,
+        public ?\FHIRFHIRTypesType $type = null,
         /** @var array<FHIRCanonical> profile The profile of the required data */
         public array $profile = [],
         /** @var FHIRCodeableConcept|FHIRReference|null subjectX E.g. Patient, Practitioner, RelatedPerson, Organization, Location, Device */
-        public FHIRCodeableConcept|FHIRReference|null $subjectX = null,
+        public \FHIRCodeableConcept|\FHIRReference|null $subjectX = null,
         /** @var array<FHIRString|string> mustSupport Indicates specific structure elements that are referenced by the knowledge module */
         public array $mustSupport = [],
         /** @var array<FHIRDataRequirementCodeFilter> codeFilter What codes are expected */
@@ -46,7 +38,7 @@ class FHIRDataRequirement extends FHIRDataType
         /** @var array<FHIRDataRequirementValueFilter> valueFilter What values are expected */
         public array $valueFilter = [],
         /** @var FHIRPositiveInt|null limit Number of results */
-        public ?FHIRPositiveInt $limit = null,
+        public ?\FHIRPositiveInt $limit = null,
         /** @var array<FHIRDataRequirementSort> sort Order of the results */
         public array $sort = [],
     ) {

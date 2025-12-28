@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRMarkdown;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,18 +22,18 @@ class FHIRContractContentDefinition extends \Ardenexal\FHIRTools\Component\Model
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null type Content structure and use */
         #[NotBlank]
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRCodeableConcept|null subType Detailed Content Type Definition */
-        public ?FHIRCodeableConcept $subType = null,
+        public ?\FHIRCodeableConcept $subType = null,
         /** @var FHIRReference|null publisher Publisher Entity */
-        public ?FHIRReference $publisher = null,
+        public ?\FHIRReference $publisher = null,
         /** @var FHIRDateTime|null publicationDate When published */
-        public ?FHIRDateTime $publicationDate = null,
+        public ?\FHIRDateTime $publicationDate = null,
         /** @var FHIRContractResourcePublicationStatusCodesType|null publicationStatus amended | appended | cancelled | disputed | entered-in-error | executable | executed | negotiable | offered | policy | rejected | renewed | revoked | resolved | terminated */
         #[NotBlank]
-        public ?FHIRContractResourcePublicationStatusCodesType $publicationStatus = null,
+        public ?\FHIRContractResourcePublicationStatusCodesType $publicationStatus = null,
         /** @var FHIRMarkdown|null copyright Publication Ownership */
-        public ?FHIRMarkdown $copyright = null,
+        public ?\FHIRMarkdown $copyright = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,14 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCoding;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCode;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDecimal;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInteger;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -30,10 +22,10 @@ class FHIRValueSetExpansionContainsProperty extends \Ardenexal\FHIRTools\Compone
         public array $modifierExtension = [],
         /** @var FHIRCode|null code Reference to ValueSet.expansion.property.code */
         #[NotBlank]
-        public ?FHIRCode $code = null,
+        public ?\FHIRCode $code = null,
         /** @var FHIRCode|FHIRCoding|FHIRString|string|FHIRInteger|FHIRBoolean|FHIRDateTime|FHIRDecimal|null valueX Value of the property for this concept */
         #[NotBlank]
-        public FHIRCode|FHIRCoding|FHIRString|string|FHIRInteger|FHIRBoolean|FHIRDateTime|FHIRDecimal|null $valueX = null,
+        public \FHIRCode|\FHIRCoding|\FHIRString|string|\FHIRInteger|\FHIRBoolean|\FHIRDateTime|\FHIRDecimal|null $valueX = null,
         /** @var array<FHIRValueSetExpansionContainsPropertySubProperty> subProperty SubProperty value for the concept */
         public array $subProperty = [],
     ) {

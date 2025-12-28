@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,7 +22,7 @@ class FHIRAdverseEventSuspectEntity extends \Ardenexal\FHIRTools\Component\Model
         public array $modifierExtension = [],
         /** @var FHIRReference|null instance Refers to the specific entity that caused the adverse event */
         #[NotBlank]
-        public ?FHIRReference $instance = null,
+        public ?\FHIRReference $instance = null,
         /** @var array<FHIRAdverseEventSuspectEntityCausality> causality Information on the possible cause of the event */
         public array $causality = [],
     ) {

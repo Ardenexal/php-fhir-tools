@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRMeta;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBase64Binary;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,18 +20,18 @@ class FHIRBinary extends FHIRResource
         /** @var string|null id Logical id of this artifact */
         public ?string $id = null,
         /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?FHIRMeta $meta = null,
+        public ?\FHIRMeta $meta = null,
         /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?FHIRUri $implicitRules = null,
+        public ?\FHIRUri $implicitRules = null,
         /** @var FHIRAllLanguagesType|null language Language of the resource content */
-        public ?FHIRAllLanguagesType $language = null,
+        public ?\FHIRAllLanguagesType $language = null,
         /** @var FHIRMimeTypesType|null contentType MimeType of the binary content */
         #[NotBlank]
-        public ?FHIRMimeTypesType $contentType = null,
+        public ?\FHIRMimeTypesType $contentType = null,
         /** @var FHIRReference|null securityContext Identifies another resource to use as proxy when enforcing access control */
-        public ?FHIRReference $securityContext = null,
+        public ?\FHIRReference $securityContext = null,
         /** @var FHIRBase64Binary|null data The actual content */
-        public ?FHIRBase64Binary $data = null,
+        public ?\FHIRBase64Binary $data = null,
     ) {
         parent::__construct($id, $meta, $implicitRules, $language);
     }

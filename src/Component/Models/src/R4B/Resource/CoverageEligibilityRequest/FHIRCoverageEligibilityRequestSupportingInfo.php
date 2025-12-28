@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRPositiveInt;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -30,12 +26,12 @@ class FHIRCoverageEligibilityRequestSupportingInfo extends \Ardenexal\FHIRTools\
         public array $modifierExtension = [],
         /** @var FHIRPositiveInt|null sequence Information instance identifier */
         #[NotBlank]
-        public ?FHIRPositiveInt $sequence = null,
+        public ?\FHIRPositiveInt $sequence = null,
         /** @var FHIRReference|null information Data to be provided */
         #[NotBlank]
-        public ?FHIRReference $information = null,
+        public ?\FHIRReference $information = null,
         /** @var FHIRBoolean|null appliesToAll Applies to all items */
-        public ?FHIRBoolean $appliesToAll = null,
+        public ?\FHIRBoolean $appliesToAll = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

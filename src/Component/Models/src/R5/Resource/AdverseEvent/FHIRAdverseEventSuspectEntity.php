@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,9 +22,9 @@ class FHIRAdverseEventSuspectEntity extends \Ardenexal\FHIRTools\Component\Model
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|FHIRReference|null instanceX Refers to the specific entity that caused the adverse event */
         #[NotBlank]
-        public FHIRCodeableConcept|FHIRReference|null $instanceX = null,
+        public \FHIRCodeableConcept|\FHIRReference|null $instanceX = null,
         /** @var FHIRAdverseEventSuspectEntityCausality|null causality Information on the possible cause of the event */
-        public ?FHIRAdverseEventSuspectEntityCausality $causality = null,
+        public ?\FHIRAdverseEventSuspectEntityCausality $causality = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

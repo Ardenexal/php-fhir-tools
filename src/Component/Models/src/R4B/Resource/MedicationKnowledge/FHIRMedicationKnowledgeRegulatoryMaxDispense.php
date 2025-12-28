@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRDuration;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,9 +22,9 @@ class FHIRMedicationKnowledgeRegulatoryMaxDispense extends \Ardenexal\FHIRTools\
         public array $modifierExtension = [],
         /** @var FHIRQuantity|null quantity The maximum number of units of the medication that can be dispensed */
         #[NotBlank]
-        public ?FHIRQuantity $quantity = null,
+        public ?\FHIRQuantity $quantity = null,
         /** @var FHIRDuration|null period The period that applies to the maximum number of units */
-        public ?FHIRDuration $period = null,
+        public ?\FHIRDuration $period = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -4,16 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRMeta;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRNarrative;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
-
 /**
  * @author Health Level Seven International (Financial Management)
  *
@@ -21,7 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
  *
  * @description This resource provides enrollment and plan details from the processing of an EnrollmentRequest resource.
  */
-#[FhirResource(
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(
     type: 'EnrollmentResponse',
     version: '5.0.0',
     url: 'http://hl7.org/fhir/StructureDefinition/EnrollmentResponse',
@@ -33,14 +23,14 @@ class FHIREnrollmentResponse extends FHIRDomainResource
         /** @var string|null id Logical id of this artifact */
         public ?string $id = null,
         /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?FHIRMeta $meta = null,
+        public ?\FHIRMeta $meta = null,
         /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?FHIRUri $implicitRules = null,
+        public ?\FHIRUri $implicitRules = null,
         /** @var FHIRAllLanguagesType|null language Language of the resource content */
-        public ?FHIRAllLanguagesType $language = null,
+        public ?\FHIRAllLanguagesType $language = null,
         /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
-        public ?FHIRNarrative $text = null,
-        /** @var array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRResource> contained Contained, inline Resources */
+        public ?\FHIRNarrative $text = null,
+        /** @var array<FHIRResource> contained Contained, inline Resources */
         public array $contained = [],
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
@@ -49,19 +39,19 @@ class FHIREnrollmentResponse extends FHIRDomainResource
         /** @var array<FHIRIdentifier> identifier Business Identifier */
         public array $identifier = [],
         /** @var FHIRFinancialResourceStatusCodesType|null status active | cancelled | draft | entered-in-error */
-        public ?FHIRFinancialResourceStatusCodesType $status = null,
+        public ?\FHIRFinancialResourceStatusCodesType $status = null,
         /** @var FHIRReference|null request Claim reference */
-        public ?FHIRReference $request = null,
+        public ?\FHIRReference $request = null,
         /** @var FHIREnrollmentOutcomeType|null outcome queued | complete | error | partial */
-        public ?FHIREnrollmentOutcomeType $outcome = null,
+        public ?\FHIREnrollmentOutcomeType $outcome = null,
         /** @var FHIRString|string|null disposition Disposition Message */
-        public FHIRString|string|null $disposition = null,
+        public \FHIRString|string|null $disposition = null,
         /** @var FHIRDateTime|null created Creation date */
-        public ?FHIRDateTime $created = null,
+        public ?\FHIRDateTime $created = null,
         /** @var FHIRReference|null organization Insurer */
-        public ?FHIRReference $organization = null,
+        public ?\FHIRReference $organization = null,
         /** @var FHIRReference|null requestProvider Responsible practitioner */
-        public ?FHIRReference $requestProvider = null,
+        public ?\FHIRReference $requestProvider = null,
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
     }

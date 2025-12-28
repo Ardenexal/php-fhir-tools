@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,12 +22,12 @@ class FHIRCitationCitedArtifactStatusDate extends \Ardenexal\FHIRTools\Component
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null activity Classification of the status */
         #[NotBlank]
-        public ?FHIRCodeableConcept $activity = null,
+        public ?\FHIRCodeableConcept $activity = null,
         /** @var FHIRBoolean|null actual Either occurred or expected */
-        public ?FHIRBoolean $actual = null,
+        public ?\FHIRBoolean $actual = null,
         /** @var FHIRPeriod|null period When the status started and/or ended */
         #[NotBlank]
-        public ?FHIRPeriod $period = null,
+        public ?\FHIRPeriod $period = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

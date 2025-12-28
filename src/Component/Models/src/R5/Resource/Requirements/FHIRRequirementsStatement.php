@@ -5,13 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRId;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRMarkdown;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUrl;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -29,20 +22,20 @@ class FHIRRequirementsStatement extends \Ardenexal\FHIRTools\Component\Models\R5
         public array $modifierExtension = [],
         /** @var FHIRId|null key Key that identifies this statement */
         #[NotBlank]
-        public ?FHIRId $key = null,
+        public ?\FHIRId $key = null,
         /** @var FHIRString|string|null label Short Human label for this statement */
-        public FHIRString|string|null $label = null,
+        public \FHIRString|string|null $label = null,
         /** @var array<FHIRConformanceExpectationType> conformance SHALL | SHOULD | MAY | SHOULD-NOT */
         public array $conformance = [],
         /** @var FHIRBoolean|null conditionality Set to true if requirements statement is conditional */
-        public ?FHIRBoolean $conditionality = null,
+        public ?\FHIRBoolean $conditionality = null,
         /** @var FHIRMarkdown|null requirement The actual requirement */
         #[NotBlank]
-        public ?FHIRMarkdown $requirement = null,
+        public ?\FHIRMarkdown $requirement = null,
         /** @var FHIRString|string|null derivedFrom Another statement this clarifies/restricts ([url#]key) */
-        public FHIRString|string|null $derivedFrom = null,
+        public \FHIRString|string|null $derivedFrom = null,
         /** @var FHIRString|string|null parent A larger requirement that this requirement helps to refine and enable */
-        public FHIRString|string|null $parent = null,
+        public \FHIRString|string|null $parent = null,
         /** @var array<FHIRUrl> satisfiedBy Design artifact that satisfies this requirement */
         public array $satisfiedBy = [],
         /** @var array<FHIRUrl> reference External artifact (rule/document etc. that) created this requirement */

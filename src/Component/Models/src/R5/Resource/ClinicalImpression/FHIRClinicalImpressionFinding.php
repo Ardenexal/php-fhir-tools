@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableReference;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 
 /**
  * @description Specific findings or diagnoses that were considered likely or relevant to ongoing treatment.
@@ -23,9 +20,9 @@ class FHIRClinicalImpressionFinding extends \Ardenexal\FHIRTools\Component\Model
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableReference|null item What was found */
-        public ?FHIRCodeableReference $item = null,
+        public ?\FHIRCodeableReference $item = null,
         /** @var FHIRString|string|null basis Which investigations support finding */
-        public FHIRString|string|null $basis = null,
+        public \FHIRString|string|null $basis = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

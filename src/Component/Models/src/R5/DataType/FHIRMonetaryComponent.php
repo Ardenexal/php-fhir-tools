@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDecimal;
-use Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRPriceComponentTypeType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,13 +24,13 @@ class FHIRMonetaryComponent extends FHIRDataType
         public array $extension = [],
         /** @var FHIRPriceComponentTypeType|null type base | surcharge | deduction | discount | tax | informational */
         #[NotBlank]
-        public ?FHIRPriceComponentTypeType $type = null,
+        public ?\FHIRPriceComponentTypeType $type = null,
         /** @var FHIRCodeableConcept|null code Codes may be used to differentiate between kinds of taxes, surcharges, discounts etc. */
-        public ?FHIRCodeableConcept $code = null,
+        public ?\FHIRCodeableConcept $code = null,
         /** @var FHIRDecimal|null factor Factor used for calculating this component */
-        public ?FHIRDecimal $factor = null,
+        public ?\FHIRDecimal $factor = null,
         /** @var FHIRMoney|null amount Explicit value amount to be used */
-        public ?FHIRMoney $amount = null,
+        public ?\FHIRMoney $amount = null,
     ) {
         parent::__construct($id, $extension);
     }

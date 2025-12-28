@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDecimal;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
 
 /**
  * @description Product storage.
@@ -24,13 +20,13 @@ class FHIRBiologicallyDerivedProductStorage extends \Ardenexal\FHIRTools\Compone
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRString|string|null description Description of storage */
-        public FHIRString|string|null $description = null,
+        public \FHIRString|string|null $description = null,
         /** @var FHIRDecimal|null temperature Storage temperature */
-        public ?FHIRDecimal $temperature = null,
+        public ?\FHIRDecimal $temperature = null,
         /** @var FHIRBiologicallyDerivedProductStorageScaleType|null scale farenheit | celsius | kelvin */
-        public ?FHIRBiologicallyDerivedProductStorageScaleType $scale = null,
+        public ?\FHIRBiologicallyDerivedProductStorageScaleType $scale = null,
         /** @var FHIRPeriod|null duration Storage timeperiod */
-        public ?FHIRPeriod $duration = null,
+        public ?\FHIRPeriod $duration = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -30,7 +26,7 @@ class FHIRMedicationKnowledgeAdministrationGuidelinesPatientCharacteristics exte
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|FHIRQuantity|null characteristicX Specific characteristic that is relevant to the administration guideline */
         #[NotBlank]
-        public FHIRCodeableConcept|FHIRQuantity|null $characteristicX = null,
+        public \FHIRCodeableConcept|\FHIRQuantity|null $characteristicX = null,
         /** @var array<FHIRString|string> value The specific characteristic */
         public array $value = [],
     ) {

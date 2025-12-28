@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,10 +21,10 @@ class FHIRAuditEventSource extends \Ardenexal\FHIRTools\Component\Models\R5\Data
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRReference|null site Logical source location within the enterprise */
-        public ?FHIRReference $site = null,
+        public ?\FHIRReference $site = null,
         /** @var FHIRReference|null observer The identity of source detecting the event */
         #[NotBlank]
-        public ?FHIRReference $observer = null,
+        public ?\FHIRReference $observer = null,
         /** @var array<FHIRCodeableConcept> type The type of source where event originated */
         public array $type = [],
     ) {

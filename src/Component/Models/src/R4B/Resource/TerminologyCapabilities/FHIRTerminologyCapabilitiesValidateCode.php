@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,7 +22,7 @@ class FHIRTerminologyCapabilitiesValidateCode extends \Ardenexal\FHIRTools\Compo
         public array $modifierExtension = [],
         /** @var FHIRBoolean|null translations Whether translations are validated */
         #[NotBlank]
-        public ?FHIRBoolean $translations = null,
+        public ?\FHIRBoolean $translations = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

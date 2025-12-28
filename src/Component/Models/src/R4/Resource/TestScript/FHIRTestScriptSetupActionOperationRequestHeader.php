@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,10 +22,10 @@ class FHIRTestScriptSetupActionOperationRequestHeader extends \Ardenexal\FHIRToo
         public array $modifierExtension = [],
         /** @var FHIRString|string|null field HTTP header field name */
         #[NotBlank]
-        public FHIRString|string|null $field = null,
+        public \FHIRString|string|null $field = null,
         /** @var FHIRString|string|null value HTTP headerfield value */
         #[NotBlank]
-        public FHIRString|string|null $value = null,
+        public \FHIRString|string|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

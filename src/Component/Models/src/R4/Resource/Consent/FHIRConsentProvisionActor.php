@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,10 +22,10 @@ class FHIRConsentProvisionActor extends \Ardenexal\FHIRTools\Component\Models\R4
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null role How the actor is involved */
         #[NotBlank]
-        public ?FHIRCodeableConcept $role = null,
+        public ?\FHIRCodeableConcept $role = null,
         /** @var FHIRReference|null reference Resource for the actor (or group, by role) */
         #[NotBlank]
-        public ?FHIRReference $reference = null,
+        public ?\FHIRReference $reference = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

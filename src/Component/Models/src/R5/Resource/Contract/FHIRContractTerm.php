@@ -5,13 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -28,24 +21,24 @@ class FHIRContractTerm extends \Ardenexal\FHIRTools\Component\Models\R5\DataType
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRIdentifier|null identifier Contract Term Number */
-        public ?FHIRIdentifier $identifier = null,
+        public ?\FHIRIdentifier $identifier = null,
         /** @var FHIRDateTime|null issued Contract Term Issue Date Time */
-        public ?FHIRDateTime $issued = null,
+        public ?\FHIRDateTime $issued = null,
         /** @var FHIRPeriod|null applies Contract Term Effective Time */
-        public ?FHIRPeriod $applies = null,
+        public ?\FHIRPeriod $applies = null,
         /** @var FHIRCodeableConcept|FHIRReference|null topicX Term Concern */
-        public FHIRCodeableConcept|FHIRReference|null $topicX = null,
+        public \FHIRCodeableConcept|\FHIRReference|null $topicX = null,
         /** @var FHIRCodeableConcept|null type Contract Term Type or Form */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRCodeableConcept|null subType Contract Term Type specific classification */
-        public ?FHIRCodeableConcept $subType = null,
+        public ?\FHIRCodeableConcept $subType = null,
         /** @var FHIRString|string|null text Term Statement */
-        public FHIRString|string|null $text = null,
+        public \FHIRString|string|null $text = null,
         /** @var array<FHIRContractTermSecurityLabel> securityLabel Protection for the Term */
         public array $securityLabel = [],
         /** @var FHIRContractTermOffer|null offer Context of the Contract term */
         #[NotBlank]
-        public ?FHIRContractTermOffer $offer = null,
+        public ?\FHIRContractTermOffer $offer = null,
         /** @var array<FHIRContractTermAsset> asset Contract Term Asset List */
         public array $asset = [],
         /** @var array<FHIRContractTermAction> action Entity being ascribed responsibility */

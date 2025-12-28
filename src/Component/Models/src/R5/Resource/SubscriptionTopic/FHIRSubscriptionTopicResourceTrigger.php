@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRMarkdown;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,16 +21,16 @@ class FHIRSubscriptionTopicResourceTrigger extends \Ardenexal\FHIRTools\Componen
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRMarkdown|null description Text representation of the resource trigger */
-        public ?FHIRMarkdown $description = null,
+        public ?\FHIRMarkdown $description = null,
         /** @var FHIRUri|null resource Data Type or Resource (reference to definition) for this trigger definition */
         #[NotBlank]
-        public ?FHIRUri $resource = null,
+        public ?\FHIRUri $resource = null,
         /** @var array<FHIRInteractionTriggerType> supportedInteraction create | update | delete */
         public array $supportedInteraction = [],
         /** @var FHIRSubscriptionTopicResourceTriggerQueryCriteria|null queryCriteria Query based trigger rule */
-        public ?FHIRSubscriptionTopicResourceTriggerQueryCriteria $queryCriteria = null,
+        public ?\FHIRSubscriptionTopicResourceTriggerQueryCriteria $queryCriteria = null,
         /** @var FHIRString|string|null fhirPathCriteria FHIRPath based trigger rule */
-        public FHIRString|string|null $fhirPathCriteria = null,
+        public \FHIRString|string|null $fhirPathCriteria = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

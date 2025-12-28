@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,9 +22,9 @@ class FHIRClaimPayee extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\F
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null type Category of recipient */
         #[NotBlank]
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRReference|null party Recipient reference */
-        public ?FHIRReference $party = null,
+        public ?\FHIRReference $party = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,18 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRDataRequirement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRDuration;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExpression;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRTiming;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRUsageContext;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -34,29 +22,29 @@ class FHIRResearchElementDefinitionCharacteristic extends \Ardenexal\FHIRTools\C
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|FHIRCanonical|FHIRExpression|FHIRDataRequirement|null definitionX What code or expression defines members? */
         #[NotBlank]
-        public FHIRCodeableConcept|FHIRCanonical|FHIRExpression|FHIRDataRequirement|null $definitionX = null,
+        public \FHIRCodeableConcept|\FHIRCanonical|\FHIRExpression|\FHIRDataRequirement|null $definitionX = null,
         /** @var array<FHIRUsageContext> usageContext What code/value pairs define members? */
         public array $usageContext = [],
         /** @var FHIRBoolean|null exclude Whether the characteristic includes or excludes members */
-        public ?FHIRBoolean $exclude = null,
+        public ?\FHIRBoolean $exclude = null,
         /** @var FHIRCodeableConcept|null unitOfMeasure What unit is the outcome described in? */
-        public ?FHIRCodeableConcept $unitOfMeasure = null,
+        public ?\FHIRCodeableConcept $unitOfMeasure = null,
         /** @var FHIRString|string|null studyEffectiveDescription What time period does the study cover */
-        public FHIRString|string|null $studyEffectiveDescription = null,
+        public \FHIRString|string|null $studyEffectiveDescription = null,
         /** @var FHIRDateTime|FHIRPeriod|FHIRDuration|FHIRTiming|null studyEffectiveX What time period does the study cover */
-        public FHIRDateTime|FHIRPeriod|FHIRDuration|FHIRTiming|null $studyEffectiveX = null,
+        public \FHIRDateTime|\FHIRPeriod|\FHIRDuration|\FHIRTiming|null $studyEffectiveX = null,
         /** @var FHIRDuration|null studyEffectiveTimeFromStart Observation time from study start */
-        public ?FHIRDuration $studyEffectiveTimeFromStart = null,
+        public ?\FHIRDuration $studyEffectiveTimeFromStart = null,
         /** @var FHIRGroupMeasureType|null studyEffectiveGroupMeasure mean | median | mean-of-mean | mean-of-median | median-of-mean | median-of-median */
-        public ?FHIRGroupMeasureType $studyEffectiveGroupMeasure = null,
+        public ?\FHIRGroupMeasureType $studyEffectiveGroupMeasure = null,
         /** @var FHIRString|string|null participantEffectiveDescription What time period do participants cover */
-        public FHIRString|string|null $participantEffectiveDescription = null,
+        public \FHIRString|string|null $participantEffectiveDescription = null,
         /** @var FHIRDateTime|FHIRPeriod|FHIRDuration|FHIRTiming|null participantEffectiveX What time period do participants cover */
-        public FHIRDateTime|FHIRPeriod|FHIRDuration|FHIRTiming|null $participantEffectiveX = null,
+        public \FHIRDateTime|\FHIRPeriod|\FHIRDuration|\FHIRTiming|null $participantEffectiveX = null,
         /** @var FHIRDuration|null participantEffectiveTimeFromStart Observation time from study start */
-        public ?FHIRDuration $participantEffectiveTimeFromStart = null,
+        public ?\FHIRDuration $participantEffectiveTimeFromStart = null,
         /** @var FHIRGroupMeasureType|null participantEffectiveGroupMeasure mean | median | mean-of-mean | mean-of-median | median-of-mean | median-of-median */
-        public ?FHIRGroupMeasureType $participantEffectiveGroupMeasure = null,
+        public ?\FHIRGroupMeasureType $participantEffectiveGroupMeasure = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

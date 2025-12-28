@@ -22,9 +22,9 @@ class FHIRRange extends FHIRDataType
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
         /** @var FHIRQuantity|null low Low limit */
-        public ?FHIRQuantity $low = null,
+        public ?\FHIRQuantity $low = null,
         /** @var FHIRQuantity|null high High limit */
-        public ?FHIRQuantity $high = null,
+        public ?\FHIRQuantity $high = null,
     ) {
         parent::__construct($id, $extension);
     }

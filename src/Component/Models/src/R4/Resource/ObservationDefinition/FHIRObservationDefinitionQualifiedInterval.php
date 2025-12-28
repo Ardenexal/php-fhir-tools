@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRRange;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
 
 /**
  * @description Multiple  ranges of results qualified by different contexts for ordinal or continuous observations conforming to this ObservationDefinition.
@@ -24,21 +20,21 @@ class FHIRObservationDefinitionQualifiedInterval extends \Ardenexal\FHIRTools\Co
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRObservationRangeCategoryType|null category reference | critical | absolute */
-        public ?FHIRObservationRangeCategoryType $category = null,
+        public ?\FHIRObservationRangeCategoryType $category = null,
         /** @var FHIRRange|null range The interval itself, for continuous or ordinal observations */
-        public ?FHIRRange $range = null,
+        public ?\FHIRRange $range = null,
         /** @var FHIRCodeableConcept|null context Range context qualifier */
-        public ?FHIRCodeableConcept $context = null,
+        public ?\FHIRCodeableConcept $context = null,
         /** @var array<FHIRCodeableConcept> appliesTo Targetted population of the range */
         public array $appliesTo = [],
         /** @var FHIRAdministrativeGenderType|null gender male | female | other | unknown */
-        public ?FHIRAdministrativeGenderType $gender = null,
+        public ?\FHIRAdministrativeGenderType $gender = null,
         /** @var FHIRRange|null age Applicable age range, if relevant */
-        public ?FHIRRange $age = null,
+        public ?\FHIRRange $age = null,
         /** @var FHIRRange|null gestationalAge Applicable gestational age range, if relevant */
-        public ?FHIRRange $gestationalAge = null,
+        public ?\FHIRRange $gestationalAge = null,
         /** @var FHIRString|string|null condition Condition associated with the reference range */
-        public FHIRString|string|null $condition = null,
+        public \FHIRString|string|null $condition = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

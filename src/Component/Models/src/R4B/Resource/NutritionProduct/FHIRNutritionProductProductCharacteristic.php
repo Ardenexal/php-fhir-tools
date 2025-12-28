@@ -5,13 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRAttachment;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBase64Binary;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -29,10 +22,10 @@ class FHIRNutritionProductProductCharacteristic extends \Ardenexal\FHIRTools\Com
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null type Code specifying the type of characteristic */
         #[NotBlank]
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRCodeableConcept|FHIRString|string|FHIRQuantity|FHIRBase64Binary|FHIRAttachment|FHIRBoolean|null valueX The value of the characteristic */
         #[NotBlank]
-        public FHIRCodeableConcept|FHIRString|string|FHIRQuantity|FHIRBase64Binary|FHIRAttachment|FHIRBoolean|null $valueX = null,
+        public \FHIRCodeableConcept|\FHIRString|string|\FHIRQuantity|\FHIRBase64Binary|\FHIRAttachment|\FHIRBoolean|null $valueX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

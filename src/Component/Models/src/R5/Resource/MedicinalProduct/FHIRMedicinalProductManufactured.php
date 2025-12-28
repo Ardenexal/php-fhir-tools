@@ -4,15 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRMeta;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRNarrative;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRProdCharacteristic;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -22,7 +13,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  *
  * @description The manufactured item as contained in the packaged medicinal product.
  */
-#[FhirResource(
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(
     type: 'MedicinalProductManufactured',
     version: '4.0.1',
     url: 'http://hl7.org/fhir/StructureDefinition/MedicinalProductManufactured',
@@ -34,14 +25,14 @@ class FHIRMedicinalProductManufactured extends FHIRDomainResource
         /** @var string|null id Logical id of this artifact */
         public ?string $id = null,
         /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?FHIRMeta $meta = null,
+        public ?\FHIRMeta $meta = null,
         /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?FHIRUri $implicitRules = null,
+        public ?\FHIRUri $implicitRules = null,
         /** @var string|null language Language of the resource content */
         public ?string $language = null,
         /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
-        public ?FHIRNarrative $text = null,
-        /** @var array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRResource> contained Contained, inline Resources */
+        public ?\FHIRNarrative $text = null,
+        /** @var array<FHIRResource> contained Contained, inline Resources */
         public array $contained = [],
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
@@ -49,18 +40,18 @@ class FHIRMedicinalProductManufactured extends FHIRDomainResource
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null manufacturedDoseForm Dose form as manufactured and before any transformation into the pharmaceutical product */
         #[NotBlank]
-        public ?FHIRCodeableConcept $manufacturedDoseForm = null,
+        public ?\FHIRCodeableConcept $manufacturedDoseForm = null,
         /** @var FHIRCodeableConcept|null unitOfPresentation The “real world” units in which the quantity of the manufactured item is described */
-        public ?FHIRCodeableConcept $unitOfPresentation = null,
+        public ?\FHIRCodeableConcept $unitOfPresentation = null,
         /** @var FHIRQuantity|null quantity The quantity or "count number" of the manufactured item */
         #[NotBlank]
-        public ?FHIRQuantity $quantity = null,
+        public ?\FHIRQuantity $quantity = null,
         /** @var array<FHIRReference> manufacturer Manufacturer of the item (Note that this should be named "manufacturer" but it currently causes technical issues) */
         public array $manufacturer = [],
         /** @var array<FHIRReference> ingredient Ingredient */
         public array $ingredient = [],
         /** @var FHIRProdCharacteristic|null physicalCharacteristics Dimensions, color etc. */
-        public ?FHIRProdCharacteristic $physicalCharacteristics = null,
+        public ?\FHIRProdCharacteristic $physicalCharacteristics = null,
         /** @var array<FHIRCodeableConcept> otherCharacteristics Other codeable characteristics */
         public array $otherCharacteristics = [],
     ) {

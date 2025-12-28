@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRMarkdown;
 
 /**
  * @description Does this service have specific eligibility requirements that need to be met in order to use the service?
@@ -23,9 +20,9 @@ class FHIRHealthcareServiceEligibility extends \Ardenexal\FHIRTools\Component\Mo
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null code Coded value for the eligibility */
-        public ?FHIRCodeableConcept $code = null,
+        public ?\FHIRCodeableConcept $code = null,
         /** @var FHIRMarkdown|null comment Describes the eligibility conditions for the service */
-        public ?FHIRMarkdown $comment = null,
+        public ?\FHIRMarkdown $comment = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableReference;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRQuantity;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,10 +22,10 @@ class FHIRNutritionIntakeIngredientLabel extends \Ardenexal\FHIRTools\Component\
         public array $modifierExtension = [],
         /** @var FHIRCodeableReference|null nutrient Total nutrient consumed */
         #[NotBlank]
-        public ?FHIRCodeableReference $nutrient = null,
+        public ?\FHIRCodeableReference $nutrient = null,
         /** @var FHIRQuantity|null amount Total amount of nutrient consumed */
         #[NotBlank]
-        public ?FHIRQuantity $amount = null,
+        public ?\FHIRQuantity $amount = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBase64Binary;
 
 /**
  * @description Specific instances of data or objects that have been accessed.
@@ -24,13 +20,13 @@ class FHIRAuditEventEntity extends \Ardenexal\FHIRTools\Component\Models\R5\Data
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRReference|null what Specific instance of resource */
-        public ?FHIRReference $what = null,
+        public ?\FHIRReference $what = null,
         /** @var FHIRCodeableConcept|null role What role the entity played */
-        public ?FHIRCodeableConcept $role = null,
+        public ?\FHIRCodeableConcept $role = null,
         /** @var array<FHIRCodeableConcept> securityLabel Security labels on the entity */
         public array $securityLabel = [],
         /** @var FHIRBase64Binary|null query Query parameters */
-        public ?FHIRBase64Binary $query = null,
+        public ?\FHIRBase64Binary $query = null,
         /** @var array<FHIRAuditEventEntityDetail> detail Additional Information about the entity */
         public array $detail = [],
         /** @var array<FHIRAuditEventAgent> agent Entity is attributed to this agent */

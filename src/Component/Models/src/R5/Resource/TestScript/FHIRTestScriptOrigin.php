@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCoding;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInteger;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUrl;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,12 +22,12 @@ class FHIRTestScriptOrigin extends \Ardenexal\FHIRTools\Component\Models\R5\Data
         public array $modifierExtension = [],
         /** @var FHIRInteger|null index The index of the abstract origin server starting at 1 */
         #[NotBlank]
-        public ?FHIRInteger $index = null,
+        public ?\FHIRInteger $index = null,
         /** @var FHIRCoding|null profile FHIR-Client | FHIR-SDC-FormFiller */
         #[NotBlank]
-        public ?FHIRCoding $profile = null,
+        public ?\FHIRCoding $profile = null,
         /** @var FHIRUrl|null url The url path of the origin server */
-        public ?FHIRUrl $url = null,
+        public ?\FHIRUrl $url = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

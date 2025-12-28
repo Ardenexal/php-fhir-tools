@@ -5,12 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRDuration;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUnsignedInt;
 
 /**
  * @description Indicates the specific details for the dispense or medication supply part of a medication request (also known as a Medication Prescription or Medication Order).  Note that this information is not always sent with the order.  There may be in some settings (e.g. hospitals) institutional or system support for completing the dispense details in the pharmacy department.
@@ -26,19 +20,19 @@ class FHIRMedicationRequestDispenseRequest extends \Ardenexal\FHIRTools\Componen
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRMedicationRequestDispenseRequestInitialFill|null initialFill First fill details */
-        public ?FHIRMedicationRequestDispenseRequestInitialFill $initialFill = null,
+        public ?\FHIRMedicationRequestDispenseRequestInitialFill $initialFill = null,
         /** @var FHIRDuration|null dispenseInterval Minimum period of time between dispenses */
-        public ?FHIRDuration $dispenseInterval = null,
+        public ?\FHIRDuration $dispenseInterval = null,
         /** @var FHIRPeriod|null validityPeriod Time period supply is authorized for */
-        public ?FHIRPeriod $validityPeriod = null,
+        public ?\FHIRPeriod $validityPeriod = null,
         /** @var FHIRUnsignedInt|null numberOfRepeatsAllowed Number of refills authorized */
-        public ?FHIRUnsignedInt $numberOfRepeatsAllowed = null,
+        public ?\FHIRUnsignedInt $numberOfRepeatsAllowed = null,
         /** @var FHIRQuantity|null quantity Amount of medication to supply per dispense */
-        public ?FHIRQuantity $quantity = null,
+        public ?\FHIRQuantity $quantity = null,
         /** @var FHIRDuration|null expectedSupplyDuration Number of days supply per dispense */
-        public ?FHIRDuration $expectedSupplyDuration = null,
+        public ?\FHIRDuration $expectedSupplyDuration = null,
         /** @var FHIRReference|null performer Intended dispenser */
-        public ?FHIRReference $performer = null,
+        public ?\FHIRReference $performer = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

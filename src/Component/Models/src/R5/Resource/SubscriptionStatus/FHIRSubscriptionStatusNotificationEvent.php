@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRInteger64;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInstant;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,11 +22,11 @@ class FHIRSubscriptionStatusNotificationEvent extends \Ardenexal\FHIRTools\Compo
         public array $modifierExtension = [],
         /** @var FHIRInteger64|null eventNumber Sequencing index of this event */
         #[NotBlank]
-        public ?FHIRInteger64 $eventNumber = null,
+        public ?\FHIRInteger64 $eventNumber = null,
         /** @var FHIRInstant|null timestamp The instant this event occurred */
-        public ?FHIRInstant $timestamp = null,
+        public ?\FHIRInstant $timestamp = null,
         /** @var FHIRReference|null focus Reference to the primary resource or information of this event */
-        public ?FHIRReference $focus = null,
+        public ?\FHIRReference $focus = null,
         /** @var array<FHIRReference> additionalContext References related to the focus resource and/or context of this event */
         public array $additionalContext = [],
     ) {

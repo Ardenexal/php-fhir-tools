@@ -5,13 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCoding;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCode;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -29,11 +22,11 @@ class FHIRConceptMapGroupElementTargetDependsOn extends \Ardenexal\FHIRTools\Com
         public array $modifierExtension = [],
         /** @var FHIRCode|null attribute A reference to a mapping attribute defined in ConceptMap.additionalAttribute */
         #[NotBlank]
-        public ?FHIRCode $attribute = null,
+        public ?\FHIRCode $attribute = null,
         /** @var FHIRCode|FHIRCoding|FHIRString|string|FHIRBoolean|FHIRQuantity|null valueX Value of the referenced data element */
-        public FHIRCode|FHIRCoding|FHIRString|string|FHIRBoolean|FHIRQuantity|null $valueX = null,
+        public \FHIRCode|\FHIRCoding|\FHIRString|string|\FHIRBoolean|\FHIRQuantity|null $valueX = null,
         /** @var FHIRCanonical|null valueSet The mapping depends on a data element with a value from this value set */
-        public ?FHIRCanonical $valueSet = null,
+        public ?\FHIRCanonical $valueSet = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

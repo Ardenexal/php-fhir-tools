@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -28,12 +26,12 @@ class FHIRMedicinalProductDefinitionNameCountryLanguage extends \Ardenexal\FHIRT
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null country Country code for where this name applies */
         #[NotBlank]
-        public ?FHIRCodeableConcept $country = null,
+        public ?\FHIRCodeableConcept $country = null,
         /** @var FHIRCodeableConcept|null jurisdiction Jurisdiction code for where this name applies */
-        public ?FHIRCodeableConcept $jurisdiction = null,
+        public ?\FHIRCodeableConcept $jurisdiction = null,
         /** @var FHIRCodeableConcept|null language Language code for this name */
         #[NotBlank]
-        public ?FHIRCodeableConcept $language = null,
+        public ?\FHIRCodeableConcept $language = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

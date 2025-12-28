@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRId;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,14 +22,14 @@ class FHIRStructureMapGroupInput extends \Ardenexal\FHIRTools\Component\Models\R
         public array $modifierExtension = [],
         /** @var FHIRId|null name Name for this instance of data */
         #[NotBlank]
-        public ?FHIRId $name = null,
+        public ?\FHIRId $name = null,
         /** @var FHIRString|string|null type Type for this instance of data */
-        public FHIRString|string|null $type = null,
+        public \FHIRString|string|null $type = null,
         /** @var FHIRStructureMapInputModeType|null mode source | target */
         #[NotBlank]
-        public ?FHIRStructureMapInputModeType $mode = null,
+        public ?\FHIRStructureMapInputModeType $mode = null,
         /** @var FHIRString|string|null documentation Documentation for this instance of data */
-        public FHIRString|string|null $documentation = null,
+        public \FHIRString|string|null $documentation = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

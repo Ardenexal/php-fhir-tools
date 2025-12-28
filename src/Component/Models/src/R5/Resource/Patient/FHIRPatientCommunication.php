@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,9 +22,9 @@ class FHIRPatientCommunication extends \Ardenexal\FHIRTools\Component\Models\R5\
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null language The language which can be used to communicate with the patient about his or her health */
         #[NotBlank]
-        public ?FHIRCodeableConcept $language = null,
+        public ?\FHIRCodeableConcept $language = null,
         /** @var FHIRBoolean|null preferred Language preference indicator */
-        public ?FHIRBoolean $preferred = null,
+        public ?\FHIRBoolean $preferred = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

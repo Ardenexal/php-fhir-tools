@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime;
 
 /**
  * @description Categorical data indicating that an adverse event is associated in time to an immunization.
@@ -24,11 +20,11 @@ class FHIRImmunizationReaction extends \Ardenexal\FHIRTools\Component\Models\R4B
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRDateTime|null date When reaction started */
-        public ?FHIRDateTime $date = null,
+        public ?\FHIRDateTime $date = null,
         /** @var FHIRReference|null detail Additional information on reaction */
-        public ?FHIRReference $detail = null,
+        public ?\FHIRReference $detail = null,
         /** @var FHIRBoolean|null reported Indicates self-reported reaction */
-        public ?FHIRBoolean $reported = null,
+        public ?\FHIRBoolean $reported = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

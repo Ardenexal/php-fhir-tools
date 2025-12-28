@@ -4,19 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRAnnotation;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableReference;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRMeta;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRNarrative;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRMarkdown;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,21 +13,21 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  *
  * @description A GenomicStudy is a set of analyses performed to analyze and generate genomic data.
  */
-#[FhirResource(type: 'GenomicStudy', version: '5.0.0', url: 'http://hl7.org/fhir/StructureDefinition/GenomicStudy', fhirVersion: 'R5')]
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(type: 'GenomicStudy', version: '5.0.0', url: 'http://hl7.org/fhir/StructureDefinition/GenomicStudy', fhirVersion: 'R5')]
 class FHIRGenomicStudy extends FHIRDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
         public ?string $id = null,
         /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?FHIRMeta $meta = null,
+        public ?\FHIRMeta $meta = null,
         /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?FHIRUri $implicitRules = null,
+        public ?\FHIRUri $implicitRules = null,
         /** @var FHIRAllLanguagesType|null language Language of the resource content */
-        public ?FHIRAllLanguagesType $language = null,
+        public ?\FHIRAllLanguagesType $language = null,
         /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
-        public ?FHIRNarrative $text = null,
-        /** @var array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRResource> contained Contained, inline Resources */
+        public ?\FHIRNarrative $text = null,
+        /** @var array<FHIRResource> contained Contained, inline Resources */
         public array $contained = [],
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
@@ -50,32 +37,32 @@ class FHIRGenomicStudy extends FHIRDomainResource
         public array $identifier = [],
         /** @var FHIRGenomicStudyStatusType|null status registered | available | cancelled | entered-in-error | unknown */
         #[NotBlank]
-        public ?FHIRGenomicStudyStatusType $status = null,
+        public ?\FHIRGenomicStudyStatusType $status = null,
         /** @var array<FHIRCodeableConcept> type The type of the study (e.g., Familial variant segregation, Functional variation detection, or Gene expression profiling) */
         public array $type = [],
         /** @var FHIRReference|null subject The primary subject of the genomic study */
         #[NotBlank]
-        public ?FHIRReference $subject = null,
+        public ?\FHIRReference $subject = null,
         /** @var FHIRReference|null encounter The healthcare event with which this genomics study is associated */
-        public ?FHIRReference $encounter = null,
+        public ?\FHIRReference $encounter = null,
         /** @var FHIRDateTime|null startDate When the genomic study was started */
-        public ?FHIRDateTime $startDate = null,
+        public ?\FHIRDateTime $startDate = null,
         /** @var array<FHIRReference> basedOn Event resources that the genomic study is based on */
         public array $basedOn = [],
         /** @var FHIRReference|null referrer Healthcare professional who requested or referred the genomic study */
-        public ?FHIRReference $referrer = null,
+        public ?\FHIRReference $referrer = null,
         /** @var array<FHIRReference> interpreter Healthcare professionals who interpreted the genomic study */
         public array $interpreter = [],
         /** @var array<FHIRCodeableReference> reason Why the genomic study was performed */
         public array $reason = [],
         /** @var FHIRCanonical|null instantiatesCanonical The defined protocol that describes the study */
-        public ?FHIRCanonical $instantiatesCanonical = null,
+        public ?\FHIRCanonical $instantiatesCanonical = null,
         /** @var FHIRUri|null instantiatesUri The URL pointing to an externally maintained protocol that describes the study */
-        public ?FHIRUri $instantiatesUri = null,
+        public ?\FHIRUri $instantiatesUri = null,
         /** @var array<FHIRAnnotation> note Comments related to the genomic study */
         public array $note = [],
         /** @var FHIRMarkdown|null description Description of the genomic study */
-        public ?FHIRMarkdown $description = null,
+        public ?\FHIRMarkdown $description = null,
         /** @var array<FHIRGenomicStudyAnalysis> analysis Genomic Analysis Event */
         public array $analysis = [],
     ) {

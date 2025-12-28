@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBase64Binary;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
 
 /**
  * @description Specifies descriptive properties of the medicine, such as color, shape, imprints, etc.
@@ -25,9 +20,9 @@ class FHIRMedicationKnowledgeDrugCharacteristic extends \Ardenexal\FHIRTools\Com
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null type Code specifying the type of characteristic of medication */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRCodeableConcept|FHIRString|string|FHIRQuantity|FHIRBase64Binary|null valueX Description of the characteristic */
-        public FHIRCodeableConcept|FHIRString|string|FHIRQuantity|FHIRBase64Binary|null $valueX = null,
+        public \FHIRCodeableConcept|\FHIRString|string|\FHIRQuantity|\FHIRBase64Binary|null $valueX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

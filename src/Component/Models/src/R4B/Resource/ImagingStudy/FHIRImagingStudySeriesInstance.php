@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCoding;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRId;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUnsignedInt;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,14 +22,14 @@ class FHIRImagingStudySeriesInstance extends \Ardenexal\FHIRTools\Component\Mode
         public array $modifierExtension = [],
         /** @var FHIRId|null uid DICOM SOP Instance UID */
         #[NotBlank]
-        public ?FHIRId $uid = null,
+        public ?\FHIRId $uid = null,
         /** @var FHIRCoding|null sopClass DICOM class type */
         #[NotBlank]
-        public ?FHIRCoding $sopClass = null,
+        public ?\FHIRCoding $sopClass = null,
         /** @var FHIRUnsignedInt|null number The number of this instance in the series */
-        public ?FHIRUnsignedInt $number = null,
+        public ?\FHIRUnsignedInt $number = null,
         /** @var FHIRString|string|null title Description of instance */
-        public FHIRString|string|null $title = null,
+        public \FHIRString|string|null $title = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

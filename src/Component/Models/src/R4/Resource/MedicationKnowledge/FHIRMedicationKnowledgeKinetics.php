@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDuration;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRQuantity;
 
 /**
  * @description The time course of drug absorption, distribution, metabolism and excretion of a medication from the body.
@@ -27,7 +24,7 @@ class FHIRMedicationKnowledgeKinetics extends \Ardenexal\FHIRTools\Component\Mod
         /** @var array<FHIRQuantity> lethalDose50 The median lethal dose of a drug */
         public array $lethalDose50 = [],
         /** @var FHIRDuration|null halfLifePeriod Time required for concentration in the body to decrease by half */
-        public ?FHIRDuration $halfLifePeriod = null,
+        public ?\FHIRDuration $halfLifePeriod = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

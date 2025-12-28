@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,10 +21,10 @@ class FHIRMedicationAdministrationPerformer extends \Ardenexal\FHIRTools\Compone
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null function Type of performance */
-        public ?FHIRCodeableConcept $function = null,
+        public ?\FHIRCodeableConcept $function = null,
         /** @var FHIRReference|null actor Who performed the medication administration */
         #[NotBlank]
-        public ?FHIRReference $actor = null,
+        public ?\FHIRReference $actor = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

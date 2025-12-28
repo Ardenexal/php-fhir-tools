@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
 
 /**
  * @description A set of rules.
@@ -22,7 +20,7 @@ class FHIRPermissionRule extends \Ardenexal\FHIRTools\Component\Models\R5\DataTy
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRConsentProvisionTypeType|null type deny | permit */
-        public ?FHIRConsentProvisionTypeType $type = null,
+        public ?\FHIRConsentProvisionTypeType $type = null,
         /** @var array<FHIRPermissionRuleData> data The selection criteria to identify data that is within scope of this provision */
         public array $data = [],
         /** @var array<FHIRPermissionRuleActivity> activity A description or definition of which activities are allowed to be done on the data */

@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime;
 
 /**
  * @description Substance may be used to describe a kind of substance, or a specific package/container of the substance: an instance.
@@ -24,11 +20,11 @@ class FHIRSubstanceInstance extends \Ardenexal\FHIRTools\Component\Models\R4B\Da
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRIdentifier|null identifier Identifier of the package/container */
-        public ?FHIRIdentifier $identifier = null,
+        public ?\FHIRIdentifier $identifier = null,
         /** @var FHIRDateTime|null expiry When no longer valid to use */
-        public ?FHIRDateTime $expiry = null,
+        public ?\FHIRDateTime $expiry = null,
         /** @var FHIRQuantity|null quantity Amount of substance in the package */
-        public ?FHIRQuantity $quantity = null,
+        public ?\FHIRQuantity $quantity = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

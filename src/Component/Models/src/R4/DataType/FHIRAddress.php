@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRAddressTypeType;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRAddressUseType;
 
 /**
  * @author HL7 FHIR Standard
@@ -25,25 +22,25 @@ class FHIRAddress extends FHIRElement
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
         /** @var FHIRAddressUseType|null use home | work | temp | old | billing - purpose of this address */
-        public ?FHIRAddressUseType $use = null,
+        public ?\FHIRAddressUseType $use = null,
         /** @var FHIRAddressTypeType|null type postal | physical | both */
-        public ?FHIRAddressTypeType $type = null,
+        public ?\FHIRAddressTypeType $type = null,
         /** @var FHIRString|string|null text Text representation of the address */
-        public FHIRString|string|null $text = null,
+        public \FHIRString|string|null $text = null,
         /** @var array<FHIRString|string> line Street name, number, direction & P.O. Box etc. */
         public array $line = [],
         /** @var FHIRString|string|null city Name of city, town etc. */
-        public FHIRString|string|null $city = null,
+        public \FHIRString|string|null $city = null,
         /** @var FHIRString|string|null district District name (aka county) */
-        public FHIRString|string|null $district = null,
+        public \FHIRString|string|null $district = null,
         /** @var FHIRString|string|null state Sub-unit of country (abbreviations ok) */
-        public FHIRString|string|null $state = null,
+        public \FHIRString|string|null $state = null,
         /** @var FHIRString|string|null postalCode Postal code for area */
-        public FHIRString|string|null $postalCode = null,
+        public \FHIRString|string|null $postalCode = null,
         /** @var FHIRString|string|null country Country (e.g. can be ISO 3166 2 or 3 letter code) */
-        public FHIRString|string|null $country = null,
+        public \FHIRString|string|null $country = null,
         /** @var FHIRPeriod|null period Time period when address was/is in use */
-        public ?FHIRPeriod $period = null,
+        public ?\FHIRPeriod $period = null,
     ) {
         parent::__construct($id, $extension);
     }

@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,10 +22,10 @@ class FHIRCatalogEntryRelatedEntry extends \Ardenexal\FHIRTools\Component\Models
         public array $modifierExtension = [],
         /** @var FHIRCatalogEntryRelationTypeType|null relationtype triggers | is-replaced-by */
         #[NotBlank]
-        public ?FHIRCatalogEntryRelationTypeType $relationtype = null,
+        public ?\FHIRCatalogEntryRelationTypeType $relationtype = null,
         /** @var FHIRReference|null item The reference to the related item */
         #[NotBlank]
-        public ?FHIRReference $item = null,
+        public ?\FHIRReference $item = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRMarkdown;
 
 /**
  * @description Information about the [ValueSet/$expand](valueset-operation-expand.html) operation.
@@ -23,15 +20,15 @@ class FHIRTerminologyCapabilitiesExpansion extends \Ardenexal\FHIRTools\Componen
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRBoolean|null hierarchical Whether the server can return nested value sets */
-        public ?FHIRBoolean $hierarchical = null,
+        public ?\FHIRBoolean $hierarchical = null,
         /** @var FHIRBoolean|null paging Whether the server supports paging on expansion */
-        public ?FHIRBoolean $paging = null,
+        public ?\FHIRBoolean $paging = null,
         /** @var FHIRBoolean|null incomplete Allow request for incomplete expansions? */
-        public ?FHIRBoolean $incomplete = null,
+        public ?\FHIRBoolean $incomplete = null,
         /** @var array<FHIRTerminologyCapabilitiesExpansionParameter> parameter Supported expansion parameter */
         public array $parameter = [],
         /** @var FHIRMarkdown|null textFilter Documentation about text searching works */
-        public ?FHIRMarkdown $textFilter = null,
+        public ?\FHIRMarkdown $textFilter = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

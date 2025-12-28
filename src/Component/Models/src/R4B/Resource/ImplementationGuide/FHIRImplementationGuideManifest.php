@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUrl;
 
 /**
  * @description Information about an assembled implementation guide, created by the publication tooling.
@@ -23,7 +20,7 @@ class FHIRImplementationGuideManifest extends \Ardenexal\FHIRTools\Component\Mod
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRUrl|null rendering Location of rendered implementation guide */
-        public ?FHIRUrl $rendering = null,
+        public ?\FHIRUrl $rendering = null,
         /** @var array<FHIRImplementationGuideManifestResource> resource Resource in the implementation guide */
         public array $resource = [],
         /** @var array<FHIRImplementationGuideManifestPage> page HTML page within the parent IG */

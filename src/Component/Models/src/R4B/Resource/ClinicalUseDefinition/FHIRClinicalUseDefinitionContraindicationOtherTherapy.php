@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -29,10 +26,10 @@ class FHIRClinicalUseDefinitionContraindicationOtherTherapy extends \Ardenexal\F
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null relationshipType The type of relationship between the product indication/contraindication and another therapy */
         #[NotBlank]
-        public ?FHIRCodeableConcept $relationshipType = null,
+        public ?\FHIRCodeableConcept $relationshipType = null,
         /** @var FHIRCodeableReference|null therapy Reference to a specific medication as part of an indication or contraindication */
         #[NotBlank]
-        public ?FHIRCodeableReference $therapy = null,
+        public ?\FHIRCodeableReference $therapy = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

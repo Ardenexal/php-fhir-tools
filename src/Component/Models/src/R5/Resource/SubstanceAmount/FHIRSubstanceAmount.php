@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRRange;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 
 /**
  * @author HL7 FHIR Standard
@@ -29,13 +24,13 @@ class FHIRSubstanceAmount extends \Ardenexal\FHIRTools\Component\Models\R5\DataT
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRQuantity|FHIRRange|FHIRString|string|null amountX Used to capture quantitative values for a variety of elements. If only limits are given, the arithmetic mean would be the average. If only a single definite value for a given element is given, it would be captured in this field */
-        public FHIRQuantity|FHIRRange|FHIRString|string|null $amountX = null,
+        public \FHIRQuantity|\FHIRRange|\FHIRString|string|null $amountX = null,
         /** @var FHIRCodeableConcept|null amountType Most elements that require a quantitative value will also have a field called amount type. Amount type should always be specified because the actual value of the amount is often dependent on it. EXAMPLE: In capturing the actual relative amounts of substances or molecular fragments it is essential to indicate whether the amount refers to a mole ratio or weight ratio. For any given element an effort should be made to use same the amount type for all related definitional elements */
-        public ?FHIRCodeableConcept $amountType = null,
+        public ?\FHIRCodeableConcept $amountType = null,
         /** @var FHIRString|string|null amountText A textual comment on a numeric value */
-        public FHIRString|string|null $amountText = null,
+        public \FHIRString|string|null $amountText = null,
         /** @var FHIRSubstanceAmountReferenceRange|null referenceRange Reference range of possible or expected values */
-        public ?FHIRSubstanceAmountReferenceRange $referenceRange = null,
+        public ?\FHIRSubstanceAmountReferenceRange $referenceRange = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

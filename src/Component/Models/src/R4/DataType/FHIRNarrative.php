@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRXhtml;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRNarrativeStatusType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,10 +24,10 @@ class FHIRNarrative extends FHIRElement
         public array $extension = [],
         /** @var FHIRNarrativeStatusType|null status generated | extensions | additional | empty */
         #[NotBlank]
-        public ?FHIRNarrativeStatusType $status = null,
+        public ?\FHIRNarrativeStatusType $status = null,
         /** @var FHIRXhtml|null div Limited xhtml content */
         #[NotBlank]
-        public ?FHIRXhtml $div = null,
+        public ?\FHIRXhtml $div = null,
     ) {
         parent::__construct($id, $extension);
     }

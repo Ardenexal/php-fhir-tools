@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRInstant;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,18 +22,18 @@ class FHIRBundleEntryRequest extends \Ardenexal\FHIRTools\Component\Models\R4B\D
         public array $modifierExtension = [],
         /** @var FHIRHTTPVerbType|null method GET | HEAD | POST | PUT | DELETE | PATCH */
         #[NotBlank]
-        public ?FHIRHTTPVerbType $method = null,
+        public ?\FHIRHTTPVerbType $method = null,
         /** @var FHIRUri|null url URL for HTTP equivalent of this entry */
         #[NotBlank]
-        public ?FHIRUri $url = null,
+        public ?\FHIRUri $url = null,
         /** @var FHIRString|string|null ifNoneMatch For managing cache currency */
-        public FHIRString|string|null $ifNoneMatch = null,
+        public \FHIRString|string|null $ifNoneMatch = null,
         /** @var FHIRInstant|null ifModifiedSince For managing cache currency */
-        public ?FHIRInstant $ifModifiedSince = null,
+        public ?\FHIRInstant $ifModifiedSince = null,
         /** @var FHIRString|string|null ifMatch For managing update contention */
-        public FHIRString|string|null $ifMatch = null,
+        public \FHIRString|string|null $ifMatch = null,
         /** @var FHIRString|string|null ifNoneExist For conditional creates */
-        public FHIRString|string|null $ifNoneExist = null,
+        public \FHIRString|string|null $ifNoneExist = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

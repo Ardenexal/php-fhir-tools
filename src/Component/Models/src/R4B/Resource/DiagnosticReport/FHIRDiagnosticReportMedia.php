@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,10 +21,10 @@ class FHIRDiagnosticReportMedia extends \Ardenexal\FHIRTools\Component\Models\R4
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRString|string|null comment Comment about the image (e.g. explanation) */
-        public FHIRString|string|null $comment = null,
+        public \FHIRString|string|null $comment = null,
         /** @var FHIRReference|null link Reference to the image source */
         #[NotBlank]
-        public ?FHIRReference $link = null,
+        public ?\FHIRReference $link = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

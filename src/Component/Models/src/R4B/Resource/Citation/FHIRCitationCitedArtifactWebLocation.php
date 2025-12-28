@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri;
 
 /**
  * @description Used for any URL for the article or artifact cited.
@@ -23,9 +20,9 @@ class FHIRCitationCitedArtifactWebLocation extends \Ardenexal\FHIRTools\Componen
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null type Code the reason for different URLs, e.g. abstract and full-text */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRUri|null url The specific URL */
-        public ?FHIRUri $url = null,
+        public ?\FHIRUri $url = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

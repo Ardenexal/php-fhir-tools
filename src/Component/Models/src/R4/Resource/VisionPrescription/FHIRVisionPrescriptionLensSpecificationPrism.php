@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDecimal;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,10 +22,10 @@ class FHIRVisionPrescriptionLensSpecificationPrism extends \Ardenexal\FHIRTools\
         public array $modifierExtension = [],
         /** @var FHIRDecimal|null amount Amount of adjustment */
         #[NotBlank]
-        public ?FHIRDecimal $amount = null,
+        public ?\FHIRDecimal $amount = null,
         /** @var FHIRVisionBaseType|null base up | down | in | out */
         #[NotBlank]
-        public ?FHIRVisionBaseType $base = null,
+        public ?\FHIRVisionBaseType $base = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

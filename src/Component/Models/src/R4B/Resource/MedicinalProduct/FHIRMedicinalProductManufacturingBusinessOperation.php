@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime;
 
 /**
  * @description An operation applied to the product, for manufacturing or adminsitrative purpose.
@@ -25,17 +20,17 @@ class FHIRMedicinalProductManufacturingBusinessOperation extends \Ardenexal\FHIR
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null operationType The type of manufacturing operation */
-        public ?FHIRCodeableConcept $operationType = null,
+        public ?\FHIRCodeableConcept $operationType = null,
         /** @var FHIRIdentifier|null authorisationReferenceNumber Regulatory authorization reference number */
-        public ?FHIRIdentifier $authorisationReferenceNumber = null,
+        public ?\FHIRIdentifier $authorisationReferenceNumber = null,
         /** @var FHIRDateTime|null effectiveDate Regulatory authorization date */
-        public ?FHIRDateTime $effectiveDate = null,
+        public ?\FHIRDateTime $effectiveDate = null,
         /** @var FHIRCodeableConcept|null confidentialityIndicator To indicate if this proces is commercially confidential */
-        public ?FHIRCodeableConcept $confidentialityIndicator = null,
+        public ?\FHIRCodeableConcept $confidentialityIndicator = null,
         /** @var array<FHIRReference> manufacturer The manufacturer or establishment associated with the process */
         public array $manufacturer = [],
         /** @var FHIRReference|null regulator A regulator which oversees the operation */
-        public ?FHIRReference $regulator = null,
+        public ?\FHIRReference $regulator = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

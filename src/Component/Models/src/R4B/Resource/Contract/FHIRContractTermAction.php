@@ -5,16 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRAnnotation;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRTiming;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUnsignedInt;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -31,26 +21,26 @@ class FHIRContractTermAction extends \Ardenexal\FHIRTools\Component\Models\R4B\D
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRBoolean|null doNotPerform True if the term prohibits the  action */
-        public ?FHIRBoolean $doNotPerform = null,
+        public ?\FHIRBoolean $doNotPerform = null,
         /** @var FHIRCodeableConcept|null type Type or form of the action */
         #[NotBlank]
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var array<FHIRContractTermActionSubject> subject Entity of the action */
         public array $subject = [],
         /** @var FHIRCodeableConcept|null intent Purpose for the Contract Term Action */
         #[NotBlank]
-        public ?FHIRCodeableConcept $intent = null,
+        public ?\FHIRCodeableConcept $intent = null,
         /** @var array<FHIRString|string> linkId Pointer to specific item */
         public array $linkId = [],
         /** @var FHIRCodeableConcept|null status State of the action */
         #[NotBlank]
-        public ?FHIRCodeableConcept $status = null,
+        public ?\FHIRCodeableConcept $status = null,
         /** @var FHIRReference|null context Episode associated with action */
-        public ?FHIRReference $context = null,
+        public ?\FHIRReference $context = null,
         /** @var array<FHIRString|string> contextLinkId Pointer to specific item */
         public array $contextLinkId = [],
         /** @var FHIRDateTime|FHIRPeriod|FHIRTiming|null occurrenceX When action happens */
-        public FHIRDateTime|FHIRPeriod|FHIRTiming|null $occurrenceX = null,
+        public \FHIRDateTime|\FHIRPeriod|\FHIRTiming|null $occurrenceX = null,
         /** @var array<FHIRReference> requester Who asked for action */
         public array $requester = [],
         /** @var array<FHIRString|string> requesterLinkId Pointer to specific item */
@@ -58,9 +48,9 @@ class FHIRContractTermAction extends \Ardenexal\FHIRTools\Component\Models\R4B\D
         /** @var array<FHIRCodeableConcept> performerType Kind of service performer */
         public array $performerType = [],
         /** @var FHIRCodeableConcept|null performerRole Competency of the performer */
-        public ?FHIRCodeableConcept $performerRole = null,
+        public ?\FHIRCodeableConcept $performerRole = null,
         /** @var FHIRReference|null performer Actor that wil execute (or not) the action */
-        public ?FHIRReference $performer = null,
+        public ?\FHIRReference $performer = null,
         /** @var array<FHIRString|string> performerLinkId Pointer to specific item */
         public array $performerLinkId = [],
         /** @var array<FHIRCodeableConcept> reasonCode Why is action (not) needed? */

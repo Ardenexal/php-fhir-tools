@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDate;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 
 /**
  * @description A set of criteria that define the contents of the value set by including or excluding codes selected from the specified code system(s) that the value set draws from. This is also known as the Content Logical Definition (CLD).
@@ -24,9 +20,9 @@ class FHIRValueSetCompose extends \Ardenexal\FHIRTools\Component\Models\R5\DataT
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRDate|null lockedDate Fixed date for references with no specified version (transitive) */
-        public ?FHIRDate $lockedDate = null,
+        public ?\FHIRDate $lockedDate = null,
         /** @var FHIRBoolean|null inactive Whether inactive codes are in the value set */
-        public ?FHIRBoolean $inactive = null,
+        public ?\FHIRBoolean $inactive = null,
         /** @var array<FHIRValueSetComposeInclude> include Include one or more codes from a code system or other value set(s) */
         public array $include = [],
         /** @var array<FHIRValueSetComposeInclude> exclude Explicitly exclude codes from a code system or other value sets */

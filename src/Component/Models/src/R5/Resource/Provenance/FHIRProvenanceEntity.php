@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,10 +22,10 @@ class FHIRProvenanceEntity extends \Ardenexal\FHIRTools\Component\Models\R5\Data
         public array $modifierExtension = [],
         /** @var FHIRProvenanceEntityRoleType|null role revision | quotation | source | instantiates | removal */
         #[NotBlank]
-        public ?FHIRProvenanceEntityRoleType $role = null,
+        public ?\FHIRProvenanceEntityRoleType $role = null,
         /** @var FHIRReference|null what Identity of entity */
         #[NotBlank]
-        public ?FHIRReference $what = null,
+        public ?\FHIRReference $what = null,
         /** @var array<FHIRProvenanceAgent> agent Entity is attributed to this agent */
         public array $agent = [],
     ) {

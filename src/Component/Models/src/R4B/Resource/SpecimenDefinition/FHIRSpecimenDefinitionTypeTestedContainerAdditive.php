@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -29,7 +26,7 @@ class FHIRSpecimenDefinitionTypeTestedContainerAdditive extends \Ardenexal\FHIRT
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|FHIRReference|null additiveX Additive associated with container */
         #[NotBlank]
-        public FHIRCodeableConcept|FHIRReference|null $additiveX = null,
+        public \FHIRCodeableConcept|\FHIRReference|null $additiveX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

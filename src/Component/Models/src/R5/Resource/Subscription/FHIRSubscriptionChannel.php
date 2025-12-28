@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUrl;
-use Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRMimeTypesType;
-use Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRSubscriptionChannelTypeType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,11 +22,11 @@ class FHIRSubscriptionChannel extends \Ardenexal\FHIRTools\Component\Models\R4B\
         public array $modifierExtension = [],
         /** @var FHIRSubscriptionChannelTypeType|null type rest-hook | websocket | email | sms | message */
         #[NotBlank]
-        public ?FHIRSubscriptionChannelTypeType $type = null,
+        public ?\FHIRSubscriptionChannelTypeType $type = null,
         /** @var FHIRUrl|null endpoint Where the channel points to */
-        public ?FHIRUrl $endpoint = null,
+        public ?\FHIRUrl $endpoint = null,
         /** @var FHIRMimeTypesType|null payload MIME type to send, or omit for no payload */
-        public ?FHIRMimeTypesType $payload = null,
+        public ?\FHIRMimeTypesType $payload = null,
         /** @var array<FHIRString|string> header Usage depends on the channel type */
         public array $header = [],
     ) {

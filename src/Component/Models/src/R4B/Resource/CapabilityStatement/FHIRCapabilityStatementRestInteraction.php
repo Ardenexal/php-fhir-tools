@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRMarkdown;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,9 +22,9 @@ class FHIRCapabilityStatementRestInteraction extends \Ardenexal\FHIRTools\Compon
         public array $modifierExtension = [],
         /** @var FHIRSystemRestfulInteractionType|null code transaction | batch | search-system | history-system */
         #[NotBlank]
-        public ?FHIRSystemRestfulInteractionType $code = null,
+        public ?\FHIRSystemRestfulInteractionType $code = null,
         /** @var FHIRMarkdown|null documentation Anything special about operation behavior */
-        public ?FHIRMarkdown $documentation = null,
+        public ?\FHIRMarkdown $documentation = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRPositiveInt;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,14 +21,14 @@ class FHIRClaimResponseProcessNote extends \Ardenexal\FHIRTools\Component\Models
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRPositiveInt|null number Note instance identifier */
-        public ?FHIRPositiveInt $number = null,
+        public ?\FHIRPositiveInt $number = null,
         /** @var FHIRCodeableConcept|null type Note purpose */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRString|string|null text Note explanatory text */
         #[NotBlank]
-        public FHIRString|string|null $text = null,
+        public \FHIRString|string|null $text = null,
         /** @var FHIRCodeableConcept|null language Language of the text */
-        public ?FHIRCodeableConcept $language = null,
+        public ?\FHIRCodeableConcept $language = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

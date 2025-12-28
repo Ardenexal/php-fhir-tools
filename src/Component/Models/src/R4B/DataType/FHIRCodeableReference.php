@@ -22,9 +22,9 @@ class FHIRCodeableReference extends FHIRElement
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
         /** @var FHIRCodeableConcept|null concept Reference to a concept (by class) */
-        public ?FHIRCodeableConcept $concept = null,
+        public ?\FHIRCodeableConcept $concept = null,
         /** @var FHIRReference|null reference Reference to a resource (by instance) */
-        public ?FHIRReference $reference = null,
+        public ?\FHIRReference $reference = null,
     ) {
         parent::__construct($id, $extension);
     }

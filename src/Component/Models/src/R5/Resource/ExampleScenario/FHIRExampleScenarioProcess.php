@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRMarkdown;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,13 +22,13 @@ class FHIRExampleScenarioProcess extends \Ardenexal\FHIRTools\Component\Models\R
         public array $modifierExtension = [],
         /** @var FHIRString|string|null title Label for procss */
         #[NotBlank]
-        public FHIRString|string|null $title = null,
+        public \FHIRString|string|null $title = null,
         /** @var FHIRMarkdown|null description Human-friendly description of the process */
-        public ?FHIRMarkdown $description = null,
+        public ?\FHIRMarkdown $description = null,
         /** @var FHIRMarkdown|null preConditions Status before process starts */
-        public ?FHIRMarkdown $preConditions = null,
+        public ?\FHIRMarkdown $preConditions = null,
         /** @var FHIRMarkdown|null postConditions Status after successful completion */
-        public ?FHIRMarkdown $postConditions = null,
+        public ?\FHIRMarkdown $postConditions = null,
         /** @var array<FHIRExampleScenarioProcessStep> step Event within of the process */
         public array $step = [],
     ) {

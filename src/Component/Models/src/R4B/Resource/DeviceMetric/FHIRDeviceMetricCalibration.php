@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRInstant;
 
 /**
  * @description Describes the calibrations that have been performed or that are required to be performed.
@@ -22,11 +20,11 @@ class FHIRDeviceMetricCalibration extends \Ardenexal\FHIRTools\Component\Models\
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRDeviceMetricCalibrationTypeType|null type unspecified | offset | gain | two-point */
-        public ?FHIRDeviceMetricCalibrationTypeType $type = null,
+        public ?\FHIRDeviceMetricCalibrationTypeType $type = null,
         /** @var FHIRDeviceMetricCalibrationStateType|null state not-calibrated | calibration-required | calibrated | unspecified */
-        public ?FHIRDeviceMetricCalibrationStateType $state = null,
+        public ?\FHIRDeviceMetricCalibrationStateType $state = null,
         /** @var FHIRInstant|null time Describes the time last calibration has been performed */
-        public ?FHIRInstant $time = null,
+        public ?\FHIRInstant $time = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

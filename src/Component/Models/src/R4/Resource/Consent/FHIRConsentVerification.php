@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,11 +22,11 @@ class FHIRConsentVerification extends \Ardenexal\FHIRTools\Component\Models\R4\D
         public array $modifierExtension = [],
         /** @var FHIRBoolean|null verified Has been verified */
         #[NotBlank]
-        public ?FHIRBoolean $verified = null,
+        public ?\FHIRBoolean $verified = null,
         /** @var FHIRReference|null verifiedWith Person who verified */
-        public ?FHIRReference $verifiedWith = null,
+        public ?\FHIRReference $verifiedWith = null,
         /** @var FHIRDateTime|null verificationDate When consent verified */
-        public ?FHIRDateTime $verificationDate = null,
+        public ?\FHIRDateTime $verificationDate = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

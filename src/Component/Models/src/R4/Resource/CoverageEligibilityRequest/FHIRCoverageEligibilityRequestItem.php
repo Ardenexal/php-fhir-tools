@@ -5,12 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRMoney;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRPositiveInt;
 
 /**
  * @description Service categories or billable services for which benefit details and/or an authorization prior to service delivery may be required by the payor.
@@ -28,19 +22,19 @@ class FHIRCoverageEligibilityRequestItem extends \Ardenexal\FHIRTools\Component\
         /** @var array<FHIRPositiveInt> supportingInfoSequence Applicable exception or supporting information */
         public array $supportingInfoSequence = [],
         /** @var FHIRCodeableConcept|null category Benefit classification */
-        public ?FHIRCodeableConcept $category = null,
+        public ?\FHIRCodeableConcept $category = null,
         /** @var FHIRCodeableConcept|null productOrService Billing, service, product, or drug code */
-        public ?FHIRCodeableConcept $productOrService = null,
+        public ?\FHIRCodeableConcept $productOrService = null,
         /** @var array<FHIRCodeableConcept> modifier Product or service billing modifiers */
         public array $modifier = [],
         /** @var FHIRReference|null provider Perfoming practitioner */
-        public ?FHIRReference $provider = null,
+        public ?\FHIRReference $provider = null,
         /** @var FHIRQuantity|null quantity Count of products or services */
-        public ?FHIRQuantity $quantity = null,
+        public ?\FHIRQuantity $quantity = null,
         /** @var FHIRMoney|null unitPrice Fee, charge or cost per item */
-        public ?FHIRMoney $unitPrice = null,
+        public ?\FHIRMoney $unitPrice = null,
         /** @var FHIRReference|null facility Servicing facility */
-        public ?FHIRReference $facility = null,
+        public ?\FHIRReference $facility = null,
         /** @var array<FHIRCoverageEligibilityRequestItemDiagnosis> diagnosis Applicable diagnosis */
         public array $diagnosis = [],
         /** @var array<FHIRReference> detail Product or service details */

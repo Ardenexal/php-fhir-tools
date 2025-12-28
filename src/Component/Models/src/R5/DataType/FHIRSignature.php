@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBase64Binary;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInstant;
-use Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRMimeTypesType;
 
 /**
  * @author HL7 FHIR Standard
@@ -27,17 +24,17 @@ class FHIRSignature extends FHIRDataType
         /** @var array<FHIRCoding> type Indication of the reason the entity signed the object(s) */
         public array $type = [],
         /** @var FHIRInstant|null when When the signature was created */
-        public ?FHIRInstant $when = null,
+        public ?\FHIRInstant $when = null,
         /** @var FHIRReference|null who Who signed */
-        public ?FHIRReference $who = null,
+        public ?\FHIRReference $who = null,
         /** @var FHIRReference|null onBehalfOf The party represented */
-        public ?FHIRReference $onBehalfOf = null,
+        public ?\FHIRReference $onBehalfOf = null,
         /** @var FHIRMimeTypesType|null targetFormat The technical format of the signed resources */
-        public ?FHIRMimeTypesType $targetFormat = null,
+        public ?\FHIRMimeTypesType $targetFormat = null,
         /** @var FHIRMimeTypesType|null sigFormat The technical format of the signature */
-        public ?FHIRMimeTypesType $sigFormat = null,
+        public ?\FHIRMimeTypesType $sigFormat = null,
         /** @var FHIRBase64Binary|null data The actual signature content (XML DigSig. JWS, picture, etc.) */
-        public ?FHIRBase64Binary $data = null,
+        public ?\FHIRBase64Binary $data = null,
     ) {
         parent::__construct($id, $extension);
     }

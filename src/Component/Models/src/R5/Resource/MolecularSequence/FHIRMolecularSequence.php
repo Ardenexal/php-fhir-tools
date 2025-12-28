@@ -4,16 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRAttachment;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRMeta;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRNarrative;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
-
 /**
  * @author Health Level Seven International (Clinical Genomics)
  *
@@ -21,7 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
  *
  * @description Representation of a molecular sequence.
  */
-#[FhirResource(
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(
     type: 'MolecularSequence',
     version: '5.0.0',
     url: 'http://hl7.org/fhir/StructureDefinition/MolecularSequence',
@@ -33,14 +23,14 @@ class FHIRMolecularSequence extends FHIRDomainResource
         /** @var string|null id Logical id of this artifact */
         public ?string $id = null,
         /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?FHIRMeta $meta = null,
+        public ?\FHIRMeta $meta = null,
         /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?FHIRUri $implicitRules = null,
+        public ?\FHIRUri $implicitRules = null,
         /** @var FHIRAllLanguagesType|null language Language of the resource content */
-        public ?FHIRAllLanguagesType $language = null,
+        public ?\FHIRAllLanguagesType $language = null,
         /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
-        public ?FHIRNarrative $text = null,
-        /** @var array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRResource> contained Contained, inline Resources */
+        public ?\FHIRNarrative $text = null,
+        /** @var array<FHIRResource> contained Contained, inline Resources */
         public array $contained = [],
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
@@ -49,19 +39,19 @@ class FHIRMolecularSequence extends FHIRDomainResource
         /** @var array<FHIRIdentifier> identifier Unique ID for this particular sequence */
         public array $identifier = [],
         /** @var FHIRSequenceTypeType|null type aa | dna | rna */
-        public ?FHIRSequenceTypeType $type = null,
+        public ?\FHIRSequenceTypeType $type = null,
         /** @var FHIRReference|null subject Subject this sequence is associated too */
-        public ?FHIRReference $subject = null,
+        public ?\FHIRReference $subject = null,
         /** @var array<FHIRReference> focus What the molecular sequence is about, when it is not about the subject of record */
         public array $focus = [],
         /** @var FHIRReference|null specimen Specimen used for sequencing */
-        public ?FHIRReference $specimen = null,
+        public ?\FHIRReference $specimen = null,
         /** @var FHIRReference|null device The method for sequencing */
-        public ?FHIRReference $device = null,
+        public ?\FHIRReference $device = null,
         /** @var FHIRReference|null performer Who should be responsible for test result */
-        public ?FHIRReference $performer = null,
+        public ?\FHIRReference $performer = null,
         /** @var FHIRString|string|null literal Sequence that was observed */
-        public FHIRString|string|null $literal = null,
+        public \FHIRString|string|null $literal = null,
         /** @var array<FHIRAttachment> formatted Embedded file or a link (URL) which contains content to represent the sequence */
         public array $formatted = [],
         /** @var array<FHIRMolecularSequenceRelative> relative A sequence defined relative to another sequence */

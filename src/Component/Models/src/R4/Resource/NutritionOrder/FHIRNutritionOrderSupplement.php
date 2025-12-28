@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRTiming;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
 
 /**
  * @description Oral nutritional products given in order to add further nutritional value to the patient's diet.
@@ -25,15 +20,15 @@ class FHIRNutritionOrderSupplement extends \Ardenexal\FHIRTools\Component\Models
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null type Type of supplement product requested */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRString|string|null productName Product or brand name of the nutritional supplement */
-        public FHIRString|string|null $productName = null,
+        public \FHIRString|string|null $productName = null,
         /** @var array<FHIRTiming> schedule Scheduled frequency of supplement */
         public array $schedule = [],
         /** @var FHIRQuantity|null quantity Amount of the nutritional supplement */
-        public ?FHIRQuantity $quantity = null,
+        public ?\FHIRQuantity $quantity = null,
         /** @var FHIRString|string|null instruction Instructions or additional information about the oral supplement */
-        public FHIRString|string|null $instruction = null,
+        public \FHIRString|string|null $instruction = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRId;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,16 +23,16 @@ class FHIRExpression extends FHIRElement
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
         /** @var FHIRString|string|null description Natural language description of the condition */
-        public FHIRString|string|null $description = null,
+        public \FHIRString|string|null $description = null,
         /** @var FHIRId|null name Short name assigned to expression for reuse */
-        public ?FHIRId $name = null,
+        public ?\FHIRId $name = null,
         /** @var string|null language text/cql | text/fhirpath | application/x-fhir-query | etc. */
         #[NotBlank]
         public ?string $language = null,
         /** @var FHIRString|string|null expression Expression in specified language */
-        public FHIRString|string|null $expression = null,
+        public \FHIRString|string|null $expression = null,
         /** @var FHIRUri|null reference Where the expression is found */
-        public ?FHIRUri $reference = null,
+        public ?\FHIRUri $reference = null,
     ) {
         parent::__construct($id, $extension);
     }

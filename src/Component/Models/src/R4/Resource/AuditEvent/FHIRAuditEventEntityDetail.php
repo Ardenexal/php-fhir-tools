@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBase64Binary;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,10 +22,10 @@ class FHIRAuditEventEntityDetail extends \Ardenexal\FHIRTools\Component\Models\R
         public array $modifierExtension = [],
         /** @var FHIRString|string|null type Name of the property */
         #[NotBlank]
-        public FHIRString|string|null $type = null,
+        public \FHIRString|string|null $type = null,
         /** @var FHIRString|string|FHIRBase64Binary|null valueX Property value */
         #[NotBlank]
-        public FHIRString|string|FHIRBase64Binary|null $valueX = null,
+        public \FHIRString|string|\FHIRBase64Binary|null $valueX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

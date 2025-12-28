@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRId;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 
 /**
  * @description Content to create because of this mapping rule.
@@ -23,17 +20,17 @@ class FHIRStructureMapGroupRuleTarget extends \Ardenexal\FHIRTools\Component\Mod
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRString|string|null context Variable this rule applies to */
-        public FHIRString|string|null $context = null,
+        public \FHIRString|string|null $context = null,
         /** @var FHIRString|string|null element Field to create in the context */
-        public FHIRString|string|null $element = null,
+        public \FHIRString|string|null $element = null,
         /** @var FHIRId|null variable Named context for field, if desired, and a field is specified */
-        public ?FHIRId $variable = null,
+        public ?\FHIRId $variable = null,
         /** @var array<FHIRStructureMapTargetListModeType> listMode first | share | last | single */
         public array $listMode = [],
         /** @var FHIRId|null listRuleId Internal rule reference for shared list items */
-        public ?FHIRId $listRuleId = null,
+        public ?\FHIRId $listRuleId = null,
         /** @var FHIRStructureMapTransformType|null transform create | copy + */
-        public ?FHIRStructureMapTransformType $transform = null,
+        public ?\FHIRStructureMapTransformType $transform = null,
         /** @var array<FHIRStructureMapGroupRuleTargetParameter> parameter Parameters to the transform */
         public array $parameter = [],
     ) {

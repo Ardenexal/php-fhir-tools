@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
 
 /**
  * @description Moiety, for structural modifications.
@@ -25,19 +20,19 @@ class FHIRSubstanceSpecificationMoiety extends \Ardenexal\FHIRTools\Component\Mo
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null role Role that the moiety is playing */
-        public ?FHIRCodeableConcept $role = null,
+        public ?\FHIRCodeableConcept $role = null,
         /** @var FHIRIdentifier|null identifier Identifier by which this moiety substance is known */
-        public ?FHIRIdentifier $identifier = null,
+        public ?\FHIRIdentifier $identifier = null,
         /** @var FHIRString|string|null name Textual name for this moiety substance */
-        public FHIRString|string|null $name = null,
+        public \FHIRString|string|null $name = null,
         /** @var FHIRCodeableConcept|null stereochemistry Stereochemistry type */
-        public ?FHIRCodeableConcept $stereochemistry = null,
+        public ?\FHIRCodeableConcept $stereochemistry = null,
         /** @var FHIRCodeableConcept|null opticalActivity Optical activity type */
-        public ?FHIRCodeableConcept $opticalActivity = null,
+        public ?\FHIRCodeableConcept $opticalActivity = null,
         /** @var FHIRString|string|null molecularFormula Molecular formula */
-        public FHIRString|string|null $molecularFormula = null,
+        public \FHIRString|string|null $molecularFormula = null,
         /** @var FHIRQuantity|FHIRString|string|null amountX Quantitative value for this moiety */
-        public FHIRQuantity|FHIRString|string|null $amountX = null,
+        public \FHIRQuantity|\FHIRString|string|null $amountX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

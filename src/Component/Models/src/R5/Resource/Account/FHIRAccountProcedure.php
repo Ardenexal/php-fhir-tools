@@ -5,12 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableReference;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRPositiveInt;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,12 +21,12 @@ class FHIRAccountProcedure extends \Ardenexal\FHIRTools\Component\Models\R5\Data
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRPositiveInt|null sequence Ranking of the procedure (for each type) */
-        public ?FHIRPositiveInt $sequence = null,
+        public ?\FHIRPositiveInt $sequence = null,
         /** @var FHIRCodeableReference|null code The procedure relevant to the account */
         #[NotBlank]
-        public ?FHIRCodeableReference $code = null,
+        public ?\FHIRCodeableReference $code = null,
         /** @var FHIRDateTime|null dateOfService Date of the procedure (when coded procedure) */
-        public ?FHIRDateTime $dateOfService = null,
+        public ?\FHIRDateTime $dateOfService = null,
         /** @var array<FHIRCodeableConcept> type How this procedure value should be used in charging the account */
         public array $type = [],
         /** @var array<FHIRCodeableConcept> packageCode Package Code specific for billing */

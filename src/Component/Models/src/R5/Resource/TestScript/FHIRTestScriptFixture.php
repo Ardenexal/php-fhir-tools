@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,12 +22,12 @@ class FHIRTestScriptFixture extends \Ardenexal\FHIRTools\Component\Models\R5\Dat
         public array $modifierExtension = [],
         /** @var FHIRBoolean|null autocreate Whether or not to implicitly create the fixture during setup */
         #[NotBlank]
-        public ?FHIRBoolean $autocreate = null,
+        public ?\FHIRBoolean $autocreate = null,
         /** @var FHIRBoolean|null autodelete Whether or not to implicitly delete the fixture during teardown */
         #[NotBlank]
-        public ?FHIRBoolean $autodelete = null,
+        public ?\FHIRBoolean $autodelete = null,
         /** @var FHIRReference|null resource Reference of the resource */
-        public ?FHIRReference $resource = null,
+        public ?\FHIRReference $resource = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

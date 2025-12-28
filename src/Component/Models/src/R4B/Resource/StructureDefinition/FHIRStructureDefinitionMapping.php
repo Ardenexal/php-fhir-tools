@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRId;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,13 +22,13 @@ class FHIRStructureDefinitionMapping extends \Ardenexal\FHIRTools\Component\Mode
         public array $modifierExtension = [],
         /** @var FHIRId|null identity Internal id when this mapping is used */
         #[NotBlank]
-        public ?FHIRId $identity = null,
+        public ?\FHIRId $identity = null,
         /** @var FHIRUri|null uri Identifies what this mapping refers to */
-        public ?FHIRUri $uri = null,
+        public ?\FHIRUri $uri = null,
         /** @var FHIRString|string|null name Names what this mapping refers to */
-        public FHIRString|string|null $name = null,
+        public \FHIRString|string|null $name = null,
         /** @var FHIRString|string|null comment Versions, Issues, Scope limitations etc. */
-        public FHIRString|string|null $comment = null,
+        public \FHIRString|string|null $comment = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

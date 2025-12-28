@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRSubstanceAmount;
 
 /**
  * @description Todo.
@@ -27,9 +24,9 @@ class FHIRSubstancePolymerRepeatRepeatUnitDegreeOfPolymerisation extends \Ardene
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null degree Todo */
-        public ?FHIRCodeableConcept $degree = null,
+        public ?\FHIRCodeableConcept $degree = null,
         /** @var FHIRSubstanceAmount|null amount Todo */
-        public ?FHIRSubstanceAmount $amount = null,
+        public ?\FHIRSubstanceAmount $amount = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

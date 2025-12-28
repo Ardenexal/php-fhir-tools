@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
 
 /**
  * @description Specifics for when this is a contraindication.
@@ -23,9 +20,9 @@ class FHIRClinicalUseDefinitionContraindication extends \Ardenexal\FHIRTools\Com
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableReference|null diseaseSymptomProcedure The situation that is being documented as contraindicating against this item */
-        public ?FHIRCodeableReference $diseaseSymptomProcedure = null,
+        public ?\FHIRCodeableReference $diseaseSymptomProcedure = null,
         /** @var FHIRCodeableReference|null diseaseStatus The status of the disease or symptom for the contraindication */
-        public ?FHIRCodeableReference $diseaseStatus = null,
+        public ?\FHIRCodeableReference $diseaseStatus = null,
         /** @var array<FHIRCodeableReference> comorbidity A comorbidity (concurrent condition) or coinfection */
         public array $comorbidity = [],
         /** @var array<FHIRReference> indication The indication which this is a contraidication for */

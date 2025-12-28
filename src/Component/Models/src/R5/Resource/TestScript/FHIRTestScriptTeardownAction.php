@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -23,7 +22,7 @@ class FHIRTestScriptTeardownAction extends \Ardenexal\FHIRTools\Component\Models
         public array $modifierExtension = [],
         /** @var FHIRTestScriptSetupActionOperation|null operation The teardown operation to perform */
         #[NotBlank]
-        public ?FHIRTestScriptSetupActionOperation $operation = null,
+        public ?\FHIRTestScriptSetupActionOperation $operation = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

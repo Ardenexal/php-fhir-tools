@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRIdentifier;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,9 +22,9 @@ class FHIRMedicinalProductPackagedBatchIdentifier extends \Ardenexal\FHIRTools\C
         public array $modifierExtension = [],
         /** @var FHIRIdentifier|null outerPackaging A number appearing on the outer packaging of a specific batch */
         #[NotBlank]
-        public ?FHIRIdentifier $outerPackaging = null,
+        public ?\FHIRIdentifier $outerPackaging = null,
         /** @var FHIRIdentifier|null immediatePackaging A number appearing on the immediate packaging (and not the outer packaging) */
-        public ?FHIRIdentifier $immediatePackaging = null,
+        public ?\FHIRIdentifier $immediatePackaging = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

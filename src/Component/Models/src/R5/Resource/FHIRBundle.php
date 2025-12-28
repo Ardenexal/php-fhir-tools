@@ -4,12 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRMeta;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRSignature;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInstant;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUnsignedInt;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,28 +20,28 @@ class FHIRBundle extends FHIRResource
         /** @var string|null id Logical id of this artifact */
         public ?string $id = null,
         /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?FHIRMeta $meta = null,
+        public ?\FHIRMeta $meta = null,
         /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?FHIRUri $implicitRules = null,
+        public ?\FHIRUri $implicitRules = null,
         /** @var FHIRAllLanguagesType|null language Language of the resource content */
-        public ?FHIRAllLanguagesType $language = null,
+        public ?\FHIRAllLanguagesType $language = null,
         /** @var FHIRIdentifier|null identifier Persistent identifier for the bundle */
-        public ?FHIRIdentifier $identifier = null,
+        public ?\FHIRIdentifier $identifier = null,
         /** @var FHIRBundleTypeType|null type document | message | transaction | transaction-response | batch | batch-response | history | searchset | collection | subscription-notification */
         #[NotBlank]
-        public ?FHIRBundleTypeType $type = null,
+        public ?\FHIRBundleTypeType $type = null,
         /** @var FHIRInstant|null timestamp When the bundle was assembled */
-        public ?FHIRInstant $timestamp = null,
+        public ?\FHIRInstant $timestamp = null,
         /** @var FHIRUnsignedInt|null total If search, the total number of matches */
-        public ?FHIRUnsignedInt $total = null,
+        public ?\FHIRUnsignedInt $total = null,
         /** @var array<FHIRBundleLink> link Links related to this Bundle */
         public array $link = [],
         /** @var array<FHIRBundleEntry> entry Entry in the bundle - will have a resource or information */
         public array $entry = [],
         /** @var FHIRSignature|null signature Digital Signature */
-        public ?FHIRSignature $signature = null,
+        public ?\FHIRSignature $signature = null,
         /** @var FHIRResource|null issues Issues with the Bundle */
-        public ?FHIRResource $issues = null,
+        public ?\FHIRResource $issues = null,
     ) {
         parent::__construct($id, $meta, $implicitRules, $language);
     }

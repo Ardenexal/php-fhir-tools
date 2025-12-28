@@ -22,17 +22,17 @@ class FHIRExtendedContactDetail extends FHIRDataType
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
         /** @var FHIRCodeableConcept|null purpose The type of contact */
-        public ?FHIRCodeableConcept $purpose = null,
+        public ?\FHIRCodeableConcept $purpose = null,
         /** @var array<FHIRHumanName> name Name of an individual to contact */
         public array $name = [],
         /** @var array<FHIRContactPoint> telecom Contact details (e.g.phone/fax/url) */
         public array $telecom = [],
         /** @var FHIRAddress|null address Address for the contact */
-        public ?FHIRAddress $address = null,
+        public ?\FHIRAddress $address = null,
         /** @var FHIRReference|null organization This contact detail is handled/monitored by a specific organization */
-        public ?FHIRReference $organization = null,
+        public ?\FHIRReference $organization = null,
         /** @var FHIRPeriod|null period Period that this contact was valid for usage */
-        public ?FHIRPeriod $period = null,
+        public ?\FHIRPeriod $period = null,
     ) {
         parent::__construct($id, $extension);
     }

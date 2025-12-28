@@ -5,12 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRRange;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDecimal;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
 
 /**
  * @description Describes the expected outcome for the subject.
@@ -26,17 +20,17 @@ class FHIRRiskAssessmentPrediction extends \Ardenexal\FHIRTools\Component\Models
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null outcome Possible outcome for the subject */
-        public ?FHIRCodeableConcept $outcome = null,
+        public ?\FHIRCodeableConcept $outcome = null,
         /** @var FHIRDecimal|FHIRRange|null probabilityX Likelihood of specified outcome */
-        public FHIRDecimal|FHIRRange|null $probabilityX = null,
+        public \FHIRDecimal|\FHIRRange|null $probabilityX = null,
         /** @var FHIRCodeableConcept|null qualitativeRisk Likelihood of specified outcome as a qualitative value */
-        public ?FHIRCodeableConcept $qualitativeRisk = null,
+        public ?\FHIRCodeableConcept $qualitativeRisk = null,
         /** @var FHIRDecimal|null relativeRisk Relative likelihood */
-        public ?FHIRDecimal $relativeRisk = null,
+        public ?\FHIRDecimal $relativeRisk = null,
         /** @var FHIRPeriod|FHIRRange|null whenX Timeframe or age range */
-        public FHIRPeriod|FHIRRange|null $whenX = null,
+        public \FHIRPeriod|\FHIRRange|null $whenX = null,
         /** @var FHIRString|string|null rationale Explanation of prediction */
-        public FHIRString|string|null $rationale = null,
+        public \FHIRString|string|null $rationale = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRPositiveInt;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -32,24 +27,24 @@ class FHIRImmunizationRecommendationRecommendation extends \Ardenexal\FHIRTools\
         /** @var array<FHIRCodeableConcept> vaccineCode Vaccine  or vaccine group recommendation applies to */
         public array $vaccineCode = [],
         /** @var FHIRCodeableConcept|null targetDisease Disease to be immunized against */
-        public ?FHIRCodeableConcept $targetDisease = null,
+        public ?\FHIRCodeableConcept $targetDisease = null,
         /** @var array<FHIRCodeableConcept> contraindicatedVaccineCode Vaccine which is contraindicated to fulfill the recommendation */
         public array $contraindicatedVaccineCode = [],
         /** @var FHIRCodeableConcept|null forecastStatus Vaccine recommendation status */
         #[NotBlank]
-        public ?FHIRCodeableConcept $forecastStatus = null,
+        public ?\FHIRCodeableConcept $forecastStatus = null,
         /** @var array<FHIRCodeableConcept> forecastReason Vaccine administration status reason */
         public array $forecastReason = [],
         /** @var array<FHIRImmunizationRecommendationRecommendationDateCriterion> dateCriterion Dates governing proposed immunization */
         public array $dateCriterion = [],
         /** @var FHIRString|string|null description Protocol details */
-        public FHIRString|string|null $description = null,
+        public \FHIRString|string|null $description = null,
         /** @var FHIRString|string|null series Name of vaccination series */
-        public FHIRString|string|null $series = null,
+        public \FHIRString|string|null $series = null,
         /** @var FHIRPositiveInt|FHIRString|string|null doseNumberX Recommended dose number within series */
-        public FHIRPositiveInt|FHIRString|string|null $doseNumberX = null,
+        public \FHIRPositiveInt|\FHIRString|string|null $doseNumberX = null,
         /** @var FHIRPositiveInt|FHIRString|string|null seriesDosesX Recommended number of doses for immunity */
-        public FHIRPositiveInt|FHIRString|string|null $seriesDosesX = null,
+        public \FHIRPositiveInt|\FHIRString|string|null $seriesDosesX = null,
         /** @var array<FHIRReference> supportingImmunization Past immunizations supporting recommendation */
         public array $supportingImmunization = [],
         /** @var array<FHIRReference> supportingPatientInformation Patient observations supporting recommendation */

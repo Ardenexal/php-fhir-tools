@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDate;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRPositiveInt;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,22 +21,22 @@ class FHIRAppointmentRecurrenceTemplate extends \Ardenexal\FHIRTools\Component\M
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null timezone The timezone of the occurrences */
-        public ?FHIRCodeableConcept $timezone = null,
+        public ?\FHIRCodeableConcept $timezone = null,
         /** @var FHIRCodeableConcept|null recurrenceType The frequency of the recurrence */
         #[NotBlank]
-        public ?FHIRCodeableConcept $recurrenceType = null,
+        public ?\FHIRCodeableConcept $recurrenceType = null,
         /** @var FHIRDate|null lastOccurrenceDate The date when the recurrence should end */
-        public ?FHIRDate $lastOccurrenceDate = null,
+        public ?\FHIRDate $lastOccurrenceDate = null,
         /** @var FHIRPositiveInt|null occurrenceCount The number of planned occurrences */
-        public ?FHIRPositiveInt $occurrenceCount = null,
+        public ?\FHIRPositiveInt $occurrenceCount = null,
         /** @var array<FHIRDate> occurrenceDate Specific dates for a recurring set of appointments (no template) */
         public array $occurrenceDate = [],
         /** @var FHIRAppointmentRecurrenceTemplateWeeklyTemplate|null weeklyTemplate Information about weekly recurring appointments */
-        public ?FHIRAppointmentRecurrenceTemplateWeeklyTemplate $weeklyTemplate = null,
+        public ?\FHIRAppointmentRecurrenceTemplateWeeklyTemplate $weeklyTemplate = null,
         /** @var FHIRAppointmentRecurrenceTemplateMonthlyTemplate|null monthlyTemplate Information about monthly recurring appointments */
-        public ?FHIRAppointmentRecurrenceTemplateMonthlyTemplate $monthlyTemplate = null,
+        public ?\FHIRAppointmentRecurrenceTemplateMonthlyTemplate $monthlyTemplate = null,
         /** @var FHIRAppointmentRecurrenceTemplateYearlyTemplate|null yearlyTemplate Information about yearly recurring appointments */
-        public ?FHIRAppointmentRecurrenceTemplateYearlyTemplate $yearlyTemplate = null,
+        public ?\FHIRAppointmentRecurrenceTemplateYearlyTemplate $yearlyTemplate = null,
         /** @var array<FHIRDate> excludingDate Any dates that should be excluded from the series */
         public array $excludingDate = [],
         /** @var array<FHIRPositiveInt> excludingRecurrenceId Any recurrence IDs that should be excluded from the recurrence */

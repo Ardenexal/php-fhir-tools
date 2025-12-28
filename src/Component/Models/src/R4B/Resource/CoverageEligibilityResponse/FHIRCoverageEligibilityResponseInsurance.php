@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,11 +22,11 @@ class FHIRCoverageEligibilityResponseInsurance extends \Ardenexal\FHIRTools\Comp
         public array $modifierExtension = [],
         /** @var FHIRReference|null coverage Insurance information */
         #[NotBlank]
-        public ?FHIRReference $coverage = null,
+        public ?\FHIRReference $coverage = null,
         /** @var FHIRBoolean|null inforce Coverage inforce indicator */
-        public ?FHIRBoolean $inforce = null,
+        public ?\FHIRBoolean $inforce = null,
         /** @var FHIRPeriod|null benefitPeriod When the benefits are applicable */
-        public ?FHIRPeriod $benefitPeriod = null,
+        public ?\FHIRPeriod $benefitPeriod = null,
         /** @var array<FHIRCoverageEligibilityResponseInsuranceItem> item Benefits and authorization details */
         public array $item = [],
     ) {

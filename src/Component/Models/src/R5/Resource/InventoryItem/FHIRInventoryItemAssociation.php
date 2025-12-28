@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRRatio;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,13 +22,13 @@ class FHIRInventoryItemAssociation extends \Ardenexal\FHIRTools\Component\Models
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null associationType The type of association between the device and the other item */
         #[NotBlank]
-        public ?FHIRCodeableConcept $associationType = null,
+        public ?\FHIRCodeableConcept $associationType = null,
         /** @var FHIRReference|null relatedItem The related item or product */
         #[NotBlank]
-        public ?FHIRReference $relatedItem = null,
+        public ?\FHIRReference $relatedItem = null,
         /** @var FHIRRatio|null quantity The quantity of the product in this product */
         #[NotBlank]
-        public ?FHIRRatio $quantity = null,
+        public ?\FHIRRatio $quantity = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

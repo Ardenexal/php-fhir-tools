@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,13 +22,13 @@ class FHIRDeviceDefinitionUdiDeviceIdentifier extends \Ardenexal\FHIRTools\Compo
         public array $modifierExtension = [],
         /** @var FHIRString|string|null deviceIdentifier The identifier that is to be associated with every Device that references this DeviceDefintiion for the issuer and jurisdication porvided in the DeviceDefinition.udiDeviceIdentifier */
         #[NotBlank]
-        public FHIRString|string|null $deviceIdentifier = null,
+        public \FHIRString|string|null $deviceIdentifier = null,
         /** @var FHIRUri|null issuer The organization that assigns the identifier algorithm */
         #[NotBlank]
-        public ?FHIRUri $issuer = null,
+        public ?\FHIRUri $issuer = null,
         /** @var FHIRUri|null jurisdiction The jurisdiction to which the deviceIdentifier applies */
         #[NotBlank]
-        public ?FHIRUri $jurisdiction = null,
+        public ?\FHIRUri $jurisdiction = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

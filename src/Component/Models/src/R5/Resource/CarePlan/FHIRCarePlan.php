@@ -4,20 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRAnnotation;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableReference;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRMeta;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRNarrative;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,21 +13,21 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  *
  * @description Describes the intention of how one or more practitioners intend to deliver care for a particular patient, group or community for a period of time, possibly limited to care for a specific condition or set of conditions.
  */
-#[FhirResource(type: 'CarePlan', version: '5.0.0', url: 'http://hl7.org/fhir/StructureDefinition/CarePlan', fhirVersion: 'R5')]
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(type: 'CarePlan', version: '5.0.0', url: 'http://hl7.org/fhir/StructureDefinition/CarePlan', fhirVersion: 'R5')]
 class FHIRCarePlan extends FHIRDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
         public ?string $id = null,
         /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?FHIRMeta $meta = null,
+        public ?\FHIRMeta $meta = null,
         /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?FHIRUri $implicitRules = null,
+        public ?\FHIRUri $implicitRules = null,
         /** @var FHIRAllLanguagesType|null language Language of the resource content */
-        public ?FHIRAllLanguagesType $language = null,
+        public ?\FHIRAllLanguagesType $language = null,
         /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
-        public ?FHIRNarrative $text = null,
-        /** @var array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRResource> contained Contained, inline Resources */
+        public ?\FHIRNarrative $text = null,
+        /** @var array<FHIRResource> contained Contained, inline Resources */
         public array $contained = [],
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
@@ -61,27 +47,27 @@ class FHIRCarePlan extends FHIRDomainResource
         public array $partOf = [],
         /** @var FHIRRequestStatusType|null status draft | active | on-hold | revoked | completed | entered-in-error | unknown */
         #[NotBlank]
-        public ?FHIRRequestStatusType $status = null,
+        public ?\FHIRRequestStatusType $status = null,
         /** @var FHIRCarePlanIntentType|null intent proposal | plan | order | option | directive */
         #[NotBlank]
-        public ?FHIRCarePlanIntentType $intent = null,
+        public ?\FHIRCarePlanIntentType $intent = null,
         /** @var array<FHIRCodeableConcept> category Type of plan */
         public array $category = [],
         /** @var FHIRString|string|null title Human-friendly name for the care plan */
-        public FHIRString|string|null $title = null,
+        public \FHIRString|string|null $title = null,
         /** @var FHIRString|string|null description Summary of nature of plan */
-        public FHIRString|string|null $description = null,
+        public \FHIRString|string|null $description = null,
         /** @var FHIRReference|null subject Who the care plan is for */
         #[NotBlank]
-        public ?FHIRReference $subject = null,
+        public ?\FHIRReference $subject = null,
         /** @var FHIRReference|null encounter The Encounter during which this CarePlan was created */
-        public ?FHIRReference $encounter = null,
+        public ?\FHIRReference $encounter = null,
         /** @var FHIRPeriod|null period Time period plan covers */
-        public ?FHIRPeriod $period = null,
+        public ?\FHIRPeriod $period = null,
         /** @var FHIRDateTime|null created Date record was first recorded */
-        public ?FHIRDateTime $created = null,
+        public ?\FHIRDateTime $created = null,
         /** @var FHIRReference|null custodian Who is the designated responsible party */
-        public ?FHIRReference $custodian = null,
+        public ?\FHIRReference $custodian = null,
         /** @var array<FHIRReference> contributor Who provided the content of the care plan */
         public array $contributor = [],
         /** @var array<FHIRReference> careTeam Who's involved in plan? */

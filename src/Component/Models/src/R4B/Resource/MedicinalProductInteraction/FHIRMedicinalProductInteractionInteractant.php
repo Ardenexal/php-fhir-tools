@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -29,7 +26,7 @@ class FHIRMedicinalProductInteractionInteractant extends \Ardenexal\FHIRTools\Co
         public array $modifierExtension = [],
         /** @var FHIRReference|FHIRCodeableConcept|null itemX The specific medication, food or laboratory test that interacts */
         #[NotBlank]
-        public FHIRReference|FHIRCodeableConcept|null $itemX = null,
+        public \FHIRReference|\FHIRCodeableConcept|null $itemX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 
 /**
  * @description Instances or occurrences of the product.
@@ -27,13 +22,13 @@ class FHIRInventoryItemInstance extends \Ardenexal\FHIRTools\Component\Models\R5
         /** @var array<FHIRIdentifier> identifier The identifier for the physical instance, typically a serial number */
         public array $identifier = [],
         /** @var FHIRString|string|null lotNumber The lot or batch number of the item */
-        public FHIRString|string|null $lotNumber = null,
+        public \FHIRString|string|null $lotNumber = null,
         /** @var FHIRDateTime|null expiry The expiry date or date and time for the product */
-        public ?FHIRDateTime $expiry = null,
+        public ?\FHIRDateTime $expiry = null,
         /** @var FHIRReference|null subject The subject that the item is associated with */
-        public ?FHIRReference $subject = null,
+        public ?\FHIRReference $subject = null,
         /** @var FHIRReference|null location The location that the item is associated with */
-        public ?FHIRReference $location = null,
+        public ?\FHIRReference $location = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,13 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRRatio;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -28,18 +21,18 @@ class FHIRSubstanceDefinitionRelationship extends \Ardenexal\FHIRTools\Component
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRReference|FHIRCodeableConcept|null substanceDefinitionX A pointer to another substance, as a resource or a representational code */
-        public FHIRReference|FHIRCodeableConcept|null $substanceDefinitionX = null,
+        public \FHIRReference|\FHIRCodeableConcept|null $substanceDefinitionX = null,
         /** @var FHIRCodeableConcept|null type For example "salt to parent", "active moiety" */
         #[NotBlank]
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRBoolean|null isDefining For example where an enzyme strongly bonds with a particular substance, this is a defining relationship for that enzyme, out of several possible relationships */
-        public ?FHIRBoolean $isDefining = null,
+        public ?\FHIRBoolean $isDefining = null,
         /** @var FHIRQuantity|FHIRRatio|FHIRString|string|null amountX A numeric factor for the relationship, e.g. that a substance salt has some percentage of active substance in relation to some other */
-        public FHIRQuantity|FHIRRatio|FHIRString|string|null $amountX = null,
+        public \FHIRQuantity|\FHIRRatio|\FHIRString|string|null $amountX = null,
         /** @var FHIRRatio|null ratioHighLimitAmount For use when the numeric has an uncertain range */
-        public ?FHIRRatio $ratioHighLimitAmount = null,
+        public ?\FHIRRatio $ratioHighLimitAmount = null,
         /** @var FHIRCodeableConcept|null comparator An operator for the amount, for example "average", "approximately", "less than" */
-        public ?FHIRCodeableConcept $comparator = null,
+        public ?\FHIRCodeableConcept $comparator = null,
         /** @var array<FHIRReference> source Supporting literature */
         public array $source = [],
     ) {

@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRMarkdown;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,10 +23,10 @@ class FHIRCitationCitedArtifactTitle extends \Ardenexal\FHIRTools\Component\Mode
         /** @var array<FHIRCodeableConcept> type The kind of title */
         public array $type = [],
         /** @var FHIRCodeableConcept|null language Used to express the specific language */
-        public ?FHIRCodeableConcept $language = null,
+        public ?\FHIRCodeableConcept $language = null,
         /** @var FHIRMarkdown|null text The title of the article or artifact */
         #[NotBlank]
-        public ?FHIRMarkdown $text = null,
+        public ?\FHIRMarkdown $text = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

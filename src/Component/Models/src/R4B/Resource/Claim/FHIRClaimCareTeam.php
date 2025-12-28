@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRPositiveInt;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,16 +22,16 @@ class FHIRClaimCareTeam extends \Ardenexal\FHIRTools\Component\Models\R4B\DataTy
         public array $modifierExtension = [],
         /** @var FHIRPositiveInt|null sequence Order of care team */
         #[NotBlank]
-        public ?FHIRPositiveInt $sequence = null,
+        public ?\FHIRPositiveInt $sequence = null,
         /** @var FHIRReference|null provider Practitioner or organization */
         #[NotBlank]
-        public ?FHIRReference $provider = null,
+        public ?\FHIRReference $provider = null,
         /** @var FHIRBoolean|null responsible Indicator of the lead practitioner */
-        public ?FHIRBoolean $responsible = null,
+        public ?\FHIRBoolean $responsible = null,
         /** @var FHIRCodeableConcept|null role Function within the team */
-        public ?FHIRCodeableConcept $role = null,
+        public ?\FHIRCodeableConcept $role = null,
         /** @var FHIRCodeableConcept|null qualification Practitioner credential or specialization */
-        public ?FHIRCodeableConcept $qualification = null,
+        public ?\FHIRCodeableConcept $qualification = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

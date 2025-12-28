@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRAnnotation;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUnsignedInt;
 
 /**
  * @description Number of samples in the statistic.
@@ -24,15 +20,15 @@ class FHIREvidenceStatisticSampleSize extends \Ardenexal\FHIRTools\Component\Mod
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRString|string|null description Textual description of sample size for statistic */
-        public FHIRString|string|null $description = null,
+        public \FHIRString|string|null $description = null,
         /** @var array<FHIRAnnotation> note Footnote or explanatory note about the sample size */
         public array $note = [],
         /** @var FHIRUnsignedInt|null numberOfStudies Number of contributing studies */
-        public ?FHIRUnsignedInt $numberOfStudies = null,
+        public ?\FHIRUnsignedInt $numberOfStudies = null,
         /** @var FHIRUnsignedInt|null numberOfParticipants Cumulative number of participants */
-        public ?FHIRUnsignedInt $numberOfParticipants = null,
+        public ?\FHIRUnsignedInt $numberOfParticipants = null,
         /** @var FHIRUnsignedInt|null knownDataCount Number of participants with known results for measured variables */
-        public ?FHIRUnsignedInt $knownDataCount = null,
+        public ?\FHIRUnsignedInt $knownDataCount = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

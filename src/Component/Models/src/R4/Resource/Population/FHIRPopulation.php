@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRRange;
 
 /**
  * @author HL7 FHIR Standard
@@ -27,13 +24,13 @@ class FHIRPopulation extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\F
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRRange|FHIRCodeableConcept|null ageX The age of the specific population */
-        public FHIRRange|FHIRCodeableConcept|null $ageX = null,
+        public \FHIRRange|\FHIRCodeableConcept|null $ageX = null,
         /** @var FHIRCodeableConcept|null gender The gender of the specific population */
-        public ?FHIRCodeableConcept $gender = null,
+        public ?\FHIRCodeableConcept $gender = null,
         /** @var FHIRCodeableConcept|null race Race of the specific population */
-        public ?FHIRCodeableConcept $race = null,
+        public ?\FHIRCodeableConcept $race = null,
         /** @var FHIRCodeableConcept|null physiologicalCondition The existing physiological conditions of the specific population to which this applies */
-        public ?FHIRCodeableConcept $physiologicalCondition = null,
+        public ?\FHIRCodeableConcept $physiologicalCondition = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

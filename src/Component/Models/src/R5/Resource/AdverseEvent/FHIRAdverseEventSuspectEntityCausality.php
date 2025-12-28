@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
 
 /**
  * @description Information on the possible cause of the event.
@@ -23,11 +20,11 @@ class FHIRAdverseEventSuspectEntityCausality extends \Ardenexal\FHIRTools\Compon
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null assessmentMethod Method of evaluating the relatedness of the suspected entity to the event */
-        public ?FHIRCodeableConcept $assessmentMethod = null,
+        public ?\FHIRCodeableConcept $assessmentMethod = null,
         /** @var FHIRCodeableConcept|null entityRelatedness Result of the assessment regarding the relatedness of the suspected entity to the event */
-        public ?FHIRCodeableConcept $entityRelatedness = null,
+        public ?\FHIRCodeableConcept $entityRelatedness = null,
         /** @var FHIRReference|null author Author of the information on the possible cause of the event */
-        public ?FHIRReference $author = null,
+        public ?\FHIRReference $author = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

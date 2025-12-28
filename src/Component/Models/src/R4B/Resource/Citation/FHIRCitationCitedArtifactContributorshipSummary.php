@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRMarkdown;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,14 +21,14 @@ class FHIRCitationCitedArtifactContributorshipSummary extends \Ardenexal\FHIRToo
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null type Either authorList or contributorshipStatement */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRCodeableConcept|null style The format for the display string */
-        public ?FHIRCodeableConcept $style = null,
+        public ?\FHIRCodeableConcept $style = null,
         /** @var FHIRCodeableConcept|null source Used to code the producer or rule for creating the display string */
-        public ?FHIRCodeableConcept $source = null,
+        public ?\FHIRCodeableConcept $source = null,
         /** @var FHIRMarkdown|null value The display string for the author list, contributor list, or contributorship statement */
         #[NotBlank]
-        public ?FHIRMarkdown $value = null,
+        public ?\FHIRMarkdown $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

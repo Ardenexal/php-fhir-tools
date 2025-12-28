@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRPositiveInt;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,16 +22,16 @@ class FHIRExplanationOfBenefitDiagnosis extends \Ardenexal\FHIRTools\Component\M
         public array $modifierExtension = [],
         /** @var FHIRPositiveInt|null sequence Diagnosis instance identifier */
         #[NotBlank]
-        public ?FHIRPositiveInt $sequence = null,
+        public ?\FHIRPositiveInt $sequence = null,
         /** @var FHIRCodeableConcept|FHIRReference|null diagnosisX Nature of illness or problem */
         #[NotBlank]
-        public FHIRCodeableConcept|FHIRReference|null $diagnosisX = null,
+        public \FHIRCodeableConcept|\FHIRReference|null $diagnosisX = null,
         /** @var array<FHIRCodeableConcept> type Timing or nature of the diagnosis */
         public array $type = [],
         /** @var FHIRCodeableConcept|null onAdmission Present on admission */
-        public ?FHIRCodeableConcept $onAdmission = null,
+        public ?\FHIRCodeableConcept $onAdmission = null,
         /** @var FHIRCodeableConcept|null packageCode Package billing code */
-        public ?FHIRCodeableConcept $packageCode = null,
+        public ?\FHIRCodeableConcept $packageCode = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

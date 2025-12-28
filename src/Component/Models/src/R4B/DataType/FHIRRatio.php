@@ -22,9 +22,9 @@ class FHIRRatio extends FHIRElement
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
         /** @var FHIRQuantity|null numerator Numerator value */
-        public ?FHIRQuantity $numerator = null,
+        public ?\FHIRQuantity $numerator = null,
         /** @var FHIRQuantity|null denominator Denominator value */
-        public ?FHIRQuantity $denominator = null,
+        public ?\FHIRQuantity $denominator = null,
     ) {
         parent::__construct($id, $extension);
     }

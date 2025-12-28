@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
 
 /**
  * @description Organization affiliated with the entity.
@@ -27,9 +24,9 @@ class FHIRCitationCitedArtifactContributorshipEntryAffiliationInfo extends \Arde
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRString|string|null affiliation Display for the organization */
-        public FHIRString|string|null $affiliation = null,
+        public \FHIRString|string|null $affiliation = null,
         /** @var FHIRString|string|null role Role within the organization, such as professional title */
-        public FHIRString|string|null $role = null,
+        public \FHIRString|string|null $role = null,
         /** @var array<FHIRIdentifier> identifier Identifier for the organization */
         public array $identifier = [],
     ) {

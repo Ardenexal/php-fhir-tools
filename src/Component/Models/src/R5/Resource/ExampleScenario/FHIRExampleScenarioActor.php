@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRMarkdown;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,15 +22,15 @@ class FHIRExampleScenarioActor extends \Ardenexal\FHIRTools\Component\Models\R5\
         public array $modifierExtension = [],
         /** @var FHIRString|string|null key ID or acronym of the actor */
         #[NotBlank]
-        public FHIRString|string|null $key = null,
+        public \FHIRString|string|null $key = null,
         /** @var FHIRExampleScenarioActorTypeType|null type person | system */
         #[NotBlank]
-        public ?FHIRExampleScenarioActorTypeType $type = null,
+        public ?\FHIRExampleScenarioActorTypeType $type = null,
         /** @var FHIRString|string|null title Label for actor when rendering */
         #[NotBlank]
-        public FHIRString|string|null $title = null,
+        public \FHIRString|string|null $title = null,
         /** @var FHIRMarkdown|null description Details about actor */
-        public ?FHIRMarkdown $description = null,
+        public ?\FHIRMarkdown $description = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

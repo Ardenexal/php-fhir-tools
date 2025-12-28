@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRPositiveInt;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,14 +22,14 @@ class FHIRClaimDiagnosis extends \Ardenexal\FHIRTools\Component\Models\R5\DataTy
         public array $modifierExtension = [],
         /** @var FHIRPositiveInt|null sequence Diagnosis instance identifier */
         #[NotBlank]
-        public ?FHIRPositiveInt $sequence = null,
+        public ?\FHIRPositiveInt $sequence = null,
         /** @var FHIRCodeableConcept|FHIRReference|null diagnosisX Nature of illness or problem */
         #[NotBlank]
-        public FHIRCodeableConcept|FHIRReference|null $diagnosisX = null,
+        public \FHIRCodeableConcept|\FHIRReference|null $diagnosisX = null,
         /** @var array<FHIRCodeableConcept> type Timing or nature of the diagnosis */
         public array $type = [],
         /** @var FHIRCodeableConcept|null onAdmission Present on admission */
-        public ?FHIRCodeableConcept $onAdmission = null,
+        public ?\FHIRCodeableConcept $onAdmission = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

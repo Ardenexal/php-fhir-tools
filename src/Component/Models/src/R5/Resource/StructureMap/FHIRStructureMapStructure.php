@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,14 +22,14 @@ class FHIRStructureMapStructure extends \Ardenexal\FHIRTools\Component\Models\R5
         public array $modifierExtension = [],
         /** @var FHIRCanonical|null url Canonical reference to structure definition */
         #[NotBlank]
-        public ?FHIRCanonical $url = null,
+        public ?\FHIRCanonical $url = null,
         /** @var FHIRStructureMapModelModeType|null mode source | queried | target | produced */
         #[NotBlank]
-        public ?FHIRStructureMapModelModeType $mode = null,
+        public ?\FHIRStructureMapModelModeType $mode = null,
         /** @var FHIRString|string|null alias Name for type in this map */
-        public FHIRString|string|null $alias = null,
+        public \FHIRString|string|null $alias = null,
         /** @var FHIRString|string|null documentation Documentation on use of structure */
-        public FHIRString|string|null $documentation = null,
+        public \FHIRString|string|null $documentation = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

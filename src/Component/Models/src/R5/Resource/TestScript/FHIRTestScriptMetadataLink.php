@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,9 +22,9 @@ class FHIRTestScriptMetadataLink extends \Ardenexal\FHIRTools\Component\Models\R
         public array $modifierExtension = [],
         /** @var FHIRUri|null url URL to the specification */
         #[NotBlank]
-        public ?FHIRUri $url = null,
+        public ?\FHIRUri $url = null,
         /** @var FHIRString|string|null description Short description */
-        public FHIRString|string|null $description = null,
+        public \FHIRString|string|null $description = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

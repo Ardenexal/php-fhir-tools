@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
 
 /**
  * @author HL7 FHIR Standard
@@ -23,7 +22,7 @@ class FHIRContactDetail extends FHIRElement
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
         /** @var FHIRString|string|null name Name of an individual to contact */
-        public FHIRString|string|null $name = null,
+        public \FHIRString|string|null $name = null,
         /** @var array<FHIRContactPoint> telecom Contact details for individual or organization */
         public array $telecom = [],
     ) {

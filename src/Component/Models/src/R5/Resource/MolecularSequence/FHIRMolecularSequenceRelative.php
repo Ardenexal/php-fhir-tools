@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRRange;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInteger;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,13 +22,13 @@ class FHIRMolecularSequenceRelative extends \Ardenexal\FHIRTools\Component\Model
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null coordinateSystem Ways of identifying nucleotides or amino acids within a sequence */
         #[NotBlank]
-        public ?FHIRCodeableConcept $coordinateSystem = null,
+        public ?\FHIRCodeableConcept $coordinateSystem = null,
         /** @var FHIRInteger|null ordinalPosition Indicates the order in which the sequence should be considered when putting multiple 'relative' elements together */
-        public ?FHIRInteger $ordinalPosition = null,
+        public ?\FHIRInteger $ordinalPosition = null,
         /** @var FHIRRange|null sequenceRange Indicates the nucleotide range in the composed sequence when multiple 'relative' elements are used together */
-        public ?FHIRRange $sequenceRange = null,
+        public ?\FHIRRange $sequenceRange = null,
         /** @var FHIRMolecularSequenceRelativeStartingSequence|null startingSequence A sequence used as starting sequence */
-        public ?FHIRMolecularSequenceRelativeStartingSequence $startingSequence = null,
+        public ?\FHIRMolecularSequenceRelativeStartingSequence $startingSequence = null,
         /** @var array<FHIRMolecularSequenceRelativeEdit> edit Changes in sequence from the starting sequence */
         public array $edit = [],
     ) {

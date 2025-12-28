@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime;
 
 /**
  * @description Information about the primary source(s) involved in validation.
@@ -24,17 +20,17 @@ class FHIRVerificationResultPrimarySource extends \Ardenexal\FHIRTools\Component
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRReference|null who Reference to the primary source */
-        public ?FHIRReference $who = null,
+        public ?\FHIRReference $who = null,
         /** @var array<FHIRCodeableConcept> type Type of primary source (License Board; Primary Education; Continuing Education; Postal Service; Relationship owner; Registration Authority; legal source; issuing source; authoritative source) */
         public array $type = [],
         /** @var array<FHIRCodeableConcept> communicationMethod Method for exchanging information with the primary source */
         public array $communicationMethod = [],
         /** @var FHIRCodeableConcept|null validationStatus successful | failed | unknown */
-        public ?FHIRCodeableConcept $validationStatus = null,
+        public ?\FHIRCodeableConcept $validationStatus = null,
         /** @var FHIRDateTime|null validationDate When the target was validated against the primary source */
-        public ?FHIRDateTime $validationDate = null,
+        public ?\FHIRDateTime $validationDate = null,
         /** @var FHIRCodeableConcept|null canPushUpdates yes | no | undetermined */
-        public ?FHIRCodeableConcept $canPushUpdates = null,
+        public ?\FHIRCodeableConcept $canPushUpdates = null,
         /** @var array<FHIRCodeableConcept> pushTypeAvailable specific | any | source */
         public array $pushTypeAvailable = [],
     ) {

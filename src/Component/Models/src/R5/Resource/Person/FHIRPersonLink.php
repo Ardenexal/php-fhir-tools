@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,9 +22,9 @@ class FHIRPersonLink extends \Ardenexal\FHIRTools\Component\Models\R5\DataType\F
         public array $modifierExtension = [],
         /** @var FHIRReference|null target The resource to which this actual person is associated */
         #[NotBlank]
-        public ?FHIRReference $target = null,
+        public ?\FHIRReference $target = null,
         /** @var FHIRIdentityAssuranceLevelType|null assurance level1 | level2 | level3 | level4 */
-        public ?FHIRIdentityAssuranceLevelType $assurance = null,
+        public ?\FHIRIdentityAssuranceLevelType $assurance = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

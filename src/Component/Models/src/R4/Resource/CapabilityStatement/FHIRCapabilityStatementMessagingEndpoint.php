@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCoding;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUrl;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,10 +22,10 @@ class FHIRCapabilityStatementMessagingEndpoint extends \Ardenexal\FHIRTools\Comp
         public array $modifierExtension = [],
         /** @var FHIRCoding|null protocol http | ftp | mllp + */
         #[NotBlank]
-        public ?FHIRCoding $protocol = null,
+        public ?\FHIRCoding $protocol = null,
         /** @var FHIRUrl|null address Network address or identifier of the end-point */
         #[NotBlank]
-        public ?FHIRUrl $address = null,
+        public ?\FHIRUrl $address = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

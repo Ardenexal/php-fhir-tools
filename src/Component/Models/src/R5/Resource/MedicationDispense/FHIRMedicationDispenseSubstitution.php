@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,13 +22,13 @@ class FHIRMedicationDispenseSubstitution extends \Ardenexal\FHIRTools\Component\
         public array $modifierExtension = [],
         /** @var FHIRBoolean|null wasSubstituted Whether a substitution was or was not performed on the dispense */
         #[NotBlank]
-        public ?FHIRBoolean $wasSubstituted = null,
+        public ?\FHIRBoolean $wasSubstituted = null,
         /** @var FHIRCodeableConcept|null type Code signifying whether a different drug was dispensed from what was prescribed */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var array<FHIRCodeableConcept> reason Why was substitution made */
         public array $reason = [],
         /** @var FHIRReference|null responsibleParty Who is responsible for the substitution */
-        public ?FHIRReference $responsibleParty = null,
+        public ?\FHIRReference $responsibleParty = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

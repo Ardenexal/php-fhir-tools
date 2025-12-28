@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,14 +23,14 @@ class FHIRAppointmentParticipant extends \Ardenexal\FHIRTools\Component\Models\R
         /** @var array<FHIRCodeableConcept> type Role of participant in the appointment */
         public array $type = [],
         /** @var FHIRReference|null actor Person, Location/HealthcareService or Device */
-        public ?FHIRReference $actor = null,
+        public ?\FHIRReference $actor = null,
         /** @var FHIRParticipantRequiredType|null required required | optional | information-only */
-        public ?FHIRParticipantRequiredType $required = null,
+        public ?\FHIRParticipantRequiredType $required = null,
         /** @var FHIRParticipationStatusType|null status accepted | declined | tentative | needs-action */
         #[NotBlank]
-        public ?FHIRParticipationStatusType $status = null,
+        public ?\FHIRParticipationStatusType $status = null,
         /** @var FHIRPeriod|null period Participation period of the actor */
-        public ?FHIRPeriod $period = null,
+        public ?\FHIRPeriod $period = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

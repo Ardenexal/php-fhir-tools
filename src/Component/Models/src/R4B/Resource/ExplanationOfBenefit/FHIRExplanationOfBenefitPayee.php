@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
 
 /**
  * @description The party to be reimbursed for cost of the products and services according to the terms of the policy.
@@ -23,9 +20,9 @@ class FHIRExplanationOfBenefitPayee extends \Ardenexal\FHIRTools\Component\Model
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null type Category of recipient */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRReference|null party Recipient reference */
-        public ?FHIRReference $party = null,
+        public ?\FHIRReference $party = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

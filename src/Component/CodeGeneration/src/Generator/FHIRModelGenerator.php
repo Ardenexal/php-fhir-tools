@@ -324,6 +324,11 @@ class FHIRModelGenerator implements GeneratorInterface
     {
         $constructor      = $classType->getMethod('__construct');
         $parentParameters = [];
+        $classNamespace   = $classType->getNamespace();
+
+        if ($classNamespace === null) {
+            throw GenerationException::invalidElementPath('ClassType has no namespace');
+        }
 
         foreach ($propertyElements as $key => $propertyElement) {
             // This is a primitive type
@@ -343,7 +348,7 @@ class FHIRModelGenerator implements GeneratorInterface
                 ) {
                     $parentParameters[] = $this->convertToMethodName($element['base']['path']);
                 }
-                $this->addElementAsProperty($propertyElement['_element'], $constructor, $version, $builderContext);
+                $this->addElementAsProperty($propertyElement['_element'], $constructor, $version, $builderContext, $classNamespace);
             } else {
                 $element = $propertyElement['_element'];
 
@@ -401,7 +406,7 @@ class FHIRModelGenerator implements GeneratorInterface
                 ) {
                     $parentParameters[] = $this->convertToMethodName($element['base']['path']);
                 }
-                $this->addElementAsProperty($element, $constructor, $version, $builderContext);
+                $this->addElementAsProperty($element, $constructor, $version, $builderContext, $classNamespace);
 
                 if (isset($propertyElement['_properties'])) {
                     // Recursively process nested elements for ValueSet dependencies
@@ -550,11 +555,12 @@ class FHIRModelGenerator implements GeneratorInterface
      * @param Method                  $method
      * @param string                  $version
      * @param BuilderContextInterface $builderContext
+     * @param PhpNamespace            $namespace
      * @param EnumType|null           $enum
      *
      * @return void
      */
-    private function addElementAsProperty(array $element, Method $method, string $version, BuilderContextInterface $builderContext, ?EnumType $enum = null): void
+    private function addElementAsProperty(array $element, Method $method, string $version, BuilderContextInterface $builderContext, PhpNamespace $namespace, ?EnumType $enum = null): void
     {
         $types = [];
         if (!isset($element['type']) && isset($element['contentReference'])) {
@@ -660,17 +666,49 @@ class FHIRModelGenerator implements GeneratorInterface
         $isArray    = !in_array($maxValue, ['1', '0'], true);
         $isNullable = $minValue === 0 && $isArray === false;
 
+        // Add use statements for all fully qualified class names in $types
+        // and convert them to short names for use in type hints
+        $shortTypes = [];
+        foreach ($types as $type) {
+            // Only add use statement for fully qualified class names (starting with \)
+            // and skip built-in types like string, int, bool, array, etc.
+            if (str_starts_with($type, '\\') && !str_contains($type, 'DateTimeInterface')) {
+                $fqcn = ltrim($type, '\\');
+                // Extract the namespace part from the FQCN
+                $lastBackslash = strrpos($fqcn, '\\');
+                if ($lastBackslash !== false) {
+                    $typeNamespace = substr($fqcn, 0, $lastBackslash);
+                    $className     = substr($fqcn, $lastBackslash + 1);
+                    // Only add use statement if the type is from a different namespace
+                    if ($typeNamespace !== $namespace->getName()) {
+                        $namespace->addUse($fqcn);
+                        // Use short name since we added a use statement
+                        $shortTypes[] = $className;
+                    } else {
+                        // Same namespace, use short name without use statement
+                        $shortTypes[] = $className;
+                    }
+                } else {
+                    // No namespace separator, just use as-is
+                    $shortTypes[] = $type;
+                }
+            } else {
+                // Built-in type or non-FQ class name, use as-is
+                $shortTypes[] = $type;
+            }
+        }
+
         if ($maxValue !== '0') {
             $shortDescription = $element['short'] ?? '';
             if ($isArray) {
                 $method->addPromotedParameter($parameterName, [])
                     ->setNullable(false)
                     ->setType('array')
-                    ->addComment('@var  array<' . implode('|', $types) . '> ' . $parameterName . ' ' . $shortDescription);
+                    ->addComment('@var  array<' . implode('|', $shortTypes) . '> ' . $parameterName . ' ' . $shortDescription);
             } else {
                 $parameter = $method->addPromotedParameter($parameterName, null)
-                    ->setType(implode('|', $types))
-                    ->addComment('@var null|' . implode('|', $types) . ' ' . $parameterName . ' ' . $shortDescription);
+                    ->setType(implode('|', $shortTypes))
+                    ->addComment('@var null|' . implode('|', $shortTypes) . ' ' . $parameterName . ' ' . $shortDescription);
                 if ($isNullable === false) {
                     $parameter->addAttribute(NotBlank::class);
                 }

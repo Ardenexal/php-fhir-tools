@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCoding;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRSignature;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,10 +22,10 @@ class FHIRContractSigner extends \Ardenexal\FHIRTools\Component\Models\R4B\DataT
         public array $modifierExtension = [],
         /** @var FHIRCoding|null type Contract Signatory Role */
         #[NotBlank]
-        public ?FHIRCoding $type = null,
+        public ?\FHIRCoding $type = null,
         /** @var FHIRReference|null party Contract Signatory Party */
         #[NotBlank]
-        public ?FHIRReference $party = null,
+        public ?\FHIRReference $party = null,
         /** @var array<FHIRSignature> signature Contract Documentation Signature */
         public array $signature = [],
     ) {

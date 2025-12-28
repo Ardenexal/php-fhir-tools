@@ -5,15 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDate;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDecimal;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRId;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInteger;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRTime;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -31,7 +22,7 @@ class FHIRStructureMapGroupRuleTargetParameter extends \Ardenexal\FHIRTools\Comp
         public array $modifierExtension = [],
         /** @var FHIRId|FHIRString|string|FHIRBoolean|FHIRInteger|FHIRDecimal|FHIRDate|FHIRTime|FHIRDateTime|null valueX Parameter value - variable or literal */
         #[NotBlank]
-        public FHIRId|FHIRString|string|FHIRBoolean|FHIRInteger|FHIRDecimal|FHIRDate|FHIRTime|FHIRDateTime|null $valueX = null,
+        public \FHIRId|\FHIRString|string|\FHIRBoolean|\FHIRInteger|\FHIRDecimal|\FHIRDate|\FHIRTime|\FHIRDateTime|null $valueX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

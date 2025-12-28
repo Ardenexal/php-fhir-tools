@@ -5,12 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDecimal;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRId;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRInteger;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -28,7 +22,7 @@ class FHIRStructureMapGroupRuleTargetParameter extends \Ardenexal\FHIRTools\Comp
         public array $modifierExtension = [],
         /** @var FHIRId|FHIRString|string|FHIRBoolean|FHIRInteger|FHIRDecimal|null valueX Parameter value - variable or literal */
         #[NotBlank]
-        public FHIRId|FHIRString|string|FHIRBoolean|FHIRInteger|FHIRDecimal|null $valueX = null,
+        public \FHIRId|\FHIRString|string|\FHIRBoolean|\FHIRInteger|\FHIRDecimal|null $valueX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

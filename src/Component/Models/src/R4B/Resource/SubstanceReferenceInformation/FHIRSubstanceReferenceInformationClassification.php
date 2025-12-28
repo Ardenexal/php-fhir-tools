@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
 
 /**
  * @description Todo.
@@ -27,9 +24,9 @@ class FHIRSubstanceReferenceInformationClassification extends \Ardenexal\FHIRToo
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null domain Todo */
-        public ?FHIRCodeableConcept $domain = null,
+        public ?\FHIRCodeableConcept $domain = null,
         /** @var FHIRCodeableConcept|null classification Todo */
-        public ?FHIRCodeableConcept $classification = null,
+        public ?\FHIRCodeableConcept $classification = null,
         /** @var array<FHIRCodeableConcept> subtype Todo */
         public array $subtype = [],
         /** @var array<FHIRReference> source Todo */

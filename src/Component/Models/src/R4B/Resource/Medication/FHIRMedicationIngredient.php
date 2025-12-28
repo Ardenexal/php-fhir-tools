@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRRatio;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,11 +22,11 @@ class FHIRMedicationIngredient extends \Ardenexal\FHIRTools\Component\Models\R4B
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|FHIRReference|null itemX The actual ingredient or content */
         #[NotBlank]
-        public FHIRCodeableConcept|FHIRReference|null $itemX = null,
+        public \FHIRCodeableConcept|\FHIRReference|null $itemX = null,
         /** @var FHIRBoolean|null isActive Active ingredient indicator */
-        public ?FHIRBoolean $isActive = null,
+        public ?\FHIRBoolean $isActive = null,
         /** @var FHIRRatio|null strength Quantity of ingredient present */
-        public ?FHIRRatio $strength = null,
+        public ?\FHIRRatio $strength = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

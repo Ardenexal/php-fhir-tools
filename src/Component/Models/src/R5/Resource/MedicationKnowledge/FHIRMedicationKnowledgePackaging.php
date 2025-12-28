@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
 
 /**
  * @description Information that only applies to packages (not products).
@@ -24,7 +22,7 @@ class FHIRMedicationKnowledgePackaging extends \Ardenexal\FHIRTools\Component\Mo
         /** @var array<FHIRMedicationKnowledgeCost> cost Cost of the packaged medication */
         public array $cost = [],
         /** @var FHIRReference|null packagedProduct The packaged medication that is being priced */
-        public ?FHIRReference $packagedProduct = null,
+        public ?\FHIRReference $packagedProduct = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

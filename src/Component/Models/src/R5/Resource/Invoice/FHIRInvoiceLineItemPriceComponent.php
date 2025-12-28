@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMoney;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDecimal;
-use Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRInvoicePriceComponentTypeType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,13 +22,13 @@ class FHIRInvoiceLineItemPriceComponent extends \Ardenexal\FHIRTools\Component\M
         public array $modifierExtension = [],
         /** @var FHIRInvoicePriceComponentTypeType|null type base | surcharge | deduction | discount | tax | informational */
         #[NotBlank]
-        public ?FHIRInvoicePriceComponentTypeType $type = null,
+        public ?\FHIRInvoicePriceComponentTypeType $type = null,
         /** @var FHIRCodeableConcept|null code Code identifying the specific component */
-        public ?FHIRCodeableConcept $code = null,
+        public ?\FHIRCodeableConcept $code = null,
         /** @var FHIRDecimal|null factor Factor used for calculating this component */
-        public ?FHIRDecimal $factor = null,
+        public ?\FHIRDecimal $factor = null,
         /** @var FHIRMoney|null amount Monetary amount associated with this component */
-        public ?FHIRMoney $amount = null,
+        public ?\FHIRMoney $amount = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,12 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCode;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInteger;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRFHIRTypesType;
-use Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIROperationParameterUseType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -29,21 +23,21 @@ class FHIRParameterDefinition extends FHIRDataType
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
         /** @var FHIRCode|null name Name used to access the parameter value */
-        public ?FHIRCode $name = null,
+        public ?\FHIRCode $name = null,
         /** @var FHIROperationParameterUseType|null use in | out */
         #[NotBlank]
-        public ?FHIROperationParameterUseType $use = null,
+        public ?\FHIROperationParameterUseType $use = null,
         /** @var FHIRInteger|null min Minimum cardinality */
-        public ?FHIRInteger $min = null,
+        public ?\FHIRInteger $min = null,
         /** @var FHIRString|string|null max Maximum cardinality (a number of *) */
-        public FHIRString|string|null $max = null,
+        public \FHIRString|string|null $max = null,
         /** @var FHIRString|string|null documentation A brief description of the parameter */
-        public FHIRString|string|null $documentation = null,
+        public \FHIRString|string|null $documentation = null,
         /** @var FHIRFHIRTypesType|null type What type of value */
         #[NotBlank]
-        public ?FHIRFHIRTypesType $type = null,
+        public ?\FHIRFHIRTypesType $type = null,
         /** @var FHIRCanonical|null profile What profile the value is expected to be */
-        public ?FHIRCanonical $profile = null,
+        public ?\FHIRCanonical $profile = null,
     ) {
         parent::__construct($id, $extension);
     }

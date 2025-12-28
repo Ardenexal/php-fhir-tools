@@ -4,20 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRAnnotation;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRContactDetail;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMeta;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRNarrative;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRRelatedArtifact;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRMarkdown;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,7 +13,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  *
  * @description A process where a researcher or organization plans and then executes a series of steps intended to increase the field of healthcare-related knowledge.  This includes studies of safety, efficacy, comparative effectiveness and other information about medications, devices, therapies and other interventional and investigative techniques.  A ResearchStudy involves the gathering of information about human or animal subjects.
  */
-#[FhirResource(
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(
     type: 'ResearchStudy',
     version: '4.3.0',
     url: 'http://hl7.org/fhir/StructureDefinition/ResearchStudy',
@@ -39,14 +25,14 @@ class FHIRResearchStudy extends FHIRDomainResource
         /** @var string|null id Logical id of this artifact */
         public ?string $id = null,
         /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?FHIRMeta $meta = null,
+        public ?\FHIRMeta $meta = null,
         /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?FHIRUri $implicitRules = null,
+        public ?\FHIRUri $implicitRules = null,
         /** @var string|null language Language of the resource content */
         public ?string $language = null,
         /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
-        public ?FHIRNarrative $text = null,
-        /** @var array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRResource> contained Contained, inline Resources */
+        public ?\FHIRNarrative $text = null,
+        /** @var array<FHIRResource> contained Contained, inline Resources */
         public array $contained = [],
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
@@ -55,18 +41,18 @@ class FHIRResearchStudy extends FHIRDomainResource
         /** @var array<FHIRIdentifier> identifier Business Identifier for study */
         public array $identifier = [],
         /** @var FHIRString|string|null title Name for this study */
-        public FHIRString|string|null $title = null,
+        public \FHIRString|string|null $title = null,
         /** @var array<FHIRReference> protocol Steps followed in executing study */
         public array $protocol = [],
         /** @var array<FHIRReference> partOf Part of larger study */
         public array $partOf = [],
         /** @var FHIRResearchStudyStatusType|null status active | administratively-completed | approved | closed-to-accrual | closed-to-accrual-and-intervention | completed | disapproved | in-review | temporarily-closed-to-accrual | temporarily-closed-to-accrual-and-intervention | withdrawn */
         #[NotBlank]
-        public ?FHIRResearchStudyStatusType $status = null,
+        public ?\FHIRResearchStudyStatusType $status = null,
         /** @var FHIRCodeableConcept|null primaryPurposeType treatment | prevention | diagnostic | supportive-care | screening | health-services-research | basic-science | device-feasibility */
-        public ?FHIRCodeableConcept $primaryPurposeType = null,
+        public ?\FHIRCodeableConcept $primaryPurposeType = null,
         /** @var FHIRCodeableConcept|null phase n-a | early-phase-1 | phase-1 | phase-1-phase-2 | phase-2 | phase-2-phase-3 | phase-3 | phase-4 */
-        public ?FHIRCodeableConcept $phase = null,
+        public ?\FHIRCodeableConcept $phase = null,
         /** @var array<FHIRCodeableConcept> category Classifications for the study */
         public array $category = [],
         /** @var array<FHIRCodeableConcept> focus Drugs, devices, etc. under study */
@@ -82,19 +68,19 @@ class FHIRResearchStudy extends FHIRDomainResource
         /** @var array<FHIRCodeableConcept> location Geographic region(s) for study */
         public array $location = [],
         /** @var FHIRMarkdown|null description What this is study doing */
-        public ?FHIRMarkdown $description = null,
+        public ?\FHIRMarkdown $description = null,
         /** @var array<FHIRReference> enrollment Inclusion & exclusion criteria */
         public array $enrollment = [],
         /** @var FHIRPeriod|null period When the study began and ended */
-        public ?FHIRPeriod $period = null,
+        public ?\FHIRPeriod $period = null,
         /** @var FHIRReference|null sponsor Organization that initiates and is legally responsible for the study */
-        public ?FHIRReference $sponsor = null,
+        public ?\FHIRReference $sponsor = null,
         /** @var FHIRReference|null principalInvestigator Researcher who oversees multiple aspects of the study */
-        public ?FHIRReference $principalInvestigator = null,
+        public ?\FHIRReference $principalInvestigator = null,
         /** @var array<FHIRReference> site Facility where study activities are conducted */
         public array $site = [],
         /** @var FHIRCodeableConcept|null reasonStopped accrual-goal-met | closed-due-to-toxicity | closed-due-to-lack-of-study-progress | temporarily-closed-per-study-design */
-        public ?FHIRCodeableConcept $reasonStopped = null,
+        public ?\FHIRCodeableConcept $reasonStopped = null,
         /** @var array<FHIRAnnotation> note Comments made about the study */
         public array $note = [],
         /** @var array<FHIRResearchStudyArm> arm Defined path through the study for a subject */

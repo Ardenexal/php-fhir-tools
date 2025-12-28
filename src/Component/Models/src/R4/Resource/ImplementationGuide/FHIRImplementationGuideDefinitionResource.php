@@ -5,12 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRId;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -28,17 +22,17 @@ class FHIRImplementationGuideDefinitionResource extends \Ardenexal\FHIRTools\Com
         public array $modifierExtension = [],
         /** @var FHIRReference|null reference Location of the resource */
         #[NotBlank]
-        public ?FHIRReference $reference = null,
+        public ?\FHIRReference $reference = null,
         /** @var array<FHIRFHIRVersionType> fhirVersion Versions this applies to (if different to IG) */
         public array $fhirVersion = [],
         /** @var FHIRString|string|null name Human Name for the resource */
-        public FHIRString|string|null $name = null,
+        public \FHIRString|string|null $name = null,
         /** @var FHIRString|string|null description Reason why included in guide */
-        public FHIRString|string|null $description = null,
+        public \FHIRString|string|null $description = null,
         /** @var FHIRBoolean|FHIRCanonical|null exampleX Is an example/What is this an example of? */
-        public FHIRBoolean|FHIRCanonical|null $exampleX = null,
+        public \FHIRBoolean|\FHIRCanonical|null $exampleX = null,
         /** @var FHIRId|null groupingId Grouping this is part of */
-        public ?FHIRId $groupingId = null,
+        public ?\FHIRId $groupingId = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

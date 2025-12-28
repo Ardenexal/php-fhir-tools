@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -30,12 +25,12 @@ class FHIRMedicinalProductAuthorizationProcedure extends \Ardenexal\FHIRTools\Co
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRIdentifier|null identifier Identifier for this procedure */
-        public ?FHIRIdentifier $identifier = null,
+        public ?\FHIRIdentifier $identifier = null,
         /** @var FHIRCodeableConcept|null type Type of procedure */
         #[NotBlank]
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRPeriod|FHIRDateTime|null dateX Date of procedure */
-        public FHIRPeriod|FHIRDateTime|null $dateX = null,
+        public \FHIRPeriod|\FHIRDateTime|null $dateX = null,
         /** @var array<FHIRMedicinalProductAuthorizationProcedure> application Applcations submitted to obtain a marketing authorization */
         public array $application = [],
     ) {

@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExpression;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,10 +22,10 @@ class FHIRActivityDefinitionDynamicValue extends \Ardenexal\FHIRTools\Component\
         public array $modifierExtension = [],
         /** @var FHIRString|string|null path The path to the element to be set dynamically */
         #[NotBlank]
-        public FHIRString|string|null $path = null,
+        public \FHIRString|string|null $path = null,
         /** @var FHIRExpression|null expression An expression that provides the dynamic value for the customization */
         #[NotBlank]
-        public ?FHIRExpression $expression = null,
+        public ?\FHIRExpression $expression = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

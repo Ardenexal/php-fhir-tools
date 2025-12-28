@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDate;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRTriggerTypeType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -29,19 +24,19 @@ class FHIRTriggerDefinition extends FHIRDataType
         public array $extension = [],
         /** @var FHIRTriggerTypeType|null type named-event | periodic | data-changed | data-added | data-modified | data-removed | data-accessed | data-access-ended */
         #[NotBlank]
-        public ?FHIRTriggerTypeType $type = null,
+        public ?\FHIRTriggerTypeType $type = null,
         /** @var FHIRString|string|null name Name or URI that identifies the event */
-        public FHIRString|string|null $name = null,
+        public \FHIRString|string|null $name = null,
         /** @var FHIRCodeableConcept|null code Coded definition of the event */
-        public ?FHIRCodeableConcept $code = null,
+        public ?\FHIRCodeableConcept $code = null,
         /** @var FHIRCanonical|null subscriptionTopic What event */
-        public ?FHIRCanonical $subscriptionTopic = null,
+        public ?\FHIRCanonical $subscriptionTopic = null,
         /** @var FHIRTiming|FHIRReference|FHIRDate|FHIRDateTime|null timingX Timing of the event */
-        public FHIRTiming|FHIRReference|FHIRDate|FHIRDateTime|null $timingX = null,
+        public \FHIRTiming|\FHIRReference|\FHIRDate|\FHIRDateTime|null $timingX = null,
         /** @var array<FHIRDataRequirement> data Triggering data of the event (multiple = 'and') */
         public array $data = [],
         /** @var FHIRExpression|null condition Whether the event triggers (boolean expression) */
-        public ?FHIRExpression $condition = null,
+        public ?\FHIRExpression $condition = null,
     ) {
         parent::__construct($id, $extension);
     }

@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableReference;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRRatio;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,11 +22,11 @@ class FHIRMedicationKnowledgeDefinitionalIngredient extends \Ardenexal\FHIRTools
         public array $modifierExtension = [],
         /** @var FHIRCodeableReference|null item Substances contained in the medication */
         #[NotBlank]
-        public ?FHIRCodeableReference $item = null,
+        public ?\FHIRCodeableReference $item = null,
         /** @var FHIRCodeableConcept|null type A code that defines the type of ingredient, active, base, etc */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
         /** @var FHIRRatio|FHIRCodeableConcept|FHIRQuantity|null strengthX Quantity of ingredient present */
-        public FHIRRatio|FHIRCodeableConcept|FHIRQuantity|null $strengthX = null,
+        public \FHIRRatio|\FHIRCodeableConcept|\FHIRQuantity|null $strengthX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

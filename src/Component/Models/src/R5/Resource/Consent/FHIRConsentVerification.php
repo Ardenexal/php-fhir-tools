@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,13 +22,13 @@ class FHIRConsentVerification extends \Ardenexal\FHIRTools\Component\Models\R5\D
         public array $modifierExtension = [],
         /** @var FHIRBoolean|null verified Has been verified */
         #[NotBlank]
-        public ?FHIRBoolean $verified = null,
+        public ?\FHIRBoolean $verified = null,
         /** @var FHIRCodeableConcept|null verificationType Business case of verification */
-        public ?FHIRCodeableConcept $verificationType = null,
+        public ?\FHIRCodeableConcept $verificationType = null,
         /** @var FHIRReference|null verifiedBy Person conducting verification */
-        public ?FHIRReference $verifiedBy = null,
+        public ?\FHIRReference $verifiedBy = null,
         /** @var FHIRReference|null verifiedWith Person who verified */
-        public ?FHIRReference $verifiedWith = null,
+        public ?\FHIRReference $verifiedWith = null,
         /** @var array<FHIRDateTime> verificationDate When consent verified */
         public array $verificationDate = [],
     ) {

@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCode;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri;
 
 /**
  * @author HL7 FHIR Standard
@@ -26,15 +22,15 @@ class FHIRCoding extends FHIRElement
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
         /** @var FHIRUri|null system Identity of the terminology system */
-        public ?FHIRUri $system = null,
+        public ?\FHIRUri $system = null,
         /** @var FHIRString|string|null version Version of the system - if relevant */
-        public FHIRString|string|null $version = null,
+        public \FHIRString|string|null $version = null,
         /** @var FHIRCode|null code Symbol in syntax defined by the system */
-        public ?FHIRCode $code = null,
+        public ?\FHIRCode $code = null,
         /** @var FHIRString|string|null display Representation defined by the system */
-        public FHIRString|string|null $display = null,
+        public \FHIRString|string|null $display = null,
         /** @var FHIRBoolean|null userSelected If this coding was chosen directly by the user */
-        public ?FHIRBoolean $userSelected = null,
+        public ?\FHIRBoolean $userSelected = null,
     ) {
         parent::__construct($id, $extension);
     }

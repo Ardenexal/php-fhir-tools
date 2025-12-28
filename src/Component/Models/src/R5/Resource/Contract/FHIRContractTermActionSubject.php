@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
 
 /**
  * @description Entity of the action.
@@ -25,7 +22,7 @@ class FHIRContractTermActionSubject extends \Ardenexal\FHIRTools\Component\Model
         /** @var array<FHIRReference> reference Entity of the action */
         public array $reference = [],
         /** @var FHIRCodeableConcept|null role Role type of the agent */
-        public ?FHIRCodeableConcept $role = null,
+        public ?\FHIRCodeableConcept $role = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

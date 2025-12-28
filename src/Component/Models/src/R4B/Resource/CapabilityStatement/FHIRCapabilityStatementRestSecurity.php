@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRMarkdown;
 
 /**
  * @description Information about security implementation from an interface perspective - what a client needs to know.
@@ -24,11 +20,11 @@ class FHIRCapabilityStatementRestSecurity extends \Ardenexal\FHIRTools\Component
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRBoolean|null cors Adds CORS Headers (http://enable-cors.org/) */
-        public ?FHIRBoolean $cors = null,
+        public ?\FHIRBoolean $cors = null,
         /** @var array<FHIRCodeableConcept> service OAuth | SMART-on-FHIR | NTLM | Basic | Kerberos | Certificates */
         public array $service = [],
         /** @var FHIRMarkdown|null description General description of how security works */
-        public ?FHIRMarkdown $description = null,
+        public ?\FHIRMarkdown $description = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

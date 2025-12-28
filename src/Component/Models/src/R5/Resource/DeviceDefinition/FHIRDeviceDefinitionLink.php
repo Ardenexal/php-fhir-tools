@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableReference;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCoding;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,10 +22,10 @@ class FHIRDeviceDefinitionLink extends \Ardenexal\FHIRTools\Component\Models\R5\
         public array $modifierExtension = [],
         /** @var FHIRCoding|null relation The type indicates the relationship of the related device to the device instance */
         #[NotBlank]
-        public ?FHIRCoding $relation = null,
+        public ?\FHIRCoding $relation = null,
         /** @var FHIRCodeableReference|null relatedDevice A reference to the linked device */
         #[NotBlank]
-        public ?FHIRCodeableReference $relatedDevice = null,
+        public ?\FHIRCodeableReference $relatedDevice = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

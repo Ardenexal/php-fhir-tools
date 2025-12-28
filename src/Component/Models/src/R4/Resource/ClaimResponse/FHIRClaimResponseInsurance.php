@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRPositiveInt;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,17 +22,17 @@ class FHIRClaimResponseInsurance extends \Ardenexal\FHIRTools\Component\Models\R
         public array $modifierExtension = [],
         /** @var FHIRPositiveInt|null sequence Insurance instance identifier */
         #[NotBlank]
-        public ?FHIRPositiveInt $sequence = null,
+        public ?\FHIRPositiveInt $sequence = null,
         /** @var FHIRBoolean|null focal Coverage to be used for adjudication */
         #[NotBlank]
-        public ?FHIRBoolean $focal = null,
+        public ?\FHIRBoolean $focal = null,
         /** @var FHIRReference|null coverage Insurance information */
         #[NotBlank]
-        public ?FHIRReference $coverage = null,
+        public ?\FHIRReference $coverage = null,
         /** @var FHIRString|string|null businessArrangement Additional provider contract number */
-        public FHIRString|string|null $businessArrangement = null,
+        public \FHIRString|string|null $businessArrangement = null,
         /** @var FHIRReference|null claimResponse Adjudication results */
-        public ?FHIRReference $claimResponse = null,
+        public ?\FHIRReference $claimResponse = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
 
 /**
  * @description This element is used to list authors and other contributors, their contact information, specific contributions, and summary statements.
@@ -22,7 +20,7 @@ class FHIRCitationCitedArtifactContributorship extends \Ardenexal\FHIRTools\Comp
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRBoolean|null complete Indicates if the list includes all authors and/or contributors */
-        public ?FHIRBoolean $complete = null,
+        public ?\FHIRBoolean $complete = null,
         /** @var array<FHIRCitationCitedArtifactContributorshipEntry> entry An individual entity named as a contributor */
         public array $entry = [],
         /** @var array<FHIRCitationCitedArtifactContributorshipSummary> summary Used to record a display of the author/contributor list without separate data element for each list member */

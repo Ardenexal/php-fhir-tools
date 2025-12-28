@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRAddress;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRContactPoint;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRHumanName;
 
 /**
  * @description Contact for the organization for a certain purpose.
@@ -25,13 +20,13 @@ class FHIROrganizationContact extends \Ardenexal\FHIRTools\Component\Models\R4B\
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null purpose The type of contact */
-        public ?FHIRCodeableConcept $purpose = null,
+        public ?\FHIRCodeableConcept $purpose = null,
         /** @var FHIRHumanName|null name A name associated with the contact */
-        public ?FHIRHumanName $name = null,
+        public ?\FHIRHumanName $name = null,
         /** @var array<FHIRContactPoint> telecom Contact details (telephone, email, etc.)  for a contact */
         public array $telecom = [],
         /** @var FHIRAddress|null address Visiting or postal addresses for the contact */
-        public ?FHIRAddress $address = null,
+        public ?\FHIRAddress $address = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

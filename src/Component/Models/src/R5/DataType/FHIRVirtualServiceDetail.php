@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRPositiveInt;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUrl;
 
 /**
  * @author HL7 FHIR Standard
@@ -25,15 +22,15 @@ class FHIRVirtualServiceDetail extends FHIRDataType
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
         /** @var FHIRCoding|null channelType Channel Type */
-        public ?FHIRCoding $channelType = null,
+        public ?\FHIRCoding $channelType = null,
         /** @var FHIRUrl|FHIRString|string|FHIRContactPoint|FHIRExtendedContactDetail|null addressX Contact address/number */
-        public FHIRUrl|FHIRString|string|FHIRContactPoint|FHIRExtendedContactDetail|null $addressX = null,
+        public \FHIRUrl|\FHIRString|string|\FHIRContactPoint|\FHIRExtendedContactDetail|null $addressX = null,
         /** @var array<FHIRUrl> additionalInfo Address to see alternative connection details */
         public array $additionalInfo = [],
         /** @var FHIRPositiveInt|null maxParticipants Maximum number of participants supported by the virtual service */
-        public ?FHIRPositiveInt $maxParticipants = null,
+        public ?\FHIRPositiveInt $maxParticipants = null,
         /** @var FHIRString|string|null sessionKey Session Key required by the virtual service */
-        public FHIRString|string|null $sessionKey = null,
+        public \FHIRString|string|null $sessionKey = null,
     ) {
         parent::__construct($id, $extension);
     }

@@ -5,20 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRAttachment;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRRange;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRRatio;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRSampledData;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInteger;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRTime;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -36,11 +22,11 @@ class FHIRObservationComponent extends \Ardenexal\FHIRTools\Component\Models\R5\
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null code Type of component observation (code / type) */
         #[NotBlank]
-        public ?FHIRCodeableConcept $code = null,
+        public ?\FHIRCodeableConcept $code = null,
         /** @var FHIRQuantity|FHIRCodeableConcept|FHIRString|string|FHIRBoolean|FHIRInteger|FHIRRange|FHIRRatio|FHIRSampledData|FHIRTime|FHIRDateTime|FHIRPeriod|FHIRAttachment|FHIRReference|null valueX Actual component result */
-        public FHIRQuantity|FHIRCodeableConcept|FHIRString|string|FHIRBoolean|FHIRInteger|FHIRRange|FHIRRatio|FHIRSampledData|FHIRTime|FHIRDateTime|FHIRPeriod|FHIRAttachment|FHIRReference|null $valueX = null,
+        public \FHIRQuantity|\FHIRCodeableConcept|\FHIRString|string|\FHIRBoolean|\FHIRInteger|\FHIRRange|\FHIRRatio|\FHIRSampledData|\FHIRTime|\FHIRDateTime|\FHIRPeriod|\FHIRAttachment|\FHIRReference|null $valueX = null,
         /** @var FHIRCodeableConcept|null dataAbsentReason Why the component result is missing */
-        public ?FHIRCodeableConcept $dataAbsentReason = null,
+        public ?\FHIRCodeableConcept $dataAbsentReason = null,
         /** @var array<FHIRCodeableConcept> interpretation High, low, normal, etc */
         public array $interpretation = [],
         /** @var array<FHIRObservationReferenceRange> referenceRange Provides guide for interpretation of component result */

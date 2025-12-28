@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 
 /**
  * @description Not available during this time due to provided reason.
@@ -19,9 +18,9 @@ class FHIRAvailabilityNotAvailableTime extends FHIRElement
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
         /** @var FHIRString|string|null description Reason presented to the user explaining why time not available */
-        public FHIRString|string|null $description = null,
+        public \FHIRString|string|null $description = null,
         /** @var FHIRPeriod|null during Service not available during this period */
-        public ?FHIRPeriod $during = null,
+        public ?\FHIRPeriod $during = null,
     ) {
         parent::__construct($id, $extension);
     }

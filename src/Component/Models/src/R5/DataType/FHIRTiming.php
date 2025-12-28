@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRTimingRepeat;
 
 /**
  * @author HL7 FHIR Standard
@@ -28,9 +26,9 @@ class FHIRTiming extends FHIRBackboneType
         /** @var array<FHIRDateTime> event When the event occurs */
         public array $event = [],
         /** @var FHIRTimingRepeat|null repeat When the event is to occur */
-        public ?FHIRTimingRepeat $repeat = null,
+        public ?\FHIRTimingRepeat $repeat = null,
         /** @var FHIRCodeableConcept|null code C | BID | TID | QID | AM | PM | QD | QOD | + */
-        public ?FHIRCodeableConcept $code = null,
+        public ?\FHIRCodeableConcept $code = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

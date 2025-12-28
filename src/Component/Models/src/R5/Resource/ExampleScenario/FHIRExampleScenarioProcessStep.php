@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 
 /**
  * @description A significant action that occurs as part of the process.
@@ -24,17 +20,17 @@ class FHIRExampleScenarioProcessStep extends \Ardenexal\FHIRTools\Component\Mode
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRString|string|null number Sequential number of the step */
-        public FHIRString|string|null $number = null,
+        public \FHIRString|string|null $number = null,
         /** @var FHIRExampleScenarioProcess|null process Step is nested process */
-        public ?FHIRExampleScenarioProcess $process = null,
+        public ?\FHIRExampleScenarioProcess $process = null,
         /** @var FHIRCanonical|null workflow Step is nested workflow */
-        public ?FHIRCanonical $workflow = null,
+        public ?\FHIRCanonical $workflow = null,
         /** @var FHIRExampleScenarioProcessStepOperation|null operation Step is simple action */
-        public ?FHIRExampleScenarioProcessStepOperation $operation = null,
+        public ?\FHIRExampleScenarioProcessStepOperation $operation = null,
         /** @var array<FHIRExampleScenarioProcessStepAlternative> alternative Alternate non-typical step action */
         public array $alternative = [],
         /** @var FHIRBoolean|null pause Pause in the flow? */
-        public ?FHIRBoolean $pause = null,
+        public ?\FHIRBoolean $pause = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,14 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCode;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDecimal;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInteger;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -30,9 +22,9 @@ class FHIRValueSetExpansionParameter extends \Ardenexal\FHIRTools\Component\Mode
         public array $modifierExtension = [],
         /** @var FHIRString|string|null name Name as assigned by the client or server */
         #[NotBlank]
-        public FHIRString|string|null $name = null,
+        public \FHIRString|string|null $name = null,
         /** @var FHIRString|string|FHIRBoolean|FHIRInteger|FHIRDecimal|FHIRUri|FHIRCode|FHIRDateTime|null valueX Value of the named parameter */
-        public FHIRString|string|FHIRBoolean|FHIRInteger|FHIRDecimal|FHIRUri|FHIRCode|FHIRDateTime|null $valueX = null,
+        public \FHIRString|string|\FHIRBoolean|\FHIRInteger|\FHIRDecimal|\FHIRUri|\FHIRCode|\FHIRDateTime|null $valueX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

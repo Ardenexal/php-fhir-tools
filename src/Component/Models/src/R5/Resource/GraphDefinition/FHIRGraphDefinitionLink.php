@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRId;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInteger;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,23 +21,23 @@ class FHIRGraphDefinitionLink extends \Ardenexal\FHIRTools\Component\Models\R5\D
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRString|string|null description Why this link is specified */
-        public FHIRString|string|null $description = null,
+        public \FHIRString|string|null $description = null,
         /** @var FHIRInteger|null min Minimum occurrences for this link */
-        public ?FHIRInteger $min = null,
+        public ?\FHIRInteger $min = null,
         /** @var FHIRString|string|null max Maximum occurrences for this link */
-        public FHIRString|string|null $max = null,
+        public \FHIRString|string|null $max = null,
         /** @var FHIRId|null sourceId Source Node for this link */
         #[NotBlank]
-        public ?FHIRId $sourceId = null,
+        public ?\FHIRId $sourceId = null,
         /** @var FHIRString|string|null path Path in the resource that contains the link */
-        public FHIRString|string|null $path = null,
+        public \FHIRString|string|null $path = null,
         /** @var FHIRString|string|null sliceName Which slice (if profiled) */
-        public FHIRString|string|null $sliceName = null,
+        public \FHIRString|string|null $sliceName = null,
         /** @var FHIRId|null targetId Target Node for this link */
         #[NotBlank]
-        public ?FHIRId $targetId = null,
+        public ?\FHIRId $targetId = null,
         /** @var FHIRString|string|null params Criteria for reverse lookup */
-        public FHIRString|string|null $params = null,
+        public \FHIRString|string|null $params = null,
         /** @var array<FHIRGraphDefinitionLinkCompartment> compartment Compartment Consistency Rules */
         public array $compartment = [],
     ) {

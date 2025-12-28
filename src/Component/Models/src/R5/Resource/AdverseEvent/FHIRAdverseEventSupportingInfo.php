@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,7 +22,7 @@ class FHIRAdverseEventSupportingInfo extends \Ardenexal\FHIRTools\Component\Mode
         public array $modifierExtension = [],
         /** @var FHIRReference|FHIRCodeableConcept|null itemX Subject medical history or document relevant to this adverse event */
         #[NotBlank]
-        public FHIRReference|FHIRCodeableConcept|null $itemX = null,
+        public \FHIRReference|\FHIRCodeableConcept|null $itemX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

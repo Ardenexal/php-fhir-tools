@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -24,17 +21,17 @@ class FHIRSubscriptionFilterBy extends \Ardenexal\FHIRTools\Component\Models\R5\
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRUri|null resourceType Allowed Resource (reference to definition) for this Subscription filter */
-        public ?FHIRUri $resourceType = null,
+        public ?\FHIRUri $resourceType = null,
         /** @var FHIRString|string|null filterParameter Filter label defined in SubscriptionTopic */
         #[NotBlank]
-        public FHIRString|string|null $filterParameter = null,
+        public \FHIRString|string|null $filterParameter = null,
         /** @var FHIRSearchComparatorType|null comparator eq | ne | gt | lt | ge | le | sa | eb | ap */
-        public ?FHIRSearchComparatorType $comparator = null,
+        public ?\FHIRSearchComparatorType $comparator = null,
         /** @var FHIRSearchModifierCodeType|null modifier missing | exact | contains | not | text | in | not-in | below | above | type | identifier | of-type | code-text | text-advanced | iterate */
-        public ?FHIRSearchModifierCodeType $modifier = null,
+        public ?\FHIRSearchModifierCodeType $modifier = null,
         /** @var FHIRString|string|null value Literal value or resource path */
         #[NotBlank]
-        public FHIRString|string|null $value = null,
+        public \FHIRString|string|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

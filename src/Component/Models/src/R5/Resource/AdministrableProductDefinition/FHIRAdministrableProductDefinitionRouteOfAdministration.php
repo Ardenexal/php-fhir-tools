@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRDuration;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRRatio;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -31,17 +26,17 @@ class FHIRAdministrableProductDefinitionRouteOfAdministration extends \Ardenexal
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null code Coded expression for the route */
         #[NotBlank]
-        public ?FHIRCodeableConcept $code = null,
+        public ?\FHIRCodeableConcept $code = null,
         /** @var FHIRQuantity|null firstDose The first dose (dose quantity) administered can be specified for the product */
-        public ?FHIRQuantity $firstDose = null,
+        public ?\FHIRQuantity $firstDose = null,
         /** @var FHIRQuantity|null maxSingleDose The maximum single dose that can be administered */
-        public ?FHIRQuantity $maxSingleDose = null,
+        public ?\FHIRQuantity $maxSingleDose = null,
         /** @var FHIRQuantity|null maxDosePerDay The maximum dose quantity to be administered in any one 24-h period */
-        public ?FHIRQuantity $maxDosePerDay = null,
+        public ?\FHIRQuantity $maxDosePerDay = null,
         /** @var FHIRRatio|null maxDosePerTreatmentPeriod The maximum dose per treatment period that can be administered */
-        public ?FHIRRatio $maxDosePerTreatmentPeriod = null,
+        public ?\FHIRRatio $maxDosePerTreatmentPeriod = null,
         /** @var FHIRDuration|null maxTreatmentPeriod The maximum treatment period during which the product can be administered */
-        public ?FHIRDuration $maxTreatmentPeriod = null,
+        public ?\FHIRDuration $maxTreatmentPeriod = null,
         /** @var array<FHIRAdministrableProductDefinitionRouteOfAdministrationTargetSpecies> targetSpecies A species for which this route applies */
         public array $targetSpecies = [],
     ) {

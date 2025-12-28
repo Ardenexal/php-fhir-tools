@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRAttachment;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,7 +22,7 @@ class FHIRContractFriendly extends \Ardenexal\FHIRTools\Component\Models\R4\Data
         public array $modifierExtension = [],
         /** @var FHIRAttachment|FHIRReference|null contentX Easily comprehended representation of this Contract */
         #[NotBlank]
-        public FHIRAttachment|FHIRReference|null $contentX = null,
+        public \FHIRAttachment|\FHIRReference|null $contentX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

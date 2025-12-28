@@ -5,13 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCoding;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRId;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUnsignedInt;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -29,26 +22,26 @@ class FHIRImagingStudySeries extends \Ardenexal\FHIRTools\Component\Models\R4B\D
         public array $modifierExtension = [],
         /** @var FHIRId|null uid DICOM Series Instance UID for the series */
         #[NotBlank]
-        public ?FHIRId $uid = null,
+        public ?\FHIRId $uid = null,
         /** @var FHIRUnsignedInt|null number Numeric identifier of this series */
-        public ?FHIRUnsignedInt $number = null,
+        public ?\FHIRUnsignedInt $number = null,
         /** @var FHIRCoding|null modality The modality of the instances in the series */
         #[NotBlank]
-        public ?FHIRCoding $modality = null,
+        public ?\FHIRCoding $modality = null,
         /** @var FHIRString|string|null description A short human readable summary of the series */
-        public FHIRString|string|null $description = null,
+        public \FHIRString|string|null $description = null,
         /** @var FHIRUnsignedInt|null numberOfInstances Number of Series Related Instances */
-        public ?FHIRUnsignedInt $numberOfInstances = null,
+        public ?\FHIRUnsignedInt $numberOfInstances = null,
         /** @var array<FHIRReference> endpoint Series access endpoint */
         public array $endpoint = [],
         /** @var FHIRCoding|null bodySite Body part examined */
-        public ?FHIRCoding $bodySite = null,
+        public ?\FHIRCoding $bodySite = null,
         /** @var FHIRCoding|null laterality Body part laterality */
-        public ?FHIRCoding $laterality = null,
+        public ?\FHIRCoding $laterality = null,
         /** @var array<FHIRReference> specimen Specimen imaged */
         public array $specimen = [],
         /** @var FHIRDateTime|null started When the series started */
-        public ?FHIRDateTime $started = null,
+        public ?\FHIRDateTime $started = null,
         /** @var array<FHIRImagingStudySeriesPerformer> performer Who performed the series */
         public array $performer = [],
         /** @var array<FHIRImagingStudySeriesInstance> instance A single SOP instance from the series */

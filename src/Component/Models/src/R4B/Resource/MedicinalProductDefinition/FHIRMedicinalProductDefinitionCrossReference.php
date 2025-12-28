@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -29,9 +26,9 @@ class FHIRMedicinalProductDefinitionCrossReference extends \Ardenexal\FHIRTools\
         public array $modifierExtension = [],
         /** @var FHIRCodeableReference|null product Reference to another product, e.g. for linking authorised to investigational product */
         #[NotBlank]
-        public ?FHIRCodeableReference $product = null,
+        public ?\FHIRCodeableReference $product = null,
         /** @var FHIRCodeableConcept|null type The type of relationship, for instance branded to generic or virtual to actual product */
-        public ?FHIRCodeableConcept $type = null,
+        public ?\FHIRCodeableConcept $type = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

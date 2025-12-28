@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRMarkdown;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,14 +22,14 @@ class FHIRExampleScenarioInstanceVersion extends \Ardenexal\FHIRTools\Component\
         public array $modifierExtension = [],
         /** @var FHIRString|string|null key ID or acronym of the version */
         #[NotBlank]
-        public FHIRString|string|null $key = null,
+        public \FHIRString|string|null $key = null,
         /** @var FHIRString|string|null title Label for instance version */
         #[NotBlank]
-        public FHIRString|string|null $title = null,
+        public \FHIRString|string|null $title = null,
         /** @var FHIRMarkdown|null description Details about version */
-        public ?FHIRMarkdown $description = null,
+        public ?\FHIRMarkdown $description = null,
         /** @var FHIRReference|null content Example instance version data */
-        public ?FHIRReference $content = null,
+        public ?\FHIRReference $content = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

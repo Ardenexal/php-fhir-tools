@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
 
 /**
  * @description Todo.
@@ -23,9 +20,9 @@ class FHIRSubstanceReferenceInformationGene extends \Ardenexal\FHIRTools\Compone
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRCodeableConcept|null geneSequenceOrigin Todo */
-        public ?FHIRCodeableConcept $geneSequenceOrigin = null,
+        public ?\FHIRCodeableConcept $geneSequenceOrigin = null,
         /** @var FHIRCodeableConcept|null gene Todo */
-        public ?FHIRCodeableConcept $gene = null,
+        public ?\FHIRCodeableConcept $gene = null,
         /** @var array<FHIRReference> source Todo */
         public array $source = [],
     ) {

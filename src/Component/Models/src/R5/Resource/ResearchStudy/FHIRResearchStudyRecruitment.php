@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUnsignedInt;
 
 /**
  * @description Target or actual group of participants enrolled in study.
@@ -23,13 +20,13 @@ class FHIRResearchStudyRecruitment extends \Ardenexal\FHIRTools\Component\Models
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRUnsignedInt|null targetNumber Estimated total number of participants to be enrolled */
-        public ?FHIRUnsignedInt $targetNumber = null,
+        public ?\FHIRUnsignedInt $targetNumber = null,
         /** @var FHIRUnsignedInt|null actualNumber Actual total number of participants enrolled in study */
-        public ?FHIRUnsignedInt $actualNumber = null,
+        public ?\FHIRUnsignedInt $actualNumber = null,
         /** @var FHIRReference|null eligibility Inclusion and exclusion criteria */
-        public ?FHIRReference $eligibility = null,
+        public ?\FHIRReference $eligibility = null,
         /** @var FHIRReference|null actualGroup Group of participants who were enrolled in study */
-        public ?FHIRReference $actualGroup = null,
+        public ?\FHIRReference $actualGroup = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -4,20 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRContactDetail;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRMeta;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRNarrative;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRUsageContext;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCode;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRMarkdown;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUri;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,7 +13,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  *
  * @description A formal computable definition of an operation (on the RESTful interface) or a named query (using the search interaction).
  */
-#[FhirResource(
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(
     type: 'OperationDefinition',
     version: '4.0.1',
     url: 'http://hl7.org/fhir/StructureDefinition/OperationDefinition',
@@ -39,74 +25,74 @@ class FHIROperationDefinition extends FHIRDomainResource
         /** @var string|null id Logical id of this artifact */
         public ?string $id = null,
         /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?FHIRMeta $meta = null,
+        public ?\FHIRMeta $meta = null,
         /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?FHIRUri $implicitRules = null,
+        public ?\FHIRUri $implicitRules = null,
         /** @var string|null language Language of the resource content */
         public ?string $language = null,
         /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
-        public ?FHIRNarrative $text = null,
-        /** @var array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRResource> contained Contained, inline Resources */
+        public ?\FHIRNarrative $text = null,
+        /** @var array<FHIRResource> contained Contained, inline Resources */
         public array $contained = [],
         /** @var array<FHIRExtension> extension Additional content defined by implementations */
         public array $extension = [],
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored */
         public array $modifierExtension = [],
         /** @var FHIRUri|null url Canonical identifier for this operation definition, represented as a URI (globally unique) */
-        public ?FHIRUri $url = null,
+        public ?\FHIRUri $url = null,
         /** @var FHIRString|string|null version Business version of the operation definition */
-        public FHIRString|string|null $version = null,
+        public \FHIRString|string|null $version = null,
         /** @var FHIRString|string|null name Name for this operation definition (computer friendly) */
         #[NotBlank]
-        public FHIRString|string|null $name = null,
+        public \FHIRString|string|null $name = null,
         /** @var FHIRString|string|null title Name for this operation definition (human friendly) */
-        public FHIRString|string|null $title = null,
+        public \FHIRString|string|null $title = null,
         /** @var FHIRPublicationStatusType|null status draft | active | retired | unknown */
         #[NotBlank]
-        public ?FHIRPublicationStatusType $status = null,
+        public ?\FHIRPublicationStatusType $status = null,
         /** @var FHIROperationKindType|null kind operation | query */
         #[NotBlank]
-        public ?FHIROperationKindType $kind = null,
+        public ?\FHIROperationKindType $kind = null,
         /** @var FHIRBoolean|null experimental For testing purposes, not real usage */
-        public ?FHIRBoolean $experimental = null,
+        public ?\FHIRBoolean $experimental = null,
         /** @var FHIRDateTime|null date Date last changed */
-        public ?FHIRDateTime $date = null,
+        public ?\FHIRDateTime $date = null,
         /** @var FHIRString|string|null publisher Name of the publisher (organization or individual) */
-        public FHIRString|string|null $publisher = null,
+        public \FHIRString|string|null $publisher = null,
         /** @var array<FHIRContactDetail> contact Contact details for the publisher */
         public array $contact = [],
         /** @var FHIRMarkdown|null description Natural language description of the operation definition */
-        public ?FHIRMarkdown $description = null,
+        public ?\FHIRMarkdown $description = null,
         /** @var array<FHIRUsageContext> useContext The context that the content is intended to support */
         public array $useContext = [],
         /** @var array<FHIRCodeableConcept> jurisdiction Intended jurisdiction for operation definition (if applicable) */
         public array $jurisdiction = [],
         /** @var FHIRMarkdown|null purpose Why this operation definition is defined */
-        public ?FHIRMarkdown $purpose = null,
+        public ?\FHIRMarkdown $purpose = null,
         /** @var FHIRBoolean|null affectsState Whether content is changed by the operation */
-        public ?FHIRBoolean $affectsState = null,
+        public ?\FHIRBoolean $affectsState = null,
         /** @var FHIRCode|null code Name used to invoke the operation */
         #[NotBlank]
-        public ?FHIRCode $code = null,
+        public ?\FHIRCode $code = null,
         /** @var FHIRMarkdown|null comment Additional information about use */
-        public ?FHIRMarkdown $comment = null,
+        public ?\FHIRMarkdown $comment = null,
         /** @var FHIRCanonical|null base Marks this as a profile of the base */
-        public ?FHIRCanonical $base = null,
+        public ?\FHIRCanonical $base = null,
         /** @var array<FHIRResourceTypeType> resource Types this operation applies to */
         public array $resource = [],
         /** @var FHIRBoolean|null system Invoke at the system level? */
         #[NotBlank]
-        public ?FHIRBoolean $system = null,
+        public ?\FHIRBoolean $system = null,
         /** @var FHIRBoolean|null type Invoke at the type level? */
         #[NotBlank]
-        public ?FHIRBoolean $type = null,
+        public ?\FHIRBoolean $type = null,
         /** @var FHIRBoolean|null instance Invoke on an instance? */
         #[NotBlank]
-        public ?FHIRBoolean $instance = null,
+        public ?\FHIRBoolean $instance = null,
         /** @var FHIRCanonical|null inputProfile Validation information for in parameters */
-        public ?FHIRCanonical $inputProfile = null,
+        public ?\FHIRCanonical $inputProfile = null,
         /** @var FHIRCanonical|null outputProfile Validation information for out parameters */
-        public ?FHIRCanonical $outputProfile = null,
+        public ?\FHIRCanonical $outputProfile = null,
         /** @var array<FHIROperationDefinitionParameter> parameter Parameters for the operation/query */
         public array $parameter = [],
         /** @var array<FHIROperationDefinitionOverload> overload Define overloaded variants for when  generating code */

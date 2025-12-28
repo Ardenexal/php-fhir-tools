@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRQuantity;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,12 +22,12 @@ class FHIRConditionDefinitionPrecondition extends \Ardenexal\FHIRTools\Component
         public array $modifierExtension = [],
         /** @var FHIRConditionPreconditionTypeType|null type sensitive | specific */
         #[NotBlank]
-        public ?FHIRConditionPreconditionTypeType $type = null,
+        public ?\FHIRConditionPreconditionTypeType $type = null,
         /** @var FHIRCodeableConcept|null code Code for relevant Observation */
         #[NotBlank]
-        public ?FHIRCodeableConcept $code = null,
+        public ?\FHIRCodeableConcept $code = null,
         /** @var FHIRCodeableConcept|FHIRQuantity|null valueX Value of Observation */
-        public FHIRCodeableConcept|FHIRQuantity|null $valueX = null,
+        public \FHIRCodeableConcept|\FHIRQuantity|null $valueX = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

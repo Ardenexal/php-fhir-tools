@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRMarkdown;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 
 /**
  * @description An "outcome measure", "endpoint", "effect measure" or "measure of effect" is a specific measurement or observation used to quantify the effect of experimental variables on the participants in a study, or for observational studies, to describe patterns of diseases or traits or associations with exposures, risk factors or treatment.
@@ -25,13 +20,13 @@ class FHIRResearchStudyOutcomeMeasure extends \Ardenexal\FHIRTools\Component\Mod
         /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         public array $modifierExtension = [],
         /** @var FHIRString|string|null name Label for the outcome */
-        public FHIRString|string|null $name = null,
+        public \FHIRString|string|null $name = null,
         /** @var array<FHIRCodeableConcept> type primary | secondary | exploratory */
         public array $type = [],
         /** @var FHIRMarkdown|null description Description of the outcome */
-        public ?FHIRMarkdown $description = null,
+        public ?\FHIRMarkdown $description = null,
         /** @var FHIRReference|null reference Structured outcome definition */
-        public ?FHIRReference $reference = null,
+        public ?\FHIRReference $reference = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

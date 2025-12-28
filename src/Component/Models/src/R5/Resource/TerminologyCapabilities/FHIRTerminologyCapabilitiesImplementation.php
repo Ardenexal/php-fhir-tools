@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUrl;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,9 +22,9 @@ class FHIRTerminologyCapabilitiesImplementation extends \Ardenexal\FHIRTools\Com
         public array $modifierExtension = [],
         /** @var FHIRString|string|null description Describes this specific instance */
         #[NotBlank]
-        public FHIRString|string|null $description = null,
+        public \FHIRString|string|null $description = null,
         /** @var FHIRUrl|null url Base URL for the implementation */
-        public ?FHIRUrl $url = null,
+        public ?\FHIRUrl $url = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }
