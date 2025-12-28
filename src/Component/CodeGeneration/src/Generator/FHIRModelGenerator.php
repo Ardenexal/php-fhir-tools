@@ -356,7 +356,10 @@ class FHIRModelGenerator implements GeneratorInterface
                         'fhirVersion'    => $version,
                     ]);
                     $backboneElementNamespace = $this->getNamespaceForFhirType('BackboneElement', $version, $builderContext);
-                    $childClass->setExtends(name: $backboneElementNamespace . '\\' . self::DEFAULT_CLASS_PREFIX . 'BackboneElement');
+                    $backboneElementFqcn      = $backboneElementNamespace . '\\' . self::DEFAULT_CLASS_PREFIX . 'BackboneElement';
+                    $childClass->setExtends(name: $backboneElementFqcn);
+                    // Add use statement for the parent class
+                    $namespace->addUse($backboneElementFqcn);
                 } elseif ($isElement) {
                     // Add comment for regular complex elements
                     $childClass->addAttribute('Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType', [
@@ -364,7 +367,10 @@ class FHIRModelGenerator implements GeneratorInterface
                         'fhirVersion' => $version,
                     ]);
                     $elementNamespace = $this->getNamespaceForFhirType('Element', $version, $builderContext);
-                    $childClass->setExtends($elementNamespace . '\\' . self::DEFAULT_CLASS_PREFIX . 'Element');
+                    $elementFqcn      = $elementNamespace . '\\' . self::DEFAULT_CLASS_PREFIX . 'Element';
+                    $childClass->setExtends($elementFqcn);
+                    // Add use statement for the parent class
+                    $namespace->addUse($elementFqcn);
                 }
 
                 if (isset($element['definition'])) {
