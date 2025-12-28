@@ -189,7 +189,9 @@ class FHIRModelGenerator implements GeneratorInterface
         string $version,
         BuilderContextInterface $builderContext
     ): ClassType {
-        $className = self::DEFAULT_CLASS_PREFIX . $enumType->getName() . 'Type';
+        // Enum names already have the FHIR prefix, so don't add it again
+        $enumName  = $enumType->getName();
+        $className = $enumName . 'Type';
         $namespace = $builderContext->getElementNamespace($version);
         $class     = new ClassType($className, $namespace);
 
@@ -209,9 +211,11 @@ class FHIRModelGenerator implements GeneratorInterface
         // Add constructor with enum value parameter
         $constructor   = $class->addMethod('__construct');
         $enumNamespace = $builderContext->getEnumNamespace($version)->getName();
+        // Enum name already includes FHIR prefix
+        $enumFullName = '\\' . $enumNamespace . '\\' . $enumName;
         $constructor->addPromotedParameter('value', null)
-            ->setType('\\' . $enumNamespace . '\\' . self::DEFAULT_CLASS_PREFIX . $enumType->getName() . '|string|null')
-            ->addComment('@var \\' . $enumNamespace . '\\' . self::DEFAULT_CLASS_PREFIX . $enumType->getName() . '|string|null $value The code value');
+            ->setType($enumFullName . '|string|null')
+            ->addComment('@var ' . $enumFullName . '|string|null $value The code value');
 
         return $class;
     }
@@ -835,7 +839,8 @@ class FHIRModelGenerator implements GeneratorInterface
         // Check if enum already exists
         $enum = $builderContext->getEnum($valueSetUrl);
         if ($enum !== null) {
-            return '\\' . $targetElementNamespace . '\\' . self::DEFAULT_CLASS_PREFIX . $enum->getName() . 'Type';
+            // Enum name already includes FHIR prefix, just add 'Type' suffix
+            return '\\' . $targetElementNamespace . '\\' . $enum->getName() . 'Type';
         }
 
         // Handle versioned ValueSet URLs by extracting base URL for resolution
