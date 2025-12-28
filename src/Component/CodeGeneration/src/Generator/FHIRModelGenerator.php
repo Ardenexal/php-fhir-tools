@@ -195,7 +195,10 @@ class FHIRModelGenerator implements GeneratorInterface
 
         // Extend FHIRCode base type
         $codeNamespace = $this->getNamespaceForFhirType('code', $version, $builderContext);
-        $class->setExtends($codeNamespace . '\\' . self::DEFAULT_CLASS_PREFIX . 'Code');
+        $codeFqcn      = $codeNamespace . '\\' . self::DEFAULT_CLASS_PREFIX . 'Code';
+        $class->setExtends($codeFqcn);
+        // Add use statement for the parent class
+        $namespace->addUse($codeFqcn);
 
         // Add documentation
         $class->addComment('@fhir-code-type ' . $enumType->getName());
@@ -230,7 +233,10 @@ class FHIRModelGenerator implements GeneratorInterface
         if (isset($structureDefinition['baseDefinition'])) {
             $parent          = str_replace('http://hl7.org/fhir/StructureDefinition/', '', $structureDefinition['baseDefinition']);
             $parentNamespace = $this->getNamespaceForFhirType($parent, $version, $builderContext);
-            $class->setExtends($parentNamespace . '\\' . self::DEFAULT_CLASS_PREFIX . u($parent)->pascal());
+            $parentFqcn      = $parentNamespace . '\\' . self::DEFAULT_CLASS_PREFIX . u($parent)->pascal();
+            $class->setExtends($parentFqcn);
+            // Add use statement for the parent class
+            $namespace->addUse($parentFqcn);
         }
 
         // Add appropriate FHIR attributes based on the structure definition kind
