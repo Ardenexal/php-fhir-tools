@@ -210,13 +210,19 @@ class FHIRModelGenerator implements GeneratorInterface
         $class->addComment('@description Code type wrapper for ' . $enumType->getName() . ' enum');
 
         // Add constructor with enum value parameter
+        // Note: We accept string|null (same as parent) for PHP compatibility, but document the expected enum
         $constructor   = $class->addMethod('__construct');
         $enumNamespace = $builderContext->getEnumNamespace($version)->getName();
         // Enum name already includes FHIR prefix
         $enumFullName = '\\' . $enumNamespace . '\\' . $enumName;
-        $constructor->addPromotedParameter('value', null)
-            ->setType($enumFullName . '|string|null')
-            ->addComment('@var ' . $enumFullName . '|string|null $value The code value');
+
+        // Accept string|null to match parent, but document the expected enum type
+        $constructor->addParameter('value', null)
+            ->setType('string|null')
+            ->addComment('@param ' . $enumFullName . '|string|null $value The code value (enum or string)');
+
+        // Call parent constructor with the value
+        $constructor->setBody('parent::__construct(value: $value);');
 
         return $class;
     }
