@@ -363,7 +363,8 @@ class FHIRModelGenerator implements GeneratorInterface
                 $this->trackValueSetDependencies($element, $builderContext);
 
                 $className  = self::DEFAULT_CLASS_PREFIX . u($element['path'])->pascal();
-                $namespace  = $builderContext->getElementNamespace($version);
+                // Use parent's namespace for backbone elements instead of Element namespace
+                $namespace  = $classNamespace;
                 $childClass = new ClassType($className, $namespace);
                 $childClass->addMethod('__construct');
                 $builderContext->addType($element['path'], $childClass);
@@ -579,7 +580,15 @@ class FHIRModelGenerator implements GeneratorInterface
             if ($relatedClass === null) {
                 throw GenerationException::missingContentReference($element['contentReference'], $element['path']);
             }
-            $types[] = '\\' . $builderContext->getElementNamespace($version)->getName() . '\\' . $relatedClass->getName();
+            $relatedNamespace = $relatedClass->getNamespace();
+            if ($relatedNamespace !== null) {
+                error_log("ContentReference {$contentRef} found in namespace: {$relatedNamespace->getName()}");
+                $types[] = '\\' . $relatedNamespace->getName() . '\\' . $relatedClass->getName();
+            } else {
+                // Fallback to Element namespace
+                error_log("ContentReference {$contentRef} has no namespace, using Element namespace");
+                $types[] = '\\' . $builderContext->getElementNamespace($version)->getName() . '\\' . $relatedClass->getName();
+            }
         } elseif (isset($element['type'])) {
             foreach ($element['type'] as $type) {
                 $code = $type['code'];
@@ -634,13 +643,33 @@ class FHIRModelGenerator implements GeneratorInterface
 
                 if ($code === 'Element') {
                     $elementClass = u($element['path'])->pascal()->toString();
-                    $types[]      = '\\' . $targetElementNamespace . '\\' . self::DEFAULT_CLASS_PREFIX . $elementClass;
+                    // Look up the element from the builder context to get its actual namespace
+                    $storedElement = $builderContext->getType($element['path']);
+                    if ($storedElement !== null && $storedElement->getNamespace() !== null) {
+                        // Use the namespace from the stored element
+                        $types[] = '\\' . $storedElement->getNamespace()->getName() . '\\' . self::DEFAULT_CLASS_PREFIX . $elementClass;
+                    } else {
+                        // Fallback to parent's namespace if not found in context
+                        $types[] = '\\' . $namespace->getName() . '\\' . self::DEFAULT_CLASS_PREFIX . $elementClass;
+                    }
                     continue;
                 }
 
                 if ($code === 'BackboneElement') {
                     $elementClass = u($element['path'])->pascal()->toString();
-                    $types[]      = '\\' . $targetElementNamespace . '\\' . self::DEFAULT_CLASS_PREFIX . $elementClass;
+                    // Look up the backbone element from the builder context to get its actual namespace
+                    $storedElement = $builderContext->getType($element['path']);
+                    if ($storedElement !== null && $storedElement->getNamespace() !== null) {
+                        // Use the namespace from the stored backbone element
+                        $elementNamespace = $storedElement->getNamespace()->getName();
+                        error_log("Found backbone element {$element['path']} in namespace: {$elementNamespace}");
+                        $types[] = '\\' . $elementNamespace . '\\' . self::DEFAULT_CLASS_PREFIX . $elementClass;
+                    } else {
+                        // Fallback to parent's namespace if not found in context
+                        $fallbackNamespace = $namespace->getName();
+                        error_log("Backbone element {$element['path']} not found in context, using fallback namespace: {$fallbackNamespace}");
+                        $types[] = '\\' . $fallbackNamespace . '\\' . self::DEFAULT_CLASS_PREFIX . $elementClass;
+                    }
                     continue;
                 }
 
@@ -823,12 +852,16 @@ class FHIRModelGenerator implements GeneratorInterface
             return $builderContext->getElementNamespace($version)->getName();
         }
 
-        // For complex data types, try to use datatype namespace if available
+        // For complex data types and backbone elements, try to use datatype namespace if available
         try {
-            return $builderContext->getDatatypeNamespace($version)->getName();
+            $datatypeNamespace = $builderContext->getDatatypeNamespace($version)->getName();
+            error_log("Type code '{$code}' using DataType namespace: {$datatypeNamespace}");
+            return $datatypeNamespace;
         } catch (GenerationException) {
             // Fallback to element namespace if datatype namespace is not available
-            return $builderContext->getElementNamespace($version)->getName();
+            $elementNamespace = $builderContext->getElementNamespace($version)->getName();
+            error_log("Type code '{$code}' falling back to Element namespace: {$elementNamespace}");
+            return $elementNamespace;
         }
     }
 
