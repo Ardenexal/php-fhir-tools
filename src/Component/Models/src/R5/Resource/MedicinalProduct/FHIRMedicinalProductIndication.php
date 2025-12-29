@@ -48,7 +48,7 @@ class FHIRMedicinalProductIndication extends FHIRDomainResource
 		public array $otherTherapy = [],
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference> undesirableEffect Describe the undesirable effects of the medicinal product */
 		public array $undesirableEffect = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRPopulation> population The population group to which this applies */
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRPopulation> population The population group to which this applies */
 		public array $population = [],
 	) {
 		parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

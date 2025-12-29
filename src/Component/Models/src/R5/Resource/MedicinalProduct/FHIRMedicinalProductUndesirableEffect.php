@@ -40,7 +40,7 @@ class FHIRMedicinalProductUndesirableEffect extends FHIRDomainResource
 		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept $classification = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept frequencyOfOccurrence The frequency of occurrence of the effect */
 		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept $frequencyOfOccurrence = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRPopulation> population The population group to which this applies */
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRPopulation> population The population group to which this applies */
 		public array $population = [],
 	) {
 		parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

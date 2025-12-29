@@ -33,8 +33,8 @@ class FHIRMedicinalProductPackagedPackageItem extends \Ardenexal\FHIRTools\Compo
 		public array $manufacturedItem = [],
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRMedicinalProductPackagedPackageItem> packageItem Allows containers within containers */
 		public array $packageItem = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRProdCharacteristic physicalCharacteristics Dimensions, color etc. */
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRProdCharacteristic $physicalCharacteristics = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRProdCharacteristic physicalCharacteristics Dimensions, color etc. */
+		public ?FHIRProdCharacteristic $physicalCharacteristics = null,
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept> otherCharacteristics Other codeable characteristics */
 		public array $otherCharacteristics = [],
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRProductShelfLife> shelfLifeStorage Shelf Life and storage information */

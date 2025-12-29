@@ -744,21 +744,25 @@ class FHIRModelGenerator implements GeneratorInterface
 
         // Special logical types that changed namespace between FHIR versions
         // In R4/R4B: These types are in Resource namespace (logical/backbone types)
-        // In R5: They moved to DataType namespace
-        $versionSpecificLogicalTypes = [
-            'Dosage',
-            'Timing',
-            'ElementDefinition',
-            'SubstanceAmount',
-            'ProductShelfLife',  // ProductShelfLife is also version-specific
-            'ProdCharacteristic', // Product Characteristic
-            'MarketingStatus',   // Marketing Status
-            'Population',        // Population definition
+        // In R5: Some moved to DataType namespace, others stayed in Resource namespace
+        $typesMovedToDataTypeInR5 = [
+            'Dosage',           // Moved to DataType in R5
+            'Timing',           // Moved to DataType in R5
+            'ElementDefinition', // Moved to DataType in R5
+            'ProductShelfLife',  // Moved to DataType in R5
+            'MarketingStatus',   // Moved to DataType in R5
         ];
 
-        if (in_array($code, $versionSpecificLogicalTypes, true)) {
+        // Types that remain in Resource namespace across all versions
+        $typesAlwaysInResource = [
+            'SubstanceAmount',    // Stays in Resource even in R5
+            'ProdCharacteristic', // Stays in Resource even in R5
+            'Population',         // Stays in Resource even in R5
+        ];
+
+        if (in_array($code, $typesMovedToDataTypeInR5, true)) {
             // In R4 and R4B, these are logical types (Resource-like structures)
-            // In R5, they are data types
+            // In R5, they moved to DataType namespace
             if (in_array($version, ['R4', 'R4B'], true)) {
                 return $builderContext->getElementNamespace($version)->getName();
             }
@@ -769,6 +773,11 @@ class FHIRModelGenerator implements GeneratorInterface
                 // Fallback to element namespace if datatype namespace is not available
                 return $builderContext->getElementNamespace($version)->getName();
             }
+        }
+
+        if (in_array($code, $typesAlwaysInResource, true)) {
+            // These types always stay in Resource namespace
+            return $builderContext->getElementNamespace($version)->getName();
         }
 
         // List of known FHIR primitive types
