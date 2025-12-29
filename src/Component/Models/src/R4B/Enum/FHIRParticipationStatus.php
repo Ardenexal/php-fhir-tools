@@ -1,26 +1,24 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: ParticipationStatus
  * URL: http://hl7.org/fhir/ValueSet/participationstatus
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The Participation status of an appointment.
  */
 enum FHIRParticipationStatus: string
 {
-    /** Accepted */
-    case accepted = 'accepted';
+	/** Accepted */
+	case accepted = 'accepted';
 
-    /** Declined */
-    case declined = 'declined';
+	/** Declined */
+	case declined = 'declined';
 
-    /** Tentative */
-    case tentative = 'tentative';
+	/** Tentative */
+	case tentative = 'tentative';
 
-    /** Needs Action */
-    case needsaction = 'needs-action';
+	/** Needs Action */
+	case needsaction = 'needs-action';
 }

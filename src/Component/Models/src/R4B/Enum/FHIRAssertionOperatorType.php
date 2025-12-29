@@ -1,47 +1,45 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: AssertionOperatorType
  * URL: http://hl7.org/fhir/ValueSet/assert-operator-codes
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The type of operator to use for assertion.
  */
 enum FHIRAssertionOperatorType: string
 {
-    /** equals */
-    case equals = 'equals';
+	/** equals */
+	case equals = 'equals';
 
-    /** notEquals */
-    case notequals = 'notEquals';
+	/** notEquals */
+	case notequals = 'notEquals';
 
-    /** in */
-    case in = 'in';
+	/** in */
+	case in = 'in';
 
-    /** notIn */
-    case notin = 'notIn';
+	/** notIn */
+	case notin = 'notIn';
 
-    /** greaterThan */
-    case greaterthan = 'greaterThan';
+	/** greaterThan */
+	case greaterthan = 'greaterThan';
 
-    /** lessThan */
-    case lessthan = 'lessThan';
+	/** lessThan */
+	case lessthan = 'lessThan';
 
-    /** empty */
-    case empty = 'empty';
+	/** empty */
+	case empty = 'empty';
 
-    /** notEmpty */
-    case notempty = 'notEmpty';
+	/** notEmpty */
+	case notempty = 'notEmpty';
 
-    /** contains */
-    case contains = 'contains';
+	/** contains */
+	case contains = 'contains';
 
-    /** notContains */
-    case notcontains = 'notContains';
+	/** notContains */
+	case notcontains = 'notContains';
 
-    /** evaluate */
-    case evaluate = 'eval';
+	/** evaluate */
+	case evaluate = 'eval';
 }

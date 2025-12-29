@@ -1,38 +1,36 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: RelatedArtifactType
  * URL: http://hl7.org/fhir/ValueSet/related-artifact-type
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The type of relationship to the related artifact.
  */
 enum FHIRRelatedArtifactType: string
 {
-    /** Documentation */
-    case documentation = 'documentation';
+	/** Documentation */
+	case documentation = 'documentation';
 
-    /** Justification */
-    case justification = 'justification';
+	/** Justification */
+	case justification = 'justification';
 
-    /** Citation */
-    case citation = 'citation';
+	/** Citation */
+	case citation = 'citation';
 
-    /** Predecessor */
-    case predecessor = 'predecessor';
+	/** Predecessor */
+	case predecessor = 'predecessor';
 
-    /** Successor */
-    case successor = 'successor';
+	/** Successor */
+	case successor = 'successor';
 
-    /** Derived From */
-    case derivedfrom = 'derived-from';
+	/** Derived From */
+	case derivedfrom = 'derived-from';
 
-    /** Depends On */
-    case dependson = 'depends-on';
+	/** Depends On */
+	case dependson = 'depends-on';
 
-    /** Composed Of */
-    case composedof = 'composed-of';
+	/** Composed Of */
+	case composedof = 'composed-of';
 }

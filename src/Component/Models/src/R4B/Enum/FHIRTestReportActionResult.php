@@ -1,29 +1,27 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: TestReportActionResult
  * URL: http://hl7.org/fhir/ValueSet/report-action-result-codes
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The results of executing an action.
  */
 enum FHIRTestReportActionResult: string
 {
-    /** Pass */
-    case pass = 'pass';
+	/** Pass */
+	case pass = 'pass';
 
-    /** Skip */
-    case skip = 'skip';
+	/** Skip */
+	case skip = 'skip';
 
-    /** Fail */
-    case fail = 'fail';
+	/** Fail */
+	case fail = 'fail';
 
-    /** Warning */
-    case warning = 'warning';
+	/** Warning */
+	case warning = 'warning';
 
-    /** Error */
-    case error = 'error';
+	/** Error */
+	case error = 'error';
 }

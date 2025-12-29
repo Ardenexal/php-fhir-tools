@@ -1,29 +1,27 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: IdentifierUse
  * URL: http://hl7.org/fhir/ValueSet/identifier-use
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Identifies the purpose for this identifier, if known .
  */
 enum FHIRIdentifierUse: string
 {
-    /** Usual */
-    case usual = 'usual';
+	/** Usual */
+	case usual = 'usual';
 
-    /** Official */
-    case official = 'official';
+	/** Official */
+	case official = 'official';
 
-    /** Temp */
-    case temp = 'temp';
+	/** Temp */
+	case temp = 'temp';
 
-    /** Secondary */
-    case secondary = 'secondary';
+	/** Secondary */
+	case secondary = 'secondary';
 
-    /** Old */
-    case old = 'old';
+	/** Old */
+	case old = 'old';
 }

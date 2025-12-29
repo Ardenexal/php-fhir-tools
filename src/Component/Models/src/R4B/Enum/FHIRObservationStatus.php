@@ -1,35 +1,33 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: ObservationStatus
  * URL: http://hl7.org/fhir/ValueSet/observation-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Codes providing the status of an observation.
  */
 enum FHIRObservationStatus: string
 {
-    /** Registered */
-    case registered = 'registered';
+	/** Registered */
+	case registered = 'registered';
 
-    /** Preliminary */
-    case preliminary = 'preliminary';
+	/** Preliminary */
+	case preliminary = 'preliminary';
 
-    /** Final */
-    case final = 'final';
+	/** Final */
+	case final = 'final';
 
-    /** Amended */
-    case amended = 'amended';
+	/** Amended */
+	case amended = 'amended';
 
-    /** Cancelled */
-    case cancelled = 'cancelled';
+	/** Cancelled */
+	case cancelled = 'cancelled';
 
-    /** Entered in Error */
-    case enteredinerror = 'entered-in-error';
+	/** Entered in Error */
+	case enteredinerror = 'entered-in-error';
 
-    /** Unknown */
-    case unknown = 'unknown';
+	/** Unknown */
+	case unknown = 'unknown';
 }

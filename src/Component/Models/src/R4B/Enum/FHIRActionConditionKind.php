@@ -1,23 +1,21 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: ActionConditionKind
  * URL: http://hl7.org/fhir/ValueSet/action-condition-kind
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Defines the kinds of conditions that can appear on actions.
  */
 enum FHIRActionConditionKind: string
 {
-    /** Applicability */
-    case applicability = 'applicability';
+	/** Applicability */
+	case applicability = 'applicability';
 
-    /** Start */
-    case start = 'start';
+	/** Start */
+	case start = 'start';
 
-    /** Stop */
-    case stop = 'stop';
+	/** Stop */
+	case stop = 'stop';
 }

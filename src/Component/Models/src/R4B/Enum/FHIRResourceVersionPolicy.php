@@ -1,23 +1,21 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: ResourceVersionPolicy
  * URL: http://hl7.org/fhir/ValueSet/versioning-policy
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: How the system supports versioning for a resource.
  */
 enum FHIRResourceVersionPolicy: string
 {
-    /** No VersionId Support */
-    case noversionidsupport = 'no-version';
+	/** No VersionId Support */
+	case noversionidsupport = 'no-version';
 
-    /** Versioned */
-    case versioned = 'versioned';
+	/** Versioned */
+	case versioned = 'versioned';
 
-    /** VersionId tracked fully */
-    case versionidtrackedfully = 'versioned-update';
+	/** VersionId tracked fully */
+	case versionidtrackedfully = 'versioned-update';
 }

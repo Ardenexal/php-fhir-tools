@@ -1044,7 +1044,8 @@ class FHIRModelGeneratorCommand extends Command
     public function outputFiles(OutputInterface $output, string $version): void
     {
         foreach ($this->context->getTypes() as $type) {
-            $elementNamespace = $this->context->getElementNamespace($version);
+            // Use the namespace from the ClassType itself to preserve use statements
+            $elementNamespace = $type->getNamespace() ?? $this->context->getElementNamespace($version);
             $classContents    = self::asPhpFile($type, $elementNamespace);
             $path             = Path::canonicalize(__DIR__ . '/../output/' . $elementNamespace->getName() . '/' . $type->getName() . '.php');
             $this->filesystem->dumpFile($path, $classContents);
@@ -1070,10 +1071,23 @@ class FHIRModelGeneratorCommand extends Command
     {
         $printer = new Printer();
 
+        // Manually build use statements from the namespace
+        $uses = [];
+        foreach ($namespace->getUses() as $alias => $original) {
+            // Check if this is a simple use (no alias) or aliased use
+            $shortName = substr($original, strrpos($original, '\\') + 1);
+            if ($shortName === $alias) {
+                $uses[] = "use {$original};";
+            } else {
+                $uses[] = "use {$original} as {$alias};";
+            }
+        }
+        $usesSection = $uses ? "\n" . implode("\n", $uses) . "\n" : '';
+
         return <<<PHP
         <?php declare(strict_types=1);
 
-        namespace {$namespace->getName()};
+        namespace {$namespace->getName()};{$usesSection}
 
         {$printer->printClass($classType, $namespace)}
         PHP;
@@ -1127,20 +1141,19 @@ class FHIRModelGeneratorCommand extends Command
                 $enumNamespace = $this->context->getEnumNamespace($version);
                 $enumTypeName  = $enumType->getName();
                 if ($enumTypeName !== null) {
-                    // Use hasClass to check existence instead of getClass
-                    $hasClass = false;
+                    // Try to add enum to namespace, handling duplicates gracefully
                     try {
-                        $hasClass = $elementNamespace->getClass($codeTypeName ?? '') instanceof ClassType;
-                    } catch (\Throwable $e) {
-                        $hasClass = false;
-                    }
-                    if (!$hasClass) {
                         $enumNamespace->add($enumType);
                         $this->context->addEnum($url, $enumType);
-                    } else {
-                        $output->writeln("Enum class {$enumTypeName} already exists in namespace, skipping namespace addition");
-                        // Still add to context for tracking
-                        $this->context->addEnum($url, $enumType);
+                    } catch (\Nette\InvalidStateException $e) {
+                        // Enum with this name already exists in namespace
+                        if (str_contains($e->getMessage(), 'already exists')) {
+                            $output->writeln("Enum class {$enumTypeName} already exists in namespace, skipping namespace addition");
+                            // Still add to context for tracking with this URL
+                            $this->context->addEnum($url, $enumType);
+                        } else {
+                            throw $e;
+                        }
                     }
                 } else {
                     $this->context->addEnum($url, $enumType);
@@ -1151,21 +1164,20 @@ class FHIRModelGeneratorCommand extends Command
                 $this->context->removePendingType($url);
                 $this->context->removePendingEnum($url);
 
-                // Add code type to namespace safely
-                $elementNamespace = $this->context->getElementNamespace($version);
-                $codeTypeName     = $codeType->getName();
+                // Add code type to DataType namespace safely (code types extend FHIRCode which is a primitive)
+                $dataTypeNamespace = $this->context->getDatatypeNamespace($version);
+                $codeTypeName      = $codeType->getName();
                 if ($codeTypeName !== null) {
-                    // Use hasClass to check existence instead of getClass
-                    $hasClass = false;
+                    // Try to add code type to namespace, handling duplicates gracefully
                     try {
-                        $hasClass = $elementNamespace->getClass($codeTypeName) instanceof ClassType;
-                    } catch (\Throwable $e) {
-                        $hasClass = false;
-                    }
-                    if (!$hasClass) {
-                        $elementNamespace->add($codeType);
-                    } else {
-                        $output->writeln("Code type class {$codeTypeName} already exists in namespace, skipping namespace addition");
+                        $dataTypeNamespace->add($codeType);
+                    } catch (\Nette\InvalidStateException $e) {
+                        // Code type with this name already exists in namespace
+                        if (str_contains($e->getMessage(), 'already exists')) {
+                            $output->writeln("Code type class {$codeTypeName} already exists in namespace, skipping namespace addition");
+                        } else {
+                            throw $e;
+                        }
                     }
                 }
             } catch (GenerationException $e) {

@@ -1,23 +1,21 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: TestReportResult
  * URL: http://hl7.org/fhir/ValueSet/report-result-codes
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The reported execution result.
  */
 enum FHIRTestReportResult: string
 {
-    /** Pass */
-    case pass = 'pass';
+	/** Pass */
+	case pass = 'pass';
 
-    /** Fail */
-    case fail = 'fail';
+	/** Fail */
+	case fail = 'fail';
 
-    /** Pending */
-    case pending = 'pending';
+	/** Pending */
+	case pending = 'pending';
 }

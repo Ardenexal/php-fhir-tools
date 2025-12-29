@@ -1,26 +1,24 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: GraphCompartmentRule
  * URL: http://hl7.org/fhir/ValueSet/graph-compartment-rule
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: How a compartment must be linked.
  */
 enum FHIRGraphCompartmentRule: string
 {
-    /** Identical */
-    case identical = 'identical';
+	/** Identical */
+	case identical = 'identical';
 
-    /** Matching */
-    case matching = 'matching';
+	/** Matching */
+	case matching = 'matching';
 
-    /** Different */
-    case different = 'different';
+	/** Different */
+	case different = 'different';
 
-    /** Custom */
-    case custom = 'custom';
+	/** Custom */
+	case custom = 'custom';
 }

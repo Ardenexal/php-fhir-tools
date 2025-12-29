@@ -1,20 +1,18 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: SortDirection
  * URL: http://hl7.org/fhir/ValueSet/sort-direction
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The possible sort directions, ascending or descending.
  */
 enum FHIRSortDirection: string
 {
-    /** Ascending */
-    case ascending = 'ascending';
+	/** Ascending */
+	case ascending = 'ascending';
 
-    /** Descending */
-    case descending = 'descending';
+	/** Descending */
+	case descending = 'descending';
 }

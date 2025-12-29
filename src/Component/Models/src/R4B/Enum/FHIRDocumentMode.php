@@ -1,20 +1,18 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: DocumentMode
  * URL: http://hl7.org/fhir/ValueSet/document-mode
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Whether the application produces or consumes documents.
  */
 enum FHIRDocumentMode: string
 {
-    /** Producer */
-    case producer = 'producer';
+	/** Producer */
+	case producer = 'producer';
 
-    /** Consumer */
-    case consumer = 'consumer';
+	/** Consumer */
+	case consumer = 'consumer';
 }

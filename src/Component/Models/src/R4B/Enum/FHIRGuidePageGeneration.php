@@ -1,26 +1,24 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: GuidePageGeneration
  * URL: http://hl7.org/fhir/ValueSet/guide-page-generation
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: A code that indicates how the page is generated.
  */
 enum FHIRGuidePageGeneration: string
 {
-    /** HTML */
-    case html = 'html';
+	/** HTML */
+	case html = 'html';
 
-    /** Markdown */
-    case markdown = 'markdown';
+	/** Markdown */
+	case markdown = 'markdown';
 
-    /** XML */
-    case xml = 'xml';
+	/** XML */
+	case xml = 'xml';
 
-    /** Generated */
-    case generated = 'generated';
+	/** Generated */
+	case generated = 'generated';
 }

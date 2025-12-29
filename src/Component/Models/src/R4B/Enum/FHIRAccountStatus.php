@@ -1,29 +1,27 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: AccountStatus
  * URL: http://hl7.org/fhir/ValueSet/account-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Indicates whether the account is available to be used.
  */
 enum FHIRAccountStatus: string
 {
-    /** Active */
-    case active = 'active';
+	/** Active */
+	case active = 'active';
 
-    /** Inactive */
-    case inactive = 'inactive';
+	/** Inactive */
+	case inactive = 'inactive';
 
-    /** Entered in error */
-    case enteredinerror = 'entered-in-error';
+	/** Entered in error */
+	case enteredinerror = 'entered-in-error';
 
-    /** On Hold */
-    case onhold = 'on-hold';
+	/** On Hold */
+	case onhold = 'on-hold';
 
-    /** Unknown */
-    case unknown = 'unknown';
+	/** Unknown */
+	case unknown = 'unknown';
 }

@@ -1,53 +1,26 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBase64Binary;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCode;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDate;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDecimal;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRId;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRInstant;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRInteger;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRMarkdown;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIROid;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRPositiveInt;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRTime;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUnsignedInt;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUrl;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUuid;
-use Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRElement;
-use Symfony\Component\Validator\Constraints\NotBlank;
-
 /**
  * @author HL7 FHIR Standard
- *
  * @see http://hl7.org/fhir/StructureDefinition/Extension
- *
  * @description Optional Extension Element - found in all resources.
  */
-#[FHIRComplexType(typeName: 'Extension', fhirVersion: 'R4B')]
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType(typeName: 'Extension', fhirVersion: 'R4B')]
 class FHIRExtension extends FHIRElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<FHIRExtension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var string|null url identifies the meaning of the extension */
-        #[NotBlank]
-        public ?string $url = null,
-        /** @var FHIRBase64Binary|FHIRBoolean|FHIRCanonical|FHIRCode|FHIRDate|FHIRDateTime|FHIRDecimal|FHIRId|FHIRInstant|FHIRInteger|FHIRMarkdown|FHIROid|FHIRPositiveInt|FHIRString|string|FHIRTime|FHIRUnsignedInt|FHIRUri|FHIRUrl|FHIRUuid|FHIRAddress|FHIRAge|FHIRAnnotation|FHIRAttachment|FHIRCodeableConcept|FHIRCodeableReference|FHIRCoding|FHIRContactPoint|FHIRCount|FHIRDistance|FHIRDuration|FHIRHumanName|FHIRIdentifier|FHIRMoney|FHIRPeriod|FHIRQuantity|FHIRRange|FHIRRatio|FHIRRatioRange|FHIRReference|FHIRSampledData|FHIRSignature|FHIRTiming|FHIRContactDetail|FHIRContributor|FHIRDataRequirement|FHIRExpression|FHIRParameterDefinition|FHIRRelatedArtifact|FHIRTriggerDefinition|FHIRUsageContext|FHIRDosage|null valueX Value of extension */
-        public FHIRBase64Binary|FHIRBoolean|FHIRCanonical|FHIRCode|FHIRDate|FHIRDateTime|FHIRDecimal|FHIRId|FHIRInstant|FHIRInteger|FHIRMarkdown|FHIROid|FHIRPositiveInt|FHIRString|string|FHIRTime|FHIRUnsignedInt|FHIRUri|FHIRUrl|FHIRUuid|FHIRAddress|FHIRAge|FHIRAnnotation|FHIRAttachment|FHIRCodeableConcept|FHIRCodeableReference|FHIRCoding|FHIRContactPoint|FHIRCount|FHIRDistance|FHIRDuration|FHIRHumanName|FHIRIdentifier|FHIRMoney|FHIRPeriod|FHIRQuantity|FHIRRange|FHIRRatio|FHIRRatioRange|FHIRReference|FHIRSampledData|FHIRSignature|FHIRTiming|FHIRContactDetail|FHIRContributor|FHIRDataRequirement|FHIRExpression|FHIRParameterDefinition|FHIRRelatedArtifact|FHIRTriggerDefinition|FHIRUsageContext|FHIRDosage|null $valueX = null,
-    ) {
-        parent::__construct($id, $extension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var null|string url identifies the meaning of the extension */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?string $url = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBase64Binary|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCanonical|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCode|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDate|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDecimal|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRId|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRInstant|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRInteger|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRMarkdown|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIROid|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRPositiveInt|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRTime|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUnsignedInt|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUrl|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUuid|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRAddress|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRAge|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRAnnotation|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRAttachment|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableReference|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCoding|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRContactPoint|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCount|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRDistance|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRDuration|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRHumanName|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRIdentifier|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMoney|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRRange|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRRatio|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRRatioRange|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRSampledData|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRSignature|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRTiming|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRContactDetail|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRContributor|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRDataRequirement|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExpression|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRParameterDefinition|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRRelatedArtifact|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRTriggerDefinition|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRUsageContext|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRDosage valueX Value of extension */
+		public \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBase64Binary|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCanonical|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCode|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDate|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDecimal|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRId|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRInstant|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRInteger|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRMarkdown|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIROid|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRPositiveInt|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRTime|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUnsignedInt|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUrl|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUuid|FHIRAddress|FHIRAge|FHIRAnnotation|FHIRAttachment|FHIRCodeableConcept|FHIRCodeableReference|FHIRCoding|FHIRContactPoint|FHIRCount|FHIRDistance|FHIRDuration|FHIRHumanName|FHIRIdentifier|FHIRMoney|FHIRPeriod|FHIRQuantity|FHIRRange|FHIRRatio|FHIRRatioRange|FHIRReference|FHIRSampledData|FHIRSignature|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRTiming|FHIRContactDetail|FHIRContributor|FHIRDataRequirement|FHIRExpression|FHIRParameterDefinition|FHIRRelatedArtifact|FHIRTriggerDefinition|FHIRUsageContext|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRDosage|null $valueX = null,
+	) {
+		parent::__construct($id, $extension);
+	}
 }

@@ -1,20 +1,18 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: CodeSearchSupport
  * URL: http://hl7.org/fhir/ValueSet/code-search-support
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The degree to which the server supports the code search parameter on ValueSet, if it is supported.
  */
 enum FHIRCodeSearchSupport: string
 {
-    /** Explicit Codes */
-    case explicitcodes = 'explicit';
+	/** Explicit Codes */
+	case explicitcodes = 'explicit';
 
-    /** Implicit Codes */
-    case implicitcodes = 'all';
+	/** Implicit Codes */
+	case implicitcodes = 'all';
 }

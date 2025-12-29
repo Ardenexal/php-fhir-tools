@@ -1,23 +1,21 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: ResearchElementType
  * URL: http://hl7.org/fhir/ValueSet/research-element-type
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The possible types of research elements (E.g. Population, Exposure, Outcome).
  */
 enum FHIRResearchElementType: string
 {
-    /** Population */
-    case population = 'population';
+	/** Population */
+	case population = 'population';
 
-    /** Exposure */
-    case exposure = 'exposure';
+	/** Exposure */
+	case exposure = 'exposure';
 
-    /** Outcome */
-    case outcome = 'outcome';
+	/** Outcome */
+	case outcome = 'outcome';
 }

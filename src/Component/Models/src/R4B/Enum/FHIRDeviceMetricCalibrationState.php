@@ -1,26 +1,24 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: DeviceMetricCalibrationState
  * URL: http://hl7.org/fhir/ValueSet/metric-calibration-state
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Describes the state of a metric calibration.
  */
 enum FHIRDeviceMetricCalibrationState: string
 {
-    /** Not Calibrated */
-    case notcalibrated = 'not-calibrated';
+	/** Not Calibrated */
+	case notcalibrated = 'not-calibrated';
 
-    /** Calibration Required */
-    case calibrationrequired = 'calibration-required';
+	/** Calibration Required */
+	case calibrationrequired = 'calibration-required';
 
-    /** Calibrated */
-    case calibrated = 'calibrated';
+	/** Calibrated */
+	case calibrated = 'calibrated';
 
-    /** Unspecified */
-    case unspecified = 'unspecified';
+	/** Unspecified */
+	case unspecified = 'unspecified';
 }

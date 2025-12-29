@@ -1,23 +1,21 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: MeasureReportStatus
  * URL: http://hl7.org/fhir/ValueSet/measure-report-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The status of the measure report.
  */
 enum FHIRMeasureReportStatus: string
 {
-    /** Complete */
-    case complete = 'complete';
+	/** Complete */
+	case complete = 'complete';
 
-    /** Pending */
-    case pending = 'pending';
+	/** Pending */
+	case pending = 'pending';
 
-    /** Error */
-    case error = 'error';
+	/** Error */
+	case error = 'error';
 }

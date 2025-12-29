@@ -1,32 +1,30 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: ConsentState
  * URL: http://hl7.org/fhir/ValueSet/consent-state-codes
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Indicates the state of the consent.
  */
 enum FHIRConsentState: string
 {
-    /** Pending */
-    case pending = 'draft';
+	/** Pending */
+	case pending = 'draft';
 
-    /** Proposed */
-    case proposed = 'proposed';
+	/** Proposed */
+	case proposed = 'proposed';
 
-    /** Active */
-    case active = 'active';
+	/** Active */
+	case active = 'active';
 
-    /** Rejected */
-    case rejected = 'rejected';
+	/** Rejected */
+	case rejected = 'rejected';
 
-    /** Inactive */
-    case inactive = 'inactive';
+	/** Inactive */
+	case inactive = 'inactive';
 
-    /** Entered in Error */
-    case enteredinerror = 'entered-in-error';
+	/** Entered in Error */
+	case enteredinerror = 'entered-in-error';
 }

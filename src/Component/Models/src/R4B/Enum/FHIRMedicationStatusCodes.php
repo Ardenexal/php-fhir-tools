@@ -1,38 +1,21 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
- * ValueSet: Medication  status  codes
- * URL: http://hl7.org/fhir/ValueSet/medication-statement-status
- * Version: 4.0.1
+ * ValueSet: Medication Status Codes
+ * URL: http://hl7.org/fhir/ValueSet/medication-status
+ * Version: 4.3.0
  * Description: Medication Status Codes
  */
 enum FHIRMedicationStatusCodes: string
 {
-    /** Active */
-    case active = 'active';
+	/** Active */
+	case active = 'active';
 
-    /** Completed */
-    case completed = 'completed';
+	/** Inactive */
+	case inactive = 'inactive';
 
-    /** Entered in Error */
-    case enteredinerror = 'entered-in-error';
-
-    /** Intended */
-    case intended = 'intended';
-
-    /** Stopped */
-    case stopped = 'stopped';
-
-    /** On Hold */
-    case onhold = 'on-hold';
-
-    /** Unknown */
-    case unknown = 'unknown';
-
-    /** Not Taken */
-    case nottaken = 'not-taken';
+	/** Entered in Error */
+	case enteredinerror = 'entered-in-error';
 }

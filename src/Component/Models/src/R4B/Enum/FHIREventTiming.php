@@ -1,104 +1,102 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: EventTiming
  * URL: http://hl7.org/fhir/ValueSet/event-timing
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Real world event relating to the schedule.
  */
 enum FHIREventTiming: string
 {
-    /** Morning */
-    case morning = 'MORN';
+	/** Morning */
+	case morning = 'MORN';
 
-    /** Early Morning */
-    case earlymorning = 'MORN.early';
+	/** Early Morning */
+	case earlymorning = 'MORN.early';
 
-    /** Late Morning */
-    case latemorning = 'MORN.late';
+	/** Late Morning */
+	case latemorning = 'MORN.late';
 
-    /** Noon */
-    case noon = 'NOON';
+	/** Noon */
+	case noon = 'NOON';
 
-    /** Afternoon */
-    case afternoon = 'AFT';
+	/** Afternoon */
+	case afternoon = 'AFT';
 
-    /** Early Afternoon */
-    case earlyafternoon = 'AFT.early';
+	/** Early Afternoon */
+	case earlyafternoon = 'AFT.early';
 
-    /** Late Afternoon */
-    case lateafternoon = 'AFT.late';
+	/** Late Afternoon */
+	case lateafternoon = 'AFT.late';
 
-    /** Evening */
-    case evening = 'EVE';
+	/** Evening */
+	case evening = 'EVE';
 
-    /** Early Evening */
-    case earlyevening = 'EVE.early';
+	/** Early Evening */
+	case earlyevening = 'EVE.early';
 
-    /** Late Evening */
-    case lateevening = 'EVE.late';
+	/** Late Evening */
+	case lateevening = 'EVE.late';
 
-    /** Night */
-    case night = 'NIGHT';
+	/** Night */
+	case night = 'NIGHT';
 
-    /** After Sleep */
-    case aftersleep = 'PHS';
+	/** After Sleep */
+	case aftersleep = 'PHS';
 
-    /** AC */
-    case ac = 'AC';
+	/** AC */
+	case ac = 'AC';
 
-    /** ACD */
-    case acd = 'ACD';
+	/** ACD */
+	case acd = 'ACD';
 
-    /** ACM */
-    case acm = 'ACM';
+	/** ACM */
+	case acm = 'ACM';
 
-    /** ACV */
-    case acv = 'ACV';
+	/** ACV */
+	case acv = 'ACV';
 
-    /** C */
-    case c = 'C';
+	/** C */
+	case c = 'C';
 
-    /** HS */
-    case hs = 'HS';
+	/** HS */
+	case hs = 'HS';
 
-    /** IC */
-    case ic = 'IC';
+	/** IC */
+	case ic = 'IC';
 
-    /** ICD */
-    case icd = 'ICD';
+	/** ICD */
+	case icd = 'ICD';
 
-    /** ICM */
-    case icm = 'ICM';
+	/** ICM */
+	case icm = 'ICM';
 
-    /** ICV */
-    case icv = 'ICV';
+	/** ICV */
+	case icv = 'ICV';
 
-    /** PC */
-    case pc = 'PC';
+	/** PC */
+	case pc = 'PC';
 
-    /** PCD */
-    case pcd = 'PCD';
+	/** PCD */
+	case pcd = 'PCD';
 
-    /** PCM */
-    case pcm = 'PCM';
+	/** PCM */
+	case pcm = 'PCM';
 
-    /** PCV */
-    case pcv = 'PCV';
+	/** PCV */
+	case pcv = 'PCV';
 
-    /** WAKE */
-    case wake = 'WAKE';
+	/** WAKE */
+	case wake = 'WAKE';
 
-    /** CM */
-    case cm = 'CM';
+	/** CM */
+	case cm = 'CM';
 
-    /** CD */
-    case cd = 'CD';
+	/** CD */
+	case cd = 'CD';
 
-    /** CV */
-    case cv = 'CV';
+	/** CV */
+	case cv = 'CV';
 }

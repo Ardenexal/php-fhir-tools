@@ -1,26 +1,24 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: StructureDefinitionKind
  * URL: http://hl7.org/fhir/ValueSet/structure-definition-kind
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Defines the type of structure that a definition is describing.
  */
 enum FHIRStructureDefinitionKind: string
 {
-    /** Primitive Data Type */
-    case primitivedatatype = 'primitive-type';
+	/** Primitive Data Type */
+	case primitivedatatype = 'primitive-type';
 
-    /** Complex Data Type */
-    case complexdatatype = 'complex-type';
+	/** Complex Data Type */
+	case complexdatatype = 'complex-type';
 
-    /** Resource */
-    case resource = 'resource';
+	/** Resource */
+	case resource = 'resource';
 
-    /** Logical */
-    case logical = 'logical';
+	/** Logical */
+	case logical = 'logical';
 }

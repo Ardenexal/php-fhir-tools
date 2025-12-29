@@ -1,32 +1,30 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: GroupType
  * URL: http://hl7.org/fhir/ValueSet/group-type
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Types of resources that are part of group.
  */
 enum FHIRGroupType: string
 {
-    /** Person */
-    case person = 'person';
+	/** Person */
+	case person = 'person';
 
-    /** Animal */
-    case animal = 'animal';
+	/** Animal */
+	case animal = 'animal';
 
-    /** Practitioner */
-    case practitioner = 'practitioner';
+	/** Practitioner */
+	case practitioner = 'practitioner';
 
-    /** Device */
-    case device = 'device';
+	/** Device */
+	case device = 'device';
 
-    /** Medication */
-    case medication = 'medication';
+	/** Medication */
+	case medication = 'medication';
 
-    /** Substance */
-    case substance = 'substance';
+	/** Substance */
+	case substance = 'substance';
 }

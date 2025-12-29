@@ -1,50 +1,48 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: TaskStatus
  * URL: http://hl7.org/fhir/ValueSet/task-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The current status of the task.
  */
 enum FHIRTaskStatus: string
 {
-    /** Draft */
-    case draft = 'draft';
+	/** Draft */
+	case draft = 'draft';
 
-    /** Requested */
-    case requested = 'requested';
+	/** Requested */
+	case requested = 'requested';
 
-    /** Received */
-    case received = 'received';
+	/** Received */
+	case received = 'received';
 
-    /** Accepted */
-    case accepted = 'accepted';
+	/** Accepted */
+	case accepted = 'accepted';
 
-    /** Rejected */
-    case rejected = 'rejected';
+	/** Rejected */
+	case rejected = 'rejected';
 
-    /** Ready */
-    case ready = 'ready';
+	/** Ready */
+	case ready = 'ready';
 
-    /** Cancelled */
-    case cancelled = 'cancelled';
+	/** Cancelled */
+	case cancelled = 'cancelled';
 
-    /** In Progress */
-    case inprogress = 'in-progress';
+	/** In Progress */
+	case inprogress = 'in-progress';
 
-    /** On Hold */
-    case onhold = 'on-hold';
+	/** On Hold */
+	case onhold = 'on-hold';
 
-    /** Failed */
-    case failed = 'failed';
+	/** Failed */
+	case failed = 'failed';
 
-    /** Completed */
-    case completed = 'completed';
+	/** Completed */
+	case completed = 'completed';
 
-    /** Entered in Error */
-    case enteredinerror = 'entered-in-error';
+	/** Entered in Error */
+	case enteredinerror = 'entered-in-error';
 }

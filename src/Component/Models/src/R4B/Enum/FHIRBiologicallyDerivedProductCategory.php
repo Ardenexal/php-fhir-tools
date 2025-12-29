@@ -1,29 +1,27 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: BiologicallyDerivedProductCategory
  * URL: http://hl7.org/fhir/ValueSet/product-category
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Biologically Derived Product Category.
  */
 enum FHIRBiologicallyDerivedProductCategory: string
 {
-    /** Organ */
-    case organ = 'organ';
+	/** Organ */
+	case organ = 'organ';
 
-    /** Tissue */
-    case tissue = 'tissue';
+	/** Tissue */
+	case tissue = 'tissue';
 
-    /** Fluid */
-    case fluid = 'fluid';
+	/** Fluid */
+	case fluid = 'fluid';
 
-    /** Cells */
-    case cells = 'cells';
+	/** Cells */
+	case cells = 'cells';
 
-    /** BiologicalAgent */
-    case biologicalagent = 'biologicalAgent';
+	/** BiologicalAgent */
+	case biologicalagent = 'biologicalAgent';
 }

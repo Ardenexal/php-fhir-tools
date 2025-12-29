@@ -1,20 +1,18 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: OperationKind
  * URL: http://hl7.org/fhir/ValueSet/operation-kind
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Whether an operation is a normal operation or a query.
  */
 enum FHIROperationKind: string
 {
-    /** Operation */
-    case operation = 'operation';
+	/** Operation */
+	case operation = 'operation';
 
-    /** Query */
-    case query = 'query';
+	/** Query */
+	case query = 'query';
 }

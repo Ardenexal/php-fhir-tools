@@ -1,20 +1,18 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: GraphCompartmentUse
  * URL: http://hl7.org/fhir/ValueSet/graph-compartment-use
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Defines how a compartment rule is used.
  */
 enum FHIRGraphCompartmentUse: string
 {
-    /** Condition */
-    case condition = 'condition';
+	/** Condition */
+	case condition = 'condition';
 
-    /** Requirement */
-    case requirement = 'requirement';
+	/** Requirement */
+	case requirement = 'requirement';
 }

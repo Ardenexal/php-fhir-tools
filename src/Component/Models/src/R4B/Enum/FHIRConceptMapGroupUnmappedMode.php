@@ -1,23 +1,21 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: ConceptMapGroupUnmappedMode
  * URL: http://hl7.org/fhir/ValueSet/conceptmap-unmapped-mode
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Defines which action to take if there is no match in the group.
  */
 enum FHIRConceptMapGroupUnmappedMode: string
 {
-    /** Provided Code */
-    case providedcode = 'provided';
+	/** Provided Code */
+	case providedcode = 'provided';
 
-    /** Fixed Code */
-    case fixedcode = 'fixed';
+	/** Fixed Code */
+	case fixedcode = 'fixed';
 
-    /** Other Map */
-    case othermap = 'other-map';
+	/** Other Map */
+	case othermap = 'other-map';
 }

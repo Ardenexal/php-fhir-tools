@@ -1,44 +1,42 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: AppointmentStatus
  * URL: http://hl7.org/fhir/ValueSet/appointmentstatus
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The free/busy status of an appointment.
  */
 enum FHIRAppointmentStatus: string
 {
-    /** Proposed */
-    case proposed = 'proposed';
+	/** Proposed */
+	case proposed = 'proposed';
 
-    /** Pending */
-    case pending = 'pending';
+	/** Pending */
+	case pending = 'pending';
 
-    /** Booked */
-    case booked = 'booked';
+	/** Booked */
+	case booked = 'booked';
 
-    /** Arrived */
-    case arrived = 'arrived';
+	/** Arrived */
+	case arrived = 'arrived';
 
-    /** Fulfilled */
-    case fulfilled = 'fulfilled';
+	/** Fulfilled */
+	case fulfilled = 'fulfilled';
 
-    /** Cancelled */
-    case cancelled = 'cancelled';
+	/** Cancelled */
+	case cancelled = 'cancelled';
 
-    /** No Show */
-    case noshow = 'noshow';
+	/** No Show */
+	case noshow = 'noshow';
 
-    /** Entered in error */
-    case enteredinerror = 'entered-in-error';
+	/** Entered in error */
+	case enteredinerror = 'entered-in-error';
 
-    /** Checked In */
-    case checkedin = 'checked-in';
+	/** Checked In */
+	case checkedin = 'checked-in';
 
-    /** Waitlisted */
-    case waitlisted = 'waitlist';
+	/** Waitlisted */
+	case waitlisted = 'waitlist';
 }

@@ -1,29 +1,27 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: QuestionnaireResponseStatus
  * URL: http://hl7.org/fhir/ValueSet/questionnaire-answers-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Lifecycle status of the questionnaire response.
  */
 enum FHIRQuestionnaireResponseStatus: string
 {
-    /** In Progress */
-    case inprogress = 'in-progress';
+	/** In Progress */
+	case inprogress = 'in-progress';
 
-    /** Completed */
-    case completed = 'completed';
+	/** Completed */
+	case completed = 'completed';
 
-    /** Amended */
-    case amended = 'amended';
+	/** Amended */
+	case amended = 'amended';
 
-    /** Entered in Error */
-    case enteredinerror = 'entered-in-error';
+	/** Entered in Error */
+	case enteredinerror = 'entered-in-error';
 
-    /** Stopped */
-    case stopped = 'stopped';
+	/** Stopped */
+	case stopped = 'stopped';
 }

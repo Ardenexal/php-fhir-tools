@@ -1,35 +1,33 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: DiagnosticReportStatus
  * URL: http://hl7.org/fhir/ValueSet/diagnostic-report-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The status of the diagnostic report.
  */
 enum FHIRDiagnosticReportStatus: string
 {
-    /** Registered */
-    case registered = 'registered';
+	/** Registered */
+	case registered = 'registered';
 
-    /** Partial */
-    case partial = 'partial';
+	/** Partial */
+	case partial = 'partial';
 
-    /** Final */
-    case final = 'final';
+	/** Final */
+	case final = 'final';
 
-    /** Amended */
-    case amended = 'amended';
+	/** Amended */
+	case amended = 'amended';
 
-    /** Cancelled */
-    case cancelled = 'cancelled';
+	/** Cancelled */
+	case cancelled = 'cancelled';
 
-    /** Entered in Error */
-    case enteredinerror = 'entered-in-error';
+	/** Entered in Error */
+	case enteredinerror = 'entered-in-error';
 
-    /** Unknown */
-    case unknown = 'unknown';
+	/** Unknown */
+	case unknown = 'unknown';
 }

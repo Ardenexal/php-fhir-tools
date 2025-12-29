@@ -1,37 +1,29 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
-
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRAddress;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRContactPoint;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRHumanName;
 
 /**
  * @description Contact for the organization for a certain purpose.
  */
 #[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'Organization', elementPath: 'Organization.contact', fhirVersion: 'R4B')]
-class FHIROrganizationContact extends FHIRBackboneElement
+class FHIROrganizationContact extends \Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRBackboneElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<FHIRExtension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        public array $modifierExtension = [],
-        /** @var FHIRCodeableConcept|null purpose The type of contact */
-        public ?FHIRCodeableConcept $purpose = null,
-        /** @var FHIRHumanName|null name A name associated with the contact */
-        public ?FHIRHumanName $name = null,
-        /** @var array<FHIRContactPoint> telecom Contact details (telephone, email, etc.)  for a contact */
-        public array $telecom = [],
-        /** @var FHIRAddress|null address Visiting or postal addresses for the contact */
-        public ?FHIRAddress $address = null,
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept purpose The type of contact */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept $purpose = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRHumanName name A name associated with the contact */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRHumanName $name = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRContactPoint> telecom Contact details (telephone, email, etc.)  for a contact */
+		public array $telecom = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRAddress address Visiting or postal addresses for the contact */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRAddress $address = null,
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }
