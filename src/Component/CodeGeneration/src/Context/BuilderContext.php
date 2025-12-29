@@ -51,6 +51,20 @@ class BuilderContext implements BuilderContextInterface
     private array $enumNamespaces = [];
 
     /**
+     * Namespaces for primitive classes organized by FHIR version
+     *
+     * @var array<string, PhpNamespace>
+     */
+    private array $primitiveNamespaces = [];
+
+    /**
+     * Namespaces for datatype classes organized by FHIR version
+     *
+     * @var array<string, PhpNamespace>
+     */
+    private array $datatypeNamespaces = [];
+
+    /**
      * Raw FHIR definitions loaded from packages, keyed by URL
      *
      * @var array<string, array<string, mixed>>
@@ -171,6 +185,34 @@ class BuilderContext implements BuilderContextInterface
     public function addEnumNamespace(string $version, PhpNamespace $namespace): void
     {
         $this->enumNamespaces[$version] = $namespace;
+    }
+
+    public function getPrimitiveNamespace(string $version): PhpNamespace
+    {
+        if (!isset($this->primitiveNamespaces[$version])) {
+            throw GenerationException::missingNamespace($version, 'primitive');
+        }
+
+        return $this->primitiveNamespaces[$version];
+    }
+
+    public function addPrimitiveNamespace(string $version, PhpNamespace $namespace): void
+    {
+        $this->primitiveNamespaces[$version] = $namespace;
+    }
+
+    public function getDatatypeNamespace(string $version): PhpNamespace
+    {
+        if (!isset($this->datatypeNamespaces[$version])) {
+            throw GenerationException::missingNamespace($version, 'datatype');
+        }
+
+        return $this->datatypeNamespaces[$version];
+    }
+
+    public function addDatatypeNamespace(string $version, PhpNamespace $namespace): void
+    {
+        $this->datatypeNamespaces[$version] = $namespace;
     }
 
     /**

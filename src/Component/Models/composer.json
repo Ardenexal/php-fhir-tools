@@ -1,0 +1,50 @@
+{
+    "name": "ardenexal/fhir-models",
+    "description": "Pre-generated FHIR model classes for R4, R4B, and R5 versions",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "FHIR Tools Contributors",
+            "email": "contributors@fhirtools.dev"
+        }
+    ],
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=8.2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^12.5",
+        "giorgiosironi/eris": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ardenexal\\FHIRTools\\Component\\Models\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ardenexal\\FHIRTools\\Component\\Models\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "test-coverage": "phpunit --coverage-html coverage"
+    },
+    "keywords": [
+        "fhir",
+        "healthcare",
+        "hl7",
+        "models",
+        "php",
+        "r4",
+        "r4b",
+        "r5"
+    ],
+    "homepage": "https://github.com/ardenexal/fhir-tools",
+    "support": {
+        "issues": "https://github.com/ardenexal/fhir-tools/issues",
+        "source": "https://github.com/ardenexal/fhir-tools"
+    }
+}
