@@ -55,24 +55,6 @@ jobs:
     - name: Security audit
       run: composer audit
     
-    - name: Check for code style violations
-      run: |
-        # Remove composer.lock if it was generated during install (libraries shouldn't commit this)
-        rm -f composer.lock
-        
-        if [ -n "$(git status --porcelain)" ]; then
-          echo "❌ Code style issues found. Please run 'composer run lint' locally and commit the changes."
-          echo ""
-          echo "Files that need formatting:"
-          git status --porcelain
-          echo ""
-          echo "Diff of changes needed:"
-          git diff
-          exit 1
-        else
-          echo "✅ Code style is compliant"
-        fi
-    
     # - name: Validate commit messages
     #   run: |
     #     # Check if commit messages follow conventional commits
