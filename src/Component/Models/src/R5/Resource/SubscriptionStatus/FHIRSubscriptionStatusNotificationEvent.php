@@ -15,9 +15,9 @@ class FHIRSubscriptionStatusNotificationEvent extends \Ardenexal\FHIRTools\Compo
 		public array $extension = [],
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
 		public array $modifierExtension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRInteger64 eventNumber Sequencing index of this event */
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInteger64 eventNumber Sequencing index of this event */
 		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRInteger64 $eventNumber = null,
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInteger64 $eventNumber = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInstant timestamp The instant this event occurred */
 		public ?\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInstant $timestamp = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference focus Reference to the primary resource or information of this event */

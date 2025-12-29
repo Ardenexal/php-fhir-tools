@@ -775,6 +775,7 @@ class FHIRModelGenerator implements GeneratorInterface
         $primitiveTypes = [
             'boolean',
             'integer',
+            'integer64',  // Added in R5 for very large whole numbers
             'string',
             'decimal',
             'uri',

@@ -37,8 +37,8 @@ class FHIRSubscriptionStatus extends FHIRDomainResource
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRSubscriptionNotificationTypeType type handshake | heartbeat | event-notification | query-status | query-event */
 		#[\Symfony\Component\Validator\Constraints\NotBlank]
 		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRSubscriptionNotificationTypeType $type = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRInteger64 eventsSinceSubscriptionStart Events since the Subscription was created */
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRInteger64 $eventsSinceSubscriptionStart = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInteger64 eventsSinceSubscriptionStart Events since the Subscription was created */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInteger64 $eventsSinceSubscriptionStart = null,
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRSubscriptionStatusNotificationEvent> notificationEvent Detailed information about any events relevant to this notification */
 		public array $notificationEvent = [],
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference subscription Reference to the Subscription responsible for this notification */

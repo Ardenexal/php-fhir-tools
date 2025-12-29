@@ -23,8 +23,8 @@ class FHIRAttachment extends FHIRDataType
 		public ?\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBase64Binary $data = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUrl url Uri where the data can be found */
 		public ?\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUrl $url = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRInteger64 size Number of bytes of content (if url provided) */
-		public ?FHIRInteger64 $size = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInteger64 size Number of bytes of content (if url provided) */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInteger64 $size = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBase64Binary hash Hash of the data (sha-1, base64ed) */
 		public ?\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBase64Binary $hash = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString|string title Label to display in place of the data */
