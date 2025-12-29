@@ -1,0 +1,17 @@
+<?php declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
+
+/**
+ * @fhir-code-type FHIRVisionBase
+ * @description Code type wrapper for FHIRVisionBase enum
+ */
+class FHIRVisionBaseType extends \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCode
+{
+	public function __construct(
+		/** @param \Ardenexal\FHIRTools\Component\Models\R4B\Enum\FHIRVisionBase|string|null $value The code value (enum or string) */
+		string|null $value = null,
+	) {
+		parent::__construct(value: $value);
+	}
+}
