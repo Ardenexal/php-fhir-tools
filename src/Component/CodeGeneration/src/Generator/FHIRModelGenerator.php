@@ -736,7 +736,7 @@ class FHIRModelGenerator implements GeneratorInterface
     {
         // First, check if this type has already been generated and stored in the builder context
         // This ensures we use the actual namespace where the type was generated
-        $className = self::DEFAULT_CLASS_PREFIX . u($code)->pascal();
+        $className  = self::DEFAULT_CLASS_PREFIX . u($code)->pascal();
         $storedType = $builderContext->getType($className);
         if ($storedType !== null && $storedType->getNamespace() !== null) {
             return $storedType->getNamespace()->getName();
