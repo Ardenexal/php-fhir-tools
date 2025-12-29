@@ -17,7 +17,7 @@ class FHIRNutritionOrderOralDiet extends \Ardenexal\FHIRTools\Component\Models\R
 		public array $modifierExtension = [],
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept> type Type of oral diet or diet restrictions that describe what can be consumed orally */
 		public array $type = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRTiming> schedule Scheduled frequency of diet */
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRTiming> schedule Scheduled frequency of diet */
 		public array $schedule = [],
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRNutritionOrderOralDietNutrient> nutrient Required  nutrient modifications */
 		public array $nutrient = [],

@@ -34,8 +34,8 @@ class FHIRContractTermAction extends \Ardenexal\FHIRTools\Component\Models\R4\Da
 		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference $context = null,
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string> contextLinkId Pointer to specific item */
 		public array $contextLinkId = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRTiming occurrenceX When action happens */
-		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRTiming|null $occurrenceX = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRTiming occurrenceX When action happens */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod|FHIRTiming|null $occurrenceX = null,
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference> requester Who asked for action */
 		public array $requester = [],
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string> requesterLinkId Pointer to specific item */

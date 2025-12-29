@@ -705,24 +705,6 @@ class FHIRModelGenerator implements GeneratorInterface
         $isArray    = !in_array($maxValue, ['1', '0'], true);
         $isNullable = $minValue === 0 && $isArray === false;
 
-        // Add use statements for all fully qualified class names in $types
-        // Keep the fully qualified names for setType() - Nette will resolve them to short names
-        foreach ($types as $type) {
-            // Only process fully qualified class names (starting with \)
-            if (str_starts_with($type, '\\') && !str_contains($type, 'DateTimeInterface')) {
-                $fqcn = ltrim($type, '\\');
-                // Extract the namespace part from the FQCN
-                $lastBackslash = strrpos($fqcn, '\\');
-                if ($lastBackslash !== false) {
-                    $typeNamespace = substr($fqcn, 0, $lastBackslash);
-                    // Only add use statement if the type is from a different namespace
-                    if ($typeNamespace !== $namespace->getName()) {
-                        $namespace->addUse($fqcn);
-                    }
-                }
-            }
-        }
-
         if ($maxValue !== '0') {
             $shortDescription = $element['short'] ?? '';
             if ($isArray) {
@@ -752,6 +734,39 @@ class FHIRModelGenerator implements GeneratorInterface
      */
     private function getNamespaceForFhirType(string $code, string $version, BuilderContextInterface $builderContext): string
     {
+        // First, check if this type has already been generated and stored in the builder context
+        // This ensures we use the actual namespace where the type was generated
+        $className = self::DEFAULT_CLASS_PREFIX . u($code)->pascal();
+        $storedType = $builderContext->getType($className);
+        if ($storedType !== null && $storedType->getNamespace() !== null) {
+            return $storedType->getNamespace()->getName();
+        }
+
+        // Special logical types that changed namespace between FHIR versions
+        // In R4/R4B: Dosage, Timing, ElementDefinition, SubstanceAmount are in Resource namespace
+        // In R5: They moved to DataType namespace
+        $versionSpecificLogicalTypes = [
+            'Dosage',
+            'Timing',
+            'ElementDefinition',
+            'SubstanceAmount',
+        ];
+
+        if (in_array($code, $versionSpecificLogicalTypes, true)) {
+            // In R4 and R4B, these are logical types (Resource-like structures)
+            // In R5, they are data types
+            if (in_array($version, ['R4', 'R4B'], true)) {
+                return $builderContext->getElementNamespace($version)->getName();
+            }
+            // In R5 and later, they are in DataType namespace
+            try {
+                return $builderContext->getDatatypeNamespace($version)->getName();
+            } catch (GenerationException) {
+                // Fallback to element namespace if datatype namespace is not available
+                return $builderContext->getElementNamespace($version)->getName();
+            }
+        }
+
         // List of known FHIR primitive types
         $primitiveTypes = [
             'boolean',

@@ -44,8 +44,8 @@ class FHIRDeviceUseStatement extends FHIRDomainResource
 		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference $subject = null,
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference> derivedFrom Supporting information */
 		public array $derivedFrom = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRTiming|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime timingX How often  the device was used */
-		public \Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRTiming|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime|null $timingX = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRTiming|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime timingX How often  the device was used */
+		public FHIRTiming|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime|null $timingX = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime recordedOn When statement was recorded */
 		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime $recordedOn = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference source Who made the statement */

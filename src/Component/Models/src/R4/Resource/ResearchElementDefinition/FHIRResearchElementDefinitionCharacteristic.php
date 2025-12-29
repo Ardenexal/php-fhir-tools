@@ -26,16 +26,16 @@ class FHIRResearchElementDefinitionCharacteristic extends \Ardenexal\FHIRTools\C
 		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept $unitOfMeasure = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string studyEffectiveDescription What time period does the study cover */
 		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string|null $studyEffectiveDescription = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDuration|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRTiming studyEffectiveX What time period does the study cover */
-		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDuration|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRTiming|null $studyEffectiveX = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDuration|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRTiming studyEffectiveX What time period does the study cover */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDuration|FHIRTiming|null $studyEffectiveX = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDuration studyEffectiveTimeFromStart Observation time from study start */
 		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDuration $studyEffectiveTimeFromStart = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRGroupMeasureType studyEffectiveGroupMeasure mean | median | mean-of-mean | mean-of-median | median-of-mean | median-of-median */
 		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRGroupMeasureType $studyEffectiveGroupMeasure = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string participantEffectiveDescription What time period do participants cover */
 		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string|null $participantEffectiveDescription = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDuration|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRTiming participantEffectiveX What time period do participants cover */
-		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDuration|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRTiming|null $participantEffectiveX = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDuration|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRTiming participantEffectiveX What time period do participants cover */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDuration|FHIRTiming|null $participantEffectiveX = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDuration participantEffectiveTimeFromStart Observation time from study start */
 		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDuration $participantEffectiveTimeFromStart = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRGroupMeasureType participantEffectiveGroupMeasure mean | median | mean-of-mean | mean-of-median | median-of-mean | median-of-median */

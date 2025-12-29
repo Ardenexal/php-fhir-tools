@@ -101,8 +101,8 @@ class FHIRActivityDefinition extends FHIRDomainResource
 		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRRequestPriorityType $priority = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBoolean doNotPerform True if the activity should not be performed */
 		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBoolean $doNotPerform = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRTiming|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRAge|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRRange|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDuration timingX When activity is to occur */
-		public \Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRTiming|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRAge|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRRange|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDuration|null $timingX = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRTiming|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRAge|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRRange|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDuration timingX When activity is to occur */
+		public FHIRTiming|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRAge|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRRange|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDuration|null $timingX = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference location Where it should happen */
 		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference $location = null,
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRActivityDefinitionParticipant> participant Who should participate in the action */
@@ -111,7 +111,7 @@ class FHIRActivityDefinition extends FHIRDomainResource
 		public \Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept|null $productX = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRQuantity quantity How much is administered/consumed/supplied */
 		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRQuantity $quantity = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDosage> dosage Detailed dosage instructions */
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRDosage> dosage Detailed dosage instructions */
 		public array $dosage = [],
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept> bodySite What part of body to perform on */
 		public array $bodySite = [],

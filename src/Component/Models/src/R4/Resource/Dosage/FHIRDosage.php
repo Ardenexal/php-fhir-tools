@@ -25,8 +25,8 @@ class FHIRDosage extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRB
 		public array $additionalInstruction = [],
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string patientInstruction Patient or consumer oriented instructions */
 		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string|null $patientInstruction = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRTiming timing When medication should be administered */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRTiming $timing = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRTiming timing When medication should be administered */
+		public ?FHIRTiming $timing = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBoolean|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept asNeededX Take "as needed" (for x) */
 		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBoolean|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept|null $asNeededX = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept site Body site to administer to */

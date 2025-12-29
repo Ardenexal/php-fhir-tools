@@ -22,7 +22,7 @@ class FHIRMedicationKnowledgeAdministrationGuidelinesDosage extends \Ardenexal\F
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept type Type of dosage */
 		#[\Symfony\Component\Validator\Constraints\NotBlank]
 		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept $type = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDosage> dosage Dosage for the medication for the specific guidelines */
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRDosage> dosage Dosage for the medication for the specific guidelines */
 		public array $dosage = [],
 	) {
 		parent::__construct($id, $extension, $modifierExtension);

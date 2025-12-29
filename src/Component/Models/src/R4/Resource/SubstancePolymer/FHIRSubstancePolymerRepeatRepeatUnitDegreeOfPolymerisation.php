@@ -21,8 +21,8 @@ class FHIRSubstancePolymerRepeatRepeatUnitDegreeOfPolymerisation extends \Ardene
 		public array $modifierExtension = [],
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept degree Todo */
 		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept $degree = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRSubstanceAmount amount Todo */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRSubstanceAmount $amount = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRSubstanceAmount amount Todo */
+		public ?FHIRSubstanceAmount $amount = null,
 	) {
 		parent::__construct($id, $extension, $modifierExtension);
 	}

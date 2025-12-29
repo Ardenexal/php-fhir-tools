@@ -15,8 +15,8 @@ class FHIRNutritionOrderEnteralFormulaAdministration extends \Ardenexal\FHIRTool
 		public array $extension = [],
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
 		public array $modifierExtension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRTiming schedule Scheduled frequency of enteral feeding */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRTiming $schedule = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRTiming schedule Scheduled frequency of enteral feeding */
+		public ?FHIRTiming $schedule = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity quantity The volume of formula to provide */
 		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity $quantity = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRRatio rateX Speed with which the formula is provided per period of time */

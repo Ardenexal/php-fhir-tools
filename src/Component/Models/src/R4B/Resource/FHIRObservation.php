@@ -47,8 +47,8 @@ class FHIRObservation extends FHIRDomainResource
 		public array $focus = [],
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference encounter Healthcare event during which this observation is made */
 		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference $encounter = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRTiming|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRInstant effectiveX Clinically relevant time/time-period for observation */
-		public \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRTiming|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRInstant|null $effectiveX = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRTiming|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRInstant effectiveX Clinically relevant time/time-period for observation */
+		public \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod|FHIRTiming|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRInstant|null $effectiveX = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRInstant issued Date/Time this version was made available */
 		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRInstant $issued = null,
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference> performer Who is responsible for the observation */

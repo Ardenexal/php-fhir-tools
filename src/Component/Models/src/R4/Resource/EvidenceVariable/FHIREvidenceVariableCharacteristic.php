@@ -24,8 +24,8 @@ class FHIREvidenceVariableCharacteristic extends \Ardenexal\FHIRTools\Component\
 		public array $usageContext = [],
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBoolean exclude Whether the characteristic includes or excludes members */
 		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBoolean $exclude = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDuration|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRTiming participantEffectiveX What time period do participants cover */
-		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDuration|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRTiming|null $participantEffectiveX = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDuration|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRTiming participantEffectiveX What time period do participants cover */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDuration|FHIRTiming|null $participantEffectiveX = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDuration timeFromStart Observation time from study start */
 		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDuration $timeFromStart = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRGroupMeasureType groupMeasure mean | median | mean-of-mean | mean-of-median | median-of-mean | median-of-median */

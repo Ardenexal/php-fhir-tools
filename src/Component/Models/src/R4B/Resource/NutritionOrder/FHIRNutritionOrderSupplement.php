@@ -19,7 +19,7 @@ class FHIRNutritionOrderSupplement extends \Ardenexal\FHIRTools\Component\Models
 		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept $type = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string productName Product or brand name of the nutritional supplement */
 		public \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string|null $productName = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRTiming> schedule Scheduled frequency of supplement */
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRTiming> schedule Scheduled frequency of supplement */
 		public array $schedule = [],
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity quantity Amount of the nutritional supplement */
 		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity $quantity = null,

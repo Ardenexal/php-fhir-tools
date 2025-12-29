@@ -74,7 +74,7 @@ class FHIRMedicationDispense extends FHIRDomainResource
 		public array $receiver = [],
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRAnnotation> note Information about the dispense */
 		public array $note = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDosage> dosageInstruction How the medication is to be used by the patient or administered by the caregiver */
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRDosage> dosageInstruction How the medication is to be used by the patient or administered by the caregiver */
 		public array $dosageInstruction = [],
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRMedicationDispenseSubstitution substitution Whether a substitution was performed on the dispense */
 		public ?FHIRMedicationDispenseSubstitution $substitution = null,

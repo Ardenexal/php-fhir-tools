@@ -36,8 +36,8 @@ class FHIRCarePlanActivityDetail extends \Ardenexal\FHIRTools\Component\Models\R
 		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept $statusReason = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean doNotPerform If true, activity is prohibiting action */
 		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean $doNotPerform = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRTiming|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string scheduledX When activity is to occur */
-		public \Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRTiming|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string|null $scheduledX = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRTiming|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string scheduledX When activity is to occur */
+		public FHIRTiming|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string|null $scheduledX = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference location Where it should happen */
 		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference $location = null,
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference> performer Who will be responsible? */

@@ -20,8 +20,8 @@ class FHIRTriggerDefinition extends FHIRElement
 		public ?FHIRTriggerTypeType $type = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string name Name or URI that identifies the event */
 		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string|null $name = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRTiming|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDate|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime timingX Timing of the event */
-		public FHIRTiming|FHIRReference|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDate|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime|null $timingX = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRTiming|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDate|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime timingX Timing of the event */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRTiming|FHIRReference|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDate|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime|null $timingX = null,
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDataRequirement> data Triggering data of the event (multiple = 'and') */
 		public array $data = [],
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExpression condition Whether the event triggers (boolean expression) */

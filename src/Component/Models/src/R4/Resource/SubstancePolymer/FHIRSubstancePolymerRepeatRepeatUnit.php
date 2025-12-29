@@ -19,8 +19,8 @@ class FHIRSubstancePolymerRepeatRepeatUnit extends \Ardenexal\FHIRTools\Componen
 		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept $orientationOfPolymerisation = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string repeatUnit Todo */
 		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string|null $repeatUnit = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRSubstanceAmount amount Todo */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRSubstanceAmount $amount = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRSubstanceAmount amount Todo */
+		public ?FHIRSubstanceAmount $amount = null,
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRSubstancePolymerRepeatRepeatUnitDegreeOfPolymerisation> degreeOfPolymerisation Todo */
 		public array $degreeOfPolymerisation = [],
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRSubstancePolymerRepeatRepeatUnitStructuralRepresentation> structuralRepresentation Todo */

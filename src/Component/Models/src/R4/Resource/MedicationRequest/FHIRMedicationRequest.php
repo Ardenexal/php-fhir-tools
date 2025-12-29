@@ -88,7 +88,7 @@ class FHIRMedicationRequest extends FHIRDomainResource
 		public array $insurance = [],
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRAnnotation> note Information about the prescription */
 		public array $note = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDosage> dosageInstruction How the medication should be taken */
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRDosage> dosageInstruction How the medication should be taken */
 		public array $dosageInstruction = [],
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRMedicationRequestDispenseRequest dispenseRequest Medication supply authorization */
 		public ?FHIRMedicationRequestDispenseRequest $dispenseRequest = null,

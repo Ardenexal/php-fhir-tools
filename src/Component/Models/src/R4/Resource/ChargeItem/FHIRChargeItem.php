@@ -46,8 +46,8 @@ class FHIRChargeItem extends FHIRDomainResource
 		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference $subject = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference context Encounter / Episode associated with event */
 		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference $context = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRTiming occurrenceX When the charged service was applied */
-		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRTiming|null $occurrenceX = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRTiming occurrenceX When the charged service was applied */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod|FHIRTiming|null $occurrenceX = null,
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRChargeItemPerformer> performer Who performed charged service */
 		public array $performer = [],
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference performingOrganization Organization providing the charged service */

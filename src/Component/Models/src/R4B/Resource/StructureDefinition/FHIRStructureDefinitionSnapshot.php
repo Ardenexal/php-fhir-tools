@@ -15,7 +15,7 @@ class FHIRStructureDefinitionSnapshot extends \Ardenexal\FHIRTools\Component\Mod
 		public array $extension = [],
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
 		public array $modifierExtension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRElementDefinition> element Definition of elements in the resource (if no StructureDefinition) */
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRElementDefinition> element Definition of elements in the resource (if no StructureDefinition) */
 		public array $element = [],
 	) {
 		parent::__construct($id, $extension, $modifierExtension);

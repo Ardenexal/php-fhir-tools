@@ -21,8 +21,8 @@ class FHIRSubstancePolymerMonomerSetStartingMaterial extends \Ardenexal\FHIRTool
 		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept $type = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean isDefining Todo */
 		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean $isDefining = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRSubstanceAmount amount Todo */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRSubstanceAmount $amount = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRSubstanceAmount amount Todo */
+		public ?FHIRSubstanceAmount $amount = null,
 	) {
 		parent::__construct($id, $extension, $modifierExtension);
 	}

@@ -69,7 +69,7 @@ class FHIRMedicationStatement extends FHIRDomainResource
 		public array $reasonReference = [],
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRAnnotation> note Further information about the statement */
 		public array $note = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRDosage> dosage Details of how medication is/was taken or should be taken */
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRDosage> dosage Details of how medication is/was taken or should be taken */
 		public array $dosage = [],
 	) {
 		parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

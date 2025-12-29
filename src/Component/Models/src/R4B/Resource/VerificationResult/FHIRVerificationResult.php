@@ -47,8 +47,8 @@ class FHIRVerificationResult extends FHIRDomainResource
 		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept $validationType = null,
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept> validationProcess The primary process by which the target is validated (edit check; value set; primary source; multiple sources; standalone; in context) */
 		public array $validationProcess = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRTiming frequency Frequency of revalidation */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRTiming $frequency = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRTiming frequency Frequency of revalidation */
+		public ?FHIRTiming $frequency = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime lastPerformed The date/time validation was last completed (including failed validations) */
 		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime $lastPerformed = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDate nextScheduled The date when target is next validated, if appropriate */

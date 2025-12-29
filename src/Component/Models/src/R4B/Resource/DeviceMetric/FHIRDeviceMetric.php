@@ -45,8 +45,8 @@ class FHIRDeviceMetric extends FHIRDomainResource
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRDeviceMetricCategoryType category measurement | setting | calculation | unspecified */
 		#[\Symfony\Component\Validator\Constraints\NotBlank]
 		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRDeviceMetricCategoryType $category = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRTiming measurementPeriod Describes the measurement repetition time */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRTiming $measurementPeriod = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRTiming measurementPeriod Describes the measurement repetition time */
+		public ?FHIRTiming $measurementPeriod = null,
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRDeviceMetricCalibration> calibration Describes the calibrations that have been performed or that are required to be performed */
 		public array $calibration = [],
 	) {
