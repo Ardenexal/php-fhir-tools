@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: CatalogEntryRelationType
  * URL: http://hl7.org/fhir/ValueSet/relation-type
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The type of relations between entries.
  */
 enum FHIRCatalogEntryRelationType: string

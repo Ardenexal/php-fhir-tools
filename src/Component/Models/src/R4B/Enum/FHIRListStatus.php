@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: ListStatus
  * URL: http://hl7.org/fhir/ValueSet/list-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The current state of the list.
  */
 enum FHIRListStatus: string

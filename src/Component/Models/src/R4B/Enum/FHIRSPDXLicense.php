@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: SPDXLicense
  * URL: http://hl7.org/fhir/ValueSet/spdx-license
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The license that applies to an Implementation Guide (using an SPDX license Identifiers, or 'not-open-source'). The binding is required but new SPDX license Identifiers are allowed to be used (https://spdx.org/licenses/).
  */
 enum FHIRSPDXLicense: string

@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: ObservationDataType
  * URL: http://hl7.org/fhir/ValueSet/permitted-data-type
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Permitted data type for observation value.
  */
 enum FHIRObservationDataType: string

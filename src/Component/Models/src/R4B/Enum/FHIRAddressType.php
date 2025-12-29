@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: AddressType
  * URL: http://hl7.org/fhir/ValueSet/address-type
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The type of an address (physical / postal).
  */
 enum FHIRAddressType: string

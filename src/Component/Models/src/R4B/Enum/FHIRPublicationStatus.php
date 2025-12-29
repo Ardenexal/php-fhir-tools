@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: PublicationStatus
  * URL: http://hl7.org/fhir/ValueSet/publication-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The lifecycle status of an artifact.
  */
 enum FHIRPublicationStatus: string

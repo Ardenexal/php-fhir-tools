@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: AllergyIntoleranceType
  * URL: http://hl7.org/fhir/ValueSet/allergy-intolerance-type
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Identification of the underlying physiological mechanism for a Reaction Risk.
  */
 enum FHIRAllergyIntoleranceType: string

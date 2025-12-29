@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: repositoryType
  * URL: http://hl7.org/fhir/ValueSet/repository-type
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Type for access of external URI.
  */
 enum FHIRRepositoryType: string

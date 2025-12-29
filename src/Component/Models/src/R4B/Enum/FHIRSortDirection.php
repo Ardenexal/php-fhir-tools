@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: SortDirection
  * URL: http://hl7.org/fhir/ValueSet/sort-direction
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The possible sort directions, ascending or descending.
  */
 enum FHIRSortDirection: string

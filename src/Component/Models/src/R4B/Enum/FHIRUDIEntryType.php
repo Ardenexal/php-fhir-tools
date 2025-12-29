@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: UDIEntryType
  * URL: http://hl7.org/fhir/ValueSet/udi-entry-type
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Codes to identify how UDI data was entered.
  */
 enum FHIRUDIEntryType: string

@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: EligibilityResponsePurpose
  * URL: http://hl7.org/fhir/ValueSet/eligibilityresponse-purpose
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: A code specifying the types of information being requested.
  */
 enum FHIREligibilityResponsePurpose: string

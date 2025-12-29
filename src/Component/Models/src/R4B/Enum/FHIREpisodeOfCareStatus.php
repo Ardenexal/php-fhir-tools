@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: EpisodeOfCareStatus
  * URL: http://hl7.org/fhir/ValueSet/episode-of-care-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The status of the episode of care.
  */
 enum FHIREpisodeOfCareStatus: string

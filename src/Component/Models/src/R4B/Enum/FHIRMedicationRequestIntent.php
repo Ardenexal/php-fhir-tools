@@ -3,9 +3,9 @@
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
- * ValueSet: Medication request  intent
+ * ValueSet: medicationRequest Intent
  * URL: http://hl7.org/fhir/ValueSet/medicationrequest-intent
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: MedicationRequest Intent Codes
  */
 enum FHIRMedicationRequestIntent: string

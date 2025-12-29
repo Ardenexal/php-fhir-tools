@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: BindingStrength
  * URL: http://hl7.org/fhir/ValueSet/binding-strength
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Indication of the degree of conformance expectations associated with a binding.
  */
 enum FHIRBindingStrength: string

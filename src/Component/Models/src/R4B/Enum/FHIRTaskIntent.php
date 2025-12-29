@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: TaskIntent
  * URL: http://hl7.org/fhir/ValueSet/task-intent
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Distinguishes whether the task is a proposal, plan or full order.
  */
 enum FHIRTaskIntent: string

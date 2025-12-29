@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: ProvenanceEntityRole
  * URL: http://hl7.org/fhir/ValueSet/provenance-entity-role
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: How an entity was used in an activity.
  */
 enum FHIRProvenanceEntityRole: string

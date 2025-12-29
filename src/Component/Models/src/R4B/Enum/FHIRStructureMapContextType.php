@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: StructureMapContextType
  * URL: http://hl7.org/fhir/ValueSet/map-context-type
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: How to interpret the context.
  */
 enum FHIRStructureMapContextType: string

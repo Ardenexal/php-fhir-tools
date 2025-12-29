@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: ActionGroupingBehavior
  * URL: http://hl7.org/fhir/ValueSet/action-grouping-behavior
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Defines organization behavior of a group.
  */
 enum FHIRActionGroupingBehavior: string

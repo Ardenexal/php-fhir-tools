@@ -6,10 +6,10 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
  * @fhir-code-type FHIRBundleType
  * @description Code type wrapper for FHIRBundleType enum
  */
-class FHIRBundleTypeType extends \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCode
+class FHIRBundleTypeType extends \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCode
 {
 	public function __construct(
-		/** @param \Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRBundleType|string|null $value The code value (enum or string) */
+		/** @param \Ardenexal\FHIRTools\Component\Models\R4B\Enum\FHIRBundleType|string|null $value The code value (enum or string) */
 		string|null $value = null,
 	) {
 		parent::__construct(value: $value);

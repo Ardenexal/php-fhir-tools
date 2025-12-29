@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: DeviceMetricColor
  * URL: http://hl7.org/fhir/ValueSet/metric-color
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Describes the typical color of representation.
  */
 enum FHIRDeviceMetricColor: string

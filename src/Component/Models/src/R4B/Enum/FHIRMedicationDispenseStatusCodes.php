@@ -3,9 +3,9 @@
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
- * ValueSet: Medication dispense  status  codes
+ * ValueSet: MedicationDispense Status Codes
  * URL: http://hl7.org/fhir/ValueSet/medicationdispense-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: MedicationDispense Status Codes
  */
 enum FHIRMedicationDispenseStatusCodes: string

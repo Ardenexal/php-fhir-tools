@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: CurrencyCode
  * URL: http://hl7.org/fhir/ValueSet/currencies
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Currency codes from ISO 4217 (see https://www.iso.org/iso-4217-currency-codes.html)
  */
 enum FHIRCurrencies: string

@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: ParticipationStatus
  * URL: http://hl7.org/fhir/ValueSet/participationstatus
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The Participation status of an appointment.
  */
 enum FHIRParticipationStatus: string

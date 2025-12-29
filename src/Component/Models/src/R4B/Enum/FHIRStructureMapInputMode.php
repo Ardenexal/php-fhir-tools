@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: StructureMapInputMode
  * URL: http://hl7.org/fhir/ValueSet/map-input-mode
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Mode for this instance of data.
  */
 enum FHIRStructureMapInputMode: string

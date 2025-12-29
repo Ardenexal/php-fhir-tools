@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: SubscriptionChannelType
  * URL: http://hl7.org/fhir/ValueSet/subscription-channel-type
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The type of method used to execute a subscription.
  */
 enum FHIRSubscriptionChannelType: string

@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: EnableWhenBehavior
  * URL: http://hl7.org/fhir/ValueSet/questionnaire-enable-behavior
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Controls how multiple enableWhen values are interpreted -  whether all or any must be true.
  */
 enum FHIREnableWhenBehavior: string

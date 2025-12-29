@@ -6,10 +6,10 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
  * @fhir-code-type FHIRRequestPriority
  * @description Code type wrapper for FHIRRequestPriority enum
  */
-class FHIRRequestPriorityType extends \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCode
+class FHIRRequestPriorityType extends \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCode
 {
 	public function __construct(
-		/** @param \Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRRequestPriority|string|null $value The code value (enum or string) */
+		/** @param \Ardenexal\FHIRTools\Component\Models\R4B\Enum\FHIRRequestPriority|string|null $value The code value (enum or string) */
 		string|null $value = null,
 	) {
 		parent::__construct(value: $value);

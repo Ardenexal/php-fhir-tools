@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: NameUse
  * URL: http://hl7.org/fhir/ValueSet/name-use
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The use of a human name.
  */
 enum FHIRNameUse: string

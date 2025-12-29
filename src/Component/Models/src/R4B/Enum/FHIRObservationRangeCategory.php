@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: ObservationRangeCategory
  * URL: http://hl7.org/fhir/ValueSet/observation-range-category
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Codes identifying the category of observation range.
  */
 enum FHIRObservationRangeCategory: string

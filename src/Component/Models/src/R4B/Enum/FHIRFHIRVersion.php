@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: FHIRVersion
  * URL: http://hl7.org/fhir/ValueSet/FHIR-version
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: All published FHIR Versions.
  */
 enum FHIRFHIRVersion: string
@@ -64,6 +64,9 @@ enum FHIRFHIRVersion: string
 	/** 3.0.1 */
 	case CODE_301 = '3.0.1';
 
+	/** 3.0.2 */
+	case CODE_302 = '3.0.2';
+
 	/** 3.3.0 */
 	case CODE_330 = '3.3.0';
 
@@ -75,4 +78,16 @@ enum FHIRFHIRVersion: string
 
 	/** 4.0.1 */
 	case CODE_401 = '4.0.1';
+
+	/** 4.1.0 */
+	case CODE_410 = '4.1.0';
+
+	/** 4.3.0-cibuild */
+	case CODE_430_cibuild = '4.3.0-cibuild';
+
+	/** 4.3.0-snapshot1 */
+	case CODE_430_snapshot1 = '4.3.0-snapshot1';
+
+	/** 4.3.0 */
+	case CODE_430 = '4.3.0';
 }

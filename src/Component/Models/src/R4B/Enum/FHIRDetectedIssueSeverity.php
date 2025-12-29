@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: DetectedIssueSeverity
  * URL: http://hl7.org/fhir/ValueSet/detectedissue-severity
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Indicates the potential degree of impact of the identified issue on the patient.
  */
 enum FHIRDetectedIssueSeverity: string

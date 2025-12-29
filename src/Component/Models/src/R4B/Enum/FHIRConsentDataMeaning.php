@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: ConsentDataMeaning
  * URL: http://hl7.org/fhir/ValueSet/consent-data-meaning
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: How a resource reference is interpreted when testing consent restrictions.
  */
 enum FHIRConsentDataMeaning: string

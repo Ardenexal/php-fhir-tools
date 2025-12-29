@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: IssueType
  * URL: http://hl7.org/fhir/ValueSet/issue-type
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: A code that describes the type of issue.
  */
 enum FHIRIssueType: string

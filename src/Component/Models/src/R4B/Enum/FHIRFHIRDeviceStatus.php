@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: FHIRDeviceStatus
  * URL: http://hl7.org/fhir/ValueSet/device-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The availability status of the device.
  */
 enum FHIRFHIRDeviceStatus: string

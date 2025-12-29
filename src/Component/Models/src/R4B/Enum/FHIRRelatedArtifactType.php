@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: RelatedArtifactType
  * URL: http://hl7.org/fhir/ValueSet/related-artifact-type
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The type of relationship to the related artifact.
  */
 enum FHIRRelatedArtifactType: string

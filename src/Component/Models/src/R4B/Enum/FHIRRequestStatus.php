@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: RequestStatus
  * URL: http://hl7.org/fhir/ValueSet/request-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Codes identifying the lifecycle stage of a request.
  */
 enum FHIRRequestStatus: string

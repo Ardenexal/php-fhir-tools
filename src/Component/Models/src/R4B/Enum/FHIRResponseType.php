@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: ResponseType
  * URL: http://hl7.org/fhir/ValueSet/response-code
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The kind of response to a message.
  */
 enum FHIRResponseType: string

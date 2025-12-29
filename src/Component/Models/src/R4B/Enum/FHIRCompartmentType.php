@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: CompartmentType
  * URL: http://hl7.org/fhir/ValueSet/compartment-type
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Which type a compartment definition describes.
  */
 enum FHIRCompartmentType: string

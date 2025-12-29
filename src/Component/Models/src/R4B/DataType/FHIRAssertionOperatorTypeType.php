@@ -6,10 +6,10 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
  * @fhir-code-type FHIRAssertionOperatorType
  * @description Code type wrapper for FHIRAssertionOperatorType enum
  */
-class FHIRAssertionOperatorTypeType extends \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCode
+class FHIRAssertionOperatorTypeType extends \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCode
 {
 	public function __construct(
-		/** @param \Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRAssertionOperatorType|string|null $value The code value (enum or string) */
+		/** @param \Ardenexal\FHIRTools\Component\Models\R4B\Enum\FHIRAssertionOperatorType|string|null $value The code value (enum or string) */
 		string|null $value = null,
 	) {
 		parent::__construct(value: $value);

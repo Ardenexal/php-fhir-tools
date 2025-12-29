@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: XPathUsageType
  * URL: http://hl7.org/fhir/ValueSet/search-xpath-usage
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: How a search parameter relates to the set of elements returned by evaluating its xpath query.
  */
 enum FHIRXPathUsageType: string

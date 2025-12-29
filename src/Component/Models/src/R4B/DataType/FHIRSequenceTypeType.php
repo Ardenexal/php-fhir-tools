@@ -6,10 +6,10 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
  * @fhir-code-type FHIRSequenceType
  * @description Code type wrapper for FHIRSequenceType enum
  */
-class FHIRSequenceTypeType extends \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCode
+class FHIRSequenceTypeType extends \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCode
 {
 	public function __construct(
-		/** @param \Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRSequenceType|string|null $value The code value (enum or string) */
+		/** @param \Ardenexal\FHIRTools\Component\Models\R4B\Enum\FHIRSequenceType|string|null $value The code value (enum or string) */
 		string|null $value = null,
 	) {
 		parent::__construct(value: $value);

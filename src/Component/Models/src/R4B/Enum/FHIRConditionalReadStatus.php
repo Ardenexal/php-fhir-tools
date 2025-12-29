@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: ConditionalReadStatus
  * URL: http://hl7.org/fhir/ValueSet/conditional-read-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: A code that indicates how the server supports conditional read.
  */
 enum FHIRConditionalReadStatus: string

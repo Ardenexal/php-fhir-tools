@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: IdentityAssuranceLevel
  * URL: http://hl7.org/fhir/ValueSet/identity-assuranceLevel
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The level of confidence that this link represents the same actual person, based on NIST Authentication Levels.
  */
 enum FHIRIdentityAssuranceLevel: string

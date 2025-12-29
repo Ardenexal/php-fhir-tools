@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: SlotStatus
  * URL: http://hl7.org/fhir/ValueSet/slotstatus
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The free/busy status of the slot.
  */
 enum FHIRSlotStatus: string

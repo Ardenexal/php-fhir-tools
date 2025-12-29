@@ -3,9 +3,9 @@
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
- * ValueSet: Status
+ * ValueSet: status
  * URL: http://hl7.org/fhir/ValueSet/verificationresult-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The validation status of the target
  */
 enum FHIRStatus: string

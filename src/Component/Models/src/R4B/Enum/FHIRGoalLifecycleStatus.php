@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: GoalLifecycleStatus
  * URL: http://hl7.org/fhir/ValueSet/goal-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Codes that reflect the current state of a goal and whether the goal is still being targeted.
  */
 enum FHIRGoalLifecycleStatus: string

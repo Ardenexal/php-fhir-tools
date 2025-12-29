@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: QuantityComparator
  * URL: http://hl7.org/fhir/ValueSet/quantity-comparator
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: How the Quantity should be understood and represented.
  */
 enum FHIRQuantityComparator: string

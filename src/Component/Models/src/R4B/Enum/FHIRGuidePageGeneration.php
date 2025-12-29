@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: GuidePageGeneration
  * URL: http://hl7.org/fhir/ValueSet/guide-page-generation
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: A code that indicates how the page is generated.
  */
 enum FHIRGuidePageGeneration: string

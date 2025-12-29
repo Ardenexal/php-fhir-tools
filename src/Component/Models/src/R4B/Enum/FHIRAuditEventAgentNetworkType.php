@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: AuditEventAgentNetworkType
  * URL: http://hl7.org/fhir/ValueSet/network-type
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The type of network access point of this agent in the audit event.
  */
 enum FHIRAuditEventAgentNetworkType: string

@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: TestScriptRequestMethodCode
  * URL: http://hl7.org/fhir/ValueSet/http-operations
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The allowable request method or HTTP operation codes.
  */
 enum FHIRTestScriptRequestMethodCode: string

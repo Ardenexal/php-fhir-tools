@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: ActionSelectionBehavior
  * URL: http://hl7.org/fhir/ValueSet/action-selection-behavior
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Defines selection behavior of a group.
  */
 enum FHIRActionSelectionBehavior: string

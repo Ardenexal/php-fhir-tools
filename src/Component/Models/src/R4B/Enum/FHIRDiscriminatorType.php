@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: DiscriminatorType
  * URL: http://hl7.org/fhir/ValueSet/discriminator-type
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: How an element value is interpreted when discrimination is evaluated.
  */
 enum FHIRDiscriminatorType: string

@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: Contract Resource Status Codes
  * URL: http://hl7.org/fhir/ValueSet/contract-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: This value set contract specific codes for status.
  */
 enum FHIRContractResourceStatusCodes: string

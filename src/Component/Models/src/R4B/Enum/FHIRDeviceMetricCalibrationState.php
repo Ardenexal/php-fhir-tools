@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: DeviceMetricCalibrationState
  * URL: http://hl7.org/fhir/ValueSet/metric-calibration-state
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Describes the state of a metric calibration.
  */
 enum FHIRDeviceMetricCalibrationState: string

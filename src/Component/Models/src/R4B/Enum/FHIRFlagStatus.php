@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: FlagStatus
  * URL: http://hl7.org/fhir/ValueSet/flag-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Indicates whether this flag is active and needs to be displayed to a user, or whether it is no longer needed or was entered in error.
  */
 enum FHIRFlagStatus: string

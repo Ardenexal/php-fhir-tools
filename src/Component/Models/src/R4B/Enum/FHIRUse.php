@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: Use
  * URL: http://hl7.org/fhir/ValueSet/claim-use
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The purpose of the Claim: predetermination, preauthorization, claim.
  */
 enum FHIRUse: string

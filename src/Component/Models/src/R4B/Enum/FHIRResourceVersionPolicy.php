@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: ResourceVersionPolicy
  * URL: http://hl7.org/fhir/ValueSet/versioning-policy
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: How the system supports versioning for a resource.
  */
 enum FHIRResourceVersionPolicy: string

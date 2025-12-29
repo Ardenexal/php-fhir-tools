@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: GuidanceResponseStatus
  * URL: http://hl7.org/fhir/ValueSet/guidance-response-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The status of a guidance response.
  */
 enum FHIRGuidanceResponseStatus: string

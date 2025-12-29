@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: StructureMapSourceListMode
  * URL: http://hl7.org/fhir/ValueSet/map-source-list-mode
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: If field is a list, how to manage the source.
  */
 enum FHIRStructureMapSourceListMode: string

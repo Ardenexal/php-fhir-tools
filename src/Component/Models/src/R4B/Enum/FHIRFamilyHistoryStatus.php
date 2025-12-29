@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: FamilyHistoryStatus
  * URL: http://hl7.org/fhir/ValueSet/history-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: A code that identifies the status of the family history record.
  */
 enum FHIRFamilyHistoryStatus: string

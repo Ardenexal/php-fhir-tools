@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: StructureMapModelMode
  * URL: http://hl7.org/fhir/ValueSet/map-model-mode
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: How the referenced structure is used in this mapping.
  */
 enum FHIRStructureMapModelMode: string

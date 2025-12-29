@@ -3,9 +3,9 @@
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
- * ValueSet: Medicationrequest  status
+ * ValueSet: medicationrequest Status
  * URL: http://hl7.org/fhir/ValueSet/medicationrequest-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: MedicationRequest Status Codes
  */
 enum FHIRMedicationrequestStatus: string

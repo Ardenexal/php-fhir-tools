@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: ActionRequiredBehavior
  * URL: http://hl7.org/fhir/ValueSet/action-required-behavior
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Defines expectations around whether an action or action group is required.
  */
 enum FHIRActionRequiredBehavior: string

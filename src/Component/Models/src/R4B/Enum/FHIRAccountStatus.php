@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: AccountStatus
  * URL: http://hl7.org/fhir/ValueSet/account-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Indicates whether the account is available to be used.
  */
 enum FHIRAccountStatus: string

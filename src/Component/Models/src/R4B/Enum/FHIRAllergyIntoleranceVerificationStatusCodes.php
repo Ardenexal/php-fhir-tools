@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: AllergyIntolerance Verification Status Codes
  * URL: http://hl7.org/fhir/ValueSet/allergyintolerance-verification
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Preferred value set for AllergyIntolerance Verification Status.
  */
 enum FHIRAllergyIntoleranceVerificationStatusCodes: string

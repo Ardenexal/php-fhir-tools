@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: ContactPointSystem
  * URL: http://hl7.org/fhir/ValueSet/contact-point-system
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Telecommunications form for contact point.
  */
 enum FHIRContactPointSystem: string

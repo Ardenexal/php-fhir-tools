@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: AllergyIntoleranceCriticality
  * URL: http://hl7.org/fhir/ValueSet/allergy-intolerance-criticality
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Estimate of the potential clinical harm, or seriousness, of a reaction to an identified substance.
  */
 enum FHIRAllergyIntoleranceCriticality: string

@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: SpecimenStatus
  * URL: http://hl7.org/fhir/ValueSet/specimen-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Codes providing the status/availability of a specimen.
  */
 enum FHIRSpecimenStatus: string

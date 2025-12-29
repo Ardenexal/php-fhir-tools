@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: OperationParameterUse
  * URL: http://hl7.org/fhir/ValueSet/operation-parameter-use
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Whether an operation parameter is an input or an output parameter.
  */
 enum FHIROperationParameterUse: string

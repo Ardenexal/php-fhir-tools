@@ -3,9 +3,9 @@
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
- * ValueSet: Medication administration  status  codes
+ * ValueSet: MedicationAdministration Status Codes
  * URL: http://hl7.org/fhir/ValueSet/medication-admin-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: MedicationAdministration Status Codes
  */
 enum FHIRMedicationAdministrationStatusCodes: string

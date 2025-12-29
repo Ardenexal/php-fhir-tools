@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: SupplyDeliveryStatus
  * URL: http://hl7.org/fhir/ValueSet/supplydelivery-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Status of the supply delivery.
  */
 enum FHIRSupplyDeliveryStatus: string

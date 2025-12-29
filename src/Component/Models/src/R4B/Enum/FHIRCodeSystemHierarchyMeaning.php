@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: CodeSystemHierarchyMeaning
  * URL: http://hl7.org/fhir/ValueSet/codesystem-hierarchy-meaning
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The meaning of the hierarchy of concepts in a code system.
  */
 enum FHIRCodeSystemHierarchyMeaning: string

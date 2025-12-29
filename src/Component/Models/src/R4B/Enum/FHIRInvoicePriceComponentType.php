@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: InvoicePriceComponentType
  * URL: http://hl7.org/fhir/ValueSet/invoice-priceComponentType
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Codes indicating the kind of the price component.
  */
 enum FHIRInvoicePriceComponentType: string

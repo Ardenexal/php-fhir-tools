@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: FHIRSubstanceStatus
  * URL: http://hl7.org/fhir/ValueSet/substance-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: A code to indicate if the substance is actively used.
  */
 enum FHIRFHIRSubstanceStatus: string

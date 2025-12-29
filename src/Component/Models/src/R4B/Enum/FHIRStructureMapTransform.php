@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: StructureMapTransform
  * URL: http://hl7.org/fhir/ValueSet/map-transform
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: How data is copied/created.
  */
 enum FHIRStructureMapTransform: string

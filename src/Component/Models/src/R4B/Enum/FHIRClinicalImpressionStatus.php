@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: Clinical Impression Status
  * URL: http://hl7.org/fhir/ValueSet/clinicalimpression-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Codes that reflect the current state of a clinical impression within its overall lifecycle.
  */
 enum FHIRClinicalImpressionStatus: string

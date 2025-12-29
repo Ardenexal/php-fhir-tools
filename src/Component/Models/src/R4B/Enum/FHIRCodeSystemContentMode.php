@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: CodeSystemContentMode
  * URL: http://hl7.org/fhir/ValueSet/codesystem-content-mode
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The extent of the content of the code system (the concepts and codes it defines) are represented in a code system resource.
  */
 enum FHIRCodeSystemContentMode: string

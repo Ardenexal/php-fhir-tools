@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: CarePlanActivityStatus
  * URL: http://hl7.org/fhir/ValueSet/care-plan-activity-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Codes that reflect the current state of a care plan activity within its overall life cycle.
  */
 enum FHIRCarePlanActivityStatus: string

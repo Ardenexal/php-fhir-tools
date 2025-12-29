@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: SystemRestfulInteraction
  * URL: http://hl7.org/fhir/ValueSet/system-restful-interaction
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Operations supported by REST at the system level.
  */
 enum FHIRSystemRestfulInteraction: string

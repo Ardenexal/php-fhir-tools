@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: qualityType
  * URL: http://hl7.org/fhir/ValueSet/quality-type
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Type for quality report.
  */
 enum FHIRQualityType: string

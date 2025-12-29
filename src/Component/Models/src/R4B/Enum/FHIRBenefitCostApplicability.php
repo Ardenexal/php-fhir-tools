@@ -3,9 +3,9 @@
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
- * ValueSet: Benefit cost applicability
+ * ValueSet: BenefitCostApplicability
  * URL: http://hl7.org/fhir/ValueSet/insuranceplan-applicability
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Whether the cost applies to in-network or out-of-network providers.
  */
 enum FHIRBenefitCostApplicability: string

@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: LocationMode
  * URL: http://hl7.org/fhir/ValueSet/location-mode
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Indicates whether a resource instance represents a specific location or a class of locations.
  */
 enum FHIRLocationMode: string

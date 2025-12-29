@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: AuditEventAction
  * URL: http://hl7.org/fhir/ValueSet/audit-event-action
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Indicator for type of action performed during the event that generated the event.
  */
 enum FHIRAuditEventAction: string

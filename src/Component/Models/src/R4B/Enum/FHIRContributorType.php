@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: ContributorType
  * URL: http://hl7.org/fhir/ValueSet/contributor-type
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The type of contributor.
  */
 enum FHIRContributorType: string

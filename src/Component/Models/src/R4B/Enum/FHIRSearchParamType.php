@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: SearchParamType
  * URL: http://hl7.org/fhir/ValueSet/search-param-type
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Data types allowed to be used for search parameters.
  */
 enum FHIRSearchParamType: string

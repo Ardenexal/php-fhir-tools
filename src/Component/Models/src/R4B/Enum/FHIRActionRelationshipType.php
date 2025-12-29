@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: ActionRelationshipType
  * URL: http://hl7.org/fhir/ValueSet/action-relationship-type
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Defines the types of relationships between actions.
  */
 enum FHIRActionRelationshipType: string

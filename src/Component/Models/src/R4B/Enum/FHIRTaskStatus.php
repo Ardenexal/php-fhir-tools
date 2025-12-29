@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: TaskStatus
  * URL: http://hl7.org/fhir/ValueSet/task-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The current status of the task.
  */
 enum FHIRTaskStatus: string

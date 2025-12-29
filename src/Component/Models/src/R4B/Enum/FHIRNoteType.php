@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: NoteType
  * URL: http://hl7.org/fhir/ValueSet/note-type
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The presentation types of notes.
  */
 enum FHIRNoteType: string

@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: DaysOfWeek
  * URL: http://hl7.org/fhir/ValueSet/days-of-week
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The days of the week.
  */
 enum FHIRDaysOfWeek: string

@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: EventTiming
  * URL: http://hl7.org/fhir/ValueSet/event-timing
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Real world event relating to the schedule.
  */
 enum FHIREventTiming: string

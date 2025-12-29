@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: TriggerType
  * URL: http://hl7.org/fhir/ValueSet/trigger-type
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The type of trigger.
  */
 enum FHIRTriggerType: string

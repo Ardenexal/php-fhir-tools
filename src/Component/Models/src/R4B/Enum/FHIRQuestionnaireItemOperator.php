@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: QuestionnaireItemOperator
  * URL: http://hl7.org/fhir/ValueSet/questionnaire-enable-operator
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The criteria by which a question is enabled.
  */
 enum FHIRQuestionnaireItemOperator: string

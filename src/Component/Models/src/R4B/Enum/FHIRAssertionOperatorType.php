@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: AssertionOperatorType
  * URL: http://hl7.org/fhir/ValueSet/assert-operator-codes
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The type of operator to use for assertion.
  */
 enum FHIRAssertionOperatorType: string

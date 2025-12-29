@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: BiologicallyDerivedProductStatus
  * URL: http://hl7.org/fhir/ValueSet/product-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Biologically Derived Product Status.
  */
 enum FHIRBiologicallyDerivedProductStatus: string

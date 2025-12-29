@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: LinkType
  * URL: http://hl7.org/fhir/ValueSet/link-type
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The type of link between this patient resource and another patient resource.
  */
 enum FHIRLinkType: string

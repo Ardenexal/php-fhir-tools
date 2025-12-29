@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: PropertyRepresentation
  * URL: http://hl7.org/fhir/ValueSet/property-representation
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: How a property is represented when serialized.
  */
 enum FHIRPropertyRepresentation: string

@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: NamingSystemIdentifierType
  * URL: http://hl7.org/fhir/ValueSet/namingsystem-identifier-type
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Identifies the style of unique identifier used to identify a namespace.
  */
 enum FHIRNamingSystemIdentifierType: string

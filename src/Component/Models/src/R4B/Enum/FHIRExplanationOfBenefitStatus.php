@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: ExplanationOfBenefitStatus
  * URL: http://hl7.org/fhir/ValueSet/explanationofbenefit-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: A code specifying the state of the resource instance.
  */
 enum FHIRExplanationOfBenefitStatus: string

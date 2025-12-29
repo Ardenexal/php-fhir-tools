@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: Immunization Status Codes
  * URL: http://hl7.org/fhir/ValueSet/immunization-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The value set to instantiate this attribute should be drawn from a terminologically robust code system that consists of or contains concepts to support describing the current status of the administered dose of vaccine.
  */
 enum FHIRImmunizationStatusCodes: string

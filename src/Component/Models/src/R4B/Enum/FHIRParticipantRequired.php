@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: ParticipantRequired
  * URL: http://hl7.org/fhir/ValueSet/participantrequired
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Is the Participant required to attend the appointment.
  */
 enum FHIRParticipantRequired: string

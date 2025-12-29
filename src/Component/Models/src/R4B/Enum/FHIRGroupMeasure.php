@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: GroupMeasure
  * URL: http://hl7.org/fhir/ValueSet/group-measure
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Possible group measure aggregates (E.g. Mean, Median).
  */
 enum FHIRGroupMeasure: string

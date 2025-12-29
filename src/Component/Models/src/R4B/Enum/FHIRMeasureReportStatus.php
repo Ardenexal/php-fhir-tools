@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: MeasureReportStatus
  * URL: http://hl7.org/fhir/ValueSet/measure-report-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The status of the measure report.
  */
 enum FHIRMeasureReportStatus: string

@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: TestReportResult
  * URL: http://hl7.org/fhir/ValueSet/report-result-codes
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The reported execution result.
  */
 enum FHIRTestReportResult: string

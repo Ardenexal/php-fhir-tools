@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: ContactPointUse
  * URL: http://hl7.org/fhir/ValueSet/contact-point-use
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Use of contact point.
  */
 enum FHIRContactPointUse: string

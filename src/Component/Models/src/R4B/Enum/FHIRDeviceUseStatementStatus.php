@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: DeviceUseStatementStatus
  * URL: http://hl7.org/fhir/ValueSet/device-statement-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: A coded concept indicating the current status of the Device Usage.
  */
 enum FHIRDeviceUseStatementStatus: string

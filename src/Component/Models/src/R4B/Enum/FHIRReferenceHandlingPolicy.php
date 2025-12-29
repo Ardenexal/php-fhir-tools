@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: ReferenceHandlingPolicy
  * URL: http://hl7.org/fhir/ValueSet/reference-handling-policy
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: A set of flags that defines how references are supported.
  */
 enum FHIRReferenceHandlingPolicy: string

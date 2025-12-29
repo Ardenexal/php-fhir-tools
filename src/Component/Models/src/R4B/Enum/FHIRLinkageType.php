@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: LinkageType
  * URL: http://hl7.org/fhir/ValueSet/linkage-type
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Used to distinguish different roles a resource can play within a set of linked resources.
  */
 enum FHIRLinkageType: string

@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: InvoiceStatus
  * URL: http://hl7.org/fhir/ValueSet/invoice-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Codes identifying the lifecycle stage of an Invoice.
  */
 enum FHIRInvoiceStatus: string

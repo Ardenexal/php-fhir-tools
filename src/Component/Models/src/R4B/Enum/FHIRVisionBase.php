@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: VisionBase
  * URL: http://hl7.org/fhir/ValueSet/vision-base-codes
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: A coded concept listing the base codes.
  */
 enum FHIRVisionBase: string

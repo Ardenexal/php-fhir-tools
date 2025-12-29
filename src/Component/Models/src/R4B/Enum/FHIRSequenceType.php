@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: sequenceType
  * URL: http://hl7.org/fhir/ValueSet/sequence-type
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Type if a sequence -- DNA, RNA, or amino acid sequence.
  */
 enum FHIRSequenceType: string

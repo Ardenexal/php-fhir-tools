@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: AdverseEventActuality
  * URL: http://hl7.org/fhir/ValueSet/adverse-event-actuality
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Overall nature of the adverse event, e.g. real or potential.
  */
 enum FHIRAdverseEventActuality: string

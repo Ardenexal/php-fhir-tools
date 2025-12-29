@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: SearchModifierCode
  * URL: http://hl7.org/fhir/ValueSet/search-modifier-code
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: A supported modifier for a search parameter.
  */
 enum FHIRSearchModifierCode: string

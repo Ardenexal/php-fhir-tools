@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: EventCapabilityMode
  * URL: http://hl7.org/fhir/ValueSet/event-capability-mode
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The mode of a message capability statement.
  */
 enum FHIREventCapabilityMode: string

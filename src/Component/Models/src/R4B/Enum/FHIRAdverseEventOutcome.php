@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: AdverseEventOutcome
  * URL: http://hl7.org/fhir/ValueSet/adverse-event-outcome
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: TODO (and should this be required?).
  */
 enum FHIRAdverseEventOutcome: string

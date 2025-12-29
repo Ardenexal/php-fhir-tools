@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: SupplyRequestStatus
  * URL: http://hl7.org/fhir/ValueSet/supplyrequest-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Status of the supply request.
  */
 enum FHIRSupplyRequestStatus: string

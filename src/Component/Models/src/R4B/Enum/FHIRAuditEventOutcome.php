@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: AuditEventOutcome
  * URL: http://hl7.org/fhir/ValueSet/audit-event-outcome
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Indicates whether the event succeeded or failed.
  */
 enum FHIRAuditEventOutcome: string

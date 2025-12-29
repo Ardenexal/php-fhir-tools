@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: EncounterLocationStatus
  * URL: http://hl7.org/fhir/ValueSet/encounter-location-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The status of the location.
  */
 enum FHIREncounterLocationStatus: string

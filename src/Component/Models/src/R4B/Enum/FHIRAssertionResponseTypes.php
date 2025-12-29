@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: AssertionResponseTypes
  * URL: http://hl7.org/fhir/ValueSet/assert-response-code-types
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The type of response code to use for assertion.
  */
 enum FHIRAssertionResponseTypes: string

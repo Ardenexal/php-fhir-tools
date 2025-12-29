@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: RequestIntent
  * URL: http://hl7.org/fhir/ValueSet/request-intent
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Codes indicating the degree of authority/intentionality associated with a request.
  */
 enum FHIRRequestIntent: string

@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: ListMode
  * URL: http://hl7.org/fhir/ValueSet/list-mode
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The processing mode that applies to this list.
  */
 enum FHIRListMode: string

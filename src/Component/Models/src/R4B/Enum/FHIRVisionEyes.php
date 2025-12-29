@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: VisionEyes
  * URL: http://hl7.org/fhir/ValueSet/vision-eye-codes
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: A coded concept listing the eye codes.
  */
 enum FHIRVisionEyes: string

@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: RestfulCapabilityMode
  * URL: http://hl7.org/fhir/ValueSet/restful-capability-mode
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The mode of a RESTful capability statement.
  */
 enum FHIRRestfulCapabilityMode: string

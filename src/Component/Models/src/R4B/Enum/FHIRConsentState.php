@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: ConsentState
  * URL: http://hl7.org/fhir/ValueSet/consent-state-codes
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Indicates the state of the consent.
  */
 enum FHIRConsentState: string

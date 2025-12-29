@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: BiologicallyDerivedProductCategory
  * URL: http://hl7.org/fhir/ValueSet/product-category
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Biologically Derived Product Category.
  */
 enum FHIRBiologicallyDerivedProductCategory: string

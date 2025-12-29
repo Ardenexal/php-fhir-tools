@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: UnitsOfTime
  * URL: http://hl7.org/fhir/ValueSet/units-of-time
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: A unit of time (units from UCUM).
  */
 enum FHIRUnitsOfTime: string

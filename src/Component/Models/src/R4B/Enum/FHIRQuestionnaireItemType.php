@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: QuestionnaireItemType
  * URL: http://hl7.org/fhir/ValueSet/item-type
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Distinguishes groups from questions and display text and indicates data type for questions.
  */
 enum FHIRQuestionnaireItemType: string

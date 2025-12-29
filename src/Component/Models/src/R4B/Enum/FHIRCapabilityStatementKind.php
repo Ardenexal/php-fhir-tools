@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: CapabilityStatementKind
  * URL: http://hl7.org/fhir/ValueSet/capability-statement-kind
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: How a capability statement is intended to be used.
  */
 enum FHIRCapabilityStatementKind: string

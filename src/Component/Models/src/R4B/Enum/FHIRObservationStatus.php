@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: ObservationStatus
  * URL: http://hl7.org/fhir/ValueSet/observation-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Codes providing the status of an observation.
  */
 enum FHIRObservationStatus: string

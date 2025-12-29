@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: BiologicallyDerivedProductStorageScale
  * URL: http://hl7.org/fhir/ValueSet/product-storage-scale
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: BiologicallyDerived Product Storage Scale.
  */
 enum FHIRBiologicallyDerivedProductStorageScale: string

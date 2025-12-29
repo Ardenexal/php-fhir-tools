@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: GraphCompartmentRule
  * URL: http://hl7.org/fhir/ValueSet/graph-compartment-rule
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: How a compartment must be linked.
  */
 enum FHIRGraphCompartmentRule: string

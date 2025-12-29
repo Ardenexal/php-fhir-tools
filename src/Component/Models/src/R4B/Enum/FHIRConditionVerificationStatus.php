@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: ConditionVerificationStatus
  * URL: http://hl7.org/fhir/ValueSet/condition-ver-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The verification status to support or decline the clinical status of the condition or diagnosis.
  */
 enum FHIRConditionVerificationStatus: string

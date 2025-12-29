@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: IdentifierUse
  * URL: http://hl7.org/fhir/ValueSet/identifier-use
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Identifies the purpose for this identifier, if known .
  */
 enum FHIRIdentifierUse: string

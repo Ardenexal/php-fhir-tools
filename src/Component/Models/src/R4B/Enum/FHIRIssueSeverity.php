@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: IssueSeverity
  * URL: http://hl7.org/fhir/ValueSet/issue-severity
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: How the issue affects the success of the action.
  */
 enum FHIRIssueSeverity: string

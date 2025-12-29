@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: ResearchStudyStatus
  * URL: http://hl7.org/fhir/ValueSet/research-study-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Codes that convey the current status of the research study.
  */
 enum FHIRResearchStudyStatus: string

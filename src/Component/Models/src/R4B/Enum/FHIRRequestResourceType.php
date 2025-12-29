@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: RequestResourceType
  * URL: http://hl7.org/fhir/ValueSet/request-resource-types
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: A list of all the request resource types defined in this version of the FHIR specification.
  */
 enum FHIRRequestResourceType: string

@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: ActionParticipantType
  * URL: http://hl7.org/fhir/ValueSet/action-participant-type
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The type of participant for the action.
  */
 enum FHIRActionParticipantType: string

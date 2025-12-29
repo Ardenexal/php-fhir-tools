@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: DeviceMetricCategory
  * URL: http://hl7.org/fhir/ValueSet/metric-category
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Describes the category of the metric.
  */
 enum FHIRDeviceMetricCategory: string

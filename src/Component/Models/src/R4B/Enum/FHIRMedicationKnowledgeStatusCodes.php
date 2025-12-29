@@ -3,9 +3,9 @@
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
- * ValueSet: Medication knowledge  status  codes
+ * ValueSet: MedicationKnowledge Status Codes
  * URL: http://hl7.org/fhir/ValueSet/medicationknowledge-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: MedicationKnowledge Status Codes
  */
 enum FHIRMedicationKnowledgeStatusCodes: string

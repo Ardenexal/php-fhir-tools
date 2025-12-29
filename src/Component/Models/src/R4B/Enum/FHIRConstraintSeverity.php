@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: ConstraintSeverity
  * URL: http://hl7.org/fhir/ValueSet/constraint-severity
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: SHALL applications comply with this constraint?
  */
 enum FHIRConstraintSeverity: string

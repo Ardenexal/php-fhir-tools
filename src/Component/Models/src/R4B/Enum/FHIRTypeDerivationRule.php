@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: TypeDerivationRule
  * URL: http://hl7.org/fhir/ValueSet/type-derivation-rule
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: How a type relates to its baseDefinition.
  */
 enum FHIRTypeDerivationRule: string

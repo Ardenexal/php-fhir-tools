@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: AllergyIntoleranceCategory
  * URL: http://hl7.org/fhir/ValueSet/allergy-intolerance-category
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Category of an identified substance associated with allergies or intolerances.
  */
 enum FHIRAllergyIntoleranceCategory: string

@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: MessageSignificanceCategory
  * URL: http://hl7.org/fhir/ValueSet/message-significance-category
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The impact of the content of a message.
  */
 enum FHIRMessageSignificanceCategory: string

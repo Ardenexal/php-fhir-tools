@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: CareTeamStatus
  * URL: http://hl7.org/fhir/ValueSet/care-team-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Indicates the status of the care team.
  */
 enum FHIRCareTeamStatus: string

@@ -1141,20 +1141,19 @@ class FHIRModelGeneratorCommand extends Command
                 $enumNamespace = $this->context->getEnumNamespace($version);
                 $enumTypeName  = $enumType->getName();
                 if ($enumTypeName !== null) {
-                    // Use hasClass to check existence instead of getClass
-                    $hasClass = false;
+                    // Try to add enum to namespace, handling duplicates gracefully
                     try {
-                        $hasClass = $enumNamespace->getClass($enumTypeName ?? '') instanceof ClassType;
-                    } catch (\Throwable $e) {
-                        $hasClass = false;
-                    }
-                    if (!$hasClass) {
                         $enumNamespace->add($enumType);
                         $this->context->addEnum($url, $enumType);
-                    } else {
-                        $output->writeln("Enum class {$enumTypeName} already exists in namespace, skipping namespace addition");
-                        // Still add to context for tracking
-                        $this->context->addEnum($url, $enumType);
+                    } catch (\Nette\InvalidStateException $e) {
+                        // Enum with this name already exists in namespace
+                        if (str_contains($e->getMessage(), 'already exists')) {
+                            $output->writeln("Enum class {$enumTypeName} already exists in namespace, skipping namespace addition");
+                            // Still add to context for tracking with this URL
+                            $this->context->addEnum($url, $enumType);
+                        } else {
+                            throw $e;
+                        }
                     }
                 } else {
                     $this->context->addEnum($url, $enumType);
@@ -1169,17 +1168,16 @@ class FHIRModelGeneratorCommand extends Command
                 $dataTypeNamespace = $this->context->getDatatypeNamespace($version);
                 $codeTypeName      = $codeType->getName();
                 if ($codeTypeName !== null) {
-                    // Use hasClass to check existence instead of getClass
-                    $hasClass = false;
+                    // Try to add code type to namespace, handling duplicates gracefully
                     try {
-                        $hasClass = $dataTypeNamespace->getClass($codeTypeName) instanceof ClassType;
-                    } catch (\Throwable $e) {
-                        $hasClass = false;
-                    }
-                    if (!$hasClass) {
                         $dataTypeNamespace->add($codeType);
-                    } else {
-                        $output->writeln("Code type class {$codeTypeName} already exists in namespace, skipping namespace addition");
+                    } catch (\Nette\InvalidStateException $e) {
+                        // Code type with this name already exists in namespace
+                        if (str_contains($e->getMessage(), 'already exists')) {
+                            $output->writeln("Code type class {$codeTypeName} already exists in namespace, skipping namespace addition");
+                        } else {
+                            throw $e;
+                        }
                     }
                 }
             } catch (GenerationException $e) {

@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: StructureDefinitionKind
  * URL: http://hl7.org/fhir/ValueSet/structure-definition-kind
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Defines the type of structure that a definition is describing.
  */
 enum FHIRStructureDefinitionKind: string

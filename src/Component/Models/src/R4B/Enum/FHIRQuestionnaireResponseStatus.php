@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: QuestionnaireResponseStatus
  * URL: http://hl7.org/fhir/ValueSet/questionnaire-answers-status
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Lifecycle status of the questionnaire response.
  */
 enum FHIRQuestionnaireResponseStatus: string

@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: ActionCardinalityBehavior
  * URL: http://hl7.org/fhir/ValueSet/action-cardinality-behavior
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Defines behavior for an action or a group for how many times that item may be repeated.
  */
 enum FHIRActionCardinalityBehavior: string

@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: ActionConditionKind
  * URL: http://hl7.org/fhir/ValueSet/action-condition-kind
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Defines the kinds of conditions that can appear on actions.
  */
 enum FHIRActionConditionKind: string

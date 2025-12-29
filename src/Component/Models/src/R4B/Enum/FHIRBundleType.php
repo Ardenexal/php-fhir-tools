@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: BundleType
  * URL: http://hl7.org/fhir/ValueSet/bundle-type
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Indicates the purpose of a bundle - how it is intended to be used.
  */
 enum FHIRBundleType: string

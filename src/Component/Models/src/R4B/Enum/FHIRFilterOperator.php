@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: FilterOperator
  * URL: http://hl7.org/fhir/ValueSet/filter-operator
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: The kind of operation to perform as a part of a property based filter.
  */
 enum FHIRFilterOperator: string

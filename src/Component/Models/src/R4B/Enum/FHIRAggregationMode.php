@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: AggregationMode
  * URL: http://hl7.org/fhir/ValueSet/resource-aggregation-mode
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: How resource references can be aggregated.
  */
 enum FHIRAggregationMode: string

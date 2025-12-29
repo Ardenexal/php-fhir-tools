@@ -49,8 +49,8 @@ class FHIRComposition extends FHIRDomainResource
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string title Human Readable name/title */
 		#[\Symfony\Component\Validator\Constraints\NotBlank]
 		public \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string|null $title = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRV3ConfidentialityType confidentiality As defined by affinity domain */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRV3ConfidentialityType $confidentiality = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRConfidentialityType confidentiality As defined by affinity domain */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRConfidentialityType $confidentiality = null,
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRCompositionAttester> attester Attests to accuracy of composition */
 		public array $attester = [],
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference custodian Organization which maintains the composition */

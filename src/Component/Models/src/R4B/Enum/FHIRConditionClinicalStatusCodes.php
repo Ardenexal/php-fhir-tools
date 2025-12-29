@@ -5,7 +5,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 /**
  * ValueSet: Condition Clinical Status Codes
  * URL: http://hl7.org/fhir/ValueSet/condition-clinical
- * Version: 4.0.1
+ * Version: 4.3.0
  * Description: Preferred value set for Condition Clinical Status.
  */
 enum FHIRConditionClinicalStatusCodes: string
