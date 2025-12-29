@@ -46,6 +46,9 @@ class FHIRModelGeneratorCommandDirectoryCleanupTest extends TestCase
         }
     }
 
+    /**
+     * Test output directory cleanup logic
+     */
     public function testOutputDirectoryCleanupLogic(): void
     {
         // Create some test files in the output directory
@@ -70,6 +73,9 @@ class FHIRModelGeneratorCommandDirectoryCleanupTest extends TestCase
         self::assertEmpty(glob($this->testOutputDir . '/*'));
     }
 
+    /**
+     * Test models component directory cleanup logic
+     */
     public function testModelsComponentDirectoryCleanupLogic(): void
     {
         // Create some test version directories with files
@@ -118,6 +124,9 @@ class FHIRModelGeneratorCommandDirectoryCleanupTest extends TestCase
         self::assertFileExists($nonVersionDir . '/test.php');
     }
 
+    /**
+     * Test version directory pattern matching
+     */
     public function testVersionDirectoryPatternMatching(): void
     {
         // Test the regex pattern used for version directory detection
@@ -139,6 +148,9 @@ class FHIRModelGeneratorCommandDirectoryCleanupTest extends TestCase
         }
     }
 
+    /**
+     * Test directory cleanup preserves non-version directories
+     */
     public function testDirectoryCleanupPreservesNonVersionDirectories(): void
     {
         // Create mixed directories

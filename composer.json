@@ -96,9 +96,9 @@
         "test-unit": "php ./vendor/phpunit/phpunit/phpunit --testsuite=unit",
         "test-integration": "php ./vendor/phpunit/phpunit/phpunit --testsuite=integration",
         "test-fhir": "php ./vendor/phpunit/phpunit/phpunit --testsuite=fhir",
-        "test:bundle": "php ./vendor/phpunit/phpunit/phpunit tests/Unit/Bundle/",
-        "test:codegen": "php ./vendor/phpunit/phpunit/phpunit tests/Unit/Component/CodeGeneration/",
-        "test:serialization": "php ./vendor/phpunit/phpunit/phpunit tests/Unit/Component/Serialization/",
+        "test:bundle": "php ./vendor/phpunit/phpunit/phpunit tests/Unit/Bundle/ --no-coverage",
+        "test:codegen": "php ./vendor/phpunit/phpunit/phpunit tests/Unit/Component/CodeGeneration/ --no-coverage",
+        "test:serialization": "php ./vendor/phpunit/phpunit/phpunit tests/Unit/Component/Serialization/ --no-coverage",
         "test:components": [
             "@test:bundle",
             "@test:codegen",
