@@ -237,7 +237,16 @@ class FHIRModelGenerator implements GeneratorInterface
     public function generateModelClass(array $structureDefinition, string $version, BuilderContextInterface $builderContext): ClassType
     {
         $className = self::DEFAULT_CLASS_PREFIX . u($structureDefinition['name'])->pascal();
-        $namespace = $builderContext->getElementNamespace($version);
+
+        // Determine the correct namespace based on the structure definition kind
+        $kind      = $structureDefinition['kind'] ?? 'unknown';
+        $namespace = match ($kind) {
+            'resource'       => $builderContext->getElementNamespace($version),  // Resource namespace
+            'complex-type'   => $builderContext->getDatatypeNamespace($version), // DataType namespace
+            'primitive-type' => $builderContext->getPrimitiveNamespace($version), // Primitive namespace
+            default          => $builderContext->getElementNamespace($version)   // Fallback to Resource
+        };
+
         $class     = new ClassType($className, $namespace);
 
         if ($structureDefinition['abstract'] === true) {
@@ -582,11 +591,9 @@ class FHIRModelGenerator implements GeneratorInterface
             }
             $relatedNamespace = $relatedClass->getNamespace();
             if ($relatedNamespace !== null) {
-                error_log("ContentReference {$contentRef} found in namespace: {$relatedNamespace->getName()}");
                 $types[] = '\\' . $relatedNamespace->getName() . '\\' . $relatedClass->getName();
             } else {
                 // Fallback to Element namespace
-                error_log("ContentReference {$contentRef} has no namespace, using Element namespace");
                 $types[] = '\\' . $builderContext->getElementNamespace($version)->getName() . '\\' . $relatedClass->getName();
             }
         } elseif (isset($element['type'])) {
@@ -661,14 +668,10 @@ class FHIRModelGenerator implements GeneratorInterface
                     $storedElement = $builderContext->getType($element['path']);
                     if ($storedElement !== null && $storedElement->getNamespace() !== null) {
                         // Use the namespace from the stored backbone element
-                        $elementNamespace = $storedElement->getNamespace()->getName();
-                        error_log("Found backbone element {$element['path']} in namespace: {$elementNamespace}");
-                        $types[] = '\\' . $elementNamespace . '\\' . self::DEFAULT_CLASS_PREFIX . $elementClass;
+                        $types[] = '\\' . $storedElement->getNamespace()->getName() . '\\' . self::DEFAULT_CLASS_PREFIX . $elementClass;
                     } else {
                         // Fallback to parent's namespace if not found in context
-                        $fallbackNamespace = $namespace->getName();
-                        error_log("Backbone element {$element['path']} not found in context, using fallback namespace: {$fallbackNamespace}");
-                        $types[] = '\\' . $fallbackNamespace . '\\' . self::DEFAULT_CLASS_PREFIX . $elementClass;
+                        $types[] = '\\' . $namespace->getName() . '\\' . self::DEFAULT_CLASS_PREFIX . $elementClass;
                     }
                     continue;
                 }
@@ -854,14 +857,10 @@ class FHIRModelGenerator implements GeneratorInterface
 
         // For complex data types and backbone elements, try to use datatype namespace if available
         try {
-            $datatypeNamespace = $builderContext->getDatatypeNamespace($version)->getName();
-            error_log("Type code '{$code}' using DataType namespace: {$datatypeNamespace}");
-            return $datatypeNamespace;
+            return $builderContext->getDatatypeNamespace($version)->getName();
         } catch (GenerationException) {
             // Fallback to element namespace if datatype namespace is not available
-            $elementNamespace = $builderContext->getElementNamespace($version)->getName();
-            error_log("Type code '{$code}' falling back to Element namespace: {$elementNamespace}");
-            return $elementNamespace;
+            return $builderContext->getElementNamespace($version)->getName();
         }
     }
 

@@ -19,8 +19,8 @@ class FHIRTiming extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRB
 		public array $modifierExtension = [],
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime> event When the event occurs */
 		public array $event = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRTimingRepeat repeat When the event is to occur */
-		public ?FHIRTimingRepeat $repeat = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRTimingRepeat repeat When the event is to occur */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRTimingRepeat $repeat = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept code BID | TID | QID | AM | PM | QD | QOD | + */
 		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept $code = null,
 	) {

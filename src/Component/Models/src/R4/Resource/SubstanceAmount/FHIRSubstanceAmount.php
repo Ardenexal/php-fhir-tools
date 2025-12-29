@@ -23,8 +23,8 @@ class FHIRSubstanceAmount extends \Ardenexal\FHIRTools\Component\Models\R4\DataT
 		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept $amountType = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string amountText A textual comment on a numeric value */
 		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string|null $amountText = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRSubstanceAmountReferenceRange referenceRange Reference range of possible or expected values */
-		public ?FHIRSubstanceAmountReferenceRange $referenceRange = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRSubstanceAmountReferenceRange referenceRange Reference range of possible or expected values */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRSubstanceAmountReferenceRange $referenceRange = null,
 	) {
 		parent::__construct($id, $extension, $modifierExtension);
 	}

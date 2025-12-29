@@ -35,7 +35,7 @@ class FHIRDosage extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRB
 		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept $route = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept method Technique for administering medication */
 		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept $method = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRDosageDoseAndRate> doseAndRate Amount of medication administered */
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDosageDoseAndRate> doseAndRate Amount of medication administered */
 		public array $doseAndRate = [],
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRRatio maxDosePerPeriod Upper limit on medication per unit of time */
 		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRRatio $maxDosePerPeriod = null,

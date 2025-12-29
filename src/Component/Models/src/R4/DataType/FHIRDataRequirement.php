@@ -24,13 +24,13 @@ class FHIRDataRequirement extends FHIRElement
 		public FHIRCodeableConcept|FHIRReference|null $subjectX = null,
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string> mustSupport Indicates specific structure elements that are referenced by the knowledge module */
 		public array $mustSupport = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRDataRequirementCodeFilter> codeFilter What codes are expected */
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDataRequirementCodeFilter> codeFilter What codes are expected */
 		public array $codeFilter = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRDataRequirementDateFilter> dateFilter What dates/date ranges are expected */
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDataRequirementDateFilter> dateFilter What dates/date ranges are expected */
 		public array $dateFilter = [],
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRPositiveInt limit Number of results */
 		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRPositiveInt $limit = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRDataRequirementSort> sort Order of the results */
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDataRequirementSort> sort Order of the results */
 		public array $sort = [],
 	) {
 		parent::__construct($id, $extension);

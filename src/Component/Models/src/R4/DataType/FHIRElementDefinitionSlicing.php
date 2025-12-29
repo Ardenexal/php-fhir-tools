@@ -13,7 +13,7 @@ class FHIRElementDefinitionSlicing extends FHIRElement
 		public ?string $id = null,
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension> extension Additional content defined by implementations */
 		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRElementDefinitionSlicingDiscriminator> discriminator Element values that are used to distinguish the slices */
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRElementDefinitionSlicingDiscriminator> discriminator Element values that are used to distinguish the slices */
 		public array $discriminator = [],
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string description Text description of how slicing works (or not) */
 		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string|null $description = null,
