@@ -22,6 +22,7 @@ use Symfony\Component\Console\Helper\ProgressIndicator;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
+use Nette\InvalidStateException;
 
 use function Symfony\Component\String\s;
 
@@ -1145,7 +1146,7 @@ class FHIRModelGeneratorCommand extends Command
                     try {
                         $enumNamespace->add($enumType);
                         $this->context->addEnum($url, $enumType);
-                    } catch (\Nette\InvalidStateException $e) {
+                    } catch (InvalidStateException $e) {
                         // Enum with this name already exists in namespace
                         if (str_contains($e->getMessage(), 'already exists')) {
                             $output->writeln("Enum class {$enumTypeName} already exists in namespace, skipping namespace addition");
@@ -1171,7 +1172,7 @@ class FHIRModelGeneratorCommand extends Command
                     // Try to add code type to namespace, handling duplicates gracefully
                     try {
                         $dataTypeNamespace->add($codeType);
-                    } catch (\Nette\InvalidStateException $e) {
+                    } catch (InvalidStateException $e) {
                         // Code type with this name already exists in namespace
                         if (str_contains($e->getMessage(), 'already exists')) {
                             $output->writeln("Code type class {$codeTypeName} already exists in namespace, skipping namespace addition");
