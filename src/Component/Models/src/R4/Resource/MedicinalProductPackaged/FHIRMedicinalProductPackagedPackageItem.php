@@ -33,11 +33,11 @@ class FHIRMedicinalProductPackagedPackageItem extends \Ardenexal\FHIRTools\Compo
 		public array $manufacturedItem = [],
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRMedicinalProductPackagedPackageItem> packageItem Allows containers within containers */
 		public array $packageItem = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRProdCharacteristic physicalCharacteristics Dimensions, color etc. */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRProdCharacteristic $physicalCharacteristics = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRProdCharacteristic physicalCharacteristics Dimensions, color etc. */
+		public ?FHIRProdCharacteristic $physicalCharacteristics = null,
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept> otherCharacteristics Other codeable characteristics */
 		public array $otherCharacteristics = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRProductShelfLife> shelfLifeStorage Shelf Life and storage information */
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRProductShelfLife> shelfLifeStorage Shelf Life and storage information */
 		public array $shelfLifeStorage = [],
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference> manufacturer Manufacturer of this Package Item */
 		public array $manufacturer = [],

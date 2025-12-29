@@ -743,13 +743,17 @@ class FHIRModelGenerator implements GeneratorInterface
         }
 
         // Special logical types that changed namespace between FHIR versions
-        // In R4/R4B: Dosage, Timing, ElementDefinition, SubstanceAmount are in Resource namespace
+        // In R4/R4B: These types are in Resource namespace (logical/backbone types)
         // In R5: They moved to DataType namespace
         $versionSpecificLogicalTypes = [
             'Dosage',
             'Timing',
             'ElementDefinition',
             'SubstanceAmount',
+            'ProductShelfLife',  // ProductShelfLife is also version-specific
+            'ProdCharacteristic', // Product Characteristic
+            'MarketingStatus',   // Marketing Status
+            'Population',        // Population definition
         ];
 
         if (in_array($code, $versionSpecificLogicalTypes, true)) {

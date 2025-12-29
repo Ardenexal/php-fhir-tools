@@ -1144,7 +1144,7 @@ class FHIRModelGeneratorCommand extends Command
                     // Use hasClass to check existence instead of getClass
                     $hasClass = false;
                     try {
-                        $hasClass = $elementNamespace->getClass($codeTypeName ?? '') instanceof ClassType;
+                        $hasClass = $enumNamespace->getClass($enumTypeName ?? '') instanceof ClassType;
                     } catch (\Throwable $e) {
                         $hasClass = false;
                     }

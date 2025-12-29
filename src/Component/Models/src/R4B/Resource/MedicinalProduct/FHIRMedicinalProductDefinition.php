@@ -62,7 +62,7 @@ class FHIRMedicinalProductDefinition extends FHIRDomainResource
 		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept $pediatricUseIndicator = null,
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept> classification Allows the product to be classified by various systems */
 		public array $classification = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMarketingStatus> marketingStatus Marketing status of the medicinal product, in contrast to marketing authorization */
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRMarketingStatus> marketingStatus Marketing status of the medicinal product, in contrast to marketing authorization */
 		public array $marketingStatus = [],
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept> packagedMedicinalProduct Package type for the product */
 		public array $packagedMedicinalProduct = [],

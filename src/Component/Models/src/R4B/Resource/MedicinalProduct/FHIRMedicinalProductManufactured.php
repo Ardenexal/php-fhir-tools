@@ -44,8 +44,8 @@ class FHIRMedicinalProductManufactured extends FHIRDomainResource
 		public array $manufacturer = [],
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference> ingredient Ingredient */
 		public array $ingredient = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRProdCharacteristic physicalCharacteristics Dimensions, color etc. */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRProdCharacteristic $physicalCharacteristics = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRProdCharacteristic physicalCharacteristics Dimensions, color etc. */
+		public ?FHIRProdCharacteristic $physicalCharacteristics = null,
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept> otherCharacteristics Other codeable characteristics */
 		public array $otherCharacteristics = [],
 	) {

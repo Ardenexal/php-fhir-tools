@@ -50,7 +50,7 @@ class FHIRPackagedProductDefinition extends FHIRDomainResource
 		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRMarkdown $description = null,
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRPackagedProductDefinitionLegalStatusOfSupply> legalStatusOfSupply The legal status of supply of the packaged item as classified by the regulator */
 		public array $legalStatusOfSupply = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMarketingStatus> marketingStatus Allows specifying that an item is on the market for sale, or that it is not available, and the dates and locations associated */
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRMarketingStatus> marketingStatus Allows specifying that an item is on the market for sale, or that it is not available, and the dates and locations associated */
 		public array $marketingStatus = [],
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept> characteristic Allows the key features to be recorded, such as "hospital pack", "nurse prescribable" */
 		public array $characteristic = [],

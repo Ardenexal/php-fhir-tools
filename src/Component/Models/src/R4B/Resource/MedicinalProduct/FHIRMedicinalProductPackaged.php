@@ -40,7 +40,7 @@ class FHIRMedicinalProductPackaged extends FHIRDomainResource
 		public \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string|null $description = null,
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept legalStatusOfSupply The legal status of supply of the medicinal product as classified by the regulator */
 		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept $legalStatusOfSupply = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMarketingStatus> marketingStatus Marketing information */
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRMarketingStatus> marketingStatus Marketing information */
 		public array $marketingStatus = [],
 		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference marketingAuthorization Manufacturer of this Package Item */
 		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference $marketingAuthorization = null,

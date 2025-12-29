@@ -50,10 +50,10 @@ class FHIRDeviceDefinition extends FHIRDomainResource
 		public array $version = [],
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept> safety Safety characteristics of the device */
 		public array $safety = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRProductShelfLife> shelfLifeStorage Shelf Life and storage information */
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRProductShelfLife> shelfLifeStorage Shelf Life and storage information */
 		public array $shelfLifeStorage = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRProdCharacteristic physicalCharacteristics Dimensions, color etc. */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRProdCharacteristic $physicalCharacteristics = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRProdCharacteristic physicalCharacteristics Dimensions, color etc. */
+		public ?FHIRProdCharacteristic $physicalCharacteristics = null,
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept> languageCode Language code for the human-readable text strings produced by the device (all supported) */
 		public array $languageCode = [],
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRDeviceDefinitionCapability> capability Device capabilities */

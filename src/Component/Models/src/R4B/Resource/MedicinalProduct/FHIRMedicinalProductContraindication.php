@@ -44,7 +44,7 @@ class FHIRMedicinalProductContraindication extends FHIRDomainResource
 		public array $therapeuticIndication = [],
 		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRMedicinalProductContraindicationOtherTherapy> otherTherapy Information about the use of the medicinal product in relation to other therapies described as part of the indication */
 		public array $otherTherapy = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPopulation> population The population group to which this applies */
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRPopulation> population The population group to which this applies */
 		public array $population = [],
 	) {
 		parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
