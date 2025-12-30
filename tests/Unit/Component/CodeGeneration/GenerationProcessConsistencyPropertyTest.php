@@ -24,11 +24,10 @@ use Symfony\Component\Filesystem\Filesystem;
  * **Note on Filesystem Mocking:**
  * This test mocks the Filesystem to prevent actual file operations. The command's
  * __invoke() method calls clearModelsComponentOutputDirectory() which would delete
- * the real Models directory at src/Component/Models/src. By mocking the filesystem
- * and returning false for exists(), we skip the cleanup logic while still testing
- * the command's behavior and consistency properties.
- *
- * @author FHIR Tools
+ * the real Models directory at src/Component/Models/src, removing all generated
+ * R4, R4B, and R5 model files. By mocking the filesystem and returning false for
+ * exists(), we skip the cleanup logic while still testing the command's behavior
+ * and consistency properties.
  */
 class GenerationProcessConsistencyPropertyTest extends TestCase
 {
@@ -48,9 +47,10 @@ class GenerationProcessConsistencyPropertyTest extends TestCase
 
         // Mock filesystem to prevent actual file system operations during tests.
         // The command's __invoke() method calls clearModelsComponentOutputDirectory()
-        // which would delete the real Models directory at src/Component/Models/src.
-        // By mocking the filesystem and returning false for exists(), we skip the
-        // cleanup logic while still testing the command's behavior and consistency.
+        // which would delete the real Models directory at src/Component/Models/src,
+        // removing all generated R4, R4B, and R5 model files. By mocking the filesystem
+        // and returning false for exists(), we skip the cleanup logic while still testing
+        // the command's behavior and consistency.
         $this->filesystem    = $this->createMock(Filesystem::class);
         $this->context       = new BuilderContext();
         $this->packageLoader = $this->createMock(PackageLoader::class);
