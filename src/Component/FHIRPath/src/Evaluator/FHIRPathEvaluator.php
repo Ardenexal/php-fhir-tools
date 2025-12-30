@@ -19,6 +19,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Expression\UnaryOperatorNode;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\TokenType;
 use Ardenexal\FHIRTools\Component\FHIRPath\Function\FunctionRegistry;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRTypeResolver;
 
 /**
  * FHIRPath expression evaluator
@@ -33,9 +34,12 @@ final class FHIRPathEvaluator implements ExpressionVisitor
 {
     private EvaluationContext $context;
 
+    private FHIRTypeResolver $typeResolver;
+
     public function __construct()
     {
-        $this->context = new EvaluationContext();
+        $this->context      = new EvaluationContext();
+        $this->typeResolver = new FHIRTypeResolver();
     }
 
     /**
@@ -248,8 +252,41 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      */
     public function visitTypeExpression(TypeExpressionNode $node): Collection
     {
-        // Type operations will be fully implemented in Phase 7
-        throw new EvaluationException('Type operations not yet fully implemented', $node->getLine(), $node->getColumn());
+        // Evaluate the expression to get the collection to check/cast
+        $collection = $node->getExpression()->accept($this);
+        $typeName   = $node->getTypeName();
+        $operator   = $node->getOperator();
+
+        // Handle 'is' operator - type checking
+        if ($operator === TokenType::IS) {
+            // For collections, filter items that match the type
+            $filtered = [];
+            foreach ($collection->toArray() as $item) {
+                if ($this->typeResolver->isOfType($item, $typeName)) {
+                    $filtered[] = $item;
+                }
+            }
+
+            return Collection::from($filtered);
+        }
+
+        // Handle 'as' operator - type casting
+        if ($operator === TokenType::AS) {
+            // For collections, cast each item to the target type
+            $casted = [];
+            foreach ($collection->toArray() as $item) {
+                try {
+                    $casted[] = $this->typeResolver->castToType($item, $typeName);
+                } catch (\InvalidArgumentException $e) {
+                    // If cast fails, skip the item (FHIRPath semantics)
+                    continue;
+                }
+            }
+
+            return Collection::from($casted);
+        }
+
+        throw new EvaluationException(sprintf('Unsupported type operator: %s', $operator->name), $node->getLine(), $node->getColumn());
     }
 
     /**
