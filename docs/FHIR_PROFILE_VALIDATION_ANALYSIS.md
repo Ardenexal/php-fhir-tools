@@ -357,7 +357,7 @@ class ProfileConstraintRegistry
 
 ### Option 4: Hybrid FHIRPath + Symfony Validator (RECOMMENDED)
 
-**Description**: Combine FHIRPath constraint evaluation with Symfony validation framework
+**Description**: Combine FHIRPath constraint evaluation with Symfony validation framework using snapshot-based validation
 
 #### Architecture
 
@@ -367,24 +367,34 @@ class ProfileConstraintRegistry
 │  (Main validation orchestrator)                         │
 └────────────────────┬────────────────────────────────────┘
                      │
-        ┌────────────┴────────────┐
+        ┌────────────┴────────────────────┐
+        │                                 │
+        ▼                                 ▼
+┌──────────────────┐    ┌─────────────────────────────┐
+│ Symfony          │    │ FHIRPath Constraint         │
+│ Validator        │    │ Evaluator (Compiled)        │
+│                  │    │                             │
+│ - Cardinality    │    │ - Cached FHIRPath expr.     │
+│ - Type checks    │    │ - Custom logic              │
+│ - Required       │    │ - Cross-element             │
+└──────────────────┘    └─────────────────────────────┘
+        │                         │
         │                         │
         ▼                         ▼
-┌──────────────────┐    ┌─────────────────────┐
-│ Symfony          │    │ FHIRPath            │
-│ Validator        │    │ Constraint          │
-│                  │    │ Evaluator           │
-│ - Cardinality    │    │ - FHIRPath expr.    │
-│ - Type checks    │    │ - Custom logic      │
-│ - Required       │    │ - Cross-element     │
-└──────────────────┘    └─────────────────────┘
-        │                         │
-        │                         │
-        ▼                         ▼
-┌─────────────────────────────────────────┐
-│  ProfileConstraintRepository            │
-│  (Stores parsed profile constraints)    │
-└─────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────┐
+│  ProfileConstraintRepository (Snapshot-based)        │
+│  - SnapshotGenerator: Merges baseDefinition          │
+│  - SelectorRegistry: Precomputed path navigators     │
+│  - Slicer: Discriminator-based slice matching        │
+└──────────────────────────────────────────────────────┘
+        │
+        ▼
+┌──────────────────────────────────────────────────────┐
+│  Terminology Resolver (Remote-first with Fallback)   │
+│  - Remote: $validate-code, $expand (with cache)      │
+│  - Package: Local fallback                           │
+│  - Circuit breaker for resilience                    │
+└──────────────────────────────────────────────────────┘
 ```
 
 #### Implementation
@@ -405,25 +415,62 @@ class ProfileConstraint
     ) {}
 }
 
-// 2. Profile constraint repository
+// 2. Profile constraint repository (SNAPSHOT-BASED)
 class ProfileConstraintRepository
 {
     private array $profiles = [];
     
+    public function __construct(
+        private SnapshotGenerator $snapshotGenerator,
+        private FHIRPathCompiler $fhirPathCompiler,
+        private CacheInterface $cache
+    ) {}
+    
     public function load(string $profileUrl, StructureDefinition $sd): void
     {
+        // CRITICAL: Generate snapshot, not just differential
+        $snapshot = $this->snapshotGenerator->generate($sd);
+        
         $constraints = [];
-        foreach ($sd->differential->element ?? [] as $element) {
-            $constraints[] = new ProfileConstraint(
-                path: $element->path,
-                key: $element->id ?? '',
-                expression: $element->constraint[0]->expression ?? null,
-                min: $element->min ?? 0,
-                max: $element->max ?? '*',
-                types: $element->type ?? [],
-                binding: $element->binding ?? null
-            );
+        foreach ($snapshot->element as $element) {
+            // Extract all constraints from snapshot element
+            foreach ($element->constraint ?? [] as $constraint) {
+                $constraints[] = new ProfileConstraint(
+                    path: $element->path,
+                    key: $constraint->key,
+                    expression: $constraint->expression,
+                    human: $constraint->human,
+                    min: $element->min ?? 0,
+                    max: $element->max ?? '*',
+                    types: $element->type ?? [],
+                    binding: $element->binding ?? null,
+                    severity: $constraint->severity ?? 'error'
+                );
+            }
+            
+            // Also create implicit cardinality constraints
+            if ($element->min > 0 || $element->max !== '*') {
+                $constraints[] = new ProfileConstraint(
+                    path: $element->path,
+                    key: "{$element->id}.cardinality",
+                    min: $element->min ?? 0,
+                    max: $element->max ?? '*',
+                    types: $element->type ?? []
+                );
+            }
         }
+        
+        // Compile FHIRPath expressions upfront
+        foreach ($constraints as $constraint) {
+            if ($constraint->expression) {
+                $cacheKey = "fp:{$profileUrl}|{$constraint->key}";
+                $compiled = $this->cache->get($cacheKey, function() use ($constraint) {
+                    return $this->fhirPathCompiler->compile($constraint->expression);
+                });
+                $constraint->compiledExpression = $compiled;
+            }
+        }
+        
         $this->profiles[$profileUrl] = $constraints;
     }
     
@@ -569,17 +616,124 @@ class FHIRProfileValidator
         FHIRResource $resource,
         ProfileConstraint $constraint
     ): ConstraintViolationList {
-        // Validate against ValueSet binding
-        // Implementation depends on ValueSet resolution
-        return new ConstraintViolationList();
+        $violations = new ConstraintViolationList();
+        
+        if (!$constraint->binding) {
+            return $violations;
+        }
+        
+        // Get the code/coding to validate
+        $value = $this->resolvePath($constraint->path, $resource);
+        
+        // Use terminology resolver with remote-first strategy
+        $isValid = $this->terminologyResolver->validateCode(
+            $constraint->binding['valueSet'],
+            $value,
+            $constraint->binding['strength']
+        );
+        
+        if (!$isValid) {
+            $severity = $constraint->binding['strength'] === 'required' ? 'error' : 'warning';
+            $violation = new ConstraintViolation(
+                "Code not found in ValueSet {$constraint->binding['valueSet']} (binding: {$constraint->binding['strength']})",
+                null,
+                [],
+                $resource,
+                $constraint->path,
+                $value
+            );
+            $violations->add($violation);
+        }
+        
+        return $violations;
     }
 }
 
-// 6. Service registration in Symfony
+// 6. Terminology Resolver (Remote-first with fallback)
+class FallbackTerminologyResolver
+{
+    public function __construct(
+        private RemoteTerminologyResolver $remoteResolver,
+        private PackageTerminologyResolver $packageResolver,
+        private CacheInterface $cache,
+        private CircuitBreaker $circuitBreaker
+    ) {}
+    
+    public function validateCode(
+        string $valueSetUrl,
+        mixed $code,
+        string $strength
+    ): bool {
+        // Try remote first (with circuit breaker)
+        if ($this->circuitBreaker->isAvailable()) {
+            try {
+                $cacheKey = "vs:{$valueSetUrl}|code:{$code}";
+                return $this->cache->get($cacheKey, function() use ($valueSetUrl, $code) {
+                    return $this->remoteResolver->validateCode($valueSetUrl, $code);
+                });
+            } catch (TerminologyServerException $e) {
+                $this->circuitBreaker->recordFailure();
+                // Fall through to package resolver
+            }
+        }
+        
+        // Fallback to package loader
+        return $this->packageResolver->validateCode($valueSetUrl, $code);
+    }
+}
+
+// 7. Snapshot Generator
+class SnapshotGenerator
+{
+    public function generate(StructureDefinition $sd): StructureDefinition
+    {
+        // If snapshot already exists and is current, return it
+        if ($sd->snapshot && $this->isSnapshotCurrent($sd)) {
+            return $sd;
+        }
+        
+        // Load base definition
+        $base = $this->loadBaseDefinition($sd->baseDefinition);
+        
+        // Merge base snapshot with differential
+        $snapshot = clone $base->snapshot;
+        $this->applyDifferential($snapshot, $sd->differential);
+        
+        $sd->snapshot = $snapshot;
+        return $sd;
+    }
+    
+    private function applyDifferential($snapshot, $differential): void
+    {
+        // Merge differential constraints into snapshot
+        // Handle slicing, cardinality overrides, type constraints
+        // This is complex FHIR logic - see FHIR spec for details
+    }
+}
+
+// 8. Service registration in Symfony
 // config/services.yaml
 services:
+    fhir.snapshot_generator:
+        class: Ardenexal\FHIRTools\Component\Validation\SnapshotGenerator
+        
+    fhir.fhirpath_compiler:
+        class: Ardenexal\FHIRTools\Component\Validation\FHIRPathCompiler
+        
+    fhir.terminology_resolver:
+        class: Ardenexal\FHIRTools\Component\Validation\Terminology\FallbackTerminologyResolver
+        arguments:
+            - '@fhir.terminology.remote'
+            - '@fhir.terminology.package'
+            - '@cache.app'
+            - '@fhir.circuit_breaker'
+        
     fhir.profile_constraint_repository:
         class: Ardenexal\FHIRTools\Component\Validation\ProfileConstraintRepository
+        arguments:
+            - '@fhir.snapshot_generator'
+            - '@fhir.fhirpath_compiler'
+            - '@cache.app'
         
     fhir.profile_validator:
         class: Ardenexal\FHIRTools\Component\Validation\FHIRProfileValidator
@@ -587,6 +741,7 @@ services:
             - '@validator'
             - '@fhir.path_service'
             - '@fhir.profile_constraint_repository'
+            - '@fhir.terminology_resolver'
 ```
 
 #### Usage Example
@@ -632,6 +787,131 @@ if (count($violations) > 0) {
 
 ---
 
+## Production Requirements & Critical Gaps
+
+### Critical Production Considerations
+
+Based on production requirements for API Platform 3.4 with Symfony 6.4, the following elements are essential:
+
+#### 1. **Snapshot-Based Validation** ⚠️ CRITICAL
+
+**Issue**: Using differential elements directly leads to incorrect cardinality, missing inherited constraints, and incomplete slicing information.
+
+**Solution**: Always generate and validate against StructureDefinition snapshots:
+- Merge `baseDefinition` constraints
+- Materialize complete slicing structures
+- Stabilize element paths
+- Include all inherited constraints
+
+```php
+// WRONG: Using differential
+foreach ($sd->differential->element as $element) { ... }
+
+// CORRECT: Using snapshot
+$snapshot = $snapshotGenerator->generate($sd);
+foreach ($snapshot->element as $element) { ... }
+```
+
+#### 2. **Compiled FHIRPath Expressions** ⚠️ PERFORMANCE
+
+**Issue**: Interpreting FHIRPath expressions on every validation is costly (100x slower).
+
+**Solution**: Parse once, compile to PHP callables, cache per `(profileUrl, constraintKey)`:
+```php
+$compiled = $cache->get("fp:{$profileUrl}|{$key}", function() use ($expr) {
+    return $fhirPathCompiler->compile($expr);
+});
+```
+
+**Target**: <10-15ms per Patient validation on warm cache.
+
+#### 3. **Terminology Resolution (Remote-First)** ⚠️ CRITICAL
+
+**Issue**: ValueSet binding validation requires external terminology services.
+
+**Strategy**:
+- **Primary**: Remote terminology server (`$validate-code`, `$expand`)
+- **Fallback**: Package loader (local expansions)
+- **Resilience**: Circuit breaker, timeouts (200-500ms), PSR-6 caching (24-72h TTL)
+
+**Binding Strengths**:
+- `required` → error if invalid
+- `extensible` → warning if no suitable code (configurable)
+- `preferred`/`example` → informational only
+
+#### 4. **Slicing Implementation** ⚠️ CRITICAL
+
+**Issue**: Array slicing with discriminators is complex FHIR-specific logic.
+
+**Requirements**:
+- Precompute discriminator matchers (`value`, `pattern`, `type`, `profile`)
+- Bucket array items per slice
+- Enforce per-slice cardinality
+- Handle closed vs open slice policies
+- Validate slice-level constraints
+
+#### 5. **Multi-Profile Semantics**
+
+**Strategy**: **Intersection semantics** - resource must satisfy ALL selected profiles.
+
+**Profile Selection Order**:
+1. Explicit profiles (if provided)
+2. `resource.meta.profile[]` (if present)
+3. Configured default profiles (fallback)
+
+**Conflict Detection**: If two profiles constrain the same element incompatibly, emit a single top-level violation referencing both profile URLs.
+
+#### 6. **Error Format: Symfony Violations Only**
+
+**Requirement**: All validation outputs must use `Symfony\Component\Validator\ConstraintViolationList`.
+
+**Structure**:
+- **message**: Human-readable text from profile + context
+- **propertyPath**: Concrete path (e.g., `name[0].family`)
+- **code**: Machine-readable code (e.g., `fhir.cardinality.min`, `fhir.fhirpath`, `fhir.binding.required`)
+
+**NO** OperationOutcome in API responses (adapter optional for FHIR operations).
+
+#### 7. **Performance & Caching**
+
+**Caches (PSR-6)**:
+- Snapshots: `sd:<canonical>|ver:<version>`
+- Selectors: `selector:<profile>|<elementPath>`
+- Compiled FHIRPath: `fp:<profile>|<constraintKey>`
+- Slicers: `slice:<profile>|<elementPath>`
+- Terminology: `vs:<canonical>|code:<code>` (10k LRU), `expand:<canonical>` (1k LRU)
+
+**Optimization**:
+- Batch constraints by element path
+- Short-circuit on first error (strict mode)
+- Prewarm common profiles on boot
+- Avoid cloning large subtrees
+
+**Observability**: OpenTelemetry spans for all major operations.
+
+#### 8. **Developer Experience**
+
+**Explain Mode**: For failing constraints, show:
+- Profile URL + element ID
+- Selector path and selected values
+- FHIRPath source + compiled info
+- Terminology resolution path (remote vs fallback)
+
+**CLI**: `php bin/console fhir:validate <file> -p <profile> --explain`
+
+### Risks Mitigated
+
+| Risk | Mitigation |
+|------|------------|
+| Incorrect cardinality from differentials | Use snapshot generator |
+| Poor FHIRPath performance | Compile and cache expressions |
+| Terminology server unavailable | Circuit breaker + package fallback |
+| Unbounded memory growth | LRU caches with TTL |
+| Slicing validation gaps | Explicit discriminator implementation |
+| Profile conflicts | Detect at load time, emit clear violation |
+
+---
+
 ## Recommended Architecture
 
 ### Component Structure
@@ -640,10 +920,15 @@ if (count($violations) > 0) {
 src/Component/Validation/
 ├── src/
 │   ├── FHIRProfileValidator.php          # Main validator
-│   ├── ProfileConstraintRepository.php    # Stores constraints
+│   ├── ProfileConstraintRepository.php    # Stores constraints (snapshot-based)
+│   ├── SnapshotGenerator.php             # Generates StructureDefinition snapshots
+│   ├── SelectorRegistry.php              # Precomputed path selectors
+│   ├── FHIRPathCompiler.php              # Compiles FHIRPath to PHP callables
+│   ├── Slicer.php                        # Discriminator-based slice matching
+│   ├── ProfileSelection.php              # Resolves explicit/meta/default profiles
 │   ├── Model/
 │   │   ├── ProfileConstraint.php         # Constraint model
-│   │   ├── ValidationResult.php          # Result model
+│   │   ├── ValidationResult.php          # Result model (Symfony violations)
 │   │   └── ValidationIssue.php           # Issue model
 │   ├── Constraint/
 │   │   ├── FHIRPathConstraint.php        # Symfony constraint
@@ -655,17 +940,27 @@ src/Component/Validation/
 │   │   ├── CardinalityValidator.php
 │   │   ├── BindingValidator.php
 │   │   └── SlicingValidator.php
+│   ├── Terminology/
+│   │   ├── RemoteTerminologyResolver.php  # Remote terminology server
+│   │   ├── PackageTerminologyResolver.php # Package-based fallback
+│   │   ├── FallbackTerminologyResolver.php # Orchestrates remote + fallback
+│   │   └── CircuitBreaker.php             # Circuit breaker for resilience
 │   ├── Loader/
 │   │   ├── ProfileLoader.php             # Load profiles
 │   │   └── ProfileParser.php             # Parse StructureDefinitions
+│   ├── Cache/
+│   │   └── ValidationCacheWarmer.php     # Prewarm common profiles
 │   ├── Service/
 │   │   └── ValidationService.php         # High-level API
 │   └── Exception/
 │       ├── ValidationException.php
-│       └── ProfileNotFoundException.php
+│       ├── ProfileNotFoundException.php
+│       ├── TerminologyServerException.php
+│       └── SnapshotGenerationException.php
 ├── tests/
 │   ├── Unit/
-│   └── Integration/
+│   ├── Integration/
+│   └── Performance/                       # Performance benchmarks
 ├── composer.json
 └── README.md
 ```
@@ -731,62 +1026,92 @@ fhir:
 
 ## Implementation Roadmap
 
-### Phase 1: Foundation (Week 1-2)
+### Phase 1: Foundation & Snapshot Generation (Week 1-2)
 
 **Tasks**:
 - [ ] Create `Validation` component structure
-- [ ] Implement `ProfileConstraint` model
-- [ ] Implement `ProfileConstraintRepository`
-- [ ] Add basic `ProfileLoader`
-- [ ] Write unit tests for models
+- [ ] Implement `ProfileConstraint` model ✅ (POC complete)
+- [ ] Implement `SnapshotGenerator` with baseDefinition resolution
+- [ ] Implement `ProfileConstraintRepository` (snapshot-based)
+- [ ] Add `ProfileSelection` (explicit → meta → default)
+- [ ] Implement `SelectorRegistry` for path navigation
+- [ ] Write unit tests for models and snapshot generation
 
 **Deliverables**:
 - Component skeleton
-- Constraint storage
-- Profile loading from StructureDefinitions
+- Snapshot generation working
+- Profile selection logic
+- Precomputed path selectors
 
-### Phase 2: Basic Validation (Week 3-4)
+### Phase 2: Core Validation & FHIRPath Compilation (Week 3-4)
 
 **Tasks**:
+- [ ] Implement `FHIRPathCompiler` with caching
 - [ ] Implement `CardinalityConstraintValidator`
-- [ ] Implement `FHIRPathConstraintValidator`
+- [ ] Implement `FHIRPathConstraintValidator` (using compiled expressions)
 - [ ] Create `FHIRProfileValidator` orchestrator
-- [ ] Integrate with Symfony validator
+- [ ] Integrate with Symfony validator (ConstraintViolationList)
+- [ ] Batch constraints by element path
 - [ ] Write validation tests
 
 **Deliverables**:
 - Cardinality validation working
-- FHIRPath constraint validation working
-- Multi-profile validation support
+- Compiled FHIRPath constraint validation
+- Multi-profile validation with intersection semantics
+- All errors as Symfony violations
 
-### Phase 3: Advanced Features (Week 5-6)
+### Phase 3: Terminology & Slicing (Week 5-6)
 
 **Tasks**:
-- [ ] Implement `BindingConstraintValidator`
-- [ ] Implement `SlicingConstraintValidator`
-- [ ] Add type constraint validation
-- [ ] Add extension validation
-- [ ] Performance optimization (caching)
+- [ ] Implement `RemoteTerminologyResolver` with circuit breaker
+- [ ] Implement `PackageTerminologyResolver` (fallback)
+- [ ] Implement `FallbackTerminologyResolver` (orchestrates both)
+- [ ] Add PSR-6 caching for terminology (validateCode, expand)
+- [ ] Implement `Slicer` with discriminator matchers
+- [ ] Handle closed/open slice policies
+- [ ] Enforce per-slice cardinality
+- [ ] Implement type constraint validation
 
 **Deliverables**:
-- Complete validation coverage
-- ValueSet binding validation
-- Slicing support
+- Remote-first terminology resolution working
+- ValueSet binding validation (required/extensible/preferred)
+- Complete slicing support
+- Circuit breaker for resilience
 
-### Phase 4: Integration & Polish (Week 7-8)
+### Phase 4: Performance, Observability & Polish (Week 7-8)
 
 **Tasks**:
+- [ ] Add OpenTelemetry instrumentation (spans for all operations)
+- [ ] Implement bounded caches with LRU and TTL
+- [ ] Add `ValidationCacheWarmer` for common profiles
+- [ ] Create `ExplainMode` for developer troubleshooting
 - [ ] Symfony Bundle integration
-- [ ] Console commands for validation
-- [ ] Error message improvement
-- [ ] Documentation
-- [ ] Example profiles and tests
+- [ ] Console command: `fhir:validate` with --explain flag
+- [ ] Performance benchmarks (target: <15ms p95 on warm cache)
+- [ ] Complete documentation
+- [ ] Conflict detection for multi-profile validation
 
 **Deliverables**:
-- CLI tool: `php bin/console fhir:validate`
+- CLI tool with explain mode
+- Performance optimizations verified
 - Complete documentation
 - Integration tests
-- Performance benchmarks
+- OpenTelemetry dashboards
+
+### Acceptance Criteria
+
+- [ ] Validates against **snapshots** (not differentials)
+- [ ] Multi-profile with **intersection semantics**
+- [ ] **Compiled FHIRPath** with caching
+- [ ] **Remote-first terminology** with package fallback
+- [ ] All errors as **Symfony violations** with precise propertyPaths
+- [ ] **Bounded caches** (LRU + TTL)
+- [ ] **Circuit breaker** for terminology server
+- [ ] **Slicing** with discriminators working
+- [ ] **Explain mode** available
+- [ ] **p95 latency** <15ms per Patient on warm cache
+- [ ] Profile **conflict detection** working
+- [ ] **OpenTelemetry** spans for all operations
 
 ---
 

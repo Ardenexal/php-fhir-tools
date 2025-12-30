@@ -23,13 +23,13 @@ $constraint = new ProfileConstraint(
     human: 'Patient SHALL have at least family or given name',
     min: 1,
     max: '*',
-    severity: 'error'
+    severity: 'error',
 );
 
 echo "Created ProfileConstraint:\n";
 echo "  Path: {$constraint->path}\n";
-echo "  Has FHIRPath: " . ($constraint->hasFHIRPathConstraint() ? 'Yes' : 'No') . "\n";
-echo "  Has Cardinality: " . ($constraint->hasCardinalityConstraint() ? 'Yes' : 'No') . "\n\n";
+echo '  Has FHIRPath: ' . ($constraint->hasFHIRPathConstraint() ? 'Yes' : 'No') . "\n";
+echo '  Has Cardinality: ' . ($constraint->hasCardinalityConstraint() ? 'Yes' : 'No') . "\n\n";
 
 // Example 2: Create validation result
 $result = new ValidationResult();
@@ -37,11 +37,11 @@ $result->addIssue(ValidationIssue::error(
     'Patient.name',
     'Patient must have at least one name',
     'pat-name-1',
-    'http://example.org/StructureDefinition/MyPatient'
+    'http://example.org/StructureDefinition/MyPatient',
 ));
 
 echo "Validation Result:\n";
-echo "  Valid: " . ($result->isValid() ? 'Yes' : 'No') . "\n";
+echo '  Valid: ' . ($result->isValid() ? 'Yes' : 'No') . "\n";
 echo "  Errors: {$result->getErrorCount()}\n\n";
 
 echo "See docs/FHIR_PROFILE_VALIDATION_ANALYSIS.md for full analysis.\n";

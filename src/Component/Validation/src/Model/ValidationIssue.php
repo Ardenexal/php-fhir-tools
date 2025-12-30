@@ -152,7 +152,7 @@ class ValidationIssue
             'code'        => 'invariant',
             'diagnostics' => $this->message,
             'location'    => $this->path   !== '' ? [$this->path] : [],
-            'expression'  => $this->path !== '' ? [$this->path] : [],
+            'expression'  => $this->path   !== '' ? [$this->path] : [],
         ];
     }
 }
