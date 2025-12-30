@@ -22,8 +22,10 @@
         "symfony/intl": "^6.4|^7.4",
         "symfony/polyfill-php84": "^v1.33.0",
         "symfony/polyfill-php85": "^v1.33.0",
+        "symfony/property-access": "^6.4|^7.4",
         "symfony/runtime": "^6.4|^7.4",
         "symfony/serializer": "^6.4|^7.4",
+        "symfony/string": "^6.4|^7.4",
         "symfony/validator": "^6.4|^7.4",
         "symfony/yaml": "^6.4|^7.4"
     },
@@ -54,11 +56,13 @@
             "Ardenexal\\FHIRTools\\Component\\CodeGeneration\\": "src/Component/CodeGeneration/src/",
             "Ardenexal\\FHIRTools\\Component\\Serialization\\": "src/Component/Serialization/src/",
             "Ardenexal\\FHIRTools\\Component\\Models\\": "src/Component/Models/src/"
+            "Ardenexal\\FHIRTools\\Component\\FHIRPath\\": "src/Component/FHIRPath/src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
             "Ardenexal\\FHIRTools\\Tests\\": "tests/",
+            "Ardenexal\\FHIRTools\\Component\\FHIRPath\\Tests\\": "src/Component/FHIRPath/tests/",
             "Ardenexal\\FHIRTools\\R4B\\": "output/Ardenexal/FhirTools/R4B/"
         }
     },

@@ -11,6 +11,7 @@ parameters:
         - src/Component/CodeGeneration/src/
         - src/Component/Serialization/src/
         - src/Component/Models/src/
+        - src/Component/FHIRPath/src/
     excludePaths:
         - */vendor/*
         - src/Component/*/tests/*

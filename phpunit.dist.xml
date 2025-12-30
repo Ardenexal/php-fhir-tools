@@ -21,7 +21,8 @@
 
     <testsuites>
         <testsuite name="unit">
-            <directory>tests/Unit/Exception</directory>
+            <directory>tests/Unit</directory>
+            <directory>src/Component/FHIRPath/tests/Unit</directory>
         </testsuite>
         <testsuite name="integration">
             <directory>tests/Integration</directory>
@@ -38,8 +39,8 @@
         <testsuite name="serialization">
             <directory>tests/Unit/Component/Serialization</directory>
         </testsuite>
-        <testsuite name="all">
-            <directory>tests</directory>
+        <testsuite name="fhirpath">
+            <directory>src/Component/FHIRPath/tests/Unit</directory>
         </testsuite>
     </testsuites>
 
@@ -53,6 +54,7 @@
             <directory>src/Bundle/FHIRBundle</directory>
             <directory>src/Component/CodeGeneration/src</directory>
             <directory>src/Component/Serialization/src</directory>
+            <directory>src/Component/FHIRPath/src</directory>
         </include>
         <exclude>
             <directory>src/Exception</directory>

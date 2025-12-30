@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
   push:
 jobs:
-   copilot-setup-steps:
+  copilot-setup-steps:
     name: Setup PHP Environment for Copilot Agent
     runs-on: ubuntu-latest
     env:
