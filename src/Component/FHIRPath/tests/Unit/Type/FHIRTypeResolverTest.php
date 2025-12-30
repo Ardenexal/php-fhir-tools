@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Tests\Unit\Type;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRTypeResolver;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRInteger;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDecimal;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDate;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime;
+use Ardenexal\FHIRTools\Component\FHIRPath\Tests\Fixtures\Models\R4B\Primitive\FHIRBoolean;
+use Ardenexal\FHIRTools\Component\FHIRPath\Tests\Fixtures\Models\R4B\Primitive\FHIRString;
+use Ardenexal\FHIRTools\Component\FHIRPath\Tests\Fixtures\Models\R4B\Primitive\FHIRInteger;
+use Ardenexal\FHIRTools\Component\FHIRPath\Tests\Fixtures\Models\R4B\Primitive\FHIRDecimal;
+use Ardenexal\FHIRTools\Component\FHIRPath\Tests\Fixtures\Models\R4B\Primitive\FHIRDate;
+use Ardenexal\FHIRTools\Component\FHIRPath\Tests\Fixtures\Models\R4B\Primitive\FHIRDateTime;
 use PHPUnit\Framework\TestCase;
 
 /**

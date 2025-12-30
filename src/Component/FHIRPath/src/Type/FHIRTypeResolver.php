@@ -74,8 +74,8 @@ class FHIRTypeResolver
         if (is_object($value)) {
             $class = get_class($value);
 
-            // Check for FHIR primitive types from Models component
-            if (str_contains($class, '\\Models\\R4B\\Primitive\\FHIR')) {
+            // Check for FHIR primitive types from Models component or test fixtures
+            if (str_contains($class, '\\R4B\\Primitive\\FHIR')) {
                 // Extract primitive type name: FHIRBoolean -> Boolean, FHIRString -> String
                 $className = basename(str_replace('\\', '/', $class));
                 if (str_starts_with($className, 'FHIR')) {
@@ -95,16 +95,16 @@ class FHIRTypeResolver
                 }
             }
 
-            // Check for FHIR resource types from Models component
-            if (str_contains($class, '\\Models\\R4B\\Resource\\FHIR')) {
+            // Check for FHIR resource types from Models component or test fixtures
+            if (str_contains($class, '\\R4B\\Resource\\FHIR')) {
                 $className = basename(str_replace('\\', '/', $class));
                 if (str_starts_with($className, 'FHIR')) {
                     return substr($className, 4); // Remove 'FHIR' prefix: FHIRPatient -> Patient
                 }
             }
 
-            // Check for DataType from Models component
-            if (str_contains($class, '\\Models\\R4B\\DataType\\FHIR')) {
+            // Check for DataType from Models component or test fixtures
+            if (str_contains($class, '\\R4B\\DataType\\FHIR')) {
                 $className = basename(str_replace('\\', '/', $class));
                 if (str_starts_with($className, 'FHIR')) {
                     return substr($className, 4); // Remove 'FHIR' prefix

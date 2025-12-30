@@ -6,7 +6,6 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
-use DateTime;
 
 /**
  * FHIRPath today() function.
@@ -28,7 +27,8 @@ class TodayFunction extends AbstractFunction
         $this->validateParameterCount($parameters, 0, 0);
 
         // Return date portion as string in format YYYY-MM-DD
-        $now = new DateTime();
+        $now = new \DateTime();
+
         return Collection::single($now->format('Y-m-d'));
     }
 }

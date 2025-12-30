@@ -39,21 +39,13 @@ class PowerFunction extends AbstractFunction
 
         $exponent = $exponentResult->first();
         if (!is_numeric($exponent)) {
-            throw EvaluationException::invalidFunctionParameter(
-                'power',
-                'numeric exponent',
-                gettype($exponent)
-            );
+            throw EvaluationException::invalidFunctionParameter('power', 'numeric exponent', gettype($exponent));
         }
 
         $items = [];
         foreach ($input as $item) {
             if (!is_numeric($item)) {
-                throw EvaluationException::invalidFunctionParameter(
-                    'power',
-                    'numeric value',
-                    gettype($item)
-                );
+                throw EvaluationException::invalidFunctionParameter('power', 'numeric value', gettype($item));
             }
 
             $items[] = pow((float) $item, (float) $exponent);

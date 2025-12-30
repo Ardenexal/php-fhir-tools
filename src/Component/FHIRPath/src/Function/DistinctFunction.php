@@ -28,7 +28,7 @@ class DistinctFunction extends AbstractFunction
         }
 
         $distinct = [];
-        $seen = [];
+        $seen     = [];
 
         foreach ($input as $item) {
             $key = $this->getItemKey($item);

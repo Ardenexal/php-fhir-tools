@@ -8,10 +8,10 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\FHIRPathEvaluator;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\FHIRPathLexer;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\FHIRPathParser;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRInteger;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDecimal;
+use Ardenexal\FHIRTools\Component\FHIRPath\Tests\Fixtures\Models\R4B\Primitive\FHIRBoolean;
+use Ardenexal\FHIRTools\Component\FHIRPath\Tests\Fixtures\Models\R4B\Primitive\FHIRString;
+use Ardenexal\FHIRTools\Component\FHIRPath\Tests\Fixtures\Models\R4B\Primitive\FHIRInteger;
+use Ardenexal\FHIRTools\Component\FHIRPath\Tests\Fixtures\Models\R4B\Primitive\FHIRDecimal;
 use PHPUnit\Framework\TestCase;
 
 /**

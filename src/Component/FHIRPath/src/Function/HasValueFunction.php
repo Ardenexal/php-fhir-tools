@@ -37,7 +37,7 @@ class HasValueFunction extends AbstractFunction
             // Check if object has a value property (FHIR primitive pattern)
             if (is_object($item)) {
                 $hasValue = property_exists($item, 'value') && $item->value !== null;
-                $items[] = $hasValue;
+                $items[]  = $hasValue;
             } else {
                 // For non-objects, any non-null value is considered having value
                 $items[] = $item !== null;

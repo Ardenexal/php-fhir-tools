@@ -38,11 +38,7 @@ class RoundFunction extends AbstractFunction
             if (!$precisionResult->isEmpty()) {
                 $precisionValue = $precisionResult->first();
                 if (!is_numeric($precisionValue)) {
-                    throw EvaluationException::invalidFunctionParameter(
-                        'round',
-                        'numeric precision',
-                        gettype($precisionValue)
-                    );
+                    throw EvaluationException::invalidFunctionParameter('round', 'numeric precision', gettype($precisionValue));
                 }
                 $precision = (int) $precisionValue;
             }
@@ -51,11 +47,7 @@ class RoundFunction extends AbstractFunction
         $items = [];
         foreach ($input as $item) {
             if (!is_numeric($item)) {
-                throw EvaluationException::invalidFunctionParameter(
-                    'round',
-                    'numeric value',
-                    gettype($item)
-                );
+                throw EvaluationException::invalidFunctionParameter('round', 'numeric value', gettype($item));
             }
 
             $items[] = round((float) $item, $precision);

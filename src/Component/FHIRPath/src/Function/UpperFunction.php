@@ -32,10 +32,7 @@ final class UpperFunction extends AbstractFunction
 
         $string = $input->first();
         if (!is_string($string)) {
-            throw EvaluationException::invalidFunctionParameter(
-                $this->getName(),
-                'Input must be a string'
-            );
+            throw EvaluationException::invalidFunctionParameter($this->getName(), 'Input must be a string');
         }
 
         return Collection::single(strtoupper($string));

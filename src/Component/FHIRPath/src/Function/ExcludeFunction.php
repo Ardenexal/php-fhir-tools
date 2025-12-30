@@ -25,8 +25,8 @@ class ExcludeFunction extends AbstractFunction
         $this->validateParameterCount($parameters, 1);
 
         /** @var ExpressionNode $otherExpr */
-        $otherExpr = $parameters[0];
-        $evaluator = $context->getEvaluator();
+        $otherExpr   = $parameters[0];
+        $evaluator   = $context->getEvaluator();
         $otherResult = $evaluator->evaluate($otherExpr, $context);
 
         if ($input->isEmpty()) {

@@ -35,11 +35,7 @@ class TruncateFunction extends AbstractFunction
         $items = [];
         foreach ($input as $item) {
             if (!is_numeric($item)) {
-                throw EvaluationException::invalidFunctionParameter(
-                    'truncate',
-                    'numeric value',
-                    gettype($item)
-                );
+                throw EvaluationException::invalidFunctionParameter('truncate', 'numeric value', gettype($item));
             }
 
             $items[] = (int) $item;

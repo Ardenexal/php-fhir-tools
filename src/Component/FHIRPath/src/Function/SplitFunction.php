@@ -32,29 +32,20 @@ final class SplitFunction extends AbstractFunction
 
         $string = $input->first();
         if (!is_string($string)) {
-            throw EvaluationException::invalidFunctionParameter(
-                $this->getName(),
-                'Input must be a string'
-            );
+            throw EvaluationException::invalidFunctionParameter($this->getName(), 'Input must be a string');
         }
 
         $delimiter = $context->getEvaluator()->evaluate($parameters[0], $context)->first();
         if (!is_string($delimiter)) {
-            throw EvaluationException::invalidFunctionParameter(
-                $this->getName(),
-                'Delimiter parameter must be a string'
-            );
+            throw EvaluationException::invalidFunctionParameter($this->getName(), 'Delimiter parameter must be a string');
         }
 
         if ($delimiter === '') {
-            throw EvaluationException::invalidFunctionParameter(
-                $this->getName(),
-                'Delimiter cannot be empty'
-            );
+            throw EvaluationException::invalidFunctionParameter($this->getName(), 'Delimiter cannot be empty');
         }
 
         $parts = explode($delimiter, $string);
-        
+
         return Collection::from($parts);
     }
 }
