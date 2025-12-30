@@ -45,6 +45,12 @@ jobs:
         composer run generate-models-all
         echo "✅ FHIR model generation completed!"
     
+    - name: Run Laravel Pint
+      run: |
+        echo "🎨 Running Laravel Pint to format generated code..."
+        composer run lint
+        echo "✅ Code formatting completed!"
+    
     - name: Check for changes
       id: check-changes
       run: |
