@@ -55,7 +55,7 @@
             "Ardenexal\\FHIRTools\\": "src/",
             "Ardenexal\\FHIRTools\\Component\\CodeGeneration\\": "src/Component/CodeGeneration/src/",
             "Ardenexal\\FHIRTools\\Component\\Serialization\\": "src/Component/Serialization/src/",
-            "Ardenexal\\FHIRTools\\Component\\Models\\": "src/Component/Models/src/"
+            "Ardenexal\\FHIRTools\\Component\\Models\\": "src/Component/Models/src/",
             "Ardenexal\\FHIRTools\\Component\\FHIRPath\\": "src/Component/FHIRPath/src/"
         }
     },
