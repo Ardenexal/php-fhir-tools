@@ -20,6 +20,15 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * Tests that the FHIR generation process produces consistent output when using
  * the Models component structure compared to the standard generation process.
+ *
+ * **Note on Filesystem Mocking:**
+ * This test mocks the Filesystem to prevent actual file operations. The command's
+ * __invoke() method calls clearModelsComponentOutputDirectory() which would delete
+ * the real Models directory at src/Component/Models/src. By mocking the filesystem
+ * and returning false for exists(), we skip the cleanup logic while still testing
+ * the command's behavior and consistency properties.
+ *
+ * @author FHIR Tools
  */
 class GenerationProcessConsistencyPropertyTest extends TestCase
 {
@@ -37,9 +46,19 @@ class GenerationProcessConsistencyPropertyTest extends TestCase
     {
         parent::setUp();
 
-        $this->filesystem    = new Filesystem();
+        // Mock filesystem to prevent actual file system operations during tests.
+        // The command's __invoke() method calls clearModelsComponentOutputDirectory()
+        // which would delete the real Models directory at src/Component/Models/src.
+        // By mocking the filesystem and returning false for exists(), we skip the
+        // cleanup logic while still testing the command's behavior and consistency.
+        $this->filesystem    = $this->createMock(Filesystem::class);
         $this->context       = new BuilderContext();
         $this->packageLoader = $this->createMock(PackageLoader::class);
+
+        // Configure filesystem mock to prevent deletion of real Models directory
+        $this->filesystem
+            ->method('exists')
+            ->willReturn(false); // Pretend directories don't exist to skip cleanup
 
         $this->command = new FHIRModelGeneratorCommand(
             $this->filesystem,
