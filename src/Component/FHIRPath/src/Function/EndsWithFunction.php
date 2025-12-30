@@ -34,8 +34,8 @@ class EndsWithFunction extends AbstractFunction
         }
 
         /** @var ExpressionNode $suffixExpr */
-        $suffixExpr = $parameters[0];
-        $evaluator = $context->getEvaluator();
+        $suffixExpr   = $parameters[0];
+        $evaluator    = $context->getEvaluator();
         $suffixResult = $evaluator->evaluate($suffixExpr, $context);
 
         if ($suffixResult->isEmpty()) {

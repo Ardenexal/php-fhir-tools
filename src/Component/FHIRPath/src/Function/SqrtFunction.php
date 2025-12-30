@@ -36,20 +36,12 @@ class SqrtFunction extends AbstractFunction
         $items = [];
         foreach ($input as $item) {
             if (!is_numeric($item)) {
-                throw EvaluationException::invalidFunctionParameter(
-                    'sqrt',
-                    'numeric value',
-                    gettype($item)
-                );
+                throw EvaluationException::invalidFunctionParameter('sqrt', 'numeric value', gettype($item));
             }
 
             $value = (float) $item;
             if ($value < 0) {
-                throw EvaluationException::invalidFunctionParameter(
-                    'sqrt',
-                    'non-negative number',
-                    'negative number'
-                );
+                throw EvaluationException::invalidFunctionParameter('sqrt', 'non-negative number', 'negative number');
             }
 
             $items[] = sqrt($value);

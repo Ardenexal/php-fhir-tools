@@ -1,17 +1,23 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
+use Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRGuideParameterCode;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCode;
+
 /**
  * @fhir-code-type FHIRGuideParameterCode
+ *
  * @description Code type wrapper for FHIRGuideParameterCode enum
  */
-class FHIRGuideParameterCodeType extends \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCode
+class FHIRGuideParameterCodeType extends FHIRCode
 {
-	public function __construct(
-		/** @param \Ardenexal\FHIRTools\Component\Models\R4B\Enum\FHIRGuideParameterCode|string|null $value The code value (enum or string) */
-		string|null $value = null,
-	) {
-		parent::__construct(value: $value);
-	}
+    public function __construct(
+        /** @param FHIRGuideParameterCode|string|null $value The code value (enum or string) */
+        ?string $value = null,
+    ) {
+        parent::__construct(value: $value);
+    }
 }

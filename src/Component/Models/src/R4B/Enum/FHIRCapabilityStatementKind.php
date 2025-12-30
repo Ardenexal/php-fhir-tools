@@ -1,21 +1,23 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: CapabilityStatementKind
  * URL: http://hl7.org/fhir/ValueSet/capability-statement-kind
- * Version: 4.3.0
+ * Version: 4.0.1
  * Description: How a capability statement is intended to be used.
  */
 enum FHIRCapabilityStatementKind: string
 {
-	/** Instance */
-	case instance = 'instance';
+    /** Instance */
+    case instance = 'instance';
 
-	/** Capability */
-	case capability = 'capability';
+    /** Capability */
+    case capability = 'capability';
 
-	/** Requirements */
-	case requirements = 'requirements';
+    /** Requirements */
+    case requirements = 'requirements';
 }

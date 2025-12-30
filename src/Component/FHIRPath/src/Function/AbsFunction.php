@@ -32,10 +32,7 @@ final class AbsFunction extends AbstractFunction
 
         $value = $input->first();
         if (!is_numeric($value)) {
-            throw EvaluationException::invalidFunctionParameter(
-                $this->getName(),
-                'Input must be a number'
-            );
+            throw EvaluationException::invalidFunctionParameter($this->getName(), 'Input must be a number');
         }
 
         return Collection::single(abs($value));

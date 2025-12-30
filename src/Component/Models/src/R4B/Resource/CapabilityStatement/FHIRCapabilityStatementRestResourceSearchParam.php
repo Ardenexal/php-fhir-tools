@@ -1,31 +1,41 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
+
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRSearchParamTypeType;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCanonical;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRMarkdown;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * @description Search parameters for implementations to support and/or make use of - either references to ones defined in the specification, or additional ones defined for/by the implementation.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'CapabilityStatement', elementPath: 'CapabilityStatement.rest.resource.searchParam', fhirVersion: 'R4B')]
+#[FHIRBackboneElement(parentResource: 'CapabilityStatement', elementPath: 'CapabilityStatement.rest.resource.searchParam', fhirVersion: 'R4B')]
 class FHIRCapabilityStatementRestResourceSearchParam extends \Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRBackboneElement
 {
-	public function __construct(
-		/** @var null|string id Unique id for inter-element referencing */
-		public ?string $id = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> extension Additional content defined by implementations */
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-		public array $modifierExtension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string name Name of search parameter */
-		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string|null $name = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCanonical definition Source of definition for parameter */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCanonical $definition = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRSearchParamTypeType type number | date | string | token | reference | composite | quantity | uri | special */
-		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRSearchParamTypeType $type = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRMarkdown documentation Server-specific usage */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRMarkdown $documentation = null,
-	) {
-		parent::__construct($id, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        public ?string $id = null,
+        /** @var array<FHIRExtension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        public array $modifierExtension = [],
+        /** @var FHIRString|string|null name Name of search parameter */
+        #[NotBlank]
+        public FHIRString|string|null $name = null,
+        /** @var FHIRCanonical|null definition Source of definition for parameter */
+        public ?FHIRCanonical $definition = null,
+        /** @var FHIRSearchParamTypeType|null type number | date | string | token | reference | composite | quantity | uri | special */
+        #[NotBlank]
+        public ?FHIRSearchParamTypeType $type = null,
+        /** @var FHIRMarkdown|null documentation Server-specific usage */
+        public ?FHIRMarkdown $documentation = null,
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
 }

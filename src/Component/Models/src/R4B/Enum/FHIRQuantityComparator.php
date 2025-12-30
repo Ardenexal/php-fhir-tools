@@ -1,24 +1,26 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: QuantityComparator
  * URL: http://hl7.org/fhir/ValueSet/quantity-comparator
- * Version: 4.3.0
+ * Version: 4.0.1
  * Description: How the Quantity should be understood and represented.
  */
 enum FHIRQuantityComparator: string
 {
-	/** Less than */
-	case lessthan = '<';
+    /** Less than */
+    case lessthan = '<';
 
-	/** Less or Equal to */
-	case lessorequalto = '<=';
+    /** Less or Equal to */
+    case lessorequalto = '<=';
 
-	/** Greater or Equal to */
-	case greaterorequalto = '>=';
+    /** Greater or Equal to */
+    case greaterorequalto = '>=';
 
-	/** Greater than */
-	case greaterthan = '>';
+    /** Greater than */
+    case greaterthan = '>';
 }

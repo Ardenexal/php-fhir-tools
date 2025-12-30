@@ -6,7 +6,6 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
-use DateTime;
 
 /**
  * FHIRPath timeOfDay() function.
@@ -28,7 +27,8 @@ class TimeOfDayFunction extends AbstractFunction
         $this->validateParameterCount($parameters, 0, 0);
 
         // Return time portion as string in format HH:mm:ss
-        $now = new DateTime();
+        $now = new \DateTime();
+
         return Collection::single($now->format('H:i:s'));
     }
 }

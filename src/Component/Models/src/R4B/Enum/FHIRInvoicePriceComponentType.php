@@ -1,30 +1,32 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: InvoicePriceComponentType
  * URL: http://hl7.org/fhir/ValueSet/invoice-priceComponentType
- * Version: 4.3.0
+ * Version: 4.0.1
  * Description: Codes indicating the kind of the price component.
  */
 enum FHIRInvoicePriceComponentType: string
 {
-	/** base price */
-	case baseprice = 'base';
+    /** base price */
+    case baseprice = 'base';
 
-	/** surcharge */
-	case surcharge = 'surcharge';
+    /** surcharge */
+    case surcharge = 'surcharge';
 
-	/** deduction */
-	case deduction = 'deduction';
+    /** deduction */
+    case deduction = 'deduction';
 
-	/** discount */
-	case discount = 'discount';
+    /** discount */
+    case discount = 'discount';
 
-	/** tax */
-	case tax = 'tax';
+    /** tax */
+    case tax = 'tax';
 
-	/** informational */
-	case informational = 'informational';
+    /** informational */
+    case informational = 'informational';
 }

@@ -28,14 +28,14 @@ class CombineFunction extends AbstractFunction
         $this->validateParameterCount($parameters, 1, 1);
 
         $otherResult = $context->getEvaluator()->evaluate($parameters[0], $context);
-        
+
         // Combine keeps all items including duplicates
         $items = [];
-        
+
         foreach ($input as $item) {
             $items[] = $item;
         }
-        
+
         foreach ($otherResult as $item) {
             $items[] = $item;
         }

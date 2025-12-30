@@ -30,8 +30,8 @@ class SelectFunction extends AbstractFunction
 
         /** @var ExpressionNode $projection */
         $projection = $parameters[0];
-        $evaluator = $context->getEvaluator();
-        $results = [];
+        $evaluator  = $context->getEvaluator();
+        $results    = [];
 
         foreach ($input as $index => $item) {
             $itemContext = $context

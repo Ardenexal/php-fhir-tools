@@ -1,17 +1,23 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
+use Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRSpecimenStatus;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCode;
+
 /**
  * @fhir-code-type FHIRSpecimenStatus
+ *
  * @description Code type wrapper for FHIRSpecimenStatus enum
  */
-class FHIRSpecimenStatusType extends \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCode
+class FHIRSpecimenStatusType extends FHIRCode
 {
-	public function __construct(
-		/** @param \Ardenexal\FHIRTools\Component\Models\R4B\Enum\FHIRSpecimenStatus|string|null $value The code value (enum or string) */
-		string|null $value = null,
-	) {
-		parent::__construct(value: $value);
-	}
+    public function __construct(
+        /** @param FHIRSpecimenStatus|string|null $value The code value (enum or string) */
+        ?string $value = null,
+    ) {
+        parent::__construct(value: $value);
+    }
 }

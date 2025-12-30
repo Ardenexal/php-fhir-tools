@@ -39,11 +39,7 @@ class OfTypeFunction extends AbstractFunction
 
         $typeName = $typeResult->first();
         if (!is_string($typeName)) {
-            throw EvaluationException::invalidFunctionParameter(
-                'ofType',
-                'string type name',
-                gettype($typeName)
-            );
+            throw EvaluationException::invalidFunctionParameter('ofType', 'string type name', gettype($typeName));
         }
 
         $items = [];
@@ -51,7 +47,7 @@ class OfTypeFunction extends AbstractFunction
             if (is_object($item)) {
                 $className = get_class($item);
                 $shortName = substr($className, strrpos($className, '\\') + 1);
-                
+
                 if ($shortName === $typeName || $className === $typeName) {
                     $items[] = $item;
                 }

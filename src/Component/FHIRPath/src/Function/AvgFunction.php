@@ -32,20 +32,16 @@ class AvgFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        $sum = 0;
+        $sum   = 0;
         $count = 0;
 
         foreach ($input as $item) {
             if (!is_numeric($item)) {
-                throw EvaluationException::invalidFunctionParameter(
-                    'avg',
-                    'numeric values',
-                    gettype($item)
-                );
+                throw EvaluationException::invalidFunctionParameter('avg', 'numeric values', gettype($item));
             }
 
             $sum += $item;
-            $count++;
+            ++$count;
         }
 
         return Collection::single($sum / $count);

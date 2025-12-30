@@ -34,8 +34,8 @@ class ContainsStringFunction extends AbstractFunction
         }
 
         /** @var ExpressionNode $substringExpr */
-        $substringExpr = $parameters[0];
-        $evaluator = $context->getEvaluator();
+        $substringExpr   = $parameters[0];
+        $evaluator       = $context->getEvaluator();
         $substringResult = $evaluator->evaluate($substringExpr, $context);
 
         if ($substringResult->isEmpty()) {

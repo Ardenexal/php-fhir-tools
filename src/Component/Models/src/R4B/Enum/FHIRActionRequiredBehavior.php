@@ -1,21 +1,23 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: ActionRequiredBehavior
  * URL: http://hl7.org/fhir/ValueSet/action-required-behavior
- * Version: 4.3.0
+ * Version: 4.0.1
  * Description: Defines expectations around whether an action or action group is required.
  */
 enum FHIRActionRequiredBehavior: string
 {
-	/** Must */
-	case must = 'must';
+    /** Must */
+    case must = 'must';
 
-	/** Could */
-	case could = 'could';
+    /** Could */
+    case could = 'could';
 
-	/** Must Unless Documented */
-	case mustunlessdocumented = 'must-unless-documented';
+    /** Must Unless Documented */
+    case mustunlessdocumented = 'must-unless-documented';
 }

@@ -1,21 +1,23 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: sequenceType
  * URL: http://hl7.org/fhir/ValueSet/sequence-type
- * Version: 4.3.0
+ * Version: 4.0.1
  * Description: Type if a sequence -- DNA, RNA, or amino acid sequence.
  */
 enum FHIRSequenceType: string
 {
-	/** AA Sequence */
-	case aasequence = 'aa';
+    /** AA Sequence */
+    case aasequence = 'aa';
 
-	/** DNA Sequence */
-	case dnasequence = 'dna';
+    /** DNA Sequence */
+    case dnasequence = 'dna';
 
-	/** RNA Sequence */
-	case rnasequence = 'rna';
+    /** RNA Sequence */
+    case rnasequence = 'rna';
 }

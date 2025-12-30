@@ -35,11 +35,7 @@ class MaxFunction extends AbstractFunction
         $max = null;
         foreach ($input as $item) {
             if (!is_numeric($item)) {
-                throw EvaluationException::invalidFunctionParameter(
-                    'max',
-                    'numeric values',
-                    gettype($item)
-                );
+                throw EvaluationException::invalidFunctionParameter('max', 'numeric values', gettype($item));
             }
 
             if ($max === null || $item > $max) {

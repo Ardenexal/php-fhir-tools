@@ -1,24 +1,26 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: EncounterLocationStatus
  * URL: http://hl7.org/fhir/ValueSet/encounter-location-status
- * Version: 4.3.0
+ * Version: 4.0.1
  * Description: The status of the location.
  */
 enum FHIREncounterLocationStatus: string
 {
-	/** Planned */
-	case planned = 'planned';
+    /** Planned */
+    case planned = 'planned';
 
-	/** Active */
-	case active = 'active';
+    /** Active */
+    case active = 'active';
 
-	/** Reserved */
-	case reserved = 'reserved';
+    /** Reserved */
+    case reserved = 'reserved';
 
-	/** Completed */
-	case completed = 'completed';
+    /** Completed */
+    case completed = 'completed';
 }

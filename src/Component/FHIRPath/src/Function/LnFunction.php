@@ -36,20 +36,12 @@ class LnFunction extends AbstractFunction
         $items = [];
         foreach ($input as $item) {
             if (!is_numeric($item)) {
-                throw EvaluationException::invalidFunctionParameter(
-                    'ln',
-                    'numeric value',
-                    gettype($item)
-                );
+                throw EvaluationException::invalidFunctionParameter('ln', 'numeric value', gettype($item));
             }
 
             $value = (float) $item;
             if ($value <= 0) {
-                throw EvaluationException::invalidFunctionParameter(
-                    'ln',
-                    'positive number',
-                    'number <= 0'
-                );
+                throw EvaluationException::invalidFunctionParameter('ln', 'positive number', 'number <= 0');
             }
 
             $items[] = log($value);

@@ -21,31 +21,32 @@ class FHIRTypeResolver
      * @var array<string, string>
      */
     private const PRIMITIVE_TYPES = [
-        'boolean' => 'boolean',
-        'string' => 'string',
-        'integer' => 'integer',
-        'decimal' => 'float',
-        'date' => 'string',
-        'dateTime' => 'string',
-        'time' => 'string',
-        'uri' => 'string',
-        'url' => 'string',
-        'canonical' => 'string',
-        'code' => 'string',
-        'oid' => 'string',
-        'id' => 'string',
-        'uuid' => 'string',
-        'markdown' => 'string',
+        'boolean'      => 'boolean',
+        'string'       => 'string',
+        'integer'      => 'integer',
+        'decimal'      => 'float',
+        'date'         => 'string',
+        'dateTime'     => 'string',
+        'time'         => 'string',
+        'uri'          => 'string',
+        'url'          => 'string',
+        'canonical'    => 'string',
+        'code'         => 'string',
+        'oid'          => 'string',
+        'id'           => 'string',
+        'uuid'         => 'string',
+        'markdown'     => 'string',
         'base64Binary' => 'string',
-        'instant' => 'string',
-        'unsignedInt' => 'integer',
-        'positiveInt' => 'integer',
+        'instant'      => 'string',
+        'unsignedInt'  => 'integer',
+        'positiveInt'  => 'integer',
     ];
 
     /**
      * Infer the FHIR type from a PHP value.
      *
      * @param mixed $value The value to infer the type from
+     *
      * @return string The inferred FHIR type name
      */
     public function inferType(mixed $value): string
@@ -73,14 +74,15 @@ class FHIRTypeResolver
         if (is_object($value)) {
             // Get the class name and extract the FHIR type
             $class = get_class($value);
-            
+
             // Check if it's a generated FHIR model
             if (str_contains($class, '\\FHIR\\')) {
                 // Extract the type name from the class name
                 $parts = explode('\\', $class);
+
                 return end($parts);
             }
-            
+
             return 'Resource';
         }
 
@@ -94,8 +96,9 @@ class FHIRTypeResolver
     /**
      * Check if a value is of a specific FHIR type.
      *
-     * @param mixed $value The value to check
+     * @param mixed  $value    The value to check
      * @param string $typeName The FHIR type name to check against
+     *
      * @return bool True if the value is of the specified type
      */
     public function isOfType(mixed $value, string $typeName): bool
@@ -131,9 +134,11 @@ class FHIRTypeResolver
     /**
      * Attempt to cast a value to a specific FHIR type.
      *
-     * @param mixed $value The value to cast
+     * @param mixed  $value    The value to cast
      * @param string $typeName The target FHIR type name
+     *
      * @return mixed The casted value
+     *
      * @throws \InvalidArgumentException If the value cannot be cast to the type
      */
     public function castToType(mixed $value, string $typeName): mixed
@@ -146,12 +151,10 @@ class FHIRTypeResolver
         // Primitive type casting
         return match ($typeName) {
             'boolean' => $this->castToBoolean($value),
-            'string' => $this->castToString($value),
+            'string'  => $this->castToString($value),
             'integer' => $this->castToInteger($value),
             'decimal' => $this->castToDecimal($value),
-            default => throw new \InvalidArgumentException(
-                sprintf('Cannot cast value to type "%s"', $typeName)
-            ),
+            default   => throw new \InvalidArgumentException(sprintf('Cannot cast value to type "%s"', $typeName)),
         };
     }
 
@@ -159,6 +162,7 @@ class FHIRTypeResolver
      * Check if a type name is a primitive FHIR type.
      *
      * @param string $typeName
+     *
      * @return bool
      */
     public function isPrimitiveType(string $typeName): bool
@@ -170,6 +174,7 @@ class FHIRTypeResolver
      * Get the PHP type for a FHIR primitive type.
      *
      * @param string $fhirType
+     *
      * @return string|null
      */
     public function getPhpType(string $fhirType): ?string
@@ -181,6 +186,7 @@ class FHIRTypeResolver
      * Cast value to boolean.
      *
      * @param mixed $value
+     *
      * @return bool
      */
     private function castToBoolean(mixed $value): bool
@@ -206,6 +212,7 @@ class FHIRTypeResolver
      * Cast value to string.
      *
      * @param mixed $value
+     *
      * @return string
      */
     private function castToString(mixed $value): string
@@ -225,6 +232,7 @@ class FHIRTypeResolver
      * Cast value to integer.
      *
      * @param mixed $value
+     *
      * @return int
      */
     private function castToInteger(mixed $value): int
@@ -248,6 +256,7 @@ class FHIRTypeResolver
      * Cast value to decimal.
      *
      * @param mixed $value
+     *
      * @return float
      */
     private function castToDecimal(mixed $value): float

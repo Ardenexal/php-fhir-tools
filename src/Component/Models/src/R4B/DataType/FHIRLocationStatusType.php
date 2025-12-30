@@ -1,17 +1,23 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
+use Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRLocationStatus;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCode;
+
 /**
  * @fhir-code-type FHIRLocationStatus
+ *
  * @description Code type wrapper for FHIRLocationStatus enum
  */
-class FHIRLocationStatusType extends \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCode
+class FHIRLocationStatusType extends FHIRCode
 {
-	public function __construct(
-		/** @param \Ardenexal\FHIRTools\Component\Models\R4B\Enum\FHIRLocationStatus|string|null $value The code value (enum or string) */
-		string|null $value = null,
-	) {
-		parent::__construct(value: $value);
-	}
+    public function __construct(
+        /** @param FHIRLocationStatus|string|null $value The code value (enum or string) */
+        ?string $value = null,
+    ) {
+        parent::__construct(value: $value);
+    }
 }

@@ -1,17 +1,23 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
+use Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRCarePlanActivityStatus;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCode;
+
 /**
  * @fhir-code-type FHIRCarePlanActivityStatus
+ *
  * @description Code type wrapper for FHIRCarePlanActivityStatus enum
  */
-class FHIRCarePlanActivityStatusType extends \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCode
+class FHIRCarePlanActivityStatusType extends FHIRCode
 {
-	public function __construct(
-		/** @param \Ardenexal\FHIRTools\Component\Models\R4B\Enum\FHIRCarePlanActivityStatus|string|null $value The code value (enum or string) */
-		string|null $value = null,
-	) {
-		parent::__construct(value: $value);
-	}
+    public function __construct(
+        /** @param FHIRCarePlanActivityStatus|string|null $value The code value (enum or string) */
+        ?string $value = null,
+    ) {
+        parent::__construct(value: $value);
+    }
 }

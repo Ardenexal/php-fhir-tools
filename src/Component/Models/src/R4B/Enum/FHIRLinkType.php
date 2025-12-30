@@ -1,24 +1,26 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: LinkType
  * URL: http://hl7.org/fhir/ValueSet/link-type
- * Version: 4.3.0
+ * Version: 4.0.1
  * Description: The type of link between this patient resource and another patient resource.
  */
 enum FHIRLinkType: string
 {
-	/** Replaced-by */
-	case replacedby = 'replaced-by';
+    /** Replaced-by */
+    case replacedby = 'replaced-by';
 
-	/** Replaces */
-	case replaces = 'replaces';
+    /** Replaces */
+    case replaces = 'replaces';
 
-	/** Refer */
-	case refer = 'refer';
+    /** Refer */
+    case refer = 'refer';
 
-	/** See also */
-	case seealso = 'seealso';
+    /** See also */
+    case seealso = 'seealso';
 }

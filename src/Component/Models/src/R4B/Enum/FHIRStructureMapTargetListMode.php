@@ -1,24 +1,26 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: StructureMapTargetListMode
  * URL: http://hl7.org/fhir/ValueSet/map-target-list-mode
- * Version: 4.3.0
+ * Version: 4.0.1
  * Description: If field is a list, how to manage the production.
  */
 enum FHIRStructureMapTargetListMode: string
 {
-	/** First */
-	case first = 'first';
+    /** First */
+    case first = 'first';
 
-	/** Share */
-	case share = 'share';
+    /** Share */
+    case share = 'share';
 
-	/** Last */
-	case last = 'last';
+    /** Last */
+    case last = 'last';
 
-	/** Collate */
-	case collate = 'collate';
+    /** Collate */
+    case collate = 'collate';
 }

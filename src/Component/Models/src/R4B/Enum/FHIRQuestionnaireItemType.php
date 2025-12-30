@@ -1,21 +1,23 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: QuestionnaireItemType
  * URL: http://hl7.org/fhir/ValueSet/item-type
- * Version: 4.3.0
+ * Version: 4.0.1
  * Description: Distinguishes groups from questions and display text and indicates data type for questions.
  */
 enum FHIRQuestionnaireItemType: string
 {
-	/** Group */
-	case group = 'group';
+    /** Group */
+    case group = 'group';
 
-	/** Display */
-	case display = 'display';
+    /** Display */
+    case display = 'display';
 
-	/** Question */
-	case question = 'question';
+    /** Question */
+    case question = 'question';
 }

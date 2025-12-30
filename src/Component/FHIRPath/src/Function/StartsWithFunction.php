@@ -34,8 +34,8 @@ class StartsWithFunction extends AbstractFunction
         }
 
         /** @var ExpressionNode $prefixExpr */
-        $prefixExpr = $parameters[0];
-        $evaluator = $context->getEvaluator();
+        $prefixExpr   = $parameters[0];
+        $evaluator    = $context->getEvaluator();
         $prefixResult = $evaluator->evaluate($prefixExpr, $context);
 
         if ($prefixResult->isEmpty()) {

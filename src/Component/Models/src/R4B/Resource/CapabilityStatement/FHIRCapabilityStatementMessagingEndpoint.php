@@ -1,27 +1,35 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
+
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCoding;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUrl;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * @description An endpoint (network accessible address) to which messages and/or replies are to be sent.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'CapabilityStatement', elementPath: 'CapabilityStatement.messaging.endpoint', fhirVersion: 'R4B')]
+#[FHIRBackboneElement(parentResource: 'CapabilityStatement', elementPath: 'CapabilityStatement.messaging.endpoint', fhirVersion: 'R4B')]
 class FHIRCapabilityStatementMessagingEndpoint extends \Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRBackboneElement
 {
-	public function __construct(
-		/** @var null|string id Unique id for inter-element referencing */
-		public ?string $id = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> extension Additional content defined by implementations */
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-		public array $modifierExtension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCoding protocol http | ftp | mllp + */
-		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCoding $protocol = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUrl address Network address or identifier of the end-point */
-		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUrl $address = null,
-	) {
-		parent::__construct($id, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        public ?string $id = null,
+        /** @var array<FHIRExtension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        public array $modifierExtension = [],
+        /** @var FHIRCoding|null protocol http | ftp | mllp + */
+        #[NotBlank]
+        public ?FHIRCoding $protocol = null,
+        /** @var FHIRUrl|null address Network address or identifier of the end-point */
+        #[NotBlank]
+        public ?FHIRUrl $address = null,
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
 }

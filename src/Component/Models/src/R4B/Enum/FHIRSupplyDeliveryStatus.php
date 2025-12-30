@@ -1,24 +1,26 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: SupplyDeliveryStatus
  * URL: http://hl7.org/fhir/ValueSet/supplydelivery-status
- * Version: 4.3.0
+ * Version: 4.0.1
  * Description: Status of the supply delivery.
  */
 enum FHIRSupplyDeliveryStatus: string
 {
-	/** In Progress */
-	case inprogress = 'in-progress';
+    /** In Progress */
+    case inprogress = 'in-progress';
 
-	/** Delivered */
-	case delivered = 'completed';
+    /** Delivered */
+    case delivered = 'completed';
 
-	/** Abandoned */
-	case abandoned = 'abandoned';
+    /** Abandoned */
+    case abandoned = 'abandoned';
 
-	/** Entered In Error */
-	case enteredinerror = 'entered-in-error';
+    /** Entered In Error */
+    case enteredinerror = 'entered-in-error';
 }

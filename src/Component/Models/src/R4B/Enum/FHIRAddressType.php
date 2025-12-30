@@ -1,21 +1,23 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: AddressType
  * URL: http://hl7.org/fhir/ValueSet/address-type
- * Version: 4.3.0
+ * Version: 4.0.1
  * Description: The type of an address (physical / postal).
  */
 enum FHIRAddressType: string
 {
-	/** Postal */
-	case postal = 'postal';
+    /** Postal */
+    case postal = 'postal';
 
-	/** Physical */
-	case physical = 'physical';
+    /** Physical */
+    case physical = 'physical';
 
-	/** Postal & Physical */
-	case postalandphysical = 'both';
+    /** Postal & Physical */
+    case postalandphysical = 'both';
 }

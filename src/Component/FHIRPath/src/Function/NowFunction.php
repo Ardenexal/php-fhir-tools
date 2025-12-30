@@ -27,6 +27,6 @@ class NowFunction extends AbstractFunction
     {
         $this->validateParameterCount($parameters, 0, 0);
 
-        return Collection::single(new DateTime());
+        return Collection::single(new \DateTime());
     }
 }

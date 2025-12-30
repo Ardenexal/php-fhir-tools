@@ -1,0 +1,39 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
+
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRAllLanguagesType;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCoding;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
+/**
+ * @description Additional representations for the concept - other languages, aliases, specialized purposes, used for particular purposes, etc.
+ */
+#[FHIRBackboneElement(parentResource: 'CodeSystem', elementPath: 'CodeSystem.concept.designation', fhirVersion: 'R5')]
+class FHIRCodeSystemConceptDesignation extends \Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRBackboneElement
+{
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        public ?string $id = null,
+        /** @var array<FHIRExtension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        public array $modifierExtension = [],
+        /** @var FHIRAllLanguagesType|null language Human language of the designation */
+        public ?FHIRAllLanguagesType $language = null,
+        /** @var FHIRCoding|null use Details how this designation would be used */
+        public ?FHIRCoding $use = null,
+        /** @var array<FHIRCoding> additionalUse Additional ways how this designation would be used */
+        public array $additionalUse = [],
+        /** @var FHIRString|string|null value The text value for this designation */
+        #[NotBlank]
+        public FHIRString|string|null $value = null,
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
+}

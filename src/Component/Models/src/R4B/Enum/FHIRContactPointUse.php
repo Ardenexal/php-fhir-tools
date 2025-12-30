@@ -1,27 +1,29 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: ContactPointUse
  * URL: http://hl7.org/fhir/ValueSet/contact-point-use
- * Version: 4.3.0
+ * Version: 4.0.1
  * Description: Use of contact point.
  */
 enum FHIRContactPointUse: string
 {
-	/** Home */
-	case home = 'home';
+    /** Home */
+    case home = 'home';
 
-	/** Work */
-	case work = 'work';
+    /** Work */
+    case work = 'work';
 
-	/** Temp */
-	case temp = 'temp';
+    /** Temp */
+    case temp = 'temp';
 
-	/** Old */
-	case old = 'old';
+    /** Old */
+    case old = 'old';
 
-	/** Mobile */
-	case mobile = 'mobile';
+    /** Mobile */
+    case mobile = 'mobile';
 }

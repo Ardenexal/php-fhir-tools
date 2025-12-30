@@ -35,11 +35,7 @@ class MinFunction extends AbstractFunction
         $min = null;
         foreach ($input as $item) {
             if (!is_numeric($item)) {
-                throw EvaluationException::invalidFunctionParameter(
-                    'min',
-                    'numeric values',
-                    gettype($item)
-                );
+                throw EvaluationException::invalidFunctionParameter('min', 'numeric values', gettype($item));
             }
 
             if ($min === null || $item < $min) {

@@ -35,12 +35,8 @@ class ToMillisecondsFunction extends AbstractFunction
 
         $items = [];
         foreach ($input as $item) {
-            if (!($item instanceof DateTime)) {
-                throw EvaluationException::invalidFunctionParameter(
-                    'toMilliseconds',
-                    'DateTime',
-                    gettype($item)
-                );
+            if (!($item instanceof \DateTime)) {
+                throw EvaluationException::invalidFunctionParameter('toMilliseconds', 'DateTime', gettype($item));
             }
 
             // Get milliseconds since epoch

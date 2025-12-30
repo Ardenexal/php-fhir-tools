@@ -29,19 +29,19 @@ class IifFunction extends AbstractFunction
 
         // Evaluate condition
         $conditionResult = $context->getEvaluator()->evaluate($parameters[0], $context);
-        
+
         // If condition is empty or not boolean, return empty
         if ($conditionResult->isEmpty()) {
             return Collection::empty();
         }
 
         $condition = $conditionResult->first();
-        
+
         // If condition is true, evaluate and return ifTrue branch
         if ($condition === true) {
             return $context->getEvaluator()->evaluate($parameters[1], $context);
         }
-        
+
         // Otherwise, evaluate and return ifFalse branch
         return $context->getEvaluator()->evaluate($parameters[2], $context);
     }

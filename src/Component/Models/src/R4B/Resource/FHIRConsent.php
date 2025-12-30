@@ -1,61 +1,78 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRAttachment;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRConsentStateType;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRIdentifier;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMeta;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRNarrative;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
 /**
  * @author Health Level Seven International (Community Based Collaborative Care)
+ *
  * @see http://hl7.org/fhir/StructureDefinition/Consent
+ *
  * @description A record of a healthcare consumer’s  choices, which permits or denies identified recipient(s) or recipient role(s) to perform one or more actions within a given policy context, for specific purposes and periods of time.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(type: 'Consent', version: '4.3.0', url: 'http://hl7.org/fhir/StructureDefinition/Consent', fhirVersion: 'R4B')]
+#[FhirResource(type: 'Consent', version: '4.3.0', url: 'http://hl7.org/fhir/StructureDefinition/Consent', fhirVersion: 'R4B')]
 class FHIRConsent extends FHIRDomainResource
 {
-	public function __construct(
-		/** @var null|string id Logical id of this artifact */
-		public ?string $id = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMeta meta Metadata about the resource */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMeta $meta = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri implicitRules A set of rules under which this content was created */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri $implicitRules = null,
-		/** @var null|string language Language of the resource content */
-		public ?string $language = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRNarrative text Text summary of the resource, for human interpretation */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRNarrative $text = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRResource> contained Contained, inline Resources */
-		public array $contained = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> extension Additional content defined by implementations */
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored */
-		public array $modifierExtension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRIdentifier> identifier Identifier for this record (external references) */
-		public array $identifier = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRConsentStateType status draft | proposed | active | rejected | inactive | entered-in-error */
-		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRConsentStateType $status = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept scope Which of the four areas this resource covers (extensible) */
-		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept $scope = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept> category Classification of the consent statement - for indexing/retrieval */
-		public array $category = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference patient Who the consent applies to */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference $patient = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime dateTime When this Consent was created or indexed */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime $dateTime = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference> performer Who is agreeing to the policy and rules */
-		public array $performer = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference> organization Custodian of the consent */
-		public array $organization = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRAttachment|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference sourceX Source from which this consent is taken */
-		public \Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRAttachment|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference|null $sourceX = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRConsentPolicy> policy Policies covered by this consent */
-		public array $policy = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept policyRule Regulation that this consents to */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept $policyRule = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRConsentVerification> verification Consent Verified by patient or family */
-		public array $verification = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRConsentProvision provision Constraints to the base Consent.policyRule */
-		public ?FHIRConsentProvision $provision = null,
-	) {
-		parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Logical id of this artifact */
+        public ?string $id = null,
+        /** @var FHIRMeta|null meta Metadata about the resource */
+        public ?FHIRMeta $meta = null,
+        /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
+        public ?FHIRUri $implicitRules = null,
+        /** @var string|null language Language of the resource content */
+        public ?string $language = null,
+        /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
+        public ?FHIRNarrative $text = null,
+        /** @var array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRResource> contained Contained, inline Resources */
+        public array $contained = [],
+        /** @var array<FHIRExtension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored */
+        public array $modifierExtension = [],
+        /** @var array<FHIRIdentifier> identifier Identifier for this record (external references) */
+        public array $identifier = [],
+        /** @var FHIRConsentStateType|null status draft | proposed | active | rejected | inactive | entered-in-error */
+        #[NotBlank]
+        public ?FHIRConsentStateType $status = null,
+        /** @var FHIRCodeableConcept|null scope Which of the four areas this resource covers (extensible) */
+        #[NotBlank]
+        public ?FHIRCodeableConcept $scope = null,
+        /** @var array<FHIRCodeableConcept> category Classification of the consent statement - for indexing/retrieval */
+        public array $category = [],
+        /** @var FHIRReference|null patient Who the consent applies to */
+        public ?FHIRReference $patient = null,
+        /** @var FHIRDateTime|null dateTime When this Consent was created or indexed */
+        public ?FHIRDateTime $dateTime = null,
+        /** @var array<FHIRReference> performer Who is agreeing to the policy and rules */
+        public array $performer = [],
+        /** @var array<FHIRReference> organization Custodian of the consent */
+        public array $organization = [],
+        /** @var FHIRAttachment|FHIRReference|null sourceX Source from which this consent is taken */
+        public FHIRAttachment|FHIRReference|null $sourceX = null,
+        /** @var array<FHIRConsentPolicy> policy Policies covered by this consent */
+        public array $policy = [],
+        /** @var FHIRCodeableConcept|null policyRule Regulation that this consents to */
+        public ?FHIRCodeableConcept $policyRule = null,
+        /** @var array<FHIRConsentVerification> verification Consent Verified by patient or family */
+        public array $verification = [],
+        /** @var FHIRConsentProvision|null provision Constraints to the base Consent.policyRule */
+        public ?FHIRConsentProvision $provision = null,
+    ) {
+        parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
+    }
 }

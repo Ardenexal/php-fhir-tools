@@ -1,30 +1,32 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: EndpointStatus
  * URL: http://hl7.org/fhir/ValueSet/endpoint-status
- * Version: 4.3.0
+ * Version: 4.0.1
  * Description: The status of the endpoint.
  */
 enum FHIREndpointStatus: string
 {
-	/** Active */
-	case active = 'active';
+    /** Active */
+    case active = 'active';
 
-	/** Suspended */
-	case suspended = 'suspended';
+    /** Suspended */
+    case suspended = 'suspended';
 
-	/** Error */
-	case error = 'error';
+    /** Error */
+    case error = 'error';
 
-	/** Off */
-	case off = 'off';
+    /** Off */
+    case off = 'off';
 
-	/** Entered in error */
-	case enteredinerror = 'entered-in-error';
+    /** Entered in error */
+    case enteredinerror = 'entered-in-error';
 
-	/** Test */
-	case test = 'test';
+    /** Test */
+    case test = 'test';
 }

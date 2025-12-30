@@ -1,45 +1,47 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: ResearchStudyStatus
  * URL: http://hl7.org/fhir/ValueSet/research-study-status
- * Version: 4.3.0
+ * Version: 4.0.1
  * Description: Codes that convey the current status of the research study.
  */
 enum FHIRResearchStudyStatus: string
 {
-	/** Active */
-	case active = 'active';
+    /** Active */
+    case active = 'active';
 
-	/** Administratively Completed */
-	case administrativelycompleted = 'administratively-completed';
+    /** Administratively Completed */
+    case administrativelycompleted = 'administratively-completed';
 
-	/** Approved */
-	case approved = 'approved';
+    /** Approved */
+    case approved = 'approved';
 
-	/** Closed to Accrual */
-	case closedtoaccrual = 'closed-to-accrual';
+    /** Closed to Accrual */
+    case closedtoaccrual = 'closed-to-accrual';
 
-	/** Closed to Accrual and Intervention */
-	case closedtoaccrualandintervention = 'closed-to-accrual-and-intervention';
+    /** Closed to Accrual and Intervention */
+    case closedtoaccrualandintervention = 'closed-to-accrual-and-intervention';
 
-	/** Completed */
-	case completed = 'completed';
+    /** Completed */
+    case completed = 'completed';
 
-	/** Disapproved */
-	case disapproved = 'disapproved';
+    /** Disapproved */
+    case disapproved = 'disapproved';
 
-	/** In Review */
-	case inreview = 'in-review';
+    /** In Review */
+    case inreview = 'in-review';
 
-	/** Temporarily Closed to Accrual */
-	case temporarilyclosedtoaccrual = 'temporarily-closed-to-accrual';
+    /** Temporarily Closed to Accrual */
+    case temporarilyclosedtoaccrual = 'temporarily-closed-to-accrual';
 
-	/** Temporarily Closed to Accrual and Intervention */
-	case temporarilyclosedtoaccrualandintervention = 'temporarily-closed-to-accrual-and-intervention';
+    /** Temporarily Closed to Accrual and Intervention */
+    case temporarilyclosedtoaccrualandintervention = 'temporarily-closed-to-accrual-and-intervention';
 
-	/** Withdrawn */
-	case withdrawn = 'withdrawn';
+    /** Withdrawn */
+    case withdrawn = 'withdrawn';
 }

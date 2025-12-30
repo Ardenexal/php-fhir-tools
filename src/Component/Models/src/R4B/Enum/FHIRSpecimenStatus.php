@@ -1,24 +1,26 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: SpecimenStatus
  * URL: http://hl7.org/fhir/ValueSet/specimen-status
- * Version: 4.3.0
+ * Version: 4.0.1
  * Description: Codes providing the status/availability of a specimen.
  */
 enum FHIRSpecimenStatus: string
 {
-	/** Available */
-	case available = 'available';
+    /** Available */
+    case available = 'available';
 
-	/** Unavailable */
-	case unavailable = 'unavailable';
+    /** Unavailable */
+    case unavailable = 'unavailable';
 
-	/** Unsatisfactory */
-	case unsatisfactory = 'unsatisfactory';
+    /** Unsatisfactory */
+    case unsatisfactory = 'unsatisfactory';
 
-	/** Entered in Error */
-	case enteredinerror = 'entered-in-error';
+    /** Entered in Error */
+    case enteredinerror = 'entered-in-error';
 }

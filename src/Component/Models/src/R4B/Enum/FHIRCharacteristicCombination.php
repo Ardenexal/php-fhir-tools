@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,9 +12,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRCharacteristicCombination: string
 {
-	/** intersection */
-	case intersection = 'intersection';
+    /** intersection */
+    case intersection = 'intersection';
 
-	/** union */
-	case union = 'union';
+    /** union */
+    case union = 'union';
 }

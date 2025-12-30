@@ -36,20 +36,12 @@ class LogFunction extends AbstractFunction
         $items = [];
         foreach ($input as $item) {
             if (!is_numeric($item)) {
-                throw EvaluationException::invalidFunctionParameter(
-                    'log',
-                    'numeric value',
-                    gettype($item)
-                );
+                throw EvaluationException::invalidFunctionParameter('log', 'numeric value', gettype($item));
             }
 
             $value = (float) $item;
             if ($value <= 0) {
-                throw EvaluationException::invalidFunctionParameter(
-                    'log',
-                    'positive number',
-                    'number <= 0'
-                );
+                throw EvaluationException::invalidFunctionParameter('log', 'positive number', 'number <= 0');
             }
 
             $items[] = log10($value);

@@ -1,24 +1,26 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: ConditionVerificationStatus
  * URL: http://hl7.org/fhir/ValueSet/condition-ver-status
- * Version: 4.3.0
+ * Version: 4.0.1
  * Description: The verification status to support or decline the clinical status of the condition or diagnosis.
  */
 enum FHIRConditionVerificationStatus: string
 {
-	/** Unconfirmed */
-	case unconfirmed = 'unconfirmed';
+    /** Unconfirmed */
+    case unconfirmed = 'unconfirmed';
 
-	/** Confirmed */
-	case confirmed = 'confirmed';
+    /** Confirmed */
+    case confirmed = 'confirmed';
 
-	/** Refuted */
-	case refuted = 'refuted';
+    /** Refuted */
+    case refuted = 'refuted';
 
-	/** Entered in Error */
-	case enteredinerror = 'entered-in-error';
+    /** Entered in Error */
+    case enteredinerror = 'entered-in-error';
 }

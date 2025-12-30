@@ -1,24 +1,26 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: DeviceMetricCategory
  * URL: http://hl7.org/fhir/ValueSet/metric-category
- * Version: 4.3.0
+ * Version: 4.0.1
  * Description: Describes the category of the metric.
  */
 enum FHIRDeviceMetricCategory: string
 {
-	/** Measurement */
-	case measurement = 'measurement';
+    /** Measurement */
+    case measurement = 'measurement';
 
-	/** Setting */
-	case setting = 'setting';
+    /** Setting */
+    case setting = 'setting';
 
-	/** Calculation */
-	case calculation = 'calculation';
+    /** Calculation */
+    case calculation = 'calculation';
 
-	/** Unspecified */
-	case unspecified = 'unspecified';
+    /** Unspecified */
+    case unspecified = 'unspecified';
 }

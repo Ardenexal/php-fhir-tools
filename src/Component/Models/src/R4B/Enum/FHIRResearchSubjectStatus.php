@@ -1,51 +1,53 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
 /**
  * ValueSet: ResearchSubjectStatus
  * URL: http://hl7.org/fhir/ValueSet/research-subject-status
- * Version: 4.3.0
+ * Version: 4.0.1
  * Description: Indicates the progression of a study subject through a study.
  */
 enum FHIRResearchSubjectStatus: string
 {
-	/** Candidate */
-	case candidate = 'candidate';
+    /** Candidate */
+    case candidate = 'candidate';
 
-	/** Eligible */
-	case eligible = 'eligible';
+    /** Eligible */
+    case eligible = 'eligible';
 
-	/** Follow-up */
-	case followup = 'follow-up';
+    /** Follow-up */
+    case followup = 'follow-up';
 
-	/** Ineligible */
-	case ineligible = 'ineligible';
+    /** Ineligible */
+    case ineligible = 'ineligible';
 
-	/** Not Registered */
-	case notregistered = 'not-registered';
+    /** Not Registered */
+    case notregistered = 'not-registered';
 
-	/** Off-study */
-	case offstudy = 'off-study';
+    /** Off-study */
+    case offstudy = 'off-study';
 
-	/** On-study */
-	case onstudy = 'on-study';
+    /** On-study */
+    case onstudy = 'on-study';
 
-	/** On-study-intervention */
-	case onstudyintervention = 'on-study-intervention';
+    /** On-study-intervention */
+    case onstudyintervention = 'on-study-intervention';
 
-	/** On-study-observation */
-	case onstudyobservation = 'on-study-observation';
+    /** On-study-observation */
+    case onstudyobservation = 'on-study-observation';
 
-	/** Pending on-study */
-	case pendingonstudy = 'pending-on-study';
+    /** Pending on-study */
+    case pendingonstudy = 'pending-on-study';
 
-	/** Potential Candidate */
-	case potentialcandidate = 'potential-candidate';
+    /** Potential Candidate */
+    case potentialcandidate = 'potential-candidate';
 
-	/** Screening */
-	case screening = 'screening';
+    /** Screening */
+    case screening = 'screening';
 
-	/** Withdrawn */
-	case withdrawn = 'withdrawn';
+    /** Withdrawn */
+    case withdrawn = 'withdrawn';
 }
