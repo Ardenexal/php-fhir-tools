@@ -84,6 +84,29 @@ For comprehensive documentation on the serialization system, see: **[FHIR Serial
   ```bash
   composer test
   ```
+- Generate FHIR models:
+  ```bash
+  composer run generate-models-all
+  ```
+
+## GitHub Actions
+
+### Regenerate FHIR Models
+This repository includes a GitHub Actions workflow that allows you to manually regenerate FHIR models and commit them to the main branch.
+
+**To trigger the workflow:**
+1. Go to the "Actions" tab in the GitHub repository
+2. Select "Regenerate FHIR Models" from the workflows list
+3. Click "Run workflow"
+4. Optionally customize the commit message (default: "chore: regenerate FHIR models")
+5. Click the green "Run workflow" button
+
+The workflow will:
+- Set up PHP 8.3 environment with required extensions
+- Install Composer dependencies
+- Run `composer run generate-models-all` to generate models for R4, R4B, and R5
+- Automatically commit and push changes to main if models were updated
+- Provide a summary of the operation
 
 ## Project Structure
 - `src/` - Source code
