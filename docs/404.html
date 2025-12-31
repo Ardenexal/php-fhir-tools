@@ -1,0 +1,108 @@
+---
+layout: default
+title: Page Not Found
+permalink: /404.html
+---
+
+<div class="error-page">
+    <div class="container">
+        <div class="error-content">
+            <h1 class="error-code">404</h1>
+            <h2 class="error-title">Page Not Found</h2>
+            <p class="error-description">
+                Sorry, the page you're looking for doesn't exist or has been moved.
+            </p>
+            <div class="error-actions">
+                <a href="{{ '/' | relative_url }}" class="btn btn-primary">Go Home</a>
+                <a href="{{ '/pages/getting-started.html' | relative_url }}" class="btn btn-outline">Getting Started</a>
+            </div>
+            <div class="error-links">
+                <h3>Popular Pages</h3>
+                <ul>
+                    <li><a href="{{ '/' | relative_url }}">Home</a></li>
+                    <li><a href="{{ '/pages/getting-started.html' | relative_url }}">Getting Started</a></li>
+                    <li><a href="{{ '/pages/components/fhir-bundle.html' | relative_url }}">FHIRBundle</a></li>
+                    <li><a href="{{ '/pages/components/serialization.html' | relative_url }}">Serialization</a></li>
+                    <li><a href="{{ '/pages/components/fhirpath.html' | relative_url }}">FHIRPath</a></li>
+                    <li><a href="{{ '/pages/demos/serialization.html' | relative_url }}">Demos</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.error-page {
+    padding: var(--space-20) 0;
+    min-height: 60vh;
+}
+
+.error-content {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.error-code {
+    font-size: 8rem;
+    font-weight: 900;
+    color: var(--color-primary);
+    line-height: 1;
+    margin-bottom: var(--space-4);
+}
+
+.error-title {
+    font-size: var(--text-3xl);
+    margin-bottom: var(--space-4);
+}
+
+.error-description {
+    font-size: var(--text-lg);
+    color: var(--color-gray-600);
+    margin-bottom: var(--space-8);
+}
+
+.error-actions {
+    display: flex;
+    gap: var(--space-4);
+    justify-content: center;
+    margin-bottom: var(--space-12);
+}
+
+.error-links {
+    text-align: left;
+    margin-top: var(--space-12);
+    padding: var(--space-8);
+    background-color: var(--color-gray-50);
+    border-radius: var(--radius-xl);
+}
+
+.error-links h3 {
+    margin-bottom: var(--space-4);
+}
+
+.error-links ul {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+}
+
+.error-links li a {
+    color: var(--color-primary);
+}
+
+@media (max-width: 768px) {
+    .error-code {
+        font-size: 6rem;
+    }
+    
+    .error-actions {
+        flex-direction: column;
+    }
+    
+    .error-links ul {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
