@@ -503,6 +503,60 @@ lunr_search:
 2. Research php-wasm integration options
 3. Create proof-of-concept with php-wasm
 4. Bundle FHIRTools for browser use
+5. Implement OperationOutcome error handling
+6. Integrate terminology service client (tx.fhir.org)
+
+---
+
+## Acceptance Criteria ⭐ **NEW**
+
+### Core Requirements
+- [ ] All demos run **client-side only** using php-wasm
+- [ ] php-wasm loads **lazily** (after user interaction)
+- [ ] **Every error is a FHIR OperationOutcome** (no custom error shapes)
+- [ ] Terminology operations default to **tx.fhir.org**
+- [ ] UI provides **server switching** for terminology operations
+- [ ] **Small local caches** for common ValueSets (offline support)
+
+### Error Handling
+- [ ] All validation errors return OperationOutcome with proper severity/code
+- [ ] `expression` field uses FHIRPath to point to error location
+- [ ] Errors display in user-friendly format
+- [ ] OperationOutcome structure follows FHIR R4/R5 specification
+
+### Terminology Integration
+- [ ] expandValueSet operation implemented
+- [ ] validateCode operation implemented
+- [ ] lookupCode operation implemented
+- [ ] checkSubsumption operation implemented
+- [ ] Server selection UI with caveat about tx.fhir.org
+- [ ] Graceful handling of network failures
+- [ ] Cache layer for frequently accessed ValueSets
+
+### Performance & Offline
+- [ ] Service Worker caches static assets
+- [ ] php-wasm WASM file cached for offline use
+- [ ] Example resources cached
+- [ ] Terminology cache indexes maintained
+- [ ] Single-thread WASM (no SharedArrayBuffer needed)
+- [ ] Lazy loading of WASM post-interaction
+
+### Documentation
+- [ ] Links to OperationOutcome specification
+- [ ] Links to FHIRPath specification
+- [ ] Links to Terminology Service specification
+- [ ] Documentation of tx.fhir.org caveats
+- [ ] List of alternate terminology servers
+- [ ] Examples of all operations
+
+### Build & Deployment
+- [ ] CI workflow builds Jekyll site
+- [ ] SEO tags included (jekyll-seo-tag)
+- [ ] Sitemap generated (jekyll-sitemap)
+- [ ] RSS feed generated (jekyll-feed)
+- [ ] Search indexing (jekyll-lunr-js-search)
+- [ ] Custom 404 page
+- [ ] Build artifacts deployed to GitHub Pages
 
 ---
 

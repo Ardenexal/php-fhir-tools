@@ -63,7 +63,7 @@ All processing happens in the user's browser
 - **Syntax Highlighting**: Rouge (Jekyll default) or Prism.js
 - **Icons**: SVG icons (inlined or sprite)
 
-### File Structure (Jekyll)
+### File Structure (Jekyll) ⭐ **UPDATED**
 ```
 docs/                                   # GitHub Pages root
 ├── _config.yml                         # Jekyll configuration
@@ -86,10 +86,11 @@ docs/                                   # GitHub Pages root
 │   ├── serialization.md
 │   ├── fhirpath.md
 │   └── models.md
-├── demos/                              # Interactive demos
+├── demos/                              # Interactive demos (single directory)
 │   ├── serialization.html              # Uses Web Components
 │   ├── fhirpath.html
 │   └── models.html
+├── 404.html                            # Custom 404 page
 ├── assets/
 │   ├── css/
 │   │   ├── variables.css               # CSS custom properties
@@ -104,8 +105,13 @@ docs/                                   # GitHub Pages root
 │   │   │   ├── fhir-serialization-demo.js
 │   │   │   ├── fhir-path-evaluator.js
 │   │   │   └── fhir-model-explorer.js
+│   │   ├── terminology/                # NEW: Terminology service client
+│   │   │   ├── tx-client.js            # Client for tx.fhir.org operations
+│   │   │   └── cache/                  # Optional: pre-expanded VS caches
+│   │   │       └── indexes.json
 │   │   ├── php-wasm-loader.js          # php-wasm integration
 │   │   └── utils/
+│   │       ├── operation-outcome.js    # NEW: OperationOutcome handler
 │   │       ├── syntax-highlight.js
 │   │       └── error-handler.js
 │   ├── data/
@@ -701,6 +707,505 @@ const names = await fhirTools.evaluateFHIRPath(
 - ✅ Complete privacy (data never leaves browser)
 - ✅ Works offline once loaded
 - ✅ Zero hosting costs
+
+**Setup Requirements:**
+1. Include php-wasm library from CDN or bundle locally
+2. Bundle PHP FHIRTools dependencies for browser
+3. Configure file system mapping for vendor directory
+4. Handle WASM initialization on page load
+
+### OperationOutcome Error Handling ⭐ **NEW**
+
+All errors and validation issues MUST be returned as FHIR OperationOutcome resources (normative in R4/R4B/R5).
+
+**Specification:** 
+- [OperationOutcome (R4/R5)](https://fhir.hl7.org/fhir/operationoutcome.html)
+- [Element Definitions](https://fhir.hl7.org/fhir/operationoutcome-definitions.html)
+- [FHIRPath for expression](https://fhir.hl7.org/fhir/fhirpath.html)
+
+#### OperationOutcome Structure
+
+```javascript
+// assets/js/utils/operation-outcome.js
+
+/**
+ * Create a FHIR OperationOutcome for errors
+ * @param {string} severity - error|warning|information
+ * @param {string} code - IssueType value binding
+ * @param {string} details - Human-readable description
+ * @param {string} diagnostics - Additional diagnostic information
+ * @param {string[]} expression - FHIRPath expressions pointing to issue
+ */
+export function createOperationOutcome({
+    severity = 'error',
+    code = 'invalid',
+    details,
+    diagnostics,
+    expression = []
+}) {
+    return {
+        resourceType: 'OperationOutcome',
+        issue: [{
+            severity,
+            code,
+            details: { text: details },
+            diagnostics,
+            expression
+        }]
+    };
+}
+
+/**
+ * Example: Validation error
+ */
+export function validationError(message, path) {
+    return createOperationOutcome({
+        severity: 'error',
+        code: 'invalid',
+        details: message,
+        diagnostics: `Validation failed at ${path}`,
+        expression: [path]
+    });
+}
+
+/**
+ * Example: Structure error
+ */
+export function structureError(expected, found, path) {
+    return createOperationOutcome({
+        severity: 'error',
+        code: 'structure',
+        details: `Expected ${expected}, found ${found}`,
+        diagnostics: `Type mismatch at ${path}`,
+        expression: [path]
+    });
+}
+```
+
+#### Usage in Web Components
+
+```javascript
+// In FHIRSerializationDemo component
+async handleSerialize() {
+    try {
+        const input = this.querySelector('#fhir-input').value;
+        const resource = JSON.parse(input);
+        
+        // Validate resource structure
+        if (!resource.resourceType) {
+            const outcome = validationError(
+                'Missing required field: resourceType',
+                'Resource.resourceType'
+            );
+            this.displayError(outcome);
+            return;
+        }
+        
+        const result = await this.phpWasm.serialize(resource);
+        this.displayOutput(result);
+    } catch (error) {
+        const outcome = createOperationOutcome({
+            severity: 'error',
+            code: 'exception',
+            details: 'Serialization failed',
+            diagnostics: error.message,
+            expression: []
+        });
+        this.displayError(outcome);
+    }
+}
+
+displayError(operationOutcome) {
+    const output = this.querySelector('#fhir-output');
+    output.textContent = JSON.stringify(operationOutcome, null, 2);
+    output.classList.add('error');
+}
+```
+
+### Terminology Service Integration ⭐ **NEW**
+
+Default to **tx.fhir.org** for terminology operations with UI to switch servers.
+
+**Important:** tx.fhir.org is a community server, not production-grade. Document this caveat.
+
+**Specifications:**
+- [Terminology Service Operations](https://build.fhir.org/terminology-service.html)
+- [tx.fhir.org Documentation](https://confluence.hl7.org/spaces/FHIR/pages/79503413/tx.fhir.org+Documentation)
+
+**Alternate Servers:**
+- HL7 Europe: https://tx.hl7europe.eu/r4
+- Swiss TX: https://tx.fhir.ch/r4
+
+#### Terminology Client Implementation
+
+```javascript
+// assets/js/terminology/tx-client.js
+
+const TX_SERVERS = {
+    'tx.fhir.org': 'https://tx.fhir.org/r4',
+    'hl7europe': 'https://tx.hl7europe.eu/r4',
+    'swiss': 'https://tx.fhir.ch/r4'
+};
+
+let currentServer = TX_SERVERS['tx.fhir.org'];
+
+/**
+ * Switch terminology server
+ */
+export function setTerminologyServer(serverKey) {
+    if (TX_SERVERS[serverKey]) {
+        currentServer = TX_SERVERS[serverKey];
+    }
+}
+
+/**
+ * Expand a ValueSet
+ * @param {string} url - ValueSet canonical URL
+ * @param {object} options - filter, count, etc.
+ * @returns {Promise<object>} ValueSet or OperationOutcome
+ */
+export async function expandValueSet(url, { filter, count, offset } = {}) {
+    const body = {
+        resourceType: 'Parameters',
+        parameter: [
+            { name: 'url', valueUri: url },
+            ...(filter ? [{ name: 'filter', valueString: filter }] : []),
+            ...(count ? [{ name: 'count', valueInteger: count }] : []),
+            ...(offset ? [{ name: 'offset', valueInteger: offset }] : [])
+        ]
+    };
+    
+    try {
+        const response = await fetch(`${currentServer}/ValueSet/$expand`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/fhir+json',
+                'Accept': 'application/fhir+json'
+            },
+            body: JSON.stringify(body)
+        });
+        
+        return await response.json(); // ValueSet or OperationOutcome
+    } catch (error) {
+        return createOperationOutcome({
+            severity: 'error',
+            code: 'exception',
+            details: 'ValueSet expansion failed',
+            diagnostics: error.message,
+            expression: []
+        });
+    }
+}
+
+/**
+ * Validate a code against a ValueSet
+ * @param {object} params - url, code, system, display, version
+ * @returns {Promise<object>} Parameters with result or OperationOutcome
+ */
+export async function validateCode({ url, code, system, display, version }) {
+    const body = {
+        resourceType: 'Parameters',
+        parameter: [
+            { name: 'url', valueUri: url },
+            { name: 'code', valueCode: code },
+            ...(system ? [{ name: 'system', valueUri: system }] : []),
+            ...(version ? [{ name: 'systemVersion', valueString: version }] : []),
+            ...(display ? [{ name: 'display', valueString: display }] : [])
+        ]
+    };
+    
+    try {
+        const response = await fetch(`${currentServer}/ValueSet/$validate-code`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/fhir+json',
+                'Accept': 'application/fhir+json'
+            },
+            body: JSON.stringify(body)
+        });
+        
+        return await response.json(); // Parameters or OperationOutcome
+    } catch (error) {
+        return createOperationOutcome({
+            severity: 'error',
+            code: 'exception',
+            details: 'Code validation failed',
+            diagnostics: error.message,
+            expression: []
+        });
+    }
+}
+
+/**
+ * Lookup code details
+ * @param {object} params - code, system, version, property
+ * @returns {Promise<object>} Parameters or OperationOutcome
+ */
+export async function lookupCode({ code, system, version, property }) {
+    const body = {
+        resourceType: 'Parameters',
+        parameter: [
+            { name: 'code', valueCode: code },
+            { name: 'system', valueUri: system },
+            ...(version ? [{ name: 'version', valueString: version }] : []),
+            ...(property ? property.map(p => ({ name: 'property', valueCode: p })) : [])
+        ]
+    };
+    
+    try {
+        const response = await fetch(`${currentServer}/CodeSystem/$lookup`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/fhir+json',
+                'Accept': 'application/fhir+json'
+            },
+            body: JSON.stringify(body)
+        });
+        
+        return await response.json();
+    } catch (error) {
+        return createOperationOutcome({
+            severity: 'error',
+            code: 'exception',
+            details: 'Code lookup failed',
+            diagnostics: error.message,
+            expression: []
+        });
+    }
+}
+
+/**
+ * Check subsumption between codes
+ */
+export async function checkSubsumption({ codeA, codeB, system, version }) {
+    const body = {
+        resourceType: 'Parameters',
+        parameter: [
+            { name: 'codeA', valueCode: codeA },
+            { name: 'codeB', valueCode: codeB },
+            { name: 'system', valueUri: system },
+            ...(version ? [{ name: 'version', valueString: version }] : [])
+        ]
+    };
+    
+    try {
+        const response = await fetch(`${currentServer}/CodeSystem/$subsumes`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/fhir+json',
+                'Accept': 'application/fhir+json'
+            },
+            body: JSON.stringify(body)
+        });
+        
+        return await response.json();
+    } catch (error) {
+        return createOperationOutcome({
+            severity: 'error',
+            code: 'exception',
+            details: 'Subsumption check failed',
+            diagnostics: error.message,
+            expression: []
+        });
+    }
+}
+```
+
+#### Terminology Cache for Offline
+
+```json
+// assets/js/terminology/cache/indexes.json
+{
+    "valueSets": [
+        {
+            "url": "http://hl7.org/fhir/ValueSet/administrative-gender",
+            "version": "4.0.1",
+            "file": "administrative-gender.json",
+            "size": 1024
+        }
+    ],
+    "lastUpdated": "2025-12-31T00:00:00Z"
+}
+```
+
+#### UI for Server Selection
+
+```html
+<!-- In demo pages -->
+<div class="terminology-config">
+    <label for="tx-server">Terminology Server:</label>
+    <select id="tx-server">
+        <option value="tx.fhir.org" selected>tx.fhir.org (Community)</option>
+        <option value="hl7europe">HL7 Europe TX</option>
+        <option value="swiss">Swiss TX</option>
+    </select>
+    <span class="config-note">
+        ⚠️ tx.fhir.org is a community server, not production-grade
+    </span>
+</div>
+```
+
+### Service Worker for Offline Support ⭐ **NEW**
+
+```javascript
+// assets/js/service-worker.js
+
+const CACHE_NAME = 'fhir-tools-v1';
+const ASSETS_TO_CACHE = [
+    '/',
+    '/assets/css/main.css',
+    '/assets/js/main.js',
+    '/assets/js/components/fhir-serialization-demo.js',
+    '/assets/js/components/fhir-path-evaluator.js',
+    '/assets/js/components/fhir-model-explorer.js',
+    '/assets/js/terminology/tx-client.js',
+    '/assets/js/utils/operation-outcome.js',
+    '/lib/php-wasm/php.wasm',
+    '/assets/data/examples/patient.json',
+    '/assets/data/examples/observation.json'
+];
+
+// Install event - cache assets
+self.addEventListener('install', (event) => {
+    event.waitUntil(
+        caches.open(CACHE_NAME)
+            .then(cache => cache.addAll(ASSETS_TO_CACHE))
+            .then(() => self.skipWaiting())
+    );
+});
+
+// Activate event - clean old caches
+self.addEventListener('activate', (event) => {
+    event.waitUntil(
+        caches.keys()
+            .then(keys => Promise.all(
+                keys.filter(key => key !== CACHE_NAME)
+                    .map(key => caches.delete(key))
+            ))
+            .then(() => self.clients.claim())
+    );
+});
+
+// Fetch event - serve from cache, fallback to network
+self.addEventListener('fetch', (event) => {
+    // Skip terminology server requests (always fetch fresh)
+    if (event.request.url.includes('tx.fhir.org') || 
+        event.request.url.includes('tx.hl7europe.eu') ||
+        event.request.url.includes('tx.fhir.ch')) {
+        return;
+    }
+    
+    event.respondWith(
+        caches.match(event.request)
+            .then(response => response || fetch(event.request))
+    );
+});
+```
+
+**Register Service Worker:**
+```javascript
+// In main.js
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+            .then(reg => console.log('Service Worker registered'))
+            .catch(err => console.error('Service Worker registration failed', err));
+    });
+}
+```
+
+### CI Build Pipeline ⭐ **NEW**
+
+Jekyll must be built in CI and deployed as static HTML (not raw Markdown/Liquid).
+
+#### GitHub Actions Workflow
+
+```yaml
+# .github/workflows/deploy-pages.yml
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      
+      - name: Build with Jekyll
+        run: |
+          cd docs
+          bundle install
+          bundle exec jekyll build
+        env:
+          JEKYLL_ENV: production
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/_site
+  
+  deploy:
+    if: github.event_name != 'pull_request'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+```
+
+#### Gemfile for Jekyll
+
+```ruby
+# docs/Gemfile
+source 'https://rubygems.org'
+
+gem 'jekyll', '~> 4.3'
+
+group :jekyll_plugins do
+  gem 'jekyll-seo-tag'
+  gem 'jekyll-sitemap'
+  gem 'jekyll-feed'
+  gem 'jekyll-lunr-js-search'  # For search functionality
+end
+
+# Windows and JRuby does not include zoneinfo files
+platforms :mingw, :x64_mingw, :mswin, :jruby do
+  gem 'tzinfo', '>= 1', '< 3'
+  gem 'tzinfo-data'
+end
+
+# Performance-booster for watching directories
+gem 'wdm', '~> 0.1', :platforms => [:mingw, :x64_mingw, :mswin]
+```
 
 **Setup Requirements:**
 1. Include php-wasm library from CDN or bundle locally

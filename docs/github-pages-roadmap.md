@@ -195,15 +195,33 @@ Research and select php-wasm library:
 - [ ] Implement `serialize()` method
 - [ ] Implement `deserialize()` method  
 - [ ] Implement `evaluateFHIRPath()` method
-- [ ] Add error handling
+- [ ] Add OperationOutcome error handling ⭐ **NEW**
 
-#### 4.4 Testing
+#### 4.4 OperationOutcome Implementation ⭐ **NEW**
+- [ ] Create `operation-outcome.js` utility
+- [ ] Implement `createOperationOutcome()` function
+- [ ] Implement `validationError()` helper
+- [ ] Implement `structureError()` helper
+- [ ] Add FHIRPath expression support in errors
+- [ ] Document OperationOutcome usage
+
+#### 4.5 Terminology Service Client ⭐ **NEW**
+- [ ] Create `tx-client.js` with tx.fhir.org default
+- [ ] Implement `expandValueSet()` operation
+- [ ] Implement `validateCode()` operation
+- [ ] Implement `lookupCode()` operation
+- [ ] Implement `checkSubsumption()` operation
+- [ ] Add server switching capability
+- [ ] Document tx.fhir.org caveats
+- [ ] List alternate servers (HL7 Europe, Swiss)
+
+#### 4.6 Testing
 - [ ] Unit tests for JavaScript wrapper
 - [ ] Integration tests with example resources
 - [ ] Performance testing (load time, execution speed)
 - [ ] Browser compatibility testing
 
-#### 4.5 Documentation
+#### 4.7 Documentation
 - [ ] Usage documentation
 - [ ] Code examples
 - [ ] Troubleshooting guide
@@ -234,18 +252,26 @@ Research and select php-wasm library:
 - [ ] Load example resources
 - [ ] Handle user input
 - [ ] Call php-wasm serialize/deserialize methods
-- [ ] Display results
-- [ ] Handle errors gracefully
+- [ ] Return OperationOutcome for all errors ⭐ **NEW**
+- [ ] Display results with proper formatting
 - [ ] Add loading states
+- [ ] Implement lazy loading of WASM ⭐ **NEW**
 
-#### 5.3 Features
+#### 5.3 Error Display ⭐ **NEW**
+- [ ] Parse and display OperationOutcome
+- [ ] Show severity badges (error/warning/info)
+- [ ] Highlight FHIRPath expression locations
+- [ ] Provide user-friendly error messages
+- [ ] Link to FHIR specification for error codes
+
+#### 5.4 Features
 - [ ] Copy to clipboard functionality
 - [ ] Format/prettify JSON
 - [ ] Download result as file
 - [ ] Share link (encode data in URL)
 - [ ] Clear/reset functionality
 
-#### 5.4 Testing
+#### 5.5 Testing
 - [ ] Test with all example resources
 - [ ] Test error scenarios
 - [ ] Test on mobile devices
@@ -335,20 +361,73 @@ Research and select php-wasm library:
 
 ---
 
-## Phase 8: Polish & Enhancement (Week 9) ✨
+## Phase 8: CI/CD & Offline Support (Week 9) 🔧 ⭐ **NEW**
+
+**Goal**: Set up build pipeline and offline capabilities
+
+### Tasks
+
+#### 8.1 GitHub Actions Workflow ⭐ **NEW**
+- [ ] Create `.github/workflows/deploy-pages.yml`
+- [ ] Configure Jekyll build in CI
+- [ ] Add SEO plugin (jekyll-seo-tag)
+- [ ] Add sitemap plugin (jekyll-sitemap)
+- [ ] Add feed plugin (jekyll-feed)
+- [ ] Add search plugin (jekyll-lunr-js-search)
+- [ ] Configure Pages deployment
+- [ ] Test build on pull requests
+
+#### 8.2 Service Worker Implementation ⭐ **NEW**
+- [ ] Create `service-worker.js`
+- [ ] Cache static assets (CSS, JS, images)
+- [ ] Cache php-wasm WASM files
+- [ ] Cache example FHIR resources
+- [ ] Skip caching for terminology server requests
+- [ ] Implement cache versioning
+- [ ] Register service worker in main.js
+- [ ] Test offline functionality
+
+#### 8.3 Terminology Cache ⭐ **NEW**
+- [ ] Create cache structure in `assets/js/terminology/cache/`
+- [ ] Add `indexes.json` for cached ValueSets
+- [ ] Pre-cache common ValueSets (administrative-gender, etc.)
+- [ ] Implement cache fallback for offline
+- [ ] Document cache maintenance
+
+#### 8.4 Custom 404 Page ⭐ **NEW**
+- [ ] Create `404.html` with helpful navigation
+- [ ] Style consistent with site design
+- [ ] Add search functionality on 404
+- [ ] Link to main sections
+
+#### 8.5 Gemfile Setup ⭐ **NEW**
+- [ ] Create `docs/Gemfile` with Jekyll dependencies
+- [ ] Add jekyll-seo-tag
+- [ ] Add jekyll-sitemap
+- [ ] Add jekyll-feed
+- [ ] Add jekyll-lunr-js-search
+- [ ] Test local build with `bundle exec jekyll serve`
+
+**Deliverable**: Automated build pipeline and offline support
+
+**Estimated Time**: 4-5 days
+
+---
+
+## Phase 9: Polish & Enhancement (Week 10) ✨
 
 **Goal**: Improve UX and add finishing touches
 
 ### Tasks
 
-#### 8.1 Performance Optimization
+#### 9.1 Performance Optimization
 - [ ] Minify CSS and JavaScript
 - [ ] Optimize images (use WebP)
-- [ ] Implement lazy loading
-- [ ] Add service worker for offline support
-- [ ] Enable browser caching
+- [ ] Implement lazy loading for images
+- [ ] Optimize WASM loading (single-thread, lazy) ⭐ **NEW**
+- [ ] Enable browser caching headers
 
-#### 8.2 Accessibility Improvements
+#### 9.2 Accessibility Improvements
 - [ ] Run WAVE accessibility audit
 - [ ] Fix accessibility issues
 - [ ] Add ARIA labels
@@ -356,19 +435,19 @@ Research and select php-wasm library:
 - [ ] Test screen reader compatibility
 - [ ] Ensure color contrast compliance
 
-#### 8.3 SEO Optimization
+#### 9.3 SEO Optimization
 - [ ] Add meta descriptions
 - [ ] Add Open Graph tags
 - [ ] Create sitemap.xml
 - [ ] Add robots.txt
 - [ ] Add structured data (JSON-LD)
 
-#### 8.4 Analytics Setup
+#### 9.4 Analytics Setup
 - [ ] Add Google Analytics or Plausible
 - [ ] Configure goals and events
 - [ ] Set up error tracking
 
-#### 8.5 Additional Features
+#### 9.5 Additional Features
 - [ ] Add dark mode toggle
 - [ ] Add site-wide search
 - [ ] Add changelog page
@@ -381,13 +460,13 @@ Research and select php-wasm library:
 
 ---
 
-## Phase 9: Launch & Promotion (Week 10) 🎊
+## Phase 10: Launch & Promotion (Week 11) 🎊
 
 **Goal**: Launch site and promote to community
 
 ### Tasks
 
-#### 9.1 Pre-Launch Testing
+#### 10.1 Pre-Launch Testing
 - [ ] Cross-browser testing (Chrome, Firefox, Safari, Edge)
 - [ ] Mobile device testing (iOS, Android)
 - [ ] Performance testing (Lighthouse)
@@ -395,19 +474,19 @@ Research and select php-wasm library:
 - [ ] Security audit
 - [ ] Link validation
 
-#### 9.2 Launch Preparation
+#### 10.2 Launch Preparation
 - [ ] Update main README with site link
 - [ ] Create announcement blog post
 - [ ] Prepare social media posts
 - [ ] Update documentation links in code
 
-#### 9.3 Launch
+#### 10.3 Launch
 - [ ] Merge to main branch
 - [ ] Verify GitHub Pages deployment
 - [ ] Test live site
 - [ ] Monitor error logs
 
-#### 9.4 Promotion
+#### 10.4 Promotion
 - [ ] Post on Twitter/X
 - [ ] Share on Reddit (r/FHIR, r/PHP)
 - [ ] Post on dev.to
@@ -415,7 +494,7 @@ Research and select php-wasm library:
 - [ ] Submit to PHP newsletters
 - [ ] Update package listings
 
-#### 9.5 Monitoring
+#### 10.5 Monitoring
 - [ ] Monitor analytics
 - [ ] Monitor error logs
 - [ ] Respond to feedback

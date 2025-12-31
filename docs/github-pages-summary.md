@@ -3,7 +3,8 @@
 **Project**: PHP FHIRTools Showcase Website  
 **Purpose**: Create a GitHub Pages site to showcase and test Symfony bundle components  
 **Status**: Planning Complete ✅  
-**Next Step**: Implementation Phase 1
+**Next Step**: Implementation Phase 1  
+**Timeline**: 11 weeks to full launch (updated with CI/CD phase)
 
 ---
 
@@ -12,15 +13,18 @@
 This project will create a professional showcase website for PHP FHIRTools that includes:
 
 1. **Comprehensive Documentation** for all components
-2. **Interactive Demos** for testing serialization, FHIRPath, and models
-3. **Code Examples** for Symfony integration
-4. **Community Resources** for getting started and contributing
+2. **Interactive Demos** using php-wasm (client-side only)
+3. **FHIR OperationOutcome** error handling (normative standard)
+4. **Terminology Service** integration (tx.fhir.org default)
+5. **Code Examples** for Symfony integration
+6. **Offline Support** via Service Worker
+7. **Community Resources** for getting started and contributing
 
 ---
 
 ## 📚 Planning Documents
 
-We have created four comprehensive planning documents:
+We have created comprehensive planning documents:
 
 ### 1. [Implementation Plan](./github-pages-plan.md) 📖
 **What**: Detailed 10-phase plan with design decisions and mockups  
