@@ -106,3 +106,27 @@ services:
     fhir.validator:
         alias: Ardenexal\FHIRTools\Serialization\FHIRValidator
         public: true
+
+    # FHIRPath Services
+    Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService:
+        public: true
+        tags: ['fhir.path']
+
+    Ardenexal\FHIRTools\Component\FHIRPath\Cache\InMemoryExpressionCache:
+        arguments:
+            $maxSize: '%fhir.path.cache_size%'
+
+    Ardenexal\FHIRTools\Component\FHIRPath\Cache\ExpressionCacheInterface:
+        alias: Ardenexal\FHIRTools\Component\FHIRPath\Cache\InMemoryExpressionCache
+
+    # FHIRPath Service Alias
+    fhir.path_service:
+        alias: Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService
+        public: true
+
+    # FHIRPath Console Commands
+    Ardenexal\FHIRTools\Bundle\FHIRBundle\Command\FHIRPathEvaluateCommand:
+        tags: ['console.command']
+
+    Ardenexal\FHIRTools\Bundle\FHIRBundle\Command\FHIRPathValidateCommand:
+        tags: ['console.command']
