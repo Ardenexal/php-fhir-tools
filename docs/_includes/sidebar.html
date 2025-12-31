@@ -1,0 +1,71 @@
+<nav class="sidebar-nav" aria-label="Documentation navigation">
+    <h3>Components</h3>
+    <ul>
+        <li><a href="{{ '/pages/components/fhir-bundle.html' | relative_url }}" {% if page.url contains 'fhir-bundle' %}class="active"{% endif %}>FHIRBundle</a></li>
+        <li><a href="{{ '/pages/components/serialization.html' | relative_url }}" {% if page.url contains 'serialization' %}class="active"{% endif %}>Serialization</a></li>
+        <li><a href="{{ '/pages/components/fhirpath.html' | relative_url }}" {% if page.url contains 'fhirpath' %}class="active"{% endif %}>FHIRPath</a></li>
+        <li><a href="{{ '/pages/components/models.html' | relative_url }}" {% if page.url contains 'models' %}class="active"{% endif %}>Models</a></li>
+        <li><a href="{{ '/pages/components/validation.html' | relative_url }}" {% if page.url contains 'validation' %}class="active"{% endif %}>Validation</a></li>
+    </ul>
+    
+    <h3>Documentation</h3>
+    <ul>
+        <li><a href="{{ '/pages/getting-started.html' | relative_url }}" {% if page.url contains 'getting-started' %}class="active"{% endif %}>Getting Started</a></li>
+        <li><a href="{{ '/pages/api-reference.html' | relative_url }}" {% if page.url contains 'api-reference' %}class="active"{% endif %}>API Reference</a></li>
+        <li><a href="{{ '/pages/examples.html' | relative_url }}" {% if page.url contains 'examples' %}class="active"{% endif %}>Examples</a></li>
+        <li><a href="{{ '/pages/symfony-integration.html' | relative_url }}" {% if page.url contains 'symfony-integration' %}class="active"{% endif %}>Symfony Integration</a></li>
+    </ul>
+    
+    <h3>Community</h3>
+    <ul>
+        <li><a href="{{ '/pages/contributing.html' | relative_url }}" {% if page.url contains 'contributing' %}class="active"{% endif %}>Contributing</a></li>
+        <li><a href="{{ '/pages/changelog.html' | relative_url }}" {% if page.url contains 'changelog' %}class="active"{% endif %}>Changelog</a></li>
+        <li><a href="https://github.com/Ardenexal/php-fhir-tools" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+</nav>
+
+<style>
+.sidebar-nav h3 {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-gray-600);
+    margin-top: var(--spacing-6);
+    margin-bottom: var(--spacing-2);
+}
+
+.sidebar-nav h3:first-child {
+    margin-top: 0;
+}
+
+.sidebar-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-nav li {
+    margin-bottom: var(--spacing-1);
+}
+
+.sidebar-nav a {
+    display: block;
+    padding: var(--spacing-2) var(--spacing-3);
+    color: var(--color-gray-700);
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+}
+
+.sidebar-nav a:hover {
+    background: var(--color-gray-50);
+    color: var(--color-primary);
+}
+
+.sidebar-nav a.active {
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+    font-weight: 500;
+}
+</style>
