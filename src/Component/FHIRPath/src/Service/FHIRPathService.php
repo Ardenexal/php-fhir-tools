@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Service;
 
+use Ardenexal\FHIRTools\Component\FHIRPath\Cache\ExpressionCacheInterface;
+use Ardenexal\FHIRTools\Component\FHIRPath\Cache\InMemoryExpressionCache;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\FHIRPathEvaluator;
@@ -17,7 +19,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Parser\FHIRPathParser;
  *
  * Provides a convenient API for evaluating FHIRPath expressions against FHIR resources.
  * Handles lexing, parsing, and evaluation in a single call, with support for expression
- * validation and compilation for improved performance.
+ * validation, compilation, and caching for improved performance.
  *
  * @author Ardenexal
  */
@@ -29,15 +31,25 @@ class FHIRPathService
 
     private FHIRPathEvaluator $evaluator;
 
-    public function __construct()
+    private ExpressionCacheInterface $cache;
+
+    /**
+     * Create a new FHIRPath service.
+     *
+     * @param ExpressionCacheInterface|null $cache Optional cache implementation (defaults to in-memory cache)
+     */
+    public function __construct(?ExpressionCacheInterface $cache = null)
     {
         $this->lexer     = new FHIRPathLexer();
         $this->parser    = new FHIRPathParser();
         $this->evaluator = new FHIRPathEvaluator();
+        $this->cache     = $cache ?? new InMemoryExpressionCache();
     }
 
     /**
      * Evaluate a FHIRPath expression against a resource.
+     *
+     * Uses caching to avoid re-parsing frequently used expressions.
      *
      * @param string                 $expression The FHIRPath expression to evaluate
      * @param mixed                  $resource   The FHIR resource or data to evaluate against
@@ -49,9 +61,9 @@ class FHIRPathService
      */
     public function evaluate(string $expression, mixed $resource, ?EvaluationContext $context = null): Collection
     {
-        $ast = $this->parse($expression);
+        $compiled = $this->getOrCompile($expression);
 
-        return $this->evaluator->evaluate($ast, $resource, $context);
+        return $compiled->evaluate($resource, $context);
     }
 
     /**
@@ -79,6 +91,7 @@ class FHIRPathService
      *
      * Parses the expression once and returns a compiled expression that can be
      * evaluated multiple times against different resources for improved performance.
+     * The compiled expression is also cached for future use.
      *
      * @param string $expression The FHIRPath expression to compile
      *
@@ -88,9 +101,62 @@ class FHIRPathService
      */
     public function compile(string $expression): CompiledExpression
     {
-        $ast = $this->parse($expression);
+        return $this->getOrCompile($expression);
+    }
 
-        return new CompiledExpression($ast, $this->evaluator, $expression);
+    /**
+     * Get the expression cache.
+     *
+     * @return ExpressionCacheInterface The cache instance
+     */
+    public function getCache(): ExpressionCacheInterface
+    {
+        return $this->cache;
+    }
+
+    /**
+     * Clear the expression cache.
+     */
+    public function clearCache(): void
+    {
+        $this->cache->clear();
+    }
+
+    /**
+     * Get cache statistics.
+     *
+     * @return array{hits: int, misses: int, size: int} Cache statistics
+     */
+    public function getCacheStats(): array
+    {
+        return $this->cache->getStats();
+    }
+
+    /**
+     * Get or compile an expression, using cache when available.
+     *
+     * @param string $expression The FHIRPath expression
+     *
+     * @return CompiledExpression The compiled expression
+     *
+     * @throws FHIRPathException If the expression is invalid
+     */
+    private function getOrCompile(string $expression): CompiledExpression
+    {
+        // Check cache first
+        $cached = $this->cache->get($expression);
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        // Parse and compile
+        $ast      = $this->parse($expression);
+        $compiled = new CompiledExpression($ast, $this->evaluator, $expression);
+
+        // Store in cache
+        $this->cache->set($expression, $compiled);
+
+        return $compiled;
     }
 
     /**

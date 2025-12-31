@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Exception\FHIRPathException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\CompiledExpression;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use PHPUnit\Framework\TestCase;
+use Ardenexal\FHIRTools\Component\FHIRPath\Cache\ExpressionCacheInterface;
 
 /**
  * @covers \Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService
@@ -197,5 +198,76 @@ class FHIRPathServiceTest extends TestCase
 
         self::assertSame($expression, $compiled->getExpression());
         self::assertSame($expression, (string) $compiled);
+    }
+
+    public function testCachingReducesParsing(): void
+    {
+        $expression = 'name.given';
+
+        // First evaluation - should cache
+        $this->service->evaluate($expression, (object) ['name' => (object) ['given' => 'John']]);
+
+        $stats = $this->service->getCacheStats();
+        self::assertSame(0, $stats['hits']); // First time is a miss
+        self::assertSame(1, $stats['misses']);
+        self::assertSame(1, $stats['size']);
+
+        // Second evaluation - should hit cache
+        $this->service->evaluate($expression, (object) ['name' => (object) ['given' => 'Jane']]);
+
+        $stats = $this->service->getCacheStats();
+        self::assertSame(1, $stats['hits']);
+        self::assertSame(1, $stats['misses']);
+        self::assertSame(1, $stats['size']);
+    }
+
+    public function testCompileUsesCaching(): void
+    {
+        $expression = 'value * 2';
+
+        // First compile
+        $compiled1 = $this->service->compile($expression);
+
+        // Second compile - should return same cached instance
+        $compiled2 = $this->service->compile($expression);
+
+        self::assertSame($compiled1, $compiled2);
+    }
+
+    public function testClearCacheRemovesAllCachedExpressions(): void
+    {
+        $this->service->evaluate('expr1', null);
+        $this->service->evaluate('expr2', null);
+        $this->service->evaluate('expr3', null);
+
+        $stats = $this->service->getCacheStats();
+        self::assertSame(3, $stats['size']);
+
+        $this->service->clearCache();
+
+        $stats = $this->service->getCacheStats();
+        self::assertSame(0, $stats['size']);
+    }
+
+    public function testGetCacheReturnsCache(): void
+    {
+        $cache = $this->service->getCache();
+
+        self::assertInstanceOf(ExpressionCacheInterface::class, $cache);
+    }
+
+    public function testMultipleEvaluationsOfSameExpression(): void
+    {
+        $expression = 'age > 18';
+
+        // Multiple evaluations of the same expression
+        for ($i = 0; $i < 5; ++$i) {
+            $this->service->evaluate($expression, (object) ['age' => 20 + $i]);
+        }
+
+        $stats = $this->service->getCacheStats();
+        self::assertSame(4, $stats['hits']); // First is miss, then 4 hits
+        self::assertSame(1, $stats['misses']);
+        self::assertSame(1, $stats['size']);
     }
 }
