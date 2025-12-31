@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -12,18 +10,18 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRContactPointUse: string
 {
-    /** Home */
-    case home = 'home';
+	/** Home */
+	case home = 'home';
 
-    /** Work */
-    case work = 'work';
+	/** Work */
+	case work = 'work';
 
-    /** Temp */
-    case temp = 'temp';
+	/** Temp */
+	case temp = 'temp';
 
-    /** Old */
-    case old = 'old';
+	/** Old */
+	case old = 'old';
 
-    /** Mobile */
-    case mobile = 'mobile';
+	/** Mobile */
+	case mobile = 'mobile';
 }

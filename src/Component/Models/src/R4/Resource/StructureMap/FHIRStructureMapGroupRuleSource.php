@@ -1,99 +1,44 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRAddress;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRAge;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRAnnotation;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRAttachment;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCoding;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRContactDetail;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRContactPoint;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRContributor;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCount;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDataRequirement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDistance;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDuration;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExpression;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRHumanName;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRMeta;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRMoney;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRParameterDefinition;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRRange;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRRatio;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRRelatedArtifact;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRSampledData;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRSignature;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRStructureMapSourceListModeType;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRTriggerDefinition;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRUsageContext;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBase64Binary;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCode;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDate;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDecimal;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRId;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRInstant;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRInteger;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRMarkdown;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIROid;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRPositiveInt;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRTime;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUnsignedInt;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUri;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUrl;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUuid;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * @description Source inputs to the mapping.
  */
-#[FHIRBackboneElement(parentResource: 'StructureMap', elementPath: 'StructureMap.group.rule.source', fhirVersion: 'R4')]
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'StructureMap', elementPath: 'StructureMap.group.rule.source', fhirVersion: 'R4')]
 class FHIRStructureMapGroupRuleSource extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRBackboneElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<FHIRExtension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        public array $modifierExtension = [],
-        /** @var FHIRId|null context Type or variable this rule applies to */
-        #[NotBlank]
-        public ?FHIRId $context = null,
-        /** @var FHIRInteger|null min Specified minimum cardinality */
-        public ?FHIRInteger $min = null,
-        /** @var FHIRString|string|null max Specified maximum cardinality (number or *) */
-        public FHIRString|string|null $max = null,
-        /** @var FHIRString|string|null type Rule only applies if source has this type */
-        public FHIRString|string|null $type = null,
-        /** @var FHIRBase64Binary|FHIRBoolean|FHIRCanonical|FHIRCode|FHIRDate|FHIRDateTime|FHIRDecimal|FHIRId|FHIRInstant|FHIRInteger|FHIRMarkdown|FHIROid|FHIRPositiveInt|FHIRString|string|FHIRTime|FHIRUnsignedInt|FHIRUri|FHIRUrl|FHIRUuid|FHIRAddress|FHIRAge|FHIRAnnotation|FHIRAttachment|FHIRCodeableConcept|FHIRCoding|FHIRContactPoint|FHIRCount|FHIRDistance|FHIRDuration|FHIRHumanName|FHIRIdentifier|FHIRMoney|FHIRPeriod|FHIRQuantity|FHIRRange|FHIRRatio|FHIRReference|FHIRSampledData|FHIRSignature|FHIRTiming|FHIRContactDetail|FHIRContributor|FHIRDataRequirement|FHIRExpression|FHIRParameterDefinition|FHIRRelatedArtifact|FHIRTriggerDefinition|FHIRUsageContext|FHIRDosage|FHIRMeta|null defaultValueX Default value if no value exists */
-        public FHIRBase64Binary|FHIRBoolean|FHIRCanonical|FHIRCode|FHIRDate|FHIRDateTime|FHIRDecimal|FHIRId|FHIRInstant|FHIRInteger|FHIRMarkdown|FHIROid|FHIRPositiveInt|FHIRString|string|FHIRTime|FHIRUnsignedInt|FHIRUri|FHIRUrl|FHIRUuid|FHIRAddress|FHIRAge|FHIRAnnotation|FHIRAttachment|FHIRCodeableConcept|FHIRCoding|FHIRContactPoint|FHIRCount|FHIRDistance|FHIRDuration|FHIRHumanName|FHIRIdentifier|FHIRMoney|FHIRPeriod|FHIRQuantity|FHIRRange|FHIRRatio|FHIRReference|FHIRSampledData|FHIRSignature|FHIRTiming|FHIRContactDetail|FHIRContributor|FHIRDataRequirement|FHIRExpression|FHIRParameterDefinition|FHIRRelatedArtifact|FHIRTriggerDefinition|FHIRUsageContext|FHIRDosage|FHIRMeta|null $defaultValueX = null,
-        /** @var FHIRString|string|null element Optional field for this source */
-        public FHIRString|string|null $element = null,
-        /** @var FHIRStructureMapSourceListModeType|null listMode first | not_first | last | not_last | only_one */
-        public ?FHIRStructureMapSourceListModeType $listMode = null,
-        /** @var FHIRId|null variable Named context for field, if a field is specified */
-        public ?FHIRId $variable = null,
-        /** @var FHIRString|string|null condition FHIRPath expression  - must be true or the rule does not apply */
-        public FHIRString|string|null $condition = null,
-        /** @var FHIRString|string|null check FHIRPath expression  - must be true or the mapping engine throws an error instead of completing */
-        public FHIRString|string|null $check = null,
-        /** @var FHIRString|string|null logMessage Message to put in log if source exists (FHIRPath) */
-        public FHIRString|string|null $logMessage = null,
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRId context Type or variable this rule applies to */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRId $context = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRInteger min Specified minimum cardinality */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRInteger $min = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string max Specified maximum cardinality (number or *) */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string|null $max = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string type Rule only applies if source has this type */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string|null $type = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBase64Binary|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBoolean|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCanonical|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCode|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDate|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDecimal|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRId|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRInstant|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRInteger|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRMarkdown|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIROid|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRPositiveInt|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRTime|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUnsignedInt|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUri|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUrl|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUuid|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRAddress|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRAge|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRAnnotation|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRAttachment|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCoding|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRContactPoint|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCount|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDistance|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDuration|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRHumanName|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRIdentifier|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRMoney|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRQuantity|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRRange|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRRatio|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRSampledData|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRSignature|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRTiming|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRContactDetail|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRContributor|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDataRequirement|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExpression|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRParameterDefinition|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRRelatedArtifact|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRTriggerDefinition|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRUsageContext|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRDosage|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRMeta defaultValueX Default value if no value exists */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBase64Binary|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBoolean|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCanonical|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCode|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDate|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDecimal|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRId|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRInstant|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRInteger|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRMarkdown|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIROid|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRPositiveInt|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRTime|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUnsignedInt|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUri|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUrl|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUuid|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRAddress|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRAge|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRAnnotation|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRAttachment|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCoding|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRContactPoint|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCount|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDistance|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDuration|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRHumanName|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRIdentifier|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRMoney|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRQuantity|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRRange|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRRatio|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRSampledData|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRSignature|FHIRTiming|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRContactDetail|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRContributor|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRDataRequirement|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExpression|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRParameterDefinition|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRRelatedArtifact|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRTriggerDefinition|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRUsageContext|FHIRDosage|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRMeta|null $defaultValueX = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string element Optional field for this source */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string|null $element = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRStructureMapSourceListModeType listMode first | not_first | last | not_last | only_one */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRStructureMapSourceListModeType $listMode = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRId variable Named context for field, if a field is specified */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRId $variable = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string condition FHIRPath expression  - must be true or the rule does not apply */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string|null $condition = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string check FHIRPath expression  - must be true or the mapping engine throws an error instead of completing */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string|null $check = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string logMessage Message to put in log if source exists (FHIRPath) */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string|null $logMessage = null,
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }

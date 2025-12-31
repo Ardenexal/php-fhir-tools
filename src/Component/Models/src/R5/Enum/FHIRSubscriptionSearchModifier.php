@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -12,48 +10,48 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRSubscriptionSearchModifier: string
 {
-    /** = */
-    case equals = '=';
+	/** = */
+	case equals = '=';
 
-    /** Equal */
-    case equal = 'eq';
+	/** Equal */
+	case equal = 'eq';
 
-    /** Not Equal */
-    case notequal = 'ne';
+	/** Not Equal */
+	case notequal = 'ne';
 
-    /** Greater Than */
-    case greaterthan = 'gt';
+	/** Greater Than */
+	case greaterthan = 'gt';
 
-    /** Less Than */
-    case lessthan = 'lt';
+	/** Less Than */
+	case lessthan = 'lt';
 
-    /** Greater Than or Equal */
-    case greaterthanorequal = 'ge';
+	/** Greater Than or Equal */
+	case greaterthanorequal = 'ge';
 
-    /** Less Than or Equal */
-    case lessthanorequal = 'le';
+	/** Less Than or Equal */
+	case lessthanorequal = 'le';
 
-    /** Starts After */
-    case startsafter = 'sa';
+	/** Starts After */
+	case startsafter = 'sa';
 
-    /** Ends Before */
-    case endsbefore = 'eb';
+	/** Ends Before */
+	case endsbefore = 'eb';
 
-    /** Approximately */
-    case approximately = 'ap';
+	/** Approximately */
+	case approximately = 'ap';
 
-    /** Above */
-    case above = 'above';
+	/** Above */
+	case above = 'above';
 
-    /** Below */
-    case below = 'below';
+	/** Below */
+	case below = 'below';
 
-    /** In */
-    case in = 'in';
+	/** In */
+	case in = 'in';
 
-    /** Not In */
-    case notin = 'not-in';
+	/** Not In */
+	case notin = 'not-in';
 
-    /** Of Type */
-    case oftype = 'of-type';
+	/** Of Type */
+	case oftype = 'of-type';
 }

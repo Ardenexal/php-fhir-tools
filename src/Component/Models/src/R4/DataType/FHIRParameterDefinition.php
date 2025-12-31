@@ -1,48 +1,37 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCode;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRInteger;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
-use Symfony\Component\Validator\Constraints\NotBlank;
-
 /**
  * @author HL7 FHIR Standard
- *
  * @see http://hl7.org/fhir/StructureDefinition/ParameterDefinition
- *
  * @description The parameters to the module. This collection specifies both the input and output parameters. Input parameters are provided by the caller as part of the $evaluate operation. Output parameters are included in the GuidanceResponse.
  */
-#[FHIRComplexType(typeName: 'ParameterDefinition', fhirVersion: 'R4')]
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType(typeName: 'ParameterDefinition', fhirVersion: 'R4')]
 class FHIRParameterDefinition extends FHIRElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<FHIRExtension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var FHIRCode|null name Name used to access the parameter value */
-        public ?FHIRCode $name = null,
-        /** @var FHIROperationParameterUseType|null use in | out */
-        #[NotBlank]
-        public ?FHIROperationParameterUseType $use = null,
-        /** @var FHIRInteger|null min Minimum cardinality */
-        public ?FHIRInteger $min = null,
-        /** @var FHIRString|string|null max Maximum cardinality (a number of *) */
-        public FHIRString|string|null $max = null,
-        /** @var FHIRString|string|null documentation A brief description of the parameter */
-        public FHIRString|string|null $documentation = null,
-        /** @var FHIRFHIRAllTypesType|null type What type of value */
-        #[NotBlank]
-        public ?FHIRFHIRAllTypesType $type = null,
-        /** @var FHIRCanonical|null profile What profile the value is expected to be */
-        public ?FHIRCanonical $profile = null,
-    ) {
-        parent::__construct($id, $extension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCode name Name used to access the parameter value */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCode $name = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIROperationParameterUseType use in | out */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?FHIROperationParameterUseType $use = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRInteger min Minimum cardinality */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRInteger $min = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string max Maximum cardinality (a number of *) */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string|null $max = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string documentation A brief description of the parameter */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string|null $documentation = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRFHIRAllTypesType type What type of value */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?FHIRFHIRAllTypesType $type = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCanonical profile What profile the value is expected to be */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCanonical $profile = null,
+	) {
+		parent::__construct($id, $extension);
+	}
 }

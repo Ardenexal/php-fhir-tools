@@ -1,47 +1,37 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRRatio;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRRatioRange;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
 
 /**
  * @description The quantity of substance in the unit of presentation, or in the volume (or mass) of the single pharmaceutical product or manufactured item. The allowed repetitions do not represent different strengths, but are different representations - mathematically equivalent - of a single strength.
  */
-#[FHIRBackboneElement(parentResource: 'Ingredient', elementPath: 'Ingredient.substance.strength', fhirVersion: 'R5')]
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'Ingredient', elementPath: 'Ingredient.substance.strength', fhirVersion: 'R5')]
 class FHIRIngredientSubstanceStrength extends \Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRBackboneElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<FHIRExtension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        public array $modifierExtension = [],
-        /** @var FHIRRatio|FHIRRatioRange|FHIRCodeableConcept|FHIRQuantity|null presentationX The quantity of substance in the unit of presentation */
-        public FHIRRatio|FHIRRatioRange|FHIRCodeableConcept|FHIRQuantity|null $presentationX = null,
-        /** @var FHIRString|string|null textPresentation Text of either the whole presentation strength or a part of it (rest being in Strength.presentation as a ratio) */
-        public FHIRString|string|null $textPresentation = null,
-        /** @var FHIRRatio|FHIRRatioRange|FHIRCodeableConcept|FHIRQuantity|null concentrationX The strength per unitary volume (or mass) */
-        public FHIRRatio|FHIRRatioRange|FHIRCodeableConcept|FHIRQuantity|null $concentrationX = null,
-        /** @var FHIRString|string|null textConcentration Text of either the whole concentration strength or a part of it (rest being in Strength.concentration as a ratio) */
-        public FHIRString|string|null $textConcentration = null,
-        /** @var FHIRCodeableConcept|null basis A code that indicates if the strength is, for example, based on the ingredient substance as stated or on the substance base (when the ingredient is a salt) */
-        public ?FHIRCodeableConcept $basis = null,
-        /** @var FHIRString|string|null measurementPoint When strength is measured at a particular point or distance */
-        public FHIRString|string|null $measurementPoint = null,
-        /** @var array<FHIRCodeableConcept> country Where the strength range applies */
-        public array $country = [],
-        /** @var array<FHIRIngredientSubstanceStrengthReferenceStrength> referenceStrength Strength expressed in terms of a reference substance */
-        public array $referenceStrength = [],
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRRatio|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRRatioRange|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRQuantity presentationX The quantity of substance in the unit of presentation */
+		public \Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRRatio|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRRatioRange|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRQuantity|null $presentationX = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString|string textPresentation Text of either the whole presentation strength or a part of it (rest being in Strength.presentation as a ratio) */
+		public \Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString|string|null $textPresentation = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRRatio|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRRatioRange|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRQuantity concentrationX The strength per unitary volume (or mass) */
+		public \Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRRatio|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRRatioRange|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRQuantity|null $concentrationX = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString|string textConcentration Text of either the whole concentration strength or a part of it (rest being in Strength.concentration as a ratio) */
+		public \Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString|string|null $textConcentration = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept basis A code that indicates if the strength is, for example, based on the ingredient substance as stated or on the substance base (when the ingredient is a salt) */
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept $basis = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString|string measurementPoint When strength is measured at a particular point or distance */
+		public \Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString|string|null $measurementPoint = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept> country Where the strength range applies */
+		public array $country = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\FHIRIngredientSubstanceStrengthReferenceStrength> referenceStrength Strength expressed in terms of a reference substance */
+		public array $referenceStrength = [],
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }

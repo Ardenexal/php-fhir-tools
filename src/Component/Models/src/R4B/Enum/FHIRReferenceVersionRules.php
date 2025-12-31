@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -12,12 +10,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRReferenceVersionRules: string
 {
-    /** Either Specific or independent */
-    case eitherspecificorindependent = 'either';
+	/** Either Specific or independent */
+	case eitherspecificorindependent = 'either';
 
-    /** Version independent */
-    case versionindependent = 'independent';
+	/** Version independent */
+	case versionindependent = 'independent';
 
-    /** Version Specific */
-    case versionspecific = 'specific';
+	/** Version Specific */
+	case versionspecific = 'specific';
 }

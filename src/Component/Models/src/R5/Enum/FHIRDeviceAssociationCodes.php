@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -12,18 +10,18 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRDeviceAssociationCodes: string
 {
-    /** Attached */
-    case attached = 'attached';
+	/** Attached */
+	case attached = 'attached';
 
-    /** Disconnected */
-    case disconnected = 'disconnected';
+	/** Disconnected */
+	case disconnected = 'disconnected';
 
-    /** Failed */
-    case failed = 'failed';
+	/** Failed */
+	case failed = 'failed';
 
-    /** placed */
-    case placed = 'placed';
+	/** placed */
+	case placed = 'placed';
 
-    /** Replaced */
-    case replaced = 'replaced';
+	/** Replaced */
+	case replaced = 'replaced';
 }

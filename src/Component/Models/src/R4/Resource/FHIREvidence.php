@@ -1,115 +1,91 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRAnnotation;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRContactDetail;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRMeta;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRNarrative;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPublicationStatusType;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRRelatedArtifact;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRUsageContext;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDate;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRMarkdown;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUri;
-use Symfony\Component\Validator\Constraints\NotBlank;
-
 /**
  * @author Health Level Seven International (Clinical Decision Support)
- *
  * @see http://hl7.org/fhir/StructureDefinition/Evidence
- *
  * @description The Evidence resource describes the conditional state (population and any exposures being compared within the population) and outcome (if specified) that the knowledge (evidence, assertion, recommendation) is about.
  */
-#[FhirResource(type: 'Evidence', version: '4.0.1', url: 'http://hl7.org/fhir/StructureDefinition/Evidence', fhirVersion: 'R4')]
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(type: 'Evidence', version: '4.0.1', url: 'http://hl7.org/fhir/StructureDefinition/Evidence', fhirVersion: 'R4')]
 class FHIREvidence extends FHIRDomainResource
 {
-    public function __construct(
-        /** @var string|null id Logical id of this artifact */
-        public ?string $id = null,
-        /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?FHIRMeta $meta = null,
-        /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?FHIRUri $implicitRules = null,
-        /** @var string|null language Language of the resource content */
-        public ?string $language = null,
-        /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
-        public ?FHIRNarrative $text = null,
-        /** @var array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRResource> contained Contained, inline Resources */
-        public array $contained = [],
-        /** @var array<FHIRExtension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored */
-        public array $modifierExtension = [],
-        /** @var FHIRUri|null url Canonical identifier for this evidence, represented as a URI (globally unique) */
-        public ?FHIRUri $url = null,
-        /** @var array<FHIRIdentifier> identifier Additional identifier for the evidence */
-        public array $identifier = [],
-        /** @var FHIRString|string|null version Business version of the evidence */
-        public FHIRString|string|null $version = null,
-        /** @var FHIRString|string|null name Name for this evidence (computer friendly) */
-        public FHIRString|string|null $name = null,
-        /** @var FHIRString|string|null title Name for this evidence (human friendly) */
-        public FHIRString|string|null $title = null,
-        /** @var FHIRString|string|null shortTitle Title for use in informal contexts */
-        public FHIRString|string|null $shortTitle = null,
-        /** @var FHIRString|string|null subtitle Subordinate title of the Evidence */
-        public FHIRString|string|null $subtitle = null,
-        /** @var FHIRPublicationStatusType|null status draft | active | retired | unknown */
-        #[NotBlank]
-        public ?FHIRPublicationStatusType $status = null,
-        /** @var FHIRDateTime|null date Date last changed */
-        public ?FHIRDateTime $date = null,
-        /** @var FHIRString|string|null publisher Name of the publisher (organization or individual) */
-        public FHIRString|string|null $publisher = null,
-        /** @var array<FHIRContactDetail> contact Contact details for the publisher */
-        public array $contact = [],
-        /** @var FHIRMarkdown|null description Natural language description of the evidence */
-        public ?FHIRMarkdown $description = null,
-        /** @var array<FHIRAnnotation> note Used for footnotes or explanatory notes */
-        public array $note = [],
-        /** @var array<FHIRUsageContext> useContext The context that the content is intended to support */
-        public array $useContext = [],
-        /** @var array<FHIRCodeableConcept> jurisdiction Intended jurisdiction for evidence (if applicable) */
-        public array $jurisdiction = [],
-        /** @var FHIRMarkdown|null copyright Use and/or publishing restrictions */
-        public ?FHIRMarkdown $copyright = null,
-        /** @var FHIRDate|null approvalDate When the evidence was approved by publisher */
-        public ?FHIRDate $approvalDate = null,
-        /** @var FHIRDate|null lastReviewDate When the evidence was last reviewed */
-        public ?FHIRDate $lastReviewDate = null,
-        /** @var FHIRPeriod|null effectivePeriod When the evidence is expected to be used */
-        public ?FHIRPeriod $effectivePeriod = null,
-        /** @var array<FHIRCodeableConcept> topic The category of the Evidence, such as Education, Treatment, Assessment, etc. */
-        public array $topic = [],
-        /** @var array<FHIRContactDetail> author Who authored the content */
-        public array $author = [],
-        /** @var array<FHIRContactDetail> editor Who edited the content */
-        public array $editor = [],
-        /** @var array<FHIRContactDetail> reviewer Who reviewed the content */
-        public array $reviewer = [],
-        /** @var array<FHIRContactDetail> endorser Who endorsed the content */
-        public array $endorser = [],
-        /** @var array<FHIRRelatedArtifact> relatedArtifact Additional documentation, citations, etc. */
-        public array $relatedArtifact = [],
-        /** @var FHIRReference|null exposureBackground What population? */
-        #[NotBlank]
-        public ?FHIRReference $exposureBackground = null,
-        /** @var array<FHIRReference> exposureVariant What exposure? */
-        public array $exposureVariant = [],
-        /** @var array<FHIRReference> outcome What outcome? */
-        public array $outcome = [],
-    ) {
-        parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Logical id of this artifact */
+		public ?string $id = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRMeta meta Metadata about the resource */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRMeta $meta = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUri implicitRules A set of rules under which this content was created */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUri $implicitRules = null,
+		/** @var null|string language Language of the resource content */
+		public ?string $language = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRNarrative text Text summary of the resource, for human interpretation */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRNarrative $text = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRResource> contained Contained, inline Resources */
+		public array $contained = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUri url Canonical identifier for this evidence, represented as a URI (globally unique) */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUri $url = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRIdentifier> identifier Additional identifier for the evidence */
+		public array $identifier = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string version Business version of the evidence */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string|null $version = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string name Name for this evidence (computer friendly) */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string|null $name = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string title Name for this evidence (human friendly) */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string|null $title = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string shortTitle Title for use in informal contexts */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string|null $shortTitle = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string subtitle Subordinate title of the Evidence */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string|null $subtitle = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPublicationStatusType status draft | active | retired | unknown */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPublicationStatusType $status = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime date Date last changed */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime $date = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string publisher Name of the publisher (organization or individual) */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string|null $publisher = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRContactDetail> contact Contact details for the publisher */
+		public array $contact = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRMarkdown description Natural language description of the evidence */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRMarkdown $description = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRAnnotation> note Used for footnotes or explanatory notes */
+		public array $note = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRUsageContext> useContext The context that the content is intended to support */
+		public array $useContext = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept> jurisdiction Intended jurisdiction for evidence (if applicable) */
+		public array $jurisdiction = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRMarkdown copyright Use and/or publishing restrictions */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRMarkdown $copyright = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDate approvalDate When the evidence was approved by publisher */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDate $approvalDate = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDate lastReviewDate When the evidence was last reviewed */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDate $lastReviewDate = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod effectivePeriod When the evidence is expected to be used */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRPeriod $effectivePeriod = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept> topic The category of the Evidence, such as Education, Treatment, Assessment, etc. */
+		public array $topic = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRContactDetail> author Who authored the content */
+		public array $author = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRContactDetail> editor Who edited the content */
+		public array $editor = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRContactDetail> reviewer Who reviewed the content */
+		public array $reviewer = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRContactDetail> endorser Who endorsed the content */
+		public array $endorser = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRRelatedArtifact> relatedArtifact Additional documentation, citations, etc. */
+		public array $relatedArtifact = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference exposureBackground What population? */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference $exposureBackground = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference> exposureVariant What exposure? */
+		public array $exposureVariant = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference> outcome What outcome? */
+		public array $outcome = [],
+	) {
+		parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
+	}
 }

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -12,15 +10,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRLinkType: string
 {
-    /** Replaced-by */
-    case replacedby = 'replaced-by';
+	/** Replaced-by */
+	case replacedby = 'replaced-by';
 
-    /** Replaces */
-    case replaces = 'replaces';
+	/** Replaces */
+	case replaces = 'replaces';
 
-    /** Refer */
-    case refer = 'refer';
+	/** Refer */
+	case refer = 'refer';
 
-    /** See also */
-    case seealso = 'seealso';
+	/** See also */
+	case seealso = 'seealso';
 }

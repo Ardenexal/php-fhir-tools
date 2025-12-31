@@ -1,37 +1,28 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCompositionAttestationModeType;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * @description A participant who has attested to the accuracy of the composition/document.
  */
-#[FHIRBackboneElement(parentResource: 'Composition', elementPath: 'Composition.attester', fhirVersion: 'R4B')]
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'Composition', elementPath: 'Composition.attester', fhirVersion: 'R4B')]
 class FHIRCompositionAttester extends \Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRBackboneElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<FHIRExtension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        public array $modifierExtension = [],
-        /** @var FHIRCompositionAttestationModeType|null mode personal | professional | legal | official */
-        #[NotBlank]
-        public ?FHIRCompositionAttestationModeType $mode = null,
-        /** @var FHIRDateTime|null time When the composition was attested */
-        public ?FHIRDateTime $time = null,
-        /** @var FHIRReference|null party Who attested the composition */
-        public ?FHIRReference $party = null,
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCompositionAttestationModeType mode personal | professional | legal | official */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCompositionAttestationModeType $mode = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime time When the composition was attested */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime $time = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference party Who attested the composition */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference $party = null,
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }

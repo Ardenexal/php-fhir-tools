@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -12,45 +10,45 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRAppointmentResponseStatus: string
 {
-    /** Accepted */
-    case accepted = 'accepted';
+	/** Accepted */
+	case accepted = 'accepted';
 
-    /** Declined */
-    case declined = 'declined';
+	/** Declined */
+	case declined = 'declined';
 
-    /** Tentative */
-    case tentative = 'tentative';
+	/** Tentative */
+	case tentative = 'tentative';
 
-    /** Needs Action */
-    case needsaction = 'needs-action';
+	/** Needs Action */
+	case needsaction = 'needs-action';
 
-    /** Proposed */
-    case proposed = 'proposed';
+	/** Proposed */
+	case proposed = 'proposed';
 
-    /** Pending */
-    case pending = 'pending';
+	/** Pending */
+	case pending = 'pending';
 
-    /** Booked */
-    case booked = 'booked';
+	/** Booked */
+	case booked = 'booked';
 
-    /** Arrived */
-    case arrived = 'arrived';
+	/** Arrived */
+	case arrived = 'arrived';
 
-    /** Fulfilled */
-    case fulfilled = 'fulfilled';
+	/** Fulfilled */
+	case fulfilled = 'fulfilled';
 
-    /** Cancelled */
-    case cancelled = 'cancelled';
+	/** Cancelled */
+	case cancelled = 'cancelled';
 
-    /** No Show */
-    case noshow = 'noshow';
+	/** No Show */
+	case noshow = 'noshow';
 
-    /** Entered in error */
-    case enteredinerror = 'entered-in-error';
+	/** Entered in error */
+	case enteredinerror = 'entered-in-error';
 
-    /** Checked In */
-    case checkedin = 'checked-in';
+	/** Checked In */
+	case checkedin = 'checked-in';
 
-    /** Waitlisted */
-    case waitlisted = 'waitlist';
+	/** Waitlisted */
+	case waitlisted = 'waitlist';
 }

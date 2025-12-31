@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -12,15 +10,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRAssertionManualCompletionType: string
 {
-    /** Fail */
-    case fail = 'fail';
+	/** Fail */
+	case fail = 'fail';
 
-    /** Pass */
-    case pass = 'pass';
+	/** Pass */
+	case pass = 'pass';
 
-    /** Skip */
-    case skip = 'skip';
+	/** Skip */
+	case skip = 'skip';
 
-    /** Stop */
-    case stop = 'stop';
+	/** Stop */
+	case stop = 'stop';
 }

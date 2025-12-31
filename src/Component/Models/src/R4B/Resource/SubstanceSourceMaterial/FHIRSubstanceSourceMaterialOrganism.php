@@ -1,44 +1,37 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
 
 /**
  * @description This subclause describes the organism which the substance is derived from. For vaccines, the parent organism shall be specified based on these subclause elements. As an example, full taxonomy will be described for the Substance Name: ., Leaf.
  */
-#[FHIRBackboneElement(parentResource: 'SubstanceSourceMaterial', elementPath: 'SubstanceSourceMaterial.organism', fhirVersion: 'R4B')]
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'SubstanceSourceMaterial', elementPath: 'SubstanceSourceMaterial.organism', fhirVersion: 'R4B')]
 class FHIRSubstanceSourceMaterialOrganism extends \Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRBackboneElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<FHIRExtension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        public array $modifierExtension = [],
-        /** @var FHIRCodeableConcept|null family The family of an organism shall be specified */
-        public ?FHIRCodeableConcept $family = null,
-        /** @var FHIRCodeableConcept|null genus The genus of an organism shall be specified; refers to the Latin epithet of the genus element of the plant/animal scientific name; it is present in names for genera, species and infraspecies */
-        public ?FHIRCodeableConcept $genus = null,
-        /** @var FHIRCodeableConcept|null species The species of an organism shall be specified; refers to the Latin epithet of the species of the plant/animal; it is present in names for species and infraspecies */
-        public ?FHIRCodeableConcept $species = null,
-        /** @var FHIRCodeableConcept|null intraspecificType The Intraspecific type of an organism shall be specified */
-        public ?FHIRCodeableConcept $intraspecificType = null,
-        /** @var FHIRString|string|null intraspecificDescription The intraspecific description of an organism shall be specified based on a controlled vocabulary. For Influenza Vaccine, the intraspecific description shall contain the syntax of the antigen in line with the WHO convention */
-        public FHIRString|string|null $intraspecificDescription = null,
-        /** @var array<FHIRSubstanceSourceMaterialOrganismAuthor> author 4.9.13.6.1 Author type (Conditional) */
-        public array $author = [],
-        /** @var FHIRSubstanceSourceMaterialOrganismHybrid|null hybrid 4.9.13.8.1 Hybrid species maternal organism ID (Optional) */
-        public ?FHIRSubstanceSourceMaterialOrganismHybrid $hybrid = null,
-        /** @var FHIRSubstanceSourceMaterialOrganismOrganismGeneral|null organismGeneral 4.9.13.7.1 Kingdom (Conditional) */
-        public ?FHIRSubstanceSourceMaterialOrganismOrganismGeneral $organismGeneral = null,
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept family The family of an organism shall be specified */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept $family = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept genus The genus of an organism shall be specified; refers to the Latin epithet of the genus element of the plant/animal scientific name; it is present in names for genera, species and infraspecies */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept $genus = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept species The species of an organism shall be specified; refers to the Latin epithet of the species of the plant/animal; it is present in names for species and infraspecies */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept $species = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept intraspecificType The Intraspecific type of an organism shall be specified */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept $intraspecificType = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string intraspecificDescription The intraspecific description of an organism shall be specified based on a controlled vocabulary. For Influenza Vaccine, the intraspecific description shall contain the syntax of the antigen in line with the WHO convention */
+		public \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string|null $intraspecificDescription = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRSubstanceSourceMaterialOrganismAuthor> author 4.9.13.6.1 Author type (Conditional) */
+		public array $author = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRSubstanceSourceMaterialOrganismHybrid hybrid 4.9.13.8.1 Hybrid species maternal organism ID (Optional) */
+		public ?FHIRSubstanceSourceMaterialOrganismHybrid $hybrid = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRSubstanceSourceMaterialOrganismOrganismGeneral organismGeneral 4.9.13.7.1 Kingdom (Conditional) */
+		public ?FHIRSubstanceSourceMaterialOrganismOrganismGeneral $organismGeneral = null,
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }

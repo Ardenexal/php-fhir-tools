@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -12,24 +10,24 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRTestScriptRequestMethodCode: string
 {
-    /** DELETE */
-    case delete = 'delete';
+	/** DELETE */
+	case delete = 'delete';
 
-    /** GET */
-    case get = 'get';
+	/** GET */
+	case get = 'get';
 
-    /** OPTIONS */
-    case options = 'options';
+	/** OPTIONS */
+	case options = 'options';
 
-    /** PATCH */
-    case patch = 'patch';
+	/** PATCH */
+	case patch = 'patch';
 
-    /** POST */
-    case post = 'post';
+	/** POST */
+	case post = 'post';
 
-    /** PUT */
-    case put = 'put';
+	/** PUT */
+	case put = 'put';
 
-    /** HEAD */
-    case head = 'head';
+	/** HEAD */
+	case head = 'head';
 }

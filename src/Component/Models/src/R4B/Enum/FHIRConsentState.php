@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -12,21 +10,21 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRConsentState: string
 {
-    /** Pending */
-    case pending = 'draft';
+	/** Pending */
+	case pending = 'draft';
 
-    /** Proposed */
-    case proposed = 'proposed';
+	/** Proposed */
+	case proposed = 'proposed';
 
-    /** Active */
-    case active = 'active';
+	/** Active */
+	case active = 'active';
 
-    /** Rejected */
-    case rejected = 'rejected';
+	/** Rejected */
+	case rejected = 'rejected';
 
-    /** Inactive */
-    case inactive = 'inactive';
+	/** Inactive */
+	case inactive = 'inactive';
 
-    /** Entered in Error */
-    case enteredinerror = 'entered-in-error';
+	/** Entered in Error */
+	case enteredinerror = 'entered-in-error';
 }

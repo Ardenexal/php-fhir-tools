@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -12,12 +10,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum FHIRNoteType: string
 {
-    /** Display */
-    case display = 'display';
+	/** Display */
+	case display = 'display';
 
-    /** Print (Form) */
-    case printform = 'print';
+	/** Print (Form) */
+	case printform = 'print';
 
-    /** Print (Operator) */
-    case printoperator = 'printoper';
+	/** Print (Operator) */
+	case printoperator = 'printoper';
 }

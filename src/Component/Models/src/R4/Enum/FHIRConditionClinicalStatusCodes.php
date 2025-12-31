@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -12,9 +10,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum FHIRConditionClinicalStatusCodes: string
 {
-    /** Active */
-    case active = 'active';
+	/** Active */
+	case active = 'active';
 
-    /** Inactive */
-    case inactive = 'inactive';
+	/** Inactive */
+	case inactive = 'inactive';
 }

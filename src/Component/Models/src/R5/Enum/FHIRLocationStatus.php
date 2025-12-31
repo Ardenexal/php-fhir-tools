@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -12,12 +10,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRLocationStatus: string
 {
-    /** Active */
-    case active = 'active';
+	/** Active */
+	case active = 'active';
 
-    /** Suspended */
-    case suspended = 'suspended';
+	/** Suspended */
+	case suspended = 'suspended';
 
-    /** Inactive */
-    case inactive = 'inactive';
+	/** Inactive */
+	case inactive = 'inactive';
 }

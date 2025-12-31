@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -12,9 +10,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRSubmitDataUpdateType: string
 {
-    /** Incremental */
-    case incremental = 'incremental';
+	/** Incremental */
+	case incremental = 'incremental';
 
-    /** Snapshot */
-    case snapshot = 'snapshot';
+	/** Snapshot */
+	case snapshot = 'snapshot';
 }

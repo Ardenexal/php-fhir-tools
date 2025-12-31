@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -12,18 +10,18 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRCodeSystemContentMode: string
 {
-    /** Not Present */
-    case notpresent = 'not-present';
+	/** Not Present */
+	case notpresent = 'not-present';
 
-    /** Example */
-    case example = 'example';
+	/** Example */
+	case example = 'example';
 
-    /** Fragment */
-    case fragment = 'fragment';
+	/** Fragment */
+	case fragment = 'fragment';
 
-    /** Complete */
-    case complete = 'complete';
+	/** Complete */
+	case complete = 'complete';
 
-    /** Supplement */
-    case supplement = 'supplement';
+	/** Supplement */
+	case supplement = 'supplement';
 }

@@ -1,35 +1,27 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRVisionBaseType;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDecimal;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * @description Allows for adjustment on two axis.
  */
-#[FHIRBackboneElement(parentResource: 'VisionPrescription', elementPath: 'VisionPrescription.lensSpecification.prism', fhirVersion: 'R5')]
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'VisionPrescription', elementPath: 'VisionPrescription.lensSpecification.prism', fhirVersion: 'R5')]
 class FHIRVisionPrescriptionLensSpecificationPrism extends \Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRBackboneElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<FHIRExtension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        public array $modifierExtension = [],
-        /** @var FHIRDecimal|null amount Amount of adjustment */
-        #[NotBlank]
-        public ?FHIRDecimal $amount = null,
-        /** @var FHIRVisionBaseType|null base up | down | in | out */
-        #[NotBlank]
-        public ?FHIRVisionBaseType $base = null,
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDecimal amount Amount of adjustment */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDecimal $amount = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRVisionBaseType base up | down | in | out */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRVisionBaseType $base = null,
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -12,18 +10,18 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRQuestionnaireResponseStatus: string
 {
-    /** In Progress */
-    case inprogress = 'in-progress';
+	/** In Progress */
+	case inprogress = 'in-progress';
 
-    /** Completed */
-    case completed = 'completed';
+	/** Completed */
+	case completed = 'completed';
 
-    /** Amended */
-    case amended = 'amended';
+	/** Amended */
+	case amended = 'amended';
 
-    /** Entered in Error */
-    case enteredinerror = 'entered-in-error';
+	/** Entered in Error */
+	case enteredinerror = 'entered-in-error';
 
-    /** Stopped */
-    case stopped = 'stopped';
+	/** Stopped */
+	case stopped = 'stopped';
 }

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -12,12 +10,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRSlicingRules: string
 {
-    /** Closed */
-    case closed = 'closed';
+	/** Closed */
+	case closed = 'closed';
 
-    /** Open */
-    case open = 'open';
+	/** Open */
+	case open = 'open';
 
-    /** Open at End */
-    case openatend = 'openAtEnd';
+	/** Open at End */
+	case openatend = 'openAtEnd';
 }

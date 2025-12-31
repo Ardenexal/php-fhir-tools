@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -12,15 +10,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum FHIRPublicationStatus: string
 {
-    /** Draft */
-    case draft = 'draft';
+	/** Draft */
+	case draft = 'draft';
 
-    /** Active */
-    case active = 'active';
+	/** Active */
+	case active = 'active';
 
-    /** Retired */
-    case retired = 'retired';
+	/** Retired */
+	case retired = 'retired';
 
-    /** Unknown */
-    case unknown = 'unknown';
+	/** Unknown */
+	case unknown = 'unknown';
 }

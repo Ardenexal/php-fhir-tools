@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -12,15 +10,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRRequestPriority: string
 {
-    /** Routine */
-    case routine = 'routine';
+	/** Routine */
+	case routine = 'routine';
 
-    /** Urgent */
-    case urgent = 'urgent';
+	/** Urgent */
+	case urgent = 'urgent';
 
-    /** ASAP */
-    case asap = 'asap';
+	/** ASAP */
+	case asap = 'asap';
 
-    /** STAT */
-    case stat = 'stat';
+	/** STAT */
+	case stat = 'stat';
 }

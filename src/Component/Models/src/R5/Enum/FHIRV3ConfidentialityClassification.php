@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -12,33 +10,33 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRV3ConfidentialityClassification: string
 {
-    /** Confidentiality */
-    case confidentiality = '_Confidentiality';
+	/** Confidentiality */
+	case confidentiality = '_Confidentiality';
 
-    /** ConfidentialityByAccessKind */
-    case confidentialitybyaccesskind = '_ConfidentialityByAccessKind';
+	/** ConfidentialityByAccessKind */
+	case confidentialitybyaccesskind = '_ConfidentialityByAccessKind';
 
-    /** ConfidentialityByInfoType */
-    case confidentialitybyinfotype = '_ConfidentialityByInfoType';
+	/** ConfidentialityByInfoType */
+	case confidentialitybyinfotype = '_ConfidentialityByInfoType';
 
-    /** ConfidentialityModifiers */
-    case confidentialitymodifiers = '_ConfidentialityModifiers';
+	/** ConfidentialityModifiers */
+	case confidentialitymodifiers = '_ConfidentialityModifiers';
 
-    /** U */
-    case u = 'U';
+	/** U */
+	case u = 'U';
 
-    /** L */
-    case l = 'L';
+	/** L */
+	case l = 'L';
 
-    /** M */
-    case m = 'M';
+	/** M */
+	case m = 'M';
 
-    /** N */
-    case n = 'N';
+	/** N */
+	case n = 'N';
 
-    /** R */
-    case r = 'R';
+	/** R */
+	case r = 'R';
 
-    /** V */
-    case v = 'V';
+	/** V */
+	case v = 'V';
 }

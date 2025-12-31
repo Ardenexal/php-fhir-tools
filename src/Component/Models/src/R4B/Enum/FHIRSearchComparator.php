@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -12,30 +10,30 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRSearchComparator: string
 {
-    /** Equals */
-    case equals = 'eq';
+	/** Equals */
+	case equals = 'eq';
 
-    /** Not Equals */
-    case notequals = 'ne';
+	/** Not Equals */
+	case notequals = 'ne';
 
-    /** Greater Than */
-    case greaterthan = 'gt';
+	/** Greater Than */
+	case greaterthan = 'gt';
 
-    /** Less Than */
-    case lessthan = 'lt';
+	/** Less Than */
+	case lessthan = 'lt';
 
-    /** Greater or Equals */
-    case greaterorequals = 'ge';
+	/** Greater or Equals */
+	case greaterorequals = 'ge';
 
-    /** Less of Equal */
-    case lessofequal = 'le';
+	/** Less of Equal */
+	case lessofequal = 'le';
 
-    /** Starts After */
-    case startsafter = 'sa';
+	/** Starts After */
+	case startsafter = 'sa';
 
-    /** Ends Before */
-    case endsbefore = 'eb';
+	/** Ends Before */
+	case endsbefore = 'eb';
 
-    /** Approximately */
-    case approximately = 'ap';
+	/** Approximately */
+	case approximately = 'ap';
 }

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -12,21 +10,21 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRPermissionRuleCombining: string
 {
-    /** Deny-overrides */
-    case denyoverrides = 'deny-overrides';
+	/** Deny-overrides */
+	case denyoverrides = 'deny-overrides';
 
-    /** Permit-overrides */
-    case permitoverrides = 'permit-overrides';
+	/** Permit-overrides */
+	case permitoverrides = 'permit-overrides';
 
-    /** Ordered-deny-overrides */
-    case ordereddenyoverrides = 'ordered-deny-overrides';
+	/** Ordered-deny-overrides */
+	case ordereddenyoverrides = 'ordered-deny-overrides';
 
-    /** Ordered-permit-overrides */
-    case orderedpermitoverrides = 'ordered-permit-overrides';
+	/** Ordered-permit-overrides */
+	case orderedpermitoverrides = 'ordered-permit-overrides';
 
-    /** Deny-unless-permit */
-    case denyunlesspermit = 'deny-unless-permit';
+	/** Deny-unless-permit */
+	case denyunlesspermit = 'deny-unless-permit';
 
-    /** Permit-unless-deny */
-    case permitunlessdeny = 'permit-unless-deny';
+	/** Permit-unless-deny */
+	case permitunlessdeny = 'permit-unless-deny';
 }

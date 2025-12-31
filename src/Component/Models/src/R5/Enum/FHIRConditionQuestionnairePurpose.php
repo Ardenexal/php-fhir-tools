@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -12,12 +10,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRConditionQuestionnairePurpose: string
 {
-    /** Pre-admit */
-    case preadmit = 'preadmit';
+	/** Pre-admit */
+	case preadmit = 'preadmit';
 
-    /** Diff Diagnosis */
-    case diffdiagnosis = 'diff-diagnosis';
+	/** Diff Diagnosis */
+	case diffdiagnosis = 'diff-diagnosis';
 
-    /** Outcome */
-    case outcome = 'outcome';
+	/** Outcome */
+	case outcome = 'outcome';
 }

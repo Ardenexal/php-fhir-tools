@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -12,15 +10,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRDeviceMetricCalibrationState: string
 {
-    /** Not Calibrated */
-    case notcalibrated = 'not-calibrated';
+	/** Not Calibrated */
+	case notcalibrated = 'not-calibrated';
 
-    /** Calibration Required */
-    case calibrationrequired = 'calibration-required';
+	/** Calibration Required */
+	case calibrationrequired = 'calibration-required';
 
-    /** Calibrated */
-    case calibrated = 'calibrated';
+	/** Calibrated */
+	case calibrated = 'calibrated';
 
-    /** Unspecified */
-    case unspecified = 'unspecified';
+	/** Unspecified */
+	case unspecified = 'unspecified';
 }

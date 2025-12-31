@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -12,15 +10,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRGuidePageGeneration: string
 {
-    /** HTML */
-    case html = 'html';
+	/** HTML */
+	case html = 'html';
 
-    /** Markdown */
-    case markdown = 'markdown';
+	/** Markdown */
+	case markdown = 'markdown';
 
-    /** XML */
-    case xml = 'xml';
+	/** XML */
+	case xml = 'xml';
 
-    /** Generated */
-    case generated = 'generated';
+	/** Generated */
+	case generated = 'generated';
 }

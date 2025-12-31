@@ -1,38 +1,30 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRQuantity;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * @description List of the costs associated with a specific benefit.
  */
-#[FHIRBackboneElement(parentResource: 'InsurancePlan', elementPath: 'InsurancePlan.plan.specificCost.benefit.cost', fhirVersion: 'R4')]
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'InsurancePlan', elementPath: 'InsurancePlan.plan.specificCost.benefit.cost', fhirVersion: 'R4')]
 class FHIRInsurancePlanPlanSpecificCostBenefitCost extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRBackboneElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<FHIRExtension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        public array $modifierExtension = [],
-        /** @var FHIRCodeableConcept|null type Type of cost */
-        #[NotBlank]
-        public ?FHIRCodeableConcept $type = null,
-        /** @var FHIRCodeableConcept|null applicability in-network | out-of-network | other */
-        public ?FHIRCodeableConcept $applicability = null,
-        /** @var array<FHIRCodeableConcept> qualifiers Additional information about the cost */
-        public array $qualifiers = [],
-        /** @var FHIRQuantity|null value The actual cost value */
-        public ?FHIRQuantity $value = null,
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept type Type of cost */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept $type = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept applicability in-network | out-of-network | other */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept $applicability = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept> qualifiers Additional information about the cost */
+		public array $qualifiers = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRQuantity value The actual cost value */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRQuantity $value = null,
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }

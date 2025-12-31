@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -12,15 +10,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRFamilyHistoryStatus: string
 {
-    /** Partial */
-    case partial = 'partial';
+	/** Partial */
+	case partial = 'partial';
 
-    /** Completed */
-    case completed = 'completed';
+	/** Completed */
+	case completed = 'completed';
 
-    /** Entered in Error */
-    case enteredinerror = 'entered-in-error';
+	/** Entered in Error */
+	case enteredinerror = 'entered-in-error';
 
-    /** Health Unknown */
-    case healthunknown = 'health-unknown';
+	/** Health Unknown */
+	case healthunknown = 'health-unknown';
 }

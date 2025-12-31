@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -12,15 +10,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRStructureMapModelMode: string
 {
-    /** Source Structure Definition */
-    case sourcestructuredefinition = 'source';
+	/** Source Structure Definition */
+	case sourcestructuredefinition = 'source';
 
-    /** Queried Structure Definition */
-    case queriedstructuredefinition = 'queried';
+	/** Queried Structure Definition */
+	case queriedstructuredefinition = 'queried';
 
-    /** Target Structure Definition */
-    case targetstructuredefinition = 'target';
+	/** Target Structure Definition */
+	case targetstructuredefinition = 'target';
 
-    /** Produced Structure Definition */
-    case producedstructuredefinition = 'produced';
+	/** Produced Structure Definition */
+	case producedstructuredefinition = 'produced';
 }

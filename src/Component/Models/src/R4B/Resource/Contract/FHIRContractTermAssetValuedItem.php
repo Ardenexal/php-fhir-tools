@@ -1,63 +1,49 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMoney;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDecimal;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUnsignedInt;
 
 /**
  * @description Contract Valued Item List.
  */
-#[FHIRBackboneElement(parentResource: 'Contract', elementPath: 'Contract.term.asset.valuedItem', fhirVersion: 'R4B')]
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'Contract', elementPath: 'Contract.term.asset.valuedItem', fhirVersion: 'R4B')]
 class FHIRContractTermAssetValuedItem extends \Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRBackboneElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<FHIRExtension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        public array $modifierExtension = [],
-        /** @var FHIRCodeableConcept|FHIRReference|null entityX Contract Valued Item Type */
-        public FHIRCodeableConcept|FHIRReference|null $entityX = null,
-        /** @var FHIRIdentifier|null identifier Contract Valued Item Number */
-        public ?FHIRIdentifier $identifier = null,
-        /** @var FHIRDateTime|null effectiveTime Contract Valued Item Effective Tiem */
-        public ?FHIRDateTime $effectiveTime = null,
-        /** @var FHIRQuantity|null quantity Count of Contract Valued Items */
-        public ?FHIRQuantity $quantity = null,
-        /** @var FHIRMoney|null unitPrice Contract Valued Item fee, charge, or cost */
-        public ?FHIRMoney $unitPrice = null,
-        /** @var FHIRDecimal|null factor Contract Valued Item Price Scaling Factor */
-        public ?FHIRDecimal $factor = null,
-        /** @var FHIRDecimal|null points Contract Valued Item Difficulty Scaling Factor */
-        public ?FHIRDecimal $points = null,
-        /** @var FHIRMoney|null net Total Contract Valued Item Value */
-        public ?FHIRMoney $net = null,
-        /** @var FHIRString|string|null payment Terms of valuation */
-        public FHIRString|string|null $payment = null,
-        /** @var FHIRDateTime|null paymentDate When payment is due */
-        public ?FHIRDateTime $paymentDate = null,
-        /** @var FHIRReference|null responsible Who will make payment */
-        public ?FHIRReference $responsible = null,
-        /** @var FHIRReference|null recipient Who will receive payment */
-        public ?FHIRReference $recipient = null,
-        /** @var array<FHIRString|string> linkId Pointer to specific item */
-        public array $linkId = [],
-        /** @var array<FHIRUnsignedInt> securityLabelNumber Security Labels that define affected terms */
-        public array $securityLabelNumber = [],
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference entityX Contract Valued Item Type */
+		public \Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference|null $entityX = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRIdentifier identifier Contract Valued Item Number */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRIdentifier $identifier = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime effectiveTime Contract Valued Item Effective Tiem */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime $effectiveTime = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity quantity Count of Contract Valued Items */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity $quantity = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMoney unitPrice Contract Valued Item fee, charge, or cost */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMoney $unitPrice = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDecimal factor Contract Valued Item Price Scaling Factor */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDecimal $factor = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDecimal points Contract Valued Item Difficulty Scaling Factor */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDecimal $points = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMoney net Total Contract Valued Item Value */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMoney $net = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string payment Terms of valuation */
+		public \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string|null $payment = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime paymentDate When payment is due */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRDateTime $paymentDate = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference responsible Who will make payment */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference $responsible = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference recipient Who will receive payment */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference $recipient = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string> linkId Pointer to specific item */
+		public array $linkId = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUnsignedInt> securityLabelNumber Security Labels that define affected terms */
+		public array $securityLabelNumber = [],
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }

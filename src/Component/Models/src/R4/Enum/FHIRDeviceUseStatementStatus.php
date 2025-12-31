@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -12,21 +10,21 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum FHIRDeviceUseStatementStatus: string
 {
-    /** Active */
-    case active = 'active';
+	/** Active */
+	case active = 'active';
 
-    /** Completed */
-    case completed = 'completed';
+	/** Completed */
+	case completed = 'completed';
 
-    /** Entered in Error */
-    case enteredinerror = 'entered-in-error';
+	/** Entered in Error */
+	case enteredinerror = 'entered-in-error';
 
-    /** Intended */
-    case intended = 'intended';
+	/** Intended */
+	case intended = 'intended';
 
-    /** Stopped */
-    case stopped = 'stopped';
+	/** Stopped */
+	case stopped = 'stopped';
 
-    /** On Hold */
-    case onhold = 'on-hold';
+	/** On Hold */
+	case onhold = 'on-hold';
 }

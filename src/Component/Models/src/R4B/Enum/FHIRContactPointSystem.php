@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -12,24 +10,24 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRContactPointSystem: string
 {
-    /** Phone */
-    case phone = 'phone';
+	/** Phone */
+	case phone = 'phone';
 
-    /** Fax */
-    case fax = 'fax';
+	/** Fax */
+	case fax = 'fax';
 
-    /** Email */
-    case email = 'email';
+	/** Email */
+	case email = 'email';
 
-    /** Pager */
-    case pager = 'pager';
+	/** Pager */
+	case pager = 'pager';
 
-    /** URL */
-    case url = 'url';
+	/** URL */
+	case url = 'url';
 
-    /** SMS */
-    case sms = 'sms';
+	/** SMS */
+	case sms = 'sms';
 
-    /** Other */
-    case other = 'other';
+	/** Other */
+	case other = 'other';
 }

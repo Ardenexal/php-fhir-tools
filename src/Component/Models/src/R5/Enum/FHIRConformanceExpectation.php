@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -12,15 +10,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRConformanceExpectation: string
 {
-    /** SHALL */
-    case shall = 'SHALL';
+	/** SHALL */
+	case shall = 'SHALL';
 
-    /** SHOULD */
-    case should = 'SHOULD';
+	/** SHOULD */
+	case should = 'SHOULD';
 
-    /** MAY */
-    case may = 'MAY';
+	/** MAY */
+	case may = 'MAY';
 
-    /** SHOULD-NOT */
-    case shouldnot = 'SHOULD-NOT';
+	/** SHOULD-NOT */
+	case shouldnot = 'SHOULD-NOT';
 }

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -12,9 +10,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRAssertionDirectionType: string
 {
-    /** response */
-    case response = 'response';
+	/** response */
+	case response = 'response';
 
-    /** request */
-    case request = 'request';
+	/** request */
+	case request = 'request';
 }

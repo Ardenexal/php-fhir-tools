@@ -1,45 +1,35 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRDuration;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUnsignedInt;
 
 /**
  * @description Indicates the specific details for the dispense or medication supply part of a medication request (also known as a Medication Prescription or Medication Order).  Note that this information is not always sent with the order.  There may be in some settings (e.g. hospitals) institutional or system support for completing the dispense details in the pharmacy department.
  */
-#[FHIRBackboneElement(parentResource: 'MedicationRequest', elementPath: 'MedicationRequest.dispenseRequest', fhirVersion: 'R4B')]
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'MedicationRequest', elementPath: 'MedicationRequest.dispenseRequest', fhirVersion: 'R4B')]
 class FHIRMedicationRequestDispenseRequest extends \Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRBackboneElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<FHIRExtension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        public array $modifierExtension = [],
-        /** @var FHIRMedicationRequestDispenseRequestInitialFill|null initialFill First fill details */
-        public ?FHIRMedicationRequestDispenseRequestInitialFill $initialFill = null,
-        /** @var FHIRDuration|null dispenseInterval Minimum period of time between dispenses */
-        public ?FHIRDuration $dispenseInterval = null,
-        /** @var FHIRPeriod|null validityPeriod Time period supply is authorized for */
-        public ?FHIRPeriod $validityPeriod = null,
-        /** @var FHIRUnsignedInt|null numberOfRepeatsAllowed Number of refills authorized */
-        public ?FHIRUnsignedInt $numberOfRepeatsAllowed = null,
-        /** @var FHIRQuantity|null quantity Amount of medication to supply per dispense */
-        public ?FHIRQuantity $quantity = null,
-        /** @var FHIRDuration|null expectedSupplyDuration Number of days supply per dispense */
-        public ?FHIRDuration $expectedSupplyDuration = null,
-        /** @var FHIRReference|null performer Intended dispenser */
-        public ?FHIRReference $performer = null,
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRMedicationRequestDispenseRequestInitialFill initialFill First fill details */
+		public ?FHIRMedicationRequestDispenseRequestInitialFill $initialFill = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRDuration dispenseInterval Minimum period of time between dispenses */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRDuration $dispenseInterval = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod validityPeriod Time period supply is authorized for */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod $validityPeriod = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUnsignedInt numberOfRepeatsAllowed Number of refills authorized */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUnsignedInt $numberOfRepeatsAllowed = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity quantity Amount of medication to supply per dispense */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity $quantity = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRDuration expectedSupplyDuration Number of days supply per dispense */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRDuration $expectedSupplyDuration = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference performer Intended dispenser */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference $performer = null,
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }

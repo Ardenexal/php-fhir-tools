@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -12,24 +10,24 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRDaysOfWeek: string
 {
-    /** Monday */
-    case monday = 'mon';
+	/** Monday */
+	case monday = 'mon';
 
-    /** Tuesday */
-    case tuesday = 'tue';
+	/** Tuesday */
+	case tuesday = 'tue';
 
-    /** Wednesday */
-    case wednesday = 'wed';
+	/** Wednesday */
+	case wednesday = 'wed';
 
-    /** Thursday */
-    case thursday = 'thu';
+	/** Thursday */
+	case thursday = 'thu';
 
-    /** Friday */
-    case friday = 'fri';
+	/** Friday */
+	case friday = 'fri';
 
-    /** Saturday */
-    case saturday = 'sat';
+	/** Saturday */
+	case saturday = 'sat';
 
-    /** Sunday */
-    case sunday = 'sun';
+	/** Sunday */
+	case sunday = 'sun';
 }

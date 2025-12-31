@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -12,9 +10,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRActionCardinalityBehavior: string
 {
-    /** Single */
-    case single = 'single';
+	/** Single */
+	case single = 'single';
 
-    /** Multiple */
-    case multiple = 'multiple';
+	/** Multiple */
+	case multiple = 'multiple';
 }

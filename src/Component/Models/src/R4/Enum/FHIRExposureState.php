@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -12,9 +10,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum FHIRExposureState: string
 {
-    /** Exposure */
-    case exposure = 'exposure';
+	/** Exposure */
+	case exposure = 'exposure';
 
-    /** Exposure Alternative */
-    case exposurealternative = 'exposure-alternative';
+	/** Exposure Alternative */
+	case exposurealternative = 'exposure-alternative';
 }

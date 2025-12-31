@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -12,15 +10,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum FHIRParticipationStatus: string
 {
-    /** Accepted */
-    case accepted = 'accepted';
+	/** Accepted */
+	case accepted = 'accepted';
 
-    /** Declined */
-    case declined = 'declined';
+	/** Declined */
+	case declined = 'declined';
 
-    /** Tentative */
-    case tentative = 'tentative';
+	/** Tentative */
+	case tentative = 'tentative';
 
-    /** Needs Action */
-    case needsaction = 'needs-action';
+	/** Needs Action */
+	case needsaction = 'needs-action';
 }

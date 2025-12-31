@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -12,15 +10,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum FHIREligibilityResponsePurpose: string
 {
-    /** Coverage auth-requirements */
-    case coverageauthrequirements = 'auth-requirements';
+	/** Coverage auth-requirements */
+	case coverageauthrequirements = 'auth-requirements';
 
-    /** Coverage benefits */
-    case coveragebenefits = 'benefits';
+	/** Coverage benefits */
+	case coveragebenefits = 'benefits';
 
-    /** Coverage Discovery */
-    case coveragediscovery = 'discovery';
+	/** Coverage Discovery */
+	case coveragediscovery = 'discovery';
 
-    /** Coverage Validation */
-    case coveragevalidation = 'validation';
+	/** Coverage Validation */
+	case coveragevalidation = 'validation';
 }

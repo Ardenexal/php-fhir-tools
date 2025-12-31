@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -12,15 +10,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRContributorType: string
 {
-    /** Author */
-    case author = 'author';
+	/** Author */
+	case author = 'author';
 
-    /** Editor */
-    case editor = 'editor';
+	/** Editor */
+	case editor = 'editor';
 
-    /** Reviewer */
-    case reviewer = 'reviewer';
+	/** Reviewer */
+	case reviewer = 'reviewer';
 
-    /** Endorser */
-    case endorser = 'endorser';
+	/** Endorser */
+	case endorser = 'endorser';
 }

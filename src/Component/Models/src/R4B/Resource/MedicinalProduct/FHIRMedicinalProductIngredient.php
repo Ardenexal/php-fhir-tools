@@ -1,66 +1,51 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRIdentifier;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMeta;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRNarrative;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri;
-use Symfony\Component\Validator\Constraints\NotBlank;
-
 /**
  * @author Health Level Seven International (Biomedical Research and Regulation)
- *
  * @see http://hl7.org/fhir/StructureDefinition/MedicinalProductIngredient
- *
  * @description An ingredient of a manufactured item or pharmaceutical product.
  */
-#[FhirResource(
-    type: 'MedicinalProductIngredient',
-    version: '4.0.1',
-    url: 'http://hl7.org/fhir/StructureDefinition/MedicinalProductIngredient',
-    fhirVersion: 'R4B',
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(
+	type: 'MedicinalProductIngredient',
+	version: '4.0.1',
+	url: 'http://hl7.org/fhir/StructureDefinition/MedicinalProductIngredient',
+	fhirVersion: 'R4B',
 )]
 class FHIRMedicinalProductIngredient extends FHIRDomainResource
 {
-    public function __construct(
-        /** @var string|null id Logical id of this artifact */
-        public ?string $id = null,
-        /** @var FHIRMeta|null meta Metadata about the resource */
-        public ?FHIRMeta $meta = null,
-        /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
-        public ?FHIRUri $implicitRules = null,
-        /** @var string|null language Language of the resource content */
-        public ?string $language = null,
-        /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
-        public ?FHIRNarrative $text = null,
-        /** @var array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRResource> contained Contained, inline Resources */
-        public array $contained = [],
-        /** @var array<FHIRExtension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored */
-        public array $modifierExtension = [],
-        /** @var FHIRIdentifier|null identifier Identifier for the ingredient */
-        public ?FHIRIdentifier $identifier = null,
-        /** @var FHIRCodeableConcept|null role Ingredient role e.g. Active ingredient, excipient */
-        #[NotBlank]
-        public ?FHIRCodeableConcept $role = null,
-        /** @var FHIRBoolean|null allergenicIndicator If the ingredient is a known or suspected allergen */
-        public ?FHIRBoolean $allergenicIndicator = null,
-        /** @var array<FHIRReference> manufacturer Manufacturer of this Ingredient */
-        public array $manufacturer = [],
-        /** @var array<FHIRMedicinalProductIngredientSpecifiedSubstance> specifiedSubstance A specified substance that comprises this ingredient */
-        public array $specifiedSubstance = [],
-        /** @var FHIRMedicinalProductIngredientSubstance|null substance The ingredient substance */
-        public ?FHIRMedicinalProductIngredientSubstance $substance = null,
-    ) {
-        parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Logical id of this artifact */
+		public ?string $id = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMeta meta Metadata about the resource */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRMeta $meta = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri implicitRules A set of rules under which this content was created */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUri $implicitRules = null,
+		/** @var null|string language Language of the resource content */
+		public ?string $language = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRNarrative text Text summary of the resource, for human interpretation */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRNarrative $text = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRResource> contained Contained, inline Resources */
+		public array $contained = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRIdentifier identifier Identifier for the ingredient */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRIdentifier $identifier = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept role Ingredient role e.g. Active ingredient, excipient */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept $role = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean allergenicIndicator If the ingredient is a known or suspected allergen */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRBoolean $allergenicIndicator = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference> manufacturer Manufacturer of this Ingredient */
+		public array $manufacturer = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRMedicinalProductIngredientSpecifiedSubstance> specifiedSubstance A specified substance that comprises this ingredient */
+		public array $specifiedSubstance = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRMedicinalProductIngredientSubstance substance The ingredient substance */
+		public ?FHIRMedicinalProductIngredientSubstance $substance = null,
+	) {
+		parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
+	}
 }

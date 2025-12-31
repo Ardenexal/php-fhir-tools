@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -12,15 +10,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRSpecimenStatus: string
 {
-    /** Available */
-    case available = 'available';
+	/** Available */
+	case available = 'available';
 
-    /** Unavailable */
-    case unavailable = 'unavailable';
+	/** Unavailable */
+	case unavailable = 'unavailable';
 
-    /** Unsatisfactory */
-    case unsatisfactory = 'unsatisfactory';
+	/** Unsatisfactory */
+	case unsatisfactory = 'unsatisfactory';
 
-    /** Entered in Error */
-    case enteredinerror = 'entered-in-error';
+	/** Entered in Error */
+	case enteredinerror = 'entered-in-error';
 }

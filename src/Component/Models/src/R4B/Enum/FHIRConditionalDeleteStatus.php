@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -12,12 +10,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRConditionalDeleteStatus: string
 {
-    /** Not Supported */
-    case notsupported = 'not-supported';
+	/** Not Supported */
+	case notsupported = 'not-supported';
 
-    /** Single Deletes Supported */
-    case singledeletessupported = 'single';
+	/** Single Deletes Supported */
+	case singledeletessupported = 'single';
 
-    /** Multiple Deletes Supported */
-    case multipledeletessupported = 'multiple';
+	/** Multiple Deletes Supported */
+	case multipledeletessupported = 'multiple';
 }

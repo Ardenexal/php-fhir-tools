@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -12,21 +10,21 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRGroupMeasure: string
 {
-    /** Mean */
-    case mean = 'mean';
+	/** Mean */
+	case mean = 'mean';
 
-    /** Median */
-    case median = 'median';
+	/** Median */
+	case median = 'median';
 
-    /** Mean of Study Means */
-    case meanofstudymeans = 'mean-of-mean';
+	/** Mean of Study Means */
+	case meanofstudymeans = 'mean-of-mean';
 
-    /** Mean of Study Medins */
-    case meanofstudymedins = 'mean-of-median';
+	/** Mean of Study Medins */
+	case meanofstudymedins = 'mean-of-median';
 
-    /** Median of Study Means */
-    case medianofstudymeans = 'median-of-mean';
+	/** Median of Study Means */
+	case medianofstudymeans = 'median-of-mean';
 
-    /** Median of Study Medians */
-    case medianofstudymedians = 'median-of-median';
+	/** Median of Study Medians */
+	case medianofstudymedians = 'median-of-median';
 }

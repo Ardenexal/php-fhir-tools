@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -12,21 +10,21 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRHTTPVerb: string
 {
-    /** GET */
-    case get = 'GET';
+	/** GET */
+	case get = 'GET';
 
-    /** HEAD */
-    case head = 'HEAD';
+	/** HEAD */
+	case head = 'HEAD';
 
-    /** POST */
-    case post = 'POST';
+	/** POST */
+	case post = 'POST';
 
-    /** PUT */
-    case put = 'PUT';
+	/** PUT */
+	case put = 'PUT';
 
-    /** DELETE */
-    case delete = 'DELETE';
+	/** DELETE */
+	case delete = 'DELETE';
 
-    /** PATCH */
-    case patch = 'PATCH';
+	/** PATCH */
+	case patch = 'PATCH';
 }

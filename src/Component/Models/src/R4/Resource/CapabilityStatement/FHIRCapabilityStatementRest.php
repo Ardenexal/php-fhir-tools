@@ -1,47 +1,38 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRRestfulCapabilityModeType;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCanonical;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRMarkdown;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * @description A definition of the restful capabilities of the solution, if any.
  */
-#[FHIRBackboneElement(parentResource: 'CapabilityStatement', elementPath: 'CapabilityStatement.rest', fhirVersion: 'R4')]
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'CapabilityStatement', elementPath: 'CapabilityStatement.rest', fhirVersion: 'R4')]
 class FHIRCapabilityStatementRest extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRBackboneElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<FHIRExtension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        public array $modifierExtension = [],
-        /** @var FHIRRestfulCapabilityModeType|null mode client | server */
-        #[NotBlank]
-        public ?FHIRRestfulCapabilityModeType $mode = null,
-        /** @var FHIRMarkdown|null documentation General description of implementation */
-        public ?FHIRMarkdown $documentation = null,
-        /** @var FHIRCapabilityStatementRestSecurity|null security Information about security of implementation */
-        public ?FHIRCapabilityStatementRestSecurity $security = null,
-        /** @var array<FHIRCapabilityStatementRestResource> resource Resource served on the REST interface */
-        public array $resource = [],
-        /** @var array<FHIRCapabilityStatementRestInteraction> interaction What operations are supported? */
-        public array $interaction = [],
-        /** @var array<FHIRCapabilityStatementRestResourceSearchParam> searchParam Search parameters for searching all resources */
-        public array $searchParam = [],
-        /** @var array<FHIRCapabilityStatementRestResourceOperation> operation Definition of a system level operation */
-        public array $operation = [],
-        /** @var array<FHIRCanonical> compartment Compartments served/used by system */
-        public array $compartment = [],
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRRestfulCapabilityModeType mode client | server */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRRestfulCapabilityModeType $mode = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRMarkdown documentation General description of implementation */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRMarkdown $documentation = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRCapabilityStatementRestSecurity security Information about security of implementation */
+		public ?FHIRCapabilityStatementRestSecurity $security = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRCapabilityStatementRestResource> resource Resource served on the REST interface */
+		public array $resource = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRCapabilityStatementRestInteraction> interaction What operations are supported? */
+		public array $interaction = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRCapabilityStatementRestResourceSearchParam> searchParam Search parameters for searching all resources */
+		public array $searchParam = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRCapabilityStatementRestResourceOperation> operation Definition of a system level operation */
+		public array $operation = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRCanonical> compartment Compartments served/used by system */
+		public array $compartment = [],
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }

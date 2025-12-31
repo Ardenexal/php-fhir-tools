@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -12,12 +10,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum FHIRDocumentReferenceStatus: string
 {
-    /** Current */
-    case current = 'current';
+	/** Current */
+	case current = 'current';
 
-    /** Superseded */
-    case superseded = 'superseded';
+	/** Superseded */
+	case superseded = 'superseded';
 
-    /** Entered in Error */
-    case enteredinerror = 'entered-in-error';
+	/** Entered in Error */
+	case enteredinerror = 'entered-in-error';
 }

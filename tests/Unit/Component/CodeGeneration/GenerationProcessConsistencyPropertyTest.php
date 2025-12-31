@@ -20,6 +20,15 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * Tests that the FHIR generation process produces consistent output when using
  * the Models component structure compared to the standard generation process.
+ *
+ * **Note on Filesystem Mocking:**
+ * This test mocks the Filesystem object to prevent actual file operations. The
+ * command's __invoke() method calls clearModelsComponentOutputDirectory() which
+ * would delete the real Models directory at src/Component/Models/src, removing
+ * all generated R4, R4B, and R5 model files. The mock is configured to return
+ * false for the exists() method, which prevents clearModelsComponentOutputDirectory()
+ * from executing its deletion logic (it checks directory existence before cleanup).
+ * This approach allows testing the command's behavior while preventing file deletion.
  */
 class GenerationProcessConsistencyPropertyTest extends TestCase
 {
@@ -37,9 +46,21 @@ class GenerationProcessConsistencyPropertyTest extends TestCase
     {
         parent::setUp();
 
-        $this->filesystem    = new Filesystem();
+        // Mock filesystem to prevent actual file system operations during tests.
+        // The command's __invoke() method calls clearModelsComponentOutputDirectory()
+        // which would delete the real Models directory at src/Component/Models/src,
+        // removing all generated R4, R4B, and R5 model files. By mocking the filesystem
+        // and returning false for exists(), we prevent clearModelsComponentOutputDirectory()
+        // from executing its deletion logic (it checks directory existence before cleanup).
+        $this->filesystem    = $this->createMock(Filesystem::class);
         $this->context       = new BuilderContext();
         $this->packageLoader = $this->createMock(PackageLoader::class);
+
+        // Configure filesystem mock: return false for exists() to prevent cleanup
+        // This causes clearModelsComponentOutputDirectory() to skip its deletion logic
+        $this->filesystem
+            ->method('exists')
+            ->willReturn(false);
 
         $this->command = new FHIRModelGeneratorCommand(
             $this->filesystem,

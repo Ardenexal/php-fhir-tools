@@ -1,62 +1,51 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCoding;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUnsignedInt;
 
 /**
  * @description Contract Term Asset List.
  */
-#[FHIRBackboneElement(parentResource: 'Contract', elementPath: 'Contract.term.asset', fhirVersion: 'R4B')]
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'Contract', elementPath: 'Contract.term.asset', fhirVersion: 'R4B')]
 class FHIRContractTermAsset extends \Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRBackboneElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<FHIRExtension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        public array $modifierExtension = [],
-        /** @var FHIRCodeableConcept|null scope Range of asset */
-        public ?FHIRCodeableConcept $scope = null,
-        /** @var array<FHIRCodeableConcept> type Asset category */
-        public array $type = [],
-        /** @var array<FHIRReference> typeReference Associated entities */
-        public array $typeReference = [],
-        /** @var array<FHIRCodeableConcept> subtype Asset sub-category */
-        public array $subtype = [],
-        /** @var FHIRCoding|null relationship Kinship of the asset */
-        public ?FHIRCoding $relationship = null,
-        /** @var array<FHIRContractTermAssetContext> context Circumstance of the asset */
-        public array $context = [],
-        /** @var FHIRString|string|null condition Quality desctiption of asset */
-        public FHIRString|string|null $condition = null,
-        /** @var array<FHIRCodeableConcept> periodType Asset availability types */
-        public array $periodType = [],
-        /** @var array<FHIRPeriod> period Time period of the asset */
-        public array $period = [],
-        /** @var array<FHIRPeriod> usePeriod Time period */
-        public array $usePeriod = [],
-        /** @var FHIRString|string|null text Asset clause or question text */
-        public FHIRString|string|null $text = null,
-        /** @var array<FHIRString|string> linkId Pointer to asset text */
-        public array $linkId = [],
-        /** @var array<FHIRContractTermOfferAnswer> answer Response to assets */
-        public array $answer = [],
-        /** @var array<FHIRUnsignedInt> securityLabelNumber Asset restriction numbers */
-        public array $securityLabelNumber = [],
-        /** @var array<FHIRContractTermAssetValuedItem> valuedItem Contract Valued Item List */
-        public array $valuedItem = [],
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept scope Range of asset */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept $scope = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept> type Asset category */
+		public array $type = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRReference> typeReference Associated entities */
+		public array $typeReference = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept> subtype Asset sub-category */
+		public array $subtype = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCoding relationship Kinship of the asset */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCoding $relationship = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRContractTermAssetContext> context Circumstance of the asset */
+		public array $context = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string condition Quality desctiption of asset */
+		public \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string|null $condition = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept> periodType Asset availability types */
+		public array $periodType = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod> period Time period of the asset */
+		public array $period = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRPeriod> usePeriod Time period */
+		public array $usePeriod = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string text Asset clause or question text */
+		public \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string|null $text = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRString|string> linkId Pointer to asset text */
+		public array $linkId = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRContractTermOfferAnswer> answer Response to assets */
+		public array $answer = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRUnsignedInt> securityLabelNumber Asset restriction numbers */
+		public array $securityLabelNumber = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRContractTermAssetValuedItem> valuedItem Contract Valued Item List */
+		public array $valuedItem = [],
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }
