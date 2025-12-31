@@ -32,7 +32,7 @@ final class LowerFunction extends AbstractFunction
 
         $string = $input->first();
         if (!is_string($string)) {
-            throw EvaluationException::invalidFunctionParameter($this->getName(), 'Input must be a string');
+            throw EvaluationException::invalidFunctionParameter($this->getName(), 'input', 'string');
         }
 
         return Collection::single(strtolower($string));
