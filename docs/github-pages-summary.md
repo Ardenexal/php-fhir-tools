@@ -68,7 +68,7 @@ We have created four comprehensive planning documents:
 
 **Key Decisions**:
 - Site generator choice
-- API hosting provider
+- **PHP execution approach (php-wasm vs backend)** ⭐ **NEW!**
 - Rollout strategy
 - CSS/JavaScript approach
 - Monitoring and analytics
@@ -118,17 +118,24 @@ We have created four comprehensive planning documents:
 
 ## 💡 Key Recommendations
 
-### Technology Stack
+### Technology Stack ⭐ **UPDATED!**
 - ✅ **Frontend**: Plain HTML/CSS/JavaScript (no build step)
-- ✅ **Backend**: Symfony API (separate repository)
-- ✅ **Hosting**: GitHub Pages (free) + Railway (free tier)
-- ✅ **Cost**: $0/month to start, $15/month for full features
+- ✅ **PHP Execution**: php-wasm (WebAssembly in browser) ⭐ **NEW!**
+- ✅ **Hosting**: GitHub Pages only (no backend needed!)
+- ✅ **Cost**: $0/month (completely free!)
 
 ### Why These Choices?
 1. **Plain HTML**: Simple, fast, no learning curve
-2. **Separate API**: Clean architecture, independent deployment
-3. **Railway**: Generous free tier, easy deployment
+2. **php-wasm**: Runs PHP in browser - zero hosting costs, instant execution
+3. **No Backend**: Eliminates server costs and complexity
 4. **Phased Rollout**: Quick wins, iterative improvement
+
+### Benefits of php-wasm Approach
+- 🚀 **Instant execution** - No network latency
+- 💰 **Zero cost** - No backend hosting needed
+- 🔒 **Complete privacy** - Data never leaves browser
+- 📱 **Offline capable** - Works without internet
+- 🎯 **Simplified deployment** - Just GitHub Pages
 
 ---
 
@@ -138,7 +145,7 @@ We have created four comprehensive planning documents:
 |---------|---------|---------|---------|
 | **Documentation** | ✅ | ✅ | ✅ |
 | **Code Examples** | ✅ | ✅ | ✅ |
-| **Backend API** | ❌ | ✅ | ✅ |
+| **php-wasm Integration** | ❌ | ✅ | ✅ |
 | **Serialization Demo** | ❌ | ✅ | ✅ |
 | **FHIRPath Demo** | ❌ | ❌ | ✅ |
 | **Model Explorer** | ❌ | ❌ | ✅ |
@@ -150,10 +157,20 @@ We have created four comprehensive planning documents:
 
 ## 💰 Budget Breakdown
 
-### Free Option (Recommended for Start)
+### Free Option with php-wasm (Recommended) ⭐ **NEW!**
 ```
 GitHub Pages:      $0/month
-Railway API:       $0/month (free tier)
+php-wasm:          $0/month (client-side)
+Domain:           $0/month (use github.io)
+Analytics:        $0/month (none or GA)
+────────────────────────────
+Total:            $0/month ✨
+```
+
+### Free Option with Backend (Alternative)
+```
+GitHub Pages:      $0/month
+Railway API:       $0/month (free tier, limited)
 Domain:           $0/month (use github.io)
 Analytics:        $0/month (none or GA)
 ────────────────────────────

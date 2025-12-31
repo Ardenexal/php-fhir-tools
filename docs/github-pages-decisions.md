@@ -38,40 +38,75 @@ This document helps make key architectural and implementation decisions for the 
 
 ---
 
-## Decision 2: Backend API Hosting
+## Decision 2: PHP Execution Architecture
 
 ### Options Comparison
 
+| Approach | Cost | Ease of Setup | Latency | Offline Support | Notes |
+|----------|------|---------------|---------|----------------|-------|
+| **php-wasm (Browser)** | $0 | ⭐⭐⭐ Easy | Instant | ✅ Yes | Runs PHP in browser via WebAssembly |
+| **Separate Backend API** | $0-15/month | ⭐⭐ Medium | 100-500ms | ❌ No | Traditional server approach |
+| **Serverless Functions** | $0-5/month | ⭐⭐ Medium | 100-1000ms | ❌ No | Cold start issues |
+
+### Recommendation: **php-wasm (Browser-based)** ⭐ **NEW!**
+
+**Why php-wasm is Better:**
+- ✅ **Zero cost** - No backend server required
+- ✅ **Zero latency** - Runs directly in browser
+- ✅ **Offline capable** - Works without internet connection
+- ✅ **No CORS issues** - Everything runs client-side
+- ✅ **Simplified deployment** - Just GitHub Pages
+- ✅ **Better UX** - Instant responses, no loading states
+- ✅ **Privacy** - Data never leaves user's browser
+
+**How it Works:**
+```javascript
+// Load php-wasm
+import { PhpWeb } from 'php-wasm/PhpWeb';
+
+// Initialize PHP runtime
+const php = new PhpWeb();
+
+// Run PHP code
+const result = await php.run(`<?php
+    // Load FHIR libraries
+    require_once 'vendor/autoload.php';
+    
+    // Use FHIRTools
+    $serializer = new FHIRSerializationService();
+    echo $serializer->serialize($fhirResource);
+`);
+```
+
+**Implementation Requirements:**
+- Include php-wasm library (~2-5 MB initial download)
+- Bundle PHP FHIRTools dependencies
+- Create JavaScript wrapper for PHP functions
+- Handle async PHP execution in browser
+
+**Limitations:**
+- Initial load time (download WASM + dependencies)
+- Browser compatibility (needs WebAssembly support)
+- Memory constraints (browser limits)
+- Can't access external APIs from PHP
+
+**When to Use Backend Instead:**
+- Need to access external FHIR servers
+- Processing very large files (>100MB)
+- Browser compatibility requirements (IE11)
+- Need server-side caching
+- Want to track usage analytics server-side
+
+### Alternative: Backend API Hosting (if needed)
+
 | Provider | Free Tier | Ease of Setup | Cost (Paid) | PHP Support | Notes |
 |----------|-----------|---------------|-------------|-------------|-------|
-| **Heroku** | 550 hrs/month | ⭐⭐⭐ Easy | $7/month | ✅ Good | Deprecated free tier Nov 2022 |
 | **Railway** | $5 credit/month | ⭐⭐⭐ Easy | $5-20/month | ✅ Good | Generous free tier |
 | **Fly.io** | Limited free | ⭐⭐ Medium | $5-15/month | ✅ Good | Docker-based |
 | **Render** | Limited free | ⭐⭐⭐ Easy | $7/month | ✅ Good | Good for web services |
 | **DigitalOcean App Platform** | ❌ | ⭐⭐ Medium | $5/month | ✅ Excellent | Reliable, affordable |
-| **PaaS.sh (Platform.sh)** | Free trial | ⭐⭐ Medium | $10/month | ✅ Excellent | PHP-focused |
-| **Self-hosted (VPS)** | ❌ | ⭐ Complex | $5-10/month | ✅ Full control | Requires DevOps knowledge |
 
-### Recommendation: **Railway** or **DigitalOcean App Platform** ⭐
-
-**Primary Choice: Railway**
-- $5/month free credit (sufficient for demos)
-- Easy GitHub integration
-- Automatic deployments
-- Good PHP support
-- No credit card required for free tier
-
-**Secondary Choice: DigitalOcean App Platform**
-- Reliable and stable
-- Excellent PHP support
-- $5/month (affordable)
-- Great documentation
-- Easy scaling
-
-**Budget Option: Fly.io**
-- Limited free tier works for demos
-- Docker-based (more flexible)
-- Good performance
+**Recommendation if Backend Needed:** Railway or DigitalOcean
 
 ---
 
@@ -126,28 +161,37 @@ This document helps make key architectural and implementation decisions for the 
 
 ---
 
-## Decision 4: API Architecture
+## Decision 4: Architecture Pattern
 
 ### Options Comparison
 
 | Approach | Pros | Cons | Best For |
 |----------|------|------|----------|
-| **Separate Repository** | Clean separation, independent versioning, easier to deploy | More repos to manage, code duplication | Production apps |
-| **Monorepo Subfolder** | Single codebase, shared dependencies, easier development | More complex deployment, tighter coupling | Development/demos |
-| **Serverless Functions** | Low cost, auto-scaling, no server management | Cold starts, platform lock-in, complexity | Simple APIs |
+| **php-wasm (Client-side)** | Zero cost, instant execution, no server, offline support | Initial load time, browser-only | Interactive demos |
+| **Separate Backend** | Full PHP capabilities, server-side caching, external APIs | Costs money, deployment complexity, CORS | Production apps |
+| **Hybrid (php-wasm + Backend)** | Best of both worlds, fallback options | Most complex, dual maintenance | Advanced use cases |
 
-### Recommendation: **Separate Repository** ⭐
+### Recommendation: **php-wasm (Client-side)** ⭐ **NEW!**
+
+**For Showcase Site:**
+Use php-wasm for all interactive demos. This gives:
+- Zero hosting costs
+- Instant user experience
+- Complete privacy (data stays in browser)
+- Works offline once loaded
 
 **Structure:**
 ```
 Ardenexal/php-fhir-tools (main repo)
   ├── docs/ (GitHub Pages site)
+  │   ├── index.html
+  │   ├── assets/
+  │   │   ├── js/
+  │   │   │   ├── php-wasm-loader.js
+  │   │   │   └── fhir-demos.js
+  │   │   └── php-wasm/ (PHP WASM runtime)
+  │   └── lib/ (PHP FHIRTools bundled for WASM)
   └── ...
-
-Ardenexal/php-fhir-tools-api (new repo)
-  ├── src/
-  ├── public/
-  └── composer.json
 ```
 
 **Reasons:**
@@ -355,11 +399,11 @@ const utils = { };
 | Decision | Recommendation | Reason |
 |----------|----------------|--------|
 | Site Generator | Plain HTML/CSS/JS | Simplicity, flexibility, no build step |
-| API Hosting | Railway (primary) or DigitalOcean | Free tier or affordable, easy deployment |
+| **PHP Execution** | **php-wasm (Browser-based)** ⭐ **NEW!** | **Zero cost, instant execution, no server needed** |
 | Rollout Strategy | Phased (Option C) | Quick launch, iterative improvement |
-| API Architecture | Separate Repository | Clean separation, easier management |
+| Architecture | Client-side only (no backend) | Simplified with php-wasm |
 | CSS Approach | Custom CSS | Full control, minimal overhead |
-| JavaScript | Vanilla JS | Sufficient for needs, no dependencies |
+| JavaScript | Vanilla JS + php-wasm | Sufficient for needs, runs PHP in browser |
 
 ### Deferred Decisions (Can Decide Later)
 
@@ -368,6 +412,7 @@ const utils = { };
 | Analytics | After Phase 1 launch | None initially |
 | Search | After Phase 2 | Add in Phase 3 |
 | Custom Domain | After launch success | Use GitHub subdomain |
+| Backend API | If php-wasm insufficient | Add as fallback option |
 | Advanced Features | Based on usage | Add based on feedback |
 
 ---
@@ -382,8 +427,8 @@ const utils = { };
 5. ✅ Code examples
 
 ### Should Have (Phase 2)
-6. ✅ Backend API
-7. ✅ Serialization demo
+6. ✅ php-wasm integration
+7. ✅ Serialization demo (browser-based)
 8. ✅ Syntax highlighting
 9. ✅ Mobile responsive
 
@@ -398,13 +443,21 @@ const utils = { };
 
 ## Budget Summary
 
-### Free Option (Recommended for Start)
+### Free Option with php-wasm (Recommended) ⭐ **NEW!**
 - GitHub Pages: **$0**
-- Railway: **$0** (free tier)
+- php-wasm (client-side): **$0**
+- Domain: **$0** (use GitHub subdomain)
+- **Total: $0/month** ✨
+
+**This is now the primary recommendation!**
+
+### Free Option with Backend (Alternative)
+- GitHub Pages: **$0**
+- Railway: **$0** (free tier, limited)
 - Domain: **$0** (use GitHub subdomain)
 - **Total: $0/month**
 
-### Paid Option (Future)
+### Paid Option (If Backend Needed)
 - GitHub Pages: **$0**
 - DigitalOcean App Platform: **$5/month**
 - Plausible Analytics: **$9/month**
@@ -417,13 +470,14 @@ const utils = { };
 
 ### Low Risk Decisions ✅
 - Use plain HTML/CSS/JS
+- Use php-wasm for demos
 - Phased rollout
 - Start without analytics
 - Use GitHub subdomain
 
 ### Medium Risk Decisions ⚠️
-- API hosting choice (can migrate later)
-- Separate repository (adds complexity)
+- php-wasm browser compatibility (needs WebAssembly)
+- Initial load time with WASM (~2-5 MB)
 
 ### High Risk Decisions ❌
 - None identified (all decisions are reversible)
@@ -441,15 +495,15 @@ const utils = { };
 
 ### Next Week
 1. Complete Phase 1 documentation
-2. Set up Railway account
-3. Create API repository (if needed)
-4. Start backend API development
+2. Research php-wasm integration options
+3. Create proof-of-concept with php-wasm
+4. Bundle FHIRTools for browser use
 
 ---
 
 ## Questions for Stakeholders
 
-1. **Budget**: Is $15/month acceptable for paid tier, or must we stay free?
+1. **php-wasm**: Are we comfortable with browser-only execution (no backend)?
 2. **Timeline**: Is 3 weeks for Phase 1 acceptable, or do we need faster/slower?
 3. **Features**: Are interactive demos essential for launch, or can they come later?
 4. **Branding**: Do we want a custom domain, or is GitHub subdomain okay?

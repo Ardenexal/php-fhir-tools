@@ -6,7 +6,33 @@ This document provides the technical specifications for building a GitHub Pages 
 
 ## Architecture Overview
 
-### Two-Tier Architecture
+### Client-Side Architecture with php-wasm (Recommended) ⭐
+
+```
+┌─────────────────────────────────────────────────┐
+│          GitHub Pages (Static Site)             │
+│  ┌───────────────────────────────────────────┐  │
+│  │  HTML/CSS/JavaScript                      │  │
+│  │  - Documentation                          │  │
+│  │  - Interactive UI                         │  │
+│  └───────────────────────────────────────────┘  │
+│  ┌───────────────────────────────────────────┐  │
+│  │  php-wasm (WebAssembly Runtime)           │  │
+│  │  - Runs PHP in browser                    │  │
+│  │  - FHIRBundle Integration                 │  │
+│  │  - Serialization Service                  │  │
+│  │  - FHIRPath Evaluator                     │  │
+│  └───────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────┘
+
+All processing happens in the user's browser
+✅ Zero backend costs
+✅ Instant execution
+✅ Complete privacy
+✅ Offline capable
+```
+
+### Alternative: Two-Tier Architecture (If Backend Needed)
 
 ```
 ┌─────────────────────────────────────┐
@@ -348,7 +374,140 @@ class FHIRToolsAPIClient {
 window.FHIRToolsAPIClient = FHIRToolsAPIClient;
 ```
 
-## Backend API Specification
+### php-wasm Integration (Recommended) ⭐
+
+```javascript
+// assets/js/php-wasm-client.js
+import { PhpWeb } from 'php-wasm/PhpWeb';
+
+class PHPWasmFHIRTools {
+    constructor() {
+        this.php = null;
+        this.initialized = false;
+    }
+    
+    async initialize() {
+        if (this.initialized) return;
+        
+        // Load PHP WebAssembly runtime
+        this.php = new PhpWeb();
+        
+        // Load FHIRTools library
+        await this.php.mount('/app', {
+            'vendor/': '/assets/php-wasm/vendor/', // FHIRTools dependencies
+            'src/': '/assets/php-wasm/src/'        // FHIRTools source
+        });
+        
+        // Bootstrap autoloader
+        await this.php.run(`<?php
+            require_once '/app/vendor/autoload.php';
+            use Ardenexal\\FHIRTools\\Component\\Serialization\\FHIRSerializationService;
+            use Ardenexal\\FHIRTools\\Component\\FHIRPath\\FHIRPathEvaluator;
+        `);
+        
+        this.initialized = true;
+    }
+    
+    async serialize(resource, options = {}) {
+        await this.initialize();
+        
+        const phpCode = `<?php
+            $serializer = new FHIRSerializationService();
+            $resource = json_decode('${JSON.stringify(resource)}', true);
+            $options = json_decode('${JSON.stringify(options)}', true);
+            
+            try {
+                $result = $serializer->serialize($resource, $options);
+                echo json_encode(['success' => true, 'data' => $result]);
+            } catch (Exception $e) {
+                echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            }
+        ?>`;
+        
+        const result = await this.php.run(phpCode);
+        return JSON.parse(result);
+    }
+    
+    async deserialize(json, resourceType, options = {}) {
+        await this.initialize();
+        
+        const phpCode = `<?php
+            $serializer = new FHIRSerializationService();
+            
+            try {
+                $result = $serializer->deserialize('${json}', '${resourceType}', ${JSON.stringify(options)});
+                echo json_encode(['success' => true, 'data' => $result]);
+            } catch (Exception $e) {
+                echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            }
+        ?>`;
+        
+        const result = await this.php.run(phpCode);
+        return JSON.parse(result);
+    }
+    
+    async evaluateFHIRPath(resource, expression) {
+        await this.initialize();
+        
+        const phpCode = `<?php
+            $evaluator = new FHIRPathEvaluator();
+            $resource = json_decode('${JSON.stringify(resource)}', true);
+            
+            try {
+                $result = $evaluator->evaluate('${expression}', $resource);
+                echo json_encode([
+                    'success' => true, 
+                    'result' => $result,
+                    'type' => gettype($result),
+                    'count' => is_array($result) ? count($result) : 1
+                ]);
+            } catch (Exception $e) {
+                echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            }
+        ?>`;
+        
+        const result = await this.php.run(phpCode);
+        return JSON.parse(result);
+    }
+}
+
+// Export for use in demos
+window.PHPWasmFHIRTools = PHPWasmFHIRTools;
+```
+
+**Usage in Demo:**
+```javascript
+// Initialize php-wasm client
+const fhirTools = new PHPWasmFHIRTools();
+
+// Serialize FHIR resource
+const result = await fhirTools.serialize(patientResource, { 
+    validationMode: 'strict' 
+});
+
+// Evaluate FHIRPath
+const names = await fhirTools.evaluateFHIRPath(
+    patientResource, 
+    'Patient.name.given'
+);
+```
+
+**Benefits:**
+- ✅ No backend server required
+- ✅ Instant execution (no network latency)
+- ✅ Complete privacy (data never leaves browser)
+- ✅ Works offline once loaded
+- ✅ Zero hosting costs
+
+**Setup Requirements:**
+1. Include php-wasm library from CDN or bundle locally
+2. Bundle PHP FHIRTools dependencies for browser
+3. Configure file system mapping for vendor directory
+4. Handle WASM initialization on page load
+
+## Backend API Specification (Alternative)
+
+**Note:** This section describes a traditional backend API approach. With php-wasm, this backend is **optional** and only needed for specific use cases like external API access or server-side caching.
 
 ### Technology Stack
 - **Framework**: Symfony 6.4/7.4

@@ -4,31 +4,47 @@
 
 This document outlines the comprehensive plan for creating a GitHub Pages site to showcase and test the PHP FHIRTools Symfony Bundle, including serialization, FHIRPath, models, and future validation components.
 
-## Architecture Decision
+## Architecture Decision ⭐ **UPDATED!**
 
-### Option A: Static Site + Separate API Backend (Recommended)
+### Option A: php-wasm (Browser-based PHP) - **NEW RECOMMENDATION!**
 - **Frontend**: GitHub Pages (static HTML/CSS/JS)
-- **Backend**: Separate PHP application (Heroku, DigitalOcean, Railway)
+- **PHP Execution**: php-wasm (WebAssembly in browser)
 - **Pros**: 
-  - Free GitHub Pages hosting
-  - Clean separation of concerns
-  - Easy to deploy and maintain
-  - Can showcase frontend independently
+  - ✅ **Zero cost** - No backend server needed
+  - ✅ **Instant execution** - No network latency
+  - ✅ **Complete privacy** - Data never leaves browser
+  - ✅ **Offline capable** - Works without connection
+  - ✅ **No CORS issues** - Everything client-side
+  - ✅ **Simplified deployment** - Just GitHub Pages
 - **Cons**: 
-  - Requires separate backend hosting
-  - CORS configuration needed
+  - Initial load time (WASM + dependencies ~2-5 MB)
+  - Browser compatibility (needs WebAssembly)
+  - Memory constraints (browser limits)
 
-### Option B: Full PHP Site with Custom Hosting
+### Option B: Static Site + Separate API Backend (Alternative)
+- **Frontend**: GitHub Pages (static HTML/CSS/JS)
+- **Backend**: Separate PHP application (Railway, DigitalOcean)
+- **Pros**: 
+  - Can access external APIs
+  - Server-side caching
+  - Usage analytics on backend
+- **Cons**: 
+  - Requires backend hosting ($0-15/month)
+  - CORS configuration needed
+  - Network latency
+  - More complex deployment
+
+### Option C: Full PHP Site with Custom Hosting
 - **Stack**: Full Symfony application
 - **Hosting**: VPS or cloud hosting
 - **Pros**: 
   - Integrated solution
-  - Can demonstrate full Symfony integration
+  - Full control
 - **Cons**: 
-  - Requires paid hosting
-  - More complex deployment
+  - Requires paid hosting ($5-20/month)
+  - Most complex deployment
 
-**Recommendation**: Start with Option A for quick deployment, can migrate to Option B later.
+**New Recommendation**: Start with **Option A (php-wasm)** for zero cost and instant execution. Add Option B backend only if specific features require it (external APIs, heavy processing).
 
 ## Site Structure
 
@@ -60,15 +76,20 @@ docs/
 │   └── validation/
 │       └── index.html                  # Validation (coming soon)
 ├── demos/
-│   ├── serialization.html              # Interactive serialization demo
-│   ├── fhirpath.html                   # Interactive FHIRPath demo
+│   ├── serialization.html              # Interactive serialization demo (php-wasm)
+│   ├── fhirpath.html                   # Interactive FHIRPath demo (php-wasm)
 │   └── models.html                     # Model browser/explorer
 ├── examples/
 │   ├── symfony-integration.html        # Symfony code examples
 │   └── standalone-usage.html           # Standalone usage examples
+├── lib/
+│   ├── php-wasm/                       # PHP WebAssembly runtime
+│   └── fhir-tools/                     # FHIRTools bundled for WASM
 └── api/
     └── reference.html                  # API reference
 ```
+
+**Note:** With php-wasm approach, no separate backend API repository is needed!
 
 ## Phase-by-Phase Implementation
 
