@@ -4,12 +4,19 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Type;
 
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRPrimitive;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
+
 /**
  * Resolves and validates FHIR types using the generated FHIR models.
  *
  * This class integrates the FHIRPath type system with the generated FHIR models
  * from src/Component/Models (or wherever they are generated). It provides
  * type checking, validation, and inference based on actual FHIR resource classes.
+ *
+ * Uses PHP attributes (FHIRPrimitive, FhirResource, FHIRComplexType) for FHIR version-safe
+ * type inference instead of relying on namespace patterns.
  *
  * @author Ardenexal
  */
@@ -45,6 +52,8 @@ class FHIRTypeResolver
     /**
      * Infer the FHIR type from a PHP value.
      *
+     * Uses PHP attributes (FHIRPrimitive, FhirResource, FHIRComplexType) for version-safe type inference.
+     *
      * @param mixed $value The value to infer the type from
      *
      * @return string The inferred FHIR type name
@@ -72,10 +81,38 @@ class FHIRTypeResolver
         }
 
         if (is_object($value)) {
+            // Try to get type from PHP attributes first (FHIR version-safe approach)
+            $reflectionClass = new \ReflectionClass($value);
+
+            // Check for FHIRPrimitive attribute
+            $primitiveAttributes = $reflectionClass->getAttributes(FHIRPrimitive::class);
+            if (!empty($primitiveAttributes)) {
+                $primitiveAttr = $primitiveAttributes[0]->newInstance();
+
+                return $primitiveAttr->primitiveType;
+            }
+
+            // Check for FhirResource attribute
+            $resourceAttributes = $reflectionClass->getAttributes(FhirResource::class);
+            if (!empty($resourceAttributes)) {
+                $resourceAttr = $resourceAttributes[0]->newInstance();
+
+                return $resourceAttr->type;
+            }
+
+            // Check for FHIRComplexType attribute
+            $complexTypeAttributes = $reflectionClass->getAttributes(FHIRComplexType::class);
+            if (!empty($complexTypeAttributes)) {
+                $complexTypeAttr = $complexTypeAttributes[0]->newInstance();
+
+                return $complexTypeAttr->typeName;
+            }
+
+            // Fallback: Use class name-based inference (for backward compatibility)
             $class = get_class($value);
 
             // Check for FHIR primitive types from Models component or test fixtures
-            if (str_contains($class, '\\R4B\\Primitive\\FHIR')) {
+            if (str_contains($class, '\\Primitive\\FHIR')) {
                 // Extract primitive type name: FHIRBoolean -> Boolean, FHIRString -> String
                 $className = basename(str_replace('\\', '/', $class));
                 if (str_starts_with($className, 'FHIR')) {
@@ -96,7 +133,7 @@ class FHIRTypeResolver
             }
 
             // Check for FHIR resource types from Models component or test fixtures
-            if (str_contains($class, '\\R4B\\Resource\\FHIR')) {
+            if (str_contains($class, '\\Resource\\FHIR')) {
                 $className = basename(str_replace('\\', '/', $class));
                 if (str_starts_with($className, 'FHIR')) {
                     return substr($className, 4); // Remove 'FHIR' prefix: FHIRPatient -> Patient
@@ -104,7 +141,7 @@ class FHIRTypeResolver
             }
 
             // Check for DataType from Models component or test fixtures
-            if (str_contains($class, '\\R4B\\DataType\\FHIR')) {
+            if (str_contains($class, '\\DataType\\FHIR')) {
                 $className = basename(str_replace('\\', '/', $class));
                 if (str_starts_with($className, 'FHIR')) {
                     return substr($className, 4); // Remove 'FHIR' prefix
@@ -136,6 +173,8 @@ class FHIRTypeResolver
     /**
      * Check if a value is of a specific FHIR type.
      *
+     * Uses PHP attributes when available for version-safe type checking.
+     *
      * @param mixed  $value    The value to check
      * @param string $typeName The FHIR type name to check against
      *
@@ -162,6 +201,34 @@ class FHIRTypeResolver
 
         // Check if value is an instance of a FHIR model class
         if (is_object($value)) {
+            // Try to get type from PHP attributes first (FHIR version-safe approach)
+            $reflectionClass = new \ReflectionClass($value);
+
+            // Check FHIRPrimitive attribute
+            $primitiveAttributes = $reflectionClass->getAttributes(FHIRPrimitive::class);
+            if (!empty($primitiveAttributes)) {
+                $primitiveAttr = $primitiveAttributes[0]->newInstance();
+
+                return strcasecmp($primitiveAttr->primitiveType, $typeName) === 0;
+            }
+
+            // Check FhirResource attribute
+            $resourceAttributes = $reflectionClass->getAttributes(FhirResource::class);
+            if (!empty($resourceAttributes)) {
+                $resourceAttr = $resourceAttributes[0]->newInstance();
+
+                return strcasecmp($resourceAttr->type, $typeName) === 0;
+            }
+
+            // Check FHIRComplexType attribute
+            $complexTypeAttributes = $reflectionClass->getAttributes(FHIRComplexType::class);
+            if (!empty($complexTypeAttributes)) {
+                $complexTypeAttr = $complexTypeAttributes[0]->newInstance();
+
+                return strcasecmp($complexTypeAttr->typeName, $typeName) === 0;
+            }
+
+            // Fallback: class name-based checks for backward compatibility
             $class = get_class($value);
 
             // Check for exact class name match with FHIR prefix
