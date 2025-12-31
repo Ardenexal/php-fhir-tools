@@ -53,32 +53,58 @@ All processing happens in the user's browser
 
 ## Frontend Specification
 
-### Technology Stack
+### Technology Stack ⭐ **UPDATED**
+- **Static Site Generator**: Jekyll (GitHub Pages native)
+- **Templating**: Liquid templates
 - **HTML5**: Semantic elements, accessibility features
-- **CSS3**: Custom properties, CSS Grid, Flexbox
-- **JavaScript**: Vanilla ES6+ (no framework required for MVP)
-- **Syntax Highlighting**: Prism.js (lightweight)
+- **CSS3**: Modern CSS with custom properties, Grid, Flexbox
+- **JavaScript**: Vanilla ES6+ with Web Components
+- **Search**: Jekyll Simple Search with Lunr.js
+- **Syntax Highlighting**: Rouge (Jekyll default) or Prism.js
 - **Icons**: SVG icons (inlined or sprite)
 
-### File Structure
+### File Structure (Jekyll)
 ```
 docs/                                   # GitHub Pages root
-├── index.html                          # Landing page
-├── _config.yml                         # Jekyll config (optional)
+├── _config.yml                         # Jekyll configuration
+├── _layouts/                           # Jekyll layouts
+│   ├── default.html                    # Base layout
+│   ├── page.html                       # Page layout
+│   └── docs.html                       # Documentation layout
+├── _includes/                          # Reusable components
+│   ├── header.html                     # Site header
+│   ├── footer.html                     # Site footer
+│   ├── navigation.html                 # Navigation menu
+│   └── search.html                     # Search component
+├── _data/                              # Data files
+│   ├── navigation.yml                  # Navigation structure
+│   └── examples.yml                    # FHIR examples metadata
+├── index.md                            # Landing page
+├── getting-started.md                  # Getting started guide
+├── components/                         # Component documentation
+│   ├── fhir-bundle.md
+│   ├── serialization.md
+│   ├── fhirpath.md
+│   └── models.md
+├── demos/                              # Interactive demos
+│   ├── serialization.html              # Uses Web Components
+│   ├── fhirpath.html
+│   └── models.html
 ├── assets/
 │   ├── css/
 │   │   ├── variables.css               # CSS custom properties
 │   │   ├── reset.css                   # Normalize
+│   │   ├── base.css                    # Base styles
 │   │   ├── layout.css                  # Layout components
 │   │   ├── components.css              # UI components
 │   │   └── demos.css                   # Demo-specific styles
 │   ├── js/
 │   │   ├── main.js                     # Core functionality
-│   │   ├── api-client.js               # Backend API client
-│   │   ├── demos/
-│   │   │   ├── serialization.js
-│   │   │   ├── fhirpath.js
-│   │   │   └── models.js
+│   │   ├── components/                 # Web Components
+│   │   │   ├── fhir-serialization-demo.js
+│   │   │   ├── fhir-path-evaluator.js
+│   │   │   └── fhir-model-explorer.js
+│   │   ├── php-wasm-loader.js          # php-wasm integration
 │   │   └── utils/
 │   │       ├── syntax-highlight.js
 │   │       └── error-handler.js
@@ -91,27 +117,204 @@ docs/                                   # GitHub Pages root
 │   └── images/
 │       ├── logo.svg
 │       └── screenshots/
-├── pages/
-│   ├── getting-started.html
-│   ├── components/
-│   │   ├── fhir-bundle.html
-│   │   ├── serialization.html
-│   │   ├── fhirpath.html
-│   │   └── models.html
-│   ├── demos/
-│   │   ├── serialization.html
-│   │   ├── fhirpath.html
-│   │   └── models.html
-│   └── api-reference.html
-└── .nojekyll                           # Disable Jekyll if not used
+└── lib/
+    └── php-wasm/                       # PHP WASM runtime files
+```
+
+### Jekyll Configuration
+
+#### _config.yml
+```yaml
+# Site settings
+title: PHP FHIRTools
+description: FHIR tools for PHP - Build FHIR-compliant applications
+baseurl: "/php-fhir-tools"
+url: "https://ardenexal.github.io"
+
+# Build settings
+markdown: kramdown
+theme: null  # Custom theme
+
+# Collections
+collections:
+  components:
+    output: true
+    permalink: /components/:path/
+
+# Plugins
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+  - jekyll-lunr-js-search  # For search
+
+# Search configuration
+lunr_search:
+  excludes: [rss.xml, atom.xml]
+  min_length: 3
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+```
+
+### Jekyll Layout Templates
+
+#### _layouts/default.html
+```liquid
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page.title }} - {{ site.title }}</title>
+    <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+    {% seo %}
+</head>
+<body>
+    {% include header.html %}
+    
+    <main class="main-content">
+        {{ content }}
+    </main>
+    
+    {% include footer.html %}
+    
+    <script src="{{ '/assets/js/main.js' | relative_url }}"></script>
+</body>
+</html>
+```
+
+#### _includes/header.html
+```liquid
+<header class="site-header">
+    <nav class="navbar">
+        <div class="container">
+            <a href="{{ '/' | relative_url }}" class="logo">
+                {{ site.title }}
+            </a>
+            <ul class="nav-menu">
+                {% for item in site.data.navigation %}
+                <li><a href="{{ item.url | relative_url }}">{{ item.title }}</a></li>
+                {% endfor %}
+            </ul>
+            {% include search.html %}
+        </div>
+    </nav>
+</header>
+```
+
+### Web Components
+
+#### assets/js/components/fhir-serialization-demo.js
+```javascript
+class FHIRSerializationDemo extends HTMLElement {
+    constructor() {
+        super();
+        this.phpWasm = null;
+    }
+    
+    async connectedCallback() {
+        await this.loadPhpWasm();
+        this.render();
+        this.attachEventListeners();
+    }
+    
+    async loadPhpWasm() {
+        const { PhpWeb } = await import('../php-wasm-loader.js');
+        this.phpWasm = new PhpWeb();
+        await this.phpWasm.initialize();
+    }
+    
+    render() {
+        this.innerHTML = `
+            <div class="demo-container">
+                <div class="demo-header">
+                    <h2>FHIR Serialization Demo</h2>
+                    <p>Test JSON serialization of FHIR resources</p>
+                </div>
+                
+                <div class="demo-content">
+                    <div class="demo-panel input-panel">
+                        <h3>Input</h3>
+                        <select id="example-selector">
+                            <option value="">Select example...</option>
+                            <option value="patient">Patient</option>
+                            <option value="observation">Observation</option>
+                        </select>
+                        <textarea id="fhir-input" rows="20"></textarea>
+                    </div>
+                    
+                    <div class="demo-controls">
+                        <button id="btn-serialize">Serialize</button>
+                        <button id="btn-deserialize">Deserialize</button>
+                    </div>
+                    
+                    <div class="demo-panel output-panel">
+                        <h3>Output</h3>
+                        <pre id="fhir-output"></pre>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    attachEventListeners() {
+        this.querySelector('#btn-serialize').addEventListener('click', 
+            () => this.handleSerialize());
+        this.querySelector('#btn-deserialize').addEventListener('click', 
+            () => this.handleDeserialize());
+    }
+    
+    async handleSerialize() {
+        const input = this.querySelector('#fhir-input').value;
+        const output = this.querySelector('#fhir-output');
+        
+        try {
+            const result = await this.phpWasm.serialize(JSON.parse(input));
+            output.textContent = JSON.stringify(result, null, 2);
+        } catch (error) {
+            output.textContent = `Error: ${error.message}`;
+        }
+    }
+    
+    async handleDeserialize() {
+        const input = this.querySelector('#fhir-input').value;
+        const output = this.querySelector('#fhir-output');
+        
+        try {
+            const result = await this.phpWasm.deserialize(input, 'Patient');
+            output.textContent = JSON.stringify(result, null, 2);
+        } catch (error) {
+            output.textContent = `Error: ${error.message}`;
+        }
+    }
+}
+
+// Register the custom element
+customElements.define('fhir-serialization-demo', FHIRSerializationDemo);
+```
+
+#### Usage in Jekyll pages (demos/serialization.md)
+```markdown
+---
+layout: default
+title: Serialization Demo
+---
+
+# FHIR Serialization Demo
+
+Interactive demo using php-wasm to run PHP directly in your browser.
+
+<fhir-serialization-demo></fhir-serialization-demo>
+
+<script type="module" src="{{ '/assets/js/components/fhir-serialization-demo.js' | relative_url }}"></script>
 ```
 
 ### Page Templates
-
-#### Base Template Structure
-```html
-<!DOCTYPE html>
-<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

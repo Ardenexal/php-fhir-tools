@@ -118,24 +118,34 @@ We have created four comprehensive planning documents:
 
 ## 💡 Key Recommendations
 
-### Technology Stack ⭐ **UPDATED!**
-- ✅ **Frontend**: Plain HTML/CSS/JavaScript (no build step)
-- ✅ **PHP Execution**: php-wasm (WebAssembly in browser) ⭐ **NEW!**
-- ✅ **Hosting**: GitHub Pages only (no backend needed!)
+### Technology Stack ⭐ **CONFIRMED DECISIONS!**
+- ✅ **Site Generator**: Jekyll (GitHub Pages native)
+- ✅ **Templating**: Liquid templates for DRY code
+- ✅ **CSS**: Modern CSS with CSS variables
+- ✅ **JavaScript**: Vanilla JS + Web Components
+- ✅ **PHP Execution**: php-wasm (WebAssembly in browser)
+- ✅ **Search**: Jekyll Simple Search (Lunr.js)
+- ✅ **Domain**: GitHub Pages subdomain
+- ✅ **Analytics**: Deferred for later
+- ✅ **Hosting**: GitHub Pages only (no backend!)
 - ✅ **Cost**: $0/month (completely free!)
 
 ### Why These Choices?
-1. **Plain HTML**: Simple, fast, no learning curve
-2. **php-wasm**: Runs PHP in browser - zero hosting costs, instant execution
-3. **No Backend**: Eliminates server costs and complexity
-4. **Phased Rollout**: Quick wins, iterative improvement
+1. **Jekyll**: Native GitHub Pages support, Liquid templates, automatic builds
+2. **Modern CSS**: Clean, performant, CSS variables for theming
+3. **Web Components**: Reusable, encapsulated, modern JavaScript
+4. **php-wasm**: Runs PHP in browser - zero hosting costs, instant execution
+5. **No Backend**: Eliminates server costs and complexity
+6. **Phased Rollout**: Quick wins, iterative improvement
 
-### Benefits of php-wasm Approach
+### Benefits of This Stack
 - 🚀 **Instant execution** - No network latency
 - 💰 **Zero cost** - No backend hosting needed
 - 🔒 **Complete privacy** - Data never leaves browser
 - 📱 **Offline capable** - Works without internet
 - 🎯 **Simplified deployment** - Just GitHub Pages
+- 🔍 **Built-in search** - Jekyll plugins for search
+- 🎨 **Modern design** - CSS variables, Web Components
 
 ---
 
@@ -143,13 +153,15 @@ We have created four comprehensive planning documents:
 
 | Feature | Phase 1 | Phase 2 | Phase 3 |
 |---------|---------|---------|---------|
+| **Jekyll Site** | ✅ | ✅ | ✅ |
 | **Documentation** | ✅ | ✅ | ✅ |
 | **Code Examples** | ✅ | ✅ | ✅ |
+| **Web Components** | ❌ | ✅ | ✅ |
 | **php-wasm Integration** | ❌ | ✅ | ✅ |
 | **Serialization Demo** | ❌ | ✅ | ✅ |
 | **FHIRPath Demo** | ❌ | ❌ | ✅ |
 | **Model Explorer** | ❌ | ❌ | ✅ |
-| **Search** | ❌ | ❌ | ✅ |
+| **Jekyll Search** | ❌ | ✅ | ✅ |
 | **Mobile Responsive** | ✅ | ✅ | ✅ |
 | **Dark Mode** | ❌ | ❌ | ✅ |
 
@@ -157,7 +169,7 @@ We have created four comprehensive planning documents:
 
 ## 💰 Budget Breakdown
 
-### Free Option with php-wasm (Recommended) ⭐ **NEW!**
+### Free Option with Jekyll + php-wasm (Confirmed) ⭐
 ```
 GitHub Pages:      $0/month
 php-wasm:          $0/month (client-side)

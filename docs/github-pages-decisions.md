@@ -21,20 +21,22 @@ This document helps make key architectural and implementation decisions for the 
 | Template System | Manual | Liquid | Go | React |
 | Search Built-in | ❌ | ❌ | ❌ | ✅ |
 
-### Recommendation: **Plain HTML/CSS/JS** ⭐
+### Recommendation: **Jekyll** ⭐ **DECISION CONFIRMED**
 
 **Reasons:**
-- No build step required
-- Complete control over markup
+- Native GitHub Pages support (automatic builds)
+- Liquid templating for reusable components
+- Modern CSS with CSS variables support
 - Easy to add interactive JavaScript demos
-- No learning curve for contributors
-- GitHub Pages deploys directly
-- Perfect for our use case (documentation + demos)
+- Built-in support for search plugins
+- Good documentation and community
+- No separate build pipeline needed
 
-**When to Reconsider:**
-- If we need 100+ pages (templating becomes valuable)
-- If we want built-in search (can add manually)
-- If team prefers working with static site generators
+**Implementation Details:**
+- Use modern CSS with CSS variables for theming
+- Vanilla JavaScript with Web Components for interactive parts
+- Jekyll's recommended search solution
+- Leverage Liquid templates for DRY principles
 
 ---
 
@@ -223,31 +225,31 @@ composer require ardenexal/fhir-bundle
 | **Bulma** | ~30KB | Low | High | Clean CSS |
 | **Pure.css** | ~4KB | Low | High | Minimal sites |
 
-### Recommendation: **Custom CSS with CSS Variables** ⭐
+### Recommendation: **Modern CSS with CSS Variables** ⭐ **DECISION CONFIRMED**
 
-**Reasons:**
-- Complete control over styling
-- Minimal file size (better performance)
-- No external dependencies
-- Easy to customize
-- Perfect for our use case (not a complex app)
-- Modern CSS features (Grid, Flexbox, Custom Properties)
-
-**Alternative: Tailwind CSS** (if team prefers utility-first)
-- Faster development
-- Consistent design system
-- Requires build step
+**Confirmed Approach:**
+- Modern CSS with CSS custom properties (variables)
+- No framework overhead
+- CSS Grid and Flexbox for layouts
+- Responsive design with media queries
+- Design tokens for consistency
 
 **Sample Structure:**
 ```
 assets/css/
-├── variables.css    (Design tokens)
+├── variables.css    (Design tokens - colors, spacing, etc.)
 ├── reset.css        (Normalize)
 ├── base.css         (Typography, base elements)
 ├── layout.css       (Grid, containers)
 ├── components.css   (Buttons, cards, etc.)
 └── demos.css        (Demo-specific styles)
 ```
+
+**Key Features:**
+- CSS custom properties for theming
+- Dark mode support via CSS variables
+- Mobile-first responsive design
+- Performance-optimized (no framework bloat)
 
 ---
 
@@ -257,37 +259,46 @@ assets/css/
 
 | Framework | Size | Learning Curve | Best For | Overhead |
 |-----------|------|----------------|----------|----------|
-| **Vanilla JS** | 0KB | Low | Simple interactions | None |
+| **Vanilla JS + Web Components** | 0KB | Low | Reusable components | None |
 | **Alpine.js** | 15KB | Low | Lightweight reactivity | Minimal |
 | **Vue.js** | 34KB | Medium | Complex UIs | Medium |
 | **React** | 45KB | High | SPAs | High |
 | **Svelte** | Minimal | Medium | Modern apps | Build step |
 
-### Recommendation: **Vanilla JavaScript** (with optional Alpine.js) ⭐
+### Recommendation: **Vanilla JavaScript + Web Components** ⭐ **DECISION CONFIRMED**
 
-**Reasons:**
-- No dependencies or build step
-- Fast page loads
-- Easy for contributors
-- Sufficient for our needs (form handling, API calls, DOM manipulation)
-- Modern JavaScript features (async/await, fetch, ES6+)
+**Confirmed Approach:**
+- Vanilla JavaScript (ES6+) for all functionality
+- Web Components for reusable interactive parts
+- Modern JavaScript features (async/await, fetch, modules)
+- No framework dependencies
 
-**When to Add Alpine.js:**
-- If we need simple reactivity
-- For state management in demos
-- Still very lightweight (15KB)
+**Use Web Components For:**
+- Interactive demo interfaces (serialization tester, FHIRPath evaluator)
+- Reusable UI components (code editors, syntax highlighters)
+- Stateful widgets (search, navigation)
 
 **Sample Architecture:**
 ```javascript
-// api-client.js - Backend communication
-class FHIRToolsAPIClient { }
+// Web Component for demo
+class FHIRSerializationDemo extends HTMLElement {
+    connectedCallback() {
+        this.render();
+        this.attachEventListeners();
+    }
+}
+customElements.define('fhir-serialization-demo', FHIRSerializationDemo);
 
-// demos/serialization.js - Demo logic
-class SerializationDemo { }
-
-// main.js - Global utilities
-const utils = { };
+// Usage in HTML
+<fhir-serialization-demo></fhir-serialization-demo>
 ```
+
+**Benefits:**
+- Native browser support (no polyfills needed)
+- Encapsulated styles and behavior
+- Reusable across pages
+- Modern JavaScript features
+- Zero framework overhead
 
 ---
 
@@ -332,30 +343,39 @@ const utils = { };
 
 ### Options Comparison
 
-| Solution | Cost | Setup | Features | Client-side |
-|----------|------|-------|----------|-------------|
-| **Algolia DocSearch** | Free | Medium | Excellent | Yes |
-| **Pagefind** | Free | Easy | Good | Yes |
-| **Lunr.js** | Free | Easy | Basic | Yes |
-| **Custom** | Free | Hard | Variable | Yes |
-| **Google Custom Search** | Free | Easy | Good | No |
+| Solution | Cost | Setup | Features | Jekyll Support |
+|----------|------|-------|----------|----------------|
+| **Jekyll Simple Search** | Free | Easy | Good | ✅ Native |
+| **Lunr.js** | Free | Easy | Good | ✅ Popular plugin |
+| **Algolia DocSearch** | Free | Medium | Excellent | ✅ Plugin available |
+| **Pagefind** | Free | Easy | Good | ⚠️ Manual |
+| **Google Custom Search** | Free | Easy | Good | ✅ Embeddable |
 
-### Recommendation: **Phase 2 Feature** (Start with Lunr.js or Pagefind) ⭐
+### Recommendation: **Jekyll's Recommended Search** ⭐ **DECISION CONFIRMED**
 
-**Phase 1**: Launch without search
-- Not critical for launch
-- Can use browser search (Ctrl+F)
+**Confirmed Approach:**
+Use Jekyll's recommended search solution, which is typically **Jekyll Simple Search** with Lunr.js:
 
-**Phase 2**: Add Lunr.js
-- Lightweight (small index)
-- Client-side search
-- Easy to implement
-- Good enough for documentation
+**Implementation:**
+```yaml
+# _config.yml
+plugins:
+  - jekyll-lunr-js-search
 
-**Future**: Consider Algolia DocSearch
-- Excellent search experience
-- Free for open source
-- Requires application approval
+lunr_search:
+  excludes: [rss.xml, atom.xml]
+  stopwords: 'stopwords.txt'
+  min_length: 3
+```
+
+**Benefits:**
+- Native Jekyll integration
+- Client-side search (no backend)
+- Easy setup with Jekyll plugins
+- Good performance for documentation sites
+- Works with GitHub Pages
+
+**Alternative**: If Jekyll Simple Search is insufficient, can upgrade to Algolia DocSearch (free for open source)
 
 ---
 
@@ -368,50 +388,49 @@ const utils = { };
 | **GitHub Subdomain** | Free | Instant | Good | Good |
 | **Custom Domain** | $12/year | Easy | Better | Better |
 
-### Recommendation: **GitHub Subdomain Initially** ⭐
+### Recommendation: **GitHub Subdomain** ⭐ **DECISION CONFIRMED**
 
-**Launch with**: `ardenexal.github.io/php-fhir-tools`
+**Confirmed Approach**: `ardenexal.github.io/php-fhir-tools`
 - Free
 - Works immediately
 - SSL included
 - Professional enough
+- No additional configuration needed
 
-**Future**: Add custom domain (optional)
-- Examples: `fhir-tools.dev`, `phpfhir.tools`
-- Better branding
-- Easier to remember
-- Only $12/year
+---
 
-**Implementation** (if custom domain):
-```
-1. Buy domain (Namecheap, Google Domains)
-2. Add CNAME file to docs/
-3. Configure DNS
-4. Enable HTTPS in GitHub Pages
-```
+## Decision 10: Analytics
+
+### Recommendation: **Deferred** ⭐ **DECISION CONFIRMED**
+
+**Confirmed Approach:**
+- Launch without analytics
+- Can add later if needed (Google Analytics or Plausible)
+- Focus on core functionality first
 
 ---
 
 ## Summary of Recommendations
 
-### Immediate Decisions (Start of Project)
+### Immediate Decisions (Start of Project) ⭐ **UPDATED**
 
 | Decision | Recommendation | Reason |
 |----------|----------------|--------|
-| Site Generator | Plain HTML/CSS/JS | Simplicity, flexibility, no build step |
-| **PHP Execution** | **php-wasm (Browser-based)** ⭐ **NEW!** | **Zero cost, instant execution, no server needed** |
-| Rollout Strategy | Phased (Option C) | Quick launch, iterative improvement |
-| Architecture | Client-side only (no backend) | Simplified with php-wasm |
-| CSS Approach | Custom CSS | Full control, minimal overhead |
-| JavaScript | Vanilla JS + php-wasm | Sufficient for needs, runs PHP in browser |
+| **Site Generator** | **Jekyll** ⭐ | Native GitHub Pages, Liquid templates, good search support |
+| **CSS Approach** | **Modern CSS with Variables** ⭐ | Clean, performant, no framework bloat |
+| **JavaScript** | **Vanilla JS + Web Components** ⭐ | Modern, reusable, zero overhead |
+| **Search** | **Jekyll's Recommended (Lunr.js)** ⭐ | Native integration, client-side |
+| **Domain** | **GitHub Subdomain** ⭐ | Free, instant, SSL included |
+| **Analytics** | **Deferred** ⭐ | Add later if needed |
+| **PHP Execution** | **php-wasm (Browser-based)** ⭐ | Zero cost, instant execution, no server needed |
+| **Rollout Strategy** | **Phased (Option C)** ⭐ | Quick launch, iterative improvement |
 
 ### Deferred Decisions (Can Decide Later)
 
 | Decision | When to Decide | Default |
 |----------|----------------|---------|
-| Analytics | After Phase 1 launch | None initially |
-| Search | After Phase 2 | Add in Phase 3 |
-| Custom Domain | After launch success | Use GitHub subdomain |
+| Analytics | After launch | Deferred per decision |
+| Custom Domain | If needed later | Use GitHub subdomain |
 | Backend API | If php-wasm insufficient | Add as fallback option |
 | Advanced Features | Based on usage | Add based on feedback |
 
@@ -420,17 +439,18 @@ const utils = { };
 ## Implementation Priority
 
 ### Must Have (Phase 1)
-1. ✅ Basic site structure
+1. ✅ Jekyll site structure with modern CSS
 2. ✅ Landing page
-3. ✅ Documentation pages
+3. ✅ Documentation pages with Liquid templates
 4. ✅ Getting started guide
 5. ✅ Code examples
 
 ### Should Have (Phase 2)
 6. ✅ php-wasm integration
-7. ✅ Serialization demo (browser-based)
-8. ✅ Syntax highlighting
-9. ✅ Mobile responsive
+7. ✅ Serialization demo (browser-based with Web Components)
+8. ✅ Jekyll search integration
+9. ✅ Syntax highlighting
+10. ✅ Mobile responsive
 
 ### Nice to Have (Phase 3+)
 10. ⭐ FHIRPath demo

@@ -4,70 +4,65 @@
 
 This document outlines the comprehensive plan for creating a GitHub Pages site to showcase and test the PHP FHIRTools Symfony Bundle, including serialization, FHIRPath, models, and future validation components.
 
-## Architecture Decision ⭐ **UPDATED!**
+## Architecture Decision ⭐ **CONFIRMED!**
 
-### Option A: php-wasm (Browser-based PHP) - **NEW RECOMMENDATION!**
-- **Frontend**: GitHub Pages (static HTML/CSS/JS)
+### Confirmed Stack: Jekyll + php-wasm
+
+**Technology Decisions (Confirmed):**
+- **Site Generator**: Jekyll (GitHub Pages native)
+- **Templating**: Liquid templates
+- **CSS**: Modern CSS with CSS variables
+- **JavaScript**: Vanilla JS + Web Components
 - **PHP Execution**: php-wasm (WebAssembly in browser)
-- **Pros**: 
-  - ✅ **Zero cost** - No backend server needed
-  - ✅ **Instant execution** - No network latency
-  - ✅ **Complete privacy** - Data never leaves browser
-  - ✅ **Offline capable** - Works without connection
-  - ✅ **No CORS issues** - Everything client-side
-  - ✅ **Simplified deployment** - Just GitHub Pages
-- **Cons**: 
-  - Initial load time (WASM + dependencies ~2-5 MB)
-  - Browser compatibility (needs WebAssembly)
-  - Memory constraints (browser limits)
+- **Search**: Jekyll Simple Search with Lunr.js
+- **Domain**: GitHub Pages subdomain (`ardenexal.github.io/php-fhir-tools`)
+- **Analytics**: Deferred for later
 
-### Option B: Static Site + Separate API Backend (Alternative)
-- **Frontend**: GitHub Pages (static HTML/CSS/JS)
-- **Backend**: Separate PHP application (Railway, DigitalOcean)
-- **Pros**: 
-  - Can access external APIs
-  - Server-side caching
-  - Usage analytics on backend
-- **Cons**: 
-  - Requires backend hosting ($0-15/month)
-  - CORS configuration needed
-  - Network latency
-  - More complex deployment
+**Benefits:**
+- ✅ **Zero cost** - No backend server needed
+- ✅ **Instant execution** - No network latency
+- ✅ **Complete privacy** - Data never leaves browser
+- ✅ **Offline capable** - Works without connection
+- ✅ **No CORS issues** - Everything client-side
+- ✅ **Native GitHub Pages** - Automatic Jekyll builds
+- ✅ **Reusable components** - Web Components for demos
+- ✅ **Built-in search** - Jekyll plugins
 
-### Option C: Full PHP Site with Custom Hosting
-- **Stack**: Full Symfony application
-- **Hosting**: VPS or cloud hosting
-- **Pros**: 
-  - Integrated solution
-  - Full control
-- **Cons**: 
-  - Requires paid hosting ($5-20/month)
-  - Most complex deployment
+**Considerations:**
+- Initial load time (WASM + dependencies ~2-5 MB)
+- Browser compatibility (needs WebAssembly)
+- Memory constraints (browser limits)
 
-**New Recommendation**: Start with **Option A (php-wasm)** for zero cost and instant execution. Add Option B backend only if specific features require it (external APIs, heavy processing).
+### Alternative: Backend API (if needed later)
+Only if php-wasm proves insufficient for specific use cases:
+- External API access required
+- Processing very large files (>100MB)
+- IE11 compatibility needed
 
-## Site Structure
+## Site Structure (Jekyll)
 
 ```
 docs/
-├── index.html                          # Landing page
-├── assets/
-│   ├── css/
-│   │   ├── main.css                    # Main stylesheet
-│   │   └── syntax-highlight.css        # Code highlighting
-│   ├── js/
-│   │   ├── main.js                     # Core functionality
-│   │   ├── serialization-demo.js       # Serialization interactive demo
-│   │   ├── fhirpath-demo.js            # FHIRPath evaluator demo
-│   │   └── model-explorer.js           # Model browser
-│   └── images/
-│       └── logo.png                    # Project logo
-├── getting-started/
-│   └── index.html                      # Getting started guide
-├── components/
-│   ├── fhir-bundle/
-│   │   └── index.html                  # FHIRBundle documentation
-│   ├── serialization/
+├── _config.yml                         # Jekyll configuration
+├── _layouts/                           # Liquid layouts
+│   ├── default.html                    # Base layout
+│   ├── page.html                       # Page layout
+│   └── docs.html                       # Documentation layout
+├── _includes/                          # Reusable components
+│   ├── header.html                     # Site header
+│   ├── footer.html                     # Site footer
+│   └── navigation.html                 # Navigation menu
+├── _data/                              # Data files
+│   └── navigation.yml                  # Navigation structure
+├── index.md                            # Landing page
+├── getting-started.md                  # Getting started guide
+├── components/                         # Component documentation (Markdown)
+│   ├── fhir-bundle.md                  # FHIRBundle documentation
+│   ├── serialization.md                # Serialization docs
+│   ├── fhirpath.md                     # FHIRPath docs
+│   ├── models.md                       # Models docs
+│   └── validation.md                   # Validation (coming soon)
+├── demos/                              # Interactive demos (HTML with Web Components)
 │   │   └── index.html                  # Serialization docs
 │   ├── fhirpath/
 │   │   └── index.html                  # FHIRPath docs
@@ -76,32 +71,60 @@ docs/
 │   └── validation/
 │       └── index.html                  # Validation (coming soon)
 ├── demos/
-│   ├── serialization.html              # Interactive serialization demo (php-wasm)
-│   ├── fhirpath.html                   # Interactive FHIRPath demo (php-wasm)
+│   ├── serialization.html              # Interactive serialization demo (Web Component)
+│   ├── fhirpath.html                   # Interactive FHIRPath demo (Web Component)
 │   └── models.html                     # Model browser/explorer
-├── examples/
-│   ├── symfony-integration.html        # Symfony code examples
-│   └── standalone-usage.html           # Standalone usage examples
-├── lib/
-│   ├── php-wasm/                       # PHP WebAssembly runtime
-│   └── fhir-tools/                     # FHIRTools bundled for WASM
-└── api/
-    └── reference.html                  # API reference
+├── assets/
+│   ├── css/
+│   │   ├── variables.css               # CSS custom properties
+│   │   ├── reset.css                   # Normalize
+│   │   ├── base.css                    # Base styles
+│   │   ├── layout.css                  # Layout components
+│   │   ├── components.css              # UI components
+│   │   └── demos.css                   # Demo-specific styles
+│   ├── js/
+│   │   ├── main.js                     # Core functionality
+│   │   ├── components/                 # Web Components
+│   │   │   ├── fhir-serialization-demo.js
+│   │   │   ├── fhir-path-evaluator.js
+│   │   │   └── fhir-model-explorer.js
+│   │   ├── php-wasm-loader.js          # php-wasm integration
+│   │   └── utils/
+│   │       ├── syntax-highlight.js
+│   │       └── error-handler.js
+│   ├── data/
+│   │   └── examples/                   # Example FHIR resources
+│   └── images/
+│       └── logo.svg
+└── lib/
+    └── php-wasm/                       # PHP WebAssembly runtime
 ```
 
-**Note:** With php-wasm approach, no separate backend API repository is needed!
+**Note:** Jekyll builds the site from Markdown files to HTML automatically!
 
 ## Phase-by-Phase Implementation
 
 ### Phase 1: Foundation (Week 1)
 
-#### 1.1 Create Base Site Structure
+#### 1.1 Create Jekyll Site Structure
 ```bash
 # Create directory structure
-mkdir -p docs/{assets/{css,js,images},getting-started,components/{fhir-bundle,serialization,fhirpath,models,validation},demos,examples,api}
+mkdir -p docs/{_layouts,_includes,_data,components,demos,assets/{css,js/components,data/examples}}
+cd docs
+
+# Create Jekyll config
+cat > _config.yml << 'EOF'
+title: PHP FHIRTools
+description: FHIR tools for PHP
+baseurl: "/php-fhir-tools"
+url: "https://ardenexal.github.io"
+markdown: kramdown
+plugins:
+  - jekyll-lunr-js-search
+EOF
 ```
 
-#### 1.2 Design System
+#### 1.2 Design System with CSS Variables
 - **Color Palette**: 
   - Primary: #0066CC (FHIR blue)
   - Secondary: #28A745 (success green)
