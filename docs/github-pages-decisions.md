@@ -88,27 +88,11 @@ const result = await php.run(`<?php
 
 **Limitations:**
 - Initial load time (download WASM + dependencies)
-- Browser compatibility (needs WebAssembly support)
+- Browser compatibility (needs WebAssembly support - modern browsers only)
 - Memory constraints (browser limits)
 - Can't access external APIs from PHP
 
-**When to Use Backend Instead:**
-- Need to access external FHIR servers
-- Processing very large files (>100MB)
-- Browser compatibility requirements (IE11)
-- Need server-side caching
-- Want to track usage analytics server-side
-
-### Alternative: Backend API Hosting (if needed)
-
-| Provider | Free Tier | Ease of Setup | Cost (Paid) | PHP Support | Notes |
-|----------|-----------|---------------|-------------|-------------|-------|
-| **Railway** | $5 credit/month | ⭐⭐⭐ Easy | $5-20/month | ✅ Good | Generous free tier |
-| **Fly.io** | Limited free | ⭐⭐ Medium | $5-15/month | ✅ Good | Docker-based |
-| **Render** | Limited free | ⭐⭐⭐ Easy | $7/month | ✅ Good | Good for web services |
-| **DigitalOcean App Platform** | ❌ | ⭐⭐ Medium | $5/month | ✅ Excellent | Reliable, affordable |
-
-**Recommendation if Backend Needed:** Railway or DigitalOcean
+**Note:** IE11 compatibility is not required for this project. php-wasm is the confirmed approach.
 
 ---
 
@@ -128,13 +112,13 @@ const result = await php.run(`<?php
 |---------|----------|----------|----------|
 | Documentation Pages | ✅ | ✅ | ✅ |
 | Code Examples | ✅ | ✅ | ✅ |
-| Backend API | ❌ | ✅ | ✅ (Phase 2) |
+| php-wasm Integration | ❌ | ✅ | ✅ (Phase 2) |
 | Serialization Demo | ❌ | ✅ | ✅ (Phase 2) |
 | FHIRPath Demo | ❌ | ✅ | ❌ (Phase 3) |
 | Model Explorer | ❌ | ✅ | ❌ (Phase 3) |
 | Interactive Features | ❌ | ✅ | ⚠️ Limited |
 
-### Recommendation: **Option C: Phased Rollout** ⭐
+### Recommendation: **Option C: Phased Rollout** ⭐ **CONFIRMED**
 
 **Phase 1 (Week 1-3)**: Launch basic site
 - Complete documentation
@@ -143,9 +127,9 @@ const result = await php.run(`<?php
 - Getting started guide
 - **Goal**: Get something useful live quickly
 
-**Phase 2 (Week 4-6)**: Add first demo
-- Deploy backend API
-- Add serialization demo
+**Phase 2 (Week 4-6)**: Add first interactive demo
+- Integrate php-wasm
+- Add serialization demo with Web Components
 - **Goal**: Showcase interactive capabilities
 
 **Phase 3 (Week 7-9)**: Complete feature set
@@ -160,6 +144,7 @@ const result = await php.run(`<?php
 - Can adjust based on community needs
 - Lower risk (can stop at any phase if needed)
 - Easier to manage development
+- No backend deployment complexity
 
 ---
 

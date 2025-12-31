@@ -94,12 +94,12 @@ We have created four comprehensive planning documents:
 **Goal**: Add first interactive demo
 
 **Includes**:
-- Backend API deployment
-- Serialization demo
+- php-wasm integration
+- Serialization demo with Web Components
 - Syntax highlighting
 - Error handling
 
-**Outcome**: Working demo users can test
+**Outcome**: Working demo users can test in browser
 
 ### Phase 3: Complete Features (4 weeks)
 **Goal**: Full-featured showcase site

@@ -6,10 +6,10 @@
 Focus on static documentation and basic structure, defer interactive demos.
 
 ### Option B: Full Featured (8-10 weeks)  
-Complete implementation with all interactive demos and backend API.
+Complete implementation with all interactive demos using php-wasm.
 
-### Option C: Phased Rollout (Recommended)
-Launch basic site quickly, add features incrementally.
+### Option C: Phased Rollout (Recommended) ⭐ **CONFIRMED**
+Launch basic site quickly, add features incrementally using php-wasm (no backend needed).
 
 ---
 
@@ -171,130 +171,81 @@ Create example JSON files in `docs/assets/data/examples/`:
 
 ---
 
-## Phase 4: Backend API Development (Week 4-5) 🔧
+## Phase 4: php-wasm Integration (Week 4-5) 🔧
 
-**Goal**: Create backend API for interactive demos
+**Goal**: Integrate php-wasm for browser-based PHP execution
 
 ### Tasks
 
-#### 4.1 API Repository Setup
-Option A: Separate repository
-```bash
-composer create-project symfony/skeleton fhir-tools-api
-cd fhir-tools-api
-composer require ardenexal/fhir-bundle
-```
+#### 4.1 php-wasm Setup
+Research and select php-wasm library:
+- [ ] Evaluate php-wasm options (php-wasm/php-wasm, WordPress playground)
+- [ ] Test compatibility with FHIRTools
+- [ ] Determine optimal loading strategy
 
-Option B: Add API to existing repository
-```bash
-# Use existing structure, add API controllers
-```
+#### 4.2 Bundle PHP Dependencies
+- [ ] Create build process for FHIRTools + dependencies
+- [ ] Bundle required PHP files for WASM
+- [ ] Optimize bundle size
+- [ ] Test PHP code execution in browser
 
-#### 4.2 Core Controllers
-- [ ] Create `SerializationController`
-  - [ ] POST `/api/serialize` endpoint
-  - [ ] POST `/api/deserialize` endpoint
-  - [ ] POST `/api/validate` endpoint
-- [ ] Create `FHIRPathController`
-  - [ ] POST `/api/fhirpath/evaluate` endpoint
-- [ ] Create `ModelsController` (optional)
-  - [ ] GET `/api/models/metadata` endpoint
-
-#### 4.3 Security Implementation
-- [ ] Add CORS configuration
-- [ ] Implement rate limiting
-- [ ] Add input validation
-- [ ] Add request size limits
-- [ ] Sanitize error messages
-- [ ] Add security headers
+#### 4.3 JavaScript Wrapper
+- [ ] Create `PHPWasmFHIRTools` class
+- [ ] Implement `initialize()` method
+- [ ] Implement `serialize()` method
+- [ ] Implement `deserialize()` method  
+- [ ] Implement `evaluateFHIRPath()` method
+- [ ] Add error handling
 
 #### 4.4 Testing
-- [ ] Write PHPUnit tests for all endpoints
-- [ ] Integration tests
-- [ ] Load testing
-- [ ] Security testing
+- [ ] Unit tests for JavaScript wrapper
+- [ ] Integration tests with example resources
+- [ ] Performance testing (load time, execution speed)
+- [ ] Browser compatibility testing
 
 #### 4.5 Documentation
-- [ ] OpenAPI/Swagger spec
-- [ ] API usage examples
-- [ ] Error response documentation
+- [ ] Usage documentation
+- [ ] Code examples
+- [ ] Troubleshooting guide
 
-**Deliverable**: Functional API with all endpoints tested
+**Deliverable**: Functional php-wasm integration
 
 **Estimated Time**: 7-10 days
 
 ---
 
-## Phase 5: Backend API Deployment (Week 6) 🚀
+## Phase 5: Interactive Serialization Demo (Week 6) 🎮
 
-**Goal**: Deploy API to production
-
-### Tasks
-
-#### 5.1 Choose Hosting Provider
-Options:
-- [ ] Heroku (Easy, free tier available)
-- [ ] Railway (Easy, generous free tier)
-- [ ] DigitalOcean App Platform ($5/month)
-- [ ] Fly.io (Free tier available)
-
-#### 5.2 Deployment Configuration
-- [ ] Create deployment configuration files
-- [ ] Set up environment variables
-- [ ] Configure database (if needed)
-- [ ] Set up Redis for caching (optional)
-
-#### 5.3 Deploy and Test
-- [ ] Deploy to staging environment
-- [ ] Test all endpoints
-- [ ] Load testing
-- [ ] Deploy to production
-- [ ] Smoke testing
-
-#### 5.4 Monitoring Setup
-- [ ] Set up error tracking (Sentry)
-- [ ] Set up uptime monitoring
-- [ ] Set up performance monitoring
-- [ ] Configure alerts
-
-**Deliverable**: Live API accessible via HTTPS
-
-**Estimated Time**: 3-4 days
-
----
-
-## Phase 6: Interactive Serialization Demo (Week 7) 🎮
-
-**Goal**: Build interactive serialization demo
+**Goal**: Build interactive serialization demo with Web Components
 
 ### Tasks
 
-#### 6.1 UI Implementation
-- [ ] Create `docs/pages/demos/serialization.html`
+#### 5.1 Web Component Implementation
+- [ ] Create `fhir-serialization-demo.js` Web Component
+- [ ] Implement component lifecycle methods
 - [ ] Design split-pane layout (input/output)
 - [ ] Add example selector dropdown
 - [ ] Add validation mode selector
 - [ ] Add action buttons (Serialize, Deserialize, Validate)
 - [ ] Add syntax highlighting for JSON
 
-#### 6.2 JavaScript Implementation
-- [ ] Create `docs/assets/js/demos/serialization.js`
-- [ ] Implement API client integration
+#### 5.2 php-wasm Integration
+- [ ] Integrate php-wasm loader in Web Component
 - [ ] Load example resources
 - [ ] Handle user input
-- [ ] Call backend API
+- [ ] Call php-wasm serialize/deserialize methods
 - [ ] Display results
 - [ ] Handle errors gracefully
 - [ ] Add loading states
 
-#### 6.3 Features
+#### 5.3 Features
 - [ ] Copy to clipboard functionality
 - [ ] Format/prettify JSON
 - [ ] Download result as file
 - [ ] Share link (encode data in URL)
 - [ ] Clear/reset functionality
 
-#### 6.4 Testing
+#### 5.4 Testing
 - [ ] Test with all example resources
 - [ ] Test error scenarios
 - [ ] Test on mobile devices
@@ -306,27 +257,27 @@ Options:
 
 ---
 
-## Phase 7: Interactive FHIRPath Demo (Week 8) 🎯
+## Phase 6: Interactive FHIRPath Demo (Week 7) 🎯
 
-**Goal**: Build interactive FHIRPath evaluator
+**Goal**: Build interactive FHIRPath evaluator with Web Components
 
 ### Tasks
 
-#### 7.1 UI Implementation
-- [ ] Create `docs/pages/demos/fhirpath.html`
+#### 6.1 Web Component Implementation
+- [ ] Create `fhir-path-evaluator.js` Web Component
 - [ ] Resource input area
 - [ ] Expression input field
 - [ ] Result display area
 - [ ] Sidebar with examples and reference
 
-#### 7.2 JavaScript Implementation
-- [ ] Create `docs/assets/js/demos/fhirpath.js`
-- [ ] Integrate with API backend
+#### 6.2 php-wasm Integration
+- [ ] Integrate php-wasm
+- [ ] Call FHIRPath evaluation via php-wasm
 - [ ] Expression evaluation
 - [ ] Result formatting
 - [ ] Error handling
 
-#### 7.3 Features
+#### 6.3 Features
 - [ ] Expression history
 - [ ] Quick reference sidebar
 - [ ] Example expression library
@@ -334,7 +285,7 @@ Options:
 - [ ] Syntax help
 - [ ] Result type detection
 
-#### 7.4 Documentation Integration
+#### 6.4 Documentation Integration
 - [ ] Link to FHIRPath spec
 - [ ] Function reference
 - [ ] Operator reference
@@ -346,33 +297,33 @@ Options:
 
 ---
 
-## Phase 8: Model Explorer (Week 9) 📊
+## Phase 7: Model Explorer (Week 8) 📊
 
 **Goal**: Build FHIR model browser
 
 ### Tasks
 
-#### 8.1 Generate Model Metadata
+#### 7.1 Generate Model Metadata
 - [ ] Create script to extract model information
 - [ ] Generate JSON metadata file
 - [ ] Include all FHIR versions (R4, R4B, R5)
 - [ ] Extract properties, types, cardinality
 
-#### 8.2 UI Implementation
+#### 7.2 UI Implementation
 - [ ] Create `docs/pages/demos/models.html`
 - [ ] Tree view for resource types
 - [ ] Search/filter functionality
 - [ ] Version selector
 - [ ] Property inspector panel
 
-#### 8.3 JavaScript Implementation
+#### 7.3 JavaScript Implementation
 - [ ] Create `docs/assets/js/demos/models.js`
 - [ ] Load metadata JSON
 - [ ] Implement tree navigation
 - [ ] Implement search
 - [ ] Display property details
 
-#### 8.4 Features
+#### 7.4 Features
 - [ ] Link to FHIR specification
 - [ ] Compare versions side-by-side
 - [ ] Export model information
@@ -384,20 +335,20 @@ Options:
 
 ---
 
-## Phase 9: Polish & Enhancement (Week 10) ✨
+## Phase 8: Polish & Enhancement (Week 9) ✨
 
 **Goal**: Improve UX and add finishing touches
 
 ### Tasks
 
-#### 9.1 Performance Optimization
+#### 8.1 Performance Optimization
 - [ ] Minify CSS and JavaScript
 - [ ] Optimize images (use WebP)
 - [ ] Implement lazy loading
 - [ ] Add service worker for offline support
 - [ ] Enable browser caching
 
-#### 9.2 Accessibility Improvements
+#### 8.2 Accessibility Improvements
 - [ ] Run WAVE accessibility audit
 - [ ] Fix accessibility issues
 - [ ] Add ARIA labels
@@ -405,19 +356,19 @@ Options:
 - [ ] Test screen reader compatibility
 - [ ] Ensure color contrast compliance
 
-#### 9.3 SEO Optimization
+#### 8.3 SEO Optimization
 - [ ] Add meta descriptions
 - [ ] Add Open Graph tags
 - [ ] Create sitemap.xml
 - [ ] Add robots.txt
 - [ ] Add structured data (JSON-LD)
 
-#### 9.4 Analytics Setup
+#### 8.4 Analytics Setup
 - [ ] Add Google Analytics or Plausible
 - [ ] Configure goals and events
 - [ ] Set up error tracking
 
-#### 9.5 Additional Features
+#### 8.5 Additional Features
 - [ ] Add dark mode toggle
 - [ ] Add site-wide search
 - [ ] Add changelog page
@@ -430,13 +381,13 @@ Options:
 
 ---
 
-## Phase 10: Launch & Promotion (Week 11) 🎊
+## Phase 9: Launch & Promotion (Week 10) 🎊
 
 **Goal**: Launch site and promote to community
 
 ### Tasks
 
-#### 10.1 Pre-Launch Testing
+#### 9.1 Pre-Launch Testing
 - [ ] Cross-browser testing (Chrome, Firefox, Safari, Edge)
 - [ ] Mobile device testing (iOS, Android)
 - [ ] Performance testing (Lighthouse)
@@ -444,19 +395,19 @@ Options:
 - [ ] Security audit
 - [ ] Link validation
 
-#### 10.2 Launch Preparation
+#### 9.2 Launch Preparation
 - [ ] Update main README with site link
 - [ ] Create announcement blog post
 - [ ] Prepare social media posts
 - [ ] Update documentation links in code
 
-#### 10.3 Launch
+#### 9.3 Launch
 - [ ] Merge to main branch
 - [ ] Verify GitHub Pages deployment
 - [ ] Test live site
 - [ ] Monitor error logs
 
-#### 10.4 Promotion
+#### 9.4 Promotion
 - [ ] Post on Twitter/X
 - [ ] Share on Reddit (r/FHIR, r/PHP)
 - [ ] Post on dev.to
@@ -464,7 +415,7 @@ Options:
 - [ ] Submit to PHP newsletters
 - [ ] Update package listings
 
-#### 10.5 Monitoring
+#### 9.5 Monitoring
 - [ ] Monitor analytics
 - [ ] Monitor error logs
 - [ ] Respond to feedback
@@ -575,8 +526,8 @@ Options:
 3. **Maintenance Burden**: Keeping site updated
    - Mitigation: Automate as much as possible, set up monitoring
 
-4. **Security Issues**: API vulnerabilities
-   - Mitigation: Implement rate limiting, input validation, security headers
+4. **php-wasm Limitations**: Browser compatibility and performance
+   - Mitigation: Provide clear requirements, optimize bundle size, progressive enhancement
 
 ---
 
