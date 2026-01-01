@@ -1,24 +1,33 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
+
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRAttachment;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * @description Text, attachment(s), or resource(s) to be communicated to the recipient.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'CommunicationRequest', elementPath: 'CommunicationRequest.payload', fhirVersion: 'R5')]
+#[FHIRBackboneElement(parentResource: 'CommunicationRequest', elementPath: 'CommunicationRequest.payload', fhirVersion: 'R5')]
 class FHIRCommunicationRequestPayload extends \Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRBackboneElement
 {
-	public function __construct(
-		/** @var null|string id Unique id for inter-element referencing */
-		public ?string $id = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension> extension Additional content defined by implementations */
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-		public array $modifierExtension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRAttachment|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept contentX Message part content */
-		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public \Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRAttachment|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRReference|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept|null $contentX = null,
-	) {
-		parent::__construct($id, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        public ?string $id = null,
+        /** @var array<FHIRExtension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        public array $modifierExtension = [],
+        /** @var FHIRAttachment|FHIRReference|FHIRCodeableConcept|null contentX Message part content */
+        #[NotBlank]
+        public FHIRAttachment|FHIRReference|FHIRCodeableConcept|null $contentX = null,
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
 }

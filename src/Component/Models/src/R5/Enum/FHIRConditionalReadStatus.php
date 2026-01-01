@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,15 +12,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRConditionalReadStatus: string
 {
-	/** Not Supported */
-	case notsupported = 'not-supported';
+    /** Not Supported */
+    case notsupported = 'not-supported';
 
-	/** If-Modified-Since */
-	case ifmodifiedsince = 'modified-since';
+    /** If-Modified-Since */
+    case ifmodifiedsince = 'modified-since';
 
-	/** If-None-Match */
-	case ifnonematch = 'not-match';
+    /** If-None-Match */
+    case ifnonematch = 'not-match';
 
-	/** Full Support */
-	case fullsupport = 'full-support';
+    /** Full Support */
+    case fullsupport = 'full-support';
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,45 +12,45 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRSystemRestfulInteraction: string
 {
-	/** read */
-	case read = 'read';
+    /** read */
+    case read = 'read';
 
-	/** vread */
-	case vread = 'vread';
+    /** vread */
+    case vread = 'vread';
 
-	/** update */
-	case update = 'update';
+    /** update */
+    case update = 'update';
 
-	/** patch */
-	case patch = 'patch';
+    /** patch */
+    case patch = 'patch';
 
-	/** delete */
-	case delete = 'delete';
+    /** delete */
+    case delete = 'delete';
 
-	/** history */
-	case history = 'history';
+    /** history */
+    case history = 'history';
 
-	/** create */
-	case create = 'create';
+    /** create */
+    case create = 'create';
 
-	/** search */
-	case search = 'search';
+    /** search */
+    case search = 'search';
 
-	/** capabilities */
-	case capabilities = 'capabilities';
+    /** capabilities */
+    case capabilities = 'capabilities';
 
-	/** transaction */
-	case transaction = 'transaction';
+    /** transaction */
+    case transaction = 'transaction';
 
-	/** batch */
-	case batch = 'batch';
+    /** batch */
+    case batch = 'batch';
 
-	/** operation */
-	case operation = 'operation';
+    /** operation */
+    case operation = 'operation';
 
-	/** search-system */
-	case searchsystem = 'search-system';
+    /** search-system */
+    case searchsystem = 'search-system';
 
-	/** history-system */
-	case historysystem = 'history-system';
+    /** history-system */
+    case historysystem = 'history-system';
 }

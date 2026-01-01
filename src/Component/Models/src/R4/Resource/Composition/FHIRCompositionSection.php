@@ -1,41 +1,51 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
+
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRListModeType;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRNarrative;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
 
 /**
  * @description The root of the sections that make up the composition.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'Composition', elementPath: 'Composition.section', fhirVersion: 'R4')]
+#[FHIRBackboneElement(parentResource: 'Composition', elementPath: 'Composition.section', fhirVersion: 'R4')]
 class FHIRCompositionSection extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRBackboneElement
 {
-	public function __construct(
-		/** @var null|string id Unique id for inter-element referencing */
-		public ?string $id = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension> extension Additional content defined by implementations */
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-		public array $modifierExtension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string title Label for section (e.g. for ToC) */
-		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string|null $title = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept code Classification of section (recommended) */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept $code = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference> author Who and/or what authored the section */
-		public array $author = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference focus Who/what the section is about, when it is not about the subject of composition */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference $focus = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRNarrative text Text summary of the section, for human interpretation */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRNarrative $text = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRListModeType mode working | snapshot | changes */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRListModeType $mode = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept orderedBy Order of section entries */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept $orderedBy = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference> entry A reference to data that supports this section */
-		public array $entry = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept emptyReason Why the section is empty */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept $emptyReason = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRCompositionSection> section Nested Section */
-		public array $section = [],
-	) {
-		parent::__construct($id, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        public ?string $id = null,
+        /** @var array<FHIRExtension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        public array $modifierExtension = [],
+        /** @var FHIRString|string|null title Label for section (e.g. for ToC) */
+        public FHIRString|string|null $title = null,
+        /** @var FHIRCodeableConcept|null code Classification of section (recommended) */
+        public ?FHIRCodeableConcept $code = null,
+        /** @var array<FHIRReference> author Who and/or what authored the section */
+        public array $author = [],
+        /** @var FHIRReference|null focus Who/what the section is about, when it is not about the subject of composition */
+        public ?FHIRReference $focus = null,
+        /** @var FHIRNarrative|null text Text summary of the section, for human interpretation */
+        public ?FHIRNarrative $text = null,
+        /** @var FHIRListModeType|null mode working | snapshot | changes */
+        public ?FHIRListModeType $mode = null,
+        /** @var FHIRCodeableConcept|null orderedBy Order of section entries */
+        public ?FHIRCodeableConcept $orderedBy = null,
+        /** @var array<FHIRReference> entry A reference to data that supports this section */
+        public array $entry = [],
+        /** @var FHIRCodeableConcept|null emptyReason Why the section is empty */
+        public ?FHIRCodeableConcept $emptyReason = null,
+        /** @var array<FHIRCompositionSection> section Nested Section */
+        public array $section = [],
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
 }

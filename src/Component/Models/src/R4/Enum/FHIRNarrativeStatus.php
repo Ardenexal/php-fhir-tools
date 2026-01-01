@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -10,15 +12,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum FHIRNarrativeStatus: string
 {
-	/** Generated */
-	case generated = 'generated';
+    /** Generated */
+    case generated = 'generated';
 
-	/** Extensions */
-	case extensions = 'extensions';
+    /** Extensions */
+    case extensions = 'extensions';
 
-	/** Additional */
-	case additional = 'additional';
+    /** Additional */
+    case additional = 'additional';
 
-	/** Empty */
-	case empty = 'empty';
+    /** Empty */
+    case empty = 'empty';
 }

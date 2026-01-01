@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -10,12 +12,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum FHIRParticipantRequired: string
 {
-	/** Required */
-	case required = 'required';
+    /** Required */
+    case required = 'required';
 
-	/** Optional */
-	case optional = 'optional';
+    /** Optional */
+    case optional = 'optional';
 
-	/** Information Only */
-	case informationonly = 'information-only';
+    /** Information Only */
+    case informationonly = 'information-only';
 }

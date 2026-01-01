@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,21 +12,21 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRAdverseEventOutcome: string
 {
-	/** Resolved */
-	case resolved = 'resolved';
+    /** Resolved */
+    case resolved = 'resolved';
 
-	/** Recovering */
-	case recovering = 'recovering';
+    /** Recovering */
+    case recovering = 'recovering';
 
-	/** Ongoing */
-	case ongoing = 'ongoing';
+    /** Ongoing */
+    case ongoing = 'ongoing';
 
-	/** Resolved with Sequelae */
-	case resolvedwithsequelae = 'resolvedWithSequelae';
+    /** Resolved with Sequelae */
+    case resolvedwithsequelae = 'resolvedWithSequelae';
 
-	/** Fatal */
-	case fatal = 'fatal';
+    /** Fatal */
+    case fatal = 'fatal';
 
-	/** Unknown */
-	case unknown = 'unknown';
+    /** Unknown */
+    case unknown = 'unknown';
 }

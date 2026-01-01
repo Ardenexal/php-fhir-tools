@@ -30,11 +30,11 @@
         "symfony/yaml": "^6.4|^7.4"
     },
     "require-dev": {
+        "giorgiosironi/eris": "^1.0",
         "laravel/pint": "^1.26",
         "phpstan/phpstan": "^2.1.33",
-        "roave/security-advisories": "dev-latest",
         "phpunit/phpunit": "^11.0|^12.5.4",
-        "giorgiosironi/eris": "^1.0",
+        "roave/security-advisories": "dev-latest",
         "symfony/browser-kit": "^6.4|^7.4",
         "symfony/css-selector": "^6.4|^7.4",
         "symfony/dom-crawler": "^6.4|^7.4",
@@ -63,7 +63,8 @@
         "psr-4": {
             "Ardenexal\\FHIRTools\\Tests\\": "tests/",
             "Ardenexal\\FHIRTools\\Component\\FHIRPath\\Tests\\": "src/Component/FHIRPath/tests/",
-            "Ardenexal\\FHIRTools\\R4B\\": "output/Ardenexal/FhirTools/R4B/"
+            "Ardenexal\\FHIRTools\\R4B\\": "output/Ardenexal/FhirTools/R4B/",
+            "App\\Mate\\": "mate/src/"
         }
     },
     "replace": {

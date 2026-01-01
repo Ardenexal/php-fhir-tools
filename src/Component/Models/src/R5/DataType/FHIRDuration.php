@@ -1,31 +1,41 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCode;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDecimal;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
+
 /**
  * @author HL7 FHIR Standard
+ *
  * @see http://hl7.org/fhir/StructureDefinition/Duration
+ *
  * @description A length of time.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType(typeName: 'Duration', fhirVersion: 'R5')]
+#[FHIRComplexType(typeName: 'Duration', fhirVersion: 'R5')]
 class FHIRDuration extends FHIRQuantity
 {
-	public function __construct(
-		/** @var null|string id Unique id for inter-element referencing */
-		public ?string $id = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension> extension Additional content defined by implementations */
-		public array $extension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDecimal value Numerical value (with implicit precision) */
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRDecimal $value = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRQuantityComparatorType comparator < | <= | >= | > | ad - how to understand the value */
-		public ?FHIRQuantityComparatorType $comparator = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString|string unit Unit representation */
-		public \Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString|string|null $unit = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri system System that defines coded unit form */
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri $system = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCode code Coded form of the unit */
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCode $code = null,
-	) {
-		parent::__construct($id, $extension, $value, $comparator, $unit, $system, $code);
-	}
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        public ?string $id = null,
+        /** @var array<FHIRExtension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var FHIRDecimal|null value Numerical value (with implicit precision) */
+        public ?FHIRDecimal $value = null,
+        /** @var FHIRQuantityComparatorType|null comparator < | <= | >= | > | ad - how to understand the value */
+        public ?FHIRQuantityComparatorType $comparator = null,
+        /** @var FHIRString|string|null unit Unit representation */
+        public FHIRString|string|null $unit = null,
+        /** @var FHIRUri|null system System that defines coded unit form */
+        public ?FHIRUri $system = null,
+        /** @var FHIRCode|null code Coded form of the unit */
+        public ?FHIRCode $code = null,
+    ) {
+        parent::__construct($id, $extension, $value, $comparator, $unit, $system, $code);
+    }
 }

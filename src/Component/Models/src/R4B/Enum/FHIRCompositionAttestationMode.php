@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,15 +12,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRCompositionAttestationMode: string
 {
-	/** Personal */
-	case personal = 'personal';
+    /** Personal */
+    case personal = 'personal';
 
-	/** Professional */
-	case professional = 'professional';
+    /** Professional */
+    case professional = 'professional';
 
-	/** Legal */
-	case legal = 'legal';
+    /** Legal */
+    case legal = 'legal';
 
-	/** Official */
-	case official = 'official';
+    /** Official */
+    case official = 'official';
 }

@@ -1,31 +1,40 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
+
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRStructureMapInputModeType;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRId;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * @description A name assigned to an instance of data. The instance must be provided when the mapping is invoked.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'StructureMap', elementPath: 'StructureMap.group.input', fhirVersion: 'R5')]
+#[FHIRBackboneElement(parentResource: 'StructureMap', elementPath: 'StructureMap.group.input', fhirVersion: 'R5')]
 class FHIRStructureMapGroupInput extends \Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRBackboneElement
 {
-	public function __construct(
-		/** @var null|string id Unique id for inter-element referencing */
-		public ?string $id = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension> extension Additional content defined by implementations */
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-		public array $modifierExtension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRId name Name for this instance of data */
-		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRId $name = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString|string type Type for this instance of data */
-		public \Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString|string|null $type = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRStructureMapInputModeType mode source | target */
-		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRStructureMapInputModeType $mode = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString|string documentation Documentation for this instance of data */
-		public \Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString|string|null $documentation = null,
-	) {
-		parent::__construct($id, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        public ?string $id = null,
+        /** @var array<FHIRExtension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        public array $modifierExtension = [],
+        /** @var FHIRId|null name Name for this instance of data */
+        #[NotBlank]
+        public ?FHIRId $name = null,
+        /** @var FHIRString|string|null type Type for this instance of data */
+        public FHIRString|string|null $type = null,
+        /** @var FHIRStructureMapInputModeType|null mode source | target */
+        #[NotBlank]
+        public ?FHIRStructureMapInputModeType $mode = null,
+        /** @var FHIRString|string|null documentation Documentation for this instance of data */
+        public FHIRString|string|null $documentation = null,
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
 }

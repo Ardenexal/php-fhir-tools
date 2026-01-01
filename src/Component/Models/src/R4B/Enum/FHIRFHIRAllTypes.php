@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,642 +12,642 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRFHIRAllTypes: string
 {
-	/** Address */
-	case address = 'Address';
+    /** Address */
+    case address = 'Address';
 
-	/** Age */
-	case age = 'Age';
+    /** Age */
+    case age = 'Age';
 
-	/** Annotation */
-	case annotation = 'Annotation';
+    /** Annotation */
+    case annotation = 'Annotation';
 
-	/** Attachment */
-	case attachment = 'Attachment';
+    /** Attachment */
+    case attachment = 'Attachment';
 
-	/** BackboneElement */
-	case backboneelement = 'BackboneElement';
+    /** BackboneElement */
+    case backboneelement = 'BackboneElement';
 
-	/** CodeableConcept */
-	case codeableconcept = 'CodeableConcept';
+    /** CodeableConcept */
+    case codeableconcept = 'CodeableConcept';
 
-	/** Coding */
-	case coding = 'Coding';
+    /** Coding */
+    case coding = 'Coding';
 
-	/** ContactDetail */
-	case contactdetail = 'ContactDetail';
+    /** ContactDetail */
+    case contactdetail = 'ContactDetail';
 
-	/** ContactPoint */
-	case contactpoint = 'ContactPoint';
+    /** ContactPoint */
+    case contactpoint = 'ContactPoint';
 
-	/** Contributor */
-	case contributor = 'Contributor';
+    /** Contributor */
+    case contributor = 'Contributor';
 
-	/** Count */
-	case count = 'Count';
+    /** Count */
+    case count = 'Count';
 
-	/** DataRequirement */
-	case datarequirement = 'DataRequirement';
+    /** DataRequirement */
+    case datarequirement = 'DataRequirement';
 
-	/** Distance */
-	case distance = 'Distance';
+    /** Distance */
+    case distance = 'Distance';
 
-	/** Dosage */
-	case dosage = 'Dosage';
+    /** Dosage */
+    case dosage = 'Dosage';
 
-	/** Duration */
-	case duration = 'Duration';
+    /** Duration */
+    case duration = 'Duration';
 
-	/** Element */
-	case element = 'Element';
+    /** Element */
+    case element = 'Element';
 
-	/** ElementDefinition */
-	case elementdefinition = 'ElementDefinition';
+    /** ElementDefinition */
+    case elementdefinition = 'ElementDefinition';
 
-	/** Expression */
-	case expression = 'Expression';
+    /** Expression */
+    case expression = 'Expression';
 
-	/** Extension */
-	case extension = 'Extension';
+    /** Extension */
+    case extension = 'Extension';
 
-	/** HumanName */
-	case humanname = 'HumanName';
+    /** HumanName */
+    case humanname = 'HumanName';
 
-	/** Identifier */
-	case identifier = 'Identifier';
+    /** Identifier */
+    case identifier = 'Identifier';
 
-	/** MarketingStatus */
-	case marketingstatus = 'MarketingStatus';
+    /** MarketingStatus */
+    case marketingstatus = 'MarketingStatus';
 
-	/** Meta */
-	case meta = 'Meta';
+    /** Meta */
+    case meta = 'Meta';
 
-	/** Money */
-	case money = 'Money';
+    /** Money */
+    case money = 'Money';
 
-	/** MoneyQuantity */
-	case moneyquantity = 'MoneyQuantity';
+    /** MoneyQuantity */
+    case moneyquantity = 'MoneyQuantity';
 
-	/** Narrative */
-	case narrative = 'Narrative';
+    /** Narrative */
+    case narrative = 'Narrative';
 
-	/** ParameterDefinition */
-	case parameterdefinition = 'ParameterDefinition';
+    /** ParameterDefinition */
+    case parameterdefinition = 'ParameterDefinition';
 
-	/** Period */
-	case period = 'Period';
+    /** Period */
+    case period = 'Period';
 
-	/** Population */
-	case population = 'Population';
+    /** Population */
+    case population = 'Population';
 
-	/** ProdCharacteristic */
-	case prodcharacteristic = 'ProdCharacteristic';
+    /** ProdCharacteristic */
+    case prodcharacteristic = 'ProdCharacteristic';
 
-	/** ProductShelfLife */
-	case productshelflife = 'ProductShelfLife';
+    /** ProductShelfLife */
+    case productshelflife = 'ProductShelfLife';
 
-	/** Quantity */
-	case quantity = 'Quantity';
+    /** Quantity */
+    case quantity = 'Quantity';
 
-	/** Range */
-	case range = 'Range';
+    /** Range */
+    case range = 'Range';
 
-	/** Ratio */
-	case ratio = 'Ratio';
+    /** Ratio */
+    case ratio = 'Ratio';
 
-	/** Reference */
-	case reference = 'Reference';
+    /** Reference */
+    case reference = 'Reference';
 
-	/** RelatedArtifact */
-	case relatedartifact = 'RelatedArtifact';
+    /** RelatedArtifact */
+    case relatedartifact = 'RelatedArtifact';
 
-	/** SampledData */
-	case sampleddata = 'SampledData';
+    /** SampledData */
+    case sampleddata = 'SampledData';
 
-	/** Signature */
-	case signature = 'Signature';
+    /** Signature */
+    case signature = 'Signature';
 
-	/** SimpleQuantity */
-	case simplequantity = 'SimpleQuantity';
+    /** SimpleQuantity */
+    case simplequantity = 'SimpleQuantity';
 
-	/** SubstanceAmount */
-	case substanceamount = 'SubstanceAmount';
+    /** SubstanceAmount */
+    case substanceamount = 'SubstanceAmount';
 
-	/** Timing */
-	case timing = 'Timing';
+    /** Timing */
+    case timing = 'Timing';
 
-	/** TriggerDefinition */
-	case triggerdefinition = 'TriggerDefinition';
+    /** TriggerDefinition */
+    case triggerdefinition = 'TriggerDefinition';
 
-	/** UsageContext */
-	case usagecontext = 'UsageContext';
+    /** UsageContext */
+    case usagecontext = 'UsageContext';
 
-	/** base64Binary */
-	case base64_binary = 'base64Binary';
+    /** base64Binary */
+    case base64_binary = 'base64Binary';
 
-	/** boolean */
-	case boolean = 'boolean';
+    /** boolean */
+    case boolean = 'boolean';
 
-	/** canonical */
-	case canonical = 'canonical';
+    /** canonical */
+    case canonical = 'canonical';
 
-	/** code */
-	case code = 'code';
+    /** code */
+    case code = 'code';
 
-	/** date */
-	case date = 'date';
+    /** date */
+    case date = 'date';
 
-	/** dateTime */
-	case datetime = 'dateTime';
+    /** dateTime */
+    case datetime = 'dateTime';
 
-	/** decimal */
-	case decimal = 'decimal';
+    /** decimal */
+    case decimal = 'decimal';
 
-	/** id */
-	case id = 'id';
+    /** id */
+    case id = 'id';
 
-	/** instant */
-	case instant = 'instant';
+    /** instant */
+    case instant = 'instant';
 
-	/** integer */
-	case integer = 'integer';
+    /** integer */
+    case integer = 'integer';
 
-	/** markdown */
-	case markdown = 'markdown';
+    /** markdown */
+    case markdown = 'markdown';
 
-	/** oid */
-	case oid = 'oid';
+    /** oid */
+    case oid = 'oid';
 
-	/** positiveInt */
-	case positiveint = 'positiveInt';
+    /** positiveInt */
+    case positiveint = 'positiveInt';
 
-	/** string */
-	case string = 'string';
+    /** string */
+    case string = 'string';
 
-	/** time */
-	case time = 'time';
+    /** time */
+    case time = 'time';
 
-	/** unsignedInt */
-	case unsignedint = 'unsignedInt';
+    /** unsignedInt */
+    case unsignedint = 'unsignedInt';
 
-	/** uri */
-	case uri = 'uri';
+    /** uri */
+    case uri = 'uri';
 
-	/** url */
-	case url = 'url';
+    /** url */
+    case url = 'url';
 
-	/** uuid */
-	case uuid = 'uuid';
+    /** uuid */
+    case uuid = 'uuid';
 
-	/** XHTML */
-	case xhtml = 'xhtml';
+    /** XHTML */
+    case xhtml = 'xhtml';
 
-	/** Account */
-	case account = 'Account';
+    /** Account */
+    case account = 'Account';
 
-	/** ActivityDefinition */
-	case activitydefinition = 'ActivityDefinition';
+    /** ActivityDefinition */
+    case activitydefinition = 'ActivityDefinition';
 
-	/** AdverseEvent */
-	case adverseevent = 'AdverseEvent';
+    /** AdverseEvent */
+    case adverseevent = 'AdverseEvent';
 
-	/** AllergyIntolerance */
-	case allergyintolerance = 'AllergyIntolerance';
+    /** AllergyIntolerance */
+    case allergyintolerance = 'AllergyIntolerance';
 
-	/** Appointment */
-	case appointment = 'Appointment';
+    /** Appointment */
+    case appointment = 'Appointment';
 
-	/** AppointmentResponse */
-	case appointmentresponse = 'AppointmentResponse';
+    /** AppointmentResponse */
+    case appointmentresponse = 'AppointmentResponse';
 
-	/** AuditEvent */
-	case auditevent = 'AuditEvent';
+    /** AuditEvent */
+    case auditevent = 'AuditEvent';
 
-	/** Basic */
-	case basic = 'Basic';
+    /** Basic */
+    case basic = 'Basic';
 
-	/** Binary */
-	case binary = 'Binary';
+    /** Binary */
+    case binary = 'Binary';
 
-	/** BiologicallyDerivedProduct */
-	case biologicallyderivedproduct = 'BiologicallyDerivedProduct';
+    /** BiologicallyDerivedProduct */
+    case biologicallyderivedproduct = 'BiologicallyDerivedProduct';
 
-	/** BodyStructure */
-	case bodystructure = 'BodyStructure';
+    /** BodyStructure */
+    case bodystructure = 'BodyStructure';
 
-	/** Bundle */
-	case bundle = 'Bundle';
+    /** Bundle */
+    case bundle = 'Bundle';
 
-	/** CapabilityStatement */
-	case capabilitystatement = 'CapabilityStatement';
+    /** CapabilityStatement */
+    case capabilitystatement = 'CapabilityStatement';
 
-	/** CarePlan */
-	case careplan = 'CarePlan';
+    /** CarePlan */
+    case careplan = 'CarePlan';
 
-	/** CareTeam */
-	case careteam = 'CareTeam';
+    /** CareTeam */
+    case careteam = 'CareTeam';
 
-	/** CatalogEntry */
-	case catalogentry = 'CatalogEntry';
+    /** CatalogEntry */
+    case catalogentry = 'CatalogEntry';
 
-	/** ChargeItem */
-	case chargeitem = 'ChargeItem';
+    /** ChargeItem */
+    case chargeitem = 'ChargeItem';
 
-	/** ChargeItemDefinition */
-	case chargeitemdefinition = 'ChargeItemDefinition';
+    /** ChargeItemDefinition */
+    case chargeitemdefinition = 'ChargeItemDefinition';
 
-	/** Claim */
-	case claim = 'Claim';
+    /** Claim */
+    case claim = 'Claim';
 
-	/** ClaimResponse */
-	case claimresponse = 'ClaimResponse';
+    /** ClaimResponse */
+    case claimresponse = 'ClaimResponse';
 
-	/** ClinicalImpression */
-	case clinicalimpression = 'ClinicalImpression';
+    /** ClinicalImpression */
+    case clinicalimpression = 'ClinicalImpression';
 
-	/** CodeSystem */
-	case codesystem = 'CodeSystem';
+    /** CodeSystem */
+    case codesystem = 'CodeSystem';
 
-	/** Communication */
-	case communication = 'Communication';
+    /** Communication */
+    case communication = 'Communication';
 
-	/** CommunicationRequest */
-	case communicationrequest = 'CommunicationRequest';
+    /** CommunicationRequest */
+    case communicationrequest = 'CommunicationRequest';
 
-	/** CompartmentDefinition */
-	case compartmentdefinition = 'CompartmentDefinition';
+    /** CompartmentDefinition */
+    case compartmentdefinition = 'CompartmentDefinition';
 
-	/** Composition */
-	case composition = 'Composition';
+    /** Composition */
+    case composition = 'Composition';
 
-	/** ConceptMap */
-	case conceptmap = 'ConceptMap';
+    /** ConceptMap */
+    case conceptmap = 'ConceptMap';
 
-	/** Condition */
-	case condition = 'Condition';
+    /** Condition */
+    case condition = 'Condition';
 
-	/** Consent */
-	case consent = 'Consent';
+    /** Consent */
+    case consent = 'Consent';
 
-	/** Contract */
-	case contract = 'Contract';
+    /** Contract */
+    case contract = 'Contract';
 
-	/** Coverage */
-	case coverage = 'Coverage';
+    /** Coverage */
+    case coverage = 'Coverage';
 
-	/** CoverageEligibilityRequest */
-	case coverageeligibilityrequest = 'CoverageEligibilityRequest';
+    /** CoverageEligibilityRequest */
+    case coverageeligibilityrequest = 'CoverageEligibilityRequest';
 
-	/** CoverageEligibilityResponse */
-	case coverageeligibilityresponse = 'CoverageEligibilityResponse';
+    /** CoverageEligibilityResponse */
+    case coverageeligibilityresponse = 'CoverageEligibilityResponse';
 
-	/** DetectedIssue */
-	case detectedissue = 'DetectedIssue';
+    /** DetectedIssue */
+    case detectedissue = 'DetectedIssue';
 
-	/** Device */
-	case device = 'Device';
+    /** Device */
+    case device = 'Device';
 
-	/** DeviceDefinition */
-	case devicedefinition = 'DeviceDefinition';
+    /** DeviceDefinition */
+    case devicedefinition = 'DeviceDefinition';
 
-	/** DeviceMetric */
-	case devicemetric = 'DeviceMetric';
+    /** DeviceMetric */
+    case devicemetric = 'DeviceMetric';
 
-	/** DeviceRequest */
-	case devicerequest = 'DeviceRequest';
+    /** DeviceRequest */
+    case devicerequest = 'DeviceRequest';
 
-	/** DeviceUseStatement */
-	case deviceusestatement = 'DeviceUseStatement';
+    /** DeviceUseStatement */
+    case deviceusestatement = 'DeviceUseStatement';
 
-	/** DiagnosticReport */
-	case diagnosticreport = 'DiagnosticReport';
+    /** DiagnosticReport */
+    case diagnosticreport = 'DiagnosticReport';
 
-	/** DocumentManifest */
-	case documentmanifest = 'DocumentManifest';
+    /** DocumentManifest */
+    case documentmanifest = 'DocumentManifest';
 
-	/** DocumentReference */
-	case documentreference = 'DocumentReference';
+    /** DocumentReference */
+    case documentreference = 'DocumentReference';
 
-	/** DomainResource */
-	case domainresource = 'DomainResource';
+    /** DomainResource */
+    case domainresource = 'DomainResource';
 
-	/** EffectEvidenceSynthesis */
-	case effectevidencesynthesis = 'EffectEvidenceSynthesis';
+    /** EffectEvidenceSynthesis */
+    case effectevidencesynthesis = 'EffectEvidenceSynthesis';
 
-	/** Encounter */
-	case encounter = 'Encounter';
+    /** Encounter */
+    case encounter = 'Encounter';
 
-	/** Endpoint */
-	case endpoint = 'Endpoint';
+    /** Endpoint */
+    case endpoint = 'Endpoint';
 
-	/** EnrollmentRequest */
-	case enrollmentrequest = 'EnrollmentRequest';
+    /** EnrollmentRequest */
+    case enrollmentrequest = 'EnrollmentRequest';
 
-	/** EnrollmentResponse */
-	case enrollmentresponse = 'EnrollmentResponse';
+    /** EnrollmentResponse */
+    case enrollmentresponse = 'EnrollmentResponse';
 
-	/** EpisodeOfCare */
-	case episodeofcare = 'EpisodeOfCare';
+    /** EpisodeOfCare */
+    case episodeofcare = 'EpisodeOfCare';
 
-	/** EventDefinition */
-	case eventdefinition = 'EventDefinition';
+    /** EventDefinition */
+    case eventdefinition = 'EventDefinition';
 
-	/** Evidence */
-	case evidence = 'Evidence';
+    /** Evidence */
+    case evidence = 'Evidence';
 
-	/** EvidenceVariable */
-	case evidencevariable = 'EvidenceVariable';
+    /** EvidenceVariable */
+    case evidencevariable = 'EvidenceVariable';
 
-	/** ExampleScenario */
-	case examplescenario = 'ExampleScenario';
+    /** ExampleScenario */
+    case examplescenario = 'ExampleScenario';
 
-	/** ExplanationOfBenefit */
-	case explanationofbenefit = 'ExplanationOfBenefit';
+    /** ExplanationOfBenefit */
+    case explanationofbenefit = 'ExplanationOfBenefit';
 
-	/** FamilyMemberHistory */
-	case familymemberhistory = 'FamilyMemberHistory';
+    /** FamilyMemberHistory */
+    case familymemberhistory = 'FamilyMemberHistory';
 
-	/** Flag */
-	case flag = 'Flag';
+    /** Flag */
+    case flag = 'Flag';
 
-	/** Goal */
-	case goal = 'Goal';
+    /** Goal */
+    case goal = 'Goal';
 
-	/** GraphDefinition */
-	case graphdefinition = 'GraphDefinition';
+    /** GraphDefinition */
+    case graphdefinition = 'GraphDefinition';
 
-	/** Group */
-	case group = 'Group';
+    /** Group */
+    case group = 'Group';
 
-	/** GuidanceResponse */
-	case guidanceresponse = 'GuidanceResponse';
+    /** GuidanceResponse */
+    case guidanceresponse = 'GuidanceResponse';
 
-	/** HealthcareService */
-	case healthcareservice = 'HealthcareService';
+    /** HealthcareService */
+    case healthcareservice = 'HealthcareService';
 
-	/** ImagingStudy */
-	case imagingstudy = 'ImagingStudy';
+    /** ImagingStudy */
+    case imagingstudy = 'ImagingStudy';
 
-	/** Immunization */
-	case immunization = 'Immunization';
+    /** Immunization */
+    case immunization = 'Immunization';
 
-	/** ImmunizationEvaluation */
-	case immunizationevaluation = 'ImmunizationEvaluation';
+    /** ImmunizationEvaluation */
+    case immunizationevaluation = 'ImmunizationEvaluation';
 
-	/** ImmunizationRecommendation */
-	case immunizationrecommendation = 'ImmunizationRecommendation';
+    /** ImmunizationRecommendation */
+    case immunizationrecommendation = 'ImmunizationRecommendation';
 
-	/** ImplementationGuide */
-	case implementationguide = 'ImplementationGuide';
+    /** ImplementationGuide */
+    case implementationguide = 'ImplementationGuide';
 
-	/** InsurancePlan */
-	case insuranceplan = 'InsurancePlan';
+    /** InsurancePlan */
+    case insuranceplan = 'InsurancePlan';
 
-	/** Invoice */
-	case invoice = 'Invoice';
+    /** Invoice */
+    case invoice = 'Invoice';
 
-	/** Library */
-	case library = 'Library';
+    /** Library */
+    case library = 'Library';
 
-	/** Linkage */
-	case linkage = 'Linkage';
+    /** Linkage */
+    case linkage = 'Linkage';
 
-	/** List */
-	case list = 'List';
+    /** List */
+    case list = 'List';
 
-	/** Location */
-	case location = 'Location';
+    /** Location */
+    case location = 'Location';
 
-	/** Measure */
-	case measure = 'Measure';
+    /** Measure */
+    case measure = 'Measure';
 
-	/** MeasureReport */
-	case measurereport = 'MeasureReport';
+    /** MeasureReport */
+    case measurereport = 'MeasureReport';
 
-	/** Media */
-	case media = 'Media';
+    /** Media */
+    case media = 'Media';
 
-	/** Medication */
-	case medication = 'Medication';
+    /** Medication */
+    case medication = 'Medication';
 
-	/** MedicationAdministration */
-	case medicationadministration = 'MedicationAdministration';
+    /** MedicationAdministration */
+    case medicationadministration = 'MedicationAdministration';
 
-	/** MedicationDispense */
-	case medicationdispense = 'MedicationDispense';
+    /** MedicationDispense */
+    case medicationdispense = 'MedicationDispense';
 
-	/** MedicationKnowledge */
-	case medicationknowledge = 'MedicationKnowledge';
+    /** MedicationKnowledge */
+    case medicationknowledge = 'MedicationKnowledge';
 
-	/** MedicationRequest */
-	case medicationrequest = 'MedicationRequest';
+    /** MedicationRequest */
+    case medicationrequest = 'MedicationRequest';
 
-	/** MedicationStatement */
-	case medicationstatement = 'MedicationStatement';
+    /** MedicationStatement */
+    case medicationstatement = 'MedicationStatement';
 
-	/** MedicinalProduct */
-	case medicinalproduct = 'MedicinalProduct';
+    /** MedicinalProduct */
+    case medicinalproduct = 'MedicinalProduct';
 
-	/** MedicinalProductAuthorization */
-	case medicinalproductauthorization = 'MedicinalProductAuthorization';
+    /** MedicinalProductAuthorization */
+    case medicinalproductauthorization = 'MedicinalProductAuthorization';
 
-	/** MedicinalProductContraindication */
-	case medicinalproductcontraindication = 'MedicinalProductContraindication';
+    /** MedicinalProductContraindication */
+    case medicinalproductcontraindication = 'MedicinalProductContraindication';
 
-	/** MedicinalProductIndication */
-	case medicinalproductindication = 'MedicinalProductIndication';
+    /** MedicinalProductIndication */
+    case medicinalproductindication = 'MedicinalProductIndication';
 
-	/** MedicinalProductIngredient */
-	case medicinalproductingredient = 'MedicinalProductIngredient';
+    /** MedicinalProductIngredient */
+    case medicinalproductingredient = 'MedicinalProductIngredient';
 
-	/** MedicinalProductInteraction */
-	case medicinalproductinteraction = 'MedicinalProductInteraction';
+    /** MedicinalProductInteraction */
+    case medicinalproductinteraction = 'MedicinalProductInteraction';
 
-	/** MedicinalProductManufactured */
-	case medicinalproductmanufactured = 'MedicinalProductManufactured';
+    /** MedicinalProductManufactured */
+    case medicinalproductmanufactured = 'MedicinalProductManufactured';
 
-	/** MedicinalProductPackaged */
-	case medicinalproductpackaged = 'MedicinalProductPackaged';
+    /** MedicinalProductPackaged */
+    case medicinalproductpackaged = 'MedicinalProductPackaged';
 
-	/** MedicinalProductPharmaceutical */
-	case medicinalproductpharmaceutical = 'MedicinalProductPharmaceutical';
+    /** MedicinalProductPharmaceutical */
+    case medicinalproductpharmaceutical = 'MedicinalProductPharmaceutical';
 
-	/** MedicinalProductUndesirableEffect */
-	case medicinalproductundesirableeffect = 'MedicinalProductUndesirableEffect';
+    /** MedicinalProductUndesirableEffect */
+    case medicinalproductundesirableeffect = 'MedicinalProductUndesirableEffect';
 
-	/** MessageDefinition */
-	case messagedefinition = 'MessageDefinition';
+    /** MessageDefinition */
+    case messagedefinition = 'MessageDefinition';
 
-	/** MessageHeader */
-	case messageheader = 'MessageHeader';
+    /** MessageHeader */
+    case messageheader = 'MessageHeader';
 
-	/** MolecularSequence */
-	case molecularsequence = 'MolecularSequence';
+    /** MolecularSequence */
+    case molecularsequence = 'MolecularSequence';
 
-	/** NamingSystem */
-	case namingsystem = 'NamingSystem';
+    /** NamingSystem */
+    case namingsystem = 'NamingSystem';
 
-	/** NutritionOrder */
-	case nutritionorder = 'NutritionOrder';
+    /** NutritionOrder */
+    case nutritionorder = 'NutritionOrder';
 
-	/** Observation */
-	case observation = 'Observation';
+    /** Observation */
+    case observation = 'Observation';
 
-	/** ObservationDefinition */
-	case observationdefinition = 'ObservationDefinition';
+    /** ObservationDefinition */
+    case observationdefinition = 'ObservationDefinition';
 
-	/** OperationDefinition */
-	case operationdefinition = 'OperationDefinition';
+    /** OperationDefinition */
+    case operationdefinition = 'OperationDefinition';
 
-	/** OperationOutcome */
-	case operationoutcome = 'OperationOutcome';
+    /** OperationOutcome */
+    case operationoutcome = 'OperationOutcome';
 
-	/** Organization */
-	case organization = 'Organization';
+    /** Organization */
+    case organization = 'Organization';
 
-	/** OrganizationAffiliation */
-	case organizationaffiliation = 'OrganizationAffiliation';
+    /** OrganizationAffiliation */
+    case organizationaffiliation = 'OrganizationAffiliation';
 
-	/** Parameters */
-	case parameters = 'Parameters';
+    /** Parameters */
+    case parameters = 'Parameters';
 
-	/** Patient */
-	case patient = 'Patient';
+    /** Patient */
+    case patient = 'Patient';
 
-	/** PaymentNotice */
-	case paymentnotice = 'PaymentNotice';
+    /** PaymentNotice */
+    case paymentnotice = 'PaymentNotice';
 
-	/** PaymentReconciliation */
-	case paymentreconciliation = 'PaymentReconciliation';
+    /** PaymentReconciliation */
+    case paymentreconciliation = 'PaymentReconciliation';
 
-	/** Person */
-	case person = 'Person';
+    /** Person */
+    case person = 'Person';
 
-	/** PlanDefinition */
-	case plandefinition = 'PlanDefinition';
+    /** PlanDefinition */
+    case plandefinition = 'PlanDefinition';
 
-	/** Practitioner */
-	case practitioner = 'Practitioner';
+    /** Practitioner */
+    case practitioner = 'Practitioner';
 
-	/** PractitionerRole */
-	case practitionerrole = 'PractitionerRole';
+    /** PractitionerRole */
+    case practitionerrole = 'PractitionerRole';
 
-	/** Procedure */
-	case procedure = 'Procedure';
+    /** Procedure */
+    case procedure = 'Procedure';
 
-	/** Provenance */
-	case provenance = 'Provenance';
+    /** Provenance */
+    case provenance = 'Provenance';
 
-	/** Questionnaire */
-	case questionnaire = 'Questionnaire';
+    /** Questionnaire */
+    case questionnaire = 'Questionnaire';
 
-	/** QuestionnaireResponse */
-	case questionnaireresponse = 'QuestionnaireResponse';
+    /** QuestionnaireResponse */
+    case questionnaireresponse = 'QuestionnaireResponse';
 
-	/** RelatedPerson */
-	case relatedperson = 'RelatedPerson';
+    /** RelatedPerson */
+    case relatedperson = 'RelatedPerson';
 
-	/** RequestGroup */
-	case requestgroup = 'RequestGroup';
+    /** RequestGroup */
+    case requestgroup = 'RequestGroup';
 
-	/** ResearchDefinition */
-	case researchdefinition = 'ResearchDefinition';
+    /** ResearchDefinition */
+    case researchdefinition = 'ResearchDefinition';
 
-	/** ResearchElementDefinition */
-	case researchelementdefinition = 'ResearchElementDefinition';
+    /** ResearchElementDefinition */
+    case researchelementdefinition = 'ResearchElementDefinition';
 
-	/** ResearchStudy */
-	case researchstudy = 'ResearchStudy';
+    /** ResearchStudy */
+    case researchstudy = 'ResearchStudy';
 
-	/** ResearchSubject */
-	case researchsubject = 'ResearchSubject';
+    /** ResearchSubject */
+    case researchsubject = 'ResearchSubject';
 
-	/** Resource */
-	case resource = 'Resource';
+    /** Resource */
+    case resource = 'Resource';
 
-	/** RiskAssessment */
-	case riskassessment = 'RiskAssessment';
+    /** RiskAssessment */
+    case riskassessment = 'RiskAssessment';
 
-	/** RiskEvidenceSynthesis */
-	case riskevidencesynthesis = 'RiskEvidenceSynthesis';
+    /** RiskEvidenceSynthesis */
+    case riskevidencesynthesis = 'RiskEvidenceSynthesis';
 
-	/** Schedule */
-	case schedule = 'Schedule';
+    /** Schedule */
+    case schedule = 'Schedule';
 
-	/** SearchParameter */
-	case searchparameter = 'SearchParameter';
+    /** SearchParameter */
+    case searchparameter = 'SearchParameter';
 
-	/** ServiceRequest */
-	case servicerequest = 'ServiceRequest';
+    /** ServiceRequest */
+    case servicerequest = 'ServiceRequest';
 
-	/** Slot */
-	case slot = 'Slot';
+    /** Slot */
+    case slot = 'Slot';
 
-	/** Specimen */
-	case specimen = 'Specimen';
+    /** Specimen */
+    case specimen = 'Specimen';
 
-	/** SpecimenDefinition */
-	case specimendefinition = 'SpecimenDefinition';
+    /** SpecimenDefinition */
+    case specimendefinition = 'SpecimenDefinition';
 
-	/** StructureDefinition */
-	case structuredefinition = 'StructureDefinition';
+    /** StructureDefinition */
+    case structuredefinition = 'StructureDefinition';
 
-	/** StructureMap */
-	case structuremap = 'StructureMap';
+    /** StructureMap */
+    case structuremap = 'StructureMap';
 
-	/** Subscription */
-	case subscription = 'Subscription';
+    /** Subscription */
+    case subscription = 'Subscription';
 
-	/** Substance */
-	case substance = 'Substance';
+    /** Substance */
+    case substance = 'Substance';
 
-	/** SubstanceNucleicAcid */
-	case substancenucleicacid = 'SubstanceNucleicAcid';
+    /** SubstanceNucleicAcid */
+    case substancenucleicacid = 'SubstanceNucleicAcid';
 
-	/** SubstancePolymer */
-	case substancepolymer = 'SubstancePolymer';
+    /** SubstancePolymer */
+    case substancepolymer = 'SubstancePolymer';
 
-	/** SubstanceProtein */
-	case substanceprotein = 'SubstanceProtein';
+    /** SubstanceProtein */
+    case substanceprotein = 'SubstanceProtein';
 
-	/** SubstanceReferenceInformation */
-	case substancereferenceinformation = 'SubstanceReferenceInformation';
+    /** SubstanceReferenceInformation */
+    case substancereferenceinformation = 'SubstanceReferenceInformation';
 
-	/** SubstanceSourceMaterial */
-	case substancesourcematerial = 'SubstanceSourceMaterial';
+    /** SubstanceSourceMaterial */
+    case substancesourcematerial = 'SubstanceSourceMaterial';
 
-	/** SubstanceSpecification */
-	case substancespecification = 'SubstanceSpecification';
+    /** SubstanceSpecification */
+    case substancespecification = 'SubstanceSpecification';
 
-	/** SupplyDelivery */
-	case supplydelivery = 'SupplyDelivery';
+    /** SupplyDelivery */
+    case supplydelivery = 'SupplyDelivery';
 
-	/** SupplyRequest */
-	case supplyrequest = 'SupplyRequest';
+    /** SupplyRequest */
+    case supplyrequest = 'SupplyRequest';
 
-	/** Task */
-	case task = 'Task';
+    /** Task */
+    case task = 'Task';
 
-	/** TerminologyCapabilities */
-	case terminologycapabilities = 'TerminologyCapabilities';
+    /** TerminologyCapabilities */
+    case terminologycapabilities = 'TerminologyCapabilities';
 
-	/** TestReport */
-	case testreport = 'TestReport';
+    /** TestReport */
+    case testreport = 'TestReport';
 
-	/** TestScript */
-	case testscript = 'TestScript';
+    /** TestScript */
+    case testscript = 'TestScript';
 
-	/** ValueSet */
-	case valueset = 'ValueSet';
+    /** ValueSet */
+    case valueset = 'ValueSet';
 
-	/** VerificationResult */
-	case verificationresult = 'VerificationResult';
+    /** VerificationResult */
+    case verificationresult = 'VerificationResult';
 
-	/** VisionPrescription */
-	case visionprescription = 'VisionPrescription';
+    /** VisionPrescription */
+    case visionprescription = 'VisionPrescription';
 
-	/** Type */
-	case type = 'Type';
+    /** Type */
+    case type = 'Type';
 
-	/** Any */
-	case any = 'Any';
+    /** Any */
+    case any = 'Any';
 }

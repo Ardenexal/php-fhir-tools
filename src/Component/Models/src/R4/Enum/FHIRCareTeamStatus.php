@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -10,18 +12,18 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum FHIRCareTeamStatus: string
 {
-	/** Proposed */
-	case proposed = 'proposed';
+    /** Proposed */
+    case proposed = 'proposed';
 
-	/** Active */
-	case active = 'active';
+    /** Active */
+    case active = 'active';
 
-	/** Suspended */
-	case suspended = 'suspended';
+    /** Suspended */
+    case suspended = 'suspended';
 
-	/** Inactive */
-	case inactive = 'inactive';
+    /** Inactive */
+    case inactive = 'inactive';
 
-	/** Entered in Error */
-	case enteredinerror = 'entered-in-error';
+    /** Entered in Error */
+    case enteredinerror = 'entered-in-error';
 }

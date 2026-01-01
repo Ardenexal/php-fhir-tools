@@ -1,52 +1,64 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRMeta;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRNarrative;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUri;
+
 /**
  * @author Health Level Seven International (Biomedical Research and Regulation)
+ *
  * @see http://hl7.org/fhir/StructureDefinition/MedicinalProductContraindication
+ *
  * @description The clinical particulars - indications, contraindications etc. of a medicinal product, including for regulatory purposes.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(
-	type: 'MedicinalProductContraindication',
-	version: '4.0.1',
-	url: 'http://hl7.org/fhir/StructureDefinition/MedicinalProductContraindication',
-	fhirVersion: 'R4',
+#[FhirResource(
+    type: 'MedicinalProductContraindication',
+    version: '4.0.1',
+    url: 'http://hl7.org/fhir/StructureDefinition/MedicinalProductContraindication',
+    fhirVersion: 'R4',
 )]
 class FHIRMedicinalProductContraindication extends FHIRDomainResource
 {
-	public function __construct(
-		/** @var null|string id Logical id of this artifact */
-		public ?string $id = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRMeta meta Metadata about the resource */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRMeta $meta = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUri implicitRules A set of rules under which this content was created */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUri $implicitRules = null,
-		/** @var null|string language Language of the resource content */
-		public ?string $language = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRNarrative text Text summary of the resource, for human interpretation */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRNarrative $text = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRResource> contained Contained, inline Resources */
-		public array $contained = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension> extension Additional content defined by implementations */
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored */
-		public array $modifierExtension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference> subject The medication for which this is an indication */
-		public array $subject = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept disease The disease, symptom or procedure for the contraindication */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept $disease = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept diseaseStatus The status of the disease or symptom for the contraindication */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept $diseaseStatus = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept> comorbidity A comorbidity (concurrent condition) or coinfection */
-		public array $comorbidity = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference> therapeuticIndication Information about the use of the medicinal product in relation to other therapies as part of the indication */
-		public array $therapeuticIndication = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRMedicinalProductContraindicationOtherTherapy> otherTherapy Information about the use of the medicinal product in relation to other therapies described as part of the indication */
-		public array $otherTherapy = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRPopulation> population The population group to which this applies */
-		public array $population = [],
-	) {
-		parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Logical id of this artifact */
+        public ?string $id = null,
+        /** @var FHIRMeta|null meta Metadata about the resource */
+        public ?FHIRMeta $meta = null,
+        /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
+        public ?FHIRUri $implicitRules = null,
+        /** @var string|null language Language of the resource content */
+        public ?string $language = null,
+        /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
+        public ?FHIRNarrative $text = null,
+        /** @var array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRResource> contained Contained, inline Resources */
+        public array $contained = [],
+        /** @var array<FHIRExtension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored */
+        public array $modifierExtension = [],
+        /** @var array<FHIRReference> subject The medication for which this is an indication */
+        public array $subject = [],
+        /** @var FHIRCodeableConcept|null disease The disease, symptom or procedure for the contraindication */
+        public ?FHIRCodeableConcept $disease = null,
+        /** @var FHIRCodeableConcept|null diseaseStatus The status of the disease or symptom for the contraindication */
+        public ?FHIRCodeableConcept $diseaseStatus = null,
+        /** @var array<FHIRCodeableConcept> comorbidity A comorbidity (concurrent condition) or coinfection */
+        public array $comorbidity = [],
+        /** @var array<FHIRReference> therapeuticIndication Information about the use of the medicinal product in relation to other therapies as part of the indication */
+        public array $therapeuticIndication = [],
+        /** @var array<FHIRMedicinalProductContraindicationOtherTherapy> otherTherapy Information about the use of the medicinal product in relation to other therapies described as part of the indication */
+        public array $otherTherapy = [],
+        /** @var array<FHIRPopulation> population The population group to which this applies */
+        public array $population = [],
+    ) {
+        parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
+    }
 }

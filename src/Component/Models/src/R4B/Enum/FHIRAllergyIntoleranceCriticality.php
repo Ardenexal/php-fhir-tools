@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,12 +12,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRAllergyIntoleranceCriticality: string
 {
-	/** Low Risk */
-	case lowrisk = 'low';
+    /** Low Risk */
+    case lowrisk = 'low';
 
-	/** High Risk */
-	case highrisk = 'high';
+    /** High Risk */
+    case highrisk = 'high';
 
-	/** Unable to Assess Risk */
-	case unabletoassessrisk = 'unable-to-assess';
+    /** Unable to Assess Risk */
+    case unabletoassessrisk = 'unable-to-assess';
 }

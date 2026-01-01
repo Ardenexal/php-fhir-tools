@@ -1,44 +1,56 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
+
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCoding;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBoolean;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUri;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * @description An actor taking an active role in the event or activity that is logged.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'AuditEvent', elementPath: 'AuditEvent.agent', fhirVersion: 'R4')]
+#[FHIRBackboneElement(parentResource: 'AuditEvent', elementPath: 'AuditEvent.agent', fhirVersion: 'R4')]
 class FHIRAuditEventAgent extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRBackboneElement
 {
-	public function __construct(
-		/** @var null|string id Unique id for inter-element referencing */
-		public ?string $id = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension> extension Additional content defined by implementations */
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-		public array $modifierExtension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept type How agent participated */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept $type = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept> role Agent role in the event */
-		public array $role = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference who Identifier of who */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference $who = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string altId Alternative User identity */
-		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string|null $altId = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string name Human friendly name for the agent */
-		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string|null $name = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBoolean requestor Whether user is initiator */
-		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRBoolean $requestor = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference location Where */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference $location = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUri> policy Policy that authorized event */
-		public array $policy = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCoding media Type of media */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCoding $media = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRAuditEventAgentNetwork network Logical network location for application activity */
-		public ?FHIRAuditEventAgentNetwork $network = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRCodeableConcept> purposeOfUse Reason given for this user */
-		public array $purposeOfUse = [],
-	) {
-		parent::__construct($id, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        public ?string $id = null,
+        /** @var array<FHIRExtension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        public array $modifierExtension = [],
+        /** @var FHIRCodeableConcept|null type How agent participated */
+        public ?FHIRCodeableConcept $type = null,
+        /** @var array<FHIRCodeableConcept> role Agent role in the event */
+        public array $role = [],
+        /** @var FHIRReference|null who Identifier of who */
+        public ?FHIRReference $who = null,
+        /** @var FHIRString|string|null altId Alternative User identity */
+        public FHIRString|string|null $altId = null,
+        /** @var FHIRString|string|null name Human friendly name for the agent */
+        public FHIRString|string|null $name = null,
+        /** @var FHIRBoolean|null requestor Whether user is initiator */
+        #[NotBlank]
+        public ?FHIRBoolean $requestor = null,
+        /** @var FHIRReference|null location Where */
+        public ?FHIRReference $location = null,
+        /** @var array<FHIRUri> policy Policy that authorized event */
+        public array $policy = [],
+        /** @var FHIRCoding|null media Type of media */
+        public ?FHIRCoding $media = null,
+        /** @var FHIRAuditEventAgentNetwork|null network Logical network location for application activity */
+        public ?FHIRAuditEventAgentNetwork $network = null,
+        /** @var array<FHIRCodeableConcept> purposeOfUse Reason given for this user */
+        public array $purposeOfUse = [],
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,12 +12,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRTestReportResult: string
 {
-	/** Pass */
-	case pass = 'pass';
+    /** Pass */
+    case pass = 'pass';
 
-	/** Fail */
-	case fail = 'fail';
+    /** Fail */
+    case fail = 'fail';
 
-	/** Pending */
-	case pending = 'pending';
+    /** Pending */
+    case pending = 'pending';
 }

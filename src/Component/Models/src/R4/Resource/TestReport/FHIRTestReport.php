@@ -1,60 +1,78 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRIdentifier;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRMeta;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRNarrative;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRTestReportResultType;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRTestReportStatusType;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDecimal;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUri;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
 /**
  * @author Health Level Seven International (FHIR Infrastructure)
+ *
  * @see http://hl7.org/fhir/StructureDefinition/TestReport
+ *
  * @description A summary of information based on the results of executing a TestScript.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(type: 'TestReport', version: '4.0.1', url: 'http://hl7.org/fhir/StructureDefinition/TestReport', fhirVersion: 'R4')]
+#[FhirResource(type: 'TestReport', version: '4.0.1', url: 'http://hl7.org/fhir/StructureDefinition/TestReport', fhirVersion: 'R4')]
 class FHIRTestReport extends FHIRDomainResource
 {
-	public function __construct(
-		/** @var null|string id Logical id of this artifact */
-		public ?string $id = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRMeta meta Metadata about the resource */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRMeta $meta = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUri implicitRules A set of rules under which this content was created */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRUri $implicitRules = null,
-		/** @var null|string language Language of the resource content */
-		public ?string $language = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRNarrative text Text summary of the resource, for human interpretation */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRNarrative $text = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRResource> contained Contained, inline Resources */
-		public array $contained = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension> extension Additional content defined by implementations */
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored */
-		public array $modifierExtension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRIdentifier identifier External identifier */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRIdentifier $identifier = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string name Informal name of the executed TestScript */
-		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string|null $name = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRTestReportStatusType status completed | in-progress | waiting | stopped | entered-in-error */
-		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRTestReportStatusType $status = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference testScript Reference to the  version-specific TestScript that was executed to produce this TestReport */
-		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRReference $testScript = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRTestReportResultType result pass | fail | pending */
-		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRTestReportResultType $result = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDecimal score The final score (percentage of tests passed) resulting from the execution of the TestScript */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDecimal $score = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string tester Name of the tester producing this report (Organization or individual) */
-		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString|string|null $tester = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime issued When the TestScript was executed and this TestReport was generated */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRDateTime $issued = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRTestReportParticipant> participant A participant in the test execution, either the execution engine, a client, or a server */
-		public array $participant = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRTestReportSetup setup The results of the series of required setup operations before the tests were executed */
-		public ?FHIRTestReportSetup $setup = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRTestReportTest> test A test executed from the test script */
-		public array $test = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRTestReportTeardown teardown The results of running the series of required clean up steps */
-		public ?FHIRTestReportTeardown $teardown = null,
-	) {
-		parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Logical id of this artifact */
+        public ?string $id = null,
+        /** @var FHIRMeta|null meta Metadata about the resource */
+        public ?FHIRMeta $meta = null,
+        /** @var FHIRUri|null implicitRules A set of rules under which this content was created */
+        public ?FHIRUri $implicitRules = null,
+        /** @var string|null language Language of the resource content */
+        public ?string $language = null,
+        /** @var FHIRNarrative|null text Text summary of the resource, for human interpretation */
+        public ?FHIRNarrative $text = null,
+        /** @var array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRResource> contained Contained, inline Resources */
+        public array $contained = [],
+        /** @var array<FHIRExtension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored */
+        public array $modifierExtension = [],
+        /** @var FHIRIdentifier|null identifier External identifier */
+        public ?FHIRIdentifier $identifier = null,
+        /** @var FHIRString|string|null name Informal name of the executed TestScript */
+        public FHIRString|string|null $name = null,
+        /** @var FHIRTestReportStatusType|null status completed | in-progress | waiting | stopped | entered-in-error */
+        #[NotBlank]
+        public ?FHIRTestReportStatusType $status = null,
+        /** @var FHIRReference|null testScript Reference to the  version-specific TestScript that was executed to produce this TestReport */
+        #[NotBlank]
+        public ?FHIRReference $testScript = null,
+        /** @var FHIRTestReportResultType|null result pass | fail | pending */
+        #[NotBlank]
+        public ?FHIRTestReportResultType $result = null,
+        /** @var FHIRDecimal|null score The final score (percentage of tests passed) resulting from the execution of the TestScript */
+        public ?FHIRDecimal $score = null,
+        /** @var FHIRString|string|null tester Name of the tester producing this report (Organization or individual) */
+        public FHIRString|string|null $tester = null,
+        /** @var FHIRDateTime|null issued When the TestScript was executed and this TestReport was generated */
+        public ?FHIRDateTime $issued = null,
+        /** @var array<FHIRTestReportParticipant> participant A participant in the test execution, either the execution engine, a client, or a server */
+        public array $participant = [],
+        /** @var FHIRTestReportSetup|null setup The results of the series of required setup operations before the tests were executed */
+        public ?FHIRTestReportSetup $setup = null,
+        /** @var array<FHIRTestReportTest> test A test executed from the test script */
+        public array $test = [],
+        /** @var FHIRTestReportTeardown|null teardown The results of running the series of required clean up steps */
+        public ?FHIRTestReportTeardown $teardown = null,
+    ) {
+        parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
+    }
 }

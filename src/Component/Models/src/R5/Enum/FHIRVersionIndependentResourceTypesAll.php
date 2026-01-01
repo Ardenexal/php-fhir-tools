@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,126 +12,126 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRVersionIndependentResourceTypesAll: string
 {
-	/** BodySite */
-	case bodysite = 'BodySite';
+    /** BodySite */
+    case bodysite = 'BodySite';
 
-	/** CatalogEntry */
-	case catalogentry = 'CatalogEntry';
+    /** CatalogEntry */
+    case catalogentry = 'CatalogEntry';
 
-	/** Conformance */
-	case conformance = 'Conformance';
+    /** Conformance */
+    case conformance = 'Conformance';
 
-	/** DataElement */
-	case dataelement = 'DataElement';
+    /** DataElement */
+    case dataelement = 'DataElement';
 
-	/** DeviceComponent */
-	case devicecomponent = 'DeviceComponent';
+    /** DeviceComponent */
+    case devicecomponent = 'DeviceComponent';
 
-	/** DeviceUseRequest */
-	case deviceuserequest = 'DeviceUseRequest';
+    /** DeviceUseRequest */
+    case deviceuserequest = 'DeviceUseRequest';
 
-	/** DeviceUseStatement */
-	case deviceusestatement = 'DeviceUseStatement';
+    /** DeviceUseStatement */
+    case deviceusestatement = 'DeviceUseStatement';
 
-	/** DiagnosticOrder */
-	case diagnosticorder = 'DiagnosticOrder';
+    /** DiagnosticOrder */
+    case diagnosticorder = 'DiagnosticOrder';
 
-	/** DocumentManifest */
-	case documentmanifest = 'DocumentManifest';
+    /** DocumentManifest */
+    case documentmanifest = 'DocumentManifest';
 
-	/** EffectEvidenceSynthesis */
-	case effectevidencesynthesis = 'EffectEvidenceSynthesis';
+    /** EffectEvidenceSynthesis */
+    case effectevidencesynthesis = 'EffectEvidenceSynthesis';
 
-	/** EligibilityRequest */
-	case eligibilityrequest = 'EligibilityRequest';
+    /** EligibilityRequest */
+    case eligibilityrequest = 'EligibilityRequest';
 
-	/** EligibilityResponse */
-	case eligibilityresponse = 'EligibilityResponse';
+    /** EligibilityResponse */
+    case eligibilityresponse = 'EligibilityResponse';
 
-	/** ExpansionProfile */
-	case expansionprofile = 'ExpansionProfile';
+    /** ExpansionProfile */
+    case expansionprofile = 'ExpansionProfile';
 
-	/** ImagingManifest */
-	case imagingmanifest = 'ImagingManifest';
+    /** ImagingManifest */
+    case imagingmanifest = 'ImagingManifest';
 
-	/** ImagingObjectSelection */
-	case imagingobjectselection = 'ImagingObjectSelection';
+    /** ImagingObjectSelection */
+    case imagingobjectselection = 'ImagingObjectSelection';
 
-	/** Media */
-	case media = 'Media';
+    /** Media */
+    case media = 'Media';
 
-	/** MedicationOrder */
-	case medicationorder = 'MedicationOrder';
+    /** MedicationOrder */
+    case medicationorder = 'MedicationOrder';
 
-	/** MedicationUsage */
-	case medicationusage = 'MedicationUsage';
+    /** MedicationUsage */
+    case medicationusage = 'MedicationUsage';
 
-	/** MedicinalProduct */
-	case medicinalproduct = 'MedicinalProduct';
+    /** MedicinalProduct */
+    case medicinalproduct = 'MedicinalProduct';
 
-	/** MedicinalProductAuthorization */
-	case medicinalproductauthorization = 'MedicinalProductAuthorization';
+    /** MedicinalProductAuthorization */
+    case medicinalproductauthorization = 'MedicinalProductAuthorization';
 
-	/** MedicinalProductContraindication */
-	case medicinalproductcontraindication = 'MedicinalProductContraindication';
+    /** MedicinalProductContraindication */
+    case medicinalproductcontraindication = 'MedicinalProductContraindication';
 
-	/** MedicinalProductIndication */
-	case medicinalproductindication = 'MedicinalProductIndication';
+    /** MedicinalProductIndication */
+    case medicinalproductindication = 'MedicinalProductIndication';
 
-	/** MedicinalProductIngredient */
-	case medicinalproductingredient = 'MedicinalProductIngredient';
+    /** MedicinalProductIngredient */
+    case medicinalproductingredient = 'MedicinalProductIngredient';
 
-	/** MedicinalProductInteraction */
-	case medicinalproductinteraction = 'MedicinalProductInteraction';
+    /** MedicinalProductInteraction */
+    case medicinalproductinteraction = 'MedicinalProductInteraction';
 
-	/** MedicinalProductManufactured */
-	case medicinalproductmanufactured = 'MedicinalProductManufactured';
+    /** MedicinalProductManufactured */
+    case medicinalproductmanufactured = 'MedicinalProductManufactured';
 
-	/** MedicinalProductPackaged */
-	case medicinalproductpackaged = 'MedicinalProductPackaged';
+    /** MedicinalProductPackaged */
+    case medicinalproductpackaged = 'MedicinalProductPackaged';
 
-	/** MedicinalProductPharmaceutical */
-	case medicinalproductpharmaceutical = 'MedicinalProductPharmaceutical';
+    /** MedicinalProductPharmaceutical */
+    case medicinalproductpharmaceutical = 'MedicinalProductPharmaceutical';
 
-	/** MedicinalProductUndesirableEffect */
-	case medicinalproductundesirableeffect = 'MedicinalProductUndesirableEffect';
+    /** MedicinalProductUndesirableEffect */
+    case medicinalproductundesirableeffect = 'MedicinalProductUndesirableEffect';
 
-	/** Order */
-	case order = 'Order';
+    /** Order */
+    case order = 'Order';
 
-	/** OrderResponse */
-	case orderresponse = 'OrderResponse';
+    /** OrderResponse */
+    case orderresponse = 'OrderResponse';
 
-	/** ProcedureRequest */
-	case procedurerequest = 'ProcedureRequest';
+    /** ProcedureRequest */
+    case procedurerequest = 'ProcedureRequest';
 
-	/** ProcessRequest */
-	case processrequest = 'ProcessRequest';
+    /** ProcessRequest */
+    case processrequest = 'ProcessRequest';
 
-	/** ProcessResponse */
-	case processresponse = 'ProcessResponse';
+    /** ProcessResponse */
+    case processresponse = 'ProcessResponse';
 
-	/** ReferralRequest */
-	case referralrequest = 'ReferralRequest';
+    /** ReferralRequest */
+    case referralrequest = 'ReferralRequest';
 
-	/** RequestGroup */
-	case requestgroup = 'RequestGroup';
+    /** RequestGroup */
+    case requestgroup = 'RequestGroup';
 
-	/** ResearchDefinition */
-	case researchdefinition = 'ResearchDefinition';
+    /** ResearchDefinition */
+    case researchdefinition = 'ResearchDefinition';
 
-	/** ResearchElementDefinition */
-	case researchelementdefinition = 'ResearchElementDefinition';
+    /** ResearchElementDefinition */
+    case researchelementdefinition = 'ResearchElementDefinition';
 
-	/** RiskEvidenceSynthesis */
-	case riskevidencesynthesis = 'RiskEvidenceSynthesis';
+    /** RiskEvidenceSynthesis */
+    case riskevidencesynthesis = 'RiskEvidenceSynthesis';
 
-	/** Sequence */
-	case sequence = 'Sequence';
+    /** Sequence */
+    case sequence = 'Sequence';
 
-	/** ServiceDefinition */
-	case servicedefinition = 'ServiceDefinition';
+    /** ServiceDefinition */
+    case servicedefinition = 'ServiceDefinition';
 
-	/** SubstanceSpecification */
-	case substancespecification = 'SubstanceSpecification';
+    /** SubstanceSpecification */
+    case substancespecification = 'SubstanceSpecification';
 }

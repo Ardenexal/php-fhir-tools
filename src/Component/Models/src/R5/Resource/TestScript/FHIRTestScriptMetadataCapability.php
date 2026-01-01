@@ -1,38 +1,49 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
+
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCanonical;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInteger;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * @description Capabilities that must exist and are assumed to function correctly on the FHIR server being tested.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'TestScript', elementPath: 'TestScript.metadata.capability', fhirVersion: 'R5')]
+#[FHIRBackboneElement(parentResource: 'TestScript', elementPath: 'TestScript.metadata.capability', fhirVersion: 'R5')]
 class FHIRTestScriptMetadataCapability extends \Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRBackboneElement
 {
-	public function __construct(
-		/** @var null|string id Unique id for inter-element referencing */
-		public ?string $id = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension> extension Additional content defined by implementations */
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-		public array $modifierExtension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean required Are the capabilities required? */
-		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean $required = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean validated Are the capabilities validated? */
-		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRBoolean $validated = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString|string description The expected capabilities of the server */
-		public \Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString|string|null $description = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInteger> origin Which origin server these requirements apply to */
-		public array $origin = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInteger destination Which server these requirements apply to */
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRInteger $destination = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRUri> link Links to the FHIR specification */
-		public array $link = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCanonical capabilities Required Capability Statement */
-		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCanonical $capabilities = null,
-	) {
-		parent::__construct($id, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        public ?string $id = null,
+        /** @var array<FHIRExtension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        public array $modifierExtension = [],
+        /** @var FHIRBoolean|null required Are the capabilities required? */
+        #[NotBlank]
+        public ?FHIRBoolean $required = null,
+        /** @var FHIRBoolean|null validated Are the capabilities validated? */
+        #[NotBlank]
+        public ?FHIRBoolean $validated = null,
+        /** @var FHIRString|string|null description The expected capabilities of the server */
+        public FHIRString|string|null $description = null,
+        /** @var array<FHIRInteger> origin Which origin server these requirements apply to */
+        public array $origin = [],
+        /** @var FHIRInteger|null destination Which server these requirements apply to */
+        public ?FHIRInteger $destination = null,
+        /** @var array<FHIRUri> link Links to the FHIR specification */
+        public array $link = [],
+        /** @var FHIRCanonical|null capabilities Required Capability Statement */
+        #[NotBlank]
+        public ?FHIRCanonical $capabilities = null,
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
 }

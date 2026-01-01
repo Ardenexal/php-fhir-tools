@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,21 +12,21 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRDeviceProductionIdentifierInUDI: string
 {
-	/** Lot Number */
-	case lotnumber = 'lot-number';
+    /** Lot Number */
+    case lotnumber = 'lot-number';
 
-	/** Manufactured date */
-	case manufactureddate = 'manufactured-date';
+    /** Manufactured date */
+    case manufactureddate = 'manufactured-date';
 
-	/** Serial Number */
-	case serialnumber = 'serial-number';
+    /** Serial Number */
+    case serialnumber = 'serial-number';
 
-	/** Expiration date */
-	case expirationdate = 'expiration-date';
+    /** Expiration date */
+    case expirationdate = 'expiration-date';
 
-	/** Biological source */
-	case biologicalsource = 'biological-source';
+    /** Biological source */
+    case biologicalsource = 'biological-source';
 
-	/** Software Version */
-	case softwareversion = 'software-version';
+    /** Software Version */
+    case softwareversion = 'software-version';
 }

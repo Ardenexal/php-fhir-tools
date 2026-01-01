@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,12 +12,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRBenefitCostApplicability: string
 {
-	/** In Network */
-	case innetwork = 'in-network';
+    /** In Network */
+    case innetwork = 'in-network';
 
-	/** Out of Network */
-	case outofnetwork = 'out-of-network';
+    /** Out of Network */
+    case outofnetwork = 'out-of-network';
 
-	/** Other */
-	case other = 'other';
+    /** Other */
+    case other = 'other';
 }

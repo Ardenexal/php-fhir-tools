@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,15 +12,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRActionParticipantType: string
 {
-	/** Patient */
-	case patient = 'patient';
+    /** Patient */
+    case patient = 'patient';
 
-	/** Practitioner */
-	case practitioner = 'practitioner';
+    /** Practitioner */
+    case practitioner = 'practitioner';
 
-	/** Related Person */
-	case relatedperson = 'related-person';
+    /** Related Person */
+    case relatedperson = 'related-person';
 
-	/** Device */
-	case device = 'device';
+    /** Device */
+    case device = 'device';
 }

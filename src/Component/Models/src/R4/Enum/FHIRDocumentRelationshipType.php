@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -10,15 +12,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum FHIRDocumentRelationshipType: string
 {
-	/** Replaces */
-	case replaces = 'replaces';
+    /** Replaces */
+    case replaces = 'replaces';
 
-	/** Transforms */
-	case transforms = 'transforms';
+    /** Transforms */
+    case transforms = 'transforms';
 
-	/** Signs */
-	case signs = 'signs';
+    /** Signs */
+    case signs = 'signs';
 
-	/** Appends */
-	case appends = 'appends';
+    /** Appends */
+    case appends = 'appends';
 }

@@ -1,30 +1,39 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
+
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRPositiveInt;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * @description A note that describes or explains adjudication results in a human readable form.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'ClaimResponse', elementPath: 'ClaimResponse.processNote', fhirVersion: 'R5')]
+#[FHIRBackboneElement(parentResource: 'ClaimResponse', elementPath: 'ClaimResponse.processNote', fhirVersion: 'R5')]
 class FHIRClaimResponseProcessNote extends \Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRBackboneElement
 {
-	public function __construct(
-		/** @var null|string id Unique id for inter-element referencing */
-		public ?string $id = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension> extension Additional content defined by implementations */
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-		public array $modifierExtension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRPositiveInt number Note instance identifier */
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRPositiveInt $number = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept type Note purpose */
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept $type = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString|string text Note explanatory text */
-		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public \Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRString|string|null $text = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept language Language of the text */
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRCodeableConcept $language = null,
-	) {
-		parent::__construct($id, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        public ?string $id = null,
+        /** @var array<FHIRExtension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        public array $modifierExtension = [],
+        /** @var FHIRPositiveInt|null number Note instance identifier */
+        public ?FHIRPositiveInt $number = null,
+        /** @var FHIRCodeableConcept|null type Note purpose */
+        public ?FHIRCodeableConcept $type = null,
+        /** @var FHIRString|string|null text Note explanatory text */
+        #[NotBlank]
+        public FHIRString|string|null $text = null,
+        /** @var FHIRCodeableConcept|null language Language of the text */
+        public ?FHIRCodeableConcept $language = null,
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
 }

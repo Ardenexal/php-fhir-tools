@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -10,9 +12,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum FHIRCodeSearchSupport: string
 {
-	/** Explicit Codes */
-	case explicitcodes = 'explicit';
+    /** Explicit Codes */
+    case explicitcodes = 'explicit';
 
-	/** Implicit Codes */
-	case implicitcodes = 'all';
+    /** Implicit Codes */
+    case implicitcodes = 'all';
 }

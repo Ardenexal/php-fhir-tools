@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,30 +12,30 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRSearchParamType: string
 {
-	/** Number */
-	case number = 'number';
+    /** Number */
+    case number = 'number';
 
-	/** Date/DateTime */
-	case datedatetime = 'date';
+    /** Date/DateTime */
+    case datedatetime = 'date';
 
-	/** String */
-	case string = 'string';
+    /** String */
+    case string = 'string';
 
-	/** Token */
-	case token = 'token';
+    /** Token */
+    case token = 'token';
 
-	/** Reference */
-	case reference = 'reference';
+    /** Reference */
+    case reference = 'reference';
 
-	/** Composite */
-	case composite = 'composite';
+    /** Composite */
+    case composite = 'composite';
 
-	/** Quantity */
-	case quantity = 'quantity';
+    /** Quantity */
+    case quantity = 'quantity';
 
-	/** URI */
-	case uri = 'uri';
+    /** URI */
+    case uri = 'uri';
 
-	/** Special */
-	case special = 'special';
+    /** Special */
+    case special = 'special';
 }

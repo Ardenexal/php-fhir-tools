@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -10,36 +12,36 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum FHIRObservationDataType: string
 {
-	/** Quantity */
-	case quantity = 'Quantity';
+    /** Quantity */
+    case quantity = 'Quantity';
 
-	/** CodeableConcept */
-	case codeableconcept = 'CodeableConcept';
+    /** CodeableConcept */
+    case codeableconcept = 'CodeableConcept';
 
-	/** string */
-	case string = 'string';
+    /** string */
+    case string = 'string';
 
-	/** boolean */
-	case boolean = 'boolean';
+    /** boolean */
+    case boolean = 'boolean';
 
-	/** integer */
-	case integer = 'integer';
+    /** integer */
+    case integer = 'integer';
 
-	/** Range */
-	case range = 'Range';
+    /** Range */
+    case range = 'Range';
 
-	/** Ratio */
-	case ratio = 'Ratio';
+    /** Ratio */
+    case ratio = 'Ratio';
 
-	/** SampledData */
-	case sampleddata = 'SampledData';
+    /** SampledData */
+    case sampleddata = 'SampledData';
 
-	/** time */
-	case time = 'time';
+    /** time */
+    case time = 'time';
 
-	/** dateTime */
-	case datetime = 'dateTime';
+    /** dateTime */
+    case datetime = 'dateTime';
 
-	/** Period */
-	case period = 'Period';
+    /** Period */
+    case period = 'Period';
 }

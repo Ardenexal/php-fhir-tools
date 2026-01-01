@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,12 +12,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRResourceVersionPolicy: string
 {
-	/** No VersionId Support */
-	case noversionidsupport = 'no-version';
+    /** No VersionId Support */
+    case noversionidsupport = 'no-version';
 
-	/** Versioned */
-	case versioned = 'versioned';
+    /** Versioned */
+    case versioned = 'versioned';
 
-	/** VersionId tracked fully */
-	case versionidtrackedfully = 'versioned-update';
+    /** VersionId tracked fully */
+    case versionidtrackedfully = 'versioned-update';
 }

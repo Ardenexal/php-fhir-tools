@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,9 +12,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRStructureMapGroupTypeMode: string
 {
-	/** Not a Default */
-	case no_ta_default = 'none';
+    /** Not a Default */
+    case no_ta_default = 'none';
 
-	/** Default for Type Combination */
-	case defaultfortypecombination = 'types';
+    /** Default for Type Combination */
+    case defaultfortypecombination = 'types';
 }

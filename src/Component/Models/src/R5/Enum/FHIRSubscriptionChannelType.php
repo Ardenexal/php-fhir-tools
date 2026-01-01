@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,18 +12,18 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRSubscriptionChannelType: string
 {
-	/** Rest Hook */
-	case resthook = 'rest-hook';
+    /** Rest Hook */
+    case resthook = 'rest-hook';
 
-	/** Websocket */
-	case websocket = 'websocket';
+    /** Websocket */
+    case websocket = 'websocket';
 
-	/** Email */
-	case email = 'email';
+    /** Email */
+    case email = 'email';
 
-	/** SMS */
-	case sms = 'sms';
+    /** SMS */
+    case sms = 'sms';
 
-	/** Message */
-	case message = 'message';
+    /** Message */
+    case message = 'message';
 }

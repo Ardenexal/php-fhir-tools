@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,21 +12,21 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRTransportStatus: string
 {
-	/** In Progress */
-	case inprogress = 'in-progress';
+    /** In Progress */
+    case inprogress = 'in-progress';
 
-	/** Completed */
-	case completed = 'completed';
+    /** Completed */
+    case completed = 'completed';
 
-	/** Abandoned */
-	case abandoned = 'abandoned';
+    /** Abandoned */
+    case abandoned = 'abandoned';
 
-	/** Cancelled */
-	case cancelled = 'cancelled';
+    /** Cancelled */
+    case cancelled = 'cancelled';
 
-	/** Planned */
-	case planned = 'planned';
+    /** Planned */
+    case planned = 'planned';
 
-	/** Entered In Error */
-	case enteredinerror = 'entered-in-error';
+    /** Entered In Error */
+    case enteredinerror = 'entered-in-error';
 }

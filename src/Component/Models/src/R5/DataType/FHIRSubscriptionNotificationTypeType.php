@@ -1,17 +1,23 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
+use Ardenexal\FHIRTools\Component\Models\R4B\Enum\FHIRSubscriptionNotificationType;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCode;
+
 /**
  * @fhir-code-type FHIRSubscriptionNotificationType
+ *
  * @description Code type wrapper for FHIRSubscriptionNotificationType enum
  */
-class FHIRSubscriptionNotificationTypeType extends \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\FHIRCode
+class FHIRSubscriptionNotificationTypeType extends FHIRCode
 {
-	public function __construct(
-		/** @param \Ardenexal\FHIRTools\Component\Models\R4B\Enum\FHIRSubscriptionNotificationType|string|null $value The code value (enum or string) */
-		string|null $value = null,
-	) {
-		parent::__construct(value: $value);
-	}
+    public function __construct(
+        /** @param FHIRSubscriptionNotificationType|string|null $value The code value (enum or string) */
+        ?string $value = null,
+    ) {
+        parent::__construct(value: $value);
+    }
 }

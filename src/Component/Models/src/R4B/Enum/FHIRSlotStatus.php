@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,18 +12,18 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum FHIRSlotStatus: string
 {
-	/** Busy */
-	case busy = 'busy';
+    /** Busy */
+    case busy = 'busy';
 
-	/** Free */
-	case free = 'free';
+    /** Free */
+    case free = 'free';
 
-	/** Busy (Unavailable) */
-	case busyunavailable = 'busy-unavailable';
+    /** Busy (Unavailable) */
+    case busyunavailable = 'busy-unavailable';
 
-	/** Busy (Tentative) */
-	case busytentative = 'busy-tentative';
+    /** Busy (Tentative) */
+    case busytentative = 'busy-tentative';
 
-	/** Entered in error */
-	case enteredinerror = 'entered-in-error';
+    /** Entered in error */
+    case enteredinerror = 'entered-in-error';
 }

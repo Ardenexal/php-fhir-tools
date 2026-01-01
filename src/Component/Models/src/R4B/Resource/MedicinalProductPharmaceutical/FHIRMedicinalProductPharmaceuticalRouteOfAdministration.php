@@ -1,40 +1,50 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
+
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRDuration;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRRatio;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * @description The path by which the pharmaceutical product is taken into or makes contact with the body.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(
-	parentResource: 'MedicinalProductPharmaceutical',
-	elementPath: 'MedicinalProductPharmaceutical.routeOfAdministration',
-	fhirVersion: 'R4B',
+#[FHIRBackboneElement(
+    parentResource: 'MedicinalProductPharmaceutical',
+    elementPath: 'MedicinalProductPharmaceutical.routeOfAdministration',
+    fhirVersion: 'R4B',
 )]
 class FHIRMedicinalProductPharmaceuticalRouteOfAdministration extends \Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRBackboneElement
 {
-	public function __construct(
-		/** @var null|string id Unique id for inter-element referencing */
-		public ?string $id = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> extension Additional content defined by implementations */
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-		public array $modifierExtension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept code Coded expression for the route */
-		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRCodeableConcept $code = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity firstDose The first dose (dose quantity) administered in humans can be specified, for a product under investigation, using a numerical value and its unit of measurement */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity $firstDose = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity maxSingleDose The maximum single dose that can be administered as per the protocol of a clinical trial can be specified using a numerical value and its unit of measurement */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity $maxSingleDose = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity maxDosePerDay The maximum dose per day (maximum dose quantity to be administered in any one 24-h period) that can be administered as per the protocol referenced in the clinical trial authorisation */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRQuantity $maxDosePerDay = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRRatio maxDosePerTreatmentPeriod The maximum dose per treatment period that can be administered as per the protocol referenced in the clinical trial authorisation */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRRatio $maxDosePerTreatmentPeriod = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRDuration maxTreatmentPeriod The maximum treatment period during which an Investigational Medicinal Product can be administered as per the protocol referenced in the clinical trial authorisation */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRDuration $maxTreatmentPeriod = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRMedicinalProductPharmaceuticalRouteOfAdministrationTargetSpecies> targetSpecies A species for which this route applies */
-		public array $targetSpecies = [],
-	) {
-		parent::__construct($id, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        public ?string $id = null,
+        /** @var array<FHIRExtension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var array<FHIRExtension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        public array $modifierExtension = [],
+        /** @var FHIRCodeableConcept|null code Coded expression for the route */
+        #[NotBlank]
+        public ?FHIRCodeableConcept $code = null,
+        /** @var FHIRQuantity|null firstDose The first dose (dose quantity) administered in humans can be specified, for a product under investigation, using a numerical value and its unit of measurement */
+        public ?FHIRQuantity $firstDose = null,
+        /** @var FHIRQuantity|null maxSingleDose The maximum single dose that can be administered as per the protocol of a clinical trial can be specified using a numerical value and its unit of measurement */
+        public ?FHIRQuantity $maxSingleDose = null,
+        /** @var FHIRQuantity|null maxDosePerDay The maximum dose per day (maximum dose quantity to be administered in any one 24-h period) that can be administered as per the protocol referenced in the clinical trial authorisation */
+        public ?FHIRQuantity $maxDosePerDay = null,
+        /** @var FHIRRatio|null maxDosePerTreatmentPeriod The maximum dose per treatment period that can be administered as per the protocol referenced in the clinical trial authorisation */
+        public ?FHIRRatio $maxDosePerTreatmentPeriod = null,
+        /** @var FHIRDuration|null maxTreatmentPeriod The maximum treatment period during which an Investigational Medicinal Product can be administered as per the protocol referenced in the clinical trial authorisation */
+        public ?FHIRDuration $maxTreatmentPeriod = null,
+        /** @var array<FHIRMedicinalProductPharmaceuticalRouteOfAdministrationTargetSpecies> targetSpecies A species for which this route applies */
+        public array $targetSpecies = [],
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
 }

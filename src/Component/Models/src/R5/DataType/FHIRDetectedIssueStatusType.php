@@ -1,17 +1,23 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
+use Ardenexal\FHIRTools\Component\Models\R5\Enum\FHIRDetectedIssueStatus;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCode;
+
 /**
  * @fhir-code-type FHIRDetectedIssueStatus
+ *
  * @description Code type wrapper for FHIRDetectedIssueStatus enum
  */
-class FHIRDetectedIssueStatusType extends \Ardenexal\FHIRTools\Component\Models\R5\Primitive\FHIRCode
+class FHIRDetectedIssueStatusType extends FHIRCode
 {
-	public function __construct(
-		/** @param \Ardenexal\FHIRTools\Component\Models\R5\Enum\FHIRDetectedIssueStatus|string|null $value The code value (enum or string) */
-		string|null $value = null,
-	) {
-		parent::__construct(value: $value);
-	}
+    public function __construct(
+        /** @param FHIRDetectedIssueStatus|string|null $value The code value (enum or string) */
+        ?string $value = null,
+    ) {
+        parent::__construct(value: $value);
+    }
 }

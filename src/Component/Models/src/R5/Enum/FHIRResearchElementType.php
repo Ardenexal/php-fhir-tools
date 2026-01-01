@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,12 +12,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRResearchElementType: string
 {
-	/** Population */
-	case population = 'population';
+    /** Population */
+    case population = 'population';
 
-	/** Exposure */
-	case exposure = 'exposure';
+    /** Exposure */
+    case exposure = 'exposure';
 
-	/** Outcome */
-	case outcome = 'outcome';
+    /** Outcome */
+    case outcome = 'outcome';
 }

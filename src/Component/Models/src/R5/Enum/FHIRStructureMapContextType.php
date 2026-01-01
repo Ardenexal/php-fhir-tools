@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,9 +12,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRStructureMapContextType: string
 {
-	/** Type */
-	case type = 'type';
+    /** Type */
+    case type = 'type';
 
-	/** Variable */
-	case variable = 'variable';
+    /** Variable */
+    case variable = 'variable';
 }

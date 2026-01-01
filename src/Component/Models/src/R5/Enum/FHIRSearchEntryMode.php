@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,12 +12,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum FHIRSearchEntryMode: string
 {
-	/** Match */
-	case match = 'match';
+    /** Match */
+    case match = 'match';
 
-	/** Include */
-	case include = 'include';
+    /** Include */
+    case include = 'include';
 
-	/** Outcome */
-	case outcome = 'outcome';
+    /** Outcome */
+    case outcome = 'outcome';
 }

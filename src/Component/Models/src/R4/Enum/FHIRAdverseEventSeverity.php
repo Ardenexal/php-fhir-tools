@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -10,12 +12,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum FHIRAdverseEventSeverity: string
 {
-	/** Mild */
-	case mild = 'mild';
+    /** Mild */
+    case mild = 'mild';
 
-	/** Moderate */
-	case moderate = 'moderate';
+    /** Moderate */
+    case moderate = 'moderate';
 
-	/** Severe */
-	case severe = 'severe';
+    /** Severe */
+    case severe = 'severe';
 }
