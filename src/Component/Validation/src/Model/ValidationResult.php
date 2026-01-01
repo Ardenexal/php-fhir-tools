@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation\Model;
 
+use Ardenexal\FHIRTools\Component\Validation\Violation\ViolationMapper;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
+
 /**
  * Represents the result of a FHIR profile validation.
  *
@@ -162,5 +165,37 @@ class ValidationResult
                 $this->issues,
             ),
         ];
+    }
+
+    /**
+     * Convert to Symfony ConstraintViolationList.
+     *
+     * This is the primary error format for API outputs as per production requirements.
+     * Each ValidationIssue is mapped to a ConstraintViolation with:
+     * - Machine-readable code (e.g., fhir.cardinality.min)
+     * - Precise propertyPath (e.g., name[0].family)
+     * - Human-readable message with profile context
+     *
+     * @param mixed|null $root The root value being validated (optional)
+     *
+     * @return ConstraintViolationListInterface
+     */
+    public function toViolationList(mixed $root = null): ConstraintViolationListInterface
+    {
+        $mapper = new ViolationMapper();
+
+        return $mapper->map($this, $root);
+    }
+
+    /**
+     * Alias for toViolationList() for backward compatibility.
+     *
+     * @param mixed|null $root The root value being validated (optional)
+     *
+     * @return ConstraintViolationListInterface
+     */
+    public function getViolations(mixed $root = null): ConstraintViolationListInterface
+    {
+        return $this->toViolationList($root);
     }
 }
