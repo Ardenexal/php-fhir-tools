@@ -1,0 +1,489 @@
+---
+layout: docs
+title: Examples
+permalink: /pages/examples/
+---
+
+<div class="examples-page">
+    <h1>Code Examples</h1>
+    <p class="lead">Practical examples demonstrating PHP FHIRTools capabilities with real FHIR resources.</p>
+
+    <!-- Example Browser Section -->
+    <section class="example-browser">
+        <h2>Interactive Example Browser</h2>
+        <p>Browse and explore production-ready FHIR R4 resources. Click an example to view the JSON structure.</p>
+        
+        <div class="example-selector">
+            <button class="example-btn" onclick="loadExample('patient-simple.json')">Simple Patient</button>
+            <button class="example-btn" onclick="loadExample('patient-complex.json')">Complex Patient</button>
+            <button class="example-btn" onclick="loadExample('observation-vital-signs.json')">Vital Signs</button>
+            <button class="example-btn" onclick="loadExample('bundle-transaction.json')">Transaction Bundle</button>
+            <button class="example-btn" onclick="loadExample('medication-request.json')">Medication Request</button>
+            <button class="example-btn" onclick="loadExample('practitioner.json')">Practitioner</button>
+        </div>
+
+        <div class="example-display" id="example-display" style="display:none;">
+            <div class="example-header">
+                <h3 id="example-title">Example Resource</h3>
+                <button class="copy-btn" onclick="copyExample()">Copy JSON</button>
+            </div>
+            <pre><code class="language-json" id="example-json"></code></pre>
+        </div>
+    </section>
+
+    <!-- Patient Creation Examples -->
+    <section class="code-examples">
+        <h2>Patient Resource Creation</h2>
+        
+        <h3>Simple Patient</h3>
+        <p>Create a basic patient resource with minimal required fields:</p>
+        <pre><code class="language-php">use Ardenexal\Component\Models\R4\Resource\Patient\FHIRPatient;
+use Ardenexal\Component\Models\R4\DataType\FHIRHumanName;
+
+$patient = new FHIRPatient();
+$patient->setId('example-simple');
+
+$name = new FHIRHumanName();
+$name->setFamily('Smith');
+$name->setGiven(['John']);
+$patient->addName($name);
+
+$patient->setGender('male');
+$patient->setBirthDate('1974-12-25');
+
+// Serialize to JSON
+$serializer = new FHIRSerializationService();
+$json = $serializer->serializeToJson($patient);
+echo $json;</code></pre>
+
+        <h3>Complex Patient with Full Demographics</h3>
+        <p>Create a patient with complete demographic information:</p>
+        <pre><code class="language-php">$patient = new FHIRPatient();
+$patient->setId('example-complex');
+$patient->setActive(true);
+
+// Add multiple names
+$officialName = new FHIRHumanName();
+$officialName->setUse('official');
+$officialName->setFamily('Smith');
+$officialName->setGiven(['John', 'Robert']);
+$officialName->setPrefix(['Mr.']);
+$patient->addName($officialName);
+
+// Add identifiers
+$mrn = new FHIRIdentifier();
+$mrn->setSystem('http://hospital.example.org/patients');
+$mrn->setValue('MRN-123456');
+$mrn->setUse('official');
+$patient->addIdentifier($mrn);
+
+// Add telecom
+$phone = new FHIRContactPoint();
+$phone->setSystem('phone');
+$phone->setValue('+1-555-123-4567');
+$phone->setUse('home');
+$patient->addTelecom($phone);
+
+// Add address
+$address = new FHIRAddress();
+$address->setUse('home');
+$address->setLine(['123 Main St', 'Apt 4B']);
+$address->setCity('Springfield');
+$address->setState('IL');
+$address->setPostalCode('62701');
+$address->setCountry('US');
+$patient->addAddress($address);
+
+$patient->setGender('male');
+$patient->setBirthDate('1974-12-25');</code></pre>
+    </section>
+
+    <!-- Observation Examples -->
+    <section class="code-examples">
+        <h2>Observation Creation</h2>
+        
+        <h3>Blood Pressure Observation</h3>
+        <p>Create a vital signs observation with multiple components:</p>
+        <pre><code class="language-php">use Ardenexal\Component\Models\R4\Resource\Observation\FHIRObservation;
+use Ardenexal\Component\Models\R4\DataType\FHIRCodeableConcept;
+use Ardenexal\Component\Models\R4\DataType\FHIRCoding;
+use Ardenexal\Component\Models\R4\Resource\Observation\FHIRObservationComponent;
+
+$observation = new FHIRObservation();
+$observation->setId('blood-pressure-example');
+$observation->setStatus('final');
+
+// Set category
+$category = new FHIRCodeableConcept();
+$categoryCoding = new FHIRCoding();
+$categoryCoding->setSystem('http://terminology.hl7.org/CodeSystem/observation-category');
+$categoryCoding->setCode('vital-signs');
+$categoryCoding->setDisplay('Vital Signs');
+$category->addCoding($categoryCoding);
+$observation->addCategory($category);
+
+// Set code (LOINC for Blood Pressure)
+$code = new FHIRCodeableConcept();
+$coding = new FHIRCoding();
+$coding->setSystem('http://loinc.org');
+$coding->setCode('85354-9');
+$coding->setDisplay('Blood pressure panel');
+$code->addCoding($coding);
+$observation->setCode($code);
+
+// Add systolic component
+$systolic = new FHIRObservationComponent();
+$systolicCode = new FHIRCodeableConcept();
+$systolicCoding = new FHIRCoding();
+$systolicCoding->setSystem('http://loinc.org');
+$systolicCoding->setCode('8480-6');
+$systolicCoding->setDisplay('Systolic blood pressure');
+$systolicCode->addCoding($systolicCoding);
+$systolic->setCode($systolicCode);
+
+$systolicValue = new FHIRQuantity();
+$systolicValue->setValue(120);
+$systolicValue->setUnit('mmHg');
+$systolicValue->setSystem('http://unitsofmeasure.org');
+$systolicValue->setCode('mm[Hg]');
+$systolic->setValueQuantity($systolicValue);
+$observation->addComponent($systolic);
+
+// Add diastolic component
+$diastolic = new FHIRObservationComponent();
+$diastolicCode = new FHIRCodeableConcept();
+$diastolicCoding = new FHIRCoding();
+$diastolicCoding->setSystem('http://loinc.org');
+$diastolicCoding->setCode('8462-4');
+$diastolicCoding->setDisplay('Diastolic blood pressure');
+$diastolicCode->addCoding($diastolicCoding);
+$diastolic->setCode($diastolicCode);
+
+$diastolicValue = new FHIRQuantity();
+$diastolicValue->setValue(80);
+$diastolicValue->setUnit('mmHg');
+$diastolicValue->setSystem('http://unitsofmeasure.org');
+$diastolicValue->setCode('mm[Hg]');
+$diastolic->setValueQuantity($diastolicValue);
+$observation->addComponent($diastolic);
+
+// Set subject reference
+$subject = new FHIRReference();
+$subject->setReference('Patient/example-simple');
+$observation->setSubject($subject);
+
+// Set effective datetime
+$observation->setEffectiveDateTime('2024-01-15T10:30:00Z');</code></pre>
+    </section>
+
+    <!-- FHIRPath Examples -->
+    <section class="code-examples">
+        <h2>FHIRPath Evaluation</h2>
+        
+        <h3>Basic Expression Evaluation</h3>
+        <pre><code class="language-php">use Ardenexal\Component\FHIRPath\FHIRPathEvaluator;
+
+$evaluator = new FHIRPathEvaluator();
+
+// Get patient name
+$result = $evaluator->evaluate($patient, 'Patient.name.family');
+// Returns: ['Smith']
+
+// Check if patient is active
+$result = $evaluator->evaluate($patient, 'Patient.active');
+// Returns: [true]
+
+// Get all phone numbers
+$result = $evaluator->evaluate($patient, "Patient.telecom.where(system='phone').value");
+// Returns: ['+1-555-123-4567']
+
+// Get patient age (if birthDate exists)
+$result = $evaluator->evaluate($patient, 'Patient.birthDate.toInteger()');
+
+// Check if email exists
+$result = $evaluator->evaluate($patient, "Patient.telecom.where(system='email').exists()");
+// Returns: [false]</code></pre>
+
+        <h3>Complex FHIRPath Queries</h3>
+        <pre><code class="language-php">// Get all observations with systolic > 140
+$result = $evaluator->evaluate($bundle, 
+    "Bundle.entry.resource.ofType(Observation)" .
+    ".where(component.where(code.coding.code='8480-6').value > 140)"
+);
+
+// Get patient names in specific format
+$result = $evaluator->evaluate($patient,
+    "Patient.name.where(use='official').select(family + ', ' + given.first())"
+);
+// Returns: ['Smith, John']
+
+// Count number of addresses
+$result = $evaluator->evaluate($patient, 'Patient.address.count()');
+// Returns: [1]
+
+// Get all identifiers of a specific system
+$result = $evaluator->evaluate($patient,
+    "Patient.identifier.where(system='http://hospital.example.org/patients').value"
+);
+// Returns: ['MRN-123456']</code></pre>
+    </section>
+
+    <!-- Bundle Examples -->
+    <section class="code-examples">
+        <h2>Bundle Creation and Processing</h2>
+        
+        <h3>Create Transaction Bundle</h3>
+        <pre><code class="language-php">use Ardenexal\Component\Models\R4\Resource\Bundle\FHIRBundle;
+use Ardenexal\Component\Models\R4\Resource\Bundle\FHIRBundleEntry;
+use Ardenexal\Component\Models\R4\Resource\Bundle\FHIRBundleEntryRequest;
+
+$bundle = new FHIRBundle();
+$bundle->setType('transaction');
+
+// Add patient entry
+$patientEntry = new FHIRBundleEntry();
+$patientEntry->setFullUrl('urn:uuid:' . $this->generateUuid());
+$patientEntry->setResource($patient);
+
+$patientRequest = new FHIRBundleEntryRequest();
+$patientRequest->setMethod('POST');
+$patientRequest->setUrl('Patient');
+$patientEntry->setRequest($patientRequest);
+
+$bundle->addEntry($patientEntry);
+
+// Add observation entry
+$observationEntry = new FHIRBundleEntry();
+$observationEntry->setFullUrl('urn:uuid:' . $this->generateUuid());
+$observationEntry->setResource($observation);
+
+$observationRequest = new FHIRBundleEntryRequest();
+$observationRequest->setMethod('POST');
+$observationRequest->setUrl('Observation');
+$observationEntry->setRequest($observationRequest);
+
+$bundle->addEntry($observationEntry);
+
+// Serialize bundle
+$json = $serializer->serializeToJson($bundle);</code></pre>
+
+        <h3>Process Bundle Entries</h3>
+        <pre><code class="language-php">// Iterate through bundle entries
+foreach ($bundle->getEntry() as $entry) {
+    $resource = $entry->getResource();
+    $resourceType = $resource->getResourceType();
+    
+    echo "Processing {$resourceType}\n";
+    
+    if ($resourceType === 'Patient') {
+        $patient = $resource;
+        // Process patient
+    } elseif ($resourceType === 'Observation') {
+        $observation = $resource;
+        // Process observation
+    }
+}
+
+// Use FHIRPath to filter entries
+$patients = $evaluator->evaluate($bundle, 
+    "Bundle.entry.resource.ofType(Patient)"
+);
+
+$observations = $evaluator->evaluate($bundle,
+    "Bundle.entry.resource.ofType(Observation)"
+);</code></pre>
+    </section>
+
+    <!-- Validation Examples -->
+    <section class="code-examples">
+        <h2>Validation</h2>
+        
+        <h3>Strict Validation Mode</h3>
+        <pre><code class="language-php">use Ardenexal\Component\Serialization\FHIRSerializationService;
+use Ardenexal\Component\Serialization\ValidationMode;
+
+$serializer = new FHIRSerializationService();
+
+try {
+    $patient = $serializer->deserializeFromJson(
+        $json,
+        FHIRPatient::class,
+        ValidationMode::STRICT
+    );
+    echo "Validation passed!";
+} catch (ValidationException $e) {
+    // Get OperationOutcome
+    $outcome = $e->getOperationOutcome();
+    
+    foreach ($outcome->getIssue() as $issue) {
+        echo "Severity: " . $issue->getSeverity() . "\n";
+        echo "Code: " . $issue->getCode() . "\n";
+        echo "Details: " . $issue->getDetails()->getText() . "\n";
+        echo "Diagnostics: " . $issue->getDiagnostics() . "\n";
+        
+        if ($issue->getExpression()) {
+            echo "Location: " . implode(', ', $issue->getExpression()) . "\n";
+        }
+    }
+}</code></pre>
+
+        <h3>Lenient Validation Mode</h3>
+        <pre><code class="language-php">// Lenient mode allows some non-critical errors
+$patient = $serializer->deserializeFromJson(
+    $json,
+    FHIRPatient::class,
+    ValidationMode::LENIENT
+);
+
+// Check if there were any warnings
+if ($serializer->hasWarnings()) {
+    $warnings = $serializer->getWarnings();
+    foreach ($warnings as $warning) {
+        echo "Warning: " . $warning . "\n";
+    }
+}</code></pre>
+    </section>
+</div>
+
+<style>
+.examples-page {
+    max-width: 1200px;
+}
+
+.example-browser {
+    background: var(--color-gray-50);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-6);
+    margin-bottom: var(--spacing-8);
+}
+
+.example-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-3);
+    margin-bottom: var(--spacing-4);
+}
+
+.example-btn {
+    padding: var(--spacing-3) var(--spacing-5);
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    transition: var(--transition-base);
+}
+
+.example-btn:hover {
+    background: var(--color-primary-dark);
+    transform: translateY(-1px);
+}
+
+.example-display {
+    margin-top: var(--spacing-4);
+}
+
+.example-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-3);
+}
+
+.example-header h3 {
+    margin: 0;
+}
+
+.copy-btn {
+    padding: var(--spacing-2) var(--spacing-4);
+    background: var(--color-secondary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+    transition: var(--transition-base);
+}
+
+.copy-btn:hover {
+    background: var(--color-secondary-dark);
+}
+
+.code-examples {
+    margin-bottom: var(--spacing-10);
+}
+
+.code-examples h2 {
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-4);
+    padding-bottom: var(--spacing-2);
+    border-bottom: 2px solid var(--color-primary);
+}
+
+.code-examples h3 {
+    color: var(--color-gray-800);
+    margin-top: var(--spacing-6);
+    margin-bottom: var(--spacing-3);
+}
+
+.code-examples p {
+    color: var(--color-gray-600);
+    margin-bottom: var(--spacing-3);
+}
+
+.code-examples pre {
+    margin-bottom: var(--spacing-6);
+}
+</style>
+
+<script>
+async function loadExample(filename) {
+    try {
+        const response = await fetch('{{ site.baseurl }}/assets/data/examples/' + filename);
+        const data = await response.json();
+        
+        const display = document.getElementById('example-display');
+        const title = document.getElementById('example-title');
+        const jsonElement = document.getElementById('example-json');
+        
+        title.textContent = filename.replace('.json', '').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        jsonElement.textContent = JSON.stringify(data, null, 2);
+        
+        display.style.display = 'block';
+        
+        // Highlight syntax if Prism is available
+        if (window.Prism) {
+            Prism.highlightElement(jsonElement);
+        }
+    } catch (error) {
+        console.error('Error loading example:', error);
+        alert('Failed to load example. Please try again.');
+    }
+}
+
+function copyExample() {
+    const jsonElement = document.getElementById('example-json');
+    const text = jsonElement.textContent;
+    
+    navigator.clipboard.writeText(text).then(() => {
+        const btn = event.target;
+        const originalText = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => {
+            btn.textContent = originalText;
+        }, 2000);
+    }).catch(err => {
+        console.error('Failed to copy:', err);
+        alert('Failed to copy to clipboard');
+    });
+}
+</script>
+
+<!-- Load Prism.js for syntax highlighting -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
