@@ -1,10 +1,5 @@
 services:
-    _defaults:
-        autowire: true
-        autoconfigure: true
-        public: false
-
-    # FHIRPath Console Commands
+    # FHIRBundle Console Commands
     Ardenexal\FHIRTools\Bundle\FHIRBundle\Command\FHIRPathEvaluateCommand:
         arguments:
             $pathService: '@Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService'

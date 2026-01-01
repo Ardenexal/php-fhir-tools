@@ -695,23 +695,43 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     generate_final_classes?: bool|Param, // Default: true
  *     generate_final_entities?: bool|Param, // Default: false
  * }
+ * @psalm-type FhirConfig = array{
+ *     output_directory?: scalar|null|Param, // Directory where generated FHIR classes will be stored // Default: "%kernel.project_dir%/output"
+ *     cache_directory?: scalar|null|Param, // Directory for FHIR package cache and metadata // Default: "%kernel.cache_dir%/fhir"
+ *     default_version?: scalar|null|Param, // Default FHIR version to use when not specified // Default: "R4B"
+ *     validation?: array{
+ *         enabled?: bool|Param, // Enable FHIR validation during code generation // Default: true
+ *         strict_mode?: bool|Param, // Enable strict validation mode (fail on warnings) // Default: false
+ *     },
+ *     packages?: array<string, array{ // Default: []
+ *         version: scalar|null|Param, // Package version to use
+ *         url?: scalar|null|Param, // Custom package URL (optional)
+ *         auto_update?: bool|Param, // Automatically update package to latest version // Default: false
+ *     }>,
+ *     path?: array{
+ *         cache_size?: int|Param, // Maximum number of FHIRPath expressions to cache // Default: 100
+ *     },
+ * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
  *     services?: ServicesConfig,
  *     framework?: FrameworkConfig,
+ *     fhir?: FhirConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
  *         services?: ServicesConfig,
  *         framework?: FrameworkConfig,
  *         maker?: MakerConfig,
+ *         fhir?: FhirConfig,
  *     },
  *     "when@test"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
  *         services?: ServicesConfig,
  *         framework?: FrameworkConfig,
+ *         fhir?: FhirConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,
