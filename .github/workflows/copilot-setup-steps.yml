@@ -7,6 +7,12 @@ name: Copilot Agent Setup
 on:
   workflow_dispatch:
   push:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+  pull_request:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+
 jobs:
   copilot-setup-steps:
     name: Setup PHP Environment for Copilot Agent
