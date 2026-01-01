@@ -33,17 +33,17 @@ final class ReplaceFunction extends AbstractFunction
 
         $string = $input->first();
         if (!is_string($string)) {
-            throw EvaluationException::invalidFunctionParameter($this->getName(), 'input', 'string');
+            throw EvaluationException::invalidFunctionParameter($this->getName(), 'Input must be a string');
         }
 
         $search = $context->getEvaluator()->evaluate($parameters[0], $context)->first();
         if (!is_string($search)) {
-            throw EvaluationException::invalidFunctionParameter($this->getName(), 'search', 'string');
+            throw EvaluationException::invalidFunctionParameter($this->getName(), 'Search parameter must be a string');
         }
 
         $replace = $context->getEvaluator()->evaluate($parameters[1], $context)->first();
         if (!is_string($replace)) {
-            throw EvaluationException::invalidFunctionParameter($this->getName(), 'replace', 'string');
+            throw EvaluationException::invalidFunctionParameter($this->getName(), 'Replace parameter must be a string');
         }
 
         return Collection::single(str_replace($search, $replace, $string));
