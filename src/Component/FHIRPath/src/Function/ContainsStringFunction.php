@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Expression\ExpressionNode;
+use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
 
 /**
  * Returns true if string contains the given substring.
@@ -34,8 +35,11 @@ class ContainsStringFunction extends AbstractFunction
         }
 
         /** @var ExpressionNode $substringExpr */
-        $substringExpr   = $parameters[0];
-        $evaluator       = $context->getEvaluator();
+        $substringExpr = $parameters[0];
+        $evaluator     = $context->getEvaluator();
+        if ($evaluator === null) {
+            throw new EvaluationException('Evaluator not available in context');
+        }
         $substringResult = $evaluator->evaluate($substringExpr, $context);
 
         if ($substringResult->isEmpty()) {

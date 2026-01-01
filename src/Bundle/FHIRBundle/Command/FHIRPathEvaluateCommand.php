@@ -126,12 +126,21 @@ HELP
         }
     }
 
+    /**
+     * @param array<mixed> $result
+     */
     private function outputJson(SymfonyStyle $io, array $result, bool $pretty): void
     {
         $flags = $pretty ? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES : 0;
-        $io->writeln(json_encode($result, $flags));
+        $json  = json_encode($result, $flags);
+        if ($json !== false) {
+            $io->writeln($json);
+        }
     }
 
+    /**
+     * @param array<mixed> $result
+     */
     private function outputText(SymfonyStyle $io, array $result): void
     {
         if (empty($result)) {

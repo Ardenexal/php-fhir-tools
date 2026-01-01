@@ -32,12 +32,17 @@ final class MatchesFunction extends AbstractFunction
 
         $string = $input->first();
         if (!is_string($string)) {
-            throw EvaluationException::invalidFunctionParameter($this->getName(), 'Input must be a string');
+            throw EvaluationException::invalidFunctionParameter($this->getName(), 'input', 'string');
         }
 
-        $pattern = $context->getEvaluator()->evaluate($parameters[0], $context)->first();
+        $evaluator = $context->getEvaluator();
+        if ($evaluator === null) {
+            throw new EvaluationException('Evaluator not available in context');
+        }
+
+        $pattern = $evaluator->evaluate($parameters[0], $context)->first();
         if (!is_string($pattern)) {
-            throw EvaluationException::invalidFunctionParameter($this->getName(), 'Pattern parameter must be a string');
+            throw EvaluationException::invalidFunctionParameter($this->getName(), 'pattern', 'string');
         }
 
         // Add delimiters if not present
@@ -48,7 +53,7 @@ final class MatchesFunction extends AbstractFunction
         $result = @preg_match($pattern, $string);
 
         if ($result === false) {
-            throw EvaluationException::invalidFunctionParameter($this->getName(), 'Invalid regular expression pattern');
+            throw EvaluationException::invalidFunctionParameter($this->getName(), 'pattern', 'valid regular expression');
         }
 
         return Collection::single($result === 1);

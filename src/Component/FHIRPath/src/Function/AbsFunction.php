@@ -35,6 +35,9 @@ final class AbsFunction extends AbstractFunction
             throw EvaluationException::invalidFunctionParameter($this->getName(), 'input', 'number');
         }
 
-        return Collection::single(abs($value));
+        // Ensure we have a numeric value for abs()
+        $numericValue = is_string($value) ? (float) $value : $value;
+
+        return Collection::single(abs($numericValue));
     }
 }

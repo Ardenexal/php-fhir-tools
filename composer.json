@@ -92,10 +92,12 @@
         "phpstan:bundle": "php ./vendor/bin/phpstan.phar analyse src/Bundle/ --configuration=phpstan.neon --memory-limit=-1 -v",
         "phpstan:codegen": "php ./vendor/bin/phpstan.phar analyse src/Component/CodeGeneration/ --configuration=phpstan.neon --memory-limit=-1 -v",
         "phpstan:serialization": "php ./vendor/bin/phpstan.phar analyse src/Component/Serialization/ --configuration=phpstan.neon --memory-limit=-1 -v",
+        "phpstan:fhir-path": "php ./vendor/bin/phpstan.phar analyse src/Component/FHIRPath/ --configuration=phpstan.neon --memory-limit=-1 -v",
         "lint": "php ./vendor/bin/pint -v --parallel --max-processes=4",
         "lint:bundle": "php ./vendor/bin/pint src/Bundle/ -v --parallel --max-processes=4",
         "lint:codegen": "php ./vendor/bin/pint src/Component/CodeGeneration/ -v --parallel --max-processes=4",
         "lint:serialization": "php ./vendor/bin/pint src/Component/Serialization/ -v --parallel --max-processes=4",
+        "lint:fhir-path": "php ./vendor/bin/pint src/Component/FHIRPath/ -v --parallel --max-processes=4",
         "test": "php ./vendor/phpunit/phpunit/phpunit",
         "test-coverage": "php ./vendor/phpunit/phpunit/phpunit --coverage-html coverage",
         "test-unit": "php ./vendor/phpunit/phpunit/phpunit --testsuite=unit",
@@ -104,6 +106,7 @@
         "test:bundle": "php ./vendor/phpunit/phpunit/phpunit tests/Unit/Bundle/ --no-coverage",
         "test:codegen": "php ./vendor/phpunit/phpunit/phpunit tests/Unit/Component/CodeGeneration/ --no-coverage",
         "test:serialization": "php ./vendor/phpunit/phpunit/phpunit tests/Unit/Component/Serialization/ --no-coverage",
+        "test:fhir-path": "php ./vendor/phpunit/phpunit/phpunit tests/Unit/Component/FHIRPath/ --no-coverage",
         "test:components": [
             "@test:bundle",
             "@test:codegen",
@@ -129,10 +132,16 @@
             "@phpstan:serialization",
             "@test:serialization"
         ],
+        "quality:fhir-path": [
+            "@lint:fhir-path",
+            "@phpstan:fhir-path",
+            "@test:fhir-path"
+        ],
         "quality:components": [
             "@quality:bundle",
             "@quality:codegen",
-            "@quality:serialization"
+            "@quality:serialization",
+            "@quality:fhir-path"
         ],
         "generate-models": "php ./bin/console fhir:generate -vvv",
         "generate-models-all": [
