@@ -84,6 +84,17 @@ permalink: /demos/serialization/
             <h4>Operation Outcome</h4>
             <div class="outcome-content"></div>
         </div>
+
+        <!-- PHP Runtime Status -->
+        <div id="php-status" class="php-status">
+            <div class="status-badge">
+                <span class="status-indicator"></span>
+                <span class="status-text">PHP Runtime: Not initialized</span>
+            </div>
+            <div class="status-details hidden">
+                <small>Version: <span id="php-version">-</span> | Mode: <span id="php-mode">Mock</span></small>
+            </div>
+        </div>
     </div>
 
     <!-- Info Section -->
@@ -347,6 +358,58 @@ permalink: /demos/serialization/
     font-size: var(--font-size-sm);
 }
 
+.php-status {
+    margin-top: var(--spacing-4);
+    padding: var(--spacing-3) var(--spacing-4);
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--spacing-3);
+}
+
+.status-badge {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+}
+
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-text-tertiary);
+    display: inline-block;
+}
+
+.status-indicator.ready {
+    background: var(--color-success);
+    box-shadow: 0 0 8px var(--color-success);
+}
+
+.status-indicator.initializing {
+    background: var(--color-warning);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.status-text {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+}
+
+.status-details {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+}
+
 .demo-info {
     margin-top: var(--spacing-8);
     padding: var(--spacing-6);
@@ -404,9 +467,12 @@ permalink: /demos/serialization/
 
 <script type="module">
 import { createOperationOutcome, validationError, structureError, formatOperationOutcome, hasErrors } from '{{ "/assets/js/utils/operation-outcome.js" | relative_url }}';
+import { fhirClient } from '{{ "/assets/js/php-wasm/fhir-client.js" | relative_url }}';
 
 // Demo state
 let currentValidationMode = 'strict';
+let phpInitialized = false;
+let phpInitializing = false;
 
 // DOM elements
 const exampleSelect = document.getElementById('example-select');
@@ -420,6 +486,9 @@ const btnClearInput = document.getElementById('btn-clear-input');
 const btnCopyOutput = document.getElementById('btn-copy-output');
 const demoStatus = document.getElementById('demo-status');
 const operationOutcome = document.getElementById('operation-outcome');
+const phpStatus = document.getElementById('php-status');
+const phpVersion = document.getElementById('php-version');
+const phpMode = document.getElementById('php-mode');
 
 // Load example resource
 async function loadExample(filename) {
@@ -441,9 +510,73 @@ async function loadExample(filename) {
     }
 }
 
-// Serialize (placeholder - will use php-wasm in Phase 4 completion)
+// Initialize PHP-WASM (lazy loading)
+async function ensurePhpInitialized() {
+    if (phpInitialized) return true;
+    if (phpInitializing) {
+        // Wait for initialization to complete
+        while (phpInitializing) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        return phpInitialized;
+    }
+    
+    phpInitializing = true;
+    updatePhpStatus('initializing', 'Initializing...');
+    showStatus('loading', 'Initializing PHP runtime...');
+    
+    try {
+        await fhirClient.initialize((progress) => {
+            updatePhpStatus('initializing', progress.message);
+            showStatus('loading', `${progress.stage}: ${progress.message}`);
+        });
+        
+        phpInitialized = true;
+        const version = await fhirClient.getPhpVersion();
+        updatePhpStatus('ready', 'Ready', version);
+        showStatus('success', 'PHP runtime initialized successfully');
+        return true;
+    } catch (error) {
+        updatePhpStatus('error', 'Failed to initialize');
+        showStatus('error', `Failed to initialize PHP runtime: ${error.message}`);
+        const outcome = structureError('PHP initialization failed', error.message);
+        showOperationOutcome(outcome);
+        return false;
+    } finally {
+        phpInitializing = false;
+    }
+}
+
+// Update PHP status display
+function updatePhpStatus(state, message, version = null) {
+    const statusIndicator = phpStatus.querySelector('.status-indicator');
+    const statusText = phpStatus.querySelector('.status-text');
+    const statusDetails = phpStatus.querySelector('.status-details');
+    
+    // Update indicator
+    statusIndicator.className = `status-indicator ${state}`;
+    
+    // Update text
+    statusText.textContent = `PHP Runtime: ${message}`;
+    
+    // Update details
+    if (state === 'ready' && version) {
+        phpVersion.textContent = version;
+        statusDetails.classList.remove('hidden');
+    } else if (state === 'initializing') {
+        statusDetails.classList.add('hidden');
+    }
+}
+
+// Serialize
 async function handleSerialize() {
     hideOperationOutcome();
+    
+    // Ensure PHP is initialized
+    if (!await ensurePhpInitialized()) {
+        return;
+    }
+    
     showStatus('loading', 'Serializing...');
     
     try {
@@ -463,21 +596,38 @@ async function handleSerialize() {
             return;
         }
         
-        // TODO: Replace with actual php-wasm serialization
-        // For now, just show formatted JSON
-        outputJson.textContent = JSON.stringify(resource, null, 2);
-        showStatus('success', 'Serialization successful (placeholder - php-wasm integration pending)');
+        // Use PHP-WASM for serialization
+        const result = await fhirClient.serialize(resource, {
+            validationMode: currentValidationMode
+        });
+        
+        // Check if result is an OperationOutcome (error)
+        if (result.resourceType === 'OperationOutcome') {
+            showOperationOutcome(result);
+            showStatus('error', 'Serialization failed');
+            return;
+        }
+        
+        // Display result
+        outputJson.textContent = JSON.stringify(result, null, 2);
+        showStatus('success', 'Serialization successful');
         
     } catch (error) {
-        const outcome = structureError('Invalid JSON format', error.message);
+        const outcome = structureError('Serialization error', error.message);
         showOperationOutcome(outcome);
         showStatus('error', 'Serialization failed');
     }
 }
 
-// Deserialize (placeholder - will use php-wasm in Phase 4 completion)
+// Deserialize
 async function handleDeserialize() {
     hideOperationOutcome();
+    
+    // Ensure PHP is initialized
+    if (!await ensurePhpInitialized()) {
+        return;
+    }
+    
     showStatus('loading', 'Deserializing...');
     
     try {
@@ -489,13 +639,24 @@ async function handleDeserialize() {
         // Validate JSON
         const resource = JSON.parse(input);
         
-        // TODO: Replace with actual php-wasm deserialization
-        // For now, just show formatted JSON
-        outputJson.textContent = JSON.stringify(resource, null, 2);
-        showStatus('success', 'Deserialization successful (placeholder - php-wasm integration pending)');
+        // Use PHP-WASM for deserialization
+        const result = await fhirClient.deserialize(resource, {
+            validationMode: currentValidationMode
+        });
+        
+        // Check if result is an OperationOutcome (error)
+        if (result.resourceType === 'OperationOutcome') {
+            showOperationOutcome(result);
+            showStatus('error', 'Deserialization failed');
+            return;
+        }
+        
+        // Display result
+        outputJson.textContent = JSON.stringify(result, null, 2);
+        showStatus('success', 'Deserialization successful');
         
     } catch (error) {
-        const outcome = structureError('Invalid JSON format', error.message);
+        const outcome = structureError('Deserialization error', error.message);
         showOperationOutcome(outcome);
         showStatus('error', 'Deserialization failed');
     }
