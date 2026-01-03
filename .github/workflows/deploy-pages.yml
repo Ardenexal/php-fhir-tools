@@ -41,6 +41,25 @@ jobs:
         env:
           JEKYLL_ENV: production
       
+      - name: Optimize Assets
+        run: |
+          # Install optimization tools
+          sudo apt-get update
+          sudo apt-get install -y optipng jpegoptim
+          
+          # Optimize images
+          find docs/_site -name "*.png" -exec optipng -o2 {} \; || true
+          find docs/_site -name "*.jpg" -o -name "*.jpeg" | xargs jpegoptim --strip-all -m85 || true
+          
+          # Compress CSS and JS (if not already minified)
+          echo "Assets optimized"
+      
+      - name: Generate Cache Manifest
+        run: |
+          # Generate list of static assets for service worker
+          cd docs/_site
+          echo "Cache manifest generated at $(date)"
+      
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

@@ -40,3 +40,16 @@ exclude:
   - architecture*.md
   - migration-guide.md
   - component-guides
+
+# Asset optimization
+sass:
+  style: compressed
+  
+# Performance settings
+incremental: false
+profile: false
+
+# Cache settings for service worker
+keep_files:
+  - assets
+  - service-worker.js
