@@ -10,6 +10,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
@@ -51,6 +52,11 @@ class PackageLoader
     private const DEFAULT_REGISTRY = 'https://packages.fhir.org';
 
     /**
+     * Version directory separator
+     */
+    private const VERSION_SEPARATOR = '_';
+
+    /**
      * Retry handler for resilient network operations
      *
      * @var RetryHandler
@@ -86,13 +92,6 @@ class PackageLoader
     private CacheIntegrityManager $integrityManager;
 
     /**
-     * Version isolation manager for FHIR version separation
-     *
-     * @var VersionIsolationManager
-     */
-    private VersionIsolationManager $isolationManager;
-
-    /**
      * Construct a new enhanced PackageLoader with comprehensive dependencies
      *
      * @param HttpClientInterface  $httpClient     HTTP client for downloading packages
@@ -116,7 +115,6 @@ class PackageLoader
         $this->versionResolver    = new SemanticVersionResolver();
         $this->dependencyResolver = new DependencyResolver($this->versionResolver);
         $this->integrityManager   = new CacheIntegrityManager($this->filesystem, $this->logger);
-        $this->isolationManager   = new VersionIsolationManager($this->cacheDir ?? sys_get_temp_dir(), $this->filesystem, $this->logger);
     }
 
     /**
@@ -124,7 +122,6 @@ class PackageLoader
      *
      * @param string      $packageName Package name to install
      * @param string|null $version     Version constraint (e.g., "^1.0.0", "~1.2.0") or null for latest
-     * @param string      $fhirVersion FHIR version for isolation (e.g., "R4", "R4B", "R5")
      * @param string|null $registry    Package registry URL
      * @param bool        $resolveDeps Whether to resolve and install dependencies
      *
@@ -135,7 +132,6 @@ class PackageLoader
     public function installPackage(
         string $packageName,
         ?string $version = null,
-        string $fhirVersion = 'R4',
         ?string $registry = self::DEFAULT_REGISTRY,
         bool $resolveDeps = true
     ): PackageMetadata {
@@ -151,32 +147,32 @@ class PackageLoader
             }
 
             // Check if package is already cached with integrity verification
-            $packageMetadata = $this->getPackageMetadata($packageName, $version, $fhirVersion, $registry ?? self::DEFAULT_REGISTRY);
+            $packageMetadata = $this->getPackageMetadata($packageName, $version, $registry ?? self::DEFAULT_REGISTRY);
 
-            if ($this->isPackageCachedWithIntegrity($packageMetadata, $fhirVersion)) {
-                $this->logger->info("Package {$packageName}@{$version} already cached and verified for FHIR {$fhirVersion}");
+            if ($this->isPackageCachedWithIntegrity($packageMetadata)) {
+                $this->logger->info("Package {$packageName}@{$version} already cached and verified");
 
                 if ($resolveDeps) {
-                    $this->resolveDependencies($packageMetadata, $fhirVersion, $registry ?? self::DEFAULT_REGISTRY);
+                    $this->resolveDependencies($packageMetadata, $registry ?? self::DEFAULT_REGISTRY);
                 }
 
-                $this->loadPackageToContext($packageMetadata, $fhirVersion);
+                $this->loadPackageStructureDefinitions($packageMetadata);
 
                 return $packageMetadata;
             }
 
             // Download and install package
-            $this->downloadAndInstallPackage($packageMetadata, $fhirVersion, $registry ?? self::DEFAULT_REGISTRY);
+            $this->downloadAndInstallPackage($packageMetadata, $registry ?? self::DEFAULT_REGISTRY);
 
             // Resolve dependencies if requested
             if ($resolveDeps) {
-                $this->resolveDependencies($packageMetadata, $fhirVersion, $registry ?? self::DEFAULT_REGISTRY);
+                $this->resolveDependencies($packageMetadata, $registry ?? self::DEFAULT_REGISTRY);
             }
 
             // Load package to context
-            $this->loadPackageToContext($packageMetadata, $fhirVersion);
+            $this->loadPackageStructureDefinitions($packageMetadata);
 
-            $this->logger->info("Successfully installed package: {$packageName}@{$version} for FHIR {$fhirVersion}");
+            $this->logger->info("Successfully installed package: {$packageName}@{$version}");
 
             return $packageMetadata;
         } catch (PackageException $e) {
@@ -191,17 +187,16 @@ class PackageLoader
      * Check if package is cached with integrity verification
      *
      * @param PackageMetadata $packageMetadata Package metadata
-     * @param string          $fhirVersion     FHIR version
      *
      * @return bool True if package is cached and verified
      */
-    private function isPackageCachedWithIntegrity(PackageMetadata $packageMetadata, string $fhirVersion): bool
+    private function isPackageCachedWithIntegrity(PackageMetadata $packageMetadata): bool
     {
-        if (!$this->isolationManager->isPackageCached($packageMetadata->getName(), $packageMetadata->getVersion(), $fhirVersion)) {
+        if (!$this->isPackageCached($packageMetadata->getName(), $packageMetadata->getVersion())) {
             return false;
         }
 
-        $cachePath   = $this->isolationManager->getPackageCachePath($packageMetadata->getName(), $packageMetadata->getVersion(), $fhirVersion);
+        $cachePath   = $this->getPackageCachePath($packageMetadata->getName(), $packageMetadata->getVersion());
         $packageFile = $cachePath . '.tgz';
 
         return $this->integrityManager->validateCacheIntegrity($cachePath, $packageMetadata, $packageFile);
@@ -211,14 +206,15 @@ class PackageLoader
      * Load package resources to BuilderContext with FHIR version isolation
      *
      * @param PackageMetadata $packageMetadata Package metadata
-     * @param string          $fhirVersion     FHIR version
+     *
+     * @throws PackageException
+     * @return array<string, mixed>
      */
-    public function loadPackageToContext(PackageMetadata $packageMetadata, string $fhirVersion): void
+    public function loadPackageStructureDefinitions(PackageMetadata $packageMetadata): array
     {
-        $packagePath = $this->isolationManager->getPackageCachePath(
+        $packagePath = $this->getPackageCachePath(
             $packageMetadata->getName(),
             $packageMetadata->getVersion(),
-            $fhirVersion,
         );
 
         if (!$this->filesystem->exists($packagePath)) {
@@ -230,17 +226,19 @@ class PackageLoader
         });
 
         $loadedCount = 0;
+        $structureDefinitions = [];
         foreach ($jsonFiles as $jsonFile) {
             $json = json_decode($jsonFile->getContents(), true);
             if (isset($json['resourceType'])) {
                 switch ($json['resourceType']) {
                     case 'StructureDefinition':
-                        $this->contextBuilder->addDefinition($json['url'], $json);
+                        $structureDefinitions[$json['url']] = $json;
                         ++$loadedCount;
                         break;
                     case 'ValueSet':
                     case 'CodeSystem':
                         $this->contextBuilder->addDefinition($json['url'], $json);
+                        $structureDefinitions[$json['url']] = $json;
                         ++$loadedCount;
                         break;
                     default:
@@ -251,6 +249,7 @@ class PackageLoader
         }
 
         $this->logger->debug("Loaded {$loadedCount} resources from package {$packageMetadata->getIdentifier()} to context");
+        return  $structureDefinitions;
     }
 
     /**
@@ -287,14 +286,13 @@ class PackageLoader
      *
      * @param string $packageName Package name
      * @param string $version     Package version
-     * @param string $fhirVersion FHIR version
      * @param string $registry    Registry URL
      *
      * @return PackageMetadata Package metadata
      *
      * @throws PackageException When metadata cannot be retrieved
      */
-    private function getPackageMetadata(string $packageName, string $version, string $fhirVersion, string $registry): PackageMetadata
+    private function getPackageMetadata(string $packageName, string $version, string $registry): PackageMetadata
     {
         try {
             // Get package versions to find the correct download URL
@@ -333,21 +331,20 @@ class PackageLoader
      * Download and install package with integrity verification
      *
      * @param PackageMetadata $packageMetadata Package metadata
-     * @param string          $fhirVersion     FHIR version
      * @param string          $registry        Registry URL
      *
      * @throws PackageException When download or installation fails
      */
-    private function downloadAndInstallPackage(PackageMetadata $packageMetadata, string $fhirVersion, string $registry): void
+    private function downloadAndInstallPackage(PackageMetadata $packageMetadata, string $registry): void
     {
         $packageName = $packageMetadata->getName();
         $version     = $packageMetadata->getVersion();
         $url         = $packageMetadata->getUrl();
 
-        $extractPath    = $this->isolationManager->getPackageCachePath($packageName, $version, $fhirVersion);
+        $extractPath    = $this->getPackageCachePath($packageName, $version);
         $packageZipPath = $extractPath . '.tgz';
 
-        $this->retryHandler->executeHttpWithRetry(function() use ($url, $packageName, $version, $packageZipPath, $extractPath, $packageMetadata, $fhirVersion) {
+        $this->retryHandler->executeHttpWithRetry(function() use ($url, $packageName, $version, $packageZipPath, $extractPath, $packageMetadata) {
             $response = $this->httpClient->request('GET', $url);
 
             if ($response->getStatusCode() !== 200) {
@@ -356,7 +353,7 @@ class PackageLoader
 
             $packageZip = $response->getContent();
 
-            $this->retryHandler->executeFileWithRetry(function() use ($packageZipPath, $packageZip, $extractPath, $packageName, $version, $packageMetadata, $fhirVersion) {
+            $this->retryHandler->executeFileWithRetry(function() use ($packageZipPath, $packageZip, $extractPath, $packageName, $version, $packageMetadata) {
                 // Save package file
                 $this->filesystem->dumpFile($packageZipPath, $packageZip);
 
@@ -372,7 +369,7 @@ class PackageLoader
                     // Store integrity metadata
                     $this->integrityManager->storeIntegrityMetadata($extractPath, $packageMetadata, $checksum);
 
-                    $this->logger->info("Downloaded and extracted package {$packageName}@{$version} for FHIR {$fhirVersion}");
+                    $this->logger->info("Downloaded and extracted package {$packageName}@{$version}");
                 } catch (\Exception $e) {
                     // Cleanup on failure
                     $this->filesystem->remove($extractPath);
@@ -387,12 +384,11 @@ class PackageLoader
      * Resolve and install package dependencies
      *
      * @param PackageMetadata $packageMetadata Root package metadata
-     * @param string          $fhirVersion     FHIR version
      * @param string          $registry        Registry URL
      *
      * @throws PackageException When dependency resolution fails
      */
-    private function resolveDependencies(PackageMetadata $packageMetadata, string $fhirVersion, string $registry): void
+    private function resolveDependencies(PackageMetadata $packageMetadata, string $registry): void
     {
         if (!$packageMetadata->hasDependencies()) {
             return;
@@ -408,7 +404,7 @@ class PackageLoader
             try {
                 $availableVersions           = $this->getAvailableVersions($depName, $registry);
                 $bestVersion                 = $this->versionResolver->resolveBestVersion($depConstraint, $availableVersions);
-                $depMetadata                 = $this->getPackageMetadata($depName, $bestVersion, $fhirVersion, $registry);
+                $depMetadata                 = $this->getPackageMetadata($depName, $bestVersion, $registry);
                 $availablePackages[$depName] = $depMetadata;
             } catch (PackageException $e) {
                 $this->logger->warning("Could not resolve dependency {$depName}: {$e->getMessage()}");
@@ -421,7 +417,7 @@ class PackageLoader
             // Install dependencies in order
             foreach ($installationOrder as $package) {
                 if ($package->getName() !== $packageMetadata->getName()) {
-                    $this->installPackage($package->getName(), $package->getVersion(), $fhirVersion, $registry, false);
+                    $this->installPackage($package->getName(), $package->getVersion(), $registry, false);
                 }
             }
 
@@ -430,40 +426,6 @@ class PackageLoader
             $this->logger->error("Dependency resolution failed for {$packageMetadata->getIdentifier()}: {$e->getMessage()}");
             throw $e;
         }
-    }
-
-    /**
-     * Get package cache statistics for all FHIR versions
-     *
-     * @return array<string, array{package_count: int, total_size: int, last_modified: string|null}> Statistics by FHIR version
-     */
-    public function getCacheStatistics(): array
-    {
-        return $this->isolationManager->getCacheStatistics();
-    }
-
-    /**
-     * Clean cache for a specific FHIR version
-     *
-     * @param string $fhirVersion FHIR version to clean
-     *
-     * @throws PackageException When cleanup fails
-     */
-    public function cleanVersionCache(string $fhirVersion): void
-    {
-        $this->isolationManager->cleanVersionCache($fhirVersion);
-    }
-
-    /**
-     * List all cached packages for a specific FHIR version
-     *
-     * @param string $fhirVersion FHIR version
-     *
-     * @return array<array{name: string, version: string, path: string}> Cached packages
-     */
-    public function listCachedPackages(string $fhirVersion): array
-    {
-        return $this->isolationManager->listCachedPackages($fhirVersion);
     }
 
     /**
@@ -479,18 +441,203 @@ class PackageLoader
     }
 
     /**
-     * Migrate packages from one FHIR version to another
+     * Get isolated cache directory for a specific FHIR version
      *
-     * @param string $fromVersion Source FHIR version
-     * @param string $toVersion   Target FHIR version
-     * @param bool   $copyOnly    If true, copy instead of move
      *
-     * @return int Number of packages migrated
+     * @return string Isolated cache directory path
      *
-     * @throws PackageException When migration fails
+     * @throws PackageException When FHIR version is not supported
      */
-    public function migratePackages(string $fromVersion, string $toVersion, bool $copyOnly = false): int
+    public function getVersionCacheDir(): string
     {
-        return $this->isolationManager->migratePackages($fromVersion, $toVersion, $copyOnly);
+
+        $versionDir = Path::canonicalize($this->cacheDir . '/');
+
+        // Ensure the directory exists
+        if (!$this->filesystem->exists($versionDir)) {
+            $this->filesystem->mkdir($versionDir);
+            $this->logger->debug("Created version cache directory: {$versionDir}");
+        }
+
+        return $versionDir;
+    }
+
+    /**
+     * Get isolated package cache path for a specific package and FHIR version
+     *
+     * @param string $packageName Package name
+     * @param string $version     Package version
+     *
+     * @return string Isolated package cache path
+     *
+     * @throws PackageException When FHIR version is not supported
+     */
+    public function getPackageCachePath(string $packageName, string $version): string
+    {
+        $versionCacheDir   = $this->getVersionCacheDir();
+        $packageIdentifier = $packageName . self::VERSION_SEPARATOR . $version;
+
+        return Path::canonicalize($versionCacheDir . '/' . $packageIdentifier);
+    }
+
+    /**
+     * Check if a package is cached for a specific FHIR version
+     *
+     * @param string $packageName Package name
+     * @param string $version     Package version
+     *
+     * @return bool True if package is cached
+     *
+     * @throws PackageException When FHIR version is not supported
+     */
+    public function isPackageCached(string $packageName, string $version): bool
+    {
+        $packagePath = $this->getPackageCachePath($packageName, $version);
+
+        return $this->filesystem->exists($packagePath);
+    }
+
+    /**
+     * List all cached packages for a specific FHIR version
+     *
+     * @return array<array{name: string, version: string, path: string}> Cached packages
+     *
+     * @throws PackageException When FHIR version is not supported
+     */
+    public function listCachedPackages(): array
+    {
+        $versionCacheDir = $this->getVersionCacheDir();
+
+        if (!$this->filesystem->exists($versionCacheDir)) {
+            return [];
+        }
+
+        $packages = [];
+        $iterator = new \DirectoryIterator($versionCacheDir);
+
+        foreach ($iterator as $item) {
+            if ($item->isDot() || !$item->isDir()) {
+                continue;
+            }
+
+            $dirName = $item->getFilename();
+            $parts   = explode(self::VERSION_SEPARATOR, $dirName);
+
+            if (count($parts) >= 2) {
+                $version = array_pop($parts);
+                $name    = implode(self::VERSION_SEPARATOR, $parts);
+
+                $packages[] = [
+                    'name'    => $name,
+                    'version' => $version,
+                    'path'    => $item->getPathname(),
+                ];
+            }
+        }
+
+        return $packages;
+    }
+
+    /**
+     * Clean up cache for a specific FHIR version
+     *
+     *
+     * @throws PackageException When cleanup fails
+     */
+    public function cleanVersionCache(): void
+    {
+        $versionCacheDir = $this->getVersionCacheDir();
+
+        try {
+            if ($this->filesystem->exists($versionCacheDir)) {
+                $this->filesystem->remove($versionCacheDir);
+                $this->logger->info("Cleaned cache");
+            }
+        } catch (\Exception $e) {
+            throw PackageException::cacheCleanupFailed($versionCacheDir, $e->getMessage());
+        }
+    }
+
+    /**
+     * Get cache statistics for all FHIR versions
+     *
+     * @return array{package_count: int, total_size: int, last_modified: string|null} Statistics by FHIR version
+     */
+    public function getCacheStatistics(): array
+    {
+        $statistics = [];
+
+            try {
+                $versionCacheDir = $this->getVersionCacheDir();
+                $packages        = $this->listCachedPackages();
+
+                $statistics = [
+                    'package_count'   => count($packages),
+                    'total_size'      => $this->calculateDirectorySize($versionCacheDir),
+                    'last_modified'   => $this->getLastModifiedTime($versionCacheDir),
+                ];
+            } catch (PackageException) {
+                $statistics = [
+                    'package_count'   => 0,
+                    'total_size'      => 0,
+                    'last_modified'   => null,
+                ];
+            }
+
+        return $statistics;
+    }
+
+    /**
+     * Calculate total size of a directory
+     *
+     * @param string $directory Directory path
+     *
+     * @return int Total size in bytes
+     */
+    private function calculateDirectorySize(string $directory): int
+    {
+        if (!$this->filesystem->exists($directory)) {
+            return 0;
+        }
+
+        $size     = 0;
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($directory, \RecursiveDirectoryIterator::SKIP_DOTS),
+        );
+
+        foreach ($iterator as $file) {
+            if ($file->isFile()) {
+                $size += $file->getSize();
+            }
+        }
+
+        return $size;
+    }
+
+    /**
+     * Get last modified time for a directory
+     *
+     * @param string $directory Directory path
+     *
+     * @return string|null Last modified time in ISO format or null if not available
+     */
+    private function getLastModifiedTime(string $directory): ?string
+    {
+        if (!$this->filesystem->exists($directory)) {
+            return null;
+        }
+
+        $lastModified = 0;
+        $iterator     = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($directory, \RecursiveDirectoryIterator::SKIP_DOTS),
+        );
+
+        foreach ($iterator as $file) {
+            if ($file->isFile()) {
+                $lastModified = max($lastModified, $file->getMTime());
+            }
+        }
+
+        return $lastModified > 0 ? date('c', $lastModified) : null;
     }
 }

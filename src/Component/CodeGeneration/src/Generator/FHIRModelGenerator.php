@@ -15,6 +15,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 
 use function Symfony\Component\String\u;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRPrimitive;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
 
 /**
  * Generates PHP model classes from FHIR StructureDefinitions
@@ -52,19 +55,14 @@ use function Symfony\Component\String\u;
  *  }
  * @phpstan-type NestedElementArray array<string, mixed>
  *
- * @author FHIR Tools
+ * @author  FHIR Tools
  *
- * @since 1.0.0
+ * @since   1.0.0
  *
  * @package Ardenexal\FHIRTools\Component\CodeGeneration
  */
 class FHIRModelGenerator implements GeneratorInterface
 {
-    /**
-     * Default prefix for all generated FHIR classes
-     */
-    public const DEFAULT_CLASS_PREFIX = 'FHIR';
-
     /**
      * Check if this generator can handle the given definition
      *
@@ -113,9 +111,9 @@ class FHIRModelGenerator implements GeneratorInterface
      * @return ClassType|null The generated class or null if generation failed
      */
     public function generateModelClassWithErrorHandling(
-        array $structureDefinition,
-        string $version,
-        ErrorCollector $errorCollector,
+        array                    $structureDefinition,
+        string                   $version,
+        ErrorCollector           $errorCollector,
         ?BuilderContextInterface $builderContext = null
     ): ?ClassType {
         try {
@@ -185,8 +183,8 @@ class FHIRModelGenerator implements GeneratorInterface
      * @return ClassType The generated code type class
      */
     public function generateModelCodeType(
-        EnumType $enumType,
-        string $version,
+        EnumType                $enumType,
+        string                  $version,
         BuilderContextInterface $builderContext
     ): ClassType {
         // Enum names already have the FHIR prefix, so don't add it again
@@ -198,7 +196,7 @@ class FHIRModelGenerator implements GeneratorInterface
 
         // Extend FHIRCode base type
         $codeNamespace = $this->getNamespaceForFhirType('code', $version, $builderContext);
-        $codeFqcn      = $codeNamespace . '\\' . self::DEFAULT_CLASS_PREFIX . 'Code';
+        $codeFqcn      = $codeNamespace . '\\' . 'Code';
         $class->setExtends($codeFqcn);
         // Add use statement for the parent class only if it's in a different namespace
         if ($codeNamespace !== $namespace->getName()) {
@@ -218,8 +216,8 @@ class FHIRModelGenerator implements GeneratorInterface
 
         // Accept string|null to match parent, but document the expected enum type
         $constructor->addParameter('value', null)
-            ->setType('string|null')
-            ->addComment('@param ' . $enumFullName . '|string|null $value The code value (enum or string)');
+                    ->setType('string|null')
+                    ->addComment('@param ' . $enumFullName . '|string|null $value The code value (enum or string)');
 
         // Call parent constructor with the value
         $constructor->setBody('parent::__construct(value: $value);');
@@ -236,26 +234,36 @@ class FHIRModelGenerator implements GeneratorInterface
      */
     public function generateModelClass(array $structureDefinition, string $version, BuilderContextInterface $builderContext): ClassType
     {
-        $className = self::DEFAULT_CLASS_PREFIX . u($structureDefinition['name'])->pascal();
+        $className = ClassNameResolver::resolveClassName($structureDefinition['url'], $structureDefinition['name']);
 
         // Determine the correct namespace based on the structure definition kind
-        $kind      = $structureDefinition['kind'] ?? 'unknown';
-        $namespace = match ($kind) {
-            'resource'       => $builderContext->getElementNamespace($version),  // Resource namespace
-            'complex-type'   => $builderContext->getDatatypeNamespace($version), // DataType namespace
-            'primitive-type' => $builderContext->getPrimitiveNamespace($version), // Primitive namespace
-            default          => $builderContext->getElementNamespace($version)   // Fallback to Resource
-        };
+        $kind = $structureDefinition['kind'] ?? 'unknown';
+        switch ($kind) {
+            case 'resource':
+                $className .= 'Resource';
+                $namespace = $builderContext->getElementNamespace($version);
+                break;
+            case 'complex-type':
+                $namespace = $builderContext->getDatatypeNamespace($version);
+                break;
+            case 'primitive-type':
+                $className .= 'Primitive';
+                $namespace = $builderContext->getPrimitiveNamespace($version);
+                break;
+            default:
+                $namespace = $builderContext->getElementNamespace($version);
+                break;
+        }
 
-        $class     = new ClassType($className, $namespace);
-
+        $class = new ClassType($className, $namespace);
+        $builderContext->addType($structureDefinition['name'], $class);
         if ($structureDefinition['abstract'] === true) {
             $class->setAbstract();
         }
         if (isset($structureDefinition['baseDefinition'])) {
             $parent          = str_replace('http://hl7.org/fhir/StructureDefinition/', '', $structureDefinition['baseDefinition']);
             $parentNamespace = $this->getNamespaceForFhirType($parent, $version, $builderContext);
-            $parentFqcn      = $parentNamespace . '\\' . self::DEFAULT_CLASS_PREFIX . u($parent)->pascal();
+            $parentFqcn      = $parentNamespace . '\\' . u($parent)->pascal();
             $class->setExtends($parentFqcn);
             // Add use statement for the parent class only if it's in a different namespace
             if ($parentNamespace !== $namespace->getName()) {
@@ -272,26 +280,26 @@ class FHIRModelGenerator implements GeneratorInterface
                 'fhirVersion' => $version,
             ]);
         } elseif ($structureDefinition['kind'] === 'primitive-type') {
-            $class->addAttribute('Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRPrimitive', [
+            $class->addAttribute(FHIRPrimitive::class, [
                 'primitiveType' => $structureDefinition['name'],
                 'fhirVersion'   => $version,
             ]);
         } elseif ($structureDefinition['kind'] === 'complex-type') {
             // Check if this is a backbone element by looking at the base definition
             $isBackboneElement = isset($structureDefinition['baseDefinition'])
-                && str_contains($structureDefinition['baseDefinition'], 'BackboneElement');
+                                 && str_contains($structureDefinition['baseDefinition'], 'BackboneElement');
 
             if ($isBackboneElement) {
                 // Extract parent resource and element path from the structure definition name
                 $elementPath    = $structureDefinition['name'];
                 $parentResource = explode('.', $elementPath)[0];
-                $class->addAttribute('Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement', [
+                $class->addAttribute(FHIRBackboneElement::class, [
                     'parentResource' => $parentResource,
                     'elementPath'    => $elementPath,
                     'fhirVersion'    => $version,
                 ]);
             } else {
-                $class->addAttribute('Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType', [
+                $class->addAttribute(FHIRComplexType::class, [
                     'typeName'    => $structureDefinition['name'],
                     'fhirVersion' => $version,
                 ]);
@@ -371,7 +379,7 @@ class FHIRModelGenerator implements GeneratorInterface
                 // Track ValueSet dependencies for complex elements with bindings
                 $this->trackValueSetDependencies($element, $builderContext);
 
-                $className  = self::DEFAULT_CLASS_PREFIX . u($element['path'])->pascal();
+                $className = u($element['path'])->pascal()->toString();
                 // Use parent's namespace for backbone elements instead of Element namespace
                 $namespace  = $classNamespace;
                 $childClass = new ClassType($className, $namespace);
@@ -392,7 +400,7 @@ class FHIRModelGenerator implements GeneratorInterface
                         'fhirVersion'    => $version,
                     ]);
                     $backboneElementNamespace = $this->getNamespaceForFhirType('BackboneElement', $version, $builderContext);
-                    $backboneElementFqcn      = $backboneElementNamespace . '\\' . self::DEFAULT_CLASS_PREFIX . 'BackboneElement';
+                    $backboneElementFqcn      = $backboneElementNamespace . '\\' . 'BackboneElement';
                     $childClass->setExtends(name: $backboneElementFqcn);
                     // Add use statement for the parent class only if it's in a different namespace
                     if ($backboneElementNamespace !== $namespace->getName()) {
@@ -405,7 +413,7 @@ class FHIRModelGenerator implements GeneratorInterface
                         'fhirVersion' => $version,
                     ]);
                     $elementNamespace = $this->getNamespaceForFhirType('Element', $version, $builderContext);
-                    $elementFqcn      = $elementNamespace . '\\' . self::DEFAULT_CLASS_PREFIX . 'Element';
+                    $elementFqcn      = $elementNamespace . '\\' . 'Element';
                     $childClass->setExtends($elementFqcn);
                     // Add use statement for the parent class only if it's in a different namespace
                     if ($elementNamespace !== $namespace->getName()) {
@@ -469,7 +477,9 @@ class FHIRModelGenerator implements GeneratorInterface
                 $valueSetData = $this->resolveValueSetDefinition($baseValueSetUrl, $builderContext);
 
                 if ($valueSetData !== null) {
-                    $enumClassName     = self::DEFAULT_CLASS_PREFIX . u($valueSetData['name'])->pascal();
+                    /** @var class-string $enumClassName */
+                    $enumClassName = u($valueSetData['name'])->pascal()->toString();
+                    /** @var class-string $codeTypeClassName */
                     $codeTypeClassName = $enumClassName . 'Type';
 
                     // Add this ValueSet as a pending enum to be generated
@@ -527,7 +537,9 @@ class FHIRModelGenerator implements GeneratorInterface
                     $valueSetData = $this->resolveValueSetDefinition($baseValueSetUrl, $builderContext);
 
                     if ($valueSetData !== null) {
-                        $enumClassName     = self::DEFAULT_CLASS_PREFIX . u($valueSetData['name'])->pascal();
+                        /** @var class-string $enumClassName */
+                        $enumClassName = u($valueSetData['name'])->pascal()->toString();
+                        /** @var class-string $codeTypeClassName */
                         $codeTypeClassName = $enumClassName . 'Type';
 
                         $builderContext->addPendingEnum($baseValueSetUrl, $enumClassName);
@@ -597,104 +609,7 @@ class FHIRModelGenerator implements GeneratorInterface
                 $types[] = '\\' . $builderContext->getElementNamespace($version)->getName() . '\\' . $relatedClass->getName();
             }
         } elseif (isset($element['type'])) {
-            foreach ($element['type'] as $type) {
-                $code = $type['code'];
-
-                $targetElementNamespace = $builderContext->getElementNamespace($version)->getName();
-                $targetEnumNamespace    = $builderContext->getEnumNamespace($version)->getName();
-                if ($code === 'http://hl7.org/fhirpath/System.String') {
-                    if (isset($element['base']['path']) && $element['base']['path'] === 'integer.value') {
-                        $types[] = 'int';
-                        continue;
-                    }
-                    $fhirTypeExtension = array_find($type['extension'] ?? [], fn ($ext) => $ext['url'] === 'http://hl7.org/fhir/StructureDefinition/structuredefinition-fhir-type');
-                    if ($enum !== null && $fhirTypeExtension !== null && $fhirTypeExtension['valueUrl'] === 'code') {
-                        $types[] = '\\' . $targetEnumNamespace . '\\' . $enum->getName();
-                        continue;
-                    }
-
-                    $types[] = 'string';
-                    continue;
-                }
-                if ($code === 'http://hl7.org/fhirpath/System.Boolean') {
-                    $types[] = 'bool';
-                    continue;
-                }
-                if ($code === 'http://hl7.org/fhirpath/System.Integer') {
-                    $types[] = 'int';
-                    continue;
-                }
-                if ($code === 'http://hl7.org/fhirpath/System.Decimal') {
-                    $types[] = 'float';
-                    continue;
-                }
-                if ($code === 'http://hl7.org/fhirpath/System.DateTime') {
-                    $types[] = '\\' . \DateTimeInterface::class;
-                    continue;
-                }
-                if ($code === 'http://hl7.org/fhirpath/System.Date') {
-                    $types[] = 'string';
-                    continue;
-                }
-                if ($code === 'http://hl7.org/fhirpath/System.Time') {
-                    $types[] = 'string';
-                    continue;
-                }
-
-                if ($code === 'string') {
-                    $correctNamespace = $this->getNamespaceForFhirType($code, $version, $builderContext);
-                    $types[]          = '\\' . $correctNamespace . '\\' . self::DEFAULT_CLASS_PREFIX . u($code)->pascal();
-                    $types[]          = 'string';
-                    continue;
-                }
-
-                if ($code === 'Element') {
-                    $elementClass = u($element['path'])->pascal()->toString();
-                    // Look up the element from the builder context to get its actual namespace
-                    $storedElement = $builderContext->getType($element['path']);
-                    if ($storedElement !== null && $storedElement->getNamespace() !== null) {
-                        // Use the namespace from the stored element
-                        $types[] = '\\' . $storedElement->getNamespace()->getName() . '\\' . self::DEFAULT_CLASS_PREFIX . $elementClass;
-                    } else {
-                        // Fallback to parent's namespace if not found in context
-                        $types[] = '\\' . $namespace->getName() . '\\' . self::DEFAULT_CLASS_PREFIX . $elementClass;
-                    }
-                    continue;
-                }
-
-                if ($code === 'BackboneElement') {
-                    $elementClass = u($element['path'])->pascal()->toString();
-                    // Look up the backbone element from the builder context to get its actual namespace
-                    $storedElement = $builderContext->getType($element['path']);
-                    if ($storedElement !== null && $storedElement->getNamespace() !== null) {
-                        // Use the namespace from the stored backbone element
-                        $types[] = '\\' . $storedElement->getNamespace()->getName() . '\\' . self::DEFAULT_CLASS_PREFIX . $elementClass;
-                    } else {
-                        // Fallback to parent's namespace if not found in context
-                        $types[] = '\\' . $namespace->getName() . '\\' . self::DEFAULT_CLASS_PREFIX . $elementClass;
-                    }
-                    continue;
-                }
-
-                if ($code === 'code' && isset($element['binding']['valueSet'])) {
-                    $bindingStrength = $element['binding']['strength'] ?? 'extensible';
-
-                    // Only generate enums for required binding strength
-                    if ($this->shouldGenerateEnumForBinding($bindingStrength)) {
-                        $valueSetUrl = $element['binding']['valueSet'];
-                        $codeType    = $this->resolveValueSetCodeType($valueSetUrl, $builderContext, $version, $targetElementNamespace);
-                    } else {
-                        // For extensible, preferred, and example bindings, use string type
-                        $codeType = 'string';
-                    }
-
-                    $types[] = $codeType;
-                    continue;
-                }
-
-                $correctNamespace = $this->getNamespaceForFhirType($code, $version, $builderContext);
-                $types[]          = '\\' . $correctNamespace . '\\' . self::DEFAULT_CLASS_PREFIX . u($code)->pascal();
-            }
+            $types = $this->resolveClassFromType($element, $builderContext, $version, $types, $enum, $namespace);
         }
 
         $parameterName = $this->convertToMethodName($element['path']);
@@ -709,13 +624,13 @@ class FHIRModelGenerator implements GeneratorInterface
             $shortDescription = $element['short'] ?? '';
             if ($isArray) {
                 $method->addPromotedParameter($parameterName, [])
-                    ->setNullable(false)
-                    ->setType('array')
-                    ->addComment('@var  array<' . implode('|', $types) . '> ' . $parameterName . ' ' . $shortDescription);
+                       ->setNullable(false)
+                       ->setType('array')
+                       ->addComment('@var  array<' . implode('|', $types) . '> ' . $parameterName . ' ' . $shortDescription);
             } else {
                 $parameter = $method->addPromotedParameter($parameterName, null)
-                    ->setType(implode('|', $types))
-                    ->addComment('@var null|' . implode('|', $types) . ' ' . $parameterName . ' ' . $shortDescription);
+                                    ->setType(implode('|', $types))
+                                    ->addComment('@var null|' . implode('|', $types) . ' ' . $parameterName . ' ' . $shortDescription);
                 if ($isNullable === false) {
                     $parameter->addAttribute(NotBlank::class);
                 }
@@ -736,7 +651,7 @@ class FHIRModelGenerator implements GeneratorInterface
     {
         // First, check if this type has already been generated and stored in the builder context
         // This ensures we use the actual namespace where the type was generated
-        $className  = self::DEFAULT_CLASS_PREFIX . u($code)->pascal();
+        $className  = u($code)->pascal()->toString();
         $storedType = $builderContext->getType($className);
         if ($storedType !== null && $storedType->getNamespace() !== null) {
             return $storedType->getNamespace()->getName();
@@ -923,10 +838,10 @@ class FHIRModelGenerator implements GeneratorInterface
      * @return string The resolved code type (class name or 'string')
      */
     private function resolveValueSetCodeType(
-        string $valueSetUrl,
+        string                  $valueSetUrl,
         BuilderContextInterface $builderContext,
-        string $version,
-        string $targetElementNamespace
+        string                  $version,
+        string                  $targetElementNamespace
     ): string {
         // Code type wrappers are in DataType namespace since they extend FHIRCode
         $dataTypeNamespace = $builderContext->getDatatypeNamespace($version)->getName();
@@ -945,7 +860,7 @@ class FHIRModelGenerator implements GeneratorInterface
         $valueSetData = $this->resolveValueSetDefinition($baseValueSetUrl, $builderContext);
 
         if ($valueSetData !== null) {
-            $enumClassName     = self::DEFAULT_CLASS_PREFIX . u($valueSetData['name'])->pascal();
+            $enumClassName     = ClassNameResolver::resolveClassName($valueSetUrl, $valueSetData['name']);
             $codeTypeClassName = $enumClassName . 'Type';
 
             // Add this ValueSet as a pending enum to be generated
@@ -1090,5 +1005,127 @@ class FHIRModelGenerator implements GeneratorInterface
         }
 
         return $nestedArray;
+    }
+
+    /**
+     * @param array                   $element
+     * @param BuilderContextInterface $builderContext
+     * @param string                  $version
+     * @param array                   $types
+     * @param EnumType|null           $enum
+     * @param PhpNamespace            $namespace
+     *
+     * @return array
+     */
+    public function resolveClassFromType(array $element, BuilderContextInterface $builderContext, string $version, array $types, ?EnumType $enum, PhpNamespace $namespace): array
+    {
+        foreach ($element['type'] as $type) {
+            $code = $type['code'];
+
+            $targetElementNamespace = $builderContext->getElementNamespace($version)->getName();
+            $targetEnumNamespace    = $builderContext->getEnumNamespace($version)->getName();
+            if ($code === 'http://hl7.org/fhirpath/System.String') {
+                if (isset($element['base']['path']) && $element['base']['path'] === 'integer.value') {
+                    $types[] = 'int';
+                    continue;
+                }
+                $fhirTypeExtension = array_find($type['extension'] ?? [], fn($ext) => $ext['url'] === 'http://hl7.org/fhir/StructureDefinition/structuredefinition-fhir-type');
+                if ($enum !== null && $fhirTypeExtension !== null && $fhirTypeExtension['valueUrl'] === 'code') {
+                    $types[] = '\\' . $targetEnumNamespace . '\\' . $enum->getName();
+                    continue;
+                }
+
+                $types[] = 'string';
+                continue;
+            }
+            if ($code === 'http://hl7.org/fhirpath/System.Boolean' || $code === 'boolean') {
+                $correctNamespace = $this->getNamespaceForFhirType($code, $version, $builderContext);
+                $types[]          = '\\' . $correctNamespace . '\\' . u($code)->pascal() .'Primitive';
+                $types[] = 'bool';
+                continue;
+            }
+            if ($code === 'http://hl7.org/fhirpath/System.Integer' || $code === 'integer') {
+                $correctNamespace = $this->getNamespaceForFhirType($code, $version, $builderContext);
+                $types[]          = '\\' . $correctNamespace . '\\' . u($code)->pascal() .'Primitive';
+                $types[] = 'int';
+                continue;
+            }
+            if ($code === 'http://hl7.org/fhirpath/System.Decimal' || $code === 'decimal') {
+                $correctNamespace = $this->getNamespaceForFhirType($code, $version, $builderContext);
+                $types[]          = '\\' . $correctNamespace . '\\' . u($code)->pascal() .'Primitive';
+                $types[] = 'float';
+                continue;
+            }
+            if ($code === 'http://hl7.org/fhirpath/System.DateTime') {
+                $types[] = '\\' . \DateTimeInterface::class;
+                continue;
+            }
+            if ($code === 'http://hl7.org/fhirpath/System.Date') {
+                $types[] = 'string';
+                continue;
+            }
+            if ($code === 'http://hl7.org/fhirpath/System.Time') {
+                $types[] = 'string';
+                continue;
+            }
+
+            if ($code === 'http://hl7.org/fhirpath/System.String' || $code === 'string') {
+                $correctNamespace = $this->getNamespaceForFhirType($code, $version, $builderContext);
+                $types[]          = '\\' . $correctNamespace . '\\' . u($code)->pascal() .'Primitive';
+                $types[]          = 'string';
+                continue;
+            }
+
+            if ($code === 'Element') {
+                $elementClass = u($element['path'])->pascal()->toString();
+                // Look up the element from the builder context to get its actual namespace
+                $storedElement = $builderContext->getType($element['path']);
+                if ($storedElement !== null && $storedElement->getNamespace() !== null) {
+                    // Use the namespace from the stored element
+                    $types[] = '\\' . $storedElement->getNamespace()->getName() . '\\' . $elementClass;
+                } else {
+                    // Fallback to parent's namespace if not found in context
+                    $types[] = '\\' . $namespace->getName() . '\\' . $elementClass;
+                }
+                continue;
+            }
+
+            if ($code === 'BackboneElement') {
+                $elementClass = u($element['path'])->pascal()->toString();
+                // Look up the backbone element from the builder context to get its actual namespace
+                $storedElement = $builderContext->getType($element['path']);
+                if ($storedElement !== null && $storedElement->getNamespace() !== null) {
+                    // Use the namespace from the stored backbone element
+                    $types[] = '\\' . $storedElement->getNamespace()->getName() . '\\' . $elementClass;
+                } else {
+                    // Fallback to parent's namespace if not found in context
+                    $types[] = '\\' . $namespace->getName() . '\\' . $elementClass;
+                }
+                continue;
+            }
+
+            if ($code === 'code' && isset($element['binding']['valueSet'])) {
+                $bindingStrength = $element['binding']['strength'] ?? 'extensible';
+
+                // Only generate enums for required binding strength
+                if ($this->shouldGenerateEnumForBinding($bindingStrength)) {
+                    $valueSetUrl = $element['binding']['valueSet'];
+                    $codeType    = $this->resolveValueSetCodeType($valueSetUrl, $builderContext, $version, $targetElementNamespace);
+                } else {
+                    // For extensible, preferred, and example bindings, use string type
+                    $codeType = 'string';
+                }
+
+                $types[] = $codeType;
+                continue;
+            }
+if($code === 'decimal'){
+    xdebug_break();
+}
+            $correctNamespace = $this->getNamespaceForFhirType($code, $version, $builderContext);
+            $types[]          = '\\' . $correctNamespace . '\\' . u($code)->pascal();
+        }
+
+        return $types;
     }
 }

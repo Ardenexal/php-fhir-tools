@@ -149,6 +149,16 @@ class BuilderContext implements BuilderContextInterface
         $this->definitions[$url] = $definition;
     }
 
+    /**
+     * @param array<string, mixed> $definition
+     *
+     * @return void
+     */
+    public function loadDefinitions(array $definition): void
+    {
+        $this->definitions = $definition;
+    }
+
     public function getDefinition(string $url): ?array
     {
         return $this->definitions[$url] ?? null;

@@ -117,7 +117,7 @@ $loader = new PackageLoader();
 $metadata = $loader->installPackage('hl7.fhir.r4b.core', '4.3.0');
 
 // Load to context
-$loader->loadPackageToContext($metadata, 'R4B');
+$loader->loadPackageStructureDefinitions($metadata, 'R4B');
 ```
 
 ## Configuration Options
