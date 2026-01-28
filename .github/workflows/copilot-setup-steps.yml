@@ -7,6 +7,8 @@ name: Copilot Agent Setup
 on:
   workflow_dispatch:
   push:
+    branches:
+      - 'copilot/**'
 jobs:
   copilot-setup-steps:
     name: Setup PHP Environment for Copilot Agent
