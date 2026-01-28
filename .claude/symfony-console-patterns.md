@@ -1,19 +1,13 @@
----
-inclusion: always
----
+# Symfony Console Patterns
 
-# Symfony Console Command Patterns
-
-## Command Structure Standards
-
-### Command Class Organization
-- **Namespace**: Place commands in appropriate namespace (e.g., `App\Command`)
-- **Naming**: Use descriptive names ending with `Command` (e.g., `FHIRModelGeneratorCommand`)
-- **Inheritance**: Extend `Symfony\Component\Console\Command\Command`
-- **Attributes**: Use `#[AsCommand]` attribute for command configuration
+## Command Structure
 
 ### Command Configuration
+Use PHP 8 attributes for command configuration:
 ```php
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
+
 #[AsCommand(
     name: 'fhir:generate',
     description: 'Generate FHIR model classes from StructureDefinitions',
@@ -22,35 +16,8 @@ inclusion: always
 class FHIRModelGeneratorCommand extends Command
 ```
 
-### Dependency Injection in Commands
-- **Constructor Injection**: Inject services through constructor
-- **Service Locator**: Avoid service locator pattern
-- **Autowiring**: Leverage Symfony's autowiring capabilities
-- **Tagged Services**: Use service tags when appropriate
-
-## Input/Output Handling
-
-### Arguments and Options
-- **Clear Names**: Use descriptive argument and option names
-- **Validation**: Validate inputs early in the command execution
-- **Default Values**: Provide sensible defaults for optional parameters
-- **Help Text**: Include comprehensive help descriptions
-
-### Output Formatting
-- **Progress Bars**: Use progress bars for long-running operations
-- **Verbosity Levels**: Respect verbosity levels (-v, -vv, -vvv)
-- **Styling**: Use Symfony's output styling for consistent formatting
-- **Tables**: Use table helper for tabular data display
-
-### Error Handling
-- **Exit Codes**: Return appropriate exit codes (0 for success, non-zero for errors)
-- **Error Messages**: Provide clear, actionable error messages
-- **Exception Handling**: Catch and handle exceptions gracefully
-- **Logging**: Log errors appropriately without exposing sensitive data
-
-## Command Execution Patterns
-
-### Service Integration
+### Dependency Injection
+Inject services through constructor:
 ```php
 public function __construct(
     private readonly FHIRModelGenerator $generator,
@@ -61,43 +28,110 @@ public function __construct(
 }
 ```
 
-### Execution Flow
-1. **Validate Input**: Check arguments and options early
-2. **Setup Services**: Configure services with command parameters
-3. **Execute Logic**: Delegate business logic to services
-4. **Handle Results**: Process results and provide feedback
-5. **Cleanup**: Perform any necessary cleanup operations
+## Input Configuration
 
-### Progress Reporting
-- **Start Progress**: Initialize progress bars for long operations
-- **Update Progress**: Regularly update progress during execution
-- **Finish Progress**: Complete progress bars with final status
-- **Status Messages**: Provide meaningful status updates
+### Arguments and Options
+```php
+protected function configure(): void
+{
+    $this
+        ->addArgument('package', InputArgument::REQUIRED, 'FHIR package name')
+        ->addOption('output', 'o', InputOption::VALUE_REQUIRED, 'Output directory')
+        ->addOption('models-component', null, InputOption::VALUE_NONE, 'Generate to Models component');
+}
+```
 
-## Testing Console Commands
+## Output Handling
 
-### Command Testing Strategy
-- **Functional Tests**: Test complete command execution
-- **Input Testing**: Test various input combinations
-- **Output Testing**: Verify output format and content
-- **Error Testing**: Test error conditions and exit codes
+### Progress Indicator
+The codebase uses `ProgressIndicator` for visual feedback:
+```php
+use Symfony\Component\Console\Helper\ProgressIndicator;
 
-### Test Helpers
-- **CommandTester**: Use Symfony's CommandTester for testing
-- **Mock Services**: Mock injected services for isolated testing
-- **Fixtures**: Use test fixtures for consistent test data
-- **Assertions**: Assert on exit codes, output content, and side effects
+$progress = new ProgressIndicator($output);
+$progress->start('Processing...');
+// ... work ...
+$progress->advance();
+$progress->finish('Done!');
+```
 
-## Performance Considerations
+### Verbosity Levels
+Respect verbosity flags (`-v`, `-vv`, `-vvv`):
+```php
+if ($output->isVerbose()) {
+    $output->writeln('Detailed information...');
+}
+if ($output->isVeryVerbose()) {
+    $output->writeln('More detailed information...');
+}
+if ($output->isDebug()) {
+    $output->writeln('Debug information...');
+}
+```
 
-### Memory Management
-- **Large Datasets**: Handle large FHIR packages efficiently
-- **Memory Limits**: Monitor and manage memory usage
-- **Streaming**: Use streaming for large file operations
-- **Garbage Collection**: Explicitly unset large objects when done
+### Output Styling
+```php
+use Symfony\Component\Console\Style\SymfonyStyle;
 
-### Execution Time
-- **Timeouts**: Set appropriate timeouts for network operations
-- **Batching**: Process data in batches to avoid timeouts
-- **Caching**: Cache expensive operations when possible
-- **Optimization**: Profile and optimize slow operations
+$io = new SymfonyStyle($input, $output);
+$io->success('Generation complete!');
+$io->error('Generation failed!');
+$io->warning('Some warnings occurred');
+$io->table(['Column 1', 'Column 2'], $rows);
+```
+
+## Error Handling
+
+### Exit Codes
+```php
+protected function execute(InputInterface $input, OutputInterface $output): int
+{
+    try {
+        // ... command logic ...
+        return Command::SUCCESS;
+    } catch (\Exception $e) {
+        $io->error($e->getMessage());
+        return Command::FAILURE;
+    }
+}
+```
+
+## Key Services Used
+
+### BuilderContext
+Provides generation context configuration.
+
+### ErrorCollector
+Accumulates errors for batch reporting.
+
+### PackageLoader
+Handles FHIR package downloads and caching.
+
+## Testing Commands
+
+Use Symfony's `CommandTester`:
+```php
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Tester\CommandTester;
+
+$application = new Application($kernel);
+$command = $application->find('fhir:generate');
+$commandTester = new CommandTester($command);
+
+$commandTester->execute(['package' => 'hl7.fhir.r4.core']);
+
+self::assertSame(Command::SUCCESS, $commandTester->getStatusCode());
+```
+
+## Available Commands
+
+```bash
+# List all commands
+php bin/console list
+
+# FHIR generation
+php bin/console fhir:generate --help
+
+# Run with verbosity
+php bin/console fhir:generate -vvv
+```

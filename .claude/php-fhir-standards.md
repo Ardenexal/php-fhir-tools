@@ -1,82 +1,62 @@
----
-inclusion: always
----
-
 # PHP FHIRTools Development Standards
 
 ## Core Requirements
 
 ### PHP Standards
-- **PHP Version**: 8.2+ required
+- **PHP Version**: 8.3+ required (per composer.json)
 - **Strict Types**: Always include `declare(strict_types=1);` at the top of every PHP file
 - **PSR-12 Compliance**: All code must follow PSR-12 coding standards
 - **Type Hints**: Use strict type hints for all parameters and return types
 
-### Multi-Project Structure Standards
-- **Component Isolation**: Maintain clear boundaries between Bundle, CodeGeneration, and Serialization components
-- **Namespace Organization**: Use proper component namespaces (`Ardenexal\FHIRTools\Component\*`)
-- **Dependency Management**: Declare explicit dependencies between components in composer.json
-- **Backward Compatibility**: Maintain compatibility aliases for legacy namespaces
-- **Cross-Version Support**: Ensure compatibility with Symfony 6.4 and 7.4
+### Code Quality Tools
+- **Pint**: Run `composer lint` to fix code style (uses Symfony preset with PSR-12)
+- **PHPStan**: Run `composer phpstan` for static analysis (level 8)
+- **PHPUnit**: Use PHPUnit 11+/12+, use `void` return types on tests, use `self::assert*`
+
+### Component Structure
+```
+src/
+├── Bundle/FHIRBundle/              # Symfony Bundle integration
+├── Component/
+│   ├── CodeGeneration/src/         # FHIR class generation (uses Nette PhpGenerator)
+│   ├── Serialization/src/          # FHIR JSON/XML serialization
+│   ├── Models/src/                 # Generated FHIR models (R4, R4B, R5)
+│   └── FHIRPath/src/               # FHIRPath expression evaluator
+├── Exception/                      # Project-wide exceptions
+└── Serialization/                  # Legacy serialization (deprecated)
+```
+
+### Namespace Organization
+- **Component Namespace**: `Ardenexal\FHIRTools\Component\{ComponentName}\`
+- **Bundle Namespace**: `Ardenexal\FHIRTools\Bundle\FHIRBundle\`
+- **Tests Namespace**: `Ardenexal\FHIRTools\Tests\`
 
 ### Symfony Framework Standards
-- **Dependency Injection**: Use Symfony's DI container, avoid `new` keyword in commands and services
-- **Console Components**: Leverage Symfony Console helpers and components
-- **Service Configuration**: Use Symfony Autowiring for service configuration
-- **Bundle Best Practices**: Follow Symfony Bundle conventions for FHIRBundle
-- **Component Integration**: Properly integrate standalone components with Symfony
+- **Dependency Injection**: Use Symfony's DI container, avoid `new` keyword in commands
+- **Console Components**: Use `#[AsCommand]` attribute for command configuration
+- **Service Configuration**: Use autowiring via `config/services.yaml`
+- **Bundle Best Practices**: Follow Symfony Bundle conventions
 
 ### Documentation Requirements
-- **PHPDoc**: Add comprehensive PHPDoc blocks for all public methods and classes
-- **Author Tags**: Include `@author` tags in class documentation
-- **Parameter Documentation**: Document all parameters with types and descriptions
+- **PHPDoc**: Add PHPDoc blocks for public methods and classes
+- **Parameter Documentation**: Document parameters with types and descriptions
 - **Return Documentation**: Document return types and what they represent
-- **Component Documentation**: Maintain README.md files for each component
-- **Architecture Documentation**: Keep architecture documentation up to date
 
 ### Exception Handling
-- **Project-Specific Exceptions**: Use custom exceptions from component-specific `Exception/` namespaces
-- **Component-Specific Exceptions**: Use appropriate exception types for each component
+- **Project Exceptions**: Use custom exceptions from `src/Exception/` or component-specific namespaces
 - **Meaningful Messages**: Provide clear, actionable error messages
-- **Exception Hierarchy**: Maintain proper exception inheritance structure
-
-### Code Quality Tools
-- **PHP-CS-Fixer**: Run `composer run lint` to fix code style issues
-- **PHPStan**: Run `composer run phpstan` for static analysis
-- **PHPUnit**: Use PHPUnit 12+ for testing, no `void` return types, use `self::assert*`
-- **Component Testing**: Test components independently and together
-
-## Security Guidelines
-- **No Sensitive Data**: Never include sensitive information in logs, comments, or generated code
-- **Input Validation**: Validate all external inputs and FHIR data
-- **Error Handling**: Don't expose internal system details in error messages
-- **Component Security**: Ensure secure communication between components
+- **Note**: FHIRPath component exceptions extend `RuntimeException` (should be refactored for consistency)
 
 ## Generated Code Standards
 All generated FHIR classes must:
 - Be PSR-12 compliant
-- Include comprehensive PHPDoc annotations
+- Include PHPDoc annotations with ValueSet information
 - Use strict types (`declare(strict_types=1);`)
-- Follow consistent naming conventions
-- Include proper namespace declarations
-- Use component-appropriate namespaces
+- Include FHIR attributes (`FhirResource`, `FHIRBackboneElement`, `FHIRComplexType`, `FHIRPrimitive`)
+- Use promoted constructor properties
+- Follow version-specific namespaces (R4, R4B, R5)
 
-## Component-Specific Guidelines
-
-### FHIRBundle Component
-- Follow Symfony Bundle best practices
-- Provide semantic configuration
-- Register services properly in DI container
-- Include Symfony Flex recipe
-
-### CodeGeneration Component
-- Maintain minimal dependencies
-- Support standalone usage
-- Provide clear interfaces
-- Handle errors gracefully
-
-### Serialization Component
-- Integrate with Symfony Serializer
-- Support standalone usage
-- Provide validation capabilities
-- Optimize for performance
+## Security Guidelines
+- **No Sensitive Data**: Never include sensitive information in logs or generated code
+- **Input Validation**: Validate all external inputs and FHIR data
+- **Error Handling**: Don't expose internal system details in error messages

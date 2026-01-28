@@ -1,103 +1,58 @@
----
-inclusion: always
----
-
-# Security Guidelines for PHP FHIRTools
+# Security Guidelines
 
 ## Data Protection
 
-### Sensitive Information Handling
+### Sensitive Information
 - **No Secrets in Code**: Never hardcode API keys, passwords, or sensitive data
-- **Environment Variables**: Use environment variables for configuration secrets
+- **Environment Variables**: Use `.env` files for configuration (`.env`, `.env.dev`, `.env.test`)
 - **Log Sanitization**: Ensure logs don't contain sensitive information
 - **Error Messages**: Don't expose internal system details in error messages
 
-### Input Validation and Sanitization
-- **FHIR Data Validation**: Validate all FHIR input data against schemas
-- **Path Traversal Prevention**: Prevent directory traversal attacks in file operations
+### Input Validation
+- **FHIR Data Validation**: Validate FHIR input data against schemas
+- **Path Traversal Prevention**: Validate file paths to prevent directory traversal
 - **Input Sanitization**: Sanitize user inputs before processing
-- **Command Injection Prevention**: Avoid executing user-provided commands
 
 ## File System Security
 
 ### File Operations
-- **Path Validation**: Validate file paths to prevent unauthorized access
-- **Permission Checks**: Verify file permissions before operations
-- **Temporary Files**: Securely handle temporary files and cleanup
-- **Output Directory Security**: Ensure output directories have appropriate permissions
+- **Path Validation**: Validate file paths before read/write operations
+- **Output Directory**: Generated files go to `src/Component/Models/src/`
+- **Temporary Files**: Clean up temporary files after use
+- **Permissions**: Ensure appropriate file permissions on generated code
 
 ### Generated Code Security
-- **Code Injection Prevention**: Prevent code injection in generated PHP classes
-- **Template Security**: Secure template processing to prevent template injection
-- **File Naming**: Use safe file naming conventions to prevent conflicts
-- **Namespace Security**: Ensure generated namespaces don't conflict with system classes
+- **Code Injection Prevention**: Nette PhpGenerator handles escaping
+- **Safe File Naming**: Use safe naming conventions for generated files
+- **Namespace Safety**: Ensure generated namespaces don't conflict with system classes
 
 ## Network Security
 
 ### HTTP Operations
-- **HTTPS Only**: Use HTTPS for all network communications
-- **Certificate Validation**: Validate SSL certificates for external requests
-- **Timeout Configuration**: Set appropriate timeouts to prevent hanging connections
-- **Rate Limiting**: Implement rate limiting for external API calls
+- **HTTPS**: Use HTTPS for FHIR package registry requests
+- **Certificate Validation**: Validate SSL certificates
+- **Timeouts**: Set appropriate timeouts to prevent hanging connections
 
 ### FHIR Package Downloads
-- **Source Validation**: Validate FHIR package sources before downloading
-- **Integrity Checks**: Verify package integrity using checksums when available
-- **Size Limits**: Implement reasonable size limits for downloaded packages
-- **Malware Prevention**: Consider scanning downloaded packages for malware
-
-## Access Control
-
-### File System Access
-- **Principle of Least Privilege**: Run with minimal required permissions
-- **Directory Restrictions**: Restrict file operations to designated directories
-- **User Context**: Be aware of user context when performing file operations
-- **Permission Validation**: Validate permissions before file operations
-
-### Command Execution
-- **Command Validation**: Validate all command inputs and parameters
-- **Execution Context**: Be aware of execution context and privileges
-- **Shell Injection Prevention**: Prevent shell injection attacks
-- **Resource Limits**: Implement resource limits for command execution
+- **Source Validation**: Only download from trusted FHIR package registries
+- **Integrity Checks**: Verify package integrity via `CacheIntegrityManager`
+- **Caching**: Packages cached in `var/cache/fhir-packages/`
 
 ## Dependency Security
 
-### Third-Party Dependencies
-- **Dependency Scanning**: Regularly scan dependencies for vulnerabilities
-- **Version Pinning**: Pin dependency versions to avoid supply chain attacks
-- **Security Updates**: Keep dependencies updated with security patches
-- **Minimal Dependencies**: Use minimal required dependencies
-
 ### Composer Security
-- **Lock File Management**: Commit composer.lock for reproducible builds
-- **Package Verification**: Verify package signatures when available
-- **Repository Security**: Use trusted package repositories
-- **Audit Tools**: Use composer audit tools to check for vulnerabilities
+- **Lock File**: Commit `composer.lock` for reproducible builds
+- **Audit**: Run `composer audit` to check for vulnerabilities
+- **Updates**: Keep dependencies updated with security patches
 
 ## Runtime Security
 
-### Error Handling Security
-- **Information Disclosure**: Prevent information disclosure through error messages
-- **Stack Trace Sanitization**: Sanitize stack traces in production
-- **Logging Security**: Ensure logs don't contain sensitive information
-- **Debug Mode**: Disable debug mode in production environments
+### Error Handling
+- **Information Disclosure**: Prevent information disclosure in error messages
+- **Stack Traces**: Sanitize stack traces in production
+- **Debug Mode**: Disable debug mode in production (`APP_ENV=prod`)
 
-### Memory Security
-- **Memory Cleanup**: Clear sensitive data from memory after use
-- **Memory Limits**: Set appropriate memory limits to prevent DoS
-- **Resource Exhaustion**: Prevent resource exhaustion attacks
-- **Garbage Collection**: Ensure proper garbage collection of sensitive data
-
-## Compliance and Auditing
-
-### Security Auditing
-- **Code Reviews**: Conduct security-focused code reviews
-- **Penetration Testing**: Perform regular security testing
-- **Vulnerability Assessments**: Conduct regular vulnerability assessments
-- **Security Monitoring**: Implement security monitoring and alerting
-
-### Compliance Requirements
-- **Data Protection**: Comply with data protection regulations
-- **Healthcare Standards**: Follow healthcare data security standards when applicable
-- **Industry Standards**: Adhere to relevant industry security standards
-- **Documentation**: Document security measures and procedures
+### Healthcare Data Considerations
+- FHIR data may contain PHI (Protected Health Information)
+- Follow HIPAA guidelines when applicable
+- Don't log or store patient data unnecessarily

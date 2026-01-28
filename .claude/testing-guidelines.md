@@ -1,72 +1,66 @@
----
-inclusion: always
----
-
 # Testing Guidelines for PHP FHIRTools
 
-## Test Structure and Organization
+## Test Structure
 
-### Test Directory Structure
-- **Unit Tests**: Place in `tests/` directory mirroring `src/` structure
-- **Integration Tests**: Group related integration tests in subdirectories
-- **Test Data**: Store test FHIR data in `tests/fixtures/` or similar
-- **Mocks**: Create reusable mocks for external dependencies
+### Directory Organization
+- **Tests**: Located in `tests/` directory
+- **Unit Tests**: `tests/Unit/` mirroring `src/` structure
+- **Integration Tests**: `tests/Integration/`
+- **Fixtures**: `tests/Fixtures/FHIR/` for FHIR test data
+- **Base TestCase**: `tests/TestCase.php` provides reusable utilities
 
 ### PHPUnit Standards
-- **Version**: Use PHPUnit 12+ features and syntax
+- **Version**: PHPUnit 11+/12+
 - **Assertions**: Always use `self::assert*()` methods, never `$this->assert*()`
 - **Return Types**: Use `void` return types on test methods
-- **Setup/Teardown**: Use `setUp()` and `tearDown()` methods appropriately
 - **Data Providers**: Use data providers for parameterized tests
-- **Documentation**: Tests should have a doc block explain what the test should achieve.
+- **Setup/Teardown**: Use `setUp()` and `tearDown()` methods appropriately
 
 ### Test Naming Conventions
 - **Method Names**: Use descriptive names like `testGeneratesFHIRClassFromValidStructureDefinition()`
 - **Test Classes**: Follow pattern `{ClassUnderTest}Test.php`
-- **Assertions**: Make assertion messages clear and helpful
+
+## Running Tests
+
+### Available Commands
+```bash
+# Run all tests
+composer test
+
+# Run specific test suites
+composer test-unit
+composer test-integration
+composer test-fhir
+
+# Component-specific tests
+composer test:bundle
+composer test:codegen
+composer test:serialization
+
+# Full quality check (lint + phpstan + test)
+composer quality:all
+```
 
 ## Testing Strategies
 
 ### Unit Testing
-- **Isolation**: Test individual classes in isolation using mocks
-- **Coverage**: Aim for high code coverage on core business logic
-- **Edge Cases**: Test boundary conditions and error scenarios
-- **Mocking**: Mock external dependencies (HTTP clients, file system, etc.)
+- Test individual classes in isolation using mocks
+- Mock external dependencies (HTTP clients, file system)
+- Test boundary conditions and error scenarios
 
 ### Integration Testing
-- **End-to-End**: Test complete FHIR generation workflows
-- **Real Data**: Use actual FHIR StructureDefinitions for testing
-- **Output Validation**: Verify generated code compiles and follows standards
-- **Performance**: Include performance tests for large FHIR packages
-
-### Test Data Management
-- **Fixtures**: Use consistent test fixtures for FHIR data
-- **Builders**: Create test data builders for complex objects
-- **Cleanup**: Ensure tests clean up generated files and temporary data
-- **Isolation**: Each test should be independent and repeatable
-
-## Specific Testing Areas
-
-### FHIR Generation Testing
-- **Valid Input**: Test with valid FHIR StructureDefinitions
-- **Invalid Input**: Test error handling with malformed FHIR data
-- **Edge Cases**: Test unusual but valid FHIR structures
-- **Output Quality**: Verify generated code meets quality standards
-
-### Error Handling Testing
-- **Exception Types**: Test that correct exception types are thrown
-- **Error Messages**: Verify error messages are helpful and accurate
-- **Recovery**: Test error recovery and retry mechanisms
-- **Logging**: Verify appropriate logging of errors and warnings
+- Test complete FHIR generation workflows
+- Use actual FHIR StructureDefinitions from `tests/Fixtures/`
+- Verify generated code compiles and follows standards
+- Test serialization round-trips
 
 ### Command Testing
-- **Console Commands**: Test Symfony console commands with various inputs
-- **Exit Codes**: Verify correct exit codes for success/failure scenarios
-- **Output Format**: Test command output formatting and verbosity levels
-- **Help Text**: Verify command help and usage information
+- Use Symfony's `CommandTester` for console command testing
+- Test with various input combinations
+- Verify correct exit codes (0 for success, non-zero for errors)
+- Test output formatting and verbosity levels
 
-## Test Execution
-- **Command**: Run tests with `composer run test`
-- **Coverage**: Generate coverage reports when needed
-- **CI/CD**: Ensure tests pass in continuous integration
-- **Performance**: Monitor test execution time and optimize slow tests
+## Test Data Management
+- Use consistent test fixtures from `tests/Fixtures/FHIR/`
+- Each test should be independent and repeatable
+- Clean up generated files and temporary data after tests

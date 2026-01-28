@@ -72,7 +72,7 @@ composer quality:all       # lint + phpstan + test
 - **PSR-12**: Run `composer lint` to fix code style
 - **PHPStan level 8**: Run `composer phpstan` before committing
 - **Symfony best practices**: Use dependency injection, avoid `new` in commands
-- **PHPUnit 11+/12+**: Use `self::assert*` methods, no `void` return types on tests
+- **PHPUnit 11+/12+**: Use `self::assert*` methods and `void` return types on tests
 
 ## Testing Guidelines
 
