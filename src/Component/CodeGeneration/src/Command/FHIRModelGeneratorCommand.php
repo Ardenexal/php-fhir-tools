@@ -1143,9 +1143,8 @@ class FHIRModelGeneratorCommand extends Command
                 $enumType = $enumGenerator->generateEnum($valueset, $version, $this->context);
 
                 // Add enum to namespace safely
-                $enumNamespace     = $this->context->getEnumNamespace($version);
-                $dataTypeNamespace = $this->context->getDatatypeNamespace($version);
-                $enumTypeName      = $enumType->getName();
+                $enumNamespace = $this->context->getEnumNamespace($version);
+                $enumTypeName  = $enumType->getName();
                 if ($enumTypeName !== null) {
                     // Try to add enum to namespace, handling duplicates gracefully
                     try {
@@ -1165,7 +1164,8 @@ class FHIRModelGeneratorCommand extends Command
                     $this->context->addEnum($url, $enumNamespace->getName(), $enumType);
                 }
 
-                $codeType = $classGenerator->generateModelCodeType($enumType, $version, $this->context);
+                $codeType          = $classGenerator->generateModelCodeType($enumType, $version, $this->context);
+                $dataTypeNamespace = $this->context->getDatatypeNamespace($version);
                 $this->context->addType($url, $dataTypeNamespace->getName(), $codeType);
                 $this->context->removePendingType($url);
                 $this->context->removePendingEnum($url);
