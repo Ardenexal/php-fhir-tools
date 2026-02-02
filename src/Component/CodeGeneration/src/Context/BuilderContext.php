@@ -74,14 +74,14 @@ class BuilderContext implements BuilderContextInterface
     /**
      * Generated FHIR resource classes, keyed by URL
      *
-     * @var array<string, ClassType>
+     * @var array<string, GeneratedClassInfo>
      */
     private array $resources = [];
 
     /**
      * Generated FHIR type classes, keyed by URL
      *
-     * @var array<string, ClassType>
+     * @var array<string, GeneratedClassInfo>
      */
     private array $types = [];
 
@@ -95,7 +95,7 @@ class BuilderContext implements BuilderContextInterface
     /**
      * Generated enum classes, keyed by URL
      *
-     * @var array<string, EnumType>
+     * @var array<string, GeneratedClassInfo>
      */
     private array $enums = [];
 
@@ -104,9 +104,9 @@ class BuilderContext implements BuilderContextInterface
      */
     private array $pendingEnums = [];
 
-    public function addResource(string $url, ClassType $resource): void
+    public function addResource(string $fhirUrl, string $namespace, ClassType $resource): void
     {
-        $this->resources[$url] = $resource;
+        $this->resources[$fhirUrl] = new GeneratedClassInfo($resource, $namespace, $fhirUrl);
     }
 
     public function getResources(): array
@@ -114,9 +114,14 @@ class BuilderContext implements BuilderContextInterface
         return $this->resources;
     }
 
-    public function addType(string $url, ClassType $type): void
+    public function getResource(string $fhirUrl): ?GeneratedClassInfo
     {
-        $this->types[$url] = $type;
+        return $this->resources[$fhirUrl] ?? null;
+    }
+
+    public function addType(string $fhirUrl, string $namespace, ClassType $type): void
+    {
+        $this->types[$fhirUrl] = new GeneratedClassInfo($type, $namespace, $fhirUrl);
     }
 
     public function getTypes(): array
@@ -124,14 +129,14 @@ class BuilderContext implements BuilderContextInterface
         return $this->types;
     }
 
-    public function getType(string $path): ?ClassType
+    public function getType(string $path): ?GeneratedClassInfo
     {
         return $this->types[$path] ?? null;
     }
 
-    public function addEnum(string $url, EnumType $enum): void
+    public function addEnum(string $fhirUrl, string $namespace, EnumType $enum): void
     {
-        $this->enums[$url] = $enum;
+        $this->enums[$fhirUrl] = new GeneratedClassInfo($enum, $namespace, $fhirUrl);
     }
 
     public function getEnums(): array
@@ -139,7 +144,7 @@ class BuilderContext implements BuilderContextInterface
         return $this->enums;
     }
 
-    public function getEnum(string $url): ?EnumType
+    public function getEnum(string $url): ?GeneratedClassInfo
     {
         return $this->enums[$url] ?? null;
     }
