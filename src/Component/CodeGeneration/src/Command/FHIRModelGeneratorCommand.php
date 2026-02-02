@@ -462,7 +462,8 @@ class FHIRModelGeneratorCommand extends Command
     {
         $baseNamespace = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}";
 
-        foreach ($this->context->getTypes() as $type) {
+        foreach ($this->context->getTypes() as $typeInfo) {
+            $type = $typeInfo->asClassType();
             // Determine the correct namespace based on the class attributes
             $namespace     = $this->determineModelsComponentNamespace($type, $baseNamespace);
             $classContents = self::asPhpFile($type, $namespace);
@@ -480,7 +481,8 @@ class FHIRModelGeneratorCommand extends Command
             $output->writeln("Generated Models component class for {$type->getName()}");
         }
 
-        foreach ($this->context->getEnums() as $type) {
+        foreach ($this->context->getEnums() as $enumInfo) {
+            $type          = $enumInfo->asEnumType();
             $enumNamespace = new PhpNamespace("{$baseNamespace}\\Enum");
             $classContents = self::asPhpFile($type, $enumNamespace);
 
@@ -965,7 +967,7 @@ class FHIRModelGeneratorCommand extends Command
             $class = $generator->generateModelClassWithErrorHandling($structureDefinition, $version, $this->errorCollector, $this->context);
 
             if ($class !== null) {
-                $this->context->addType($structureDefinition['url'], $class);
+                $this->context->addType($structureDefinition['url'], $targetNamespace->getName(), $class);
                 $targetNamespace->add($class);
 
                 // Count generated classes by type
@@ -1020,7 +1022,7 @@ class FHIRModelGeneratorCommand extends Command
             $class = $generator->generateModelClassWithErrorHandling($structureDefinition, $version, $this->errorCollector, $this->context);
 
             if ($class !== null) {
-                $this->context->addType($structureDefinition['url'], $class);
+                $this->context->addType($structureDefinition['url'], $namespace->getName(), $class);
                 $namespace->add($class);
             } else {
                 $output->writeln("<error>Failed to generate class for {$structureDefinition['name']}</error>");
@@ -1044,7 +1046,8 @@ class FHIRModelGeneratorCommand extends Command
      */
     public function outputFiles(OutputInterface $output, string $version): void
     {
-        foreach ($this->context->getTypes() as $type) {
+        foreach ($this->context->getTypes() as $typeInfo) {
+            $type = $typeInfo->asClassType();
             // Use the namespace from the ClassType itself to preserve use statements
             $elementNamespace = $type->getNamespace() ?? $this->context->getElementNamespace($version);
             $classContents    = self::asPhpFile($type, $elementNamespace);
@@ -1053,7 +1056,8 @@ class FHIRModelGeneratorCommand extends Command
             $output->writeln("Generated model class for {$type->getName()}");
         }
 
-        foreach ($this->context->getEnums() as $type) {
+        foreach ($this->context->getEnums() as $enumInfo) {
+            $type          = $enumInfo->asEnumType();
             $enumNamespace = $this->context->getEnumNamespace($version);
             $classContents = self::asPhpFile($type, $enumNamespace);
             $path          = Path::canonicalize(__DIR__ . '/../output/' . $enumNamespace->getName() . '/' . $type->getName() . '.php');
@@ -1139,35 +1143,35 @@ class FHIRModelGeneratorCommand extends Command
                 $enumType = $enumGenerator->generateEnum($valueset, $version, $this->context);
 
                 // Add enum to namespace safely
-                $enumNamespace = $this->context->getEnumNamespace($version);
-                $enumTypeName  = $enumType->getName();
+                $enumNamespace     = $this->context->getEnumNamespace($version);
+                $dataTypeNamespace = $this->context->getDatatypeNamespace($version);
+                $enumTypeName      = $enumType->getName();
                 if ($enumTypeName !== null) {
                     // Try to add enum to namespace, handling duplicates gracefully
                     try {
                         $enumNamespace->add($enumType);
-                        $this->context->addEnum($url, $enumType);
+                        $this->context->addEnum($url, $enumNamespace->getName(), $enumType);
                     } catch (InvalidStateException $e) {
                         // Enum with this name already exists in namespace
                         if (str_contains($e->getMessage(), 'already exists')) {
                             $output->writeln("Enum class {$enumTypeName} already exists in namespace, skipping namespace addition");
                             // Still add to context for tracking with this URL
-                            $this->context->addEnum($url, $enumType);
+                            $this->context->addEnum($url, $enumNamespace->getName(), $enumType);
                         } else {
                             throw $e;
                         }
                     }
                 } else {
-                    $this->context->addEnum($url, $enumType);
+                    $this->context->addEnum($url, $enumNamespace->getName(), $enumType);
                 }
 
                 $codeType = $classGenerator->generateModelCodeType($enumType, $version, $this->context);
-                $this->context->addType($url, $codeType);
+                $this->context->addType($url, $dataTypeNamespace->getName(), $codeType);
                 $this->context->removePendingType($url);
                 $this->context->removePendingEnum($url);
 
                 // Add code type to DataType namespace safely (code types extend FHIRCode which is a primitive)
-                $dataTypeNamespace = $this->context->getDatatypeNamespace($version);
-                $codeTypeName      = $codeType->getName();
+                $codeTypeName = $codeType->getName();
                 if ($codeTypeName !== null) {
                     // Try to add code type to namespace, handling duplicates gracefully
                     try {
