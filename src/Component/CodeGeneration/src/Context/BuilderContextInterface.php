@@ -23,30 +23,41 @@ interface BuilderContextInterface
     /**
      * Add a generated resource class
      *
-     * @param string    $url      The FHIR resource URL
-     * @param ClassType $resource The generated resource class
+     * @param string    $fhirUrl   The FHIR resource URL
+     * @param string    $namespace The namespace the class is assigned to
+     * @param ClassType $resource  The generated resource class
      */
-    public function addResource(string $url, ClassType $resource): void;
+    public function addResource(string $fhirUrl, string $namespace, ClassType $resource): void;
 
     /**
      * Get all generated resource classes
      *
-     * @return array<string, ClassType>
+     * @return array<string, GeneratedClassInfo>
      */
     public function getResources(): array;
 
     /**
+     * Get a specific resource by URL
+     *
+     * @param string $fhirUrl The FHIR resource URL
+     *
+     * @return GeneratedClassInfo|null The resource info or null if not found
+     */
+    public function getResource(string $fhirUrl): ?GeneratedClassInfo;
+
+    /**
      * Add a generated type class
      *
-     * @param string    $url  The FHIR type URL or path
-     * @param ClassType $type The generated type class
+     * @param string    $fhirUrl   The FHIR type URL or path
+     * @param string    $namespace The namespace the class is assigned to
+     * @param ClassType $type      The generated type class
      */
-    public function addType(string $url, ClassType $type): void;
+    public function addType(string $fhirUrl, string $namespace, ClassType $type): void;
 
     /**
      * Get all generated type classes
      *
-     * @return array<string, ClassType>
+     * @return array<string, GeneratedClassInfo>
      */
     public function getTypes(): array;
 
@@ -55,22 +66,23 @@ interface BuilderContextInterface
      *
      * @param string $path The type path or URL
      *
-     * @return ClassType|null The type class or null if not found
+     * @return GeneratedClassInfo|null The type info or null if not found
      */
-    public function getType(string $path): ?ClassType;
+    public function getType(string $path): ?GeneratedClassInfo;
 
     /**
      * Add a generated enum
      *
-     * @param string   $url  The enum URL
-     * @param EnumType $enum The generated enum
+     * @param string   $fhirUrl   The enum URL
+     * @param string   $namespace The namespace the enum is assigned to
+     * @param EnumType $enum      The generated enum
      */
-    public function addEnum(string $url, EnumType $enum): void;
+    public function addEnum(string $fhirUrl, string $namespace, EnumType $enum): void;
 
     /**
      * Get all generated enums
      *
-     * @return array<string, EnumType>
+     * @return array<string, GeneratedClassInfo>
      */
     public function getEnums(): array;
 
@@ -79,9 +91,9 @@ interface BuilderContextInterface
      *
      * @param string $url The enum URL
      *
-     * @return EnumType|null The enum or null if not found
+     * @return GeneratedClassInfo|null The enum info or null if not found
      */
-    public function getEnum(string $url): ?EnumType;
+    public function getEnum(string $url): ?GeneratedClassInfo;
 
     /**
      * Add a FHIR definition
