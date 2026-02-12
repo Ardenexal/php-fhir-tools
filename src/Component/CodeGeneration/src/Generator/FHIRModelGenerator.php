@@ -479,7 +479,7 @@ class FHIRModelGenerator implements GeneratorInterface
 
                 if ($valueSetData !== null) {
                     /** @var class-string $enumClassName */
-                    $enumClassName = u($valueSetData['name'])->pascal()->toString();
+                    $enumClassName = ClassNameResolver::resolveClassName($baseValueSetUrl, $valueSetData['name']);
                     /** @var class-string $codeTypeClassName */
                     $codeTypeClassName = $enumClassName . 'Type';
 
@@ -539,7 +539,7 @@ class FHIRModelGenerator implements GeneratorInterface
 
                     if ($valueSetData !== null) {
                         /** @var class-string $enumClassName */
-                        $enumClassName = u($valueSetData['name'])->pascal()->toString();
+                        $enumClassName = ClassNameResolver::resolveClassName($baseValueSetUrl, $valueSetData['name']);
                         /** @var class-string $codeTypeClassName */
                         $codeTypeClassName = $enumClassName . 'Type';
 
@@ -850,22 +850,31 @@ class FHIRModelGenerator implements GeneratorInterface
         // Code type wrappers are in DataType namespace since they extend FHIRCode
         $dataTypeNamespace = $builderContext->getDatatypeNamespace($version)->getName();
 
-        // Check if enum already exists
-        $enum = $builderContext->getEnum($valueSetUrl);
-        if ($enum !== null) {
-            // Enum name already includes FHIR prefix, just add 'Type' suffix
-            return '\\' . $dataTypeNamespace . '\\' . $enum->getClassName() . 'Type';
+        // Handle versioned ValueSet URLs by extracting base URL for resolution
+        // This must be done FIRST before any lookups since types are stored with base URL
+        $baseValueSetUrl = $this->extractBaseValueSetUrl($valueSetUrl);
+
+        // Check if code type already exists (first priority - most reliable)
+        $codeType = $builderContext->getType($baseValueSetUrl);
+        if ($codeType !== null) {
+            return $codeType->fqcn;
         }
 
-        // Handle versioned ValueSet URLs by extracting base URL for resolution
-        $baseValueSetUrl = $this->extractBaseValueSetUrl($valueSetUrl);
+        // Check if enum already exists
+        $enum = $builderContext->getEnum($baseValueSetUrl);
+        if ($enum !== null) {
+            // Use ClassNameResolver to get the correct name (handles duplicates like Use -> ClaimUse)
+            $enumClassName = ClassNameResolver::resolveClassName($enum->fhirUrl, $enum->getClassName());
+
+            return '\\' . $dataTypeNamespace . '\\' . $enumClassName . 'Type';
+        }
 
         // Try to resolve ValueSet definition from BuilderContext
         $valueSetData = $this->resolveValueSetDefinition($baseValueSetUrl, $builderContext);
 
         if ($valueSetData !== null) {
             /** @var class-string $enumClassName */
-            $enumClassName     = ClassNameResolver::resolveClassName($valueSetUrl, $valueSetData['name']);
+            $enumClassName     = ClassNameResolver::resolveClassName($baseValueSetUrl, $valueSetData['name']);
             /** @var class-string $codeTypeClassName */
             $codeTypeClassName = $enumClassName . 'Type';
 
@@ -1014,14 +1023,14 @@ class FHIRModelGenerator implements GeneratorInterface
     }
 
     /**
-     * @param array                   $element
+     * @param array<string, mixed>    $element
      * @param BuilderContextInterface $builderContext
      * @param string                  $version
-     * @param array                   $types
+     * @param array<string>           $types
      * @param EnumType|null           $enum
      * @param PhpNamespace            $namespace
      *
-     * @return array
+     * @return array<string>
      */
     public function resolveClassFromType(array $element, BuilderContextInterface $builderContext, string $version, array $types, ?EnumType $enum, PhpNamespace $namespace): array
     {
@@ -1078,7 +1087,7 @@ class FHIRModelGenerator implements GeneratorInterface
                 continue;
             }
 
-            if ($code === 'http://hl7.org/fhirpath/System.String' || $code === 'string') {
+            if ($code === 'string') {
                 $correctNamespace = $this->getNamespaceForFhirType($code, $version, $builderContext);
                 $types[]          = '\\' . $correctNamespace . '\\' . u($code)->pascal() . 'Primitive';
                 $types[]          = 'string';
