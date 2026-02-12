@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -12,9 +10,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum MeasureImprovementNotation: string
 {
-    /** Increased score indicates improvement */
-    case increasedscoreindicatesimprovement = 'increase';
+	/** Increased score indicates improvement */
+	case increasedscoreindicatesimprovement = 'increase';
 
-    /** Decreased score indicates improvement */
-    case decreasedscoreindicatesimprovement = 'decrease';
+	/** Decreased score indicates improvement */
+	case decreasedscoreindicatesimprovement = 'decrease';
 }

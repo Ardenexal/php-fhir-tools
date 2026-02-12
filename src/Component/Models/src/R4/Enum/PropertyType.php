@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -12,24 +10,24 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum PropertyType: string
 {
-    /** code (internal reference) */
-    case codeinternalreference = 'code';
+	/** code (internal reference) */
+	case codeinternalreference = 'code';
 
-    /** Coding (external reference) */
-    case codingexternalreference = 'Coding';
+	/** Coding (external reference) */
+	case codingexternalreference = 'Coding';
 
-    /** string */
-    case string = 'string';
+	/** string */
+	case string = 'string';
 
-    /** integer */
-    case integer = 'integer';
+	/** integer */
+	case integer = 'integer';
 
-    /** boolean */
-    case boolean = 'boolean';
+	/** boolean */
+	case boolean = 'boolean';
 
-    /** dateTime */
-    case datetime = 'dateTime';
+	/** dateTime */
+	case datetime = 'dateTime';
 
-    /** decimal */
-    case decimal = 'decimal';
+	/** decimal */
+	case decimal = 'decimal';
 }

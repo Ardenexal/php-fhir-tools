@@ -530,8 +530,22 @@ class FHIRModelGeneratorCommand extends Command
         foreach ($type->getAttributes() as $attribute) {
             $attributeName = $attribute->getName();
 
-            if (str_contains($attributeName, 'FhirResource') || str_contains($attributeName, 'FHIRBackboneElement')) {
+            if (str_contains($attributeName, 'FhirResource')) {
                 return new PhpNamespace("{$baseNamespace}\\Resource");
+            }
+
+            // Backbone elements nested inside a resource (elementPath contains a dot,
+            // e.g. "Communication.payload") belong in the Resource namespace.
+            // Top-level complex-type BackboneElements (elementPath has no dot,
+            // e.g. "Dosage", "Timing") are data types and belong in DataType.
+            if (str_contains($attributeName, 'FHIRBackboneElement')) {
+                $args        = $attribute->getArguments();
+                $elementPath = $args['elementPath'] ?? '';
+                if (str_contains($elementPath, '.')) {
+                    return new PhpNamespace("{$baseNamespace}\\Resource");
+                }
+
+                return new PhpNamespace("{$baseNamespace}\\DataType");
             }
 
             if (str_contains($attributeName, 'FHIRPrimitive')) {

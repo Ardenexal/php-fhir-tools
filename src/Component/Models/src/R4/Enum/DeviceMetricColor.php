@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -12,27 +10,27 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum DeviceMetricColor: string
 {
-    /** Color Black */
-    case colorblack = 'black';
+	/** Color Black */
+	case colorblack = 'black';
 
-    /** Color Red */
-    case colorred = 'red';
+	/** Color Red */
+	case colorred = 'red';
 
-    /** Color Green */
-    case colorgreen = 'green';
+	/** Color Green */
+	case colorgreen = 'green';
 
-    /** Color Yellow */
-    case coloryellow = 'yellow';
+	/** Color Yellow */
+	case coloryellow = 'yellow';
 
-    /** Color Blue */
-    case colorblue = 'blue';
+	/** Color Blue */
+	case colorblue = 'blue';
 
-    /** Color Magenta */
-    case colormagenta = 'magenta';
+	/** Color Magenta */
+	case colormagenta = 'magenta';
 
-    /** Color Cyan */
-    case colorcyan = 'cyan';
+	/** Color Cyan */
+	case colorcyan = 'cyan';
 
-    /** Color White */
-    case colorwhite = 'white';
+	/** Color White */
+	case colorwhite = 'white';
 }

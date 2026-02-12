@@ -1,35 +1,26 @@
-<?php
+<?php declare(strict_types=1);
 
-declare(strict_types=1);
-
-namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
-use Symfony\Component\Validator\Constraints\NotBlank;
+namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\Contract;
 
 /**
  * @description Offer Recipient.
  */
-#[FHIRBackboneElement(parentResource: 'Contract', elementPath: 'Contract.term.offer.party', fhirVersion: 'R4')]
-class ContractTermOfferParty extends BackboneElement
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'Contract', elementPath: 'Contract.term.offer.party', fhirVersion: 'R4')]
+class ContractTermOfferParty extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<Extension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        public array $modifierExtension = [],
-        /** @var array<Reference> reference Referenced entity */
-        public array $reference = [],
-        /** @var CodeableConcept|null role Participant engagement type */
-        #[NotBlank]
-        public ?CodeableConcept $role = null,
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference> reference Referenced entity */
+		public array $reference = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept role Participant engagement type */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept $role = null,
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }

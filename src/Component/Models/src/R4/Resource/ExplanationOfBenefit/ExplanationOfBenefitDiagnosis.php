@@ -1,43 +1,33 @@
-<?php
+<?php declare(strict_types=1);
 
-declare(strict_types=1);
-
-namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive;
-use Symfony\Component\Validator\Constraints\NotBlank;
+namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\ExplanationOfBenefit;
 
 /**
  * @description Information about diagnoses relevant to the claim items.
  */
-#[FHIRBackboneElement(parentResource: 'ExplanationOfBenefit', elementPath: 'ExplanationOfBenefit.diagnosis', fhirVersion: 'R4')]
-class ExplanationOfBenefitDiagnosis extends BackboneElement
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'ExplanationOfBenefit', elementPath: 'ExplanationOfBenefit.diagnosis', fhirVersion: 'R4')]
+class ExplanationOfBenefitDiagnosis extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<Extension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        public array $modifierExtension = [],
-        /** @var PositiveIntPrimitive|null sequence Diagnosis instance identifier */
-        #[NotBlank]
-        public ?PositiveIntPrimitive $sequence = null,
-        /** @var CodeableConcept|Reference|null diagnosisX Nature of illness or problem */
-        #[NotBlank]
-        public CodeableConcept|Reference|null $diagnosisX = null,
-        /** @var array<CodeableConcept> type Timing or nature of the diagnosis */
-        public array $type = [],
-        /** @var CodeableConcept|null onAdmission Present on admission */
-        public ?CodeableConcept $onAdmission = null,
-        /** @var CodeableConcept|null packageCode Package billing code */
-        public ?CodeableConcept $packageCode = null,
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive sequence Diagnosis instance identifier */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive $sequence = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference diagnosisX Nature of illness or problem */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public \Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference|null $diagnosisX = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept> type Timing or nature of the diagnosis */
+		public array $type = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept onAdmission Present on admission */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept $onAdmission = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept packageCode Package billing code */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept $packageCode = null,
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }

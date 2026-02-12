@@ -1,37 +1,29 @@
-<?php
+<?php declare(strict_types=1);
 
-declare(strict_types=1);
-
-namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\Measure;
 
 /**
  * @description A group of population criteria for the measure.
  */
-#[FHIRBackboneElement(parentResource: 'Measure', elementPath: 'Measure.group', fhirVersion: 'R4')]
-class MeasureGroup extends BackboneElement
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'Measure', elementPath: 'Measure.group', fhirVersion: 'R4')]
+class MeasureGroup extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<Extension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        public array $modifierExtension = [],
-        /** @var CodeableConcept|null code Meaning of the group */
-        public ?CodeableConcept $code = null,
-        /** @var StringPrimitive|string|null description Summary description */
-        public StringPrimitive|string|null $description = null,
-        /** @var array<MeasureGroupPopulation> population Population criteria */
-        public array $population = [],
-        /** @var array<MeasureGroupStratifier> stratifier Stratifier criteria for the measure */
-        public array $stratifier = [],
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept code Meaning of the group */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept $code = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string description Summary description */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string|null $description = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\Measure\MeasureGroupPopulation> population Population criteria */
+		public array $population = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\Measure\MeasureGroupStratifier> stratifier Stratifier criteria for the measure */
+		public array $stratifier = [],
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }

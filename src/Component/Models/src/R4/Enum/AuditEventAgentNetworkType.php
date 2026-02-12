@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -12,18 +10,18 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum AuditEventAgentNetworkType: string
 {
-    /** Machine Name */
-    case machinename = '1';
+	/** Machine Name */
+	case machinename = '1';
 
-    /** IP Address */
-    case ipaddress = '2';
+	/** IP Address */
+	case ipaddress = '2';
 
-    /** Telephone Number */
-    case telephonenumber = '3';
+	/** Telephone Number */
+	case telephonenumber = '3';
 
-    /** Email address */
-    case emailaddress = '4';
+	/** Email address */
+	case emailaddress = '4';
 
-    /** URI */
-    case uri = '5';
+	/** URI */
+	case uri = '5';
 }

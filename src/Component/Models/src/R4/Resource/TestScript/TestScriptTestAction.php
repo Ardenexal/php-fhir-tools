@@ -1,31 +1,25 @@
-<?php
+<?php declare(strict_types=1);
 
-declare(strict_types=1);
-
-namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\TestScript;
 
 /**
  * @description Action would contain either an operation or an assertion.
  */
-#[FHIRBackboneElement(parentResource: 'TestScript', elementPath: 'TestScript.test.action', fhirVersion: 'R4')]
-class TestScriptTestAction extends BackboneElement
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'TestScript', elementPath: 'TestScript.test.action', fhirVersion: 'R4')]
+class TestScriptTestAction extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<Extension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        public array $modifierExtension = [],
-        /** @var TestScriptSetupActionOperation|null operation The setup operation to perform */
-        public ?TestScriptSetupActionOperation $operation = null,
-        /** @var TestScriptSetupActionAssert|null assert The setup assertion to perform */
-        public ?TestScriptSetupActionAssert $assert = null,
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\TestScript\TestScriptSetupActionOperation operation The setup operation to perform */
+		public ?TestScriptSetupActionOperation $operation = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\TestScript\TestScriptSetupActionAssert assert The setup assertion to perform */
+		public ?TestScriptSetupActionAssert $assert = null,
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }

@@ -1,51 +1,35 @@
-<?php
+<?php declare(strict_types=1);
 
-declare(strict_types=1);
-
-namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Attachment;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Period;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
-use Symfony\Component\Validator\Constraints\NotBlank;
+namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\ExplanationOfBenefit;
 
 /**
  * @description Additional information codes regarding exceptions, special considerations, the condition, situation, prior or concurrent issues.
  */
-#[FHIRBackboneElement(parentResource: 'ExplanationOfBenefit', elementPath: 'ExplanationOfBenefit.supportingInfo', fhirVersion: 'R4')]
-class ExplanationOfBenefitSupportingInfo extends BackboneElement
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'ExplanationOfBenefit', elementPath: 'ExplanationOfBenefit.supportingInfo', fhirVersion: 'R4')]
+class ExplanationOfBenefitSupportingInfo extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<Extension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        public array $modifierExtension = [],
-        /** @var PositiveIntPrimitive|null sequence Information instance identifier */
-        #[NotBlank]
-        public ?PositiveIntPrimitive $sequence = null,
-        /** @var CodeableConcept|null category Classification of the supplied information */
-        #[NotBlank]
-        public ?CodeableConcept $category = null,
-        /** @var CodeableConcept|null code Type of information */
-        public ?CodeableConcept $code = null,
-        /** @var DatePrimitive|Period|null timingX When it occurred */
-        public DatePrimitive|Period|null $timingX = null,
-        /** @var bool|StringPrimitive|string|Quantity|Attachment|Reference|null valueX Data to be provided */
-        public bool|StringPrimitive|string|Quantity|Attachment|Reference|null $valueX = null,
-        /** @var Coding|null reason Explanation for the information */
-        public ?Coding $reason = null,
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive sequence Information instance identifier */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive $sequence = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept category Classification of the supplied information */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept $category = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept code Type of information */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept $code = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Period timingX When it occurred */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Period|null $timingX = null,
+		/** @var null|bool|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Attachment|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference valueX Data to be provided */
+		public bool|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Attachment|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference|null $valueX = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding reason Explanation for the information */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding $reason = null,
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }

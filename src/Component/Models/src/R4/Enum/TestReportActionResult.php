@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -12,18 +10,18 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum TestReportActionResult: string
 {
-    /** Pass */
-    case pass = 'pass';
+	/** Pass */
+	case pass = 'pass';
 
-    /** Skip */
-    case skip = 'skip';
+	/** Skip */
+	case skip = 'skip';
 
-    /** Fail */
-    case fail = 'fail';
+	/** Fail */
+	case fail = 'fail';
 
-    /** Warning */
-    case warning = 'warning';
+	/** Warning */
+	case warning = 'warning';
 
-    /** Error */
-    case error = 'error';
+	/** Error */
+	case error = 'error';
 }

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -12,12 +10,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum ActionRequiredBehavior: string
 {
-    /** Must */
-    case must = 'must';
+	/** Must */
+	case must = 'must';
 
-    /** Could */
-    case could = 'could';
+	/** Could */
+	case could = 'could';
 
-    /** Must Unless Documented */
-    case mustunlessdocumented = 'must-unless-documented';
+	/** Must Unless Documented */
+	case mustunlessdocumented = 'must-unless-documented';
 }

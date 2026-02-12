@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -12,39 +10,39 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum AssertionResponseTypes: string
 {
-    /** okay */
-    case okay = 'okay';
+	/** okay */
+	case okay = 'okay';
 
-    /** created */
-    case created = 'created';
+	/** created */
+	case created = 'created';
 
-    /** noContent */
-    case nocontent = 'noContent';
+	/** noContent */
+	case nocontent = 'noContent';
 
-    /** notModified */
-    case notmodified = 'notModified';
+	/** notModified */
+	case notmodified = 'notModified';
 
-    /** bad */
-    case bad = 'bad';
+	/** bad */
+	case bad = 'bad';
 
-    /** forbidden */
-    case forbidden = 'forbidden';
+	/** forbidden */
+	case forbidden = 'forbidden';
 
-    /** notFound */
-    case notfound = 'notFound';
+	/** notFound */
+	case notfound = 'notFound';
 
-    /** methodNotAllowed */
-    case methodnotallowed = 'methodNotAllowed';
+	/** methodNotAllowed */
+	case methodnotallowed = 'methodNotAllowed';
 
-    /** conflict */
-    case conflict = 'conflict';
+	/** conflict */
+	case conflict = 'conflict';
 
-    /** gone */
-    case gone = 'gone';
+	/** gone */
+	case gone = 'gone';
 
-    /** preconditionFailed */
-    case preconditionfailed = 'preconditionFailed';
+	/** preconditionFailed */
+	case preconditionfailed = 'preconditionFailed';
 
-    /** unprocessable */
-    case unprocessable = 'unprocessable';
+	/** unprocessable */
+	case unprocessable = 'unprocessable';
 }

@@ -1,56 +1,44 @@
-<?php
+<?php declare(strict_types=1);
 
-declare(strict_types=1);
-
-namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
-use Symfony\Component\Validator\Constraints\NotBlank;
+namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\AuditEvent;
 
 /**
  * @description An actor taking an active role in the event or activity that is logged.
  */
-#[FHIRBackboneElement(parentResource: 'AuditEvent', elementPath: 'AuditEvent.agent', fhirVersion: 'R4')]
-class AuditEventAgent extends BackboneElement
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'AuditEvent', elementPath: 'AuditEvent.agent', fhirVersion: 'R4')]
+class AuditEventAgent extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<Extension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        public array $modifierExtension = [],
-        /** @var CodeableConcept|null type How agent participated */
-        public ?CodeableConcept $type = null,
-        /** @var array<CodeableConcept> role Agent role in the event */
-        public array $role = [],
-        /** @var Reference|null who Identifier of who */
-        public ?Reference $who = null,
-        /** @var StringPrimitive|string|null altId Alternative User identity */
-        public StringPrimitive|string|null $altId = null,
-        /** @var StringPrimitive|string|null name Human friendly name for the agent */
-        public StringPrimitive|string|null $name = null,
-        /** @var bool|null requestor Whether user is initiator */
-        #[NotBlank]
-        public ?bool $requestor = null,
-        /** @var Reference|null location Where */
-        public ?Reference $location = null,
-        /** @var array<UriPrimitive> policy Policy that authorized event */
-        public array $policy = [],
-        /** @var Coding|null media Type of media */
-        public ?Coding $media = null,
-        /** @var AuditEventAgentNetwork|null network Logical network location for application activity */
-        public ?AuditEventAgentNetwork $network = null,
-        /** @var array<CodeableConcept> purposeOfUse Reason given for this user */
-        public array $purposeOfUse = [],
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept type How agent participated */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept $type = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept> role Agent role in the event */
+		public array $role = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference who Identifier of who */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference $who = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string altId Alternative User identity */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string|null $altId = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string name Human friendly name for the agent */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string|null $name = null,
+		/** @var null|bool requestor Whether user is initiator */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?bool $requestor = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference location Where */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference $location = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive> policy Policy that authorized event */
+		public array $policy = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding media Type of media */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding $media = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\AuditEvent\AuditEventAgentNetwork network Logical network location for application activity */
+		public ?AuditEventAgentNetwork $network = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept> purposeOfUse Reason given for this user */
+		public array $purposeOfUse = [],
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }

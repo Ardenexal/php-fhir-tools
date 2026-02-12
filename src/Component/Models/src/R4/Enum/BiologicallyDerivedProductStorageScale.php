@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -12,12 +10,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum BiologicallyDerivedProductStorageScale: string
 {
-    /** Fahrenheit */
-    case fahrenheit = 'farenheit';
+	/** Fahrenheit */
+	case fahrenheit = 'farenheit';
 
-    /** Celsius */
-    case celsius = 'celsius';
+	/** Celsius */
+	case celsius = 'celsius';
 
-    /** Kelvin */
-    case kelvin = 'kelvin';
+	/** Kelvin */
+	case kelvin = 'kelvin';
 }

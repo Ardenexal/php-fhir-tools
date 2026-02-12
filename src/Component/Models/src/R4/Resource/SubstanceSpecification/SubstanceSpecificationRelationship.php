@@ -1,47 +1,35 @@
-<?php
+<?php declare(strict_types=1);
 
-declare(strict_types=1);
-
-namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Range;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Ratio;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\SubstanceSpecification;
 
 /**
  * @description A link between this substance and another, with details of the relationship.
  */
-#[FHIRBackboneElement(parentResource: 'SubstanceSpecification', elementPath: 'SubstanceSpecification.relationship', fhirVersion: 'R4')]
-class SubstanceSpecificationRelationship extends BackboneElement
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'SubstanceSpecification', elementPath: 'SubstanceSpecification.relationship', fhirVersion: 'R4')]
+class SubstanceSpecificationRelationship extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<Extension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        public array $modifierExtension = [],
-        /** @var Reference|CodeableConcept|null substanceX A pointer to another substance, as a resource or just a representational code */
-        public Reference|CodeableConcept|null $substanceX = null,
-        /** @var CodeableConcept|null relationship For example "salt to parent", "active moiety", "starting material" */
-        public ?CodeableConcept $relationship = null,
-        /** @var bool|null isDefining For example where an enzyme strongly bonds with a particular substance, this is a defining relationship for that enzyme, out of several possible substance relationships */
-        public ?bool $isDefining = null,
-        /** @var Quantity|Range|Ratio|StringPrimitive|string|null amountX A numeric factor for the relationship, for instance to express that the salt of a substance has some percentage of the active substance in relation to some other */
-        public Quantity|Range|Ratio|StringPrimitive|string|null $amountX = null,
-        /** @var Ratio|null amountRatioLowLimit For use when the numeric */
-        public ?Ratio $amountRatioLowLimit = null,
-        /** @var CodeableConcept|null amountType An operator for the amount, for example "average", "approximately", "less than" */
-        public ?CodeableConcept $amountType = null,
-        /** @var array<Reference> source Supporting literature */
-        public array $source = [],
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept substanceX A pointer to another substance, as a resource or just a representational code */
+		public \Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept|null $substanceX = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept relationship For example "salt to parent", "active moiety", "starting material" */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept $relationship = null,
+		/** @var null|bool isDefining For example where an enzyme strongly bonds with a particular substance, this is a defining relationship for that enzyme, out of several possible substance relationships */
+		public ?bool $isDefining = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Range|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Ratio|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string amountX A numeric factor for the relationship, for instance to express that the salt of a substance has some percentage of the active substance in relation to some other */
+		public \Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Range|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Ratio|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string|null $amountX = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Ratio amountRatioLowLimit For use when the numeric */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Ratio $amountRatioLowLimit = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept amountType An operator for the amount, for example "average", "approximately", "less than" */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept $amountType = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference> source Supporting literature */
+		public array $source = [],
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }

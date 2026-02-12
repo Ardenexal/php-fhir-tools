@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -12,24 +10,24 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum EpisodeOfCareStatus: string
 {
-    /** Planned */
-    case planned = 'planned';
+	/** Planned */
+	case planned = 'planned';
 
-    /** Waitlist */
-    case waitlist = 'waitlist';
+	/** Waitlist */
+	case waitlist = 'waitlist';
 
-    /** Active */
-    case active = 'active';
+	/** Active */
+	case active = 'active';
 
-    /** On Hold */
-    case onhold = 'onhold';
+	/** On Hold */
+	case onhold = 'onhold';
 
-    /** Finished */
-    case finished = 'finished';
+	/** Finished */
+	case finished = 'finished';
 
-    /** Cancelled */
-    case cancelled = 'cancelled';
+	/** Cancelled */
+	case cancelled = 'cancelled';
 
-    /** Entered in Error */
-    case enteredinerror = 'entered-in-error';
+	/** Entered in Error */
+	case enteredinerror = 'entered-in-error';
 }

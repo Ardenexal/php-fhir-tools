@@ -1,38 +1,29 @@
-<?php
+<?php declare(strict_types=1);
 
-declare(strict_types=1);
-
-namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\ProvenanceEntityRoleType;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
-use Symfony\Component\Validator\Constraints\NotBlank;
+namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\Provenance;
 
 /**
  * @description An entity used in this activity.
  */
-#[FHIRBackboneElement(parentResource: 'Provenance', elementPath: 'Provenance.entity', fhirVersion: 'R4')]
-class ProvenanceEntity extends BackboneElement
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'Provenance', elementPath: 'Provenance.entity', fhirVersion: 'R4')]
+class ProvenanceEntity extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<Extension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        public array $modifierExtension = [],
-        /** @var ProvenanceEntityRoleType|null role derivation | revision | quotation | source | removal */
-        #[NotBlank]
-        public ?ProvenanceEntityRoleType $role = null,
-        /** @var Reference|null what Identity of entity */
-        #[NotBlank]
-        public ?Reference $what = null,
-        /** @var array<ProvenanceAgent> agent Entity is attributed to this agent */
-        public array $agent = [],
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\ProvenanceEntityRoleType role derivation | revision | quotation | source | removal */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\ProvenanceEntityRoleType $role = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference what Identity of entity */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference $what = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\Provenance\ProvenanceAgent> agent Entity is attributed to this agent */
+		public array $agent = [],
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }

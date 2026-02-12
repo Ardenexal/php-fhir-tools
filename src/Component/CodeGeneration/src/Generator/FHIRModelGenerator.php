@@ -355,7 +355,7 @@ class FHIRModelGenerator implements GeneratorInterface
             throw GenerationException::invalidElementPath('ClassType has no namespace');
         }
 
-        foreach ($propertyElements as $key => $propertyElement) {
+        foreach ($propertyElements as $propertyElement) {
             // This is a primitive type
             if (! array_key_exists('_properties', $propertyElement) || count($propertyElement['_properties']) === 0) {
                 if ($propertyElement['_element']['max'] === '0') {
@@ -381,15 +381,34 @@ class FHIRModelGenerator implements GeneratorInterface
                 $this->trackValueSetDependencies($element, $builderContext);
 
                 $className = u($element['path'])->pascal()->toString();
-                // Use parent's namespace for backbone elements instead of Element namespace
-                $namespace  = $classNamespace;
-                $childClass = new ClassType($className, $namespace);
-                $childClass->addMethod('__construct');
-                $builderContext->addType($element['path'], $namespace->getName(), $childClass);
 
                 // Determine if this is a backbone element or regular element
                 $isBackboneElement = isset($element['type'][0]['code']) && $element['type'][0]['code'] === 'BackboneElement';
                 $isElement         = isset($element['type'][0]['code']) && $element['type'][0]['code'] === 'Element';
+
+                // Backbone elements in a Resource namespace need a sub-namespace matching
+                // the parent resource, so that the namespace aligns with the subdirectory
+                // structure used by getModelsComponentOutputPath (PSR-4).
+                // DataType children remain flat (no subdirectory is created for them).
+                $currentNamespaceName = $classNamespace->getName();
+                $namespaceParts       = explode('\\', $currentNamespaceName);
+                $inResourceContext    = in_array('Resource', $namespaceParts, true);
+
+                if ($isBackboneElement && $inResourceContext) {
+                    $parentResourceName = explode('.', $element['path'])[0];
+                    // Avoid double-nesting for deeply nested backbone elements
+                    if (! str_ends_with($currentNamespaceName, '\\' . $parentResourceName)) {
+                        $namespace = new PhpNamespace($currentNamespaceName . '\\' . $parentResourceName);
+                    } else {
+                        $namespace = $classNamespace;
+                    }
+                } else {
+                    $namespace = $classNamespace;
+                }
+
+                $childClass = new ClassType($className, $namespace);
+                $childClass->addMethod('__construct');
+                $builderContext->addType($element['path'], $namespace->getName(), $childClass);
 
                 if ($isBackboneElement) {
                     // Add FHIRBackboneElement attribute for backbone elements

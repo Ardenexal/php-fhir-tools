@@ -1,41 +1,30 @@
-<?php
+<?php declare(strict_types=1);
 
-declare(strict_types=1);
-
-namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\ExposureStateType;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
-use Symfony\Component\Validator\Constraints\NotBlank;
+namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\EffectEvidenceSynthesis;
 
 /**
  * @description A description of the results for each exposure considered in the effect estimate.
  */
-#[FHIRBackboneElement(parentResource: 'EffectEvidenceSynthesis', elementPath: 'EffectEvidenceSynthesis.resultsByExposure', fhirVersion: 'R4')]
-class EffectEvidenceSynthesisResultsByExposure extends BackboneElement
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'EffectEvidenceSynthesis', elementPath: 'EffectEvidenceSynthesis.resultsByExposure', fhirVersion: 'R4')]
+class EffectEvidenceSynthesisResultsByExposure extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement
 {
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        public ?string $id = null,
-        /** @var array<Extension> extension Additional content defined by implementations */
-        public array $extension = [],
-        /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        public array $modifierExtension = [],
-        /** @var StringPrimitive|string|null description Description of results by exposure */
-        public StringPrimitive|string|null $description = null,
-        /** @var ExposureStateType|null exposureState exposure | exposure-alternative */
-        public ?ExposureStateType $exposureState = null,
-        /** @var CodeableConcept|null variantState Variant exposure states */
-        public ?CodeableConcept $variantState = null,
-        /** @var Reference|null riskEvidenceSynthesis Risk evidence synthesis */
-        #[NotBlank]
-        public ?Reference $riskEvidenceSynthesis = null,
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string description Description of results by exposure */
+		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string|null $description = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\ExposureStateType exposureState exposure | exposure-alternative */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\ExposureStateType $exposureState = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept variantState Variant exposure states */
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept $variantState = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference riskEvidenceSynthesis Risk evidence synthesis */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference $riskEvidenceSynthesis = null,
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }
