@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - 'copilot/**'
+        - 'copilot/**'
     paths:
       - .github/workflows/copilot-setup-steps.yml
   pull_request:

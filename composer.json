@@ -62,9 +62,7 @@
     "autoload-dev": {
         "psr-4": {
             "Ardenexal\\FHIRTools\\Tests\\": "tests/",
-            "Ardenexal\\FHIRTools\\Component\\FHIRPath\\Tests\\": "src/Component/FHIRPath/tests/",
-            "Ardenexal\\FHIRTools\\R4B\\": "output/Ardenexal/FhirTools/R4B/",
-            "App\\Mate\\": "mate/src/"
+            "Ardenexal\\FHIRTools\\Component\\FHIRPath\\Tests\\": "src/Component/FHIRPath/tests/"
         }
     },
     "replace": {

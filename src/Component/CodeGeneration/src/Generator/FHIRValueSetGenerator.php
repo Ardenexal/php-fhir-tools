@@ -39,7 +39,6 @@ use function Symfony\Component\String\u;
  */
 class FHIRValueSetGenerator implements GeneratorInterface
 {
-
     /**
      * String slugger for normalizing concept names into valid PHP identifiers
      *

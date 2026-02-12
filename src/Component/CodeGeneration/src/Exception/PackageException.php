@@ -293,4 +293,26 @@ class PackageException extends \Exception
             ],
         );
     }
+
+    /**
+     * Create exception for package not available offline
+     *
+     * @param string      $packageName The package name
+     * @param string|null $version     The package version
+     *
+     * @return self
+     */
+    public static function packageNotAvailableOffline(string $packageName, ?string $version = null): self
+    {
+        $message = "Package '{$packageName}' is not available in cache and offline mode is enabled";
+        if ($version !== null) {
+            $message .= " (version: {$version})";
+        }
+
+        return new self($message, [
+            'package_name' => $packageName,
+            'version'      => $version,
+            'offline_mode' => true,
+        ]);
+    }
 }

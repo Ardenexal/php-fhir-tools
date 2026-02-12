@@ -118,12 +118,79 @@ class PackageLoader
     }
 
     /**
+     * Try to load a package from cache without network access
+     *
+     * @param string      $packageName Package name to load
+     * @param string|null $version     Exact version or version constraint
+     *
+     * @return PackageMetadata|null Package metadata if found in cache, null otherwise
+     *
+     * @throws PackageException When cache access fails
+     */
+    public function tryLoadFromCache(string $packageName, ?string $version = null): ?PackageMetadata
+    {
+        try {
+            $cachedPackages = $this->listCachedPackages();
+
+            // Filter packages by name
+            $matchingPackages = array_filter($cachedPackages, function($pkg) use ($packageName) {
+                return $pkg['name'] === $packageName;
+            });
+
+            if (empty($matchingPackages)) {
+                $this->logger->debug("No cached packages found for {$packageName}");
+
+                return null;
+            }
+
+            // If exact version specified, look for exact match
+            if ($version !== null && !$this->versionResolver->isValidConstraint($version)) {
+                foreach ($matchingPackages as $pkg) {
+                    if ($pkg['version'] === $version) {
+                        return $this->integrityManager->reconstructPackageMetadata($pkg['path']);
+                    }
+                }
+                $this->logger->debug("Exact version {$version} not found in cache for {$packageName}");
+
+                return null;
+            }
+
+            // If version constraint or null, find best matching version
+            $availableVersions = array_column($matchingPackages, 'version');
+
+            if ($version === null) {
+                $bestVersion = $this->versionResolver->getLatestVersion($availableVersions);
+            } else {
+                $bestVersion = $this->versionResolver->resolveBestVersion($version, $availableVersions);
+            }
+
+            foreach ($matchingPackages as $pkg) {
+                if ($pkg['version'] === $bestVersion) {
+                    $packageMetadata = $this->integrityManager->reconstructPackageMetadata($pkg['path']);
+                    if ($packageMetadata !== null) {
+                        $this->logger->info("Loaded {$packageName}@{$bestVersion} from cache");
+                    }
+
+                    return $packageMetadata;
+                }
+            }
+
+            return null;
+        } catch (\Exception $e) {
+            $this->logger->warning("Failed to load package from cache: {$e->getMessage()}");
+
+            return null;
+        }
+    }
+
+    /**
      * Install a FHIR package with enhanced dependency resolution and integrity verification
      *
      * @param string      $packageName Package name to install
      * @param string|null $version     Version constraint (e.g., "^1.0.0", "~1.2.0") or null for latest
      * @param string|null $registry    Package registry URL
      * @param bool        $resolveDeps Whether to resolve and install dependencies
+     * @param bool        $offlineMode Whether to operate in offline mode (fail if not cached)
      *
      * @return PackageMetadata Installed package metadata
      *
@@ -133,10 +200,37 @@ class PackageLoader
         string $packageName,
         ?string $version = null,
         ?string $registry = self::DEFAULT_REGISTRY,
-        bool $resolveDeps = true
+        bool $resolveDeps = true,
+        bool $offlineMode = false
     ): PackageMetadata {
         try {
-            // Resolve version if not specified
+            // Try to load from cache first (offline-first approach)
+            $cachedMetadata = $this->tryLoadFromCache($packageName, $version);
+
+            if ($cachedMetadata !== null) {
+                // Verify cache integrity
+                if ($this->isPackageCachedWithIntegrity($cachedMetadata)) {
+                    $this->logger->info("Package {$packageName}@{$cachedMetadata->getVersion()} loaded from cache");
+
+                    if ($resolveDeps) {
+                        $this->resolveDependencies($cachedMetadata, $registry ?? self::DEFAULT_REGISTRY, $offlineMode);
+                    }
+
+                    $this->loadPackageStructureDefinitions($cachedMetadata);
+
+                    return $cachedMetadata;
+                }
+
+                // Cache exists but integrity check failed
+                $this->logger->warning("Cache integrity check failed for {$packageName}, will re-download");
+            }
+
+            // If offline mode and not in cache, fail early
+            if ($offlineMode) {
+                throw PackageException::packageNotAvailableOffline($packageName, $version);
+            }
+
+            // Resolve version if not specified (requires network)
             if ($version === null) {
                 $availableVersions = $this->getAvailableVersions($packageName, $registry ?? self::DEFAULT_REGISTRY);
                 $version           = $this->versionResolver->getLatestVersion($availableVersions);
@@ -146,14 +240,15 @@ class PackageLoader
                 $version           = $this->versionResolver->resolveBestVersion($version, $availableVersions);
             }
 
-            // Check if package is already cached with integrity verification
+            // Get package metadata from registry
             $packageMetadata = $this->getPackageMetadata($packageName, $version, $registry ?? self::DEFAULT_REGISTRY);
 
+            // Check if package is already cached with integrity verification
             if ($this->isPackageCachedWithIntegrity($packageMetadata)) {
                 $this->logger->info("Package {$packageName}@{$version} already cached and verified");
 
                 if ($resolveDeps) {
-                    $this->resolveDependencies($packageMetadata, $registry ?? self::DEFAULT_REGISTRY);
+                    $this->resolveDependencies($packageMetadata, $registry ?? self::DEFAULT_REGISTRY, $offlineMode);
                 }
 
                 $this->loadPackageStructureDefinitions($packageMetadata);
@@ -166,7 +261,7 @@ class PackageLoader
 
             // Resolve dependencies if requested
             if ($resolveDeps) {
-                $this->resolveDependencies($packageMetadata, $registry ?? self::DEFAULT_REGISTRY);
+                $this->resolveDependencies($packageMetadata, $registry ?? self::DEFAULT_REGISTRY, $offlineMode);
             }
 
             // Load package to context
@@ -207,8 +302,9 @@ class PackageLoader
      *
      * @param PackageMetadata $packageMetadata Package metadata
      *
-     * @throws PackageException
      * @return array<string, mixed>
+     *
+     * @throws PackageException
      */
     public function loadPackageStructureDefinitions(PackageMetadata $packageMetadata): array
     {
@@ -225,7 +321,7 @@ class PackageLoader
             return $file->getExtension() === 'json';
         });
 
-        $loadedCount = 0;
+        $loadedCount          = 0;
         $structureDefinitions = [];
         foreach ($jsonFiles as $jsonFile) {
             $json = json_decode($jsonFile->getContents(), true);
@@ -249,6 +345,7 @@ class PackageLoader
         }
 
         $this->logger->debug("Loaded {$loadedCount} resources from package {$packageMetadata->getIdentifier()} to context");
+
         return  $structureDefinitions;
     }
 
@@ -385,10 +482,11 @@ class PackageLoader
      *
      * @param PackageMetadata $packageMetadata Root package metadata
      * @param string          $registry        Registry URL
+     * @param bool            $offlineMode     Whether to operate in offline mode
      *
      * @throws PackageException When dependency resolution fails
      */
-    private function resolveDependencies(PackageMetadata $packageMetadata, string $registry): void
+    private function resolveDependencies(PackageMetadata $packageMetadata, string $registry, bool $offlineMode = false): void
     {
         if (!$packageMetadata->hasDependencies()) {
             return;
@@ -417,7 +515,7 @@ class PackageLoader
             // Install dependencies in order
             foreach ($installationOrder as $package) {
                 if ($package->getName() !== $packageMetadata->getName()) {
-                    $this->installPackage($package->getName(), $package->getVersion(), $registry, false);
+                    $this->installPackage($package->getName(), $package->getVersion(), $registry, false, $offlineMode);
                 }
             }
 
@@ -443,14 +541,12 @@ class PackageLoader
     /**
      * Get isolated cache directory for a specific FHIR version
      *
-     *
      * @return string Isolated cache directory path
      *
      * @throws PackageException When FHIR version is not supported
      */
     public function getVersionCacheDir(): string
     {
-
         $versionDir = Path::canonicalize($this->cacheDir . '/');
 
         // Ensure the directory exists
@@ -541,7 +637,6 @@ class PackageLoader
     /**
      * Clean up cache for a specific FHIR version
      *
-     *
      * @throws PackageException When cleanup fails
      */
     public function cleanVersionCache(): void
@@ -551,7 +646,7 @@ class PackageLoader
         try {
             if ($this->filesystem->exists($versionCacheDir)) {
                 $this->filesystem->remove($versionCacheDir);
-                $this->logger->info("Cleaned cache");
+                $this->logger->info('Cleaned cache');
             }
         } catch (\Exception $e) {
             throw PackageException::cacheCleanupFailed($versionCacheDir, $e->getMessage());
@@ -567,22 +662,22 @@ class PackageLoader
     {
         $statistics = [];
 
-            try {
-                $versionCacheDir = $this->getVersionCacheDir();
-                $packages        = $this->listCachedPackages();
+        try {
+            $versionCacheDir = $this->getVersionCacheDir();
+            $packages        = $this->listCachedPackages();
 
-                $statistics = [
-                    'package_count'   => count($packages),
-                    'total_size'      => $this->calculateDirectorySize($versionCacheDir),
-                    'last_modified'   => $this->getLastModifiedTime($versionCacheDir),
-                ];
-            } catch (PackageException) {
-                $statistics = [
-                    'package_count'   => 0,
-                    'total_size'      => 0,
-                    'last_modified'   => null,
-                ];
-            }
+            $statistics = [
+                'package_count'   => count($packages),
+                'total_size'      => $this->calculateDirectorySize($versionCacheDir),
+                'last_modified'   => $this->getLastModifiedTime($versionCacheDir),
+            ];
+        } catch (PackageException) {
+            $statistics = [
+                'package_count'   => 0,
+                'total_size'      => 0,
+                'last_modified'   => null,
+            ];
+        }
 
         return $statistics;
     }
