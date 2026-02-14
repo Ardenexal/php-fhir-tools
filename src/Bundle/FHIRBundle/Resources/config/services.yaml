@@ -29,6 +29,14 @@ services:
         public: true
 
     # Serialization Services
+    Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor: ~
+
+    Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface:
+        alias: 'Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor'
+
+    Ardenexal\FHIRTools\Component\Serialization\Validator\FHIRValidator:
+        public: true
+
     Ardenexal\FHIRTools\Serialization\FHIRSerializationService:
         public: true
 
