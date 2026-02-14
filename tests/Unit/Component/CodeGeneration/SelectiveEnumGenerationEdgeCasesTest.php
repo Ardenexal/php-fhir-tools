@@ -40,11 +40,11 @@ class SelectiveEnumGenerationEdgeCasesTest extends TestCase
         $this->errorCollector = new ErrorCollector();
         $this->builderContext = new BuilderContext();
 
-        // Set up namespaces for testing
-        $elementNamespace   = new PhpNamespace('Ardenexal\\FHIRTools\\Test\\Element');
-        $enumNamespace      = new PhpNamespace('Ardenexal\\FHIRTools\\Test\\Enum');
-        $primitiveNamespace = new PhpNamespace('Ardenexal\\FHIRTools\\Test\\Primitive');
-        $datatypeNamespace  = new PhpNamespace('Ardenexal\\FHIRTools\\Test\\DataType');
+        // Set up namespaces for testing using the Models component pattern
+        $elementNamespace   = new PhpNamespace('Ardenexal\\FHIRTools\\Component\\Models\\R4B\\Resource');
+        $enumNamespace      = new PhpNamespace('Ardenexal\\FHIRTools\\Component\\Models\\R4B\\Enum');
+        $primitiveNamespace = new PhpNamespace('Ardenexal\\FHIRTools\\Component\\Models\\R4B\\Primitive');
+        $datatypeNamespace  = new PhpNamespace('Ardenexal\\FHIRTools\\Component\\Models\\R4B\\DataType');
         $this->builderContext->addElementNamespace('R4B', $elementNamespace);
         $this->builderContext->addEnumNamespace('R4B', $enumNamespace);
         $this->builderContext->addPrimitiveNamespace('R4B', $primitiveNamespace);
@@ -61,18 +61,16 @@ class SelectiveEnumGenerationEdgeCasesTest extends TestCase
      */
     public function testEmptyStructureDefinitionsWithNoBindings(): void
     {
-        // Create empty StructureDefinition
+        // Create empty StructureDefinition without baseDefinition to avoid parent type issues
         $emptyStructureDefinition = [
             'resourceType'   => 'StructureDefinition',
             'id'             => 'empty-structure',
             'url'            => 'http://example.org/StructureDefinition/empty-structure',
             'name'           => 'EmptyStructure',
             'status'         => 'active',
-            'kind'           => 'resource',
+            'kind'           => 'complex-type',
             'abstract'       => false,
             'type'           => 'EmptyResource',
-            'baseDefinition' => 'http://hl7.org/fhir/StructureDefinition/DomainResource',
-            'derivation'     => 'specialization',
             'differential'   => [
                 'element' => [],
             ],
@@ -111,11 +109,9 @@ class SelectiveEnumGenerationEdgeCasesTest extends TestCase
             'url'            => 'http://example.org/StructureDefinition/no-bindings-structure',
             'name'           => 'NoBindingsStructure',
             'status'         => 'active',
-            'kind'           => 'resource',
+            'kind'           => 'complex-type',
             'abstract'       => false,
             'type'           => 'NoBindingsResource',
-            'baseDefinition' => 'http://hl7.org/fhir/StructureDefinition/DomainResource',
-            'derivation'     => 'specialization',
             'differential'   => [
                 'element' => [
                     [
@@ -183,11 +179,9 @@ class SelectiveEnumGenerationEdgeCasesTest extends TestCase
             'url'            => 'http://example.org/StructureDefinition/malformed-bindings-structure',
             'name'           => 'MalformedBindingsStructure',
             'status'         => 'active',
-            'kind'           => 'resource',
+            'kind'           => 'complex-type',
             'abstract'       => false,
             'type'           => 'MalformedBindingsResource',
-            'baseDefinition' => 'http://hl7.org/fhir/StructureDefinition/DomainResource',
-            'derivation'     => 'specialization',
             'differential'   => [
                 'element' => [
                     [
@@ -273,11 +267,9 @@ class SelectiveEnumGenerationEdgeCasesTest extends TestCase
             'url'            => 'http://example.org/StructureDefinition/missing-valueset-url',
             'name'           => 'MissingValueSetUrl',
             'status'         => 'active',
-            'kind'           => 'resource',
+            'kind'           => 'complex-type',
             'abstract'       => false,
             'type'           => 'MissingValueSetUrlResource',
-            'baseDefinition' => 'http://hl7.org/fhir/StructureDefinition/DomainResource',
-            'derivation'     => 'specialization',
             'differential'   => [
                 'element' => [
                     [
@@ -350,11 +342,9 @@ class SelectiveEnumGenerationEdgeCasesTest extends TestCase
             'url'            => 'http://example.org/StructureDefinition/circular-dependency-structure',
             'name'           => 'CircularDependencyStructure',
             'status'         => 'active',
-            'kind'           => 'resource',
+            'kind'           => 'complex-type',
             'abstract'       => false,
             'type'           => 'CircularDependencyResource',
-            'baseDefinition' => 'http://hl7.org/fhir/StructureDefinition/DomainResource',
-            'derivation'     => 'specialization',
             'snapshot'       => [
                 'element' => [
                     [
@@ -459,11 +449,9 @@ class SelectiveEnumGenerationEdgeCasesTest extends TestCase
             'url'            => 'http://example.org/StructureDefinition/multiple-references-structure',
             'name'           => 'MultipleReferencesStructure',
             'status'         => 'active',
-            'kind'           => 'resource',
+            'kind'           => 'complex-type',
             'abstract'       => false,
             'type'           => 'MultipleReferencesResource',
-            'baseDefinition' => 'http://hl7.org/fhir/StructureDefinition/DomainResource',
-            'derivation'     => 'specialization',
             'snapshot'       => [
                 'element' => [
                     [
