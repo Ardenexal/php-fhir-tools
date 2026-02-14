@@ -22,8 +22,6 @@ class OutputPathGenerationTest extends TestCase
 {
     private FHIRModelGeneratorCommand $command;
 
-    private \ReflectionClass $reflection;
-
     private \ReflectionMethod $getOutputPathMethod;
 
     private \ReflectionMethod $getBackboneParentResourceMethod;
@@ -36,14 +34,70 @@ class OutputPathGenerationTest extends TestCase
         $packageLoader = $this->createMock(PackageLoader::class);
 
         $this->command    = new FHIRModelGeneratorCommand($filesystem, $packageLoader);
-        $this->reflection = new \ReflectionClass($this->command);
+        $reflection = new \ReflectionClass($this->command);
 
         // Make private methods accessible for testing
-        $this->getOutputPathMethod = $this->reflection->getMethod('getOutputPath');
+        $this->getOutputPathMethod = $reflection->getMethod('getOutputPath');
         $this->getOutputPathMethod->setAccessible(true);
 
-        $this->getBackboneParentResourceMethod = $this->reflection->getMethod('getBackboneParentResource');
+        $this->getBackboneParentResourceMethod = $reflection->getMethod('getBackboneParentResource');
         $this->getBackboneParentResourceMethod->setAccessible(true);
+    }
+
+    /**
+     * Helper method to verify output path for a given type
+     *
+     * @param string         $version       FHIR version (R4, R4B, R5)
+     * @param string         $category      Namespace category (Resource, DataType, Primitive, Enum)
+     * @param string         $className     The class name
+     * @param string         $expectedPath  Expected path suffix
+     * @param ClassType|null $classType     Optional pre-configured ClassType
+     */
+    private function verifyOutputPath(
+        string $version,
+        string $category,
+        string $className,
+        string $expectedPath,
+        ?ClassType $classType = null
+    ): void {
+        $namespace = new PhpNamespace("Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\{$category}");
+        $class     = $classType ?? new ClassType($className);
+
+        $outputPath = $this->getOutputPathMethod->invoke(
+            $this->command,
+            $version,
+            $class,
+            $namespace,
+        );
+
+        self::assertStringEndsWith($expectedPath, $outputPath);
+        self::assertStringContainsString('/Models/src/', $outputPath);
+    }
+
+    /**
+     * Helper method to create a backbone element class with proper attributes
+     *
+     * @param string $className      The class name
+     * @param string $parentResource The parent resource name
+     * @param string $elementPath    The element path
+     * @param string $version        FHIR version
+     *
+     * @return ClassType
+     */
+    private function createBackboneElement(
+        string $className,
+        string $parentResource,
+        string $elementPath,
+        string $version = 'R4B'
+    ): ClassType {
+        $class = new ClassType($className);
+        $class->addAttribute('Ardenexal\\FHIRTools\\Component\\CodeGeneration\\Attributes\\FHIRBackboneElement', [
+            'parentResource' => $parentResource,
+            'elementPath'    => $elementPath,
+            'fhirVersion'    => $version,
+        ]);
+
+        return $class;
     }
 
     /**
@@ -53,21 +107,7 @@ class OutputPathGenerationTest extends TestCase
      */
     public function testResourceOutputPaths(): void
     {
-        $version   = 'R4B';
-        $namespace = new PhpNamespace("Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\Resource");
-
-        // Test regular resource class
-        $resourceClass = new ClassType('FHIRPatient');
-        $outputPath    = $this->getOutputPathMethod->invoke(
-            $this->command,
-            $version,
-            $resourceClass,
-            $namespace,
-        );
-
-        $expectedPath = 'src/Component/CodeGeneration/src/Component/Models/src/R4B/Resource/FHIRPatient.php';
-        self::assertStringEndsWith('R4B/Resource/FHIRPatient.php', $outputPath);
-        self::assertStringContainsString('/Models/src/', $outputPath);
+        $this->verifyOutputPath('R4B', 'Resource', 'FHIRPatient', 'R4B/Resource/FHIRPatient.php');
     }
 
     /**
@@ -77,27 +117,8 @@ class OutputPathGenerationTest extends TestCase
      */
     public function testBackboneElementOutputPaths(): void
     {
-        $version   = 'R4B';
-        $namespace = new PhpNamespace("Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\Resource");
-
-        // Create a backbone element class with proper attribute
-        $backboneClass = new ClassType('FHIRPatientContact');
-        $backboneClass->addAttribute('Ardenexal\\FHIRTools\\Component\\CodeGeneration\\Attributes\\FHIRBackboneElement', [
-            'parentResource' => 'Patient',
-            'elementPath'    => 'Patient.contact',
-            'fhirVersion'    => $version,
-        ]);
-
-        $outputPath = $this->getOutputPathMethod->invoke(
-            $this->command,
-            $version,
-            $backboneClass,
-            $namespace,
-        );
-
-        // Backbone elements should be in resource subdirectories
-        self::assertStringEndsWith('R4B/Resource/Patient/FHIRPatientContact.php', $outputPath);
-        self::assertStringContainsString('/Models/src/', $outputPath);
+        $backboneClass = $this->createBackboneElement('FHIRPatientContact', 'Patient', 'Patient.contact');
+        $this->verifyOutputPath('R4B', 'Resource', 'FHIRPatientContact', 'R4B/Resource/Patient/FHIRPatientContact.php', $backboneClass);
     }
 
     /**
@@ -107,19 +128,7 @@ class OutputPathGenerationTest extends TestCase
      */
     public function testDataTypeOutputPaths(): void
     {
-        $version   = 'R4B';
-        $namespace = new PhpNamespace("Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\DataType");
-
-        $dataTypeClass = new ClassType('FHIRHumanName');
-        $outputPath    = $this->getOutputPathMethod->invoke(
-            $this->command,
-            $version,
-            $dataTypeClass,
-            $namespace,
-        );
-
-        self::assertStringEndsWith('R4B/DataType/FHIRHumanName.php', $outputPath);
-        self::assertStringContainsString('/Models/src/', $outputPath);
+        $this->verifyOutputPath('R4B', 'DataType', 'FHIRHumanName', 'R4B/DataType/FHIRHumanName.php');
     }
 
     /**
@@ -129,19 +138,7 @@ class OutputPathGenerationTest extends TestCase
      */
     public function testPrimitiveOutputPaths(): void
     {
-        $version   = 'R4B';
-        $namespace = new PhpNamespace("Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\Primitive");
-
-        $primitiveClass = new ClassType('FHIRString');
-        $outputPath     = $this->getOutputPathMethod->invoke(
-            $this->command,
-            $version,
-            $primitiveClass,
-            $namespace,
-        );
-
-        self::assertStringEndsWith('R4B/Primitive/FHIRString.php', $outputPath);
-        self::assertStringContainsString('/Models/src/', $outputPath);
+        $this->verifyOutputPath('R4B', 'Primitive', 'FHIRString', 'R4B/Primitive/FHIRString.php');
     }
 
     /**
@@ -151,13 +148,12 @@ class OutputPathGenerationTest extends TestCase
      */
     public function testEnumOutputPaths(): void
     {
-        $version   = 'R4B';
-        $namespace = new PhpNamespace("Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\Enum");
+        $namespace = new PhpNamespace('Ardenexal\\FHIRTools\\Component\\Models\\R4B\\Enum');
+        $enumClass = new EnumType('FHIRAdministrativeGender');
 
-        $enumClass  = new EnumType('FHIRAdministrativeGender');
         $outputPath = $this->getOutputPathMethod->invoke(
             $this->command,
-            $version,
+            'R4B',
             $enumClass,
             $namespace,
         );
@@ -173,19 +169,7 @@ class OutputPathGenerationTest extends TestCase
      */
     public function testCodeTypeOutputPaths(): void
     {
-        $version   = 'R4B';
-        $namespace = new PhpNamespace("Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\DataType");
-
-        $codeTypeClass = new ClassType('FHIRAdministrativeGenderType');
-        $outputPath    = $this->getOutputPathMethod->invoke(
-            $this->command,
-            $version,
-            $codeTypeClass,
-            $namespace,
-        );
-
-        self::assertStringEndsWith('R4B/DataType/FHIRAdministrativeGenderType.php', $outputPath);
-        self::assertStringContainsString('/Models/src/', $outputPath);
+        $this->verifyOutputPath('R4B', 'DataType', 'FHIRAdministrativeGenderType', 'R4B/DataType/FHIRAdministrativeGenderType.php');
     }
 
     /**
@@ -196,11 +180,7 @@ class OutputPathGenerationTest extends TestCase
     public function testBackboneElementDetection(): void
     {
         // Test with proper backbone element attribute
-        $backboneClass = new ClassType('FHIRPatientContact');
-        $backboneClass->addAttribute('Ardenexal\\FHIRTools\\Component\\CodeGeneration\\Attributes\\FHIRBackboneElement', [
-            'parentResource' => 'Patient',
-            'elementPath'    => 'Patient.contact',
-        ]);
+        $backboneClass = $this->createBackboneElement('FHIRPatientContact', 'Patient', 'Patient.contact');
 
         $parentResource = $this->getBackboneParentResourceMethod->invoke(
             $this->command,
@@ -211,8 +191,8 @@ class OutputPathGenerationTest extends TestCase
         self::assertEquals('Patient', $parentResource);
 
         // Test with regular class (no backbone attribute)
-        $regularClass = new ClassType('FHIRPatient');
-        $parentResource   = $this->getBackboneParentResourceMethod->invoke(
+        $regularClass   = new ClassType('FHIRPatient');
+        $parentResource = $this->getBackboneParentResourceMethod->invoke(
             $this->command,
             $regularClass,
         );
@@ -228,11 +208,7 @@ class OutputPathGenerationTest extends TestCase
     public function testResourceNameExtraction(): void
     {
         // Test with proper backbone element attribute
-        $backboneClass = new ClassType('FHIRPatientContact');
-        $backboneClass->addAttribute('Ardenexal\\FHIRTools\\Component\\CodeGeneration\\Attributes\\FHIRBackboneElement', [
-            'parentResource' => 'Patient',
-            'elementPath'    => 'Patient.contact',
-        ]);
+        $backboneClass = $this->createBackboneElement('FHIRPatientContact', 'Patient', 'Patient.contact');
 
         $resourceName = $this->getBackboneParentResourceMethod->invoke(
             $this->command,
@@ -242,11 +218,7 @@ class OutputPathGenerationTest extends TestCase
         self::assertEquals('Patient', $resourceName);
 
         // Test with complex backbone element name
-        $complexClass = new ClassType('FHIRPractitionerQualification');
-        $complexClass->addAttribute('Ardenexal\\FHIRTools\\Component\\CodeGeneration\\Attributes\\FHIRBackboneElement', [
-            'parentResource' => 'Practitioner',
-            'elementPath'    => 'Practitioner.qualification',
-        ]);
+        $complexClass = $this->createBackboneElement('FHIRPractitionerQualification', 'Practitioner', 'Practitioner.qualification');
 
         $resourceName = $this->getBackboneParentResourceMethod->invoke(
             $this->command,
@@ -288,31 +260,17 @@ class OutputPathGenerationTest extends TestCase
      */
     public function testEdgeCases(): void
     {
-        $version = 'R4B';
-
         // Test with minimal valid class name
-        $namespace = new PhpNamespace("Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\Resource");
-        $class     = new ClassType('A');
-
-        $outputPath = $this->getOutputPathMethod->invoke(
-            $this->command,
-            $version,
-            $class,
-            $namespace,
-        );
-
-        // Should still generate a valid path structure
-        self::assertStringContainsString('/Models/src/', $outputPath);
-        self::assertStringContainsString('/R4B/Resource/', $outputPath);
-        self::assertStringEndsWith('/A.php', $outputPath);
+        $this->verifyOutputPath('R4B', 'Resource', 'A', 'R4B/Resource/A.php');
 
         // Test with very long backbone element name
-        $longBackboneClass = new ClassType('FHIRPatientContactRelationshipVeryLongElementName');
-        $longBackboneClass->addAttribute('Ardenexal\\FHIRTools\\Component\\CodeGeneration\\Attributes\\FHIRBackboneElement', [
-            'parentResource' => 'Patient',
-            'elementPath'    => 'Patient.contact.relationship',
-        ]);
-        $resourceName      = $this->getBackboneParentResourceMethod->invoke(
+        $longBackboneClass = $this->createBackboneElement(
+            'FHIRPatientContactRelationshipVeryLongElementName',
+            'Patient',
+            'Patient.contact.relationship'
+        );
+
+        $resourceName = $this->getBackboneParentResourceMethod->invoke(
             $this->command,
             $longBackboneClass,
         );

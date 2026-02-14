@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Tests\Unit\Component\CodeGeneration\Generator;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ClassNameResolver;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -15,60 +16,59 @@ use PHPUnit\Framework\TestCase;
  */
 class ClassNameResolverTest extends TestCase
 {
-    /**
-     * Test basic class name resolution converts to PascalCase.
-     */
-    public function testResolvesBasicClassName(): void
+    #[DataProvider('classNameConversionProvider')]
+    public function testResolvesClassName(string $url, string $name, string $expected): void
     {
-        $className = ClassNameResolver::resolveClassName(
-            'http://hl7.org/fhir/StructureDefinition/Patient',
-            'Patient',
-        );
-
-        self::assertEquals('Patient', $className);
+        $className = ClassNameResolver::resolveClassName($url, $name);
+        self::assertEquals($expected, $className);
     }
 
     /**
-     * Test class name resolution with lowercase input.
+     * @return array<string, array{string, string, string}>
      */
-    public function testResolvesLowercaseClassName(): void
+    public static function classNameConversionProvider(): array
     {
-        $className = ClassNameResolver::resolveClassName(
-            'http://hl7.org/fhir/StructureDefinition/patient',
-            'patient',
-        );
-
-        self::assertEquals('Patient', $className);
+        return [
+            'basic PascalCase preservation' => [
+                'http://hl7.org/fhir/StructureDefinition/Patient',
+                'Patient',
+                'Patient',
+            ],
+            'lowercase to PascalCase' => [
+                'http://hl7.org/fhir/StructureDefinition/patient',
+                'patient',
+                'Patient',
+            ],
+            'hyphenated to PascalCase' => [
+                'http://hl7.org/fhir/StructureDefinition/administrative-gender',
+                'administrative-gender',
+                'AdministrativeGender',
+            ],
+            'underscored to PascalCase' => [
+                'http://hl7.org/fhir/StructureDefinition/administrative_gender',
+                'administrative_gender',
+                'AdministrativeGender',
+            ],
+            'spaces to PascalCase' => [
+                'http://hl7.org/fhir/StructureDefinition/human-name',
+                'human name',
+                'HumanName',
+            ],
+            'already PascalCase' => [
+                'http://hl7.org/fhir/StructureDefinition/HumanName',
+                'HumanName',
+                'HumanName',
+            ],
+            'mixed case to PascalCase' => [
+                'http://hl7.org/fhir/StructureDefinition/CamelCaseExample',
+                'camelCaseExample',
+                'CamelCaseExample',
+            ],
+        ];
     }
 
     /**
-     * Test class name resolution with hyphenated input.
-     */
-    public function testResolvesHyphenatedClassName(): void
-    {
-        $className = ClassNameResolver::resolveClassName(
-            'http://hl7.org/fhir/StructureDefinition/administrative-gender',
-            'administrative-gender',
-        );
-
-        self::assertEquals('AdministrativeGender', $className);
-    }
-
-    /**
-     * Test class name resolution with underscored input.
-     */
-    public function testResolvesUnderscoredClassName(): void
-    {
-        $className = ClassNameResolver::resolveClassName(
-            'http://hl7.org/fhir/StructureDefinition/administrative_gender',
-            'administrative_gender',
-        );
-
-        self::assertEquals('AdministrativeGender', $className);
-    }
-
-    /**
-     * Test class name resolution with override.
+     * Test that URL overrides take precedence over name conversion
      */
     public function testResolvesOverriddenClassName(): void
     {
@@ -78,44 +78,5 @@ class ClassNameResolverTest extends TestCase
         );
 
         self::assertEquals('ClaimUse', $className);
-    }
-
-    /**
-     * Test class name resolution with spaces.
-     */
-    public function testResolvesClassNameWithSpaces(): void
-    {
-        $className = ClassNameResolver::resolveClassName(
-            'http://hl7.org/fhir/StructureDefinition/human-name',
-            'human name',
-        );
-
-        self::assertEquals('HumanName', $className);
-    }
-
-    /**
-     * Test class name resolution preserves already PascalCase names.
-     */
-    public function testPreservesPascalCaseClassName(): void
-    {
-        $className = ClassNameResolver::resolveClassName(
-            'http://hl7.org/fhir/StructureDefinition/HumanName',
-            'HumanName',
-        );
-
-        self::assertEquals('HumanName', $className);
-    }
-
-    /**
-     * Test class name resolution with mixed case input.
-     */
-    public function testResolvesMixedCaseClassName(): void
-    {
-        $className = ClassNameResolver::resolveClassName(
-            'http://hl7.org/fhir/StructureDefinition/CamelCaseExample',
-            'camelCaseExample',
-        );
-
-        self::assertEquals('CamelCaseExample', $className);
     }
 }
