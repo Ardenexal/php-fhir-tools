@@ -141,10 +141,10 @@ class FHIRModelGenerator implements GeneratorInterface
             // Use provided BuilderContext or create a temporary one
             if ($builderContext === null) {
                 $builderContext     = new BuilderContext();
-                $elementNamespace   = new PhpNamespace("Ardenexal\\FHIRTools\\FHIR\\{$version}\\Element");
-                $enumNamespace      = new PhpNamespace("Ardenexal\\FHIRTools\\FHIR\\{$version}\\Enum");
-                $primitiveNamespace = new PhpNamespace("Ardenexal\\FHIRTools\\FHIR\\{$version}\\Primitive");
-                $datatypeNamespace  = new PhpNamespace("Ardenexal\\FHIRTools\\FHIR\\{$version}\\DataType");
+                $elementNamespace   = new PhpNamespace("Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\Resource");
+                $enumNamespace      = new PhpNamespace("Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\Enum");
+                $primitiveNamespace = new PhpNamespace("Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\Primitive");
+                $datatypeNamespace  = new PhpNamespace("Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\DataType");
                 $builderContext->addElementNamespace($version, $elementNamespace);
                 $builderContext->addEnumNamespace($version, $enumNamespace);
                 $builderContext->addPrimitiveNamespace($version, $primitiveNamespace);

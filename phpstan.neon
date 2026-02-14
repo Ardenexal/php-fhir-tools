@@ -16,5 +16,6 @@ parameters:
         - */vendor/*
         - src/Component/*/tests/*
         - src/Component/*/output/*
+        - config/reference.php
     parallel:
         maximumNumberOfProcesses: 4
