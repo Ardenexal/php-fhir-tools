@@ -547,192 +547,21 @@ class FHIRModelGeneratorCommand extends Command
         $typeCategory   = end($namespaceParts);
 
         $typeName = $type->getName();
-        if ($typeName !== null && $this->isBackboneElement($typeName, $type)) {
-            $resourceName = $this->extractResourceNameFromBackboneElement($typeName, $type);
-            if ($resourceName && $typeCategory === 'Resource') {
-                return Path::canonicalize("{$basePath}/{$version}/Resource/{$resourceName}/{$typeName}.php");
+        if ($typeName !== null && $type instanceof ClassType && $typeCategory === 'Resource') {
+            $parentResource = $this->getBackboneParentResource($type);
+            if ($parentResource !== null) {
+                return Path::canonicalize("{$basePath}/{$version}/Resource/{$parentResource}/{$typeName}.php");
             }
         }
 
         return Path::canonicalize("{$basePath}/{$version}/{$typeCategory}/{$typeName}.php");
     }
 
-    private function isBackboneElement(string $typeName, ClassType|EnumType $type): bool
+    private function getBackboneParentResource(ClassType $type): ?string
     {
-        if ($type instanceof ClassType) {
-            foreach ($type->getAttributes() as $attribute) {
-                if (str_contains($attribute->getName(), 'FHIRBackboneElement')) {
-                    return true;
-                }
-            }
-        }
-
-        return preg_match('/^FHIR[A-Z][a-z]+[A-Z][a-zA-Z]+$/', $typeName) === 1;
-    }
-
-    private function extractResourceNameFromBackboneElement(string $typeName, ClassType|EnumType $type): ?string
-    {
-        if ($type instanceof ClassType) {
-            foreach ($type->getAttributes() as $attribute) {
-                if (str_contains($attribute->getName(), 'FHIRBackboneElement')) {
-                    $args = $attribute->getArguments();
-                    if (isset($args['parentResource'])) {
-                        return $args['parentResource'];
-                    }
-                }
-            }
-        }
-
-        $withoutPrefix = substr($typeName, 4);
-
-        $knownResources = [
-            'ActivityDefinition',
-            'AdverseEvent',
-            'AllergyIntolerance',
-            'AppointmentResponse',
-            'AuditEvent',
-            'BiologicallyDerivedProduct',
-            'BodyStructure',
-            'CapabilityStatement',
-            'CarePlan',
-            'CareTeam',
-            'CatalogEntry',
-            'ChargeItem',
-            'ChargeItemDefinition',
-            'ClinicalImpression',
-            'CodeSystem',
-            'CompartmentDefinition',
-            'ConceptMap',
-            'DataRequirement',
-            'DetectedIssue',
-            'DeviceDefinition',
-            'DeviceMetric',
-            'DeviceRequest',
-            'DeviceUseStatement',
-            'DiagnosticReport',
-            'DocumentManifest',
-            'DocumentReference',
-            'EffectEvidenceSynthesis',
-            'EligibilityRequest',
-            'EligibilityResponse',
-            'EnrollmentRequest',
-            'EnrollmentResponse',
-            'EpisodeOfCare',
-            'EventDefinition',
-            'EvidenceVariable',
-            'ExampleScenario',
-            'ExplanationOfBenefit',
-            'FamilyMemberHistory',
-            'GraphDefinition',
-            'GuidanceResponse',
-            'HealthcareService',
-            'ImagingStudy',
-            'ImmunizationEvaluation',
-            'ImmunizationRecommendation',
-            'ImplementationGuide',
-            'InsurancePlan',
-            'MeasureReport',
-            'MedicationAdministration',
-            'MedicationDispense',
-            'MedicationKnowledge',
-            'MedicationRequest',
-            'MedicationStatement',
-            'MedicinalProduct',
-            'MedicinalProductAuthorization',
-            'MedicinalProductContraindication',
-            'MedicinalProductIndication',
-            'MedicinalProductIngredient',
-            'MedicinalProductInteraction',
-            'MedicinalProductManufactured',
-            'MedicinalProductPackaged',
-            'MedicinalProductPharmaceutical',
-            'MedicinalProductUndesirableEffect',
-            'MessageDefinition',
-            'MessageHeader',
-            'MolecularSequence',
-            'NamingSystem',
-            'NutritionOrder',
-            'OperationDefinition',
-            'OperationOutcome',
-            'OrganizationAffiliation',
-            'PaymentNotice',
-            'PaymentReconciliation',
-            'PlanDefinition',
-            'PractitionerRole',
-            'QuestionnaireResponse',
-            'RelatedPerson',
-            'RequestGroup',
-            'ResearchDefinition',
-            'ResearchElementDefinition',
-            'ResearchStudy',
-            'ResearchSubject',
-            'RiskAssessment',
-            'RiskEvidenceSynthesis',
-            'ServiceRequest',
-            'SpecimenDefinition',
-            'StructureDefinition',
-            'StructureMap',
-            'SupplyDelivery',
-            'SupplyRequest',
-            'TestReport',
-            'TestScript',
-            'ValueSet',
-            'VerificationResult',
-            'VisionPrescription',
-            'Account',
-            'Appointment',
-            'Basic',
-            'Binary',
-            'Bundle',
-            'Claim',
-            'Communication',
-            'Composition',
-            'Condition',
-            'Consent',
-            'Contract',
-            'Coverage',
-            'Device',
-            'Encounter',
-            'Endpoint',
-            'Evidence',
-            'Flag',
-            'Goal',
-            'Group',
-            'Immunization',
-            'Invoice',
-            'Library',
-            'Linkage',
-            'List',
-            'Location',
-            'Measure',
-            'Media',
-            'Medication',
-            'Observation',
-            'Organization',
-            'Parameters',
-            'Patient',
-            'Person',
-            'Practitioner',
-            'Procedure',
-            'Provenance',
-            'Questionnaire',
-            'Schedule',
-            'Slot',
-            'Specimen',
-            'Subscription',
-            'Substance',
-            'Task',
-        ];
-
-        foreach ($knownResources as $resourceName) {
-            if (str_starts_with($withoutPrefix, $resourceName)) {
-                return $resourceName;
-            }
-        }
-
-        for ($i = 1, $iMax = strlen($withoutPrefix); $i < $iMax; ++$i) {
-            if (ctype_upper($withoutPrefix[$i])) {
-                return substr($withoutPrefix, 0, $i);
+        foreach ($type->getAttributes() as $attribute) {
+            if (str_contains($attribute->getName(), 'FHIRBackboneElement')) {
+                return $attribute->getArguments()['parentResource'] ?? null;
             }
         }
 
