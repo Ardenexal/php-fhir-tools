@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Type;
 
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRPrimitive;
+
 /**
  * Resolves and validates FHIR types using the generated FHIR models.
  *
@@ -72,11 +74,22 @@ class FHIRTypeResolver
         }
 
         if (is_object($value)) {
+            // Check if the object has a FHIRPrimitive attribute
+            $ref   = new \ReflectionClass($value);
+            $attrs = $ref->getAttributes(FHIRPrimitive::class);
+
+            if (!empty($attrs)) {
+                /** @var FHIRPrimitive $primitive */
+                $primitive = $attrs[0]->newInstance();
+
+                return $primitive->primitiveType;
+            }
+
             // Get the class name and extract the FHIR type
             $class = get_class($value);
 
             // Check if it's a generated FHIR model
-            if (str_contains($class, '\\FHIR\\')) {
+            if (str_contains($class, '\\FHIR\\') || str_contains($class, '\\Models\\')) {
                 // Extract the type name from the class name
                 $parts = explode('\\', $class);
 
@@ -110,13 +123,18 @@ class FHIRTypeResolver
             return true;
         }
 
+        // Case-insensitive match
+        if (strcasecmp($actualType, $typeName) === 0) {
+            return true;
+        }
+
         // Check for type compatibility
         if ($typeName === 'Any') {
             return true;
         }
 
-        // Check if integer is compatible with decimal
-        if ($typeName === 'decimal' && $actualType === 'integer') {
+        // Check if integer is compatible with decimal (case-insensitive)
+        if (strcasecmp($typeName, 'decimal') === 0 && $actualType === 'integer') {
             return true;
         }
 
@@ -148,12 +166,26 @@ class FHIRTypeResolver
             return $value;
         }
 
+        // Extract value from FHIR primitives before casting
+        $castValue = $value;
+        if (is_object($value)) {
+            $ref   = new \ReflectionClass($value);
+            $attrs = $ref->getAttributes(FHIRPrimitive::class);
+
+            if (!empty($attrs) && property_exists($value, 'value')) {
+                $castValue = $value->value;
+            }
+        }
+
+        // Normalize typeName to lowercase for matching
+        $normalizedType = strtolower($typeName);
+
         // Primitive type casting
-        return match ($typeName) {
-            'boolean' => $this->castToBoolean($value),
-            'string'  => $this->castToString($value),
-            'integer' => $this->castToInteger($value),
-            'decimal' => $this->castToDecimal($value),
+        return match ($normalizedType) {
+            'boolean' => $this->castToBoolean($castValue),
+            'string'  => $this->castToString($castValue),
+            'integer' => $this->castToInteger($castValue),
+            'decimal' => $this->castToDecimal($castValue),
             default   => throw new \InvalidArgumentException(sprintf('Cannot cast value to type "%s"', $typeName)),
         };
     }
