@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Expression\ExpressionNode;
+use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
 
 /**
  * Returns true if string starts with the given prefix.
@@ -34,8 +35,11 @@ class StartsWithFunction extends AbstractFunction
         }
 
         /** @var ExpressionNode $prefixExpr */
-        $prefixExpr   = $parameters[0];
-        $evaluator    = $context->getEvaluator();
+        $prefixExpr = $parameters[0];
+        $evaluator  = $context->getEvaluator();
+        if ($evaluator === null) {
+            throw new EvaluationException('Evaluator not available in context');
+        }
         $prefixResult = $evaluator->evaluate($prefixExpr, $context);
 
         if ($prefixResult->isEmpty()) {

@@ -4,105 +4,13 @@ services:
         autoconfigure: true
         public: false
 
-    # FHIR Code Generation Services
-    Ardenexal\FHIRTools\FHIRModelGenerator:
-        public: true
-        tags: ['fhir.generator']
-
-    Ardenexal\FHIRTools\FHIRValueSetGenerator:
-        public: true
-        tags: ['fhir.generator']
-
-    Ardenexal\FHIRTools\PackageLoader:
-        public: true
+    # FHIRPath Console Commands
+    Ardenexal\FHIRTools\Bundle\FHIRBundle\Command\FHIRPathEvaluateCommand:
         arguments:
-            $cacheDir: '%fhir.cache_directory%'
-
-    Ardenexal\FHIRTools\BuilderContext:
-
-    Ardenexal\FHIRTools\ErrorCollector:
-        public: true
-
-    Ardenexal\FHIRTools\RetryHandler:
-        public: true
-
-    # Component namespace services (for tests)
-    Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader:
-        public: true
-        arguments:
-            $cacheDir: '%fhir.cache_directory%'
-
-    Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector:
-        public: true
-
-    Ardenexal\FHIRTools\Component\CodeGeneration\Package\RetryHandler:
-        public: true
-
-    # FHIR Serialization Services
-    Ardenexal\FHIRTools\Serialization\FHIRSerializationService:
-        public: true
-        tags: ['fhir.serializer']
-
-    Ardenexal\FHIRTools\Serialization\FHIRSerializationContextFactory:
-        public: true
-
-    Ardenexal\FHIRTools\Serialization\FHIRValidator:
-        public: true
-
-    Ardenexal\FHIRTools\Serialization\FHIRSchemaValidator:
-        public: true
-
-    Ardenexal\FHIRTools\Serialization\FHIRTypeResolver:
-        public: true
-
-    Ardenexal\FHIRTools\Serialization\FHIRMetadataExtractor:
-        public: true
-
-    Ardenexal\FHIRTools\Serialization\FHIRMetadataCache:
-
-    # FHIR Normalizers
-    Ardenexal\FHIRTools\Serialization\FHIRResourceNormalizer:
-        tags: ['serializer.normalizer']
-
-    Ardenexal\FHIRTools\Serialization\FHIRComplexTypeNormalizer:
-        tags: ['serializer.normalizer']
-
-    Ardenexal\FHIRTools\Serialization\FHIRPrimitiveTypeNormalizer:
-        tags: ['serializer.normalizer']
-
-    Ardenexal\FHIRTools\Serialization\FHIRBackboneElementNormalizer:
-        tags: ['serializer.normalizer']
-
-    # Package Management Services
-    Ardenexal\FHIRTools\Package\CacheIntegrityManager:
-
-    Ardenexal\FHIRTools\Package\DependencyResolver:
-        public: true
-
-    Ardenexal\FHIRTools\Package\SemanticVersionResolver:
-        public: true
-
-    Ardenexal\FHIRTools\Package\VersionIsolationManager:
-        arguments:
-            $baseCacheDir: '%fhir.cache_directory%'
-
-    # Console Commands
-    Ardenexal\FHIRTools\FHIRModelGeneratorCommand:
+            $pathService: '@Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService'
         tags: ['console.command']
 
-    # Service Aliases for easier access
-    fhir.model_generator:
-        alias: Ardenexal\FHIRTools\FHIRModelGenerator
-        public: true
-
-    fhir.serialization_service:
-        alias: Ardenexal\FHIRTools\Serialization\FHIRSerializationService
-        public: true
-
-    fhir.package_loader:
-        alias: Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader
-        public: true
-
-    fhir.validator:
-        alias: Ardenexal\FHIRTools\Serialization\FHIRValidator
-        public: true
+    Ardenexal\FHIRTools\Bundle\FHIRBundle\Command\FHIRPathValidateCommand:
+        arguments:
+            $pathService: '@Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService'
+        tags: ['console.command']

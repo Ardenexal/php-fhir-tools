@@ -35,9 +35,9 @@ final readonly class GeneratedClassInfo
         public string $namespace,
         public string $fhirUrl,
     ) {
-        $className = $this->class->getName() ?? '';
+        $className  = $this->class->getName() ?? '';
         $this->fqcn = $this->namespace !== '' && $className !== ''
-            ? $this->namespace . '\\' . $className
+            ? '\\' . $this->namespace . '\\' . $className
             : $className;
     }
 
@@ -91,5 +91,10 @@ final readonly class GeneratedClassInfo
         }
 
         return $this->class;
+    }
+
+    public function getNamespace(): string
+    {
+        return $this->namespace;
     }
 }

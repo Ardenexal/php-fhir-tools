@@ -1,0 +1,27 @@
+<?php declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\DocumentReference;
+
+/**
+ * @description Relationships that this document has with other document references that already exist.
+ */
+#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'DocumentReference', elementPath: 'DocumentReference.relatesTo', fhirVersion: 'R4')]
+class DocumentReferenceRelatesTo extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement
+{
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> extension Additional content defined by implementations */
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\DocumentRelationshipTypeType code replaces | transforms | signs | appends */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\DocumentRelationshipTypeType $code = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference target Target of the relationship */
+		#[\Symfony\Component\Validator\Constraints\NotBlank]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference $target = null,
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
+}

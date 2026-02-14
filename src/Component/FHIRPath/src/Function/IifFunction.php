@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
+use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
 
 /**
  * FHIRPath iif() function.
@@ -27,8 +28,13 @@ class IifFunction extends AbstractFunction
     {
         $this->validateParameterCount($parameters, 3, 3);
 
+        $evaluator = $context->getEvaluator();
+        if ($evaluator === null) {
+            throw new EvaluationException('Evaluator not available in context');
+        }
+
         // Evaluate condition
-        $conditionResult = $context->getEvaluator()->evaluate($parameters[0], $context);
+        $conditionResult = $evaluator->evaluate($parameters[0], $context);
 
         // If condition is empty or not boolean, return empty
         if ($conditionResult->isEmpty()) {
@@ -39,10 +45,10 @@ class IifFunction extends AbstractFunction
 
         // If condition is true, evaluate and return ifTrue branch
         if ($condition === true) {
-            return $context->getEvaluator()->evaluate($parameters[1], $context);
+            return $evaluator->evaluate($parameters[1], $context);
         }
 
         // Otherwise, evaluate and return ifFalse branch
-        return $context->getEvaluator()->evaluate($parameters[2], $context);
+        return $evaluator->evaluate($parameters[2], $context);
     }
 }

@@ -18,6 +18,7 @@ services:
         exclude:
             - '../src/Component/'
             - '../src/Serialization/*Normalizer.php'
+            - '../src/Bundle/FHIRBundle/Command/FHIRPath*Command.php'
 
     # FHIR serialization services are configured in config/packages/serializer.yaml
     # to ensure proper integration with Symfony's serializer component
@@ -30,3 +31,5 @@ services:
 imports:
     - { resource: services/fhir_serialization.yaml }
     - { resource: services/fhir_code_generation.yaml }
+    - { resource: services/fhir_path.yaml }
+    - { resource: services/fhir_bundle_commands.yaml }
