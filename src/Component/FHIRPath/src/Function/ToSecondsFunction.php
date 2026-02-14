@@ -35,7 +35,7 @@ class ToSecondsFunction extends AbstractFunction
 
         $items = [];
         foreach ($input as $item) {
-            if (!($item instanceof \DateTime)) {
+            if (!$item instanceof \DateTime) {
                 throw EvaluationException::invalidFunctionParameter('toSeconds', 'DateTime', gettype($item));
             }
 

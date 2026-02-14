@@ -632,26 +632,23 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
         if (!isset($data['resourceType'])) {
             if ($fhirContext->isStrictValidation()) {
                 throw FHIRSerializationException::validationError('Missing required resourceType field');
-            } else {
-                throw new NotNormalizableValueException('Missing required resourceType field');
             }
+            throw new NotNormalizableValueException('Missing required resourceType field');
         }
 
         $resourceType = $data['resourceType'];
         if (!is_string($resourceType)) {
             if ($fhirContext->isStrictValidation()) {
                 throw FHIRSerializationException::validationError('resourceType must be a string');
-            } else {
-                throw new NotNormalizableValueException('resourceType must be a string');
             }
+            throw new NotNormalizableValueException('resourceType must be a string');
         }
 
         if (empty($resourceType)) {
             if ($fhirContext->isStrictValidation()) {
                 throw FHIRSerializationException::validationError('resourceType cannot be empty');
-            } else {
-                throw new NotNormalizableValueException('resourceType cannot be empty');
             }
+            throw new NotNormalizableValueException('resourceType cannot be empty');
         }
 
         // Use type resolver to get the correct class for the resourceType

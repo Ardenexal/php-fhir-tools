@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -10,12 +12,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum ClaimUse: string
 {
-	/** Claim */
-	case claim = 'claim';
+    /** Claim */
+    case claim = 'claim';
 
-	/** Preauthorization */
-	case preauthorization = 'preauthorization';
+    /** Preauthorization */
+    case preauthorization = 'preauthorization';
 
-	/** Predetermination */
-	case predetermination = 'predetermination';
+    /** Predetermination */
+    case predetermination = 'predetermination';
 }
