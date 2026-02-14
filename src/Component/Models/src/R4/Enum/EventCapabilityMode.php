@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -10,9 +12,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum EventCapabilityMode: string
 {
-	/** Sender */
-	case sender = 'sender';
+    /** Sender */
+    case sender = 'sender';
 
-	/** Receiver */
-	case receiver = 'receiver';
+    /** Receiver */
+    case receiver = 'receiver';
 }

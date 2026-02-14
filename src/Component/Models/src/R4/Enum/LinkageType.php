@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -10,12 +12,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum LinkageType: string
 {
-	/** Source of Truth */
-	case sourceoftruth = 'source';
+    /** Source of Truth */
+    case sourceoftruth = 'source';
 
-	/** Alternate Record */
-	case alternaterecord = 'alternate';
+    /** Alternate Record */
+    case alternaterecord = 'alternate';
 
-	/** Historical/Obsolete Record */
-	case historicalobsoleterecord = 'historical';
+    /** Historical/Obsolete Record */
+    case historicalobsoleterecord = 'historical';
 }

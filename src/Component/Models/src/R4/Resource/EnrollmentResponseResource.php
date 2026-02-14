@@ -1,54 +1,70 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\ClaimProcessingCodesType;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FinancialResourceStatusCodesType;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
+
 /**
  * @author Health Level Seven International (Financial Management)
+ *
  * @see http://hl7.org/fhir/StructureDefinition/EnrollmentResponse
+ *
  * @description This resource provides enrollment and plan details from the processing of an EnrollmentRequest resource.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(
-	type: 'EnrollmentResponse',
-	version: '4.0.1',
-	url: 'http://hl7.org/fhir/StructureDefinition/EnrollmentResponse',
-	fhirVersion: 'R4',
+#[FhirResource(
+    type: 'EnrollmentResponse',
+    version: '4.0.1',
+    url: 'http://hl7.org/fhir/StructureDefinition/EnrollmentResponse',
+    fhirVersion: 'R4',
 )]
 class EnrollmentResponseResource extends DomainResourceResource
 {
-	public function __construct(
-		/** @var null|string id Logical id of this artifact */
-		public ?string $id = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta meta Metadata about the resource */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta $meta = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive implicitRules A set of rules under which this content was created */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive $implicitRules = null,
-		/** @var null|string language Language of the resource content */
-		public ?string $language = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative text Text summary of the resource, for human interpretation */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative $text = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\ResourceResource> contained Contained, inline Resources */
-		public array $contained = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> extension Additional content defined by implementations */
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> modifierExtension Extensions that cannot be ignored */
-		public array $modifierExtension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier> identifier Business Identifier */
-		public array $identifier = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FinancialResourceStatusCodesType status active | cancelled | draft | entered-in-error */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FinancialResourceStatusCodesType $status = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference request Claim reference */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference $request = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\ClaimProcessingCodesType outcome queued | complete | error | partial */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\ClaimProcessingCodesType $outcome = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string disposition Disposition Message */
-		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string|null $disposition = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive created Creation date */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive $created = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference organization Insurer */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference $organization = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference requestProvider Responsible practitioner */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference $requestProvider = null,
-	) {
-		parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Logical id of this artifact */
+        public ?string $id = null,
+        /** @var Meta|null meta Metadata about the resource */
+        public ?Meta $meta = null,
+        /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
+        public ?UriPrimitive $implicitRules = null,
+        /** @var string|null language Language of the resource content */
+        public ?string $language = null,
+        /** @var Narrative|null text Text summary of the resource, for human interpretation */
+        public ?Narrative $text = null,
+        /** @var array<ResourceResource> contained Contained, inline Resources */
+        public array $contained = [],
+        /** @var array<Extension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
+        public array $modifierExtension = [],
+        /** @var array<Identifier> identifier Business Identifier */
+        public array $identifier = [],
+        /** @var FinancialResourceStatusCodesType|null status active | cancelled | draft | entered-in-error */
+        public ?FinancialResourceStatusCodesType $status = null,
+        /** @var Reference|null request Claim reference */
+        public ?Reference $request = null,
+        /** @var ClaimProcessingCodesType|null outcome queued | complete | error | partial */
+        public ?ClaimProcessingCodesType $outcome = null,
+        /** @var StringPrimitive|string|null disposition Disposition Message */
+        public StringPrimitive|string|null $disposition = null,
+        /** @var DateTimePrimitive|null created Creation date */
+        public ?DateTimePrimitive $created = null,
+        /** @var Reference|null organization Insurer */
+        public ?Reference $organization = null,
+        /** @var Reference|null requestProvider Responsible practitioner */
+        public ?Reference $requestProvider = null,
+    ) {
+        parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
+    }
 }

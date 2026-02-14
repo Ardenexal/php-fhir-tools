@@ -25,37 +25,51 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 use Nette\InvalidStateException;
 
-use function Symfony\Component\String\s;
-
 /**
- * Symfony Console command for generating FHIR model classes
+ * Console command that generates PHP model classes from FHIR definition packages.
  *
- * This command orchestrates the entire FHIR code generation process by:
+ * FHIR (Fast Healthcare Interoperability Resources) defines healthcare data structures
+ * as JSON "StructureDefinitions". This command downloads those definitions and converts
+ * them into strongly-typed PHP classes and enums so they can be used in application code.
  *
- * - Loading FHIR Implementation Guide packages from registries
- * - Processing StructureDefinitions and ValueSets
- * - Generating PHP classes and enums with proper type hints
- * - Organizing output files by namespace and type
- * - Providing comprehensive error reporting and progress indication
- * - Supporting multiple FHIR versions (R4, R4B, R5)
+ * The generation flow works in three phases per package:
  *
- * The command integrates with the enhanced error handling system to provide
- * detailed feedback about generation progress and any issues encountered.
+ *  1. **Load** — Download/cache the FHIR package and parse its StructureDefinitions
+ *  2. **Build** — Convert each StructureDefinition into a PHP class (via Nette PhpGenerator),
+ *     then generate PHP enums for any FHIR ValueSets referenced by those classes
+ *  3. **Output** — Write the generated PHP files to `src/Component/Models/src/{version}/`
  *
- * @author FHIR Tools
+ * Generated files are organised by FHIR version and type category:
  *
- * @since 1.0.0
+ *   Models/src/
+ *   ├── R4/
+ *   │   ├── Resource/         ← FHIR resources (Patient, Observation, …)
+ *   │   │   └── Patient/      ← Backbone elements nested under a resource
+ *   │   ├── DataType/         ← Complex types (HumanName, Address, …)
+ *   │   ├── Primitive/        ← Primitive types (String, Boolean, …)
+ *   │   └── Enum/             ← ValueSet enums (AdministrativeGender, …)
+ *   ├── R4B/
+ *   └── R5/
+ *
+ * Usage:
+ *   php bin/console fhir:generate --package=hl7.fhir.r4.core -vvv
+ *
+ * @see https://www.hl7.org/fhir/structuredefinition.html  StructureDefinition docs
+ * @see https://www.hl7.org/fhir/valueset.html             ValueSet docs
  */
 #[AsCommand(name: 'fhir:generate', description: 'Generates FHIR model classes from FHIR definitions.')]
 class FHIRModelGeneratorCommand extends Command
 {
     /**
-     * Default terminology package for FHIR code systems and value sets
+     * The HL7 terminology package contains CodeSystem and ValueSet definitions shared
+     * across all FHIR versions. It's always required, so we prepend it automatically
+     * if the user didn't include it in their --package list.
      */
     private const string DEFAULT_TERMINOLOGY_PACKAGE = 'hl7.terminology.r4#7.0.0';
 
     /**
-     * Default Implementation Guide packages for each FHIR version
+     * Pre-configured package sets for each FHIR version. Used as the default value
+     * for the --package option when no packages are specified by the user.
      *
      * @var array<string, array<string>>
      */
@@ -74,20 +88,14 @@ class FHIRModelGeneratorCommand extends Command
         ],
     ];
 
-    /**
-     * Error collector for aggregating validation and generation errors
-     *
-     * @var ErrorCollector
-     */
+    /** Collects non-fatal errors and warnings during generation for reporting at the end. */
     private ErrorCollector $errorCollector;
 
-    /**
-     * Filesystem operations handler
-     */
     private Filesystem $filesystem;
 
     /**
-     * Context for managing generated types
+     * One BuilderContext per FHIR version. Each context holds the loaded StructureDefinitions,
+     * generated classes, pending enums, and namespace registrations for that version.
      *
      * @var array{
      *  R4: BuilderContext,
@@ -97,17 +105,8 @@ class FHIRModelGeneratorCommand extends Command
      */
     private array $context;
 
-    /**
-     * Package loading and caching handler
-     */
     private PackageLoader $packageLoader;
 
-    /**
-     * Construct a new FHIR model generator command
-     *
-     * @param Filesystem    $filesystem    Filesystem operations handler
-     * @param PackageLoader $packageLoader Package loading and caching handler
-     */
     public function __construct(
         Filesystem $filesystem,
         PackageLoader $packageLoader,
@@ -118,49 +117,40 @@ class FHIRModelGeneratorCommand extends Command
             'R4'  => new BuilderContext(),
             'R4B' => new BuilderContext(),
             'R5'  => new BuilderContext(),
-
         ];
         $this->packageLoader  = $packageLoader;
         $this->errorCollector = new ErrorCollector();
     }
 
     /**
-     * @param OutputInterface $output
-     * @param array<string>   $packages
-     * @param bool            $modelsComponent
-     * @param bool            $offlineMode
+     * Entry point invoked by Symfony Console when the user runs `fhir:generate`.
      *
-     * @return int
+     * Symfony's invokable command pattern uses __invoke() instead of execute().
+     * The #[Option] and #[Ask] attributes tell Symfony how to wire CLI arguments
+     * to these parameters automatically.
+     *
+     * @param OutputInterface $output   Console output for writing messages
+     * @param array<string>   $packages FHIR packages to process, e.g. ['hl7.fhir.r4.core#4.0.1']
+     * @param bool            $offlineMode When true, only use locally cached packages (no network)
+     *
+     * @return int Command::SUCCESS (0) or Command::FAILURE (1)
      */
     public function __invoke(
         OutputInterface $output,
         #[Option(description: 'Implementation Guide packages to include.', name: 'package')]
         #[Ask(question: 'Which FHIR Implementation Guide packages do you want to include?')]
         array $packages = self::DEFAULT_IG_PACKAGES['R4B'],
-        #[Option(description: 'Generate models for the Models component', name: 'models-component')]
-        bool $modelsComponent = false,
         #[Option(description: 'Work offline using only cached packages', name: 'offline')]
         bool $offlineMode = false,
     ): int {
         try {
-            // Clear any previous errors
             $this->errorCollector->clear();
 
             if ($offlineMode) {
                 $output->writeln('<info>Running in offline mode - using cached packages only</info>');
             }
 
-            // Check if Models component generation is requested
-            if ($modelsComponent) {
-                return $this->generateForModelsComponent($output, $packages, $offlineMode);
-            }
-
-            return $this->executeGeneration(
-                output: $output,
-                packages: $packages,
-                isModelsComponent: false,
-                offlineMode: $offlineMode,
-            );
+            return $this->executeGeneration($output, $packages, $offlineMode);
         } catch (\Throwable $e) {
             $output->writeln("<error>Fatal error during generation: {$e->getMessage()}</error>");
             if ($output->isVerbose()) {
@@ -173,58 +163,27 @@ class FHIRModelGeneratorCommand extends Command
     }
 
     /**
-     * Generate FHIR models for the Models component
+     * Main orchestration method — clears output, processes each package, then reports results.
      *
-     * @param OutputInterface $output
-     * @param array<string>   $packages
-     * @param bool            $offlineMode
-     *
-     * @return int
+     * @param array<string> $packages
      */
-    private function generateForModelsComponent(OutputInterface $output, array $packages, bool $offlineMode): int
+    private function executeGeneration(OutputInterface $output, array $packages, bool $offlineMode = false): int
     {
-        return $this->executeGeneration(
-            output: $output,
-            packages: $packages,
-            isModelsComponent: true,
-            offlineMode: $offlineMode,
-        );
-    }
+        $output->writeln('<info>Generating FHIR models...</info>');
 
-    /**
-     * Execute FHIR model generation with unified logic
-     *
-     * @param OutputInterface $output
-     * @param array<string>   $packages
-     * @param bool            $isModelsComponent
-     * @param bool            $offlineMode
-     *
-     * @return int
-     */
-    private function executeGeneration(OutputInterface $output, array $packages, bool $isModelsComponent, bool $offlineMode = false): int
-    {
-        $componentType = $isModelsComponent ? 'Models component' : 'FHIR model';
-        $output->writeln("<info>Generating {$componentType}s...</info>");
-
-        // Clear appropriate output directory before generation
-        if ($isModelsComponent) {
-            $this->clearModelsComponentOutputDirectory($output);
-        } else {
-            $this->clearOutputDirectory($output);
-        }
+        $this->clearOutputDirectory($output);
 
         $loadingPackagesIndicator = new ProgressIndicator($output);
-        $progressMessage          = $isModelsComponent
-            ? 'Loading FHIR Implementation Guide packages for Models component...'
-            : 'Loading FHIR Implementation Guide packages...';
-        $loadingPackagesIndicator->start($progressMessage);
+        $loadingPackagesIndicator->start('Loading FHIR Implementation Guide packages...');
 
-        // Add terminology package if not already present
+        // The terminology package defines shared CodeSystems and ValueSets (e.g. AdministrativeGender).
+        // Ensure it's always loaded first so those definitions are available when building classes.
         if (! in_array(self::DEFAULT_TERMINOLOGY_PACKAGE, $packages, true)) {
             array_unshift($packages, self::DEFAULT_TERMINOLOGY_PACKAGE);
         }
 
         foreach ($packages as $package) {
+            // Packages are specified as "name#version", e.g. "hl7.fhir.r4.core#4.0.1"
             $packageParts = explode('#', $package);
             $version      = $packageParts[1] ?? null;
             $package      = $packageParts[0];
@@ -232,12 +191,9 @@ class FHIRModelGeneratorCommand extends Command
             $loadingPackagesIndicator->setMessage('Loading package ' . $package . ($version ? " version $version" : ''));
 
             try {
-                if ($isModelsComponent) {
-                    $this->processPackageForModelsComponent($output, $package, $version, $offlineMode);
-                } else {
-                    $this->processPackageForRegularGeneration($output, $package, $version, $offlineMode);
-                }
+                $this->processPackage($output, $package, $version, $offlineMode);
             } catch (\Throwable $e) {
+                // Record the error but keep processing remaining packages
                 $this->errorCollector->addError(
                     "Failed to process package '{$package}': {$e->getMessage()}",
                     $package,
@@ -257,51 +213,36 @@ class FHIRModelGeneratorCommand extends Command
             $loadingPackagesIndicator->advance();
         }
 
-        $finishMessage = $isModelsComponent
-            ? 'Finished loading FHIR Implementation Guide packages for Models component.'
-            : 'Finished loading FHIR Implementation Guide packages.';
-        $loadingPackagesIndicator->finish($finishMessage);
+        $loadingPackagesIndicator->finish('Finished loading FHIR Implementation Guide packages.');
 
-        // Final error report
+        // Report final status — any collected errors mean the generation is incomplete
         if ($this->errorCollector->hasErrors()) {
-            $errorMessage = $isModelsComponent
-                ? '<error>Models component generation completed with errors:</error>'
-                : '<error>Generation completed with errors:</error>';
-            $output->writeln($errorMessage);
+            $output->writeln('<error>Generation completed with errors:</error>');
             $output->writeln($this->errorCollector->getDetailedOutput());
 
             return Command::FAILURE;
         }
 
         if ($this->errorCollector->hasWarnings()) {
-            $warningMessage = $isModelsComponent
-                ? '<comment>Models component generation completed with warnings:</comment>'
-                : '<comment>Generation completed with warnings:</comment>';
-            $output->writeln($warningMessage);
+            $output->writeln('<comment>Generation completed with warnings:</comment>');
             if ($output->isVerbose()) {
                 $output->writeln($this->errorCollector->getDetailedOutput());
             }
         }
 
-        $successMessage = $isModelsComponent
-            ? '<info>FHIR Models component generation completed successfully!</info>'
-            : '<info>FHIR model generation completed successfully!</info>';
-        $output->writeln($successMessage);
+        $output->writeln('<info>FHIR model generation completed successfully!</info>');
 
         return Command::SUCCESS;
     }
 
     /**
-     * Process a package for Models component generation
+     * Download/cache a single FHIR package, then generate classes for each FHIR version it supports.
      *
-     * @param OutputInterface $output
-     * @param string          $package
-     * @param string|null     $version
-     * @param bool            $offlineMode
-     *
-     * @return void
+     * A single package can support multiple FHIR versions (though most support exactly one).
+     * For each version, we load the StructureDefinitions into the version-specific BuilderContext
+     * and run the full generate → build enums → output pipeline.
      */
-    private function processPackageForModelsComponent(OutputInterface $output, string $package, ?string $version, bool $offlineMode): void
+    private function processPackage(OutputInterface $output, string $package, ?string $version, bool $offlineMode): void
     {
         $packageMetaData = $this->packageLoader->installPackage(
             packageName: $package,
@@ -312,97 +253,37 @@ class FHIRModelGeneratorCommand extends Command
         );
 
         foreach ($packageMetaData->getFhirVersions() as $fhirVersion) {
-            // Load package definitions into context
             $definitions = $this->packageLoader->loadPackageStructureDefinitions($packageMetaData);
 
-            // Map FHIR version names to version numbers
-            $versionNumber = match ($fhirVersion) {
-                'R4'    => '4.0.1',
-                'R4B'   => '4.3.0',
-                'R5'    => '5.0.0',
-                default => throw PackageException::unsupportedFhirVersion($fhirVersion, ['R4', 'R4B', 'R5']),
+            // Validate the FHIR version is one we support
+            match ($fhirVersion) {
+                'R4', 'R4B', 'R5' => null,
+                default           => throw PackageException::unsupportedFhirVersion($fhirVersion, ['R4', 'R4B', 'R5']),
             };
-            $this->context[$fhirVersion]->loadDefinitions($definitions);
 
-            $this->generateModelsComponentClassesForPackage($output, $package, $versionNumber, $fhirVersion);
+            $this->context[$fhirVersion]->loadDefinitions($definitions);
+            $this->generateClassesForPackage($output, $package, $fhirVersion);
         }
     }
 
     /**
-     * Process a package for regular generation
+     * Remove previously generated version directories (R4/, R4B/, R5/) before regenerating.
      *
-     * @param OutputInterface $output
-     * @param string          $package
-     * @param string|null     $version
-     * @param bool            $offlineMode
-     *
-     * @return void
-     */
-    private function processPackageForRegularGeneration(OutputInterface $output, string $package, ?string $version, bool $offlineMode): void
-    {
-        $packageMetaData = $this->packageLoader->installPackage(
-            packageName: $package,
-            version: $version,
-            registry: null,
-            resolveDeps: false, // Don't resolve dependencies for now
-            offlineMode: $offlineMode,
-        );
-
-        // Map FHIR version names to version numbers expected by generateClassesForPackage
-        $fhirVersions    = $packageMetaData->getFhirVersions();
-        $fhirVersionName = $fhirVersions[0] ?? 'R4B';
-        $versionNumber   = match ($fhirVersionName) {
-            'R4'    => '4.0.1',
-            'R4B'   => '4.3.0',
-            'R5'    => '5.0.0',
-            default => '4.3.0', // Default to R4B
-        };
-
-        $this->generateClassesForPackage($output, $package, $versionNumber);
-    }
-
-    /**
-     * Clear the regular output directory before generation
-     *
-     * @param OutputInterface $output
-     *
-     * @return void
+     * Only removes directories matching the FHIR version naming pattern (e.g. "R4", "R4B", "R5")
+     * to avoid accidentally deleting other files in the Models/src directory.
      */
     private function clearOutputDirectory(OutputInterface $output): void
-    {
-        $outputPath = Path::canonicalize(__DIR__ . '/../output');
-
-        if ($this->filesystem->exists($outputPath)) {
-            $output->writeln('<comment>Clearing existing output directory...</comment>');
-            $this->filesystem->remove($outputPath);
-            $output->writeln('<info>Output directory cleared successfully.</info>');
-        }
-
-        // Ensure the output directory exists
-        $this->filesystem->mkdir($outputPath, 0755);
-    }
-
-    /**
-     * Clear the Models component output directory before generation
-     *
-     * @param OutputInterface $output
-     *
-     * @return void
-     */
-    private function clearModelsComponentOutputDirectory(OutputInterface $output): void
     {
         $basePath = Path::canonicalize(__DIR__ . '/../../../Models/src');
 
         if ($this->filesystem->exists($basePath)) {
-            $output->writeln('<comment>Clearing existing Models component output directory...</comment>');
+            $output->writeln('<comment>Clearing existing output directory...</comment>');
 
-            // Get all version directories (R4, R4B, R5, etc.)
             $versionDirs = glob($basePath . '/*', GLOB_ONLYDIR);
 
             if ($versionDirs !== false) {
                 foreach ($versionDirs as $versionDir) {
                     $versionName = basename($versionDir);
-                    // Only clear directories that look like FHIR version names
                     if (preg_match('/^R\d+[A-Z]*$/', $versionName)) {
                         $output->writeln("<comment>Clearing {$versionName} directory...</comment>");
                         $this->filesystem->remove($versionDir);
@@ -410,48 +291,46 @@ class FHIRModelGeneratorCommand extends Command
                 }
             }
 
-            $output->writeln('<info>Models component output directories cleared successfully.</info>');
+            $output->writeln('<info>Output directories cleared successfully.</info>');
         }
 
-        // Ensure the base directory exists
         $this->filesystem->mkdir($basePath, 0755);
     }
 
     /**
-     * Generate classes for a package using Models component structure
+     * Run the full generation pipeline for a single FHIR version: build classes, build enums, write files.
      *
-     * @param OutputInterface $output
-     * @param string          $package
-     * @param string          $version
-     * @param string          $fhirVersionName
-     *
-     * @return void
+     * This sets up four Nette PhpNamespace objects — one per output category (Resource, DataType,
+     * Primitive, Enum) — which act as containers for the generated class/enum types. The namespaces
+     * are registered in BuilderContext so that cross-references between types can be resolved.
      *
      * @throws \JsonException
      */
-    private function generateModelsComponentClassesForPackage(OutputInterface $output, string $package, string $version, string $fhirVersionName): void
+    private function generateClassesForPackage(OutputInterface $output, string $package, string $fhirVersion): void
     {
-        // Use Models component namespace structure
-        $baseNamespace = "Ardenexal\\FHIRTools\\Component\\Models\\{$fhirVersionName}";
+        // All generated classes live under this base namespace, e.g.
+        // "Ardenexal\FHIRTools\Component\Models\R4"
+        $baseNamespace = "Ardenexal\\FHIRTools\\Component\\Models\\{$fhirVersion}";
 
-        // Create namespaces for different types
         $resourceNamespace  = new PhpNamespace("{$baseNamespace}\\Resource");
         $dataTypeNamespace  = new PhpNamespace("{$baseNamespace}\\DataType");
         $primitiveNamespace = new PhpNamespace("{$baseNamespace}\\Primitive");
         $enumNamespace      = new PhpNamespace("{$baseNamespace}\\Enum");
 
-        // Set up all namespaces in the context
-        $this->context[$fhirVersionName]->addElementNamespace($fhirVersionName, $resourceNamespace);
-        $this->context[$fhirVersionName]->addEnumNamespace($fhirVersionName, $enumNamespace);
-        $this->context[$fhirVersionName]->addPrimitiveNamespace($fhirVersionName, $primitiveNamespace);
-        $this->context[$fhirVersionName]->addDatatypeNamespace($fhirVersionName, $dataTypeNamespace);
+        // Register namespaces in context so FHIRModelGenerator can resolve cross-type references
+        // (e.g. a Patient resource referencing the HumanName data type)
+        $this->context[$fhirVersion]->addElementNamespace($fhirVersion, $resourceNamespace);
+        $this->context[$fhirVersion]->addEnumNamespace($fhirVersion, $enumNamespace);
+        $this->context[$fhirVersion]->addPrimitiveNamespace($fhirVersion, $primitiveNamespace);
+        $this->context[$fhirVersion]->addDatatypeNamespace($fhirVersion, $dataTypeNamespace);
 
-        // Build different types of classes
-        $this->buildModelsComponentClasses($output, $fhirVersionName, $resourceNamespace, $dataTypeNamespace, $primitiveNamespace);
+        // Phase 1: Generate PHP classes from StructureDefinitions
+        $this->buildClasses($output, $fhirVersion, $resourceNamespace, $dataTypeNamespace, $primitiveNamespace);
 
-        // Try to build enums but don't fail if there are errors
+        // Phase 2: Generate PHP enums from ValueSets that were referenced during class generation.
+        // Enum failures are non-fatal — we log them and continue so we still get the class files.
         try {
-            $this->buildEnumsForValuesSets($output, $fhirVersionName);
+            $this->buildEnums($output, $fhirVersion);
         } catch (\Throwable $e) {
             $this->errorCollector->addError(
                 "Enum generation failed but continuing with class generation: {$e->getMessage()}",
@@ -466,457 +345,27 @@ class FHIRModelGeneratorCommand extends Command
             $output->writeln('<comment>Warning: Enum generation failed but continuing with class generation</comment>');
         }
 
-        $this->outputModelsComponentFiles($output, $fhirVersionName);
+        // Phase 3: Write all generated classes and enums to disk
+        $this->outputGeneratedFiles($output, $fhirVersion);
     }
 
     /**
-     * Output files using Models component directory structure
+     * Iterate over loaded StructureDefinitions and generate a PHP class for each one.
      *
-     * @param OutputInterface $output
-     * @param string          $version
+     * Each StructureDefinition has a "kind" that determines which namespace category it belongs to:
+     *   - "resource"       → Resource/    (Patient, Observation, Encounter, …)
+     *   - "complex-type"   → DataType/    (HumanName, Address, CodeableConcept, …)
+     *   - "primitive-type"  → Primitive/   (String, Boolean, DateTime, …)
      *
-     * @return void
-     */
-    private function outputModelsComponentFiles(OutputInterface $output, string $version): void
-    {
-        $baseNamespace = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}";
-
-        foreach ($this->context[$version]->getTypes() as $type) {
-            // Determine the correct namespace based on the class attributes
-            $namespace     = $this->determineModelsComponentNamespace($type->asClassType(), $baseNamespace);
-            $classContents = self::asPhpFile($type->asClassType(), $type->namespace);
-
-            // Determine output path based on type and backbone element status
-            $outputPath = $this->getModelsComponentOutputPath($version, $type->class, $namespace);
-
-            // Ensure directory exists for backbone elements
-            $directory = dirname($outputPath);
-            if (! $this->filesystem->exists($directory)) {
-                $this->filesystem->mkdir($directory, 0755);
-            }
-
-            $this->filesystem->dumpFile($outputPath, $classContents);
-            $output->writeln("Generated Models component class for {$type->getClassName()}");
-        }
-
-        foreach ($this->context[$version]->getEnums() as $type) {
-            $enumNamespace = new PhpNamespace("{$baseNamespace}\\Enum");
-            $classContents = self::asPhpFile($type->class, $type->namespace);
-
-            $outputPath = $this->getModelsComponentOutputPath($version, $type->class, $enumNamespace);
-
-            // Ensure directory exists
-            $directory = dirname($outputPath);
-            if (! $this->filesystem->exists($directory)) {
-                $this->filesystem->mkdir($directory, 0755);
-            }
-
-            $this->filesystem->dumpFile($outputPath, $classContents);
-            $output->writeln("Generated Models component enum for {$type->getClassName()}");
-        }
-    }
-
-    /**
-     * Determine the correct namespace for a type based on its attributes
-     *
-     * @param ClassType $type
-     * @param string    $baseNamespace
-     *
-     * @return PhpNamespace
-     */
-    private function determineModelsComponentNamespace(ClassType $type, string $baseNamespace): PhpNamespace
-    {
-        // Check class attributes to determine the type category
-        foreach ($type->getAttributes() as $attribute) {
-            $attributeName = $attribute->getName();
-
-            if (str_contains($attributeName, 'FhirResource')) {
-                return new PhpNamespace("{$baseNamespace}\\Resource");
-            }
-
-            // Backbone elements nested inside a resource (elementPath contains a dot,
-            // e.g. "Communication.payload") belong in the Resource namespace.
-            // Top-level complex-type BackboneElements (elementPath has no dot,
-            // e.g. "Dosage", "Timing") are data types and belong in DataType.
-            if (str_contains($attributeName, 'FHIRBackboneElement')) {
-                $args        = $attribute->getArguments();
-                $elementPath = $args['elementPath'] ?? '';
-                if (str_contains($elementPath, '.')) {
-                    return new PhpNamespace("{$baseNamespace}\\Resource");
-                }
-
-                return new PhpNamespace("{$baseNamespace}\\DataType");
-            }
-
-            if (str_contains($attributeName, 'FHIRPrimitive')) {
-                return new PhpNamespace("{$baseNamespace}\\Primitive");
-            }
-
-            if (str_contains($attributeName, 'FHIRComplexType')) {
-                return new PhpNamespace("{$baseNamespace}\\DataType");
-            }
-        }
-
-        // Fallback: try to determine from class name patterns
-        $className = $type->getName();
-        if ($className !== null) {
-            // Check if it's a known FHIR resource
-            if ($this->isKnownFHIRResource($className)) {
-                return new PhpNamespace("{$baseNamespace}\\Resource");
-            }
-
-            // Check if it's a primitive type (usually shorter names)
-            if ($this->isKnownFHIRPrimitive($className)) {
-                return new PhpNamespace("{$baseNamespace}\\Primitive");
-            }
-        }
-
-        // Default to DataType for complex types
-        return new PhpNamespace("{$baseNamespace}\\DataType");
-    }
-
-    /**
-     * Check if a class name represents a known FHIR resource
-     *
-     * @param string $className
-     *
-     * @return bool
-     */
-    private function isKnownFHIRResource(string $className): bool
-    {
-        // Remove FHIR prefix
-        $name = str_starts_with($className, 'FHIR') ? substr($className, 4) : $className;
-
-        // List of known FHIR resources (partial list for common ones)
-        $knownResources = [
-            'Patient',
-            'Observation',
-            'Practitioner',
-            'Organization',
-            'Encounter',
-            'Condition',
-            'Procedure',
-            'MedicationRequest',
-            'DiagnosticReport',
-            'AllergyIntolerance',
-            'CarePlan',
-            'Goal',
-            'Immunization',
-            'Location',
-            'Device',
-            'Medication',
-            'Substance',
-            'Specimen',
-            'BodyStructure',
-            'ImagingStudy',
-            'Media',
-            'DocumentReference',
-            'Composition',
-            'Bundle',
-            'MessageHeader',
-            'OperationOutcome',
-            'Parameters',
-            'Binary',
-            'Basic',
-            'DomainResource',
-            'Resource',
-        ];
-
-        return in_array($name, $knownResources, true);
-    }
-
-    /**
-     * Check if a class name represents a known FHIR primitive type
-     *
-     * @param string $className
-     *
-     * @return bool
-     */
-    private function isKnownFHIRPrimitive(string $className): bool
-    {
-        // Remove FHIR prefix
-        $name = str_starts_with($className, 'FHIR') ? substr($className, 4) : $className;
-
-        // List of known FHIR primitive types
-        $knownPrimitives = [
-            'Boolean',
-            'Integer',
-            'String',
-            'Decimal',
-            'Uri',
-            'Url',
-            'Canonical',
-            'Base64Binary',
-            'Instant',
-            'Date',
-            'DateTime',
-            'Time',
-            'Code',
-            'Oid',
-            'Id',
-            'Markdown',
-            'UnsignedInt',
-            'PositiveInt',
-            'Uuid',
-            'Xhtml',
-        ];
-
-        return in_array($name, $knownPrimitives, true);
-    }
-
-    /**
-     * Get output path for Models component files
-     *
-     * @param string             $version
-     * @param ClassType|EnumType $type
-     * @param PhpNamespace       $namespace
-     *
-     * @return string
-     */
-    private function getModelsComponentOutputPath(string $version, ClassType|EnumType $type, PhpNamespace $namespace): string
-    {
-        $basePath = Path::canonicalize(__DIR__ . '/../../../Models/src');
-
-        // Extract the type category from namespace
-        $namespaceParts = explode('\\', $namespace->getName());
-        $typeCategory   = end($namespaceParts); // Resource, DataType, Primitive, or Enum
-
-        // Handle backbone elements - they should go in resource subdirectories
-        $typeName = $type->getName();
-        if ($typeName !== null && $this->isBackboneElement($typeName, $type)) {
-            $resourceName = $this->extractResourceNameFromBackboneElement($typeName, $type);
-            if ($resourceName && $typeCategory === 'Resource') {
-                return Path::canonicalize("{$basePath}/{$version}/Resource/{$resourceName}/{$typeName}.php");
-            }
-        }
-
-        return Path::canonicalize("{$basePath}/{$version}/{$typeCategory}/{$typeName}.php");
-    }
-
-    /**
-     * Check if a type represents a backbone element
-     *
-     * @param string             $typeName
-     * @param ClassType|EnumType $type
-     *
-     * @return bool
-     */
-    private function isBackboneElement(string $typeName, ClassType|EnumType $type): bool
-    {
-        // Check if the class has the FHIRBackboneElement attribute
-        if ($type instanceof ClassType) {
-            foreach ($type->getAttributes() as $attribute) {
-                if (str_contains($attribute->getName(), 'FHIRBackboneElement')) {
-                    return true;
-                }
-            }
-        }
-
-        // Fallback: Check naming pattern for backbone elements
-        // Backbone elements typically have names like FHIRPatientContact, FHIRObservationComponent
-        return preg_match('/^FHIR[A-Z][a-z]+[A-Z][a-zA-Z]+$/', $typeName) === 1;
-    }
-
-    /**
-     * Extract resource name from backbone element type
-     *
-     * @param string             $typeName
-     * @param ClassType|EnumType $type
-     *
-     * @return string|null
-     */
-    private function extractResourceNameFromBackboneElement(string $typeName, ClassType|EnumType $type): ?string
-    {
-        // First try to get it from the FHIRBackboneElement attribute
-        if ($type instanceof ClassType) {
-            foreach ($type->getAttributes() as $attribute) {
-                if (str_contains($attribute->getName(), 'FHIRBackboneElement')) {
-                    $args = $attribute->getArguments();
-                    if (isset($args['parentResource'])) {
-                        return $args['parentResource'];
-                    }
-                }
-            }
-        }
-
-        // Fallback: Extract from naming pattern using known FHIR resource names
-        // Remove FHIR prefix
-        $withoutPrefix = substr($typeName, 4);
-
-        // List of known multi-word FHIR resource names (in order of length, longest first)
-        $knownResources = [
-            'ActivityDefinition',
-            'AdverseEvent',
-            'AllergyIntolerance',
-            'AppointmentResponse',
-            'AuditEvent',
-            'BiologicallyDerivedProduct',
-            'BodyStructure',
-            'CapabilityStatement',
-            'CarePlan',
-            'CareTeam',
-            'CatalogEntry',
-            'ChargeItem',
-            'ChargeItemDefinition',
-            'ClinicalImpression',
-            'CodeSystem',
-            'CompartmentDefinition',
-            'ConceptMap',
-            'DataRequirement',
-            'DetectedIssue',
-            'DeviceDefinition',
-            'DeviceMetric',
-            'DeviceRequest',
-            'DeviceUseStatement',
-            'DiagnosticReport',
-            'DocumentManifest',
-            'DocumentReference',
-            'EffectEvidenceSynthesis',
-            'EligibilityRequest',
-            'EligibilityResponse',
-            'EnrollmentRequest',
-            'EnrollmentResponse',
-            'EpisodeOfCare',
-            'EventDefinition',
-            'EvidenceVariable',
-            'ExampleScenario',
-            'ExplanationOfBenefit',
-            'FamilyMemberHistory',
-            'GraphDefinition',
-            'GuidanceResponse',
-            'HealthcareService',
-            'ImagingStudy',
-            'ImmunizationEvaluation',
-            'ImmunizationRecommendation',
-            'ImplementationGuide',
-            'InsurancePlan',
-            'MeasureReport',
-            'MedicationAdministration',
-            'MedicationDispense',
-            'MedicationKnowledge',
-            'MedicationRequest',
-            'MedicationStatement',
-            'MedicinalProduct',
-            'MedicinalProductAuthorization',
-            'MedicinalProductContraindication',
-            'MedicinalProductIndication',
-            'MedicinalProductIngredient',
-            'MedicinalProductInteraction',
-            'MedicinalProductManufactured',
-            'MedicinalProductPackaged',
-            'MedicinalProductPharmaceutical',
-            'MedicinalProductUndesirableEffect',
-            'MessageDefinition',
-            'MessageHeader',
-            'MolecularSequence',
-            'NamingSystem',
-            'NutritionOrder',
-            'OperationDefinition',
-            'OperationOutcome',
-            'OrganizationAffiliation',
-            'PaymentNotice',
-            'PaymentReconciliation',
-            'PlanDefinition',
-            'PractitionerRole',
-            'QuestionnaireResponse',
-            'RelatedPerson',
-            'RequestGroup',
-            'ResearchDefinition',
-            'ResearchElementDefinition',
-            'ResearchStudy',
-            'ResearchSubject',
-            'RiskAssessment',
-            'RiskEvidenceSynthesis',
-            'ServiceRequest',
-            'SpecimenDefinition',
-            'StructureDefinition',
-            'StructureMap',
-            'SupplyDelivery',
-            'SupplyRequest',
-            'TestReport',
-            'TestScript',
-            'ValueSet',
-            'VerificationResult',
-            'VisionPrescription',
-            // Single word resources
-            'Account',
-            'Appointment',
-            'Basic',
-            'Binary',
-            'Bundle',
-            'Claim',
-            'Communication',
-            'Composition',
-            'Condition',
-            'Consent',
-            'Contract',
-            'Coverage',
-            'Device',
-            'Encounter',
-            'Endpoint',
-            'Evidence',
-            'Flag',
-            'Goal',
-            'Group',
-            'Immunization',
-            'Invoice',
-            'Library',
-            'Linkage',
-            'List',
-            'Location',
-            'Measure',
-            'Media',
-            'Medication',
-            'Observation',
-            'Organization',
-            'Parameters',
-            'Patient',
-            'Person',
-            'Practitioner',
-            'Procedure',
-            'Provenance',
-            'Questionnaire',
-            'Schedule',
-            'Slot',
-            'Specimen',
-            'Subscription',
-            'Substance',
-            'Task',
-        ];
-
-        // Try to match against known resource names (longest first to avoid partial matches)
-        foreach ($knownResources as $resourceName) {
-            if (str_starts_with($withoutPrefix, $resourceName)) {
-                return $resourceName;
-            }
-        }
-
-        // Fallback to original logic if no known resource matches
-        for ($i = 1, $iMax = strlen($withoutPrefix); $i < $iMax; ++$i) {
-            if (ctype_upper($withoutPrefix[$i])) {
-                return substr($withoutPrefix, 0, $i);
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Build classes for Models component, categorizing by StructureDefinition kind
-     *
-     * @param OutputInterface $output
-     * @param string          $version
-     * @param PhpNamespace    $resourceNamespace
-     * @param PhpNamespace    $dataTypeNamespace
-     * @param PhpNamespace    $primitiveNamespace
-     *
-     * @return void
+     * We skip two kinds of definitions:
+     *   - "logical" models (abstract/non-instantiable)
+     *   - "constraint" derivations (profiles that constrain an existing type, e.g. US Core Patient)
      *
      * @throws \JsonException
      */
-    private function buildModelsComponentClasses(OutputInterface $output, string $version, PhpNamespace $resourceNamespace, PhpNamespace $dataTypeNamespace, PhpNamespace $primitiveNamespace): void
+    private function buildClasses(OutputInterface $output, string $version, PhpNamespace $resourceNamespace, PhpNamespace $dataTypeNamespace, PhpNamespace $primitiveNamespace): void
     {
-        $output->writeln('Generating Models component classes...');
+        $output->writeln('Generating model classes...');
 
         $resourceCount  = 0;
         $dataTypeCount  = 0;
@@ -927,7 +376,7 @@ class FHIRModelGeneratorCommand extends Command
                 continue;
             }
 
-            // Ignore Profiles that are constraints on other types for now
+            // Skip profiles (constraints on existing types) and logical models
             if ($structureDefinition['kind'] === 'logical' || (isset($structureDefinition['derivation']) && $structureDefinition['derivation'] === 'constraint')) {
                 continue;
             }
@@ -935,7 +384,7 @@ class FHIRModelGeneratorCommand extends Command
             $kind = $structureDefinition['kind'] ?? 'unknown';
             $name = $structureDefinition['name'] ?? 'Unknown';
 
-            // Determine which namespace to use based on the StructureDefinition kind
+            // Route the generated class to the correct namespace based on its kind
             $targetNamespace = match ($kind) {
                 'resource'       => $resourceNamespace,
                 'complex-type'   => $dataTypeNamespace,
@@ -949,16 +398,16 @@ class FHIRModelGeneratorCommand extends Command
                 continue;
             }
 
-            $output->writeln("Generating Models component class for {$name} (kind: {$kind})");
+            $output->writeln("Generating class for {$name} (kind: {$kind})");
             $generator = new FHIRModelGenerator();
 
             $class = $generator->generateModelClassWithErrorHandling($structureDefinition, $version, $this->errorCollector, $this->context[$version]);
 
             if ($class !== null) {
+                // Register the class in context (for cross-reference resolution) and in its namespace
                 $this->context[$version]->addType($structureDefinition['url'], $targetNamespace->getName(), $class);
                 $targetNamespace->add($class);
 
-                // Count generated classes by type
                 match ($kind) {
                     'resource'       => $resourceCount++,
                     'complex-type'   => $dataTypeCount++,
@@ -972,7 +421,6 @@ class FHIRModelGeneratorCommand extends Command
 
         $output->writeln("<info>Generated {$resourceCount} resources, {$dataTypeCount} data types, {$primitiveCount} primitives</info>");
 
-        // Report any collected errors
         if ($this->errorCollector->hasErrors()) {
             $output->writeln('<error>' . $this->errorCollector->getSummary() . '</error>');
             if ($output->isVerbose()) {
@@ -982,113 +430,21 @@ class FHIRModelGeneratorCommand extends Command
     }
 
     /**
-     * @param OutputInterface $output
-     * @param string          $version
-     * @param PhpNamespace    $namespace
+     * Generate PHP enums from FHIR ValueSets that were referenced during class building.
      *
-     * @return void
+     * When FHIRModelGenerator encounters a property bound to a ValueSet (e.g. Patient.gender
+     * is bound to the AdministrativeGender ValueSet), it records that ValueSet URL as a
+     * "pending enum" in BuilderContext. This method processes all those pending enums.
      *
-     * @throws \JsonException
+     * For each ValueSet, two things are generated:
+     *   1. A PHP enum (e.g. `AdministrativeGender`) with cases for each coded value
+     *   2. A "code type" wrapper class (e.g. `AdministrativeGenderType`) that extends FHIRCode
+     *      and associates the enum with FHIR's type system
+     *
+     * Duplicate detection is needed because multiple StructureDefinitions can reference the
+     * same ValueSet — we only want to generate each enum once.
      */
-    public function buildElementClasses(OutputInterface $output, string $version, PhpNamespace $namespace): void
-    {
-        $output->writeln('Generating model classes...');
-
-        foreach ($this->context[$version]->getDefinitions() as $structureDefinition) {
-            if ($structureDefinition['resourceType'] !== 'StructureDefinition') {
-                continue;
-            }
-
-            // Ignore Profiles that are constraints on other types for now
-            if ($structureDefinition['kind'] === 'logical' || (isset($structureDefinition['derivation']) && $structureDefinition['derivation'] === 'constraint')) {
-                continue;
-            }
-
-            $output->writeln("Generating model class for {$structureDefinition['name']}");
-            $generator = new FHIRModelGenerator();
-
-            $class = $generator->generateModelClassWithErrorHandling($structureDefinition, $version, $this->errorCollector, $this->context[$version]);
-
-            if ($class !== null) {
-                $this->context[$version]->addType($structureDefinition['url'], $namespace->getName(), $class);
-                $namespace->add($class);
-            } else {
-                $output->writeln("<error>Failed to generate class for {$structureDefinition['name']}</error>");
-            }
-        }
-
-        // Report any collected errors
-        if ($this->errorCollector->hasErrors()) {
-            $output->writeln('<error>' . $this->errorCollector->getSummary() . '</error>');
-            if ($output->isVerbose()) {
-                $output->writeln($this->errorCollector->getDetailedOutput());
-            }
-        }
-    }
-
-    /**
-     * @param OutputInterface $output
-     * @param string          $version
-     *
-     * @return void
-     */
-    public function outputFiles(OutputInterface $output, string $version): void
-    {
-        foreach ($this->context[$version]->getTypes() as $type) {
-            // Use the namespace from the ClassType itself to preserve use statements
-            $classContents = self::asPhpFile($type->asClassType(), $type->namespace);
-            $path          = Path::canonicalize(__DIR__ . '/../output/' . $type->namespace . '/' . $type->getClassName() . '.php');
-            $this->filesystem->dumpFile($path, $classContents);
-            $output->writeln("Generated model class for {$type->getClassName()}");
-        }
-
-        foreach ($this->context[$version]->getEnums() as $type) {
-            $classContents = self::asPhpFile($type->asEnumType(), $type->namespace);
-            $path          = Path::canonicalize(__DIR__ . '/../output/' . $type->namespace . '/' . $type->getClassName() . '.php');
-            $this->filesystem->dumpFile($path, $classContents);
-            $output->writeln("Generated model class for {$type->getClassName()}");
-        }
-    }
-
-    /**
-     * @param ClassType|EnumType $classType
-     * @param string             $namespace
-     *
-     * @return string
-     */
-    protected static function asPhpFile(ClassType|EnumType $classType, string $namespace): string
-    {
-        $printer = new Printer();
-
-        // Manually build use statements from the namespace
-        //        $uses = [];
-        //        foreach ($namespace->getUses() as $alias => $original) {
-        //            // Check if this is a simple use (no alias) or aliased use
-        //            $shortName = substr($original, strrpos($original, '\\') + 1);
-        //            if ($shortName === $alias) {
-        //                $uses[] = "use {$original};";
-        //            } else {
-        //                $uses[] = "use {$original} as {$alias};";
-        //            }
-        //        }
-        //        $usesSection = $uses ? "\n" . implode("\n", $uses) . "\n" : '';
-
-        return <<<PHP
-        <?php declare(strict_types=1);
-
-        namespace {$namespace};
-
-        {$printer->printClass($classType, new PhpNamespace($namespace))}
-        PHP;
-    }
-
-    /**
-     * @param OutputInterface $output
-     * @param string          $version
-     *
-     * @return void
-     */
-    private function buildEnumsForValuesSets(OutputInterface $output, string $version): void
+    private function buildEnums(OutputInterface $output, string $version): void
     {
         $output->writeln('Generating Enums for value sets');
 
@@ -1111,7 +467,8 @@ class FHIRModelGeneratorCommand extends Command
                 continue;
             }
 
-            // Check if enum already exists to prevent duplicate generation
+            // Skip if we already generated this enum (can happen when multiple
+            // StructureDefinitions reference the same ValueSet)
             if ($this->context[$version]->getEnum($url) !== null) {
                 $output->writeln("Enum for {$valueset['name']} already exists, skipping generation");
                 $this->context[$version]->removePendingType($url);
@@ -1126,21 +483,21 @@ class FHIRModelGeneratorCommand extends Command
                 $enumGenerator  = new FHIRValueSetGenerator();
                 $classGenerator = new FHIRModelGenerator();
 
+                // Step 1: Generate the PHP enum from the ValueSet definition
                 $enumType = $enumGenerator->generateEnum($valueset, $version, $this->context[$version]);
 
-                // Add enum to namespace safely
+                // Step 2: Register the enum in its namespace and context.
+                // Nette's PhpNamespace throws InvalidStateException if a type with the same
+                // name already exists, so we handle that gracefully.
                 $enumNamespace = $this->context[$version]->getEnumNamespace($version);
                 $enumTypeName  = $enumType->getName();
                 if ($enumTypeName !== null) {
-                    // Try to add enum to namespace, handling duplicates gracefully
                     try {
                         $enumNamespace->add($enumType);
                         $this->context[$version]->addEnum($url, $enumNamespace->getName(), $enumType);
                     } catch (InvalidStateException $e) {
-                        // Enum with this name already exists in namespace
                         if (str_contains($e->getMessage(), 'already exists')) {
                             $output->writeln("Enum class {$enumTypeName} already exists in namespace, skipping namespace addition");
-                            // Still add to context for tracking with this URL
                             $this->context[$version]->addEnum($url, $enumNamespace->getName(), $enumType);
                         } else {
                             throw $e;
@@ -1150,8 +507,11 @@ class FHIRModelGeneratorCommand extends Command
                     $this->context[$version]->addEnum($url, $enumNamespace->getName(), $enumType);
                 }
 
-                $codeType = $classGenerator->generateModelCodeType($enumType, $version, $this->context[$version]);
-                // Add code type to DataType namespace safely (code types extend FHIRCode which is a primitive)
+                // Step 3: Generate a "code type" wrapper class that bridges the enum to FHIR's
+                // type system. For example, AdministrativeGenderType extends FHIRCode and
+                // references the AdministrativeGender enum. This goes in DataType/ because
+                // code types are data types in FHIR's type hierarchy.
+                $codeType          = $classGenerator->generateModelCodeType($enumType, $version, $this->context[$version]);
                 $dataTypeNamespace = $this->context[$version]->getDatatypeNamespace($version);
                 $this->context[$version]->addType($url, $dataTypeNamespace->getName(), $codeType);
                 $this->context[$version]->removePendingType($url);
@@ -1159,11 +519,9 @@ class FHIRModelGeneratorCommand extends Command
 
                 $codeTypeName = $codeType->getName();
                 if ($codeTypeName !== null) {
-                    // Try to add code type to namespace, handling duplicates gracefully
                     try {
                         $dataTypeNamespace->add($codeType);
                     } catch (InvalidStateException $e) {
-                        // Code type with this name already exists in namespace
                         if (str_contains($e->getMessage(), 'already exists')) {
                             $output->writeln("Code type class {$codeTypeName} already exists in namespace, skipping namespace addition");
                         } else {
@@ -1195,7 +553,7 @@ class FHIRModelGeneratorCommand extends Command
             }
         }
 
-        // Report remaining pending types
+        // Any types still pending after enum generation means we couldn't resolve them
         $pendingTypes = $this->context[$version]->getPendingTypes();
         if (count($pendingTypes) > 0) {
             foreach ($pendingTypes as $pendingTypeUrl) {
@@ -1207,13 +565,11 @@ class FHIRModelGeneratorCommand extends Command
                 $output->writeln("Warning: Could not generate type for $pendingTypeUrl");
             }
 
-            // Only throw if there are critical errors, not just warnings
             if ($this->errorCollector->getErrorsBySeverity('error')) {
                 throw GenerationException::pendingTypesRemaining($pendingTypes);
             }
         }
 
-        // Report final error summary
         if ($this->errorCollector->hasErrors() || $this->errorCollector->hasWarnings()) {
             $output->writeln('<comment>' . $this->errorCollector->getSummary() . '</comment>');
             if ($output->isVerbose()) {
@@ -1223,48 +579,162 @@ class FHIRModelGeneratorCommand extends Command
     }
 
     /**
-     * @param OutputInterface $output
-     * @param string          $package
-     * @param string          $version
+     * Write all generated classes and enums to disk as PHP files.
      *
-     * @return void
+     * Each generated type is written to a path determined by its FHIR version and category:
+     *   Models/src/{version}/{category}/{ClassName}.php
      *
-     * @throws \JsonException
+     * For example: Models/src/R4/Resource/FHIRPatient.php
      */
-    private function generateClassesForPackage(OutputInterface $output, string $package, string $version): void
+    private function outputGeneratedFiles(OutputInterface $output, string $version): void
     {
-        $namespaceParts = s($package)->split('.');
-        $parts          = [];
-        foreach ($namespaceParts as $namespace) {
-            $parts[] = $namespace->pascal();
+        $baseNamespace = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}";
+
+        foreach ($this->context[$version]->getTypes() as $type) {
+            $namespace     = $this->determineNamespace($type->asClassType(), $baseNamespace);
+            $classContents = self::asPhpFile($type->asClassType(), $type->namespace);
+            $outputPath    = $this->getOutputPath($version, $type->class, $namespace);
+
+            $directory = dirname($outputPath);
+            if (! $this->filesystem->exists($directory)) {
+                $this->filesystem->mkdir($directory, 0755);
+            }
+
+            $this->filesystem->dumpFile($outputPath, $classContents);
+            $output->writeln("Generated class for {$type->getClassName()}");
         }
-        $namespace    = s('\\')->join($parts);
-        $namedVersion = match ($version) {
-            '4.0.1' => 'R4',
-            '4.3.0' => 'R4B',
-            '5.0.0' => 'R5',
-            default => throw GenerationException::unsupportedFhirVersion($version),
-        };
-        $targetNamespace  = "Ardenexal\\FHIRTools\\$namespace\\Element";
-        $elementNamespace = new PhpNamespace($targetNamespace);
-        $this->context[$namedVersion]->addElementNamespace($namedVersion, $elementNamespace);
 
-        $targetNamespace = "Ardenexal\\FHIRTools\\$namespace\\Enum";
-        $enumNamespace   = new PhpNamespace($targetNamespace);
-        $this->context[$namedVersion]->addEnumNamespace($namedVersion, $enumNamespace);
+        foreach ($this->context[$version]->getEnums() as $type) {
+            $enumNamespace = new PhpNamespace("{$baseNamespace}\\Enum");
+            $classContents = self::asPhpFile($type->class, $type->namespace);
+            $outputPath    = $this->getOutputPath($version, $type->class, $enumNamespace);
 
-        $targetNamespace    = "Ardenexal\\FHIRTools\\$namespace\\Primitive";
-        $primitiveNamespace = new PhpNamespace($targetNamespace);
-        $this->context[$namedVersion]->addPrimitiveNamespace($namedVersion, $primitiveNamespace);
+            $directory = dirname($outputPath);
+            if (! $this->filesystem->exists($directory)) {
+                $this->filesystem->mkdir($directory, 0755);
+            }
 
-        $targetNamespace   = "Ardenexal\\FHIRTools\\$namespace\\DataType";
-        $datatypeNamespace = new PhpNamespace($targetNamespace);
-        $this->context[$namedVersion]->addDatatypeNamespace($namedVersion, $datatypeNamespace);
+            $this->filesystem->dumpFile($outputPath, $classContents);
+            $output->writeln("Generated enum for {$type->getClassName()}");
+        }
+    }
 
+    /**
+     * Determine the correct output namespace for a generated class based on its PHP attributes.
+     *
+     * Every generated class is tagged with exactly one of these attributes by FHIRModelGenerator:
+     *   - FhirResource      → Resource namespace
+     *   - FHIRBackboneElement → Resource namespace (if nested, e.g. "Patient.contact")
+     *                           or DataType namespace (if top-level, e.g. "Dosage")
+     *   - FHIRPrimitive      → Primitive namespace
+     *   - FHIRComplexType    → DataType namespace
+     *
+     * The backbone element distinction matters because elements like "Patient.contact" are
+     * nested inside a resource (so they go in Resource/), while standalone backbone elements
+     * like "Dosage" are reusable data types (so they go in DataType/). We check the
+     * "elementPath" attribute argument — a dot means it's nested (e.g. "Communication.payload").
+     */
+    private function determineNamespace(ClassType $type, string $baseNamespace): PhpNamespace
+    {
+        foreach ($type->getAttributes() as $attribute) {
+            $attributeName = $attribute->getName();
 
-        $this->buildElementClasses($output, $namedVersion, $elementNamespace);
+            if (str_contains($attributeName, 'FhirResource')) {
+                return new PhpNamespace("{$baseNamespace}\\Resource");
+            }
 
-        $this->buildEnumsForValuesSets($output, $namedVersion);
-        $this->outputFiles($output, $namedVersion);
+            if (str_contains($attributeName, 'FHIRBackboneElement')) {
+                $args        = $attribute->getArguments();
+                $elementPath = $args['elementPath'] ?? '';
+                if (str_contains($elementPath, '.')) {
+                    return new PhpNamespace("{$baseNamespace}\\Resource");
+                }
+
+                return new PhpNamespace("{$baseNamespace}\\DataType");
+            }
+
+            if (str_contains($attributeName, 'FHIRPrimitive')) {
+                return new PhpNamespace("{$baseNamespace}\\Primitive");
+            }
+
+            if (str_contains($attributeName, 'FHIRComplexType')) {
+                return new PhpNamespace("{$baseNamespace}\\DataType");
+            }
+        }
+
+        // Default to DataType for any class without a recognized attribute
+        return new PhpNamespace("{$baseNamespace}\\DataType");
+    }
+
+    /**
+     * Resolve the filesystem path where a generated class or enum should be written.
+     *
+     * Most types go to: Models/src/{version}/{category}/{TypeName}.php
+     *
+     * Backbone elements that belong to a resource get a subdirectory:
+     *   Models/src/{version}/Resource/{ResourceName}/{BackboneElementName}.php
+     *
+     * For example, FHIRPatientContact (a backbone element of Patient) goes to:
+     *   Models/src/R4/Resource/Patient/FHIRPatientContact.php
+     *
+     * This keeps resource directories organised when a resource has many backbone elements.
+     */
+    private function getOutputPath(string $version, ClassType|EnumType $type, PhpNamespace $namespace): string
+    {
+        $basePath = Path::canonicalize(__DIR__ . '/../../../Models/src');
+
+        // Extract the last segment of the namespace to determine the category
+        // e.g. "Ardenexal\...\R4\Resource" → "Resource"
+        $namespaceParts = explode('\\', $namespace->getName());
+        $typeCategory   = end($namespaceParts);
+
+        // If this is a backbone element in the Resource category, nest it under its parent resource
+        $typeName = $type->getName();
+        if ($typeName !== null && $type instanceof ClassType && $typeCategory === 'Resource') {
+            $parentResource = $this->getBackboneParentResource($type);
+            if ($parentResource !== null) {
+                return Path::canonicalize("{$basePath}/{$version}/Resource/{$parentResource}/{$typeName}.php");
+            }
+        }
+
+        return Path::canonicalize("{$basePath}/{$version}/{$typeCategory}/{$typeName}.php");
+    }
+
+    /**
+     * If this class is a backbone element, return the name of the resource it belongs to.
+     *
+     * Reads the "parentResource" argument from the FHIRBackboneElement attribute, which is
+     * always set by FHIRModelGenerator (extracted from the StructureDefinition's element path).
+     *
+     * @return string|null The parent resource name (e.g. "Patient"), or null if not a backbone element
+     */
+    private function getBackboneParentResource(ClassType $type): ?string
+    {
+        foreach ($type->getAttributes() as $attribute) {
+            if (str_contains($attribute->getName(), 'FHIRBackboneElement')) {
+                return $attribute->getArguments()['parentResource'] ?? null;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Wrap a generated class or enum in a complete PHP file with strict types and namespace declaration.
+     *
+     * Uses Nette's Printer to render the class/enum body, then prepends the standard PHP
+     * file header (declare, namespace).
+     */
+    protected static function asPhpFile(ClassType|EnumType $classType, string $namespace): string
+    {
+        $printer = new Printer();
+
+        return <<<PHP
+        <?php declare(strict_types=1);
+
+        namespace {$namespace};
+
+        {$printer->printClass($classType, new PhpNamespace($namespace))}
+        PHP;
     }
 }

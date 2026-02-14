@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -10,48 +12,48 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum RequestResourceType: string
 {
-	/** Appointment */
-	case appointment = 'Appointment';
+    /** Appointment */
+    case appointment = 'Appointment';
 
-	/** AppointmentResponse */
-	case appointmentresponse = 'AppointmentResponse';
+    /** AppointmentResponse */
+    case appointmentresponse = 'AppointmentResponse';
 
-	/** CarePlan */
-	case careplan = 'CarePlan';
+    /** CarePlan */
+    case careplan = 'CarePlan';
 
-	/** Claim */
-	case claim = 'Claim';
+    /** Claim */
+    case claim = 'Claim';
 
-	/** CommunicationRequest */
-	case communicationrequest = 'CommunicationRequest';
+    /** CommunicationRequest */
+    case communicationrequest = 'CommunicationRequest';
 
-	/** Contract */
-	case contract = 'Contract';
+    /** Contract */
+    case contract = 'Contract';
 
-	/** DeviceRequest */
-	case devicerequest = 'DeviceRequest';
+    /** DeviceRequest */
+    case devicerequest = 'DeviceRequest';
 
-	/** EnrollmentRequest */
-	case enrollmentrequest = 'EnrollmentRequest';
+    /** EnrollmentRequest */
+    case enrollmentrequest = 'EnrollmentRequest';
 
-	/** ImmunizationRecommendation */
-	case immunizationrecommendation = 'ImmunizationRecommendation';
+    /** ImmunizationRecommendation */
+    case immunizationrecommendation = 'ImmunizationRecommendation';
 
-	/** MedicationRequest */
-	case medicationrequest = 'MedicationRequest';
+    /** MedicationRequest */
+    case medicationrequest = 'MedicationRequest';
 
-	/** NutritionOrder */
-	case nutritionorder = 'NutritionOrder';
+    /** NutritionOrder */
+    case nutritionorder = 'NutritionOrder';
 
-	/** ServiceRequest */
-	case servicerequest = 'ServiceRequest';
+    /** ServiceRequest */
+    case servicerequest = 'ServiceRequest';
 
-	/** SupplyRequest */
-	case supplyrequest = 'SupplyRequest';
+    /** SupplyRequest */
+    case supplyrequest = 'SupplyRequest';
 
-	/** Task */
-	case task = 'Task';
+    /** Task */
+    case task = 'Task';
 
-	/** VisionPrescription */
-	case visionprescription = 'VisionPrescription';
+    /** VisionPrescription */
+    case visionprescription = 'VisionPrescription';
 }

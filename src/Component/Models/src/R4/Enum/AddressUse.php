@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -10,18 +12,18 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum AddressUse: string
 {
-	/** Home */
-	case home = 'home';
+    /** Home */
+    case home = 'home';
 
-	/** Work */
-	case work = 'work';
+    /** Work */
+    case work = 'work';
 
-	/** Temporary */
-	case temporary = 'temp';
+    /** Temporary */
+    case temporary = 'temp';
 
-	/** Old / Incorrect */
-	case oldincorrect = 'old';
+    /** Old / Incorrect */
+    case oldincorrect = 'old';
 
-	/** Billing */
-	case billing = 'billing';
+    /** Billing */
+    case billing = 'billing';
 }

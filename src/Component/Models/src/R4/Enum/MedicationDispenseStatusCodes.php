@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -10,30 +12,30 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum MedicationDispenseStatusCodes: string
 {
-	/** Preparation */
-	case preparation = 'preparation';
+    /** Preparation */
+    case preparation = 'preparation';
 
-	/** In Progress */
-	case inprogress = 'in-progress';
+    /** In Progress */
+    case inprogress = 'in-progress';
 
-	/** Cancelled */
-	case cancelled = 'cancelled';
+    /** Cancelled */
+    case cancelled = 'cancelled';
 
-	/** On Hold */
-	case onhold = 'on-hold';
+    /** On Hold */
+    case onhold = 'on-hold';
 
-	/** Completed */
-	case completed = 'completed';
+    /** Completed */
+    case completed = 'completed';
 
-	/** Entered in Error */
-	case enteredinerror = 'entered-in-error';
+    /** Entered in Error */
+    case enteredinerror = 'entered-in-error';
 
-	/** Stopped */
-	case stopped = 'stopped';
+    /** Stopped */
+    case stopped = 'stopped';
 
-	/** Declined */
-	case declined = 'declined';
+    /** Declined */
+    case declined = 'declined';
 
-	/** Unknown */
-	case unknown = 'unknown';
+    /** Unknown */
+    case unknown = 'unknown';
 }
