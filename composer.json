@@ -153,7 +153,8 @@
         "fix-newlines": "powershell -ExecutionPolicy Bypass -File scripts/fix-newlines.ps1",
         "validate-recipe": "php scripts/validate-recipe.php",
         "test-recipe": "php ./vendor/phpunit/phpunit/phpunit tests/Integration/FlexRecipeTest.php",
-        "test-package-installation": "php scripts/test-package-installation.php"
+        "test-package-installation": "php scripts/test-package-installation.php",
+        "build-wasm-bundles": "php scripts/build-wasm-bundles.php"
     },
     "conflict": {
         "symfony/symfony": "*"

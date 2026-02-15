@@ -30,10 +30,18 @@ jobs:
           bundler-cache: true
           working-directory: docs
       
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+
+      - name: Build WASM PHP Bundles
+        run: php scripts/build-wasm-bundles.php
+
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v4
-      
+
       - name: Build with Jekyll
         run: |
           cd docs

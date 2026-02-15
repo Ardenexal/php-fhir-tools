@@ -689,7 +689,7 @@ permalink: /demos/fhirpath/
             });
 
             const phpVersion = fhirClient.getPhpVersion();
-            updatePhpStatus('ready', 'Ready', `Version: ${phpVersion}`, 'Mode: Mock');
+            updatePhpStatus('ready', 'Ready', phpVersion ? `Version: ${phpVersion}` : '', 'Mode: WebAssembly');
             phpInitialized = true;
         } catch (error) {
             updatePhpStatus('error', 'Initialization failed', '', '');
@@ -887,7 +887,6 @@ permalink: /demos/fhirpath/
         outcomeDisplay.classList.remove('show');
     }
 
-    // Note to user
-    console.log('%c⚠️ FHIRPath Evaluator Demo', 'font-size: 16px; font-weight: bold; color: #f59e0b;');
-    console.log('%cThis is a placeholder implementation. Full FHIRPath evaluation with php-wasm coming soon!', 'font-size: 14px; color: #6b7280;');
+    console.log('%cFHIRPath Evaluator Demo', 'font-size: 16px; font-weight: bold; color: #10b981;');
+    console.log('%cPowered by PHP FHIRTools running in WebAssembly (seanmorris/php-wasm)', 'font-size: 14px; color: #6b7280;');
 </script>

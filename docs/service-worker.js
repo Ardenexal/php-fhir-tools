@@ -4,7 +4,7 @@
  * Phase 8 Implementation
  */
 
-const CACHE_VERSION = 'v1.0.0';
+const CACHE_VERSION = 'v2.0.0';
 const CACHE_NAME = `php-fhir-tools-${CACHE_VERSION}`;
 
 // Assets to cache immediately on install
@@ -18,7 +18,9 @@ const PRECACHE_ASSETS = [
     '/assets/js/php-wasm/loader.js',
     '/assets/js/php-wasm/fhir-client.js',
     '/assets/js/utils/operation-outcome.js',
-    '/assets/js/terminology/tx-client.js'
+    '/assets/js/terminology/tx-client.js',
+    '/assets/php-bundles/fhirpath-bundle.json',
+    '/assets/php-bundles/serialization-bundle.json'
 ];
 
 // Example FHIR resources to cache
@@ -121,7 +123,8 @@ self.addEventListener('fetch', (event) => {
                         const responseToCache = networkResponse.clone();
                         
                         // Cache for future use (except HTML pages to ensure fresh content)
-                        if (!request.url.endsWith('.html')) {
+                        // Always cache .wasm files and PHP bundles for performance
+                        if (!request.url.endsWith('.html') || request.url.endsWith('.wasm')) {
                             caches.open(CACHE_NAME)
                                 .then((cache) => {
                                     console.log('[ServiceWorker] Caching new resource:', request.url);
