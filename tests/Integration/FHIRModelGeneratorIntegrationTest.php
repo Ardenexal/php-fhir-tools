@@ -80,7 +80,7 @@ class FHIRModelGeneratorIntegrationTest extends TestCase
         self::assertFalse($this->errorCollector->hasErrors(), 'No errors should occur during generation');
 
         // Verify class properties
-        self::assertSame('FHIRTestPatient', $class->getName());
+        self::assertSame('TestPatientResource', $class->getName());
         self::assertTrue($class->hasMethod('__construct'), 'Generated class should have constructor');
     }
 
@@ -144,7 +144,7 @@ class FHIRModelGeneratorIntegrationTest extends TestCase
         );
 
         self::assertNotNull($class, 'Generation with custom namespace should succeed');
-        self::assertSame('FHIRTestPatient', $class->getName());
+        self::assertSame('TestPatientResource', $class->getName());
 
         // Verify namespace is properly set
         $namespace = $class->getNamespace();
@@ -274,7 +274,7 @@ class FHIRModelGeneratorIntegrationTest extends TestCase
         );
 
         self::assertNotNull($class, 'Class generation should succeed');
-        self::assertSame('FHIRTestPatient', $class->getName());
+        self::assertSame('TestPatientResource', $class->getName());
 
         // Test that the same class can be generated multiple times without issues
         $class2 = $this->generator->generateModelClassWithErrorHandling(
