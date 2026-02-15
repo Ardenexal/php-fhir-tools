@@ -32,20 +32,25 @@ class PowerFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        $exponentResult = $context->getEvaluator()->evaluate($parameters[0], $context);
+        $evaluator = $context->getEvaluator();
+        if ($evaluator === null) {
+            throw new EvaluationException('Evaluator not available in context');
+        }
+
+        $exponentResult = $evaluator->evaluate($parameters[0], $context);
         if ($exponentResult->isEmpty()) {
             return Collection::empty();
         }
 
         $exponent = $exponentResult->first();
         if (!is_numeric($exponent)) {
-            throw EvaluationException::invalidFunctionParameter('power', 'numeric exponent', gettype($exponent));
+            throw EvaluationException::invalidFunctionParameter('power', 'exponent', 'number');
         }
 
         $items = [];
         foreach ($input as $item) {
             if (!is_numeric($item)) {
-                throw EvaluationException::invalidFunctionParameter('power', 'numeric value', gettype($item));
+                throw EvaluationException::invalidFunctionParameter('power', 'input', 'number');
             }
 
             $items[] = pow((float) $item, (float) $exponent);

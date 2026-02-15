@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Tests\Integration;
 
-use Ardenexal\FHIRTools\BuilderContext;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Command\FHIRModelGeneratorCommand;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageMetadata;
-use Ardenexal\FHIRTools\Exception\PackageException;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
-use Nette\PhpGenerator\PhpNamespace;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -21,13 +18,6 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * This test class verifies the complete command execution workflow
  * including argument parsing, service integration, and output formatting.
- *
- * Test Coverage:
- * - Command execution with various arguments
- * - Error handling and exit codes
- * - Output formatting and verbosity levels
- * - Integration with FHIR generation services
- * - Performance monitoring
  *
  * @author FHIR Tools
  *
@@ -44,26 +34,14 @@ class CommandIntegrationTest extends TestCase
         $this->application   = new Application();
         $this->tempOutputDir = $this->createTempDirectory();
 
-        // Create required dependencies for the command
         $filesystem = new Filesystem();
-        $context    = new BuilderContext();
-
-        // Set up namespaces for the context
-        $elementNamespace   = new PhpNamespace('Ardenexal\\FHIRTools\\Test\\Element');
-        $enumNamespace      = new PhpNamespace('Ardenexal\\FHIRTools\\Test\\Enum');
-        $primitiveNamespace = new PhpNamespace('Ardenexal\\FHIRTools\\Test\\Primitive');
-        $datatypeNamespace  = new PhpNamespace('Ardenexal\\FHIRTools\\Test\\DataType');
-        $context->addElementNamespace('R4B', $elementNamespace);
-        $context->addEnumNamespace('R4B', $enumNamespace);
-        $context->addPrimitiveNamespace('R4B', $primitiveNamespace);
-        $context->addDatatypeNamespace('R4B', $datatypeNamespace);
 
         // Mock the PackageLoader to avoid network calls
         $packageLoader = $this->createMock(PackageLoader::class);
         $packageLoader->method('installPackage')->willReturn(new PackageMetadata(
             name: 'test-package',
             version: '1.0.0',
-            fhirVersions: ['4.3.0'],
+            fhirVersions: ['R4B'],
             url: 'http://example.org/test-package',
             description: 'Test package',
             author: 'Test Author',
@@ -73,7 +51,7 @@ class CommandIntegrationTest extends TestCase
         ));
 
         // Add commands to application
-        $this->application->addCommand(new FHIRModelGeneratorCommand($filesystem, $context, $packageLoader));
+        $this->application->addCommand(new FHIRModelGeneratorCommand($filesystem, $packageLoader));
     }
 
     protected function tearDown(): void
@@ -110,16 +88,14 @@ class CommandIntegrationTest extends TestCase
      */
     public function testCommandExecutionWithInvalidArguments(): void
     {
-        // Create a separate application with a PackageLoader that throws exceptions for invalid packages
         $application = new Application();
         $filesystem  = new Filesystem();
-        $context     = new BuilderContext();
 
         $packageLoader = $this->createMock(PackageLoader::class);
         $packageLoader->method('installPackage')
-            ->willThrowException(PackageException::packageNotFound('invalid.package.name'));
+            ->willThrowException(new \RuntimeException('Package not found: invalid.package.name'));
 
-        $application->addCommand(new FHIRModelGeneratorCommand($filesystem, $context, $packageLoader));
+        $application->addCommand(new FHIRModelGeneratorCommand($filesystem, $packageLoader));
 
         $command       = $application->find('fhir:generate');
         $commandTester = new CommandTester($command);

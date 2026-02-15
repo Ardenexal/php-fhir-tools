@@ -12,7 +12,7 @@
         "ext-zip": "*",
         "amphp/http-client": "^5.3.4",
         "composer/semver": "^3.4.4",
-        "nette/php-generator": "^4.2.0",
+        "nette/php-generator": "^4.2.1",
         "symfony/console": "^6.4|^7.4",
         "symfony/dotenv": "^6.4|^7.4",
         "symfony/filesystem": "^6.4|^7.4",
@@ -30,15 +30,15 @@
         "symfony/yaml": "^6.4|^7.4"
     },
     "require-dev": {
-        "laravel/pint": "^1.26",
-        "phpstan/phpstan": "^2.1.33",
-        "roave/security-advisories": "dev-latest",
-        "phpunit/phpunit": "^11.0|^12.5.4",
         "giorgiosironi/eris": "^1.0",
+        "laravel/pint": "^1.27.1",
+        "phpstan/phpstan": "^2.1.39",
+        "phpunit/phpunit": "^11.0|^12.5.11",
+        "roave/security-advisories": "dev-latest",
         "symfony/browser-kit": "^6.4|^7.4",
         "symfony/css-selector": "^6.4|^7.4",
         "symfony/dom-crawler": "^6.4|^7.4",
-        "symfony/maker-bundle": "^1.65.1",
+        "symfony/maker-bundle": "^1.66.0",
         "symfony/phpunit-bridge": "^6.4|^7.4"
     },
     "config": {
@@ -62,8 +62,7 @@
     "autoload-dev": {
         "psr-4": {
             "Ardenexal\\FHIRTools\\Tests\\": "tests/",
-            "Ardenexal\\FHIRTools\\Component\\FHIRPath\\Tests\\": "src/Component/FHIRPath/tests/",
-            "Ardenexal\\FHIRTools\\R4B\\": "output/Ardenexal/FhirTools/R4B/"
+            "Ardenexal\\FHIRTools\\Component\\FHIRPath\\Tests\\": "src/Component/FHIRPath/tests/"
         }
     },
     "replace": {
@@ -91,10 +90,12 @@
         "phpstan:bundle": "php ./vendor/bin/phpstan.phar analyse src/Bundle/ --configuration=phpstan.neon --memory-limit=-1 -v",
         "phpstan:codegen": "php ./vendor/bin/phpstan.phar analyse src/Component/CodeGeneration/ --configuration=phpstan.neon --memory-limit=-1 -v",
         "phpstan:serialization": "php ./vendor/bin/phpstan.phar analyse src/Component/Serialization/ --configuration=phpstan.neon --memory-limit=-1 -v",
+        "phpstan:fhir-path": "php ./vendor/bin/phpstan.phar analyse src/Component/FHIRPath/ --configuration=phpstan.neon --memory-limit=-1 -v",
         "lint": "php ./vendor/bin/pint -v --parallel --max-processes=4",
         "lint:bundle": "php ./vendor/bin/pint src/Bundle/ -v --parallel --max-processes=4",
         "lint:codegen": "php ./vendor/bin/pint src/Component/CodeGeneration/ -v --parallel --max-processes=4",
         "lint:serialization": "php ./vendor/bin/pint src/Component/Serialization/ -v --parallel --max-processes=4",
+        "lint:fhir-path": "php ./vendor/bin/pint src/Component/FHIRPath/ -v --parallel --max-processes=4",
         "test": "php ./vendor/phpunit/phpunit/phpunit",
         "test-coverage": "php ./vendor/phpunit/phpunit/phpunit --coverage-html coverage",
         "test-unit": "php ./vendor/phpunit/phpunit/phpunit --testsuite=unit",
@@ -103,6 +104,7 @@
         "test:bundle": "php ./vendor/phpunit/phpunit/phpunit tests/Unit/Bundle/ --no-coverage",
         "test:codegen": "php ./vendor/phpunit/phpunit/phpunit tests/Unit/Component/CodeGeneration/ --no-coverage",
         "test:serialization": "php ./vendor/phpunit/phpunit/phpunit tests/Unit/Component/Serialization/ --no-coverage",
+        "test:fhir-path": "php ./vendor/phpunit/phpunit/phpunit tests/Unit/Component/FHIRPath/ --no-coverage",
         "test:components": [
             "@test:bundle",
             "@test:codegen",
@@ -128,20 +130,26 @@
             "@phpstan:serialization",
             "@test:serialization"
         ],
+        "quality:fhir-path": [
+            "@lint:fhir-path",
+            "@phpstan:fhir-path",
+            "@test:fhir-path"
+        ],
         "quality:components": [
             "@quality:bundle",
             "@quality:codegen",
-            "@quality:serialization"
+            "@quality:serialization",
+            "@quality:fhir-path"
         ],
         "generate-models": "php ./bin/console fhir:generate -vvv",
         "generate-models-all": [
             "echo 'Generating FHIR R4 models...'",
-            "php ./bin/console fhir:generate --models-component --package=hl7.fhir.r4.core --package=hl7.fhir.r4b.core --package=hl7.fhir.r5.core -vvv",
+            "php ./bin/console fhir:generate --package=hl7.fhir.r4.core --package=hl7.fhir.r4b.core --package=hl7.fhir.r5.core -vvv",
             "echo 'All FHIR models generated successfully!'"
         ],
-        "generate-models-r4": "php ./bin/console fhir:generate --models-component --package=hl7.fhir.r4.core -vvv",
-        "generate-models-r4b": "php ./bin/console fhir:generate --models-component --package=hl7.fhir.r4b.core -vvv",
-        "generate-models-r5": "php ./bin/console fhir:generate --models-component --package=hl7.fhir.r5.core -vvv",
+        "generate-models-r4": "php ./bin/console fhir:generate --package=hl7.fhir.r4.core -vvv",
+        "generate-models-r4b": "php ./bin/console fhir:generate --package=hl7.fhir.r4b.core -vvv",
+        "generate-models-r5": "php ./bin/console fhir:generate --package=hl7.fhir.r5.core -vvv",
         "fix-newlines": "powershell -ExecutionPolicy Bypass -File scripts/fix-newlines.ps1",
         "validate-recipe": "php scripts/validate-recipe.php",
         "test-recipe": "php ./vendor/phpunit/phpunit/phpunit tests/Integration/FlexRecipeTest.php",

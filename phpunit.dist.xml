@@ -30,18 +30,6 @@
         <testsuite name="fhir">
             <directory>tests/FHIR</directory>
         </testsuite>
-        <testsuite name="bundle">
-            <directory>tests/Unit/Bundle</directory>
-        </testsuite>
-        <testsuite name="codegen">
-            <directory>tests/Unit/Component/CodeGeneration</directory>
-        </testsuite>
-        <testsuite name="serialization">
-            <directory>tests/Unit/Component/Serialization</directory>
-        </testsuite>
-        <testsuite name="fhirpath">
-            <directory>src/Component/FHIRPath/tests/Unit</directory>
-        </testsuite>
     </testsuites>
 
     <source ignoreSuppressionOfDeprecations="true"
@@ -74,7 +62,6 @@
         <report>
             <html outputDirectory="coverage" lowUpperBound="50" highLowerBound="80"/>
             <clover outputFile="coverage/clover.xml"/>
-            <text outputFile="php://stdout" showUncoveredFiles="false"/>
         </report>
     </coverage>
 

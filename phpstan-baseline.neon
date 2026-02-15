@@ -1,18 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Parameter \#2 \$enumName of method Ardenexal\\FHIRTools\\Component\\CodeGeneration\\Context\\BuilderContextInterface\:\:addPendingEnum\(\) expects class\-string, string given\.$#'
-			identifier: argument.type
-			count: 3
-			path: src/Component/CodeGeneration/src/Generator/FHIRModelGenerator.php
-
-		-
-			message: '#^Parameter \#2 \$typeClassName of method Ardenexal\\FHIRTools\\Component\\CodeGeneration\\Context\\BuilderContextInterface\:\:addPendingType\(\) expects class\-string, string given\.$#'
-			identifier: argument.type
-			count: 3
-			path: src/Component/CodeGeneration/src/Generator/FHIRModelGenerator.php
-
-		-
 			message: '#^Negated boolean expression is always true\.$#'
 			identifier: booleanNot.alwaysTrue
 			count: 1

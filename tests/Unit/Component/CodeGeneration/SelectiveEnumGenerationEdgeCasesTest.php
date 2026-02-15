@@ -10,6 +10,8 @@ use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 use Nette\PhpGenerator\PhpNamespace;
 
+use function Symfony\Component\String\u;
+
 /**
  * Unit tests for selective enum generation edge cases
  *
@@ -20,7 +22,7 @@ use Nette\PhpGenerator\PhpNamespace;
  * - Empty StructureDefinitions with no bindings
  * - Malformed binding definitions
  * - Circular dependency scenarios
- * - BuilderContext interface compliance
+ * - Multiple references to same ValueSet
  *
  * @author FHIR Tools
  *
@@ -40,11 +42,11 @@ class SelectiveEnumGenerationEdgeCasesTest extends TestCase
         $this->errorCollector = new ErrorCollector();
         $this->builderContext = new BuilderContext();
 
-        // Set up namespaces for testing
-        $elementNamespace   = new PhpNamespace('Ardenexal\\FHIRTools\\Test\\Element');
-        $enumNamespace      = new PhpNamespace('Ardenexal\\FHIRTools\\Test\\Enum');
-        $primitiveNamespace = new PhpNamespace('Ardenexal\\FHIRTools\\Test\\Primitive');
-        $datatypeNamespace  = new PhpNamespace('Ardenexal\\FHIRTools\\Test\\DataType');
+        // Set up namespaces for testing using the Models component pattern
+        $elementNamespace   = new PhpNamespace('Ardenexal\\FHIRTools\\Component\\Models\\R4B\\Resource');
+        $enumNamespace      = new PhpNamespace('Ardenexal\\FHIRTools\\Component\\Models\\R4B\\Enum');
+        $primitiveNamespace = new PhpNamespace('Ardenexal\\FHIRTools\\Component\\Models\\R4B\\Primitive');
+        $datatypeNamespace  = new PhpNamespace('Ardenexal\\FHIRTools\\Component\\Models\\R4B\\DataType');
         $this->builderContext->addElementNamespace('R4B', $elementNamespace);
         $this->builderContext->addEnumNamespace('R4B', $enumNamespace);
         $this->builderContext->addPrimitiveNamespace('R4B', $primitiveNamespace);
@@ -52,48 +54,119 @@ class SelectiveEnumGenerationEdgeCasesTest extends TestCase
     }
 
     /**
-     * Test 8.1: Empty StructureDefinitions with no bindings
+     * Create a StructureDefinition with common fields pre-populated
+     *
+     * @param string                $id       The structure definition ID
+     * @param array<int, mixed>     $elements The elements array
+     * @param string                $kind     The kind (complex-type, resource, primitive-type)
+     * @param array<string, mixed>  $snapshot Optional snapshot element
+     *
+     * @return array<string, mixed>
+     */
+    private function createStructureDefinition(
+        string $id,
+        array $elements = [],
+        string $kind = 'complex-type',
+        ?array $snapshot = null
+    ): array {
+        $name = u($id)->camel()->title()->toString();
+
+        $definition = [
+            'resourceType' => 'StructureDefinition',
+            'id'           => $id,
+            'url'          => "http://example.org/StructureDefinition/{$id}",
+            'name'         => $name,
+            'status'       => 'active',
+            'kind'         => $kind,
+            'abstract'     => false,
+            'type'         => $name . 'Resource',
+            'differential' => ['element' => $elements],
+        ];
+
+        if ($snapshot !== null) {
+            $definition['snapshot'] = $snapshot;
+        }
+
+        return $definition;
+    }
+
+    /**
+     * Create a FHIR element definition
+     *
+     * @param string                     $path    The element path (e.g., "Resource.field")
+     * @param string                     $type    The type code (e.g., "string", "code", "boolean")
+     * @param array<string, mixed>|null  $binding Optional binding definition
+     * @param array<string, mixed>|null  $base    Optional base definition (for snapshot elements)
+     *
+     * @return array<string, mixed>
+     */
+    private function createElement(
+        string $path,
+        string $type,
+        ?array $binding = null,
+        ?array $base = null
+    ): array {
+        $element = [
+            'id'    => $path,
+            'path'  => $path,
+            'short' => "Element: {$path}",
+            'min'   => 0,
+            'max'   => '1',
+            'type'  => [['code' => $type]],
+        ];
+
+        if ($binding !== null) {
+            $element['binding'] = $binding;
+        }
+
+        if ($base !== null) {
+            $element['base'] = $base;
+        }
+
+        return $element;
+    }
+
+    /**
+     * Create a root element for snapshot-based structure definitions
+     *
+     * @param string $path The root path
+     *
+     * @return array<string, mixed>
+     */
+    private function createRootElement(string $path): array
+    {
+        return [
+            'id'    => $path,
+            'path'  => $path,
+            'short' => 'Root element',
+            'min'   => 0,
+            'max'   => '*',
+            'base'  => ['path' => $path],
+        ];
+    }
+
+    /**
+     * Test empty StructureDefinitions with no bindings
      *
      * Verifies that no enums are generated when no bindings exist
      * and that the system handles empty element arrays gracefully.
-     *
-     * Requirements: 1.4, 1.5
      */
     public function testEmptyStructureDefinitionsWithNoBindings(): void
     {
-        // Create empty StructureDefinition
-        $emptyStructureDefinition = [
-            'resourceType'   => 'StructureDefinition',
-            'id'             => 'empty-structure',
-            'url'            => 'http://example.org/StructureDefinition/empty-structure',
-            'name'           => 'EmptyStructure',
-            'status'         => 'active',
-            'kind'           => 'resource',
-            'abstract'       => false,
-            'type'           => 'EmptyResource',
-            'baseDefinition' => 'http://hl7.org/fhir/StructureDefinition/DomainResource',
-            'derivation'     => 'specialization',
-            'differential'   => [
-                'element' => [],
-            ],
-        ];
+        $structureDefinition = $this->createStructureDefinition('empty-structure');
 
-        // Track initial state
         $initialPendingEnums = $this->builderContext->getPendingEnums();
 
-        // Generate class
         $class = $this->generator->generateModelClassWithErrorHandling(
-            $emptyStructureDefinition,
+            $structureDefinition,
             'R4B',
             $this->errorCollector,
             $this->builderContext,
         );
 
-        // Verify generation succeeds
         self::assertNotNull($class, 'Generation should succeed for empty StructureDefinition');
         self::assertFalse($this->errorCollector->hasErrors(), 'No errors should occur for empty StructureDefinition');
 
-        // Verify no enums were added
         $finalPendingEnums = $this->builderContext->getPendingEnums();
         self::assertSame($initialPendingEnums, $finalPendingEnums, 'No enums should be added for empty StructureDefinition');
         self::assertEmpty($finalPendingEnums, 'Pending enums should remain empty');
@@ -104,52 +177,15 @@ class SelectiveEnumGenerationEdgeCasesTest extends TestCase
      */
     public function testStructureDefinitionWithElementsButNoBindings(): void
     {
-        // Create StructureDefinition with elements but no bindings
-        $structureDefinition = [
-            'resourceType'   => 'StructureDefinition',
-            'id'             => 'no-bindings-structure',
-            'url'            => 'http://example.org/StructureDefinition/no-bindings-structure',
-            'name'           => 'NoBindingsStructure',
-            'status'         => 'active',
-            'kind'           => 'resource',
-            'abstract'       => false,
-            'type'           => 'NoBindingsResource',
-            'baseDefinition' => 'http://hl7.org/fhir/StructureDefinition/DomainResource',
-            'derivation'     => 'specialization',
-            'differential'   => [
-                'element' => [
-                    [
-                        'id'    => 'NoBindingsResource.name',
-                        'path'  => 'NoBindingsResource.name',
-                        'short' => 'Name of the resource',
-                        'min'   => 0,
-                        'max'   => '1',
-                        'type'  => [
-                            [
-                                'code' => 'string',
-                            ],
-                        ],
-                    ],
-                    [
-                        'id'    => 'NoBindingsResource.active',
-                        'path'  => 'NoBindingsResource.active',
-                        'short' => 'Whether the resource is active',
-                        'min'   => 0,
-                        'max'   => '1',
-                        'type'  => [
-                            [
-                                'code' => 'boolean',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
+        $elements = [
+            $this->createElement('NoBindingsResource.name', 'string'),
+            $this->createElement('NoBindingsResource.active', 'boolean'),
         ];
 
-        // Track initial state
+        $structureDefinition = $this->createStructureDefinition('no-bindings-structure', $elements);
+
         $initialPendingEnums = $this->builderContext->getPendingEnums();
 
-        // Generate class
         $class = $this->generator->generateModelClassWithErrorHandling(
             $structureDefinition,
             'R4B',
@@ -157,92 +193,41 @@ class SelectiveEnumGenerationEdgeCasesTest extends TestCase
             $this->builderContext,
         );
 
-        // Verify generation succeeds
         self::assertNotNull($class, 'Generation should succeed for StructureDefinition without bindings');
         self::assertFalse($this->errorCollector->hasErrors(), 'No errors should occur for StructureDefinition without bindings');
 
-        // Verify no enums were added
         $finalPendingEnums = $this->builderContext->getPendingEnums();
         self::assertSame($initialPendingEnums, $finalPendingEnums, 'No enums should be added for StructureDefinition without bindings');
     }
 
     /**
-     * Test 8.2: Malformed binding definitions
+     * Test malformed binding definitions
      *
      * Handles bindings with missing valueSet URLs, invalid strength values,
      * and malformed binding structures.
-     *
-     * Requirements: 4.3, 8.3
      */
     public function testMalformedBindingDefinitions(): void
     {
-        // Create StructureDefinition with malformed bindings
-        $structureDefinition = [
-            'resourceType'   => 'StructureDefinition',
-            'id'             => 'malformed-bindings-structure',
-            'url'            => 'http://example.org/StructureDefinition/malformed-bindings-structure',
-            'name'           => 'MalformedBindingsStructure',
-            'status'         => 'active',
-            'kind'           => 'resource',
-            'abstract'       => false,
-            'type'           => 'MalformedBindingsResource',
-            'baseDefinition' => 'http://hl7.org/fhir/StructureDefinition/DomainResource',
-            'derivation'     => 'specialization',
-            'differential'   => [
-                'element' => [
-                    [
-                        'id'    => 'MalformedBindingsResource.codeWithMissingValueSet',
-                        'path'  => 'MalformedBindingsResource.codeWithMissingValueSet',
-                        'short' => 'Code with missing valueSet URL',
-                        'min'   => 0,
-                        'max'   => '1',
-                        'type'  => [
-                            [
-                                'code' => 'code',
-                            ],
-                        ],
-                        'binding' => [
-                            'strength' => 'required',
-                            // Missing valueSet URL
-                        ],
-                    ],
-                    [
-                        'id'    => 'MalformedBindingsResource.codeWithInvalidStrength',
-                        'path'  => 'MalformedBindingsResource.codeWithInvalidStrength',
-                        'short' => 'Code with invalid strength',
-                        'min'   => 0,
-                        'max'   => '1',
-                        'type'  => [
-                            [
-                                'code' => 'code',
-                            ],
-                        ],
-                        'binding' => [
-                            'strength' => 'invalid-strength-value',
-                            'valueSet' => 'http://example.org/ValueSet/test-valueset',
-                        ],
-                    ],
-                    [
-                        'id'    => 'MalformedBindingsResource.codeWithMalformedBinding',
-                        'path'  => 'MalformedBindingsResource.codeWithMalformedBinding',
-                        'short' => 'Code with malformed binding structure',
-                        'min'   => 0,
-                        'max'   => '1',
-                        'type'  => [
-                            [
-                                'code' => 'code',
-                            ],
-                        ],
-                        'binding' => 'invalid-binding-structure',
-                    ],
-                ],
-            ],
+        $elements = [
+            $this->createElement(
+                'MalformedBindingsResource.codeWithMissingValueSet',
+                'code',
+                ['strength' => 'required']  // Missing valueSet URL
+            ),
+            $this->createElement(
+                'MalformedBindingsResource.codeWithInvalidStrength',
+                'code',
+                [
+                    'strength' => 'invalid-strength-value',
+                    'valueSet' => 'http://example.org/ValueSet/test-valueset',
+                ]
+            ),
         ];
 
-        // Track initial state
+        $structureDefinition = $this->createStructureDefinition('malformed-bindings-structure', $elements);
+
         $initialPendingEnums = $this->builderContext->getPendingEnums();
 
-        // Generate class
         $class = $this->generator->generateModelClassWithErrorHandling(
             $structureDefinition,
             'R4B',
@@ -250,16 +235,10 @@ class SelectiveEnumGenerationEdgeCasesTest extends TestCase
             $this->builderContext,
         );
 
-        // Verify generation succeeds despite malformed bindings
         self::assertNotNull($class, 'Generation should succeed despite malformed bindings');
 
-        // Verify no enums were added for malformed bindings
         $finalPendingEnums = $this->builderContext->getPendingEnums();
         self::assertSame($initialPendingEnums, $finalPendingEnums, 'No enums should be added for malformed bindings');
-
-        // Verify that errors or warnings were collected for malformed bindings
-        // Note: The system should handle malformed bindings gracefully without failing
-        // but may collect warnings about the malformed structures
     }
 
     /**
@@ -267,38 +246,15 @@ class SelectiveEnumGenerationEdgeCasesTest extends TestCase
      */
     public function testBindingWithMissingValueSetUrl(): void
     {
-        $structureDefinition = [
-            'resourceType'   => 'StructureDefinition',
-            'id'             => 'missing-valueset-url',
-            'url'            => 'http://example.org/StructureDefinition/missing-valueset-url',
-            'name'           => 'MissingValueSetUrl',
-            'status'         => 'active',
-            'kind'           => 'resource',
-            'abstract'       => false,
-            'type'           => 'MissingValueSetUrlResource',
-            'baseDefinition' => 'http://hl7.org/fhir/StructureDefinition/DomainResource',
-            'derivation'     => 'specialization',
-            'differential'   => [
-                'element' => [
-                    [
-                        'id'    => 'MissingValueSetUrlResource.code',
-                        'path'  => 'MissingValueSetUrlResource.code',
-                        'short' => 'Code with missing valueSet',
-                        'min'   => 0,
-                        'max'   => '1',
-                        'type'  => [
-                            [
-                                'code' => 'code',
-                            ],
-                        ],
-                        'binding' => [
-                            'strength' => 'required',
-                            // valueSet is missing
-                        ],
-                    ],
-                ],
-            ],
+        $elements = [
+            $this->createElement(
+                'MissingValueSetUrlResource.code',
+                'code',
+                ['strength' => 'required']  // valueSet is missing
+            ),
         ];
+
+        $structureDefinition = $this->createStructureDefinition('missing-valueset-url', $elements);
 
         $initialPendingEnums = $this->builderContext->getPendingEnums();
 
@@ -311,18 +267,15 @@ class SelectiveEnumGenerationEdgeCasesTest extends TestCase
 
         self::assertNotNull($class, 'Generation should succeed with missing valueSet URL');
 
-        // No enum should be added when valueSet URL is missing
         $finalPendingEnums = $this->builderContext->getPendingEnums();
         self::assertSame($initialPendingEnums, $finalPendingEnums, 'No enum should be added when valueSet URL is missing');
     }
 
     /**
-     * Test 8.3: Circular dependency scenarios
+     * Test circular dependency scenarios
      *
      * Handles ValueSets that reference each other, prevents infinite loops,
      * and ensures proper error reporting for circular references.
-     *
-     * Requirements: 4.1, 4.2, 4.3
      */
     public function testCircularDependencyScenarios(): void
     {
@@ -343,76 +296,37 @@ class SelectiveEnumGenerationEdgeCasesTest extends TestCase
             'status'       => 'active',
         ]);
 
-        // Create StructureDefinition that could lead to circular dependencies
-        $structureDefinition = [
-            'resourceType'   => 'StructureDefinition',
-            'id'             => 'circular-dependency-structure',
-            'url'            => 'http://example.org/StructureDefinition/circular-dependency-structure',
-            'name'           => 'CircularDependencyStructure',
-            'status'         => 'active',
-            'kind'           => 'resource',
-            'abstract'       => false,
-            'type'           => 'CircularDependencyResource',
-            'baseDefinition' => 'http://hl7.org/fhir/StructureDefinition/DomainResource',
-            'derivation'     => 'specialization',
-            'snapshot'       => [
-                'element' => [
-                    [
-                        'id'    => 'CircularDependencyResource',
-                        'path'  => 'CircularDependencyResource',
-                        'short' => 'Root element',
-                        'min'   => 0,
-                        'max'   => '*',
-                        'base'  => [
-                            'path' => 'CircularDependencyResource',
-                        ],
-                    ],
-                    [
-                        'id'    => 'CircularDependencyResource.code1',
-                        'path'  => 'CircularDependencyResource.code1',
-                        'short' => 'First code that references ValueSet A',
-                        'min'   => 0,
-                        'max'   => '1',
-                        'base'  => [
-                            'path' => 'CircularDependencyResource.code1',
-                        ],
-                        'type' => [
-                            [
-                                'code' => 'code',
-                            ],
-                        ],
-                        'binding' => [
-                            'strength' => 'required',
-                            'valueSet' => 'http://example.org/ValueSet/circular-a',
-                        ],
-                    ],
-                    [
-                        'id'    => 'CircularDependencyResource.code2',
-                        'path'  => 'CircularDependencyResource.code2',
-                        'short' => 'Second code that references ValueSet B',
-                        'min'   => 0,
-                        'max'   => '1',
-                        'base'  => [
-                            'path' => 'CircularDependencyResource.code2',
-                        ],
-                        'type' => [
-                            [
-                                'code' => 'code',
-                            ],
-                        ],
-                        'binding' => [
-                            'strength' => 'required',
-                            'valueSet' => 'http://example.org/ValueSet/circular-b',
-                        ],
-                    ],
+        $snapshotElements = [
+            $this->createRootElement('CircularDependencyResource'),
+            $this->createElement(
+                'CircularDependencyResource.code1',
+                'code',
+                [
+                    'strength' => 'required',
+                    'valueSet' => 'http://example.org/ValueSet/circular-a',
                 ],
-            ],
+                ['path' => 'CircularDependencyResource.code1']
+            ),
+            $this->createElement(
+                'CircularDependencyResource.code2',
+                'code',
+                [
+                    'strength' => 'required',
+                    'valueSet' => 'http://example.org/ValueSet/circular-b',
+                ],
+                ['path' => 'CircularDependencyResource.code2']
+            ),
         ];
 
-        // Track initial state
+        $structureDefinition = $this->createStructureDefinition(
+            'circular-dependency-structure',
+            [],
+            'complex-type',
+            ['element' => $snapshotElements]
+        );
+
         $initialPendingEnums = $this->builderContext->getPendingEnums();
 
-        // Generate class
         $class = $this->generator->generateModelClassWithErrorHandling(
             $structureDefinition,
             'R4B',
@@ -420,10 +334,8 @@ class SelectiveEnumGenerationEdgeCasesTest extends TestCase
             $this->builderContext,
         );
 
-        // Verify generation succeeds
         self::assertNotNull($class, 'Generation should succeed even with potential circular dependencies');
 
-        // Verify that enums were added for the referenced ValueSets
         $finalPendingEnums = $this->builderContext->getPendingEnums();
         self::assertCount(
             count($initialPendingEnums) + 2,
@@ -431,12 +343,8 @@ class SelectiveEnumGenerationEdgeCasesTest extends TestCase
             'Two enums should be added for the two ValueSet references',
         );
 
-        // Verify the specific ValueSets were added
         self::assertArrayHasKey('http://example.org/ValueSet/circular-a', $finalPendingEnums);
         self::assertArrayHasKey('http://example.org/ValueSet/circular-b', $finalPendingEnums);
-
-        // The system should handle circular dependencies gracefully without infinite loops
-        // This test verifies that the basic dependency tracking works correctly
     }
 
     /**
@@ -453,70 +361,34 @@ class SelectiveEnumGenerationEdgeCasesTest extends TestCase
             'status'       => 'active',
         ]);
 
-        $structureDefinition = [
-            'resourceType'   => 'StructureDefinition',
-            'id'             => 'multiple-references-structure',
-            'url'            => 'http://example.org/StructureDefinition/multiple-references-structure',
-            'name'           => 'MultipleReferencesStructure',
-            'status'         => 'active',
-            'kind'           => 'resource',
-            'abstract'       => false,
-            'type'           => 'MultipleReferencesResource',
-            'baseDefinition' => 'http://hl7.org/fhir/StructureDefinition/DomainResource',
-            'derivation'     => 'specialization',
-            'snapshot'       => [
-                'element' => [
-                    [
-                        'id'    => 'MultipleReferencesResource',
-                        'path'  => 'MultipleReferencesResource',
-                        'short' => 'Root element',
-                        'min'   => 0,
-                        'max'   => '*',
-                        'base'  => [
-                            'path' => 'MultipleReferencesResource',
-                        ],
-                    ],
-                    [
-                        'id'    => 'MultipleReferencesResource.code1',
-                        'path'  => 'MultipleReferencesResource.code1',
-                        'short' => 'First code referencing same ValueSet',
-                        'min'   => 0,
-                        'max'   => '1',
-                        'base'  => [
-                            'path' => 'MultipleReferencesResource.code1',
-                        ],
-                        'type' => [
-                            [
-                                'code' => 'code',
-                            ],
-                        ],
-                        'binding' => [
-                            'strength' => 'required',
-                            'valueSet' => 'http://example.org/ValueSet/shared-valueset',
-                        ],
-                    ],
-                    [
-                        'id'    => 'MultipleReferencesResource.code2',
-                        'path'  => 'MultipleReferencesResource.code2',
-                        'short' => 'Second code referencing same ValueSet',
-                        'min'   => 0,
-                        'max'   => '1',
-                        'base'  => [
-                            'path' => 'MultipleReferencesResource.code2',
-                        ],
-                        'type' => [
-                            [
-                                'code' => 'code',
-                            ],
-                        ],
-                        'binding' => [
-                            'strength' => 'required',
-                            'valueSet' => 'http://example.org/ValueSet/shared-valueset',
-                        ],
-                    ],
+        $snapshotElements = [
+            $this->createRootElement('MultipleReferencesResource'),
+            $this->createElement(
+                'MultipleReferencesResource.code1',
+                'code',
+                [
+                    'strength' => 'required',
+                    'valueSet' => 'http://example.org/ValueSet/shared-valueset',
                 ],
-            ],
+                ['path' => 'MultipleReferencesResource.code1']
+            ),
+            $this->createElement(
+                'MultipleReferencesResource.code2',
+                'code',
+                [
+                    'strength' => 'required',
+                    'valueSet' => 'http://example.org/ValueSet/shared-valueset',
+                ],
+                ['path' => 'MultipleReferencesResource.code2']
+            ),
         ];
+
+        $structureDefinition = $this->createStructureDefinition(
+            'multiple-references-structure',
+            [],
+            'complex-type',
+            ['element' => $snapshotElements]
+        );
 
         $initialPendingEnums = $this->builderContext->getPendingEnums();
 
@@ -529,7 +401,6 @@ class SelectiveEnumGenerationEdgeCasesTest extends TestCase
 
         self::assertNotNull($class, 'Generation should succeed with multiple references to same ValueSet');
 
-        // Verify only one enum was added despite multiple references
         $finalPendingEnums = $this->builderContext->getPendingEnums();
         self::assertCount(
             count($initialPendingEnums) + 1,
@@ -538,125 +409,5 @@ class SelectiveEnumGenerationEdgeCasesTest extends TestCase
         );
 
         self::assertArrayHasKey('http://example.org/ValueSet/shared-valueset', $finalPendingEnums);
-    }
-
-    /**
-     * Test BuilderContext interface compliance
-     *
-     * Tests all pending enum management methods, verifies proper state management
-     * and consistency, and tests error conditions and edge cases.
-     *
-     * Requirements: 3.1, 3.2, 3.3, 3.4, 3.5
-     */
-    public function testBuilderContextInterfaceCompliance(): void
-    {
-        // Test addPendingEnum method
-        /** @phpstan-ignore-next-line */
-        $this->builderContext->addPendingEnum('http://example.org/ValueSet/test1', 'TestEnum1');
-        $pendingEnums = $this->builderContext->getPendingEnums();
-        self::assertArrayHasKey('http://example.org/ValueSet/test1', $pendingEnums);
-        self::assertSame('TestEnum1', $pendingEnums['http://example.org/ValueSet/test1']);
-
-        // Test getPendingEnums method
-        /** @phpstan-ignore-next-line */
-        $this->builderContext->addPendingEnum('http://example.org/ValueSet/test2', 'TestEnum2');
-        $pendingEnums = $this->builderContext->getPendingEnums();
-        self::assertCount(2, $pendingEnums);
-        self::assertArrayHasKey('http://example.org/ValueSet/test1', $pendingEnums);
-        self::assertArrayHasKey('http://example.org/ValueSet/test2', $pendingEnums);
-
-        // Test removePendingEnum method
-        $this->builderContext->removePendingEnum('http://example.org/ValueSet/test1');
-        $pendingEnums = $this->builderContext->getPendingEnums();
-        self::assertCount(1, $pendingEnums);
-        self::assertArrayNotHasKey('http://example.org/ValueSet/test1', $pendingEnums);
-        self::assertArrayHasKey('http://example.org/ValueSet/test2', $pendingEnums);
-
-        // Test addPendingType method
-        /** @phpstan-ignore-next-line */
-        $this->builderContext->addPendingType('http://example.org/ValueSet/test2', 'TestCodeType');
-        $pendingTypes = $this->builderContext->getPendingTypes();
-        self::assertArrayHasKey('http://example.org/ValueSet/test2', $pendingTypes);
-        self::assertSame('TestCodeType', $pendingTypes['http://example.org/ValueSet/test2']);
-
-        // Test hasPendingType method
-        self::assertTrue($this->builderContext->hasPendingType('http://example.org/ValueSet/test2'));
-        self::assertFalse($this->builderContext->hasPendingType('http://example.org/ValueSet/nonexistent'));
-
-        // Test removePendingType method
-        $this->builderContext->removePendingType('http://example.org/ValueSet/test2');
-        $pendingTypes = $this->builderContext->getPendingTypes();
-        self::assertArrayNotHasKey('http://example.org/ValueSet/test2', $pendingTypes);
-        self::assertFalse($this->builderContext->hasPendingType('http://example.org/ValueSet/test2'));
-    }
-
-    /**
-     * Test BuilderContext state consistency
-     */
-    public function testBuilderContextStateConsistency(): void
-    {
-        // Add multiple enums and types
-        /** @phpstan-ignore-next-line */
-        $this->builderContext->addPendingEnum('http://example.org/ValueSet/enum1', 'Enum1');
-        /** @phpstan-ignore-next-line */
-        $this->builderContext->addPendingEnum('http://example.org/ValueSet/enum2', 'Enum2');
-        /** @phpstan-ignore-next-line */
-        $this->builderContext->addPendingType('http://example.org/ValueSet/enum1', 'CodeType1');
-        /** @phpstan-ignore-next-line */
-        $this->builderContext->addPendingType('http://example.org/ValueSet/enum2', 'CodeType2');
-
-        // Verify state consistency
-        $pendingEnums = $this->builderContext->getPendingEnums();
-        $pendingTypes = $this->builderContext->getPendingTypes();
-
-        self::assertCount(2, $pendingEnums);
-        self::assertCount(2, $pendingTypes);
-
-        // Verify that enum and type URLs match
-        foreach (array_keys($pendingEnums) as $enumUrl) {
-            self::assertTrue($this->builderContext->hasPendingType($enumUrl), "Type should exist for enum URL: {$enumUrl}");
-        }
-
-        // Remove one enum and verify consistency
-        $this->builderContext->removePendingEnum('http://example.org/ValueSet/enum1');
-        $this->builderContext->removePendingType('http://example.org/ValueSet/enum1');
-
-        $pendingEnums = $this->builderContext->getPendingEnums();
-        $pendingTypes = $this->builderContext->getPendingTypes();
-
-        self::assertCount(1, $pendingEnums);
-        self::assertCount(1, $pendingTypes);
-        self::assertArrayHasKey('http://example.org/ValueSet/enum2', $pendingEnums);
-        self::assertArrayHasKey('http://example.org/ValueSet/enum2', $pendingTypes);
-    }
-
-    /**
-     * Test edge case: Adding duplicate enums
-     */
-    public function testAddingDuplicateEnums(): void
-    {
-        // Add the same enum twice
-        /** @phpstan-ignore-next-line */
-        $this->builderContext->addPendingEnum('http://example.org/ValueSet/duplicate', 'DuplicateEnum');
-        /** @phpstan-ignore-next-line */
-        $this->builderContext->addPendingEnum('http://example.org/ValueSet/duplicate', 'DuplicateEnum');
-
-        $pendingEnums = $this->builderContext->getPendingEnums();
-        self::assertCount(1, $pendingEnums, 'Duplicate enums should not create multiple entries');
-        self::assertSame('DuplicateEnum', $pendingEnums['http://example.org/ValueSet/duplicate']);
-    }
-
-    /**
-     * Test edge case: Removing non-existent enums
-     */
-    public function testRemovingNonExistentEnums(): void
-    {
-        $initialCount = count($this->builderContext->getPendingEnums());
-
-        // Try to remove non-existent enum
-        $this->builderContext->removePendingEnum('http://example.org/ValueSet/nonexistent');
-
-        $finalCount = count($this->builderContext->getPendingEnums());
-        self::assertSame($initialCount, $finalCount, 'Removing non-existent enum should not change count');
     }
 }

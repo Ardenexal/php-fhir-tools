@@ -33,12 +33,17 @@ final class IndexOfFunction extends AbstractFunction
 
         $string = $input->first();
         if (!is_string($string)) {
-            throw EvaluationException::invalidFunctionParameter($this->getName(), 'Input must be a string');
+            throw EvaluationException::invalidFunctionParameter($this->getName(), 'input', 'string');
         }
 
-        $substring = $context->getEvaluator()->evaluate($parameters[0], $context)->first();
+        $evaluator = $context->getEvaluator();
+        if ($evaluator === null) {
+            throw new EvaluationException('Evaluator not available in context');
+        }
+
+        $substring = $evaluator->evaluate($parameters[0], $context)->first();
         if (!is_string($substring)) {
-            throw EvaluationException::invalidFunctionParameter($this->getName(), 'Substring parameter must be a string');
+            throw EvaluationException::invalidFunctionParameter($this->getName(), 'substring', 'string');
         }
 
         $position = strpos($string, $substring);

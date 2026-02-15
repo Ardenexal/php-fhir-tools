@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Expression\ExpressionNode;
+use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
 
 /**
  * Transforms each item in collection using projection expression.
@@ -31,12 +32,16 @@ class SelectFunction extends AbstractFunction
         /** @var ExpressionNode $projection */
         $projection = $parameters[0];
         $evaluator  = $context->getEvaluator();
-        $results    = [];
+        if ($evaluator === null) {
+            throw new EvaluationException('Evaluator not available in context');
+        }
+
+        $results = [];
 
         foreach ($input as $index => $item) {
             $itemContext = $context
                 ->withCurrentNode($item)
-                ->withIterationVariables($index, $input->count());
+                ->withIterationVariables($item, $index, $input->count());
 
             $result = $evaluator->evaluate($projection, $itemContext);
             foreach ($result as $value) {

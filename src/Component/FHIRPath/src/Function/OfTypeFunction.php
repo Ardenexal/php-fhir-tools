@@ -32,14 +32,19 @@ class OfTypeFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        $typeResult = $context->getEvaluator()->evaluate($parameters[0], $context);
+        $evaluator = $context->getEvaluator();
+        if ($evaluator === null) {
+            throw new EvaluationException('Evaluator not available in context');
+        }
+
+        $typeResult = $evaluator->evaluate($parameters[0], $context);
         if ($typeResult->isEmpty()) {
             return Collection::empty();
         }
 
         $typeName = $typeResult->first();
         if (!is_string($typeName)) {
-            throw EvaluationException::invalidFunctionParameter('ofType', 'string type name', gettype($typeName));
+            throw EvaluationException::invalidFunctionParameter('ofType', 'typeName', 'string');
         }
 
         $items = [];

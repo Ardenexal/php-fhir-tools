@@ -1,5 +1,5 @@
 # AGENTS.md
-![PHP Version](https://img.shields.io/badge/PHP-8.2%2B-blue)  
+![PHP Version](https://img.shields.io/badge/PHP-8.3%2B-blue)  
 ![Symfony](https://img.shields.io/badge/Symfony-6.4%7C7.4-black)  
 ![License](https://img.shields.io/badge/license-MIT-green)  
 ![Status](https://img.shields.io/badge/status-active-success)
@@ -120,8 +120,8 @@ docs/
 - **Strict Types**: Always `declare(strict_types=1);`.
 - **PSR-12 Compliance**: Run PHP-CS-Fixer after changes.
 - **Exceptions**: Use project-specific exceptions.
-- **Docs**: Add PHPDoc for public methods and `@author` tags.
-- **Tests**: PHPUnit 12+, no `void` return types, use `self::assert*`.
+- **Docs**: Add PHPDoc for public methods.
+- **Tests**: PHPUnit 12+, use `void` return types and `self::assert*`.
 - **Multi-Component Development**: Follow component isolation principles.
 - **Namespace Migration**: Use new component namespaces for new code.
 
@@ -129,7 +129,6 @@ docs/
 
 ## Git & Commits
 - **No AI mentions** in commits or PRs.
-- **Sign commits** with GPG.
 - **Conventional Commits**:
     - `feat:` new feature
     - `fix:` bug fix
