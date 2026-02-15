@@ -1,0 +1,43 @@
+<footer class="site-footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col footer-about">
+                <h3>{{ site.title }}</h3>
+                <p>{{ site.description }}</p>
+                <p class="footer-copyright">
+                    © {{ 'now' | date: "%Y" }} {{ site.title }}. Open Source under MIT License.
+                </p>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Documentation</h4>
+                <ul>
+                    <li><a href="{{ '/pages/getting-started.html' | relative_url }}">Getting Started</a></li>
+                    <li><a href="{{ '/pages/components/fhir-bundle.html' | relative_url }}">FHIRBundle</a></li>
+                    <li><a href="{{ '/pages/components/serialization.html' | relative_url }}">Serialization</a></li>
+                    <li><a href="{{ '/pages/components/fhirpath.html' | relative_url }}">FHIRPath</a></li>
+                    <li><a href="{{ '/pages/components/models.html' | relative_url }}">Models</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Demos</h4>
+                <ul>
+                    <li><a href="{{ '/pages/demos/serialization.html' | relative_url }}">Serialization Demo</a></li>
+                    <li><a href="{{ '/pages/demos/fhirpath.html' | relative_url }}">FHIRPath Evaluator</a></li>
+                    <li><a href="{{ '/pages/demos/models.html' | relative_url }}">Model Explorer</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="https://github.com/Ardenexal/php-fhir-tools" target="_blank" rel="noopener">GitHub Repository</a></li>
+                    <li><a href="https://github.com/Ardenexal/php-fhir-tools/issues" target="_blank" rel="noopener">Issue Tracker</a></li>
+                    <li><a href="https://fhir.hl7.org" target="_blank" rel="noopener">FHIR Specification</a></li>
+                    <li><a href="https://confluence.hl7.org/spaces/FHIR/pages/79503413/tx.fhir.org+Documentation" target="_blank" rel="noopener">tx.fhir.org</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</footer>

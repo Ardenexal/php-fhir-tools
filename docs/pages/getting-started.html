@@ -1,0 +1,218 @@
+---
+layout: default
+title: Getting Started
+description: Get started with PHP FHIRTools - installation, configuration, and basic usage examples.
+---
+
+<div class="getting-started">
+    <div class="container">
+        <h1>Getting Started</h1>
+        <p class="lead">
+            PHP FHIRTools is a comprehensive toolkit for working with FHIR resources in PHP applications. 
+            This guide will help you get started with installation and basic usage.
+        </p>
+        
+        <h2>Installation</h2>
+        
+        <h3>Using Composer (Recommended)</h3>
+        <pre><code>composer require ardenexal/fhir-bundle</code></pre>
+        
+        <p>This will install the FHIRBundle which includes all components:</p>
+        <ul>
+            <li>Serialization Component</li>
+            <li>FHIRPath Component</li>
+            <li>Models Component (R4, R4B, R5)</li>
+            <li>Symfony Integration</li>
+        </ul>
+        
+        <h3>Standalone Components</h3>
+        <p>You can also install individual components:</p>
+        <pre><code># Serialization only
+composer require ardenexal/fhir-serialization
+
+# FHIRPath only  
+composer require ardenexal/fhir-path
+
+# Models only
+composer require ardenexal/fhir-models</code></pre>
+        
+        <h2>Requirements</h2>
+        <ul>
+            <li>PHP 8.2 or higher</li>
+            <li>Symfony 6.4 or 7.4 (for FHIRBundle)</li>
+            <li>Composer</li>
+        </ul>
+        
+        <h2>Quick Start</h2>
+        
+        <h3>1. Create a FHIR Resource</h3>
+        <pre><code><?php
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\HumanName;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\NameUseType;
+
+$name = new HumanName(
+    use: new NameUseType('official'),
+    family: 'Doe',
+    given: ['John'],
+);
+
+$patient = new PatientResource(
+    id: 'example-123',
+    active: true,
+    name: [$name],
+);</code></pre>
+        
+        <h3>2. Serialize to JSON</h3>
+        <pre><code><?php
+use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
+
+$serializer = new FHIRSerializationService();
+$json = $serializer->serialize($patient);
+
+echo $json;
+// Output: {"resourceType":"Patient","id":"example-123","active":true, ...}</code></pre>
+        
+        <h3>3. Deserialize from JSON</h3>
+        <pre><code><?php
+$jsonString = '{"resourceType":"Patient","id":"example-123","active":true}';
+$patient = $serializer->deserialize($jsonString, PatientResource::class);
+
+echo $patient->id; // "example-123"
+echo $patient->active; // true</code></pre>
+        
+        <h3>4. Use FHIRPath</h3>
+        <pre><code><?php
+use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\FHIRPathEvaluator;
+
+$evaluator = new FHIRPathEvaluator();
+
+// Get patient's family name
+$result = $evaluator->evaluate($patient, 'Patient.name.family');
+echo $result[0]; // "Doe"
+
+// Check if patient is active
+$result = $evaluator->evaluate($patient, 'Patient.active');
+echo $result[0] ? 'true' : 'false'; // "true"</code></pre>
+        
+        <h2>Symfony Integration</h2>
+        
+        <h3>1. Register the Bundle</h3>
+        <pre><code><?php
+// config/bundles.php
+return [
+    // ...
+    Ardenexal\FHIRTools\Bundle\FHIRBundle\FHIRBundle::class => ['all' => true],
+];</code></pre>
+        
+        <h3>2. Configure Services</h3>
+        <pre><code># config/packages/fhir.yaml
+fhir:
+  default_version: R4
+  serialization:
+    validation_mode: strict
+    pretty_print: true</code></pre>
+        
+        <h3>3. Use in Controllers</h3>
+        <pre><code><?php
+namespace App\Controller;
+
+use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+
+class FHIRController extends AbstractController
+{
+    public function __construct(
+        private readonly FHIRSerializationService $serializer
+    ) {}
+    
+    public function create(): JsonResponse
+    {
+        $patient = new PatientResource(
+            active: true,
+        );
+
+        $json = $this->serializer->serialize($patient);
+        
+        return new JsonResponse($json, 201);
+    }
+}</code></pre>
+        
+        <h2>Next Steps</h2>
+        <div class="next-steps">
+            <div class="next-step-card">
+                <h3>📚 Components</h3>
+                <p>Learn about each component in detail</p>
+                <a href="{{ '/pages/components/fhir-bundle.html' | relative_url }}" class="btn btn-outline">Explore Components</a>
+            </div>
+            
+            <div class="next-step-card">
+                <h3>🎮 Demos</h3>
+                <p>Try our interactive demos</p>
+                <a href="{{ '/pages/demos/serialization.html' | relative_url }}" class="btn btn-outline">Try Demos</a>
+            </div>
+            
+            <div class="next-step-card">
+                <h3>💻 GitHub</h3>
+                <p>View source code and examples</p>
+                <a href="https://github.com/Ardenexal/php-fhir-tools" class="btn btn-outline" target="_blank" rel="noopener">GitHub Repo</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.getting-started {
+    padding: var(--space-12) 0;
+}
+
+.lead {
+    font-size: var(--text-lg);
+    color: var(--color-gray-600);
+    margin-bottom: var(--space-8);
+}
+
+.getting-started h2 {
+    margin-top: var(--space-12);
+    padding-top: var(--space-8);
+    border-top: 2px solid var(--color-gray-200);
+}
+
+.getting-started h3 {
+    margin-top: var(--space-8);
+}
+
+.getting-started ul {
+    margin-bottom: var(--space-6);
+    padding-left: var(--space-6);
+}
+
+.getting-started li {
+    margin-bottom: var(--space-2);
+}
+
+.next-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-6);
+    margin-top: var(--space-12);
+}
+
+.next-step-card {
+    background-color: var(--color-gray-50);
+    padding: var(--space-8);
+    border-radius: var(--radius-xl);
+    text-align: center;
+}
+
+.next-step-card h3 {
+    margin-top: 0;
+    margin-bottom: var(--space-3);
+}
+
+.next-step-card p {
+    color: var(--color-gray-600);
+    margin-bottom: var(--space-6);
+}
+</style>

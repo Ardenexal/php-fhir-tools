@@ -1,0 +1,55 @@
+# Site settings
+title: PHP FHIRTools
+description: FHIR tools for PHP - Build FHIR-compliant applications with modern PHP
+baseurl: "/php-fhir-tools"
+url: "https://ardenexal.github.io"
+
+# Build settings
+markdown: kramdown
+theme: null  # Custom theme
+
+# Collections
+collections:
+  components:
+    output: true
+    permalink: /components/:path/
+
+# Plugins
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+  - jekyll-lunr-js-search
+
+# Search configuration
+lunr_search:
+  excludes: [rss.xml, atom.xml]
+  min_length: 3
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - README.md
+  - "*.md"
+  - github-pages-*.md
+  - GITHUB_PAGES_README.md
+  - FHIR*.md
+  - architecture*.md
+  - migration-guide.md
+  - component-guides
+
+# Asset optimization
+sass:
+  style: compressed
+  
+# Performance settings
+incremental: false
+profile: false
+
+# Cache settings for service worker
+keep_files:
+  - assets
+  - service-worker.js

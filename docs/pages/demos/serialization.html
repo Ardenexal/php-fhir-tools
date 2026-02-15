@@ -1,0 +1,756 @@
+---
+layout: default
+title: Serialization Demo
+permalink: /demos/serialization/
+---
+
+<div class="docs-container">
+    <div class="docs-header">
+        <h1>FHIR Serialization Demo</h1>
+        <p class="lead">Interactive tool for testing FHIR resource serialization and deserialization</p>
+    </div>
+
+    <div class="demo-container">
+        <!-- Controls -->
+        <div class="demo-controls">
+            <div class="control-group">
+                <label for="example-select">Load Example:</label>
+                <select id="example-select" class="form-select">
+                    <option value="">Select an example...</option>
+                    <option value="patient-simple">Patient (Simple)</option>
+                    <option value="patient-complex">Patient (Complex)</option>
+                    <option value="observation-vital-signs">Observation (Vital Signs)</option>
+                    <option value="bundle-transaction">Bundle (Transaction)</option>
+                    <option value="medication-request">Medication Request</option>
+                    <option value="practitioner">Practitioner</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="validation-mode">Validation Mode:</label>
+                <select id="validation-mode" class="form-select">
+                    <option value="strict">Strict</option>
+                    <option value="lenient">Lenient</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Editor Section -->
+        <div class="demo-editor">
+            <div class="editor-panel">
+                <div class="panel-header">
+                    <h3>Input</h3>
+                    <button id="btn-clear-input" class="btn btn-sm btn-outline">Clear</button>
+                </div>
+                <div class="panel-body">
+                    <textarea id="input-json" class="code-editor" placeholder="Enter FHIR resource JSON here..."></textarea>
+                </div>
+            </div>
+
+            <div class="editor-actions">
+                <button id="btn-serialize" class="btn btn-primary">
+                    <span class="btn-icon">→</span>
+                    Serialize
+                </button>
+                <button id="btn-deserialize" class="btn btn-primary">
+                    <span class="btn-icon">←</span>
+                    Deserialize
+                </button>
+                <button id="btn-validate" class="btn btn-secondary">
+                    <span class="btn-icon">✓</span>
+                    Validate
+                </button>
+            </div>
+
+            <div class="editor-panel">
+                <div class="panel-header">
+                    <h3>Output</h3>
+                    <button id="btn-copy-output" class="btn btn-sm btn-outline">Copy</button>
+                </div>
+                <div class="panel-body">
+                    <pre id="output-json" class="code-output"><code class="language-json">// Output will appear here...</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status/Error Display -->
+        <div id="demo-status" class="demo-status hidden">
+            <div class="status-icon"></div>
+            <div class="status-message"></div>
+        </div>
+
+        <!-- Operation Outcome Display -->
+        <div id="operation-outcome" class="operation-outcome hidden">
+            <h4>Operation Outcome</h4>
+            <div class="outcome-content"></div>
+        </div>
+
+        <!-- PHP Runtime Status -->
+        <div id="php-status" class="php-status">
+            <div class="status-badge">
+                <span class="status-indicator"></span>
+                <span class="status-text">PHP Runtime: Not initialized</span>
+            </div>
+            <div class="status-details hidden">
+                <small>Version: <span id="php-version">-</span> | Mode: <span id="php-mode">Mock</span></small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Section -->
+    <div class="demo-info">
+        <h2>About This Demo</h2>
+        <p>
+            This interactive demo allows you to test FHIR resource serialization and deserialization
+            directly in your browser using php-wasm. All processing happens client-side with zero
+            network latency and complete privacy.
+        </p>
+
+        <h3>Features</h3>
+        <ul>
+            <li><strong>Real-time Processing</strong> - Instant serialization/deserialization</li>
+            <li><strong>Example Resources</strong> - Load pre-built FHIR R4 examples</li>
+            <li><strong>Validation Modes</strong> - Test with strict or lenient validation</li>
+            <li><strong>Error Handling</strong> - FHIR OperationOutcome for all errors</li>
+            <li><strong>Privacy First</strong> - All data stays in your browser</li>
+        </ul>
+
+        <h3>How to Use</h3>
+        <ol>
+            <li>Select an example resource from the dropdown or paste your own JSON</li>
+            <li>Choose a validation mode (strict or lenient)</li>
+            <li>Click <strong>Serialize</strong> to convert JSON to a FHIR object</li>
+            <li>Click <strong>Deserialize</strong> to convert back to JSON</li>
+            <li>Click <strong>Validate</strong> to check resource validity</li>
+        </ol>
+
+        <h3>Validation Modes</h3>
+        <dl>
+            <dt>Strict Mode</dt>
+            <dd>Enforces all FHIR constraints and cardinality rules. Recommended for production use.</dd>
+            
+            <dt>Lenient Mode</dt>
+            <dd>Allows some flexibility in validation. Useful for testing and development.</dd>
+        </dl>
+    </div>
+</div>
+
+<style>
+.demo-container {
+    background: var(--color-bg-light);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-6);
+    margin: var(--spacing-8) 0;
+}
+
+.demo-controls {
+    display: flex;
+    gap: var(--spacing-4);
+    margin-bottom: var(--spacing-6);
+    flex-wrap: wrap;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+    flex: 1;
+    min-width: 200px;
+}
+
+.control-group label {
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}
+
+.form-select {
+    padding: var(--spacing-2) var(--spacing-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: white;
+    font-size: var(--font-size-base);
+    cursor: pointer;
+}
+
+.form-select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.demo-editor {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: var(--spacing-4);
+    margin-bottom: var(--spacing-6);
+}
+
+.editor-panel {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: white;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-3) var(--spacing-4);
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-bg-light);
+}
+
+.panel-header h3 {
+    margin: 0;
+    font-size: var(--font-size-base);
+    font-weight: 600;
+}
+
+.panel-body {
+    flex: 1;
+    padding: var(--spacing-4);
+}
+
+.code-editor {
+    width: 100%;
+    height: 400px;
+    padding: var(--spacing-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+    resize: vertical;
+}
+
+.code-editor:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.code-output {
+    width: 100%;
+    height: 400px;
+    overflow: auto;
+    padding: var(--spacing-3);
+    margin: 0;
+    background: var(--color-bg-dark);
+    border-radius: var(--radius-md);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+}
+
+.editor-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3);
+    justify-content: center;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-2);
+    padding: var(--spacing-3) var(--spacing-4);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-primary {
+    background: var(--color-primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--color-primary-dark);
+}
+
+.btn-secondary {
+    background: var(--color-secondary);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: var(--color-secondary-dark);
+}
+
+.btn-outline {
+    background: transparent;
+    color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+}
+
+.btn-outline:hover {
+    background: var(--color-primary);
+    color: white;
+}
+
+.btn-sm {
+    padding: var(--spacing-2) var(--spacing-3);
+    font-size: var(--font-size-sm);
+}
+
+.btn-icon {
+    font-size: var(--font-size-lg);
+}
+
+.demo-status {
+    padding: var(--spacing-4);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-4);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+}
+
+.demo-status.hidden {
+    display: none;
+}
+
+.demo-status.success {
+    background: var(--color-success-light);
+    color: var(--color-success-dark);
+    border: 1px solid var(--color-success);
+}
+
+.demo-status.error {
+    background: var(--color-error-light);
+    color: var(--color-error-dark);
+    border: 1px solid var(--color-error);
+}
+
+.demo-status.loading {
+    background: var(--color-info-light);
+    color: var(--color-info-dark);
+    border: 1px solid var(--color-info);
+}
+
+.operation-outcome {
+    padding: var(--spacing-4);
+    background: var(--color-warning-light);
+    border: 1px solid var(--color-warning);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-4);
+}
+
+.operation-outcome.hidden {
+    display: none;
+}
+
+.operation-outcome h4 {
+    margin: 0 0 var(--spacing-3) 0;
+    color: var(--color-warning-dark);
+}
+
+.outcome-content {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-sm);
+}
+
+.php-status {
+    margin-top: var(--spacing-4);
+    padding: var(--spacing-3) var(--spacing-4);
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--spacing-3);
+}
+
+.status-badge {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+}
+
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-text-tertiary);
+    display: inline-block;
+}
+
+.status-indicator.ready {
+    background: var(--color-success);
+    box-shadow: 0 0 8px var(--color-success);
+}
+
+.status-indicator.initializing {
+    background: var(--color-warning);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.status-text {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+}
+
+.status-details {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+}
+
+.demo-info {
+    margin-top: var(--spacing-8);
+    padding: var(--spacing-6);
+    background: var(--color-bg-light);
+    border-radius: var(--radius-lg);
+}
+
+.demo-info h2 {
+    margin-top: 0;
+}
+
+.demo-info h3 {
+    margin-top: var(--spacing-6);
+}
+
+.demo-info ul, .demo-info ol {
+    margin: var(--spacing-4) 0;
+    padding-left: var(--spacing-6);
+}
+
+.demo-info li {
+    margin: var(--spacing-2) 0;
+}
+
+.demo-info dl {
+    margin: var(--spacing-4) 0;
+}
+
+.demo-info dt {
+    font-weight: 600;
+    margin-top: var(--spacing-3);
+}
+
+.demo-info dd {
+    margin-left: var(--spacing-4);
+    color: var(--color-text-secondary);
+}
+
+@media (max-width: 768px) {
+    .demo-editor {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+    }
+
+    .editor-actions {
+        flex-direction: row;
+        order: 2;
+    }
+
+    .code-editor, .code-output {
+        height: 300px;
+    }
+}
+</style>
+
+<script type="module">
+import { createOperationOutcome, validationError, structureError, formatOperationOutcome, hasErrors } from '{{ "/assets/js/utils/operation-outcome.js" | relative_url }}';
+import { fhirClient } from '{{ "/assets/js/php-wasm/fhir-client.js" | relative_url }}';
+
+// Demo state
+let currentValidationMode = 'strict';
+let phpInitialized = false;
+let phpInitializing = false;
+
+// DOM elements
+const exampleSelect = document.getElementById('example-select');
+const validationModeSelect = document.getElementById('validation-mode');
+const inputJson = document.getElementById('input-json');
+const outputJson = document.getElementById('output-json');
+const btnSerialize = document.getElementById('btn-serialize');
+const btnDeserialize = document.getElementById('btn-deserialize');
+const btnValidate = document.getElementById('btn-validate');
+const btnClearInput = document.getElementById('btn-clear-input');
+const btnCopyOutput = document.getElementById('btn-copy-output');
+const demoStatus = document.getElementById('demo-status');
+const operationOutcome = document.getElementById('operation-outcome');
+const phpStatus = document.getElementById('php-status');
+const phpVersion = document.getElementById('php-version');
+const phpMode = document.getElementById('php-mode');
+
+// Load example resource
+async function loadExample(filename) {
+    if (!filename) return;
+    
+    showStatus('loading', 'Loading example...');
+    
+    try {
+        const response = await fetch(`{{ "/assets/data/examples/" | relative_url }}${filename}.json`);
+        if (!response.ok) throw new Error('Failed to load example');
+        
+        const data = await response.json();
+        inputJson.value = JSON.stringify(data, null, 2);
+        showStatus('success', 'Example loaded successfully');
+        hideOperationOutcome();
+    } catch (error) {
+        showStatus('error', `Failed to load example: ${error.message}`);
+        showOperationOutcome(structureError('Failed to load example', error.message));
+    }
+}
+
+// Initialize PHP-WASM (lazy loading)
+async function ensurePhpInitialized() {
+    if (phpInitialized) return true;
+    if (phpInitializing) {
+        // Wait for initialization to complete
+        while (phpInitializing) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        return phpInitialized;
+    }
+    
+    phpInitializing = true;
+    updatePhpStatus('initializing', 'Initializing...');
+    showStatus('loading', 'Initializing PHP runtime...');
+    
+    try {
+        await fhirClient.initialize((progress) => {
+            updatePhpStatus('initializing', progress.message);
+            showStatus('loading', `${progress.stage}: ${progress.message}`);
+        });
+        
+        phpInitialized = true;
+        const version = await fhirClient.getPhpVersion();
+        updatePhpStatus('ready', 'Ready', version);
+        showStatus('success', 'PHP runtime initialized successfully');
+        return true;
+    } catch (error) {
+        updatePhpStatus('error', 'Failed to initialize');
+        showStatus('error', `Failed to initialize PHP runtime: ${error.message}`);
+        const outcome = structureError('PHP initialization failed', error.message);
+        showOperationOutcome(outcome);
+        return false;
+    } finally {
+        phpInitializing = false;
+    }
+}
+
+// Update PHP status display
+function updatePhpStatus(state, message, version = null) {
+    const statusIndicator = phpStatus.querySelector('.status-indicator');
+    const statusText = phpStatus.querySelector('.status-text');
+    const statusDetails = phpStatus.querySelector('.status-details');
+    
+    // Update indicator
+    statusIndicator.className = `status-indicator ${state}`;
+    
+    // Update text
+    statusText.textContent = `PHP Runtime: ${message}`;
+    
+    // Update details
+    if (state === 'ready' && version) {
+        phpVersion.textContent = version;
+        statusDetails.classList.remove('hidden');
+    } else if (state === 'initializing') {
+        statusDetails.classList.add('hidden');
+    }
+}
+
+// Serialize
+async function handleSerialize() {
+    hideOperationOutcome();
+    
+    // Ensure PHP is initialized
+    if (!await ensurePhpInitialized()) {
+        return;
+    }
+    
+    showStatus('loading', 'Serializing...');
+    
+    try {
+        const input = inputJson.value.trim();
+        if (!input) {
+            throw new Error('Input is empty');
+        }
+        
+        // Validate JSON
+        const resource = JSON.parse(input);
+        
+        // Basic validation
+        if (!resource.resourceType) {
+            const outcome = validationError('Missing required field: resourceType', 'Resource.resourceType');
+            showOperationOutcome(outcome);
+            showStatus('error', 'Validation failed');
+            return;
+        }
+        
+        // Use PHP-WASM for serialization
+        const result = await fhirClient.serialize(resource, {
+            validationMode: currentValidationMode
+        });
+        
+        // Check if result is an OperationOutcome (error)
+        if (result.resourceType === 'OperationOutcome') {
+            showOperationOutcome(result);
+            showStatus('error', 'Serialization failed');
+            return;
+        }
+        
+        // Display result
+        outputJson.textContent = JSON.stringify(result, null, 2);
+        showStatus('success', 'Serialization successful');
+        
+    } catch (error) {
+        const outcome = structureError('Serialization error', error.message);
+        showOperationOutcome(outcome);
+        showStatus('error', 'Serialization failed');
+    }
+}
+
+// Deserialize
+async function handleDeserialize() {
+    hideOperationOutcome();
+    
+    // Ensure PHP is initialized
+    if (!await ensurePhpInitialized()) {
+        return;
+    }
+    
+    showStatus('loading', 'Deserializing...');
+    
+    try {
+        const input = inputJson.value.trim();
+        if (!input) {
+            throw new Error('Input is empty');
+        }
+        
+        // Validate JSON
+        const resource = JSON.parse(input);
+        
+        // Use PHP-WASM for deserialization
+        const result = await fhirClient.deserialize(resource, {
+            validationMode: currentValidationMode
+        });
+        
+        // Check if result is an OperationOutcome (error)
+        if (result.resourceType === 'OperationOutcome') {
+            showOperationOutcome(result);
+            showStatus('error', 'Deserialization failed');
+            return;
+        }
+        
+        // Display result
+        outputJson.textContent = JSON.stringify(result, null, 2);
+        showStatus('success', 'Deserialization successful');
+        
+    } catch (error) {
+        const outcome = structureError('Deserialization error', error.message);
+        showOperationOutcome(outcome);
+        showStatus('error', 'Deserialization failed');
+    }
+}
+
+// Validate
+async function handleValidate() {
+    hideOperationOutcome();
+    showStatus('loading', 'Validating...');
+    
+    try {
+        const input = inputJson.value.trim();
+        if (!input) {
+            throw new Error('Input is empty');
+        }
+        
+        // Validate JSON
+        const resource = JSON.parse(input);
+        
+        // Basic validation
+        const errors = [];
+        if (!resource.resourceType) {
+            errors.push('Missing required field: resourceType');
+        }
+        
+        if (errors.length > 0) {
+            const outcome = validationError(errors.join('; '), 'Resource');
+            showOperationOutcome(outcome);
+            showStatus('error', `Validation failed: ${errors.length} error(s) found`);
+            return;
+        }
+        
+        showStatus('success', 'Validation successful');
+        outputJson.textContent = '✓ Resource is valid';
+        
+    } catch (error) {
+        const outcome = structureError('Invalid JSON format', error.message);
+        showOperationOutcome(outcome);
+        showStatus('error', 'Validation failed');
+    }
+}
+
+// Clear input
+function clearInput() {
+    inputJson.value = '';
+    outputJson.textContent = '// Output will appear here...';
+    hideStatus();
+    hideOperationOutcome();
+}
+
+// Copy output
+async function copyOutput() {
+    const text = outputJson.textContent;
+    try {
+        await navigator.clipboard.writeText(text);
+        showStatus('success', 'Copied to clipboard');
+    } catch (error) {
+        showStatus('error', 'Failed to copy to clipboard');
+    }
+}
+
+// Show status
+function showStatus(type, message) {
+    demoStatus.className = `demo-status ${type}`;
+    demoStatus.querySelector('.status-message').textContent = message;
+}
+
+// Hide status
+function hideStatus() {
+    demoStatus.classList.add('hidden');
+}
+
+// Show OperationOutcome
+function showOperationOutcome(outcome) {
+    const formatted = formatOperationOutcome(outcome);
+    operationOutcome.querySelector('.outcome-content').innerHTML = `<pre>${formatted}</pre>`;
+    operationOutcome.classList.remove('hidden');
+}
+
+// Hide OperationOutcome
+function hideOperationOutcome() {
+    operationOutcome.classList.add('hidden');
+}
+
+// Event listeners
+exampleSelect.addEventListener('change', (e) => loadExample(e.target.value));
+validationModeSelect.addEventListener('change', (e) => currentValidationMode = e.target.value);
+btnSerialize.addEventListener('click', handleSerialize);
+btnDeserialize.addEventListener('click', handleDeserialize);
+btnValidate.addEventListener('click', handleValidate);
+btnClearInput.addEventListener('click', clearInput);
+btnCopyOutput.addEventListener('click', copyOutput);
+
+// Initialize
+hideStatus();
+hideOperationOutcome();
+</script>

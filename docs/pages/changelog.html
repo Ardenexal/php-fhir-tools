@@ -1,0 +1,283 @@
+---
+layout: docs
+title: Changelog
+permalink: /pages/changelog/
+---
+
+<div class="changelog-page">
+    <h1>Changelog</h1>
+    <p class="lead">All notable changes to PHP FHIRTools are documented here.</p>
+
+    <div class="versioning-info">
+        <p>The format is based on <a href="https://keepachangelog.com/">Keep a Changelog</a>, and this project adheres to <a href="https://semver.org/">Semantic Versioning</a>.</p>
+        <p><strong>Version Format:</strong> MAJOR.MINOR.PATCH</p>
+        <ul>
+            <li><strong>MAJOR</strong> - Breaking changes</li>
+            <li><strong>MINOR</strong> - New features (backwards compatible)</li>
+            <li><strong>PATCH</strong> - Bug fixes (backwards compatible)</li>
+        </ul>
+    </div>
+
+    <!-- Version 0.5.0 Section -->
+    <section class="version-section">
+        <h2 id="v0.5.0">Version 0.5.0</h2>
+        <p class="release-date">Released: 2024-12-15</p>
+        
+        <h3>Added</h3>
+        <ul>
+            <li>FHIRPath evaluator with support for all standard functions</li>
+            <li>FHIRPath operators: comparison, boolean, math, collection</li>
+            <li>OperationOutcome error handling with FHIRPath expressions</li>
+            <li>Terminology service client for tx.fhir.org integration</li>
+            <li>Web Components for interactive demos</li>
+            <li>Service Worker for offline support</li>
+            <li>Support for FHIR R5 resources</li>
+            <li>php-wasm integration for browser-based PHP execution</li>
+            <li>Jekyll documentation site with search</li>
+        </ul>
+
+        <h3>Changed</h3>
+        <ul>
+            <li>Improved serialization performance by 30%</li>
+            <li>Updated to FHIR R4B specification</li>
+            <li>Enhanced validation error messages with FHIRPath locations</li>
+            <li>Refactored model generation for better code quality</li>
+        </ul>
+
+        <h3>Fixed</h3>
+        <ul>
+            <li>Fixed date/time parsing in FHIRPath evaluator</li>
+            <li>Corrected Bundle entry processing order</li>
+            <li>Fixed memory leak in large resource serialization</li>
+            <li>Resolved namespace conflicts in generated models</li>
+        </ul>
+
+        <h3>Security</h3>
+        <ul>
+            <li>Added input sanitization for FHIRPath expressions</li>
+            <li>Implemented rate limiting for terminology service calls</li>
+        </ul>
+    </section>
+
+    <!-- Version 0.4.0 Section -->
+    <section class="version-section">
+        <h2 id="v0.4.0">Version 0.4.0</h2>
+        <p class="release-date">Released: 2024-09-20</p>
+        
+        <h3>Added</h3>
+        <ul>
+            <li>FHIR Bundle support with transaction processing</li>
+            <li>XML serialization and deserialization</li>
+            <li>Validation modes: strict, lenient, none</li>
+            <li>Model generation command for CLI</li>
+            <li>Support for custom extensions</li>
+            <li>Contained resources support</li>
+            <li>Reference resolution helpers</li>
+        </ul>
+
+        <h3>Changed</h3>
+        <ul>
+            <li>Improved error messages with detailed context</li>
+            <li>Optimized memory usage for large bundles</li>
+            <li>Updated dependencies to latest versions</li>
+        </ul>
+
+        <h3>Fixed</h3>
+        <li>Fixed choice type serialization (e.g., value[x])</li>
+            <li>Corrected cardinality validation</li>
+            <li>Fixed timezone handling in dateTime fields</li>
+        </ul>
+
+        <h3>Deprecated</h3>
+        <ul>
+            <li><code>setValidationMode()</code> method (use constructor parameter instead)</li>
+        </ul>
+    </section>
+
+    <!-- Version 0.3.0 Section -->
+    <section class="version-section">
+        <h2 id="v0.3.0">Version 0.3.0</h2>
+        <p class="release-date">Released: 2024-06-10</p>
+        
+        <h3>Added</h3>
+        <ul>
+            <li>Symfony Bundle for easy integration</li>
+            <li>Service dependency injection</li>
+            <li>Event system for serialization hooks</li>
+            <li>Configuration file support (fhir.yaml)</li>
+            <li>Automatic service registration</li>
+            <li>Testing helpers for PHPUnit</li>
+        </ul>
+
+        <h3>Changed</h3>
+        <ul>
+            <li>Moved core classes to Component namespace</li>
+            <li>Improved PSR-12 compliance</li>
+            <li>Enhanced type hints and return types</li>
+        </ul>
+
+        <h3>Fixed</h3>
+            <li>Fixed circular reference handling</li>
+            <li>Corrected Resource.meta serialization</li>
+            <li>Fixed empty array serialization</li>
+        </ul>
+    </section>
+
+    <!-- Version 0.2.0 Section -->
+    <section class="version-section">
+        <h2 id="v0.2.0">Version 0.2.0</h2>
+        <p class="release-date">Released: 2024-03-15</p>
+        
+        <h3>Added</h3>
+        <ul>
+            <li>FHIR R4B model generation</li>
+            <li>Type-safe PHP classes for all resources</li>
+            <li>Support for complex data types</li>
+            <li>Validation against FHIR specifications</li>
+            <li>Comprehensive unit test suite</li>
+        </ul>
+
+        <h3>Changed</h3>
+        <ul>
+            <li>Refactored serialization engine</li>
+            <li>Improved code generation templates</li>
+        </ul>
+
+        <h3>Fixed</h3>
+        <ul>
+            <li>Fixed boolean field serialization</li>
+            <li>Corrected primitive type handling</li>
+        </ul>
+    </section>
+
+    <!-- Version 0.1.0 Section -->
+    <section class="version-section">
+        <h2 id="v0.1.0">Version 0.1.0</h2>
+        <p class="release-date">Released: 2024-01-10</p>
+        
+        <h3>Added</h3>
+        <ul>
+            <li>Initial release</li>
+            <li>JSON serialization for FHIR R4 resources</li>
+            <li>Basic deserialization support</li>
+            <li>Patient, Observation, Practitioner models</li>
+            <li>Simple validation</li>
+        </ul>
+    </section>
+
+    <!-- Unreleased Section -->
+    <section class="version-section unreleased">
+        <h2 id="unreleased">Unreleased</h2>
+        <p>Features and changes in development</p>
+        
+        <h3>Planned</h3>
+        <ul>
+            <li>Schema-based validation</li>
+            <li>Profile validation engine</li>
+            <li>FHIR Questionnaire support</li>
+            <li>Subscription processing</li>
+            <li>GraphQL API support</li>
+            <li>Performance profiling tools</li>
+        </ul>
+    </section>
+
+    <!-- Links Section -->
+    <section class="links-section">
+        <h2>Release Links</h2>
+        <ul>
+            <li><a href="https://github.com/Ardenexal/php-fhir-tools/releases/tag/v0.5.0">v0.5.0 on GitHub</a></li>
+            <li><a href="https://github.com/Ardenexal/php-fhir-tools/releases/tag/v0.4.0">v0.4.0 on GitHub</a></li>
+            <li><a href="https://github.com/Ardenexal/php-fhir-tools/releases/tag/v0.3.0">v0.3.0 on GitHub</a></li>
+            <li><a href="https://github.com/Ardenexal/php-fhir-tools/releases/tag/v0.2.0">v0.2.0 on GitHub</a></li>
+            <li><a href="https://github.com/Ardenexal/php-fhir-tools/releases/tag/v0.1.0">v0.1.0 on GitHub</a></li>
+        </ul>
+        <p><a href="https://github.com/Ardenexal/php-fhir-tools/releases">View all releases on GitHub →</a></p>
+    </section>
+</div>
+
+<style>
+.changelog-page {
+    max-width: 1000px;
+}
+
+.versioning-info {
+    background: var(--color-gray-50);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-5);
+    margin-bottom: var(--spacing-8);
+}
+
+.versioning-info p {
+    margin-bottom: var(--spacing-2);
+}
+
+.versioning-info ul {
+    margin-top: var(--spacing-2);
+    margin-bottom: 0;
+}
+
+.version-section {
+    margin-bottom: var(--spacing-10);
+    padding-bottom: var(--spacing-8);
+    border-bottom: 1px solid var(--color-gray-200);
+}
+
+.version-section:last-of-type {
+    border-bottom: none;
+}
+
+.version-section h2 {
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-2);
+}
+
+.release-date {
+    color: var(--color-gray-500);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-4);
+}
+
+.version-section h3 {
+    color: var(--color-secondary);
+    margin-top: var(--spacing-5);
+    margin-bottom: var(--spacing-3);
+    font-size: var(--font-size-lg);
+}
+
+.version-section ul {
+    margin-bottom: var(--spacing-4);
+}
+
+.version-section li {
+    margin-bottom: var(--spacing-2);
+}
+
+.unreleased {
+    background: var(--color-gray-50);
+    border: 2px dashed var(--color-gray-300);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-6);
+}
+
+.unreleased h2 {
+    color: var(--color-accent);
+}
+
+.links-section {
+    background: var(--color-primary-50);
+    border: 1px solid var(--color-primary-200);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-6);
+    margin-top: var(--spacing-10);
+}
+
+.links-section h2 {
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-4);
+}
+
+.links-section ul {
+    margin-bottom: var(--spacing-4);
+}
+</style>

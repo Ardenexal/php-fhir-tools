@@ -1,0 +1,367 @@
+---
+layout: docs
+title: Contributing Guide
+permalink: /pages/contributing/
+---
+
+<div class="contributing-page">
+    <h1>Contributing to PHP FHIRTools</h1>
+    <p class="lead">Thank you for your interest in contributing! This guide will help you get started.</p>
+
+    <!-- How to Contribute Section -->
+    <section class="contribute-section">
+        <h2>How to Contribute</h2>
+        <p>There are many ways to contribute to PHP FHIRTools:</p>
+        <ul>
+            <li><strong>Report bugs</strong> - Found a bug? Let us know!</li>
+            <li><strong>Suggest features</strong> - Have an idea? We'd love to hear it!</li>
+            <li><strong>Submit pull requests</strong> - Code contributions are always welcome</li>
+            <li><strong>Improve documentation</strong> - Help make our docs better</li>
+            <li><strong>Answer questions</strong> - Help others in discussions</li>
+            <li><strong>Share your experience</strong> - Write about how you use PHP FHIRTools</li>
+        </ul>
+    </section>
+
+    <!-- Development Setup Section -->
+    <section class="contribute-section">
+        <h2>Development Setup</h2>
+        
+        <h3>1. Fork and Clone</h3>
+        <pre><code class="language-bash"># Fork the repository on GitHub, then clone your fork
+git clone https://github.com/YOUR-USERNAME/php-fhir-tools.git
+cd php-fhir-tools
+
+# Add upstream remote
+git remote add upstream https://github.com/Ardenexal/php-fhir-tools.git</code></pre>
+
+        <h3>2. Install Dependencies</h3>
+        <pre><code class="language-bash"># Install PHP dependencies
+composer install
+
+# Install development tools
+composer install --dev</code></pre>
+
+        <h3>3. Create a Branch</h3>
+        <pre><code class="language-bash"># Create a feature branch
+git checkout -b feature/your-feature-name
+
+# Or for bug fixes
+git checkout -b fix/bug-description</code></pre>
+
+        <h3>4. Make Your Changes</h3>
+        <p>Write your code following our coding standards (see below).</p>
+
+        <h3>5. Run Tests</h3>
+        <pre><code class="language-bash"># Run all tests
+composer run test
+
+# Run specific test suite
+composer run test -- tests/Unit/
+
+# Run with coverage
+composer run test -- --coverage-html coverage/</code></pre>
+
+        <h3>6. Check Code Quality</h3>
+        <pre><code class="language-bash"># Run PHP-CS-Fixer
+composer run lint
+
+# Run PHPStan
+composer run phpstan
+
+# Run both
+composer run qa</code></pre>
+    </section>
+
+    <!-- Coding Standards Section -->
+    <section class="contribute-section">
+        <h2>Coding Standards</h2>
+        
+        <h3>PSR-12 Compliance</h3>
+        <p>All code must follow PSR-12 coding standards. Use PHP-CS-Fixer to automatically fix style issues:</p>
+        <pre><code class="language-bash">composer run lint</code></pre>
+
+        <h3>Strict Types</h3>
+        <p>Always use strict type declarations at the top of every PHP file:</p>
+        <pre><code class="language-php">declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\YourComponent;</code></pre>
+
+        <h3>Type Hints</h3>
+        <p>Always use type hints for parameters and return types:</p>
+        <pre><code class="language-php">public function process(PatientResource $patient, int $maxResults = 10): array
+{
+    // ...
+}</code></pre>
+
+        <h3>PHPDoc Blocks</h3>
+        <p>Add PHPDoc blocks for all public methods and complex private methods:</p>
+        <pre><code class="language-php">/**
+ * Serializes a FHIR resource to JSON format.
+ *
+ * @param FHIRResourceInterface $resource The resource to serialize
+ * @param bool $prettyPrint Whether to format the output
+ * @return string The serialized JSON string
+ * @throws SerializationException If serialization fails
+ * @author Your Name <your.email@example.com>
+ */
+public function serializeToJson(FHIRResourceInterface $resource, bool $prettyPrint = false): string
+{
+    // ...
+}</code></pre>
+
+        <h3>Exception Handling</h3>
+        <p>Use specific exception classes, not generic exceptions:</p>
+        <pre><code class="language-php">// Good
+throw new ValidationException('Patient name is required');
+
+// Bad
+throw new \Exception('Patient name is required');</code></pre>
+
+        <h3>Naming Conventions</h3>
+        <ul>
+            <li><strong>Classes</strong>: PascalCase (e.g., <code>FHIRSerializationService</code>)</li>
+            <li><strong>Methods</strong>: camelCase (e.g., <code>serializeToJson</code>)</li>
+            <li><strong>Variables</strong>: camelCase (e.g., <code>$patientName</code>)</li>
+            <li><strong>Constants</strong>: UPPER_SNAKE_CASE (e.g., <code>VALIDATION_MODE_STRICT</code>)</li>
+            <li><strong>Interfaces</strong>: End with "Interface" (e.g., <code>FHIRResourceInterface</code>)</li>
+        </ul>
+    </section>
+
+    <!-- Testing Requirements Section -->
+    <section class="contribute-section">
+        <h2>Testing Requirements</h2>
+        
+        <h3>Unit Tests</h3>
+        <p>All new features and bug fixes must include unit tests:</p>
+        <pre><code class="language-php">namespace Ardenexal\FHIRTools\Tests\Unit\Component\Serialization;
+
+use PHPUnit\Framework\TestCase;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
+
+class FHIRSerializationServiceTest extends TestCase
+{
+    private FHIRSerializationService $serializer;
+
+    protected function setUp(): void
+    {
+        $this->serializer = new FHIRSerializationService();
+    }
+
+    public function testSerializePatientToJson(): void
+    {
+        $patient = new PatientResource(id: 'test-123');
+        
+        $json = $this->serializer->serializeToJson($patient);
+        
+        self::assertStringContainsString('"resourceType":"Patient"', $json);
+        self::assertStringContainsString('"id":"test-123"', $json);
+    }
+}</code></pre>
+
+        <h3>Test Coverage</h3>
+        <ul>
+            <li>Aim for at least 80% code coverage</li>
+            <li>Test both success and failure cases</li>
+            <li>Test edge cases and boundary conditions</li>
+            <li>Use data providers for testing multiple scenarios</li>
+        </ul>
+
+        <h3>Integration Tests</h3>
+        <p>Add integration tests for features that interact with multiple components:</p>
+        <pre><code class="language-php">public function testFullSerializationDeserialization(): void
+{
+    $original = $this->createComplexPatient();
+    
+    $json = $this->serializer->serializeToJson($original);
+    $deserialized = $this->serializer->deserializeFromJson($json, PatientResource::class);
+    
+    self::assertEquals($original->id, $deserialized->id);
+    self::assertEquals($original->name[0]->family, $deserialized->name[0]->family);
+}</code></pre>
+    </section>
+
+    <!-- Pull Request Process Section -->
+    <section class="contribute-section">
+        <h2>Pull Request Process</h2>
+        
+        <h3>1. Commit Your Changes</h3>
+        <p>Use conventional commit format:</p>
+        <pre><code class="language-bash"># Feature commits
+git commit -m "feat: add XML serialization support"
+
+# Bug fix commits
+git commit -m "fix: correct date parsing in FHIRPath evaluator"
+
+# Documentation commits
+git commit -m "docs: update installation instructions"
+
+# Maintenance commits
+git commit -m "chore: update dependencies"
+
+# Test commits
+git commit -m "test: add tests for bundle processing"</code></pre>
+
+        <h3>2. Push Your Branch</h3>
+        <pre><code class="language-bash">git push origin feature/your-feature-name</code></pre>
+
+        <h3>3. Create Pull Request</h3>
+        <p>Go to GitHub and create a pull request from your fork. Include:</p>
+        <ul>
+            <li><strong>Clear title</strong> - Describe what the PR does</li>
+            <li><strong>Description</strong> - Explain the changes and why they're needed</li>
+            <li><strong>Related issues</strong> - Link to any related issues</li>
+            <li><strong>Breaking changes</strong> - Note any breaking changes</li>
+            <li><strong>Checklist</strong> - Confirm you've followed the guidelines</li>
+        </ul>
+
+        <h3>4. Code Review</h3>
+        <p>Maintainers will review your PR and may request changes. Please:</p>
+        <ul>
+            <li>Respond to feedback promptly</li>
+            <li>Make requested changes</li>
+            <li>Push additional commits to your branch</li>
+            <li>Request re-review when ready</li>
+        </ul>
+
+        <h3>5. Merge</h3>
+        <p>Once approved, a maintainer will merge your PR. Thank you for contributing!</p>
+    </section>
+
+    <!-- Issue Reporting Section -->
+    <section class="contribute-section">
+        <h2>Reporting Issues</h2>
+        
+        <h3>Bug Reports</h3>
+        <p>When reporting a bug, include:</p>
+        <ul>
+            <li><strong>Version</strong> - Which version are you using?</li>
+            <li><strong>PHP Version</strong> - What PHP version?</li>
+            <li><strong>Description</strong> - What happened?</li>
+            <li><strong>Expected behavior</strong> - What should have happened?</li>
+            <li><strong>Steps to reproduce</strong> - How can we reproduce the bug?</li>
+            <li><strong>Code sample</strong> - Minimal code that reproduces the issue</li>
+            <li><strong>Error messages</strong> - Full error messages and stack traces</li>
+        </ul>
+
+        <h3>Feature Requests</h3>
+        <p>When requesting a feature, include:</p>
+        <ul>
+            <li><strong>Use case</strong> - Why do you need this feature?</li>
+            <li><strong>Description</strong> - What should the feature do?</li>
+            <li><strong>Alternatives</strong> - Have you tried any workarounds?</li>
+            <li><strong>Examples</strong> - Show how you envision using the feature</li>
+        </ul>
+
+        <h3>Questions</h3>
+        <p>For questions about usage:</p>
+        <ul>
+            <li>Check the <a href="{{ site.baseurl }}/pages/getting-started/">documentation</a> first</li>
+            <li>Search <a href="https://github.com/Ardenexal/php-fhir-tools/issues">existing issues</a></li>
+            <li>Ask in <a href="https://github.com/Ardenexal/php-fhir-tools/discussions">GitHub Discussions</a></li>
+        </ul>
+    </section>
+
+    <!-- Community Guidelines Section -->
+    <section class="contribute-section">
+        <h2>Community Guidelines</h2>
+        
+        <h3>Code of Conduct</h3>
+        <p>We are committed to providing a welcoming and inspiring community for all. Please:</p>
+        <ul>
+            <li>Be respectful and inclusive</li>
+            <li>Be patient and helpful</li>
+            <li>Accept constructive criticism gracefully</li>
+            <li>Focus on what is best for the community</li>
+        </ul>
+
+        <h3>Communication</h3>
+        <ul>
+            <li><strong>GitHub Issues</strong> - For bugs and feature requests</li>
+            <li><strong>GitHub Discussions</strong> - For questions and general discussion</li>
+            <li><strong>Pull Requests</strong> - For code contributions</li>
+        </ul>
+
+        <h3>Recognition</h3>
+        <p>All contributors will be:</p>
+        <ul>
+            <li>Added to the CONTRIBUTORS file</li>
+            <li>Mentioned in release notes (for significant contributions)</li>
+            <li>Credited in commit messages (@author tags)</li>
+        </ul>
+    </section>
+
+    <!-- Resources Section -->
+    <section class="contribute-section">
+        <h2>Resources</h2>
+        <ul>
+            <li><a href="{{ site.baseurl }}/">Documentation Home</a></li>
+            <li><a href="{{ site.baseurl }}/pages/getting-started/">Getting Started Guide</a></li>
+            <li><a href="{{ site.baseurl }}/pages/api-reference/">API Reference</a></li>
+            <li><a href="https://github.com/Ardenexal/php-fhir-tools">GitHub Repository</a></li>
+            <li><a href="https://github.com/Ardenexal/php-fhir-tools/issues">Issue Tracker</a></li>
+            <li><a href="https://github.com/Ardenexal/php-fhir-tools/discussions">Discussions</a></li>
+        </ul>
+    </section>
+
+    <!-- Thank You Section -->
+    <section class="contribute-section thank-you">
+        <h2>Thank You!</h2>
+        <p>Thank you for taking the time to contribute to PHP FHIRTools. Your contributions help make this project better for everyone!</p>
+        <p>If you have any questions about contributing, feel free to ask in <a href="https://github.com/Ardenexal/php-fhir-tools/discussions">GitHub Discussions</a>.</p>
+    </section>
+</div>
+
+<style>
+.contributing-page {
+    max-width: 1000px;
+}
+
+.contribute-section {
+    margin-bottom: var(--spacing-10);
+}
+
+.contribute-section h2 {
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-4);
+    padding-bottom: var(--spacing-2);
+    border-bottom: 2px solid var(--color-primary);
+}
+
+.contribute-section h3 {
+    color: var(--color-gray-800);
+    margin-top: var(--spacing-6);
+    margin-bottom: var(--spacing-3);
+}
+
+.contribute-section ul {
+    margin-bottom: var(--spacing-4);
+}
+
+.contribute-section li {
+    margin-bottom: var(--spacing-2);
+}
+
+.thank-you {
+    background: var(--color-primary-50);
+    border: 2px solid var(--color-primary);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-6);
+    text-align: center;
+}
+
+.thank-you h2 {
+    border: none;
+    color: var(--color-primary);
+}
+
+.thank-you p {
+    font-size: var(--font-size-lg);
+    color: var(--color-gray-700);
+}
+</style>
+
+<!-- Load Prism.js for syntax highlighting -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>

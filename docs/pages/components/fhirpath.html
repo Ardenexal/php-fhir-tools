@@ -1,0 +1,430 @@
+---
+layout: docs
+title: FHIRPath
+category: components
+---
+
+# FHIRPath
+
+FHIRPath is a powerful query language for extracting, filtering, and transforming data from FHIR resources. This component provides a complete FHIRPath implementation in PHP.
+
+## Overview
+
+FHIRPath enables you to:
+
+- **Extract Data**: Query specific values from FHIR resources
+- **Filter Collections**: Select resources matching criteria
+- **Transform Data**: Convert and manipulate values
+- **Validate Rules**: Implement business logic validation
+- **Navigate Structures**: Traverse complex nested resources
+
+## Installation
+
+### Standalone
+
+```bash
+composer require ardenexal/fhir-path
+```
+
+### With FHIRBundle
+
+```bash
+composer require ardenexal/fhir-bundle
+```
+
+## Basic Usage
+
+### Simple Value Extraction
+
+```php
+use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\FHIRPathEvaluator;
+
+$evaluator = new FHIRPathEvaluator();
+
+// Patient resource
+$patient = json_decode('{
+  "resourceType": "Patient",
+  "name": [{"family": "Doe", "given": ["John"]}],
+  "birthDate": "1980-01-15"
+}');
+
+// Extract family name
+$family = $evaluator->evaluate($patient, 'Patient.name.family');
+// Result: ["Doe"]
+
+// Extract given names
+$given = $evaluator->evaluate($patient, 'Patient.name.given');
+// Result: ["John"]
+
+// Extract birth year
+$year = $evaluator->evaluate($patient, 'Patient.birthDate.substring(0, 4)');
+// Result: ["1980"]
+```
+
+### Collection Filtering
+
+```php
+// Observation with multiple components
+$observation = json_decode('{
+  "resourceType": "Observation",
+  "component": [
+    {"code": {"coding": [{"code": "8480-6"}]}, "valueQuantity": {"value": 120}},
+    {"code": {"coding": [{"code": "8462-4"}]}, "valueQuantity": {"value": 80}}
+  ]
+}');
+
+// Get systolic blood pressure
+$systolic = $evaluator->evaluate(
+    $observation,
+    'Observation.component.where(code.coding.code="8480-6").valueQuantity.value'
+);
+// Result: [120]
+
+// Get diastolic blood pressure
+$diastolic = $evaluator->evaluate(
+    $observation,
+    'Observation.component.where(code.coding.code="8462-4").valueQuantity.value'
+);
+// Result: [80]
+```
+
+## FHIRPath Functions
+
+### exists()
+
+Check if an element exists:
+
+```php
+// Check if patient has a name
+$hasName = $evaluator->evaluate($patient, 'Patient.name.exists()');
+// Result: [true]
+
+// Check if patient has multiple names
+$hasMultipleNames = $evaluator->evaluate($patient, 'Patient.name.count() > 1');
+// Result: [false]
+```
+
+### where()
+
+Filter collections:
+
+```php
+// Get active patients only
+$activePatients = $evaluator->evaluate($bundle, 
+    'Bundle.entry.resource.where(resourceType="Patient" and active=true)'
+);
+
+// Get observations with abnormal values
+$abnormal = $evaluator->evaluate($observation,
+    'Observation.component.where(valueQuantity.value > 140)'
+);
+```
+
+### select()
+
+Transform collections:
+
+```php
+// Extract all family names from a bundle
+$families = $evaluator->evaluate($bundle,
+    'Bundle.entry.resource.where(resourceType="Patient").name.family'
+);
+
+// Get all medication codes
+$codes = $evaluator->evaluate($medicationRequest,
+    'MedicationRequest.medicationCodeableConcept.coding.code'
+);
+```
+
+### count()
+
+Count collection elements:
+
+```php
+// Count number of names
+$nameCount = $evaluator->evaluate($patient, 'Patient.name.count()');
+// Result: [1]
+
+// Count observations in a bundle
+$obsCount = $evaluator->evaluate($bundle,
+    'Bundle.entry.resource.where(resourceType="Observation").count()'
+);
+```
+
+### first() and last()
+
+Get first or last element:
+
+```php
+// Get first name
+$firstName = $evaluator->evaluate($patient, 'Patient.name.first().given.first()');
+// Result: ["John"]
+
+// Get most recent observation
+$latest = $evaluator->evaluate($bundle,
+    'Bundle.entry.resource.where(resourceType="Observation").effectiveDateTime.last()'
+);
+```
+
+### ofType()
+
+Filter by type:
+
+```php
+// Get Patient resources from a bundle
+$patients = $evaluator->evaluate($bundle,
+    'Bundle.entry.resource.ofType(Patient)'
+);
+```
+
+### as()
+
+Type casting:
+
+```php
+// Cast to specific type
+$quantity = $evaluator->evaluate($observation,
+    'Observation.value.as(Quantity).value'
+);
+```
+
+## Operators
+
+### Comparison Operators
+
+```php
+// Equal
+$isActive = $evaluator->evaluate($patient, 'Patient.active = true');
+
+// Not equal
+$notActive = $evaluator->evaluate($patient, 'Patient.active != true');
+
+// Greater than
+$highBP = $evaluator->evaluate($observation, 
+    'Observation.component.valueQuantity.value > 140'
+);
+
+// Less than
+$lowBP = $evaluator->evaluate($observation,
+    'Observation.component.valueQuantity.value < 90'
+);
+
+// Greater than or equal
+$atLeast = $evaluator->evaluate($observation, 
+    'Observation.component.valueQuantity.value >= 120'
+);
+
+// Less than or equal
+$atMost = $evaluator->evaluate($observation,
+    'Observation.component.valueQuantity.value <= 120'
+);
+```
+
+### Boolean Operators
+
+```php
+// AND
+$condition = $evaluator->evaluate($patient,
+    'Patient.active = true and Patient.gender = "male"'
+);
+
+// OR
+$condition = $evaluator->evaluate($patient,
+    'Patient.active = false or Patient.deceased = true'
+);
+
+// NOT (implies)
+$condition = $evaluator->evaluate($patient,
+    'Patient.active.not()'
+);
+```
+
+### Math Operators
+
+```php
+// Addition
+$sum = $evaluator->evaluate($observation, '120 + 80');
+// Result: [200]
+
+// Subtraction
+$diff = $evaluator->evaluate($observation, '120 - 80');
+// Result: [40]
+
+// Multiplication
+$product = $evaluator->evaluate($observation, '120 * 2');
+// Result: [240]
+
+// Division
+$quotient = $evaluator->evaluate($observation, '120 / 2');
+// Result: [60]
+
+// Modulo
+$remainder = $evaluator->evaluate($observation, '120 mod 10');
+// Result: [0]
+```
+
+### Collection Operators
+
+```php
+// Union (|)
+$allNames = $evaluator->evaluate($patient,
+    'Patient.name.family | Patient.name.given'
+);
+
+// Intersection
+$common = $evaluator->evaluate($patient,
+    'Patient.name[0].given & Patient.name[1].given'
+);
+```
+
+## Advanced Usage
+
+### Complex Queries
+
+```php
+// Get all active patients over 18 years old
+$adults = $evaluator->evaluate($bundle,
+    'Bundle.entry.resource.where(
+        resourceType="Patient" and 
+        active=true and 
+        birthDate <= today() - 18 years
+    )'
+);
+
+// Get high-risk observations
+$highRisk = $evaluator->evaluate($bundle,
+    'Bundle.entry.resource.where(
+        resourceType="Observation" and
+        status="final" and
+        component.where(
+            code.coding.code="8480-6" and
+            valueQuantity.value > 140
+        ).exists()
+    )'
+);
+```
+
+### Nested Navigation
+
+```php
+// Navigate deeply nested structures
+$medicationCodes = $evaluator->evaluate($medicationRequest,
+    'MedicationRequest.dosageInstruction.doseAndRate.doseQuantity.code'
+);
+
+// Access related resources
+$practitionerName = $evaluator->evaluate($observation,
+    'Observation.performer.resolve().name.family'
+);
+```
+
+### Conditional Logic
+
+```php
+// Use iif() for conditional expressions
+$status = $evaluator->evaluate($patient,
+    'iif(Patient.active = true, "Active", "Inactive")'
+);
+
+// Complex conditionals
+$risk = $evaluator->evaluate($observation,
+    'iif(
+        Observation.component.valueQuantity.value > 140,
+        "High",
+        iif(
+            Observation.component.valueQuantity.value > 120,
+            "Elevated",
+            "Normal"
+        )
+    )'
+);
+```
+
+## Error Handling
+
+FHIRPath errors are returned as OperationOutcome:
+
+```php
+try {
+    $result = $evaluator->evaluate($patient, 'Patient.invalidPath');
+} catch (\RuntimeException $e) {
+    $outcome = json_decode($e->getMessage(), true);
+    
+    // {
+    //   "resourceType": "OperationOutcome",
+    //   "issue": [{
+    //     "severity": "error",
+    //     "code": "invalid",
+    //     "details": {"text": "Invalid FHIRPath expression"},
+    //     "expression": ["Patient.invalidPath"]
+    //   }]
+    // }
+}
+```
+
+## Symfony Integration
+
+```php
+use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\FHIRPathEvaluator;
+
+class ObservationService
+{
+    public function __construct(
+        private readonly FHIRPathEvaluator $evaluator
+    ) {}
+    
+    public function extractVitalSigns($observation): array
+    {
+        return [
+            'systolic' => $this->evaluator->evaluate(
+                $observation,
+                'component.where(code.coding.code="8480-6").valueQuantity.value'
+            )[0] ?? null,
+            'diastolic' => $this->evaluator->evaluate(
+                $observation,
+                'component.where(code.coding.code="8462-4").valueQuantity.value'
+            )[0] ?? null,
+        ];
+    }
+}
+```
+
+## Performance Tips
+
+### Cache Compiled Expressions
+
+```php
+// Compile once, evaluate multiple times
+$expression = $evaluator->compile('Patient.name.family');
+
+foreach ($patients as $patient) {
+    $family = $evaluator->evaluateCompiled($patient, $expression);
+}
+```
+
+### Limit Collection Traversal
+
+```php
+// Use first() to avoid processing entire collection
+$firstActive = $evaluator->evaluate($bundle,
+    'Bundle.entry.resource.where(active=true).first()'
+);
+```
+
+## Interactive Demo
+
+Try FHIRPath expressions interactively in our [FHIRPath Demo](../../demos/fhirpath.html) (coming in Phase 6).
+
+## Next Steps
+
+- [Interactive FHIRPath Demo](../../demos/fhirpath.html) - Test expressions live
+- [Serialization Component](serialization.html) - Work with FHIR JSON/XML
+- [Models Component](models.html) - FHIR resource models
+- [API Reference](../api-reference.html) - Complete API documentation
+
+## Resources
+
+- [FHIRPath Specification](http://hl7.org/fhirpath/)
+- [FHIRPath Functions](http://hl7.org/fhirpath/#functions)
+- [FHIRPath in FHIR](https://www.hl7.org/fhir/fhirpath.html)
+- [GitHub Repository](https://github.com/Ardenexal/php-fhir-tools)

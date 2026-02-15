@@ -1,0 +1,451 @@
+---
+layout: docs
+title: API Reference
+permalink: /pages/api-reference/
+---
+
+<div class="api-reference-page">
+    <h1>API Reference</h1>
+    <p class="lead">Complete reference for all PHP FHIRTools services and methods.</p>
+
+    <!-- FHIRSerializationService Section -->
+    <section class="api-section">
+        <h2 id="serialization-service">FHIRSerializationService</h2>
+        <p>Service for serializing and deserializing FHIR resources between JSON/XML and PHP objects.</p>
+
+        <div class="api-method">
+            <h3>serializeToJson()</h3>
+            <p>Serialize a FHIR resource to JSON string.</p>
+            <pre><code class="language-php">public function serializeToJson(
+    FHIRResourceInterface $resource,
+    bool $prettyPrint = false
+): string</code></pre>
+            <h4>Parameters:</h4>
+            <ul>
+                <li><code>$resource</code> (FHIRResourceInterface): The FHIR resource to serialize</li>
+                <li><code>$prettyPrint</code> (bool): Whether to format the JSON output (default: false)</li>
+            </ul>
+            <h4>Returns:</h4>
+            <p>string - JSON representation of the resource</p>
+            <h4>Throws:</h4>
+            <p>SerializationException - If serialization fails</p>
+            <h4>Example:</h4>
+            <pre><code class="language-php">$json = $serializer->serializeToJson($patient, true);
+echo $json;</code></pre>
+        </div>
+
+        <div class="api-method">
+            <h3>deserializeFromJson()</h3>
+            <p>Deserialize a JSON string to a FHIR resource object.</p>
+            <pre><code class="language-php">public function deserializeFromJson(
+    string $json,
+    string $resourceClass,
+    ValidationMode $validationMode = ValidationMode::STRICT
+): FHIRResourceInterface</code></pre>
+            <h4>Parameters:</h4>
+            <ul>
+                <li><code>$json</code> (string): JSON string to deserialize</li>
+                <li><code>$resourceClass</code> (string): Fully qualified class name of the resource</li>
+                <li><code>$validationMode</code> (ValidationMode): Validation mode (STRICT, LENIENT, NONE)</li>
+            </ul>
+            <h4>Returns:</h4>
+            <p>FHIRResourceInterface - Deserialized FHIR resource</p>
+            <h4>Throws:</h4>
+            <ul>
+                <li>ValidationException - If validation fails</li>
+                <li>DeserializationException - If deserialization fails</li>
+            </ul>
+            <h4>Example:</h4>
+            <pre><code class="language-php">$patient = $serializer->deserializeFromJson(
+    $json,
+    PatientResource::class,
+    ValidationMode::STRICT
+);</code></pre>
+        </div>
+
+        <div class="api-method">
+            <h3>serializeToXml()</h3>
+            <p>Serialize a FHIR resource to XML string.</p>
+            <pre><code class="language-php">public function serializeToXml(
+    FHIRResourceInterface $resource,
+    bool $prettyPrint = false
+): string</code></pre>
+            <h4>Parameters:</h4>
+            <ul>
+                <li><code>$resource</code> (FHIRResourceInterface): The FHIR resource to serialize</li>
+                <li><code>$prettyPrint</code> (bool): Whether to format the XML output (default: false)</li>
+            </ul>
+            <h4>Returns:</h4>
+            <p>string - XML representation of the resource</p>
+            <h4>Example:</h4>
+            <pre><code class="language-php">$xml = $serializer->serializeToXml($patient, true);</code></pre>
+        </div>
+
+        <div class="api-method">
+            <h3>deserializeFromXml()</h3>
+            <p>Deserialize an XML string to a FHIR resource object.</p>
+            <pre><code class="language-php">public function deserializeFromXml(
+    string $xml,
+    string $resourceClass,
+    ValidationMode $validationMode = ValidationMode::STRICT
+): FHIRResourceInterface</code></pre>
+            <h4>Parameters:</h4>
+            <ul>
+                <li><code>$xml</code> (string): XML string to deserialize</li>
+                <li><code>$resourceClass</code> (string): Fully qualified class name of the resource</li>
+                <li><code>$validationMode</code> (ValidationMode): Validation mode</li>
+            </ul>
+            <h4>Returns:</h4>
+            <p>FHIRResourceInterface - Deserialized FHIR resource</p>
+            <h4>Example:</h4>
+            <pre><code class="language-php">$patient = $serializer->deserializeFromXml($xml, PatientResource::class);</code></pre>
+        </div>
+    </section>
+
+    <!-- FHIRPathEvaluator Section -->
+    <section class="api-section">
+        <h2 id="fhirpath-evaluator">FHIRPathEvaluator</h2>
+        <p>Service for evaluating FHIRPath expressions against FHIR resources.</p>
+
+        <div class="api-method">
+            <h3>evaluate()</h3>
+            <p>Evaluate a FHIRPath expression against a resource.</p>
+            <pre><code class="language-php">public function evaluate(
+    FHIRResourceInterface $resource,
+    string $expression
+): array</code></pre>
+            <h4>Parameters:</h4>
+            <ul>
+                <li><code>$resource</code> (FHIRResourceInterface): The resource to evaluate against</li>
+                <li><code>$expression</code> (string): FHIRPath expression to evaluate</li>
+            </ul>
+            <h4>Returns:</h4>
+            <p>array - Array of values matching the expression</p>
+            <h4>Throws:</h4>
+            <p>FHIRPathException - If evaluation fails or expression is invalid</p>
+            <h4>Example:</h4>
+            <pre><code class="language-php">$names = $evaluator->evaluate($patient, 'Patient.name.family');
+// Returns: ['Smith']</code></pre>
+        </div>
+
+        <div class="api-method">
+            <h3>evaluateToBoolean()</h3>
+            <p>Evaluate a FHIRPath expression and return boolean result.</p>
+            <pre><code class="language-php">public function evaluateToBoolean(
+    FHIRResourceInterface $resource,
+    string $expression
+): bool</code></pre>
+            <h4>Parameters:</h4>
+            <ul>
+                <li><code>$resource</code> (FHIRResourceInterface): The resource to evaluate against</li>
+                <li><code>$expression</code> (string): FHIRPath expression</li>
+            </ul>
+            <h4>Returns:</h4>
+            <p>bool - True if expression evaluates to true, false otherwise</p>
+            <h4>Example:</h4>
+            <pre><code class="language-php">$isActive = $evaluator->evaluateToBoolean($patient, 'Patient.active');
+// Returns: true or false</code></pre>
+        </div>
+
+        <div class="api-method">
+            <h3>evaluateToString()</h3>
+            <p>Evaluate a FHIRPath expression and return string result.</p>
+            <pre><code class="language-php">public function evaluateToString(
+    FHIRResourceInterface $resource,
+    string $expression
+): ?string</code></pre>
+            <h4>Parameters:</h4>
+            <ul>
+                <li><code>$resource</code> (FHIRResourceInterface): The resource to evaluate against</li>
+                <li><code>$expression</code> (string): FHIRPath expression</li>
+            </ul>
+            <h4>Returns:</h4>
+            <p>?string - String result or null if no match</p>
+            <h4>Example:</h4>
+            <pre><code class="language-php">$family = $evaluator->evaluateToString($patient, 'Patient.name.first().family');
+// Returns: 'Smith'</code></pre>
+        </div>
+
+        <div class="api-method">
+            <h3>evaluateToInteger()</h3>
+            <p>Evaluate a FHIRPath expression and return integer result.</p>
+            <pre><code class="language-php">public function evaluateToInteger(
+    FHIRResourceInterface $resource,
+    string $expression
+): ?int</code></pre>
+            <h4>Parameters:</h4>
+            <ul>
+                <li><code>$resource</code> (FHIRResourceInterface): The resource to evaluate against</li>
+                <li><code>$expression</code> (string): FHIRPath expression</li>
+            </ul>
+            <h4>Returns:</h4>
+            <p>?int - Integer result or null if no match</p>
+            <h4>Example:</h4>
+            <pre><code class="language-php">$count = $evaluator->evaluateToInteger($patient, 'Patient.name.count()');
+// Returns: 1</code></pre>
+        </div>
+    </section>
+
+    <!-- FHIRModelGenerator Section -->
+    <section class="api-section">
+        <h2 id="model-generator">FHIRModelGenerator</h2>
+        <p>Service for generating PHP classes from FHIR StructureDefinitions.</p>
+
+        <div class="api-method">
+            <h3>generateModels()</h3>
+            <p>Generate PHP model classes for a specific FHIR version.</p>
+            <pre><code class="language-php">public function generateModels(
+    string $fhirVersion,
+    string $outputDirectory,
+    string $namespace
+): GenerationResult</code></pre>
+            <h4>Parameters:</h4>
+            <ul>
+                <li><code>$fhirVersion</code> (string): FHIR version (r4, r4b, r5)</li>
+                <li><code>$outputDirectory</code> (string): Directory to output generated files</li>
+                <li><code>$namespace</code> (string): PHP namespace for generated classes</li>
+            </ul>
+            <h4>Returns:</h4>
+            <p>GenerationResult - Object containing generation statistics and errors</p>
+            <h4>Example:</h4>
+            <pre><code class="language-php">$result = $generator->generateModels(
+    'r4',
+    __DIR__ . '/src/FHIR/Models',
+    'App\\FHIR\\Models'
+);</code></pre>
+        </div>
+
+        <div class="api-method">
+            <h3>generateResource()</h3>
+            <p>Generate a PHP class for a specific FHIR resource.</p>
+            <pre><code class="language-php">public function generateResource(
+    string $resourceType,
+    string $fhirVersion,
+    string $outputDirectory,
+    string $namespace
+): string</code></pre>
+            <h4>Parameters:</h4>
+            <ul>
+                <li><code>$resourceType</code> (string): FHIR resource type (e.g., 'Patient')</li>
+                <li><code>$fhirVersion</code> (string): FHIR version</li>
+                <li><code>$outputDirectory</code> (string): Output directory</li>
+                <li><code>$namespace</code> (string): PHP namespace</li>
+            </ul>
+            <h4>Returns:</h4>
+            <p>string - Path to generated file</p>
+            <h4>Example:</h4>
+            <pre><code class="language-php">$filePath = $generator->generateResource(
+    'Patient',
+    'r4',
+    __DIR__ . '/src/FHIR',
+    'App\\FHIR'
+);</code></pre>
+        </div>
+
+        <div class="api-method">
+            <h3>getAvailableResources()</h3>
+            <p>Get list of available FHIR resources for a version.</p>
+            <pre><code class="language-php">public function getAvailableResources(string $fhirVersion): array</code></pre>
+            <h4>Parameters:</h4>
+            <ul>
+                <li><code>$fhirVersion</code> (string): FHIR version</li>
+            </ul>
+            <h4>Returns:</h4>
+            <p>array - Array of resource type names</p>
+            <h4>Example:</h4>
+            <pre><code class="language-php">$resources = $generator->getAvailableResources('r4');
+// Returns: ['Patient', 'Observation', 'Practitioner', ...]</code></pre>
+        </div>
+    </section>
+
+    <!-- FHIRValidator Section -->
+    <section class="api-section">
+        <h2 id="validation-service">FHIRValidator</h2>
+        <p>Service for validating FHIR resources against profiles and business rules.</p>
+
+        <div class="api-method">
+            <h3>validate()</h3>
+            <p>Validate a FHIR resource.</p>
+            <pre><code class="language-php">public function validate(
+    FHIRResourceInterface $resource,
+    ?string $profile = null
+): OperationOutcome</code></pre>
+            <h4>Parameters:</h4>
+            <ul>
+                <li><code>$resource</code> (FHIRResourceInterface): Resource to validate</li>
+                <li><code>$profile</code> (?string): Optional profile URL to validate against</li>
+            </ul>
+            <h4>Returns:</h4>
+            <p>OperationOutcome - Validation result with issues</p>
+            <h4>Example:</h4>
+            <pre><code class="language-php">$outcome = $validator->validate($patient);
+
+$errors = array_filter($outcome->issue, fn($issue) => (string) $issue->severity === 'error');
+if (!empty($errors)) {
+    foreach ($outcome->issue as $issue) {
+        echo $issue->severity . ': ' . $issue->details->text;
+    }
+}</code></pre>
+        </div>
+
+        <div class="api-method">
+            <h3>validateAgainstProfile()</h3>
+            <p>Validate a resource against a specific FHIR profile.</p>
+            <pre><code class="language-php">public function validateAgainstProfile(
+    FHIRResourceInterface $resource,
+    string $profileUrl
+): OperationOutcome</code></pre>
+            <h4>Parameters:</h4>
+            <ul>
+                <li><code>$resource</code> (FHIRResourceInterface): Resource to validate</li>
+                <li><code>$profileUrl</code> (string): Profile canonical URL</li>
+            </ul>
+            <h4>Returns:</h4>
+            <p>OperationOutcome - Validation result</p>
+            <h4>Example:</h4>
+            <pre><code class="language-php">$outcome = $validator->validateAgainstProfile(
+    $patient,
+    'http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient'
+);</code></pre>
+        </div>
+
+        <div class="api-method">
+            <h3>validateConstraints()</h3>
+            <p>Validate FHIRPath constraints on a resource.</p>
+            <pre><code class="language-php">public function validateConstraints(
+    FHIRResourceInterface $resource,
+    array $constraints
+): OperationOutcome</code></pre>
+            <h4>Parameters:</h4>
+            <ul>
+                <li><code>$resource</code> (FHIRResourceInterface): Resource to validate</li>
+                <li><code>$constraints</code> (array): Array of FHIRPath constraint expressions</li>
+            </ul>
+            <h4>Returns:</h4>
+            <p>OperationOutcome - Validation result</p>
+            <h4>Example:</h4>
+            <pre><code class="language-php">$constraints = [
+    'Patient.name.exists()',
+    'Patient.birthDate <= today()'
+];
+
+$outcome = $validator->validateConstraints($patient, $constraints);</code></pre>
+        </div>
+    </section>
+
+    <!-- Exception Reference Section -->
+    <section class="api-section">
+        <h2 id="exceptions">Exception Reference</h2>
+        
+        <div class="exception-ref">
+            <h3>SerializationException</h3>
+            <p>Thrown when serialization of a FHIR resource fails.</p>
+            <pre><code class="language-php">namespace Ardenexal\FHIRTools\Component\Serialization\Exception;
+
+class SerializationException extends \RuntimeException
+{
+    public function getResource(): ?FHIRResourceInterface;
+    public function getFormat(): string; // 'json' or 'xml'
+}</code></pre>
+        </div>
+
+        <div class="exception-ref">
+            <h3>DeserializationException</h3>
+            <p>Thrown when deserialization of a FHIR resource fails.</p>
+            <pre><code class="language-php">namespace Ardenexal\FHIRTools\Component\Serialization\Exception;
+
+class DeserializationException extends \RuntimeException
+{
+    public function getInput(): string;
+    public function getResourceClass(): string;
+}</code></pre>
+        </div>
+
+        <div class="exception-ref">
+            <h3>ValidationException</h3>
+            <p>Thrown when FHIR resource validation fails.</p>
+            <pre><code class="language-php">namespace Ardenexal\FHIRTools\Component\Serialization\Exception;
+
+class ValidationException extends \RuntimeException
+{
+    public function getOperationOutcome(): OperationOutcome;
+    public function getResource(): ?FHIRResourceInterface;
+}</code></pre>
+        </div>
+
+        <div class="exception-ref">
+            <h3>FHIRPathException</h3>
+            <p>Thrown when FHIRPath evaluation fails.</p>
+            <pre><code class="language-php">namespace Ardenexal\FHIRTools\Component\FHIRPath\Exception;
+
+class FHIRPathException extends \RuntimeException
+{
+    public function getExpression(): string;
+    public function getResource(): ?FHIRResourceInterface;
+}</code></pre>
+        </div>
+    </section>
+</div>
+
+<style>
+.api-reference-page {
+    max-width: 1000px;
+}
+
+.api-section {
+    margin-bottom: var(--spacing-10);
+}
+
+.api-section h2 {
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-4);
+    padding-bottom: var(--spacing-2);
+    border-bottom: 2px solid var(--color-primary);
+}
+
+.api-method, .exception-ref {
+    background: var(--color-gray-50);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-5);
+    margin-bottom: var(--spacing-6);
+}
+
+.api-method h3, .exception-ref h3 {
+    color: var(--color-secondary);
+    margin-top: 0;
+    margin-bottom: var(--spacing-3);
+    font-family: 'Courier New', monospace;
+}
+
+.api-method h4 {
+    color: var(--color-gray-700);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    margin-top: var(--spacing-4);
+    margin-bottom: var(--spacing-2);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.api-method ul {
+    margin: 0;
+    padding-left: var(--spacing-5);
+}
+
+.api-method li {
+    margin-bottom: var(--spacing-2);
+}
+
+.api-method code {
+    background: var(--color-gray-100);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    font-size: 0.9em;
+}
+</style>
+
+<!-- Load Prism.js for syntax highlighting -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
