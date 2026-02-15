@@ -41,7 +41,7 @@ composer require ardenexal/fhir-bundle
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\HumanName;
 
-$patient = new PatientResource();
+$patient = new PatientResource(id: 'patient-123');
 ```
 
 ### R4B (4.3.0)
@@ -50,7 +50,7 @@ $patient = new PatientResource();
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\PatientResource;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\HumanName;
 
-$patient = new PatientResource();
+$patient = new PatientResource(id: 'patient-123');
 ```
 
 ### R5 (5.0.0)
@@ -59,7 +59,7 @@ $patient = new PatientResource();
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\PatientResource;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\HumanName;
 
-$patient = new PatientResource();
+$patient = new PatientResource(id: 'patient-123');
 ```
 
 ## Basic Usage
@@ -71,164 +71,183 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\HumanName;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactPoint;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Address;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\ValueSet\AdministrativeGenderType;
+use Ardenexal\FHIRTools\Component\Models\R4\ValueSet\NameUseType;
+use Ardenexal\FHIRTools\Component\Models\R4\ValueSet\ContactPointSystemType;
+use Ardenexal\FHIRTools\Component\Models\R4\ValueSet\ContactPointUseType;
+use Ardenexal\FHIRTools\Component\Models\R4\ValueSet\AddressUseType;
 
-// Create patient
-$patient = new PatientResource();
-$patient->setId('patient-123');
-$patient->setActive(true);
-$patient->setGender('male');
-$patient->setBirthDate('1980-01-15');
+// Create patient with constructor promoted properties
+$patient = new PatientResource(
+    id: 'patient-123',
+    active: true,
+    gender: new AdministrativeGenderType('male'),
+    birthDate: new DatePrimitive(value: '1980-01-15'),
+);
 
 // Add name
-$name = new HumanName();
-$name->setFamily('Doe');
-$name->setGiven(['John', 'Robert']);
-$name->setUse('official');
-$patient->addName($name);
+$patient->name[] = new HumanName(
+    use: new NameUseType('official'),
+    family: 'Doe',
+    given: ['John', 'Robert'],
+);
 
 // Add telecom
-$phone = new ContactPoint();
-$phone->setSystem('phone');
-$phone->setValue('+1-555-123-4567');
-$phone->setUse('home');
-$patient->addTelecom($phone);
+$patient->telecom[] = new ContactPoint(
+    system: new ContactPointSystemType('phone'),
+    value: '+1-555-123-4567',
+    use: new ContactPointUseType('home'),
+);
 
-$email = new ContactPoint();
-$email->setSystem('email');
-$email->setValue('john.doe@example.com');
-$patient->addTelecom($email);
+$patient->telecom[] = new ContactPoint(
+    system: new ContactPointSystemType('email'),
+    value: 'john.doe@example.com',
+);
 
 // Add address
-$address = new Address();
-$address->setUse('home');
-$address->setLine(['123 Main St', 'Apt 4B']);
-$address->setCity('Springfield');
-$address->setState('IL');
-$address->setPostalCode('62701');
-$address->setCountry('USA');
-$patient->addAddress($address);
+$patient->address[] = new Address(
+    use: new AddressUseType('home'),
+    line: ['123 Main St', 'Apt 4B'],
+    city: 'Springfield',
+    state: 'IL',
+    postalCode: '62701',
+    country: 'USA',
+);
 ```
 
 ### Creating an Observation
 
 ```php
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\ObservationResource;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\Observation\ObservationComponent;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\ValueSet\ObservationStatusType;
 
-$observation = new ObservationResource();
-$observation->setId('obs-123');
-$observation->setStatus('final');
+// Build the code (LOINC)
+$code = new CodeableConcept(
+    coding: [
+        new Coding(
+            system: new UriPrimitive(value: 'http://loinc.org'),
+            code: new CodePrimitive(value: '85354-9'),
+            display: 'Blood pressure panel',
+        ),
+    ],
+);
 
-// Set code (LOINC)
-$code = new CodeableConcept();
-$coding = new Coding();
-$coding->setSystem('http://loinc.org');
-$coding->setCode('85354-9');
-$coding->setDisplay('Blood pressure panel');
-$code->addCoding($coding);
-$observation->setCode($code);
+// Build systolic component
+$systolicComponent = new ObservationComponent(
+    code: new CodeableConcept(
+        coding: [
+            new Coding(
+                system: new UriPrimitive(value: 'http://loinc.org'),
+                code: new CodePrimitive(value: '8480-6'),
+                display: 'Systolic blood pressure',
+            ),
+        ],
+    ),
+    valueX: new Quantity(
+        value: 120,
+        unit: 'mmHg',
+        system: new UriPrimitive(value: 'http://unitsofmeasure.org'),
+        code: new CodePrimitive(value: 'mm[Hg]'),
+    ),
+);
 
-// Set subject reference
-$subject = new Reference();
-$subject->setReference('Patient/patient-123');
-$observation->setSubject($subject);
+// Build diastolic component
+$diastolicComponent = new ObservationComponent(
+    code: new CodeableConcept(
+        coding: [
+            new Coding(
+                system: new UriPrimitive(value: 'http://loinc.org'),
+                code: new CodePrimitive(value: '8462-4'),
+                display: 'Diastolic blood pressure',
+            ),
+        ],
+    ),
+    valueX: new Quantity(
+        value: 80,
+        unit: 'mmHg',
+        system: new UriPrimitive(value: 'http://unitsofmeasure.org'),
+        code: new CodePrimitive(value: 'mm[Hg]'),
+    ),
+);
 
-// Add systolic component
-$systolicComponent = new ObservationResource\ObservationComponent();
-$systolicCode = new CodeableConcept();
-$systolicCoding = new Coding();
-$systolicCoding->setSystem('http://loinc.org');
-$systolicCoding->setCode('8480-6');
-$systolicCoding->setDisplay('Systolic blood pressure');
-$systolicCode->addCoding($systolicCoding);
-$systolicComponent->setCode($systolicCode);
-
-$systolicValue = new Quantity();
-$systolicValue->setValue(120);
-$systolicValue->setUnit('mmHg');
-$systolicValue->setSystem('http://unitsofmeasure.org');
-$systolicValue->setCode('mm[Hg]');
-$systolicComponent->setValueQuantity($systolicValue);
-
-$observation->addComponent($systolicComponent);
-
-// Add diastolic component
-$diastolicComponent = new ObservationResource\ObservationComponent();
-$diastolicCode = new CodeableConcept();
-$diastolicCoding = new Coding();
-$diastolicCoding->setSystem('http://loinc.org');
-$diastolicCoding->setCode('8462-4');
-$diastolicCoding->setDisplay('Diastolic blood pressure');
-$diastolicCode->addCoding($diastolicCoding);
-$diastolicComponent->setCode($diastolicCode);
-
-$diastolicValue = new Quantity();
-$diastolicValue->setValue(80);
-$diastolicValue->setUnit('mmHg');
-$diastolicValue->setSystem('http://unitsofmeasure.org');
-$diastolicValue->setCode('mm[Hg]');
-$diastolicComponent->setValueQuantity($diastolicValue);
-
-$observation->addComponent($diastolicComponent);
+// Create observation with all parts composed together
+$observation = new ObservationResource(
+    id: 'obs-123',
+    status: new ObservationStatusType('final'),
+    code: $code,
+    subject: new Reference(reference: 'Patient/patient-123'),
+    component: [$systolicComponent, $diastolicComponent],
+);
 ```
 
 ## Property Access
 
-### Getters and Setters
+### Property Access
+
+All model properties are public constructor promoted properties. Read and write them directly:
 
 ```php
-// Set properties
-$patient->setActive(true);
-$patient->setGender('female');
+// Read properties directly
+$isActive = $patient->active;   // bool(true)
+$gender = $patient->gender;     // AdministrativeGenderType
 
-// Get properties
-$isActive = $patient->getActive();  // bool(true)
-$gender = $patient->getGender();    // string("female")
+// Assign properties directly
+$patient->active = false;
+$patient->id = 'new-id';
 ```
 
 ### Collections
 
 ```php
-// Add to collections
-$patient->addName($name1);
-$patient->addName($name2);
+// Add to collections using array push
+$patient->name[] = $name1;
+$patient->name[] = $name2;
 
-// Get collection
-$names = $patient->getName();  // array of HumanName
+// Read collection directly
+$names = $patient->name;  // array of HumanName
 
 // Iterate collection
-foreach ($patient->getName() as $name) {
-    echo $name->getFamily() . "\n";
+foreach ($patient->name as $name) {
+    echo $name->family . "\n";
 }
 ```
 
 ### Nested Properties
 
 ```php
-// Access nested properties
-$familyName = $patient->getName()[0]->getFamily();
-$city = $patient->getAddress()[0]->getCity();
+// Access nested properties directly
+$familyName = $patient->name[0]->family;
+$city = $patient->address[0]->city;
 
 // Safe navigation with null checks
-$family = $patient->getName()[0]?->getFamily() ?? 'Unknown';
+$family = $patient->name[0]?->family ?? 'Unknown';
 ```
 
 ## Type Safety
 
-All models use strict types:
+All models use strict types via constructor promoted properties:
 
 ```php
 declare(strict_types=1);
 
 // Type errors are caught at runtime
-$patient->setActive(true);     // OK
-$patient->setActive('true');   // TypeError
+$patient = new PatientResource(active: true);       // OK
+$patient = new PatientResource(active: 'true');     // TypeError
 
-$patient->setBirthDate('1980-01-15');  // OK
-$patient->setBirthDate(new DateTime());  // TypeError
+$patient = new PatientResource(
+    birthDate: new DatePrimitive(value: '1980-01-15'),  // OK
+);
+$patient = new PatientResource(
+    birthDate: new \DateTime(),                          // TypeError
+);
 ```
 
 ## Validation
@@ -267,7 +286,7 @@ $json = $serializer->serialize($patient);
 $patient = $serializer->deserialize($json, 'Patient');
 
 // The returned object is a fully-typed Patient model
-$name = $patient->getName()[0]->getFamily();  // Type-safe
+$name = $patient->name[0]->family;  // Type-safe
 ```
 
 ## Resource Types
@@ -357,16 +376,15 @@ php bin/console fhir:generate-models R4
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 
 // Add extension to patient
-$extension = new Extension();
-$extension->setUrl('http://example.org/fhir/StructureDefinition/race');
-$extension->setValueString('Asian');
-
-$patient->addExtension($extension);
+$patient->extension[] = new Extension(
+    url: 'http://example.org/fhir/StructureDefinition/race',
+    valueX: 'Asian',
+);
 
 // Access extensions
-foreach ($patient->getExtension() as $ext) {
-    if ($ext->getUrl() === 'http://example.org/fhir/StructureDefinition/race') {
-        $race = $ext->getValueString();
+foreach ($patient->extension as $ext) {
+    if ($ext->url === 'http://example.org/fhir/StructureDefinition/race') {
+        $race = $ext->valueX;
     }
 }
 ```
@@ -374,30 +392,31 @@ foreach ($patient->getExtension() as $ext) {
 ### Contained Resources
 
 ```php
-// Add contained resource
-$practitioner = new PractitionerResource();
-$practitioner->setId('pract-1');
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\PractitionerResource;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+
+// Create contained resource
+$practitioner = new PractitionerResource(id: 'pract-1');
 // ... set practitioner properties
 
-$observation->addContained($practitioner);
+$observation->contained[] = $practitioner;
 
 // Reference contained resource
-$performer = new Reference();
-$performer->setReference('#pract-1');
-$observation->addPerformer($performer);
+$observation->performer[] = new Reference(reference: '#pract-1');
 ```
 
 ### Meta Information
 
 ```php
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IdPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\InstantPrimitive;
 
-$meta = new Meta();
-$meta->setVersionId('1');
-$meta->setLastUpdated('2024-01-15T10:30:00Z');
-$meta->addProfile('http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient');
-
-$patient->setMeta($meta);
+$patient->meta = new Meta(
+    versionId: new IdPrimitive(value: '1'),
+    lastUpdated: new InstantPrimitive(value: '2024-01-15T10:30:00Z'),
+    profile: ['http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient'],
+);
 ```
 
 ## IDE Support
@@ -417,12 +436,11 @@ Models provide full IDE auto-completion:
 Models are designed for efficiency:
 
 ```php
-// Create on demand
-$patient = new PatientResource();
-$patient->setId('123');  // Only ID is stored in memory
+// Create with only the properties you need
+$patient = new PatientResource(id: '123');  // Only ID is stored in memory
 
-// Collections are lazy-loaded
-$patient->addName($name);  // Added to internal array
+// Add to collections as needed
+$patient->name[] = $name;  // Added to internal array
 ```
 
 ### Cloning
@@ -432,7 +450,7 @@ $patient->addName($name);  // Added to internal array
 $patientCopy = clone $patient;
 
 // Modify copy without affecting original
-$patientCopy->setActive(false);
+$patientCopy->active = false;
 ```
 
 ## Next Steps

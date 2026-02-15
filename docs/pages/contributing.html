@@ -149,8 +149,7 @@ class FHIRSerializationServiceTest extends TestCase
 
     public function testSerializePatientToJson(): void
     {
-        $patient = new PatientResource();
-        $patient->setId('test-123');
+        $patient = new PatientResource(id: 'test-123');
         
         $json = $this->serializer->serializeToJson($patient);
         
@@ -176,8 +175,8 @@ class FHIRSerializationServiceTest extends TestCase
     $json = $this->serializer->serializeToJson($original);
     $deserialized = $this->serializer->deserializeFromJson($json, PatientResource::class);
     
-    self::assertEquals($original->getId(), $deserialized->getId());
-    self::assertEquals($original->getName()[0]->getFamily(), $deserialized->getName()[0]->getFamily());
+    self::assertEquals($original->id, $deserialized->id);
+    self::assertEquals($original->name[0]->family, $deserialized->name[0]->family);
 }</code></pre>
     </section>
 

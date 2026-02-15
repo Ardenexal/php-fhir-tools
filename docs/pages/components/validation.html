@@ -99,7 +99,7 @@ Custom validation rules:
 ```php
 // Planned API
 $validator->addRule('age-check', function($patient) {
-    $birthDate = new DateTime($patient->getBirthDate());
+    $birthDate = new DateTime($patient->birthDate);
     $age = $birthDate->diff(new DateTime())->y;
     return $age >= 18;
 }, 'Patient must be 18 or older');
@@ -242,15 +242,15 @@ $result = $schemaValidator->validate($resource);
 ```php
 function validatePatient($patient): array {
     $errors = [];
-    
-    if (empty($patient->getName())) {
+
+    if (empty($patient->name)) {
         $errors[] = 'Patient must have at least one name';
     }
-    
-    if (empty($patient->getId())) {
+
+    if (empty($patient->id)) {
         $errors[] = 'Patient must have an ID';
     }
-    
+
     return $errors;
 }
 ```

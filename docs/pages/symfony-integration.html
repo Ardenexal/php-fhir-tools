@@ -87,7 +87,7 @@ class PatientController extends AbstractController
         // Validate and save patient...
         
         return $this->json([
-            'id' => $patient->getId(),
+            'id' => $patient->id,
             'status' => 'created'
         ]);
     }
@@ -170,7 +170,7 @@ class FHIRController extends AbstractController
             PatientResource::class
         );
 
-        $patient->setId($id);
+        $patient->id = $id;
         $this->patientRepository->save($patient);
         
         return $this->json($patient);
@@ -221,7 +221,7 @@ class PatientFormController extends AbstractController
                 $this->patientRepository->save($validated);
                 
                 $this->addFlash('success', 'Patient created successfully');
-                return $this->redirectToRoute('patient_view', ['id' => $validated->getId()]);
+                return $this->redirectToRoute('patient_view', ['id' => $validated->id]);
             } catch (ValidationException $e) {
                 $this->addFlash('error', 'Validation failed: ' . $e->getMessage());
             }
@@ -259,24 +259,23 @@ class FHIRImportController extends AbstractController
             $imported = 0;
             $errors = [];
             
-            foreach ($bundle->getEntry() as $entry) {
-                $resource = $entry->getResource();
-                $resourceType = $resource->getResourceType();
-                
+            foreach ($bundle->entry as $entry) {
+                $resource = $entry->resource;
+
                 try {
-                    $this->processResource($resourceType, $resource);
+                    $this->processResource($resource);
                     $imported++;
                 } catch (\Exception $e) {
                     $errors[] = [
-                        'resourceType' => $resourceType,
+                        'resource' => $resource::class,
                         'error' => $e->getMessage()
                     ];
                 }
             }
-            
+
             return $this->json([
                 'imported' => $imported,
-                'total' => count($bundle->getEntry()),
+                'total' => count($bundle->entry),
                 'errors' => $errors
             ]);
         } catch (ValidationException $e) {
@@ -315,7 +314,7 @@ class FHIRValidationSubscriber implements EventSubscriberInterface
         
         // Custom validation logic
         if ($resource instanceof PatientResource) {
-            if (!$resource->getName()) {
+            if (empty($resource->name)) {
                 throw new ValidationException('Patient must have at least one name');
             }
         }
@@ -327,8 +326,8 @@ class FHIRValidationSubscriber implements EventSubscriberInterface
         
         // Log deserialization
         $this->logger->info('Deserialized resource', [
-            'type' => $resource->getResourceType(),
-            'id' => $resource->getId()
+            'type' => $resource::class,
+            'id' => $resource->id
         ]);
     }
 }</code></pre>
@@ -445,8 +444,8 @@ class PatientServiceTest extends TestCase
         $patient = $this->patientService->createFromJson($json);
         
         $this->assertInstanceOf(PatientResource::class, $patient);
-        $this->assertEquals('Smith', $patient->getName()[0]->getFamily());
-        $this->assertEquals('male', $patient->getGender());
+        $this->assertEquals('Smith', $patient->name[0]->family);
+        $this->assertEquals('male', (string) $patient->gender);
     }
     
     public function testValidationFailure(): void
@@ -592,12 +591,12 @@ class FHIRControllerTest extends WebTestCase
             
         } catch (ValidationException $e) {
             $outcome = $e->getOperationOutcome();
-            foreach ($outcome->getIssue() as $issue) {
+            foreach ($outcome->issue as $issue) {
                 $issues[] = [
-                    'severity' => $issue->getSeverity(),
-                    'code' => $issue->getCode(),
-                    'details' => $issue->getDetails()->getText(),
-                    'expression' => $issue->getExpression()
+                    'severity' => $issue->severity,
+                    'code' => $issue->code,
+                    'details' => $issue->details->text,
+                    'expression' => $issue->expression
                 ];
             }
         }

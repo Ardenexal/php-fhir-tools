@@ -280,9 +280,10 @@ echo $json;</code></pre>
             <h4>Example:</h4>
             <pre><code class="language-php">$outcome = $validator->validate($patient);
 
-if ($outcome->hasErrors()) {
-    foreach ($outcome->getIssue() as $issue) {
-        echo $issue->getSeverity() . ': ' . $issue->getDetails()->getText();
+$errors = array_filter($outcome->issue, fn($issue) => (string) $issue->severity === 'error');
+if (!empty($errors)) {
+    foreach ($outcome->issue as $issue) {
+        echo $issue->severity . ': ' . $issue->details->text;
     }
 }</code></pre>
         </div>

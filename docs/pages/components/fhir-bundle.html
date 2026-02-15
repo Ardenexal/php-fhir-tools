@@ -83,8 +83,8 @@ class PatientController extends AbstractController
         $patient = $this->serializer->deserialize($json, 'Patient');
         
         // Work with the patient object
-        $patient->setActive(true);
-        
+        $patient->active = true;
+
         // Serialize back to JSON
         $output = $this->serializer->serialize($patient);
         
@@ -191,7 +191,7 @@ class FHIREventSubscriber implements EventSubscriberInterface
         $format = $event->getFormat();
         
         // Custom logic after serialization
-        $this->logger->info('Serialized ' . $resource->getResourceType());
+        $this->logger->info('Serialized ' . $resource->resourceType);
     }
 }
 ```
