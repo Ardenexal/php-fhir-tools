@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>WASM Demo Test Harness</title>
+</head>
+<body>
+    <h1 id="status">Loading...</h1>
+    <pre id="output"></pre>
+
+    <script type="module">
+        import { PHPWasmLoader } from './assets/js/php-wasm/loader.js';
+        import { FHIRPHPClient } from './assets/js/php-wasm/fhir-client.js';
+
+        // Expose for Playwright
+        window.__testLoader = new PHPWasmLoader();
+        window.__testClient = new FHIRPHPClient();
+        window.__testReady = false;
+        window.__testErrors = [];
+
+        document.getElementById('status').textContent = 'Modules loaded';
+        window.__testReady = true;
+    </script>
+</body>
+</html>
