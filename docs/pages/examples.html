@@ -37,19 +37,22 @@ permalink: /pages/examples/
         
         <h3>Simple Patient</h3>
         <p>Create a basic patient resource with minimal required fields:</p>
-        <pre><code class="language-php">use Ardenexal\Component\Models\R4\Resource\Patient\FHIRPatient;
-use Ardenexal\Component\Models\R4\DataType\FHIRHumanName;
+        <pre><code class="language-php">use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\HumanName;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Type\AdministrativeGenderType;
 
-$patient = new FHIRPatient();
-$patient->setId('example-simple');
-
-$name = new FHIRHumanName();
-$name->setFamily('Smith');
-$name->setGiven(['John']);
-$patient->addName($name);
-
-$patient->setGender('male');
-$patient->setBirthDate('1974-12-25');
+$patient = new PatientResource(
+    id: 'example-simple',
+    name: [
+        new HumanName(
+            family: 'Smith',
+            given: ['John'],
+        ),
+    ],
+    gender: new AdministrativeGenderType('male'),
+    birthDate: new DatePrimitive(value: '1974-12-25'),
+);
 
 // Serialize to JSON
 $serializer = new FHIRSerializationService();
@@ -58,44 +61,56 @@ echo $json;</code></pre>
 
         <h3>Complex Patient with Full Demographics</h3>
         <p>Create a patient with complete demographic information:</p>
-        <pre><code class="language-php">$patient = new FHIRPatient();
-$patient->setId('example-complex');
-$patient->setActive(true);
+        <pre><code class="language-php">use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactPoint;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Address;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Type\IdentifierUseType;
+use Ardenexal\FHIRTools\Component\Models\R4\Type\ContactPointSystemType;
+use Ardenexal\FHIRTools\Component\Models\R4\Type\ContactPointUseType;
+use Ardenexal\FHIRTools\Component\Models\R4\Type\NameUseType;
+use Ardenexal\FHIRTools\Component\Models\R4\Type\AddressUseType;
 
-// Add multiple names
-$officialName = new FHIRHumanName();
-$officialName->setUse('official');
-$officialName->setFamily('Smith');
-$officialName->setGiven(['John', 'Robert']);
-$officialName->setPrefix(['Mr.']);
-$patient->addName($officialName);
+// Build individual data types
+$officialName = new HumanName(
+    use: new NameUseType('official'),
+    family: 'Smith',
+    given: ['John', 'Robert'],
+    prefix: ['Mr.'],
+);
 
-// Add identifiers
-$mrn = new FHIRIdentifier();
-$mrn->setSystem('http://hospital.example.org/patients');
-$mrn->setValue('MRN-123456');
-$mrn->setUse('official');
-$patient->addIdentifier($mrn);
+$mrn = new Identifier(
+    use: new IdentifierUseType('official'),
+    system: new UriPrimitive(value: 'http://hospital.example.org/patients'),
+    value: 'MRN-123456',
+);
 
-// Add telecom
-$phone = new FHIRContactPoint();
-$phone->setSystem('phone');
-$phone->setValue('+1-555-123-4567');
-$phone->setUse('home');
-$patient->addTelecom($phone);
+$phone = new ContactPoint(
+    system: new ContactPointSystemType('phone'),
+    value: '+1-555-123-4567',
+    use: new ContactPointUseType('home'),
+);
 
-// Add address
-$address = new FHIRAddress();
-$address->setUse('home');
-$address->setLine(['123 Main St', 'Apt 4B']);
-$address->setCity('Springfield');
-$address->setState('IL');
-$address->setPostalCode('62701');
-$address->setCountry('US');
-$patient->addAddress($address);
+$address = new Address(
+    use: new AddressUseType('home'),
+    line: ['123 Main St', 'Apt 4B'],
+    city: 'Springfield',
+    state: 'IL',
+    postalCode: '62701',
+    country: 'US',
+);
 
-$patient->setGender('male');
-$patient->setBirthDate('1974-12-25');</code></pre>
+// Compose the patient resource
+$patient = new PatientResource(
+    id: 'example-complex',
+    active: true,
+    name: [$officialName],
+    identifier: [$mrn],
+    telecom: [$phone],
+    address: [$address],
+    gender: new AdministrativeGenderType('male'),
+    birthDate: new DatePrimitive(value: '1974-12-25'),
+);</code></pre>
     </section>
 
     <!-- Observation Examples -->
@@ -104,76 +119,90 @@ $patient->setBirthDate('1974-12-25');</code></pre>
         
         <h3>Blood Pressure Observation</h3>
         <p>Create a vital signs observation with multiple components:</p>
-        <pre><code class="language-php">use Ardenexal\Component\Models\R4\Resource\Observation\FHIRObservation;
-use Ardenexal\Component\Models\R4\DataType\FHIRCodeableConcept;
-use Ardenexal\Component\Models\R4\DataType\FHIRCoding;
-use Ardenexal\Component\Models\R4\Resource\Observation\FHIRObservationComponent;
+        <pre><code class="language-php">use Ardenexal\FHIRTools\Component\Models\R4\Resource\ObservationResource;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\Observation\ObservationComponent;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Type\ObservationStatusType;
 
-$observation = new FHIRObservation();
-$observation->setId('blood-pressure-example');
-$observation->setStatus('final');
+// Build category
+$category = new CodeableConcept(
+    coding: [
+        new Coding(
+            system: new UriPrimitive(value: 'http://terminology.hl7.org/CodeSystem/observation-category'),
+            code: new CodePrimitive(value: 'vital-signs'),
+            display: 'Vital Signs',
+        ),
+    ],
+);
 
-// Set category
-$category = new FHIRCodeableConcept();
-$categoryCoding = new FHIRCoding();
-$categoryCoding->setSystem('http://terminology.hl7.org/CodeSystem/observation-category');
-$categoryCoding->setCode('vital-signs');
-$categoryCoding->setDisplay('Vital Signs');
-$category->addCoding($categoryCoding);
-$observation->addCategory($category);
+// Build code (LOINC for Blood Pressure)
+$code = new CodeableConcept(
+    coding: [
+        new Coding(
+            system: new UriPrimitive(value: 'http://loinc.org'),
+            code: new CodePrimitive(value: '85354-9'),
+            display: 'Blood pressure panel',
+        ),
+    ],
+);
 
-// Set code (LOINC for Blood Pressure)
-$code = new FHIRCodeableConcept();
-$coding = new FHIRCoding();
-$coding->setSystem('http://loinc.org');
-$coding->setCode('85354-9');
-$coding->setDisplay('Blood pressure panel');
-$code->addCoding($coding);
-$observation->setCode($code);
+// Build systolic component
+$systolicValue = new Quantity(
+    value: 120,
+    unit: 'mmHg',
+    system: new UriPrimitive(value: 'http://unitsofmeasure.org'),
+    code: new CodePrimitive(value: 'mm[Hg]'),
+);
 
-// Add systolic component
-$systolic = new FHIRObservationComponent();
-$systolicCode = new FHIRCodeableConcept();
-$systolicCoding = new FHIRCoding();
-$systolicCoding->setSystem('http://loinc.org');
-$systolicCoding->setCode('8480-6');
-$systolicCoding->setDisplay('Systolic blood pressure');
-$systolicCode->addCoding($systolicCoding);
-$systolic->setCode($systolicCode);
+$systolic = new ObservationComponent(
+    code: new CodeableConcept(
+        coding: [
+            new Coding(
+                system: new UriPrimitive(value: 'http://loinc.org'),
+                code: new CodePrimitive(value: '8480-6'),
+                display: 'Systolic blood pressure',
+            ),
+        ],
+    ),
+    valueX: $systolicValue,
+);
 
-$systolicValue = new FHIRQuantity();
-$systolicValue->setValue(120);
-$systolicValue->setUnit('mmHg');
-$systolicValue->setSystem('http://unitsofmeasure.org');
-$systolicValue->setCode('mm[Hg]');
-$systolic->setValueQuantity($systolicValue);
-$observation->addComponent($systolic);
+// Build diastolic component
+$diastolicValue = new Quantity(
+    value: 80,
+    unit: 'mmHg',
+    system: new UriPrimitive(value: 'http://unitsofmeasure.org'),
+    code: new CodePrimitive(value: 'mm[Hg]'),
+);
 
-// Add diastolic component
-$diastolic = new FHIRObservationComponent();
-$diastolicCode = new FHIRCodeableConcept();
-$diastolicCoding = new FHIRCoding();
-$diastolicCoding->setSystem('http://loinc.org');
-$diastolicCoding->setCode('8462-4');
-$diastolicCoding->setDisplay('Diastolic blood pressure');
-$diastolicCode->addCoding($diastolicCoding);
-$diastolic->setCode($diastolicCode);
+$diastolic = new ObservationComponent(
+    code: new CodeableConcept(
+        coding: [
+            new Coding(
+                system: new UriPrimitive(value: 'http://loinc.org'),
+                code: new CodePrimitive(value: '8462-4'),
+                display: 'Diastolic blood pressure',
+            ),
+        ],
+    ),
+    valueX: $diastolicValue,
+);
 
-$diastolicValue = new FHIRQuantity();
-$diastolicValue->setValue(80);
-$diastolicValue->setUnit('mmHg');
-$diastolicValue->setSystem('http://unitsofmeasure.org');
-$diastolicValue->setCode('mm[Hg]');
-$diastolic->setValueQuantity($diastolicValue);
-$observation->addComponent($diastolic);
-
-// Set subject reference
-$subject = new FHIRReference();
-$subject->setReference('Patient/example-simple');
-$observation->setSubject($subject);
-
-// Set effective datetime
-$observation->setEffectiveDateTime('2024-01-15T10:30:00Z');</code></pre>
+// Compose the observation resource
+$observation = new ObservationResource(
+    id: 'blood-pressure-example',
+    status: new ObservationStatusType('final'),
+    category: [$category],
+    code: $code,
+    subject: new Reference(reference: 'Patient/example-simple'),
+    effectiveDateTime: '2024-01-15T10:30:00Z',
+    component: [$systolic, $diastolic],
+);</code></pre>
     </section>
 
     <!-- FHIRPath Examples -->
@@ -181,7 +210,7 @@ $observation->setEffectiveDateTime('2024-01-15T10:30:00Z');</code></pre>
         <h2>FHIRPath Evaluation</h2>
         
         <h3>Basic Expression Evaluation</h3>
-        <pre><code class="language-php">use Ardenexal\Component\FHIRPath\FHIRPathEvaluator;
+        <pre><code class="language-php">use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\FHIRPathEvaluator;
 
 $evaluator = new FHIRPathEvaluator();
 
@@ -233,59 +262,59 @@ $result = $evaluator->evaluate($patient,
         <h2>Bundle Creation and Processing</h2>
         
         <h3>Create Transaction Bundle</h3>
-        <pre><code class="language-php">use Ardenexal\Component\Models\R4\Resource\Bundle\FHIRBundle;
-use Ardenexal\Component\Models\R4\Resource\Bundle\FHIRBundleEntry;
-use Ardenexal\Component\Models\R4\Resource\Bundle\FHIRBundleEntryRequest;
+        <pre><code class="language-php">use Ardenexal\FHIRTools\Component\Models\R4\Resource\BundleResource;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\Bundle\BundleEntry;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\Bundle\BundleEntryRequest;
+use Ardenexal\FHIRTools\Component\Models\R4\Type\BundleTypeType;
+use Ardenexal\FHIRTools\Component\Models\R4\Type\HTTPVerbType;
 
-$bundle = new FHIRBundle();
-$bundle->setType('transaction');
+// Build patient entry
+$patientEntry = new BundleEntry(
+    fullUrl: 'urn:uuid:' . $this->generateUuid(),
+    resource: $patient,
+    request: new BundleEntryRequest(
+        method: new HTTPVerbType('POST'),
+        url: new UriPrimitive(value: 'Patient'),
+    ),
+);
 
-// Add patient entry
-$patientEntry = new FHIRBundleEntry();
-$patientEntry->setFullUrl('urn:uuid:' . $this->generateUuid());
-$patientEntry->setResource($patient);
+// Build observation entry
+$observationEntry = new BundleEntry(
+    fullUrl: 'urn:uuid:' . $this->generateUuid(),
+    resource: $observation,
+    request: new BundleEntryRequest(
+        method: new HTTPVerbType('POST'),
+        url: new UriPrimitive(value: 'Observation'),
+    ),
+);
 
-$patientRequest = new FHIRBundleEntryRequest();
-$patientRequest->setMethod('POST');
-$patientRequest->setUrl('Patient');
-$patientEntry->setRequest($patientRequest);
-
-$bundle->addEntry($patientEntry);
-
-// Add observation entry
-$observationEntry = new FHIRBundleEntry();
-$observationEntry->setFullUrl('urn:uuid:' . $this->generateUuid());
-$observationEntry->setResource($observation);
-
-$observationRequest = new FHIRBundleEntryRequest();
-$observationRequest->setMethod('POST');
-$observationRequest->setUrl('Observation');
-$observationEntry->setRequest($observationRequest);
-
-$bundle->addEntry($observationEntry);
+// Compose the bundle
+$bundle = new BundleResource(
+    type: new BundleTypeType('transaction'),
+    entry: [$patientEntry, $observationEntry],
+);
 
 // Serialize bundle
 $json = $serializer->serializeToJson($bundle);</code></pre>
 
         <h3>Process Bundle Entries</h3>
         <pre><code class="language-php">// Iterate through bundle entries
-foreach ($bundle->getEntry() as $entry) {
-    $resource = $entry->getResource();
-    $resourceType = $resource->getResourceType();
-    
-    echo "Processing {$resourceType}\n";
-    
-    if ($resourceType === 'Patient') {
+foreach ($bundle->entry as $entry) {
+    $resource = $entry->resource;
+
+    if ($resource instanceof PatientResource) {
+        echo "Processing Patient\n";
         $patient = $resource;
         // Process patient
-    } elseif ($resourceType === 'Observation') {
+    } elseif ($resource instanceof ObservationResource) {
+        echo "Processing Observation\n";
         $observation = $resource;
         // Process observation
     }
 }
 
 // Use FHIRPath to filter entries
-$patients = $evaluator->evaluate($bundle, 
+$patients = $evaluator->evaluate($bundle,
     "Bundle.entry.resource.ofType(Patient)"
 );
 
@@ -299,30 +328,30 @@ $observations = $evaluator->evaluate($bundle,
         <h2>Validation</h2>
         
         <h3>Strict Validation Mode</h3>
-        <pre><code class="language-php">use Ardenexal\Component\Serialization\FHIRSerializationService;
-use Ardenexal\Component\Serialization\ValidationMode;
+        <pre><code class="language-php">use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Serialization\ValidationMode;
 
 $serializer = new FHIRSerializationService();
 
 try {
     $patient = $serializer->deserializeFromJson(
         $json,
-        FHIRPatient::class,
+        PatientResource::class,
         ValidationMode::STRICT
     );
     echo "Validation passed!";
 } catch (ValidationException $e) {
     // Get OperationOutcome
     $outcome = $e->getOperationOutcome();
-    
-    foreach ($outcome->getIssue() as $issue) {
-        echo "Severity: " . $issue->getSeverity() . "\n";
-        echo "Code: " . $issue->getCode() . "\n";
-        echo "Details: " . $issue->getDetails()->getText() . "\n";
-        echo "Diagnostics: " . $issue->getDiagnostics() . "\n";
-        
-        if ($issue->getExpression()) {
-            echo "Location: " . implode(', ', $issue->getExpression()) . "\n";
+
+    foreach ($outcome->issue as $issue) {
+        echo "Severity: " . $issue->severity . "\n";
+        echo "Code: " . $issue->code . "\n";
+        echo "Details: " . $issue->details->text . "\n";
+        echo "Diagnostics: " . $issue->diagnostics . "\n";
+
+        if ($issue->expression) {
+            echo "Location: " . implode(', ', $issue->expression) . "\n";
         }
     }
 }</code></pre>
@@ -331,7 +360,7 @@ try {
         <pre><code class="language-php">// Lenient mode allows some non-critical errors
 $patient = $serializer->deserializeFromJson(
     $json,
-    FHIRPatient::class,
+    PatientResource::class,
     ValidationMode::LENIENT
 );
 

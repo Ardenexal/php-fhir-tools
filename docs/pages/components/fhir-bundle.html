@@ -32,7 +32,7 @@ The bundle is automatically registered in Symfony Flex projects. For manual regi
 // config/bundles.php
 return [
     // ... other bundles
-    Ardenexal\FHIRBundle\FHIRBundle::class => ['all' => true],
+    Ardenexal\FHIRTools\Bundle\FHIRBundle\FHIRBundle::class => ['all' => true],
 ];
 ```
 
@@ -67,7 +67,7 @@ fhir:
 Inject and use the serialization service:
 
 ```php
-use Ardenexal\FHIRBundle\Service\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 
 class PatientController extends AbstractController
 {
@@ -83,8 +83,8 @@ class PatientController extends AbstractController
         $patient = $this->serializer->deserialize($json, 'Patient');
         
         // Work with the patient object
-        $patient->setActive(true);
-        
+        $patient->active = true;
+
         // Serialize back to JSON
         $output = $this->serializer->serialize($patient);
         
@@ -98,7 +98,7 @@ class PatientController extends AbstractController
 Use FHIRPath expressions for data extraction:
 
 ```php
-use Ardenexal\FHIRBundle\Service\FHIRPathEvaluator;
+use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\FHIRPathEvaluator;
 
 class ObservationController extends AbstractController
 {
@@ -126,7 +126,7 @@ class ObservationController extends AbstractController
 Generate FHIR model classes:
 
 ```php
-use Ardenexal\FHIRBundle\Service\FHIRModelGenerator;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator;
 
 class GenerateCommand extends Command
 {
@@ -152,9 +152,9 @@ class GenerateCommand extends Command
 All services are auto-configured and ready for injection:
 
 ```php
-use Ardenexal\FHIRBundle\Service\FHIRSerializationService;
-use Ardenexal\FHIRBundle\Service\FHIRPathEvaluator;
-use Ardenexal\FHIRBundle\Service\FHIRModelGenerator;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\FHIRPathEvaluator;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator;
 
 class FHIRService
 {
@@ -173,7 +173,7 @@ class FHIRService
 Listen to FHIR-related events:
 
 ```php
-use Ardenexal\FHIRBundle\Event\ResourceSerializedEvent;
+use Ardenexal\FHIRTools\Bundle\FHIRBundle\Event\ResourceSerializedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class FHIREventSubscriber implements EventSubscriberInterface
@@ -191,7 +191,7 @@ class FHIREventSubscriber implements EventSubscriberInterface
         $format = $event->getFormat();
         
         // Custom logic after serialization
-        $this->logger->info('Serialized ' . $resource->getResourceType());
+        $this->logger->info('Serialized ' . $resource->resourceType);
     }
 }
 ```
@@ -201,7 +201,7 @@ class FHIREventSubscriber implements EventSubscriberInterface
 The bundle provides test helpers:
 
 ```php
-use Ardenexal\FHIRBundle\Test\FHIRTestCase;
+use Ardenexal\FHIRTools\Bundle\FHIRBundle\Test\FHIRTestCase;
 
 class PatientSerializationTest extends FHIRTestCase
 {

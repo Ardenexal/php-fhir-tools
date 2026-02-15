@@ -20,7 +20,7 @@ permalink: /pages/symfony-integration/
         <pre><code class="language-php">// config/bundles.php
 return [
     // ... other bundles
-    Ardenexal\Bundle\FHIRBundle\FHIRBundle::class => ['all' => true],
+    Ardenexal\FHIRTools\Bundle\FHIRBundle\FHIRBundle::class => ['all' => true],
 ];</code></pre>
 
         <h3>3. Configure the Bundle</h3>
@@ -50,9 +50,9 @@ fhir:
         <h3>Constructor Injection (Recommended)</h3>
         <pre><code class="language-php">namespace App\Service;
 
-use Ardenexal\Component\Serialization\FHIRSerializationService;
-use Ardenexal\Component\FHIRPath\FHIRPathEvaluator;
-use Ardenexal\Component\Models\FHIRModelGenerator;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\FHIRPathEvaluator;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator;
 
 class PatientService
 {
@@ -64,7 +64,7 @@ class PatientService
     
     public function processPatient(string $json): void
     {
-        $patient = $this->serializer->deserializeFromJson($json, FHIRPatient::class);
+        $patient = $this->serializer->deserializeFromJson($json, PatientResource::class);
         $name = $this->evaluator->evaluate($patient, 'Patient.name.family');
         // Process patient...
     }
@@ -82,12 +82,12 @@ class PatientController extends AbstractController
         FHIRSerializationService $serializer
     ): Response {
         $json = $request->getContent();
-        $patient = $serializer->deserializeFromJson($json, FHIRPatient::class);
-        
+        $patient = $serializer->deserializeFromJson($json, PatientResource::class);
+
         // Validate and save patient...
         
         return $this->json([
-            'id' => $patient->getId(),
+            'id' => $patient->id,
             'status' => 'created'
         ]);
     }
@@ -105,7 +105,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Ardenexal\Component\Serialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 
 #[Route('/api/fhir')]
 class FHIRController extends AbstractController
@@ -121,9 +121,9 @@ class FHIRController extends AbstractController
             $json = $request->getContent();
             $patient = $this->serializer->deserializeFromJson(
                 $json,
-                FHIRPatient::class
+                PatientResource::class
             );
-            
+
             // Persist patient to database
             $this->patientRepository->save($patient);
             
@@ -167,10 +167,10 @@ class FHIRController extends AbstractController
         $json = $request->getContent();
         $patient = $this->serializer->deserializeFromJson(
             $json,
-            FHIRPatient::class
+            PatientResource::class
         );
-        
-        $patient->setId($id);
+
+        $patient->id = $id;
         $this->patientRepository->save($patient);
         
         return $this->json($patient);
@@ -215,13 +215,13 @@ class PatientFormController extends AbstractController
             // Validate using FHIR serializer
             try {
                 $json = $serializer->serializeToJson($patient);
-                $validated = $serializer->deserializeFromJson($json, FHIRPatient::class);
+                $validated = $serializer->deserializeFromJson($json, PatientResource::class);
                 
                 // Save to database
                 $this->patientRepository->save($validated);
                 
                 $this->addFlash('success', 'Patient created successfully');
-                return $this->redirectToRoute('patient_view', ['id' => $validated->getId()]);
+                return $this->redirectToRoute('patient_view', ['id' => $validated->id]);
             } catch (ValidationException $e) {
                 $this->addFlash('error', 'Validation failed: ' . $e->getMessage());
             }
@@ -254,29 +254,28 @@ class FHIRImportController extends AbstractController
         $json = file_get_contents($file->getPathname());
         
         try {
-            $bundle = $this->serializer->deserializeFromJson($json, FHIRBundle::class);
+            $bundle = $this->serializer->deserializeFromJson($json, BundleResource::class);
             
             $imported = 0;
             $errors = [];
             
-            foreach ($bundle->getEntry() as $entry) {
-                $resource = $entry->getResource();
-                $resourceType = $resource->getResourceType();
-                
+            foreach ($bundle->entry as $entry) {
+                $resource = $entry->resource;
+
                 try {
-                    $this->processResource($resourceType, $resource);
+                    $this->processResource($resource);
                     $imported++;
                 } catch (\Exception $e) {
                     $errors[] = [
-                        'resourceType' => $resourceType,
+                        'resource' => $resource::class,
                         'error' => $e->getMessage()
                     ];
                 }
             }
-            
+
             return $this->json([
                 'imported' => $imported,
-                'total' => count($bundle->getEntry()),
+                'total' => count($bundle->entry),
                 'errors' => $errors
             ]);
         } catch (ValidationException $e) {
@@ -296,7 +295,7 @@ class FHIRImportController extends AbstractController
         <h3>FHIR Resource Validation Event</h3>
         <pre><code class="language-php">namespace App\EventSubscriber;
 
-use Ardenexal\Bundle\FHIRBundle\Event\FHIRResourceEvent;
+use Ardenexal\FHIRTools\Bundle\FHIRBundle\Event\FHIRResourceEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class FHIRValidationSubscriber implements EventSubscriberInterface
@@ -314,8 +313,8 @@ class FHIRValidationSubscriber implements EventSubscriberInterface
         $resource = $event->getResource();
         
         // Custom validation logic
-        if ($resource instanceof FHIRPatient) {
-            if (!$resource->getName()) {
+        if ($resource instanceof PatientResource) {
+            if (empty($resource->name)) {
                 throw new ValidationException('Patient must have at least one name');
             }
         }
@@ -327,8 +326,8 @@ class FHIRValidationSubscriber implements EventSubscriberInterface
         
         // Log deserialization
         $this->logger->info('Deserialized resource', [
-            'type' => $resource->getResourceType(),
-            'id' => $resource->getId()
+            'type' => $resource::class,
+            'id' => $resource->id
         ]);
     }
 }</code></pre>
@@ -382,7 +381,7 @@ class FHIRAuditSubscriber implements EventSubscriberInterface
 
         <h3>Error Handling Subscriber</h3>
         <pre><code class="language-php">use Symfony\Component\HttpKernel\Event\ExceptionEvent;
-use Ardenexal\Component\Serialization\Exception\ValidationException;
+use Ardenexal\FHIRTools\Component\Serialization\Exception\ValidationException;
 
 class FHIRExceptionSubscriber implements EventSubscriberInterface
 {
@@ -417,7 +416,7 @@ class FHIRExceptionSubscriber implements EventSubscriberInterface
         <pre><code class="language-php">namespace App\Tests\Service;
 
 use PHPUnit\Framework\TestCase;
-use Ardenexal\Component\Serialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 
 class PatientServiceTest extends TestCase
 {
@@ -444,9 +443,9 @@ class PatientServiceTest extends TestCase
         
         $patient = $this->patientService->createFromJson($json);
         
-        $this->assertInstanceOf(FHIRPatient::class, $patient);
-        $this->assertEquals('Smith', $patient->getName()[0]->getFamily());
-        $this->assertEquals('male', $patient->getGender());
+        $this->assertInstanceOf(PatientResource::class, $patient);
+        $this->assertEquals('Smith', $patient->name[0]->family);
+        $this->assertEquals('male', (string) $patient->gender);
     }
     
     public function testValidationFailure(): void
@@ -540,7 +539,7 @@ class FHIRControllerTest extends WebTestCase
         private readonly HttpClientInterface $httpClient
     ) {}
     
-    public function syncPatientToEHR(FHIRPatient $patient): void
+    public function syncPatientToEHR(PatientResource $patient): void
     {
         // Serialize patient to JSON
         $json = $this->serializer->serializeToJson($patient);
@@ -559,7 +558,7 @@ class FHIRControllerTest extends WebTestCase
         }
     }
     
-    public function fetchPatientFromEHR(string $patientId): FHIRPatient
+    public function fetchPatientFromEHR(string $patientId): PatientResource
     {
         $response = $this->httpClient->request('GET',
             "https://ehr-system.example.com/api/fhir/Patient/{$patientId}",
@@ -568,7 +567,7 @@ class FHIRControllerTest extends WebTestCase
         
         return $this->serializer->deserializeFromJson(
             $response->getContent(),
-            FHIRPatient::class
+            PatientResource::class
         );
     }
 }</code></pre>
@@ -592,12 +591,12 @@ class FHIRControllerTest extends WebTestCase
             
         } catch (ValidationException $e) {
             $outcome = $e->getOperationOutcome();
-            foreach ($outcome->getIssue() as $issue) {
+            foreach ($outcome->issue as $issue) {
                 $issues[] = [
-                    'severity' => $issue->getSeverity(),
-                    'code' => $issue->getCode(),
-                    'details' => $issue->getDetails()->getText(),
-                    'expression' => $issue->getExpression()
+                    'severity' => $issue->severity,
+                    'code' => $issue->code,
+                    'details' => $issue->details->text,
+                    'expression' => $issue->expression
                 ];
             }
         }

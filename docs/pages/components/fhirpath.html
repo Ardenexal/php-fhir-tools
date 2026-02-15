@@ -37,7 +37,7 @@ composer require ardenexal/fhir-bundle
 ### Simple Value Extraction
 
 ```php
-use Ardenexal\FHIRPath\FHIRPathEvaluator;
+use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\FHIRPathEvaluator;
 
 $evaluator = new FHIRPathEvaluator();
 
@@ -365,7 +365,7 @@ try {
 ## Symfony Integration
 
 ```php
-use Ardenexal\FHIRBundle\Service\FHIRPathEvaluator;
+use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\FHIRPathEvaluator;
 
 class ObservationService
 {

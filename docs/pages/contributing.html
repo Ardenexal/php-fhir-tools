@@ -84,11 +84,11 @@ composer run qa</code></pre>
         <p>Always use strict type declarations at the top of every PHP file:</p>
         <pre><code class="language-php">declare(strict_types=1);
 
-namespace Ardenexal\Component\YourComponent;</code></pre>
+namespace Ardenexal\FHIRTools\Component\YourComponent;</code></pre>
 
         <h3>Type Hints</h3>
         <p>Always use type hints for parameters and return types:</p>
-        <pre><code class="language-php">public function process(FHIRPatient $patient, int $maxResults = 10): array
+        <pre><code class="language-php">public function process(PatientResource $patient, int $maxResults = 10): array
 {
     // ...
 }</code></pre>
@@ -133,10 +133,10 @@ throw new \Exception('Patient name is required');</code></pre>
         
         <h3>Unit Tests</h3>
         <p>All new features and bug fixes must include unit tests:</p>
-        <pre><code class="language-php">namespace Ardenexal\Tests\Unit\Component\Serialization;
+        <pre><code class="language-php">namespace Ardenexal\FHIRTools\Tests\Unit\Component\Serialization;
 
 use PHPUnit\Framework\TestCase;
-use Ardenexal\Component\Serialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 
 class FHIRSerializationServiceTest extends TestCase
 {
@@ -149,8 +149,7 @@ class FHIRSerializationServiceTest extends TestCase
 
     public function testSerializePatientToJson(): void
     {
-        $patient = new FHIRPatient();
-        $patient->setId('test-123');
+        $patient = new PatientResource(id: 'test-123');
         
         $json = $this->serializer->serializeToJson($patient);
         
@@ -174,10 +173,10 @@ class FHIRSerializationServiceTest extends TestCase
     $original = $this->createComplexPatient();
     
     $json = $this->serializer->serializeToJson($original);
-    $deserialized = $this->serializer->deserializeFromJson($json, FHIRPatient::class);
+    $deserialized = $this->serializer->deserializeFromJson($json, PatientResource::class);
     
-    self::assertEquals($original->getId(), $deserialized->getId());
-    self::assertEquals($original->getName()[0]->getFamily(), $deserialized->getName()[0]->getFamily());
+    self::assertEquals($original->id, $deserialized->id);
+    self::assertEquals($original->name[0]->family, $deserialized->name[0]->family);
 }</code></pre>
     </section>
 

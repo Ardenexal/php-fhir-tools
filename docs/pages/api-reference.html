@@ -58,7 +58,7 @@ echo $json;</code></pre>
             <h4>Example:</h4>
             <pre><code class="language-php">$patient = $serializer->deserializeFromJson(
     $json,
-    FHIRPatient::class,
+    PatientResource::class,
     ValidationMode::STRICT
 );</code></pre>
         </div>
@@ -98,7 +98,7 @@ echo $json;</code></pre>
             <h4>Returns:</h4>
             <p>FHIRResourceInterface - Deserialized FHIR resource</p>
             <h4>Example:</h4>
-            <pre><code class="language-php">$patient = $serializer->deserializeFromXml($xml, FHIRPatient::class);</code></pre>
+            <pre><code class="language-php">$patient = $serializer->deserializeFromXml($xml, PatientResource::class);</code></pre>
         </div>
     </section>
 
@@ -258,9 +258,9 @@ echo $json;</code></pre>
         </div>
     </section>
 
-    <!-- FHIRValidationService Section -->
+    <!-- FHIRValidator Section -->
     <section class="api-section">
-        <h2 id="validation-service">FHIRValidationService</h2>
+        <h2 id="validation-service">FHIRValidator</h2>
         <p>Service for validating FHIR resources against profiles and business rules.</p>
 
         <div class="api-method">
@@ -280,9 +280,10 @@ echo $json;</code></pre>
             <h4>Example:</h4>
             <pre><code class="language-php">$outcome = $validator->validate($patient);
 
-if ($outcome->hasErrors()) {
-    foreach ($outcome->getIssue() as $issue) {
-        echo $issue->getSeverity() . ': ' . $issue->getDetails()->getText();
+$errors = array_filter($outcome->issue, fn($issue) => (string) $issue->severity === 'error');
+if (!empty($errors)) {
+    foreach ($outcome->issue as $issue) {
+        echo $issue->severity . ': ' . $issue->details->text;
     }
 }</code></pre>
         </div>
@@ -339,7 +340,7 @@ $outcome = $validator->validateConstraints($patient, $constraints);</code></pre>
         <div class="exception-ref">
             <h3>SerializationException</h3>
             <p>Thrown when serialization of a FHIR resource fails.</p>
-            <pre><code class="language-php">namespace Ardenexal\Component\Serialization\Exception;
+            <pre><code class="language-php">namespace Ardenexal\FHIRTools\Component\Serialization\Exception;
 
 class SerializationException extends \RuntimeException
 {
@@ -351,7 +352,7 @@ class SerializationException extends \RuntimeException
         <div class="exception-ref">
             <h3>DeserializationException</h3>
             <p>Thrown when deserialization of a FHIR resource fails.</p>
-            <pre><code class="language-php">namespace Ardenexal\Component\Serialization\Exception;
+            <pre><code class="language-php">namespace Ardenexal\FHIRTools\Component\Serialization\Exception;
 
 class DeserializationException extends \RuntimeException
 {
@@ -363,7 +364,7 @@ class DeserializationException extends \RuntimeException
         <div class="exception-ref">
             <h3>ValidationException</h3>
             <p>Thrown when FHIR resource validation fails.</p>
-            <pre><code class="language-php">namespace Ardenexal\Component\Serialization\Exception;
+            <pre><code class="language-php">namespace Ardenexal\FHIRTools\Component\Serialization\Exception;
 
 class ValidationException extends \RuntimeException
 {
@@ -375,7 +376,7 @@ class ValidationException extends \RuntimeException
         <div class="exception-ref">
             <h3>FHIRPathException</h3>
             <p>Thrown when FHIRPath evaluation fails.</p>
-            <pre><code class="language-php">namespace Ardenexal\Component\FHIRPath\Exception;
+            <pre><code class="language-php">namespace Ardenexal\FHIRTools\Component\FHIRPath\Exception;
 
 class FHIRPathException extends \RuntimeException
 {

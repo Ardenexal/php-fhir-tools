@@ -40,20 +40,20 @@ composer require ardenexal/fhir-bundle
 Convert a FHIR resource object to JSON:
 
 ```php
-use Ardenexal\FHIRSerialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\HumanName;
 
 $serializer = new FHIRSerializationService();
 
 // Create a Patient resource
-$patient = new \Ardenexal\FHIRModels\R4\Resource\Patient();
-$patient->setId('patient-123');
-$patient->setActive(true);
-
-// Add name
-$name = new \Ardenexal\FHIRModels\R4\DataType\HumanName();
-$name->setFamily('Doe');
-$name->setGiven(['John']);
-$patient->addName($name);
+$patient = new PatientResource(
+    id: 'patient-123',
+    active: true,
+    name: [
+        new HumanName(family: 'Doe', given: ['John']),
+    ],
+);
 
 // Serialize to JSON
 $json = $serializer->serialize($patient);
@@ -88,9 +88,9 @@ $json = '{
 
 try {
     $patient = $serializer->deserialize($json, 'Patient');
-    
-    echo $patient->getName()[0]->getFamily();  // "Doe"
-    echo $patient->getActive();  // true
+
+    echo $patient->name[0]->family;  // "Doe"
+    echo $patient->active;  // true
 } catch (\Exception $e) {
     // Handle deserialization errors
     $error = json_decode($e->getMessage(), true);
@@ -140,7 +140,7 @@ $xml = '<?xml version="1.0" encoding="UTF-8"?>
 
 $patient = $serializer->deserializeFromXml($xml, 'Patient');
 
-echo $patient->getId();  // "patient-123"
+echo $patient->id;  // "patient-123"
 ```
 
 ## Validation Modes
@@ -260,7 +260,7 @@ fhir:
 Use via dependency injection:
 
 ```php
-use Ardenexal\FHIRBundle\Service\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 
 class PatientService
 {
@@ -282,18 +282,17 @@ class PatientService
 Serialize a FHIR Bundle with multiple resources:
 
 ```php
-$bundle = new \Ardenexal\FHIRModels\R4\Resource\Bundle();
-$bundle->setType('transaction');
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\BundleResource;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\Bundle\BundleEntry;
+use Ardenexal\FHIRTools\Component\Models\R4\ValueSet\BundleTypeType;
 
-// Add Patient entry
-$patientEntry = new \Ardenexal\FHIRModels\R4\Resource\Bundle\BundleEntry();
-$patientEntry->setResource($patient);
-$bundle->addEntry($patientEntry);
-
-// Add Observation entry
-$observationEntry = new \Ardenexal\FHIRModels\R4\Resource\Bundle\BundleEntry();
-$observationEntry->setResource($observation);
-$bundle->addEntry($observationEntry);
+$bundle = new BundleResource(
+    type: new BundleTypeType('transaction'),
+    entry: [
+        new BundleEntry(resource: $patient),
+        new BundleEntry(resource: $observation),
+    ],
+);
 
 // Serialize entire bundle
 $json = $serializer->serialize($bundle);
@@ -304,33 +303,40 @@ $json = $serializer->serialize($bundle);
 Work with complex nested structures:
 
 ```php
-$observation = new \Ardenexal\FHIRModels\R4\Resource\Observation();
-$observation->setStatus('final');
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\ObservationResource;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\Observation\ObservationComponent;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\ValueSet\ObservationStatusType;
 
-// Add code
-$code = new \Ardenexal\FHIRModels\R4\DataType\CodeableConcept();
-$coding = new \Ardenexal\FHIRModels\R4\DataType\Coding();
-$coding->setSystem('http://loinc.org');
-$coding->setCode('85354-9');
-$coding->setDisplay('Blood pressure');
-$code->addCoding($coding);
-$observation->setCode($code);
-
-// Add component (systolic)
-$component = new \Ardenexal\FHIRModels\R4\Resource\Observation\ObservationComponent();
-$componentCode = new \Ardenexal\FHIRModels\R4\DataType\CodeableConcept();
-$componentCoding = new \Ardenexal\FHIRModels\R4\DataType\Coding();
-$componentCoding->setSystem('http://loinc.org');
-$componentCoding->setCode('8480-6');
-$componentCode->addCoding($componentCoding);
-$component->setCode($componentCode);
-
-$value = new \Ardenexal\FHIRModels\R4\DataType\Quantity();
-$value->setValue(120);
-$value->setUnit('mmHg');
-$component->setValueQuantity($value);
-
-$observation->addComponent($component);
+$observation = new ObservationResource(
+    status: new ObservationStatusType('final'),
+    code: new CodeableConcept(
+        coding: [
+            new Coding(
+                system: new UriPrimitive(value: 'http://loinc.org'),
+                code: new CodePrimitive(value: '85354-9'),
+                display: 'Blood pressure',
+            ),
+        ],
+    ),
+    component: [
+        new ObservationComponent(
+            code: new CodeableConcept(
+                coding: [
+                    new Coding(
+                        system: new UriPrimitive(value: 'http://loinc.org'),
+                        code: new CodePrimitive(value: '8480-6'),
+                    ),
+                ],
+            ),
+            valueX: new Quantity(value: 120, unit: 'mmHg'),
+        ),
+    ],
+);
 
 // Serialize with all nested structures
 $json = $serializer->serialize($observation);
@@ -352,7 +358,7 @@ class CachedSerializationService
     
     public function serialize($resource): string
     {
-        $key = 'fhir_' . $resource->getResourceType() . '_' . $resource->getId();
+        $key = 'fhir_' . $resource->resourceType . '_' . $resource->id;
         
         return $this->cache->get($key, function () use ($resource) {
             return $this->serializer->serialize($resource);
@@ -374,14 +380,15 @@ foreach ($resources as $resource) {
 }
 
 // Or serialize as a Bundle for better performance
-$bundle = new Bundle();
-$bundle->setType('collection');
+$entries = array_map(
+    fn ($resource) => new BundleEntry(resource: $resource),
+    $resources,
+);
 
-foreach ($resources as $resource) {
-    $entry = new BundleEntry();
-    $entry->setResource($resource);
-    $bundle->addEntry($entry);
-}
+$bundle = new BundleResource(
+    type: new BundleTypeType('collection'),
+    entry: $entries,
+);
 
 $json = $serializer->serialize($bundle);  // Single serialization call
 ```
