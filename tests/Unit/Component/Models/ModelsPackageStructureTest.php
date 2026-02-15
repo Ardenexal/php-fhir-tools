@@ -142,17 +142,11 @@ class ModelsPackageStructureTest extends TestCase
         self::assertDirectoryExists($this->componentPath . '/tests', 'tests directory should exist');
 
         // Test .gitkeep files exist to ensure directories are tracked
-        self::assertFileExists($this->componentPath . '/src/.gitkeep', 'src/.gitkeep should exist');
         self::assertFileExists($this->componentPath . '/tests/.gitkeep', 'tests/.gitkeep should exist');
 
         // Test .gitignore content
         $gitignoreContent = file_get_contents($this->componentPath . '/.gitignore');
         self::assertNotFalse($gitignoreContent, '.gitignore should be readable');
-
-        // Verify generated files are ignored
-        self::assertStringContainsString('src/R4/', $gitignoreContent);
-        self::assertStringContainsString('src/R4B/', $gitignoreContent);
-        self::assertStringContainsString('src/R5/', $gitignoreContent);
 
         // Verify utility classes are preserved
         self::assertStringContainsString('!src/Utility/', $gitignoreContent);

@@ -14,3 +14,54 @@ services:
         arguments:
             $pathService: '@Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService'
         tags: ['console.command']
+
+    # Code Generation Services
+    Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator:
+        public: true
+
+    Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader:
+        public: true
+
+    Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector:
+        public: true
+
+    Ardenexal\FHIRTools\Component\CodeGeneration\Package\RetryHandler:
+        public: true
+
+    # Serialization Services
+    Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor: ~
+
+    Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface:
+        alias: 'Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor'
+
+    Ardenexal\FHIRTools\Component\Serialization\Validator\FHIRValidator:
+        public: true
+
+    Ardenexal\FHIRTools\Serialization\FHIRSerializationService:
+        public: true
+
+    # Top-level aliases for backward compatibility
+    Ardenexal\FHIRTools\FHIRModelGenerator:
+        alias: 'Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator'
+        public: true
+
+    Ardenexal\FHIRTools\Serialization\FHIRValidator:
+        alias: 'Ardenexal\FHIRTools\Component\Serialization\Validator\FHIRValidator'
+        public: true
+
+    # Named service aliases
+    fhir.model_generator:
+        alias: 'Ardenexal\FHIRTools\FHIRModelGenerator'
+        public: true
+
+    fhir.serialization_service:
+        alias: 'Ardenexal\FHIRTools\Serialization\FHIRSerializationService'
+        public: true
+
+    fhir.package_loader:
+        alias: 'Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader'
+        public: true
+
+    fhir.validator:
+        alias: 'Ardenexal\FHIRTools\Serialization\FHIRValidator'
+        public: true
