@@ -1,0 +1,711 @@
+---
+layout: default
+title: Model Explorer
+permalink: /demos/models/
+---
+
+<style>
+    .model-explorer {
+        padding: 2rem 0;
+    }
+
+    .explorer-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    .explorer-header h1 {
+        margin: 0;
+        font-size: 2rem;
+    }
+
+    .version-selector {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .version-selector label {
+        font-weight: 600;
+        color: var(--text-secondary);
+    }
+
+    .version-selector select {
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        font-size: 1rem;
+        background: white;
+        cursor: pointer;
+    }
+
+    .explorer-grid {
+        display: grid;
+        grid-template-columns: 280px 1fr 320px;
+        gap: 1.5rem;
+        min-height: 600px;
+    }
+
+    @media (max-width: 1200px) {
+        .explorer-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .property-inspector {
+            display: none;
+        }
+        
+        .property-inspector.active {
+            display: block;
+        }
+    }
+
+    /* Resource Browser Panel */
+    .resource-browser {
+        background: var(--bg-secondary);
+        border-radius: 8px;
+        padding: 1.5rem;
+        overflow-y: auto;
+        max-height: 800px;
+    }
+
+    .resource-browser h3 {
+        margin-top: 0;
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+    }
+
+    .search-box {
+        position: relative;
+        margin-bottom: 1rem;
+    }
+
+    .search-box input {
+        width: 100%;
+        padding: 0.75rem;
+        padding-right: 2.5rem;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        font-size: 0.95rem;
+    }
+
+    .search-box .clear-search {
+        position: absolute;
+        right: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: var(--text-secondary);
+        cursor: pointer;
+        font-size: 1.2rem;
+        display: none;
+    }
+
+    .search-box .clear-search.visible {
+        display: block;
+    }
+
+    .resource-count {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.75rem;
+    }
+
+    .resource-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .resource-list li {
+        padding: 0.75rem 1rem;
+        margin-bottom: 0.25rem;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.95rem;
+    }
+
+    .resource-list li:hover {
+        background: var(--bg-hover);
+    }
+
+    .resource-list li.active {
+        background: var(--primary-color);
+        color: white;
+        font-weight: 600;
+    }
+
+    .resource-list li.hidden {
+        display: none;
+    }
+
+    /* Resource Details Panel */
+    .resource-details {
+        background: white;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 2rem;
+        overflow-y: auto;
+        max-height: 800px;
+    }
+
+    .resource-details-empty {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--text-secondary);
+    }
+
+    .resource-details-empty p {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .resource-header {
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    .resource-header h2 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.8rem;
+        color: var(--primary-color);
+    }
+
+    .resource-description {
+        color: var(--text-secondary);
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+
+    .spec-link {
+        display: inline-block;
+        color: var(--primary-color);
+        text-decoration: none;
+        font-size: 0.95rem;
+        margin-top: 0.5rem;
+    }
+
+    .spec-link:hover {
+        text-decoration: underline;
+    }
+
+    .properties-section h3 {
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        font-size: 1.3rem;
+    }
+
+    .properties-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .properties-table th {
+        text-align: left;
+        padding: 0.75rem;
+        background: var(--bg-secondary);
+        border-bottom: 2px solid var(--border-color);
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+
+    .properties-table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 0.95rem;
+    }
+
+    .properties-table tr {
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .properties-table tr:hover {
+        background: var(--bg-hover);
+    }
+
+    .properties-table tr.active {
+        background: rgba(var(--primary-rgb), 0.1);
+    }
+
+    .property-name {
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .property-required {
+        color: var(--error-color);
+        font-weight: 600;
+        font-size: 0.8rem;
+        margin-left: 0.25rem;
+    }
+
+    .type-badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .type-badge.primitive {
+        background: #e3f2fd;
+        color: #1976d2;
+    }
+
+    .type-badge.complex {
+        background: #e8f5e9;
+        color: #388e3c;
+    }
+
+    .type-badge.reference {
+        background: #fff3e0;
+        color: #f57c00;
+    }
+
+    .cardinality {
+        font-family: monospace;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+
+    /* Property Inspector Panel */
+    .property-inspector {
+        background: var(--bg-secondary);
+        border-radius: 8px;
+        padding: 1.5rem;
+        overflow-y: auto;
+        max-height: 800px;
+    }
+
+    .property-inspector-empty {
+        text-align: center;
+        padding: 2rem 1rem;
+        color: var(--text-secondary);
+    }
+
+    .property-inspector h3 {
+        margin-top: 0;
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+    }
+
+    .inspector-section {
+        margin-bottom: 1.5rem;
+    }
+
+    .inspector-section h4 {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .inspector-value {
+        font-size: 1rem;
+        color: var(--text-primary);
+        line-height: 1.6;
+    }
+
+    .inspector-value code {
+        background: rgba(0, 0, 0, 0.05);
+        padding: 0.2rem 0.4rem;
+        border-radius: 3px;
+        font-size: 0.9rem;
+    }
+
+    .inspector-badge {
+        display: inline-block;
+        padding: 0.4rem 0.8rem;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-right: 0.5rem;
+    }
+
+    .inspector-badge.required {
+        background: #ffebee;
+        color: #c62828;
+    }
+
+    .inspector-badge.optional {
+        background: #f5f5f5;
+        color: #616161;
+    }
+</style>
+
+<div class="container model-explorer">
+    <div class="explorer-header">
+        <h1>📊 FHIR Model Explorer</h1>
+        <div class="version-selector">
+            <label for="fhir-version">FHIR Version:</label>
+            <select id="fhir-version">
+                <option value="r4" selected>R4 (Current)</option>
+                <option value="r4b">R4B (Next)</option>
+                <option value="r5">R5 (Latest)</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="explorer-grid">
+        <!-- Resource Browser -->
+        <div class="resource-browser">
+            <h3>Resources</h3>
+            <div class="search-box">
+                <input type="text" id="resource-search" placeholder="Search resources...">
+                <button class="clear-search" id="clear-search" aria-label="Clear search">&times;</button>
+            </div>
+            <div class="resource-count" id="resource-count">Loading...</div>
+            <ul class="resource-list" id="resource-list">
+                <!-- Populated by JavaScript -->
+            </ul>
+        </div>
+
+        <!-- Resource Details -->
+        <div class="resource-details" id="resource-details">
+            <div class="resource-details-empty">
+                <p>👈 Select a resource to view details</p>
+                <small>Choose a FHIR resource from the list to explore its properties and structure.</small>
+            </div>
+        </div>
+
+        <!-- Property Inspector -->
+        <div class="property-inspector" id="property-inspector">
+            <div class="property-inspector-empty">
+                <p>👈 Select a property</p>
+                <small>Click on a property in the resource details to view more information.</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    // Sample FHIR model metadata (simplified for demo)
+    // In production, this would be generated from actual PHP FHIR classes
+    const modelData = {
+        r4: {
+            Patient: {
+                description: "Demographics and administrative information about an individual receiving or registered to receive health care services.",
+                url: "http://hl7.org/fhir/R4/patient.html",
+                properties: [
+                    { name: "identifier", type: "Identifier", cardinality: "0..*", required: false, description: "An identifier for this patient" },
+                    { name: "active", type: "boolean", cardinality: "0..1", required: false, description: "Whether this patient's record is in active use" },
+                    { name: "name", type: "HumanName", cardinality: "0..*", required: false, description: "A name associated with the patient" },
+                    { name: "telecom", type: "ContactPoint", cardinality: "0..*", required: false, description: "A contact detail for the individual" },
+                    { name: "gender", type: "code", cardinality: "0..1", required: false, description: "male | female | other | unknown" },
+                    { name: "birthDate", type: "date", cardinality: "0..1", required: false, description: "The date of birth for the individual" },
+                    { name: "deceased", type: "boolean | dateTime", cardinality: "0..1", required: false, description: "Indicates if the individual is deceased or not" },
+                    { name: "address", type: "Address", cardinality: "0..*", required: false, description: "An address for the individual" },
+                    { name: "maritalStatus", type: "CodeableConcept", cardinality: "0..1", required: false, description: "Marital (civil) status of a patient" },
+                    { name: "photo", type: "Attachment", cardinality: "0..*", required: false, description: "Image of the patient" }
+                ]
+            },
+            Observation: {
+                description: "Measurements and simple assertions made about a patient, device or other subject.",
+                url: "http://hl7.org/fhir/R4/observation.html",
+                properties: [
+                    { name: "identifier", type: "Identifier", cardinality: "0..*", required: false, description: "Business Identifier for observation" },
+                    { name: "status", type: "code", cardinality: "1..1", required: true, description: "registered | preliminary | final | amended +" },
+                    { name: "category", type: "CodeableConcept", cardinality: "0..*", required: false, description: "Classification of type of observation" },
+                    { name: "code", type: "CodeableConcept", cardinality: "1..1", required: true, description: "Type of observation (code / type)" },
+                    { name: "subject", type: "Reference(Patient)", cardinality: "0..1", required: false, description: "Who and/or what the observation is about" },
+                    { name: "effective", type: "dateTime | Period", cardinality: "0..1", required: false, description: "Clinically relevant time/time-period for observation" },
+                    { name: "value", type: "Quantity | CodeableConcept | string", cardinality: "0..1", required: false, description: "Actual result" },
+                    { name: "interpretation", type: "CodeableConcept", cardinality: "0..*", required: false, description: "High, low, normal, etc." },
+                    { name: "note", type: "Annotation", cardinality: "0..*", required: false, description: "Comments about the observation" },
+                    { name: "method", type: "CodeableConcept", cardinality: "0..1", required: false, description: "How it was done" }
+                ]
+            },
+            Practitioner: {
+                description: "A person who is directly or indirectly involved in the provisioning of healthcare.",
+                url: "http://hl7.org/fhir/R4/practitioner.html",
+                properties: [
+                    { name: "identifier", type: "Identifier", cardinality: "0..*", required: false, description: "An identifier for the person as this agent" },
+                    { name: "active", type: "boolean", cardinality: "0..1", required: false, description: "Whether this practitioner's record is in active use" },
+                    { name: "name", type: "HumanName", cardinality: "0..*", required: false, description: "The name(s) associated with the practitioner" },
+                    { name: "telecom", type: "ContactPoint", cardinality: "0..*", required: false, description: "A contact detail for the practitioner" },
+                    { name: "address", type: "Address", cardinality: "0..*", required: false, description: "Address(es) of the practitioner" },
+                    { name: "gender", type: "code", cardinality: "0..1", required: false, description: "male | female | other | unknown" },
+                    { name: "birthDate", type: "date", cardinality: "0..1", required: false, description: "The date on which the practitioner was born" },
+                    { name: "qualification", type: "BackboneElement", cardinality: "0..*", required: false, description: "Certification, licenses, or training pertaining to the provision of care" }
+                ]
+            },
+            Condition: {
+                description: "A clinical condition, problem, diagnosis, or other event, situation, issue, or clinical concept that has risen to a level of concern.",
+                url: "http://hl7.org/fhir/R4/condition.html",
+                properties: [
+                    { name: "identifier", type: "Identifier", cardinality: "0..*", required: false, description: "External Ids for this condition" },
+                    { name: "clinicalStatus", type: "CodeableConcept", cardinality: "0..1", required: false, description: "active | recurrence | relapse | inactive | remission | resolved" },
+                    { name: "verificationStatus", type: "CodeableConcept", cardinality: "0..1", required: false, description: "unconfirmed | provisional | differential | confirmed | refuted | entered-in-error" },
+                    { name: "category", type: "CodeableConcept", cardinality: "0..*", required: false, description: "problem-list-item | encounter-diagnosis" },
+                    { name: "severity", type: "CodeableConcept", cardinality: "0..1", required: false, description: "Subjective severity of condition" },
+                    { name: "code", type: "CodeableConcept", cardinality: "0..1", required: false, description: "Identification of the condition, problem or diagnosis" },
+                    { name: "subject", type: "Reference(Patient)", cardinality: "1..1", required: true, description: "Who has the condition?" },
+                    { name: "onset", type: "dateTime | Age | Period | Range | string", cardinality: "0..1", required: false, description: "Estimated or actual date, date-time, or age" }
+                ]
+            },
+            MedicationRequest: {
+                description: "An order or request for both supply of the medication and the instructions for administration of the medication to a patient.",
+                url: "http://hl7.org/fhir/R4/medicationrequest.html",
+                properties: [
+                    { name: "identifier", type: "Identifier", cardinality: "0..*", required: false, description: "External ids for this request" },
+                    { name: "status", type: "code", cardinality: "1..1", required: true, description: "active | on-hold | cancelled | completed | entered-in-error | stopped | draft | unknown" },
+                    { name: "intent", type: "code", cardinality: "1..1", required: true, description: "proposal | plan | order | original-order | reflex-order | filler-order | instance-order | option" },
+                    { name: "medication", type: "CodeableConcept | Reference(Medication)", cardinality: "1..1", required: true, description: "Medication to be taken" },
+                    { name: "subject", type: "Reference(Patient)", cardinality: "1..1", required: true, description: "Who or group medication request is for" },
+                    { name: "authoredOn", type: "dateTime", cardinality: "0..1", required: false, description: "When request was initially authored" },
+                    { name: "requester", type: "Reference(Practitioner)", cardinality: "0..1", required: false, description: "Who/What requested the Request" },
+                    { name: "dosageInstruction", type: "Dosage", cardinality: "0..*", required: false, description: "How the medication should be taken" }
+                ]
+            },
+            // Add more R4 resources (showing first 5 as examples)
+            Procedure: {
+                description: "An action that is or was performed on or for a patient.",
+                url: "http://hl7.org/fhir/R4/procedure.html",
+                properties: [
+                    { name: "identifier", type: "Identifier", cardinality: "0..*", required: false, description: "External Identifiers for this procedure" },
+                    { name: "status", type: "code", cardinality: "1..1", required: true, description: "preparation | in-progress | not-done | on-hold | stopped | completed | entered-in-error | unknown" },
+                    { name: "code", type: "CodeableConcept", cardinality: "0..1", required: false, description: "Identification of the procedure" },
+                    { name: "subject", type: "Reference(Patient)", cardinality: "1..1", required: true, description: "Who the procedure was performed on" },
+                    { name: "performed", type: "dateTime | Period", cardinality: "0..1", required: false, description: "When the procedure was performed" }
+                ]
+            },
+            Encounter: {
+                description: "An interaction between a patient and healthcare provider(s) for the purpose of providing healthcare service(s) or assessing the health status of a patient.",
+                url: "http://hl7.org/fhir/R4/encounter.html",
+                properties: [
+                    { name: "identifier", type: "Identifier", cardinality: "0..*", required: false, description: "Identifier(s) by which this encounter is known" },
+                    { name: "status", type: "code", cardinality: "1..1", required: true, description: "planned | arrived | triaged | in-progress | onleave | finished | cancelled +" },
+                    { name: "class", type: "Coding", cardinality: "1..1", required: true, description: "Classification of patient encounter" },
+                    { name: "subject", type: "Reference(Patient)", cardinality: "0..1", required: false, description: "The patient present at the encounter" },
+                    { name: "period", type: "Period", cardinality: "0..1", required: false, description: "The start and end time of the encounter" }
+                ]
+            }
+        }
+    };
+
+    // Add placeholder data for other versions
+    modelData.r4b = { ...modelData.r4 };
+    modelData.r5 = { ...modelData.r4 };
+
+    // State
+    let currentVersion = 'r4';
+    let selectedResource = null;
+    let selectedProperty = null;
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+        renderResourceList();
+        setupEventListeners();
+    });
+
+    function setupEventListeners() {
+        // Version selector
+        document.getElementById('fhir-version').addEventListener('change', (e) => {
+            currentVersion = e.target.value;
+            selectedResource = null;
+            selectedProperty = null;
+            renderResourceList();
+            document.getElementById('resource-details').innerHTML = '<div class="resource-details-empty"><p>👈 Select a resource to view details</p><small>Choose a FHIR resource from the list to explore its properties and structure.</small></div>';
+            document.getElementById('property-inspector').innerHTML = '<div class="property-inspector-empty"><p>👈 Select a property</p><small>Click on a property in the resource details to view more information.</small></div>';
+        });
+
+        // Search
+        const searchInput = document.getElementById('resource-search');
+        const clearButton = document.getElementById('clear-search');
+        
+        searchInput.addEventListener('input', (e) => {
+            filterResources(e.target.value);
+            clearButton.classList.toggle('visible', e.target.value.length > 0);
+        });
+
+        clearButton.addEventListener('click', () => {
+            searchInput.value = '';
+            filterResources('');
+            clearButton.classList.remove('visible');
+        });
+    }
+
+    function renderResourceList() {
+        const resources = modelData[currentVersion];
+        const resourceList = document.getElementById('resource-list');
+        const resourceNames = Object.keys(resources).sort();
+
+        resourceList.innerHTML = resourceNames.map(name => 
+            `<li data-resource="${name}">${name}</li>`
+        ).join('');
+
+        updateResourceCount(resourceNames.length, resourceNames.length);
+
+        // Add click handlers
+        resourceList.querySelectorAll('li').forEach(li => {
+            li.addEventListener('click', () => {
+                selectedResource = li.dataset.resource;
+                selectedProperty = null;
+                renderResourceDetails();
+                
+                // Update active state
+                resourceList.querySelectorAll('li').forEach(item => item.classList.remove('active'));
+                li.classList.add('active');
+            });
+        });
+    }
+
+    function filterResources(query) {
+        const resourceList = document.getElementById('resource-list');
+        const items = resourceList.querySelectorAll('li');
+        const lowerQuery = query.toLowerCase();
+        let visibleCount = 0;
+
+        items.forEach(item => {
+            const resourceName = item.dataset.resource.toLowerCase();
+            const matches = resourceName.includes(lowerQuery);
+            item.classList.toggle('hidden', !matches);
+            if (matches) visibleCount++;
+        });
+
+        updateResourceCount(visibleCount, items.length);
+    }
+
+    function updateResourceCount(visible, total) {
+        const countEl = document.getElementById('resource-count');
+        countEl.textContent = `${visible} of ${total} resources`;
+    }
+
+    function renderResourceDetails() {
+        const resource = modelData[currentVersion][selectedResource];
+        if (!resource) return;
+
+        const detailsHtml = `
+            <div class="resource-header">
+                <h2>${selectedResource}</h2>
+                <p class="resource-description">${resource.description}</p>
+                <a href="${resource.url}" target="_blank" class="spec-link">📖 View FHIR Specification →</a>
+            </div>
+            <div class="properties-section">
+                <h3>Properties (${resource.properties.length})</h3>
+                <table class="properties-table">
+                    <thead>
+                        <tr>
+                            <th>Property</th>
+                            <th>Type</th>
+                            <th>Cardinality</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${resource.properties.map((prop, idx) => `
+                            <tr data-property-index="${idx}">
+                                <td>
+                                    <span class="property-name">${prop.name}</span>
+                                    ${prop.required ? '<span class="property-required">*</span>' : ''}
+                                </td>
+                                <td>
+                                    ${formatTypeWithBadges(prop.type)}
+                                </td>
+                                <td>
+                                    <span class="cardinality">${prop.cardinality}</span>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        document.getElementById('resource-details').innerHTML = detailsHtml;
+
+        // Add click handlers for properties
+        document.querySelectorAll('.properties-table tbody tr').forEach(tr => {
+            tr.addEventListener('click', () => {
+                const propIndex = parseInt(tr.dataset.propertyIndex);
+                selectedProperty = resource.properties[propIndex];
+                renderPropertyInspector();
+                
+                // Update active state
+                document.querySelectorAll('.properties-table tbody tr').forEach(row => row.classList.remove('active'));
+                tr.classList.add('active');
+            });
+        });
+    }
+
+    function renderPropertyInspector() {
+        if (!selectedProperty) return;
+
+        const inspectorHtml = `
+            <h3>Property Details</h3>
+            <div class="inspector-section">
+                <h4>Name</h4>
+                <div class="inspector-value">
+                    <code>${selectedProperty.name}</code>
+                </div>
+            </div>
+            <div class="inspector-section">
+                <h4>Type</h4>
+                <div class="inspector-value">
+                    <code>${selectedProperty.type}</code>
+                </div>
+            </div>
+            <div class="inspector-section">
+                <h4>Cardinality</h4>
+                <div class="inspector-value">
+                    <code>${selectedProperty.cardinality}</code>
+                    <div style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-secondary);">
+                        ${formatCardinalityDescription(selectedProperty.cardinality)}
+                    </div>
+                </div>
+            </div>
+            <div class="inspector-section">
+                <h4>Required</h4>
+                <div class="inspector-value">
+                    <span class="inspector-badge ${selectedProperty.required ? 'required' : 'optional'}">
+                        ${selectedProperty.required ? 'Required' : 'Optional'}
+                    </span>
+                </div>
+            </div>
+            <div class="inspector-section">
+                <h4>Description</h4>
+                <div class="inspector-value">
+                    ${selectedProperty.description}
+                </div>
+            </div>
+        `;
+
+        document.getElementById('property-inspector').innerHTML = inspectorHtml;
+    }
+
+    function formatTypeWithBadges(type) {
+        const types = type.split('|').map(t => t.trim());
+        return types.map(t => {
+            const badgeClass = getTypeBadgeClass(t);
+            return `<span class="type-badge ${badgeClass}">${t}</span>`;
+        }).join(' ');
+    }
+
+    function getTypeBadgeClass(type) {
+        const primitiveTypes = ['string', 'boolean', 'integer', 'decimal', 'date', 'dateTime', 'time', 'code', 'uri', 'url', 'canonical', 'oid', 'uuid', 'id', 'markdown', 'base64Binary', 'instant', 'unsignedInt', 'positiveInt'];
+        const referenceTypes = ['Reference'];
+        
+        if (primitiveTypes.includes(type)) return 'primitive';
+        if (type.startsWith('Reference(') || referenceTypes.includes(type)) return 'reference';
+        return 'complex';
+    }
+
+    function formatCardinalityDescription(cardinality) {
+        const descriptions = {
+            '0..1': 'Optional, maximum one',
+            '1..1': 'Required, exactly one',
+            '0..*': 'Optional, zero or more',
+            '1..*': 'Required, at least one'
+        };
+        return descriptions[cardinality] || cardinality;
+    }
+</script>

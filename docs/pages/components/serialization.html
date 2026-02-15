@@ -1,0 +1,401 @@
+---
+layout: docs
+title: Serialization
+category: components
+---
+
+# Serialization
+
+The Serialization component provides robust JSON and XML serialization for FHIR resources with validation, error handling using OperationOutcome, and support for multiple FHIR versions.
+
+## Overview
+
+Key capabilities:
+
+- **JSON Serialization**: Serialize/deserialize FHIR resources to/from JSON
+- **XML Serialization**: Serialize/deserialize FHIR resources to/from XML
+- **Validation Modes**: Strict or lenient validation during deserialization
+- **OperationOutcome Errors**: FHIR-compliant error handling
+- **Type Safety**: Strong typing with PHP strict types
+- **Multi-Version**: Support for R4, R4B, and R5
+
+## Installation
+
+### Standalone
+
+```bash
+composer require ardenexal/fhir-serialization
+```
+
+### With FHIRBundle
+
+```bash
+composer require ardenexal/fhir-bundle
+```
+
+## JSON Serialization
+
+### Serialize to JSON
+
+Convert a FHIR resource object to JSON:
+
+```php
+use Ardenexal\FHIRSerialization\FHIRSerializationService;
+
+$serializer = new FHIRSerializationService();
+
+// Create a Patient resource
+$patient = new \Ardenexal\FHIRModels\R4\Resource\Patient();
+$patient->setId('patient-123');
+$patient->setActive(true);
+
+// Add name
+$name = new \Ardenexal\FHIRModels\R4\DataType\HumanName();
+$name->setFamily('Doe');
+$name->setGiven(['John']);
+$patient->addName($name);
+
+// Serialize to JSON
+$json = $serializer->serialize($patient);
+
+echo $json;
+// Output:
+// {
+//   "resourceType": "Patient",
+//   "id": "patient-123",
+//   "active": true,
+//   "name": [{
+//     "family": "Doe",
+//     "given": ["John"]
+//   }]
+// }
+```
+
+### Deserialize from JSON
+
+Parse JSON into a FHIR resource object:
+
+```php
+$json = '{
+  "resourceType": "Patient",
+  "id": "patient-123",
+  "active": true,
+  "name": [{
+    "family": "Doe",
+    "given": ["John"]
+  }]
+}';
+
+try {
+    $patient = $serializer->deserialize($json, 'Patient');
+    
+    echo $patient->getName()[0]->getFamily();  // "Doe"
+    echo $patient->getActive();  // true
+} catch (\Exception $e) {
+    // Handle deserialization errors
+    $error = json_decode($e->getMessage(), true);
+    // $error is an OperationOutcome
+}
+```
+
+## XML Serialization
+
+### Serialize to XML
+
+Convert a FHIR resource to XML format:
+
+```php
+$serializer = new FHIRSerializationService();
+
+// Use the same Patient object
+$xml = $serializer->serializeToXml($patient);
+
+echo $xml;
+// Output:
+// <?xml version="1.0" encoding="UTF-8"?>
+// <Patient xmlns="http://hl7.org/fhir">
+//   <id value="patient-123"/>
+//   <active value="true"/>
+//   <name>
+//     <family value="Doe"/>
+//     <given value="John"/>
+//   </name>
+// </Patient>
+```
+
+### Deserialize from XML
+
+Parse XML into a FHIR resource object:
+
+```php
+$xml = '<?xml version="1.0" encoding="UTF-8"?>
+<Patient xmlns="http://hl7.org/fhir">
+  <id value="patient-123"/>
+  <active value="true"/>
+  <name>
+    <family value="Doe"/>
+    <given value="John"/>
+  </name>
+</Patient>';
+
+$patient = $serializer->deserializeFromXml($xml, 'Patient');
+
+echo $patient->getId();  // "patient-123"
+```
+
+## Validation Modes
+
+### Strict Validation
+
+In strict mode, any schema violations throw exceptions:
+
+```php
+$serializer = new FHIRSerializationService(['mode' => 'strict']);
+
+$json = '{
+  "resourceType": "Patient",
+  "birthDate": "invalid-date"
+}';
+
+try {
+    $patient = $serializer->deserialize($json, 'Patient');
+} catch (\RuntimeException $e) {
+    // OperationOutcome with validation errors
+    $outcome = json_decode($e->getMessage(), true);
+    
+    // {
+    //   "resourceType": "OperationOutcome",
+    //   "issue": [{
+    //     "severity": "error",
+    //     "code": "invalid",
+    //     "details": {"text": "Invalid date format"},
+    //     "expression": ["Patient.birthDate"]
+    //   }]
+    // }
+}
+```
+
+### Lenient Validation
+
+In lenient mode, minor violations are tolerated:
+
+```php
+$serializer = new FHIRSerializationService(['mode' => 'lenient']);
+
+$json = '{
+  "resourceType": "Patient",
+  "unknownField": "value"
+}';
+
+// Deserializes successfully, ignoring unknown field
+$patient = $serializer->deserialize($json, 'Patient');
+```
+
+## Error Handling with OperationOutcome
+
+All errors are returned as FHIR OperationOutcome resources:
+
+```php
+try {
+    $resource = $serializer->deserialize($invalidJson, 'Observation');
+} catch (\RuntimeException $e) {
+    $outcome = json_decode($e->getMessage(), true);
+    
+    foreach ($outcome['issue'] as $issue) {
+        echo "Severity: " . $issue['severity'] . "\n";
+        echo "Code: " . $issue['code'] . "\n";
+        echo "Details: " . $issue['details']['text'] . "\n";
+        echo "Location: " . implode(', ', $issue['expression']) . "\n";
+    }
+}
+```
+
+Example OperationOutcome:
+
+```json
+{
+  "resourceType": "OperationOutcome",
+  "issue": [
+    {
+      "severity": "error",
+      "code": "required",
+      "details": {
+        "text": "Missing required field: resourceType"
+      },
+      "diagnostics": "Field 'resourceType' is required for all FHIR resources",
+      "expression": ["Resource.resourceType"]
+    }
+  ]
+}
+```
+
+## Configuration Options
+
+Configure the serializer with options:
+
+```php
+$serializer = new FHIRSerializationService([
+    'mode' => 'strict',          // 'strict' or 'lenient'
+    'pretty_print' => true,      // Format JSON output
+    'validate_references' => true, // Validate resource references
+    'allow_unknown_fields' => false, // Allow extra fields
+    'encoding' => 'UTF-8'        // Character encoding
+]);
+```
+
+## Symfony Integration
+
+When using FHIRBundle, configure serialization in YAML:
+
+```yaml
+# config/packages/fhir.yaml
+fhir:
+    serialization:
+        format: 'json'        # 'json' or 'xml'
+        pretty_print: true
+        mode: 'strict'
+        encoding: 'UTF-8'
+```
+
+Use via dependency injection:
+
+```php
+use Ardenexal\FHIRBundle\Service\FHIRSerializationService;
+
+class PatientService
+{
+    public function __construct(
+        private readonly FHIRSerializationService $serializer
+    ) {}
+    
+    public function createFromJson(string $json): Patient
+    {
+        return $this->serializer->deserialize($json, 'Patient');
+    }
+}
+```
+
+## Complex Examples
+
+### Bundle Serialization
+
+Serialize a FHIR Bundle with multiple resources:
+
+```php
+$bundle = new \Ardenexal\FHIRModels\R4\Resource\Bundle();
+$bundle->setType('transaction');
+
+// Add Patient entry
+$patientEntry = new \Ardenexal\FHIRModels\R4\Resource\Bundle\BundleEntry();
+$patientEntry->setResource($patient);
+$bundle->addEntry($patientEntry);
+
+// Add Observation entry
+$observationEntry = new \Ardenexal\FHIRModels\R4\Resource\Bundle\BundleEntry();
+$observationEntry->setResource($observation);
+$bundle->addEntry($observationEntry);
+
+// Serialize entire bundle
+$json = $serializer->serialize($bundle);
+```
+
+### Handling Nested Resources
+
+Work with complex nested structures:
+
+```php
+$observation = new \Ardenexal\FHIRModels\R4\Resource\Observation();
+$observation->setStatus('final');
+
+// Add code
+$code = new \Ardenexal\FHIRModels\R4\DataType\CodeableConcept();
+$coding = new \Ardenexal\FHIRModels\R4\DataType\Coding();
+$coding->setSystem('http://loinc.org');
+$coding->setCode('85354-9');
+$coding->setDisplay('Blood pressure');
+$code->addCoding($coding);
+$observation->setCode($code);
+
+// Add component (systolic)
+$component = new \Ardenexal\FHIRModels\R4\Resource\Observation\ObservationComponent();
+$componentCode = new \Ardenexal\FHIRModels\R4\DataType\CodeableConcept();
+$componentCoding = new \Ardenexal\FHIRModels\R4\DataType\Coding();
+$componentCoding->setSystem('http://loinc.org');
+$componentCoding->setCode('8480-6');
+$componentCode->addCoding($componentCoding);
+$component->setCode($componentCode);
+
+$value = new \Ardenexal\FHIRModels\R4\DataType\Quantity();
+$value->setValue(120);
+$value->setUnit('mmHg');
+$component->setValueQuantity($value);
+
+$observation->addComponent($component);
+
+// Serialize with all nested structures
+$json = $serializer->serialize($observation);
+```
+
+## Performance Considerations
+
+### Caching Serialized Resources
+
+```php
+use Symfony\Contracts\Cache\CacheInterface;
+
+class CachedSerializationService
+{
+    public function __construct(
+        private readonly FHIRSerializationService $serializer,
+        private readonly CacheInterface $cache
+    ) {}
+    
+    public function serialize($resource): string
+    {
+        $key = 'fhir_' . $resource->getResourceType() . '_' . $resource->getId();
+        
+        return $this->cache->get($key, function () use ($resource) {
+            return $this->serializer->serialize($resource);
+        });
+    }
+}
+```
+
+### Batch Processing
+
+Process multiple resources efficiently:
+
+```php
+$resources = [$patient1, $patient2, $observation1];
+$serialized = [];
+
+foreach ($resources as $resource) {
+    $serialized[] = $serializer->serialize($resource);
+}
+
+// Or serialize as a Bundle for better performance
+$bundle = new Bundle();
+$bundle->setType('collection');
+
+foreach ($resources as $resource) {
+    $entry = new BundleEntry();
+    $entry->setResource($resource);
+    $bundle->addEntry($entry);
+}
+
+$json = $serializer->serialize($bundle);  // Single serialization call
+```
+
+## Next Steps
+
+- [FHIRPath Component](fhirpath.html) - Query serialized resources
+- [Models Component](models.html) - FHIR model documentation
+- [Validation Component](validation.html) - Advanced validation (coming soon)
+- [API Reference](../api-reference.html) - Complete API documentation
+
+## Resources
+
+- [FHIR JSON Format](https://www.hl7.org/fhir/json.html)
+- [FHIR XML Format](https://www.hl7.org/fhir/xml.html)
+- [OperationOutcome Resource](https://www.hl7.org/fhir/operationoutcome.html)
+- [GitHub Repository](https://github.com/Ardenexal/php-fhir-tools)

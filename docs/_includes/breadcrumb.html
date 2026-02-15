@@ -1,0 +1,49 @@
+<nav class="breadcrumb" aria-label="Breadcrumb">
+    <ol>
+        <li><a href="{{ '/' | relative_url }}">Home</a></li>
+        {% if page.category %}
+        <li><a href="{{ '/pages/' | append: page.category | append: '/' | relative_url }}">{{ page.category | capitalize }}</a></li>
+        {% endif %}
+        <li aria-current="page">{{ page.title }}</li>
+    </ol>
+</nav>
+
+<style>
+.breadcrumb {
+    margin-bottom: var(--spacing-6);
+    font-size: var(--font-size-sm);
+}
+
+.breadcrumb ol {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    gap: var(--spacing-2);
+}
+
+.breadcrumb li {
+    display: flex;
+    align-items: center;
+}
+
+.breadcrumb li:not(:last-child)::after {
+    content: '/';
+    margin-left: var(--spacing-2);
+    color: var(--color-gray-400);
+}
+
+.breadcrumb a {
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+.breadcrumb a:hover {
+    text-decoration: underline;
+}
+
+.breadcrumb li[aria-current="page"] {
+    color: var(--color-gray-600);
+}
+</style>

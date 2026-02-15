@@ -1,0 +1,265 @@
+---
+layout: docs
+title: FHIRBundle
+category: components
+---
+
+# FHIRBundle
+
+The FHIRBundle provides seamless Symfony integration for all PHP FHIRTools components, offering dependency injection, configuration management, and event-driven architecture.
+
+## Overview
+
+FHIRBundle wraps all PHP FHIRTools components into a single, easy-to-use Symfony bundle with:
+
+- **Dependency Injection**: Auto-configured services ready for injection
+- **Configuration Management**: YAML-based configuration for all components
+- **Event System**: Extensible hooks for custom logic
+- **Developer Tools**: Profiler integration and debugging helpers
+- **Multi-Version Support**: Works with Symfony 6.4 and 7.x
+
+## Installation
+
+Install via Composer:
+
+```bash
+composer require ardenexal/fhir-bundle
+```
+
+The bundle is automatically registered in Symfony Flex projects. For manual registration:
+
+```php
+// config/bundles.php
+return [
+    // ... other bundles
+    Ardenexal\FHIRBundle\FHIRBundle::class => ['all' => true],
+];
+```
+
+## Configuration
+
+Create a configuration file at `config/packages/fhir.yaml`:
+
+```yaml
+# config/packages/fhir.yaml
+fhir:
+    # FHIR version to use (R4, R4B, or R5)
+    fhir_version: 'R4'
+    
+    # Validation mode (strict or lenient)
+    validation_mode: 'strict'
+    
+    # Model generation settings
+    models:
+        cache_directory: '%kernel.cache_dir%/fhir/models'
+        auto_generate: false
+    
+    # Serialization settings
+    serialization:
+        format: 'json'  # json or xml
+        pretty_print: true
+```
+
+## Service Usage
+
+### FHIRSerializationService
+
+Inject and use the serialization service:
+
+```php
+use Ardenexal\FHIRBundle\Service\FHIRSerializationService;
+
+class PatientController extends AbstractController
+{
+    public function __construct(
+        private readonly FHIRSerializationService $serializer
+    ) {}
+    
+    public function create(Request $request): JsonResponse
+    {
+        $json = $request->getContent();
+        
+        // Deserialize JSON to FHIR Patient object
+        $patient = $this->serializer->deserialize($json, 'Patient');
+        
+        // Work with the patient object
+        $patient->setActive(true);
+        
+        // Serialize back to JSON
+        $output = $this->serializer->serialize($patient);
+        
+        return new JsonResponse($output, 201);
+    }
+}
+```
+
+### FHIRPathEvaluator
+
+Use FHIRPath expressions for data extraction:
+
+```php
+use Ardenexal\FHIRBundle\Service\FHIRPathEvaluator;
+
+class ObservationController extends AbstractController
+{
+    public function __construct(
+        private readonly FHIRPathEvaluator $fhirPath
+    ) {}
+    
+    public function analyze(string $id): JsonResponse
+    {
+        $observation = $this->getObservation($id);
+        
+        // Extract values using FHIRPath
+        $values = $this->fhirPath->evaluate(
+            $observation,
+            'Observation.component.where(code.coding.code="8480-6").value.value'
+        );
+        
+        return new JsonResponse(['systolic' => $values[0] ?? null]);
+    }
+}
+```
+
+### FHIRModelGenerator
+
+Generate FHIR model classes:
+
+```php
+use Ardenexal\FHIRBundle\Service\FHIRModelGenerator;
+
+class GenerateCommand extends Command
+{
+    public function __construct(
+        private readonly FHIRModelGenerator $generator
+    ) {
+        parent::__construct();
+    }
+    
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $this->generator->generateModels('R4', '/path/to/output');
+        
+        $output->writeln('✓ Models generated successfully');
+        
+        return Command::SUCCESS;
+    }
+}
+```
+
+## Dependency Injection
+
+All services are auto-configured and ready for injection:
+
+```php
+use Ardenexal\FHIRBundle\Service\FHIRSerializationService;
+use Ardenexal\FHIRBundle\Service\FHIRPathEvaluator;
+use Ardenexal\FHIRBundle\Service\FHIRModelGenerator;
+
+class FHIRService
+{
+    public function __construct(
+        private readonly FHIRSerializationService $serializer,
+        private readonly FHIRPathEvaluator $fhirPath,
+        private readonly FHIRModelGenerator $generator
+    ) {}
+    
+    // Use injected services...
+}
+```
+
+## Event System
+
+Listen to FHIR-related events:
+
+```php
+use Ardenexal\FHIRBundle\Event\ResourceSerializedEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
+class FHIREventSubscriber implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            ResourceSerializedEvent::class => 'onResourceSerialized',
+        ];
+    }
+    
+    public function onResourceSerialized(ResourceSerializedEvent $event): void
+    {
+        $resource = $event->getResource();
+        $format = $event->getFormat();
+        
+        // Custom logic after serialization
+        $this->logger->info('Serialized ' . $resource->getResourceType());
+    }
+}
+```
+
+## Testing
+
+The bundle provides test helpers:
+
+```php
+use Ardenexal\FHIRBundle\Test\FHIRTestCase;
+
+class PatientSerializationTest extends FHIRTestCase
+{
+    public function testPatientSerialization(): void
+    {
+        $patient = $this->createPatient('John', 'Doe');
+        
+        $json = $this->getSerializer()->serialize($patient);
+        
+        $this->assertJson($json);
+        $this->assertStringContainsString('John', $json);
+    }
+}
+```
+
+## Configuration Reference
+
+Complete configuration options:
+
+```yaml
+fhir:
+    # FHIR specification version
+    fhir_version: 'R4'  # R4, R4B, or R5
+    
+    # Validation behavior
+    validation_mode: 'strict'  # strict or lenient
+    
+    # Model generation
+    models:
+        cache_directory: '%kernel.cache_dir%/fhir/models'
+        auto_generate: false
+        namespaces:
+            R4: 'App\FHIR\R4'
+            R4B: 'App\FHIR\R4B'
+            R5: 'App\FHIR\R5'
+    
+    # Serialization
+    serialization:
+        format: 'json'
+        pretty_print: true
+        encoding: 'UTF-8'
+    
+    # Profiler (dev environment only)
+    profiler:
+        enabled: true
+        collect_queries: true
+```
+
+## Next Steps
+
+- [Serialization Component](serialization.html) - Detailed serialization guide
+- [FHIRPath Component](fhirpath.html) - FHIRPath expression reference
+- [Models Component](models.html) - Generated model documentation
+- [Symfony Integration](../symfony-integration.html) - Complete integration guide
+- [API Reference](../api-reference.html) - Full API documentation
+
+## Resources
+
+- [GitHub Repository](https://github.com/Ardenexal/php-fhir-tools)
+- [Symfony Bundle Best Practices](https://symfony.com/doc/current/bundles/best_practices.html)
+- [FHIR R4 Specification](https://hl7.org/fhir/R4/)

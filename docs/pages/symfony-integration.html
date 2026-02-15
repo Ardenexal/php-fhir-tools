@@ -1,0 +1,687 @@
+---
+layout: docs
+title: Symfony Integration
+permalink: /pages/symfony-integration/
+---
+
+<div class="symfony-integration-page">
+    <h1>Symfony Integration Guide</h1>
+    <p class="lead">Complete guide for integrating PHP FHIRTools with Symfony applications.</p>
+
+    <!-- Installation Section -->
+    <section class="integration-section">
+        <h2>Installation</h2>
+        
+        <h3>1. Install the FHIRBundle</h3>
+        <pre><code class="language-bash">composer require ardenexal/fhir-bundle</code></pre>
+
+        <h3>2. Register the Bundle</h3>
+        <p>The bundle should be auto-registered via Symfony Flex. If not, add it manually:</p>
+        <pre><code class="language-php">// config/bundles.php
+return [
+    // ... other bundles
+    Ardenexal\Bundle\FHIRBundle\FHIRBundle::class => ['all' => true],
+];</code></pre>
+
+        <h3>3. Configure the Bundle</h3>
+        <pre><code class="language-yaml"># config/packages/fhir.yaml
+fhir:
+    # FHIR version (r4, r4b, r5)
+    fhir_version: 'r4'
+    
+    # Validation mode (strict, lenient, none)
+    validation_mode: 'strict'
+    
+    # Serialization settings
+    serialization:
+        pretty_print: true
+        validate_on_serialize: true
+    
+    # Model generation settings (optional)
+    model_generation:
+        output_directory: '%kernel.project_dir%/src/FHIR/Models'
+        namespace: 'App\\FHIR\\Models'</code></pre>
+    </section>
+
+    <!-- Service Injection Section -->
+    <section class="integration-section">
+        <h2>Service Dependency Injection</h2>
+        
+        <h3>Constructor Injection (Recommended)</h3>
+        <pre><code class="language-php">namespace App\Service;
+
+use Ardenexal\Component\Serialization\FHIRSerializationService;
+use Ardenexal\Component\FHIRPath\FHIRPathEvaluator;
+use Ardenexal\Component\Models\FHIRModelGenerator;
+
+class PatientService
+{
+    public function __construct(
+        private readonly FHIRSerializationService $serializer,
+        private readonly FHIRPathEvaluator $evaluator,
+        private readonly FHIRModelGenerator $modelGenerator
+    ) {}
+    
+    public function processPatient(string $json): void
+    {
+        $patient = $this->serializer->deserializeFromJson($json, FHIRPatient::class);
+        $name = $this->evaluator->evaluate($patient, 'Patient.name.family');
+        // Process patient...
+    }
+}</code></pre>
+
+        <h3>Method Injection</h3>
+        <pre><code class="language-php">use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+class PatientController extends AbstractController
+{
+    #[Route('/api/patients', methods: ['POST'])]
+    public function create(
+        Request $request,
+        FHIRSerializationService $serializer
+    ): Response {
+        $json = $request->getContent();
+        $patient = $serializer->deserializeFromJson($json, FHIRPatient::class);
+        
+        // Validate and save patient...
+        
+        return $this->json([
+            'id' => $patient->getId(),
+            'status' => 'created'
+        ]);
+    }
+}</code></pre>
+    </section>
+
+    <!-- Controller Examples Section -->
+    <section class="integration-section">
+        <h2>Controller Implementations</h2>
+        
+        <h3>REST API Controller</h3>
+        <pre><code class="language-php">namespace App\Controller\Api;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use Ardenexal\Component\Serialization\FHIRSerializationService;
+
+#[Route('/api/fhir')]
+class FHIRController extends AbstractController
+{
+    public function __construct(
+        private readonly FHIRSerializationService $serializer
+    ) {}
+    
+    #[Route('/Patient', methods: ['POST'])]
+    public function createPatient(Request $request): Response
+    {
+        try {
+            $json = $request->getContent();
+            $patient = $this->serializer->deserializeFromJson(
+                $json,
+                FHIRPatient::class
+            );
+            
+            // Persist patient to database
+            $this->patientRepository->save($patient);
+            
+            return $this->json($patient, 201);
+        } catch (ValidationException $e) {
+            return $this->json(
+                $e->getOperationOutcome(),
+                400
+            );
+        }
+    }
+    
+    #[Route('/Patient/{id}', methods: ['GET'])]
+    public function getPatient(string $id): Response
+    {
+        $patient = $this->patientRepository->find($id);
+        
+        if (!$patient) {
+            return $this->json([
+                'resourceType' => 'OperationOutcome',
+                'issue' => [[
+                    'severity' => 'error',
+                    'code' => 'not-found',
+                    'details' => ['text' => 'Patient not found']
+                ]]
+            ], 404);
+        }
+        
+        return $this->json($patient);
+    }
+    
+    #[Route('/Patient/{id}', methods: ['PUT'])]
+    public function updatePatient(string $id, Request $request): Response
+    {
+        $existingPatient = $this->patientRepository->find($id);
+        
+        if (!$existingPatient) {
+            return $this->json(['error' => 'Patient not found'], 404);
+        }
+        
+        $json = $request->getContent();
+        $patient = $this->serializer->deserializeFromJson(
+            $json,
+            FHIRPatient::class
+        );
+        
+        $patient->setId($id);
+        $this->patientRepository->save($patient);
+        
+        return $this->json($patient);
+    }
+    
+    #[Route('/Patient', methods: ['GET'])]
+    public function searchPatients(Request $request): Response
+    {
+        $familyName = $request->query->get('family');
+        $givenName = $request->query->get('given');
+        
+        $patients = $this->patientRepository->search([
+            'family' => $familyName,
+            'given' => $givenName
+        ]);
+        
+        // Create search bundle
+        $bundle = $this->createSearchBundle($patients);
+        
+        return $this->json($bundle);
+    }
+}</code></pre>
+
+        <h3>Form Handler Controller</h3>
+        <pre><code class="language-php">#[Route('/patients')]
+class PatientFormController extends AbstractController
+{
+    #[Route('/new', methods: ['GET', 'POST'])]
+    public function new(
+        Request $request,
+        FHIRSerializationService $serializer
+    ): Response {
+        $form = $this->createForm(PatientType::class);
+        $form->handleRequest($request);
+        
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+            
+            // Convert form data to FHIR Patient
+            $patient = $this->buildPatientFromForm($data);
+            
+            // Validate using FHIR serializer
+            try {
+                $json = $serializer->serializeToJson($patient);
+                $validated = $serializer->deserializeFromJson($json, FHIRPatient::class);
+                
+                // Save to database
+                $this->patientRepository->save($validated);
+                
+                $this->addFlash('success', 'Patient created successfully');
+                return $this->redirectToRoute('patient_view', ['id' => $validated->getId()]);
+            } catch (ValidationException $e) {
+                $this->addFlash('error', 'Validation failed: ' . $e->getMessage());
+            }
+        }
+        
+        return $this->render('patient/new.html.twig', [
+            'form' => $form->createView()
+        ]);
+    }
+}</code></pre>
+
+        <h3>File Processing Controller</h3>
+        <pre><code class="language-php">#[Route('/fhir/import')]
+class FHIRImportController extends AbstractController
+{
+    public function __construct(
+        private readonly FHIRSerializationService $serializer,
+        private readonly FHIRPathEvaluator $evaluator
+    ) {}
+    
+    #[Route('/bundle', methods: ['POST'])]
+    public function importBundle(Request $request): Response
+    {
+        $file = $request->files->get('bundle');
+        
+        if (!$file) {
+            return $this->json(['error' => 'No file provided'], 400);
+        }
+        
+        $json = file_get_contents($file->getPathname());
+        
+        try {
+            $bundle = $this->serializer->deserializeFromJson($json, FHIRBundle::class);
+            
+            $imported = 0;
+            $errors = [];
+            
+            foreach ($bundle->getEntry() as $entry) {
+                $resource = $entry->getResource();
+                $resourceType = $resource->getResourceType();
+                
+                try {
+                    $this->processResource($resourceType, $resource);
+                    $imported++;
+                } catch (\Exception $e) {
+                    $errors[] = [
+                        'resourceType' => $resourceType,
+                        'error' => $e->getMessage()
+                    ];
+                }
+            }
+            
+            return $this->json([
+                'imported' => $imported,
+                'total' => count($bundle->getEntry()),
+                'errors' => $errors
+            ]);
+        } catch (ValidationException $e) {
+            return $this->json([
+                'error' => 'Invalid bundle',
+                'operationOutcome' => $e->getOperationOutcome()
+            ], 400);
+        }
+    }
+}</code></pre>
+    </section>
+
+    <!-- Event Subscribers Section -->
+    <section class="integration-section">
+        <h2>Event Subscribers</h2>
+        
+        <h3>FHIR Resource Validation Event</h3>
+        <pre><code class="language-php">namespace App\EventSubscriber;
+
+use Ardenexal\Bundle\FHIRBundle\Event\FHIRResourceEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
+class FHIRValidationSubscriber implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            FHIRResourceEvent::PRE_SERIALIZE => 'onPreSerialize',
+            FHIRResourceEvent::POST_DESERIALIZE => 'onPostDeserialize',
+        ];
+    }
+    
+    public function onPreSerialize(FHIRResourceEvent $event): void
+    {
+        $resource = $event->getResource();
+        
+        // Custom validation logic
+        if ($resource instanceof FHIRPatient) {
+            if (!$resource->getName()) {
+                throw new ValidationException('Patient must have at least one name');
+            }
+        }
+    }
+    
+    public function onPostDeserialize(FHIRResourceEvent $event): void
+    {
+        $resource = $event->getResource();
+        
+        // Log deserialization
+        $this->logger->info('Deserialized resource', [
+            'type' => $resource->getResourceType(),
+            'id' => $resource->getId()
+        ]);
+    }
+}</code></pre>
+
+        <h3>Audit Logging Subscriber</h3>
+        <pre><code class="language-php">use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
+
+class FHIRAuditSubscriber implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            KernelEvents::REQUEST => 'onKernelRequest',
+            KernelEvents::RESPONSE => 'onKernelResponse',
+        ];
+    }
+    
+    public function onKernelRequest(RequestEvent $event): void
+    {
+        $request = $event->getRequest();
+        
+        // Log FHIR API requests
+        if (str_starts_with($request->getPathInfo(), '/api/fhir')) {
+            $this->auditLogger->logRequest([
+                'method' => $request->getMethod(),
+                'path' => $request->getPathInfo(),
+                'content_type' => $request->headers->get('Content-Type'),
+                'user' => $this->getUser()?->getUserIdentifier(),
+                'timestamp' => new \DateTime()
+            ]);
+        }
+    }
+    
+    public function onKernelResponse(ResponseEvent $event): void
+    {
+        $response = $event->getResponse();
+        $request = $event->getRequest();
+        
+        // Log FHIR API responses
+        if (str_starts_with($request->getPathInfo(), '/api/fhir')) {
+            $this->auditLogger->logResponse([
+                'status_code' => $response->getStatusCode(),
+                'content_length' => strlen($response->getContent()),
+                'timestamp' => new \DateTime()
+            ]);
+        }
+    }
+}</code></pre>
+
+        <h3>Error Handling Subscriber</h3>
+        <pre><code class="language-php">use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Ardenexal\Component\Serialization\Exception\ValidationException;
+
+class FHIRExceptionSubscriber implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            KernelEvents::EXCEPTION => 'onKernelException',
+        ];
+    }
+    
+    public function onKernelException(ExceptionEvent $event): void
+    {
+        $exception = $event->getThrowable();
+        
+        if ($exception instanceof ValidationException) {
+            $outcome = $exception->getOperationOutcome();
+            
+            $response = new JsonResponse($outcome, 400);
+            $response->headers->set('Content-Type', 'application/fhir+json');
+            
+            $event->setResponse($response);
+        }
+    }
+}</code></pre>
+    </section>
+
+    <!-- Testing Section -->
+    <section class="integration-section">
+        <h2>Testing</h2>
+        
+        <h3>Unit Tests</h3>
+        <pre><code class="language-php">namespace App\Tests\Service;
+
+use PHPUnit\Framework\TestCase;
+use Ardenexal\Component\Serialization\FHIRSerializationService;
+
+class PatientServiceTest extends TestCase
+{
+    private FHIRSerializationService $serializer;
+    private PatientService $patientService;
+    
+    protected function setUp(): void
+    {
+        $this->serializer = new FHIRSerializationService();
+        $this->patientService = new PatientService($this->serializer);
+    }
+    
+    public function testCreatePatient(): void
+    {
+        $json = json_encode([
+            'resourceType' => 'Patient',
+            'name' => [[
+                'family' => 'Smith',
+                'given' => ['John']
+            ]],
+            'gender' => 'male',
+            'birthDate' => '1974-12-25'
+        ]);
+        
+        $patient = $this->patientService->createFromJson($json);
+        
+        $this->assertInstanceOf(FHIRPatient::class, $patient);
+        $this->assertEquals('Smith', $patient->getName()[0]->getFamily());
+        $this->assertEquals('male', $patient->getGender());
+    }
+    
+    public function testValidationFailure(): void
+    {
+        $this->expectException(ValidationException::class);
+        
+        $json = json_encode([
+            'resourceType' => 'Patient',
+            // Missing required fields
+        ]);
+        
+        $this->patientService->createFromJson($json);
+    }
+}</code></pre>
+
+        <h3>Functional Tests</h3>
+        <pre><code class="language-php">namespace App\Tests\Controller;
+
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+
+class FHIRControllerTest extends WebTestCase
+{
+    public function testCreatePatient(): void
+    {
+        $client = static::createClient();
+        
+        $patient = [
+            'resourceType' => 'Patient',
+            'name' => [[
+                'family' => 'Test',
+                'given' => ['Patient']
+            ]],
+            'gender' => 'male',
+            'birthDate' => '1990-01-01'
+        ];
+        
+        $client->request(
+            'POST',
+            '/api/fhir/Patient',
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/fhir+json'],
+            json_encode($patient)
+        );
+        
+        $this->assertResponseStatusCodeSame(201);
+        $this->assertResponseHeaderSame('Content-Type', 'application/fhir+json');
+        
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals('Patient', $response['resourceType']);
+        $this->assertArrayHasKey('id', $response);
+    }
+    
+    public function testValidationError(): void
+    {
+        $client = static::createClient();
+        
+        $invalidPatient = [
+            'resourceType' => 'Patient',
+            // Invalid: missing required fields
+        ];
+        
+        $client->request(
+            'POST',
+            '/api/fhir/Patient',
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/fhir+json'],
+            json_encode($invalidPatient)
+        );
+        
+        $this->assertResponseStatusCodeSame(400);
+        
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals('OperationOutcome', $response['resourceType']);
+        $this->assertArrayHasKey('issue', $response);
+    }
+}</code></pre>
+    </section>
+
+    <!-- Real-World Use Cases Section -->
+    <section class="integration-section">
+        <h2>Real-World Use Cases</h2>
+        
+        <h3>1. EHR Integration Service</h3>
+        <pre><code class="language-php">class EHRIntegrationService
+{
+    public function __construct(
+        private readonly FHIRSerializationService $serializer,
+        private readonly FHIRPathEvaluator $evaluator,
+        private readonly HttpClientInterface $httpClient
+    ) {}
+    
+    public function syncPatientToEHR(FHIRPatient $patient): void
+    {
+        // Serialize patient to JSON
+        $json = $this->serializer->serializeToJson($patient);
+        
+        // Send to external EHR system
+        $response = $this->httpClient->request('POST', 
+            'https://ehr-system.example.com/api/fhir/Patient',
+            [
+                'headers' => ['Content-Type' => 'application/fhir+json'],
+                'body' => $json
+            ]
+        );
+        
+        if ($response->getStatusCode() !== 201) {
+            throw new \RuntimeException('Failed to sync patient to EHR');
+        }
+    }
+    
+    public function fetchPatientFromEHR(string $patientId): FHIRPatient
+    {
+        $response = $this->httpClient->request('GET',
+            "https://ehr-system.example.com/api/fhir/Patient/{$patientId}",
+            ['headers' => ['Accept' => 'application/fhir+json']]
+        );
+        
+        return $this->serializer->deserializeFromJson(
+            $response->getContent(),
+            FHIRPatient::class
+        );
+    }
+}</code></pre>
+
+        <h3>2. FHIR Validation Service</h3>
+        <pre><code class="language-php">class FHIRValidationService
+{
+    public function validateResource(string $json, string $resourceType): array
+    {
+        $issues = [];
+        
+        try {
+            $resource = $this->serializer->deserializeFromJson(
+                $json,
+                $resourceType,
+                ValidationMode::STRICT
+            );
+            
+            // Additional custom validation
+            $issues = array_merge($issues, $this->validateBusinessRules($resource));
+            
+        } catch (ValidationException $e) {
+            $outcome = $e->getOperationOutcome();
+            foreach ($outcome->getIssue() as $issue) {
+                $issues[] = [
+                    'severity' => $issue->getSeverity(),
+                    'code' => $issue->getCode(),
+                    'details' => $issue->getDetails()->getText(),
+                    'expression' => $issue->getExpression()
+                ];
+            }
+        }
+        
+        return [
+            'valid' => empty($issues),
+            'issues' => $issues
+        ];
+    }
+}</code></pre>
+
+        <h3>3. FHIR API Gateway</h3>
+        <pre><code class="language-php">class FHIRGatewayController extends AbstractController
+{
+    #[Route('/gateway/fhir/{resourceType}/{id}', methods: ['GET'])]
+    public function proxyRequest(
+        string $resourceType,
+        string $id,
+        Request $request
+    ): Response {
+        // Authenticate and authorize request
+        $this->denyAccessUnlessGranted('ROLE_FHIR_READ');
+        
+        // Determine target system based on resource type
+        $targetUrl = $this->getTargetUrl($resourceType, $id);
+        
+        // Forward request
+        $response = $this->httpClient->request('GET', $targetUrl, [
+            'headers' => [
+                'Accept' => 'application/fhir+json',
+                'Authorization' => $this->getAuthToken()
+            ]
+        ]);
+        
+        // Validate response
+        $resource = $this->serializer->deserializeFromJson(
+            $response->getContent(),
+            $this->getResourceClass($resourceType)
+        );
+        
+        // Transform if needed
+        $transformed = $this->transformResource($resource);
+        
+        return $this->json($transformed);
+    }
+}</code></pre>
+    </section>
+</div>
+
+<style>
+.symfony-integration-page {
+    max-width: 1000px;
+}
+
+.integration-section {
+    margin-bottom: var(--spacing-10);
+}
+
+.integration-section h2 {
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-4);
+    padding-bottom: var(--spacing-2);
+    border-bottom: 2px solid var(--color-primary);
+}
+
+.integration-section h3 {
+    color: var(--color-gray-800);
+    margin-top: var(--spacing-6);
+    margin-bottom: var(--spacing-3);
+}
+
+.integration-section p {
+    color: var(--color-gray-600);
+    margin-bottom: var(--spacing-3);
+}
+
+.integration-section pre {
+    margin-bottom: var(--spacing-6);
+}
+</style>
+
+<!-- Load Prism.js for syntax highlighting -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>

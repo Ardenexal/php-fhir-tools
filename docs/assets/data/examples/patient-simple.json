@@ -1,0 +1,28 @@
+{
+  "resourceType": "Patient",
+  "id": "example-simple",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2024-01-15T09:30:00Z"
+  },
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Simple patient example</div>"
+  },
+  "identifier": [
+    {
+      "system": "http://example.org/fhir/Patient",
+      "value": "12345"
+    }
+  ],
+  "active": true,
+  "name": [
+    {
+      "use": "official",
+      "family": "Smith",
+      "given": ["John"]
+    }
+  ],
+  "gender": "male",
+  "birthDate": "1974-12-25"
+}

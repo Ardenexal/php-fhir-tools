@@ -1,0 +1,450 @@
+---
+layout: docs
+title: Models
+category: components
+---
+
+# Models
+
+The Models component provides type-safe PHP classes for FHIR resources, data types, and complex elements. All models are generated from official FHIR specifications.
+
+## Overview
+
+Key features:
+
+- **Type-Safe**: Strict PHP types for all properties
+- **Multi-Version**: Support for R4, R4B, and R5
+- **Auto-Generated**: Generated from official FHIR structure definitions
+- **Validated**: Built-in validation rules
+- **Serializable**: Works seamlessly with the Serialization component
+- **IDE-Friendly**: Full auto-completion support
+
+## Installation
+
+### Standalone
+
+```bash
+composer require ardenexal/fhir-models
+```
+
+### With FHIRBundle
+
+```bash
+composer require ardenexal/fhir-bundle
+```
+
+## FHIR Versions
+
+### R4 (4.0.1)
+
+```php
+use Ardenexal\FHIRModels\R4\Resource\Patient;
+use Ardenexal\FHIRModels\R4\DataType\HumanName;
+
+$patient = new Patient();
+```
+
+### R4B (4.3.0)
+
+```php
+use Ardenexal\FHIRModels\R4B\Resource\Patient;
+use Ardenexal\FHIRModels\R4B\DataType\HumanName;
+
+$patient = new Patient();
+```
+
+### R5 (5.0.0)
+
+```php
+use Ardenexal\FHIRModels\R5\Resource\Patient;
+use Ardenexal\FHIRModels\R5\DataType\HumanName;
+
+$patient = new Patient();
+```
+
+## Basic Usage
+
+### Creating a Patient
+
+```php
+use Ardenexal\FHIRModels\R4\Resource\Patient;
+use Ardenexal\FHIRModels\R4\DataType\HumanName;
+use Ardenexal\FHIRModels\R4\DataType\ContactPoint;
+use Ardenexal\FHIRModels\R4\DataType\Address;
+
+// Create patient
+$patient = new Patient();
+$patient->setId('patient-123');
+$patient->setActive(true);
+$patient->setGender('male');
+$patient->setBirthDate('1980-01-15');
+
+// Add name
+$name = new HumanName();
+$name->setFamily('Doe');
+$name->setGiven(['John', 'Robert']);
+$name->setUse('official');
+$patient->addName($name);
+
+// Add telecom
+$phone = new ContactPoint();
+$phone->setSystem('phone');
+$phone->setValue('+1-555-123-4567');
+$phone->setUse('home');
+$patient->addTelecom($phone);
+
+$email = new ContactPoint();
+$email->setSystem('email');
+$email->setValue('john.doe@example.com');
+$patient->addTelecom($email);
+
+// Add address
+$address = new Address();
+$address->setUse('home');
+$address->setLine(['123 Main St', 'Apt 4B']);
+$address->setCity('Springfield');
+$address->setState('IL');
+$address->setPostalCode('62701');
+$address->setCountry('USA');
+$patient->addAddress($address);
+```
+
+### Creating an Observation
+
+```php
+use Ardenexal\FHIRModels\R4\Resource\Observation;
+use Ardenexal\FHIRModels\R4\DataType\CodeableConcept;
+use Ardenexal\FHIRModels\R4\DataType\Coding;
+use Ardenexal\FHIRModels\R4\DataType\Quantity;
+use Ardenexal\FHIRModels\R4\DataType\Reference;
+
+$observation = new Observation();
+$observation->setId('obs-123');
+$observation->setStatus('final');
+
+// Set code (LOINC)
+$code = new CodeableConcept();
+$coding = new Coding();
+$coding->setSystem('http://loinc.org');
+$coding->setCode('85354-9');
+$coding->setDisplay('Blood pressure panel');
+$code->addCoding($coding);
+$observation->setCode($code);
+
+// Set subject reference
+$subject = new Reference();
+$subject->setReference('Patient/patient-123');
+$observation->setSubject($subject);
+
+// Add systolic component
+$systolicComponent = new Observation\ObservationComponent();
+$systolicCode = new CodeableConcept();
+$systolicCoding = new Coding();
+$systolicCoding->setSystem('http://loinc.org');
+$systolicCoding->setCode('8480-6');
+$systolicCoding->setDisplay('Systolic blood pressure');
+$systolicCode->addCoding($systolicCoding);
+$systolicComponent->setCode($systolicCode);
+
+$systolicValue = new Quantity();
+$systolicValue->setValue(120);
+$systolicValue->setUnit('mmHg');
+$systolicValue->setSystem('http://unitsofmeasure.org');
+$systolicValue->setCode('mm[Hg]');
+$systolicComponent->setValueQuantity($systolicValue);
+
+$observation->addComponent($systolicComponent);
+
+// Add diastolic component
+$diastolicComponent = new Observation\ObservationComponent();
+$diastolicCode = new CodeableConcept();
+$diastolicCoding = new Coding();
+$diastolicCoding->setSystem('http://loinc.org');
+$diastolicCoding->setCode('8462-4');
+$diastolicCoding->setDisplay('Diastolic blood pressure');
+$diastolicCode->addCoding($diastolicCoding);
+$diastolicComponent->setCode($diastolicCode);
+
+$diastolicValue = new Quantity();
+$diastolicValue->setValue(80);
+$diastolicValue->setUnit('mmHg');
+$diastolicValue->setSystem('http://unitsofmeasure.org');
+$diastolicValue->setCode('mm[Hg]');
+$diastolicComponent->setValueQuantity($diastolicValue);
+
+$observation->addComponent($diastolicComponent);
+```
+
+## Property Access
+
+### Getters and Setters
+
+```php
+// Set properties
+$patient->setActive(true);
+$patient->setGender('female');
+
+// Get properties
+$isActive = $patient->getActive();  // bool(true)
+$gender = $patient->getGender();    // string("female")
+```
+
+### Collections
+
+```php
+// Add to collections
+$patient->addName($name1);
+$patient->addName($name2);
+
+// Get collection
+$names = $patient->getName();  // array of HumanName
+
+// Iterate collection
+foreach ($patient->getName() as $name) {
+    echo $name->getFamily() . "\n";
+}
+```
+
+### Nested Properties
+
+```php
+// Access nested properties
+$familyName = $patient->getName()[0]->getFamily();
+$city = $patient->getAddress()[0]->getCity();
+
+// Safe navigation with null checks
+$family = $patient->getName()[0]?->getFamily() ?? 'Unknown';
+```
+
+## Type Safety
+
+All models use strict types:
+
+```php
+declare(strict_types=1);
+
+// Type errors are caught at runtime
+$patient->setActive(true);     // OK
+$patient->setActive('true');   // TypeError
+
+$patient->setBirthDate('1980-01-15');  // OK
+$patient->setBirthDate(new DateTime());  // TypeError
+```
+
+## Validation
+
+Models include built-in validation:
+
+```php
+use Ardenexal\FHIRModels\R4\Validation\ResourceValidator;
+
+$validator = new ResourceValidator();
+
+// Validate resource
+$result = $validator->validate($patient);
+
+if (!$result->isValid()) {
+    foreach ($result->getErrors() as $error) {
+        echo $error->getMessage() . "\n";
+        echo "Path: " . $error->getPath() . "\n";
+    }
+}
+```
+
+## Serialization Integration
+
+Models work seamlessly with the Serialization component:
+
+```php
+use Ardenexal\FHIRSerialization\FHIRSerializationService;
+
+$serializer = new FHIRSerializationService();
+
+// Serialize to JSON
+$json = $serializer->serialize($patient);
+
+// Deserialize from JSON
+$patient = $serializer->deserialize($json, 'Patient');
+
+// The returned object is a fully-typed Patient model
+$name = $patient->getName()[0]->getFamily();  // Type-safe
+```
+
+## Resource Types
+
+### Domain Resources
+
+- **Patient**: Demographics and other administrative information
+- **Observation**: Measurements and simple assertions
+- **Condition**: Detailed information about conditions, problems or diagnoses
+- **MedicationRequest**: Order or request for medication
+- **Procedure**: An action performed on or to a patient
+- **Encounter**: Interaction between patient and healthcare provider
+- **DiagnosticReport**: Report of diagnostic tests
+- **CarePlan**: Healthcare plan for patient
+- And 100+ more...
+
+### Data Types
+
+#### Primitive Types
+- string, boolean, integer, decimal
+- date, dateTime, time, instant
+- uri, url, canonical, oid, uuid
+- base64Binary, code, id, markdown
+
+#### Complex Types
+- **HumanName**: Name of a person
+- **Address**: Postal address
+- **ContactPoint**: Phone, email, etc.
+- **Identifier**: Business identifier
+- **CodeableConcept**: Concept with coding
+- **Quantity**: Measured amount
+- **Period**: Time period
+- **Reference**: Reference to another resource
+- **Attachment**: Binary content
+- And 40+ more...
+
+## Code Generation
+
+### Generate Models
+
+```php
+use Ardenexal\FHIRModels\Generator\ModelGenerator;
+
+$generator = new ModelGenerator();
+
+// Generate R4 models
+$generator->generate('R4', '/path/to/output/R4');
+
+// Generate R5 models
+$generator->generate('R5', '/path/to/output/R5');
+```
+
+### Custom Namespaces
+
+```php
+$generator->generate('R4', '/path/to/output', [
+    'namespace' => 'App\\FHIR\\R4',
+    'base_namespace' => 'App\\FHIR'
+]);
+```
+
+### Symfony Integration
+
+```yaml
+# config/packages/fhir.yaml
+fhir:
+    models:
+        cache_directory: '%kernel.cache_dir%/fhir/models'
+        auto_generate: false
+        namespaces:
+            R4: 'App\FHIR\R4'
+            R4B: 'App\FHIR\R4B'
+            R5: 'App\FHIR\R5'
+```
+
+Generate via command:
+
+```bash
+php bin/console fhir:generate-models R4
+```
+
+## Advanced Usage
+
+### Custom Extensions
+
+```php
+use Ardenexal\FHIRModels\R4\DataType\Extension;
+
+// Add extension to patient
+$extension = new Extension();
+$extension->setUrl('http://example.org/fhir/StructureDefinition/race');
+$extension->setValueString('Asian');
+
+$patient->addExtension($extension);
+
+// Access extensions
+foreach ($patient->getExtension() as $ext) {
+    if ($ext->getUrl() === 'http://example.org/fhir/StructureDefinition/race') {
+        $race = $ext->getValueString();
+    }
+}
+```
+
+### Contained Resources
+
+```php
+// Add contained resource
+$practitioner = new Practitioner();
+$practitioner->setId('pract-1');
+// ... set practitioner properties
+
+$observation->addContained($practitioner);
+
+// Reference contained resource
+$performer = new Reference();
+$performer->setReference('#pract-1');
+$observation->addPerformer($performer);
+```
+
+### Meta Information
+
+```php
+use Ardenexal\FHIRModels\R4\DataType\Meta;
+
+$meta = new Meta();
+$meta->setVersionId('1');
+$meta->setLastUpdated('2024-01-15T10:30:00Z');
+$meta->addProfile('http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient');
+
+$patient->setMeta($meta);
+```
+
+## IDE Support
+
+Models provide full IDE auto-completion:
+
+- Property discovery
+- Method signatures
+- Type hints
+- PHPDoc annotations
+- Return type declarations
+
+## Performance
+
+### Memory Efficiency
+
+Models are designed for efficiency:
+
+```php
+// Create on demand
+$patient = new Patient();
+$patient->setId('123');  // Only ID is stored in memory
+
+// Collections are lazy-loaded
+$patient->addName($name);  // Added to internal array
+```
+
+### Cloning
+
+```php
+// Deep clone resources
+$patientCopy = clone $patient;
+
+// Modify copy without affecting original
+$patientCopy->setActive(false);
+```
+
+## Next Steps
+
+- [Serialization Component](serialization.html) - Serialize models to JSON/XML
+- [FHIRPath Component](fhirpath.html) - Query model properties
+- [Validation Component](validation.html) - Validate models (coming soon)
+- [API Reference](../api-reference.html) - Complete API documentation
+
+## Resources
+
+- [FHIR R4 Resources](https://www.hl7.org/fhir/R4/resourcelist.html)
+- [FHIR R5 Resources](https://www.hl7.org/fhir/R5/resourcelist.html)
+- [FHIR Data Types](https://www.hl7.org/fhir/datatypes.html)
+- [GitHub Repository](https://github.com/Ardenexal/php-fhir-tools)
