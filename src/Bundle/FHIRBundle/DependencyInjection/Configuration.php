@@ -72,6 +72,17 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('path')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->integerNode('cache_size')
+                            ->defaultValue(100)
+                            ->min(10)
+                            ->max(10000)
+                            ->info('Maximum number of FHIRPath expressions to cache')
+                        ->end()
+                    ->end()
+                ->end()
             ->end();
 
         return $treeBuilder;

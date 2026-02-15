@@ -164,13 +164,6 @@ class PSR12CompliancePropertyTest extends TestCase
                             $className,
                             "Class name {$className} should match filename in {$file->getPathname()}",
                         );
-
-                        // Class should start with FHIR prefix for generated models
-                        self::assertStringStartsWith(
-                            'FHIR',
-                            $className,
-                            "Generated class {$className} should start with FHIR prefix in {$file->getPathname()}",
-                        );
                     }
 
                     // Test enum declaration format (for Enum type)

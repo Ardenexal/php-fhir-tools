@@ -40,11 +40,6 @@ use function Symfony\Component\String\u;
 class FHIRValueSetGenerator implements GeneratorInterface
 {
     /**
-     * Default prefix for all generated FHIR classes
-     */
-    public const DEFAULT_CLASS_PREFIX = 'FHIR';
-
-    /**
      * String slugger for normalizing concept names into valid PHP identifiers
      *
      * @var AsciiSlugger
@@ -113,7 +108,7 @@ class FHIRValueSetGenerator implements GeneratorInterface
      */
     public function generateEnum(array $valueSet, string $version, BuilderContextInterface $builderContext): EnumType
     {
-        $className = self::DEFAULT_CLASS_PREFIX . u($valueSet['name'])->pascal();
+        $className = ClassNameResolver::resolveClassName($valueSet['url'], $valueSet['name']);
         $enumType  = new EnumType($className, $builderContext->getEnumNamespace($version));
         $enumType->addComment('ValueSet: ' . ($valueSet['title'] ?? $valueSet['name']));
         $enumType->addComment('URL: ' . ($valueSet['url'] ?? 'unknown'));

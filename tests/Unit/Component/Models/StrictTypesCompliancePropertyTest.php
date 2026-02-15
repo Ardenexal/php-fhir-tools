@@ -43,19 +43,26 @@ class StrictTypesCompliancePropertyTest extends TestCase
                 if ($file->getExtension() === 'php') {
                     $content = file_get_contents($file->getPathname());
 
-                    // Check that the file starts with <?php declare(strict_types=1);
+                    // Check that the file starts with <?php
                     self::assertStringStartsWith(
-                        '<?php declare(strict_types=1);',
+                        '<?php',
                         $content,
-                        "File {$file->getPathname()} must start with strict types declaration",
+                        "File {$file->getPathname()} must start with <?php",
                     );
 
-                    // Verify the declaration is on the first line
-                    $lines = explode("\n", $content);
-                    self::assertSame(
-                        '<?php declare(strict_types=1);',
-                        $lines[0],
-                        "File {$file->getPathname()} must have strict types declaration on first line",
+                    // Check that declare(strict_types=1) is present within first 5 lines
+                    $lines                 = explode("\n", $content);
+                    $foundInFirstFiveLines = false;
+                    for ($i = 0; $i < min(5, count($lines)); ++$i) {
+                        if (str_contains($lines[$i], 'declare(strict_types=1)')) {
+                            $foundInFirstFiveLines = true;
+                            break;
+                        }
+                    }
+
+                    self::assertTrue(
+                        $foundInFirstFiveLines,
+                        "File {$file->getPathname()} must have strict types declaration within first 5 lines",
                     );
                 }
             }

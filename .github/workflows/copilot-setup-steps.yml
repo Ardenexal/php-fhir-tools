@@ -7,6 +7,14 @@ name: Copilot Agent Setup
 on:
   workflow_dispatch:
   push:
+    branches:
+        - 'copilot/**'
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+  pull_request:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+
 jobs:
   copilot-setup-steps:
     name: Setup PHP Environment for Copilot Agent
@@ -21,7 +29,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
+
       - name: Setup PHP 8.3
         uses: shivammathur/setup-php@v2
         with:
@@ -29,7 +37,7 @@ jobs:
           extensions: ctype, iconv, zip, curl, intl
           ini-values: memory_limit=-1, max_execution_time=0
           coverage: none
-      
+
       - name: Verify PHP installation
         run: |
           echo "=== PHP Version ==="
@@ -40,10 +48,10 @@ jobs:
           echo ""
           echo "=== PHP Configuration ==="
           php -i | grep -E "(memory_limit|max_execution_time)"
-      
+
       - name: Validate Composer
         run: composer --version
-      
+
       - name: Cache Composer packages
         uses: actions/cache@v4
         with:
@@ -51,12 +59,12 @@ jobs:
           key: ${{ runner.os }}-php-8.3-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
             ${{ runner.os }}-php-8.3-
-      
+
       - name: Install Composer dependencies
         run: |
           composer install --prefer-dist --no-interaction --optimize-autoloader
           echo "✅ Composer dependencies installed successfully"
-      
+
       - name: Verify required tools are installed
         run: |
           echo "=== Checking for required tools ==="
@@ -65,14 +73,14 @@ jobs:
           test -f vendor/bin/phpstan.phar && echo "✅ PHPStan found" || exit 1
           test -f vendor/bin/pint && echo "✅ Pint found" || exit 1
           echo "All required tools are available"
-      
+
       - name: Create required directories
         run: |
           mkdir -p output var/cache var/log coverage
           chmod -R 755 bin/console
           chmod -R 777 var/ coverage/
           echo "✅ Required directories created"
-      
+
       - name: Verify Symfony Console
         run: |
           echo "=== Symfony Console Version ==="
@@ -83,13 +91,13 @@ jobs:
           echo ""
           echo "=== Verifying FHIR Commands ==="
           php bin/console list | grep -q "fhir:generate" && echo "✅ FHIR generation command available" || exit 1
-      
+
       - name: Run unit tests
         run: |
           echo "=== Running Unit Tests ==="
           composer run test-unit -- --no-coverage
           echo "✅ Unit tests passed"
-      
+
       - name: Display project information
         if: always()
         run: |

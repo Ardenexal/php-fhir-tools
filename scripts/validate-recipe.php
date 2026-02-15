@@ -240,8 +240,7 @@ if ($isValid) {
     echo "✅ Recipe validation passed!\n";
     echo "📦 Recipe is ready for Symfony Flex installation.\n";
     exit(0);
-} else {
-    echo "❌ Recipe validation failed!\n";
-    echo "🔧 Please fix the errors above before using the recipe.\n";
-    exit(1);
 }
+echo "❌ Recipe validation failed!\n";
+echo "🔧 Please fix the errors above before using the recipe.\n";
+exit(1);

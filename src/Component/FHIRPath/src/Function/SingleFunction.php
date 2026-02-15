@@ -25,11 +25,11 @@ class SingleFunction extends AbstractFunction
         $this->validateParameterCount($parameters, 0);
 
         if ($input->isEmpty()) {
-            throw EvaluationException::invalidFunctionParameter('single', 'Collection is empty, expected exactly one item');
+            throw EvaluationException::invalidFunctionParameter('single', 'collection', 'non-empty collection');
         }
 
         if ($input->count() > 1) {
-            throw EvaluationException::invalidFunctionParameter('single', sprintf('Collection has %d items, expected exactly one item', $input->count()));
+            throw EvaluationException::invalidFunctionParameter('single', 'collection', 'single item collection');
         }
 
         return $input;

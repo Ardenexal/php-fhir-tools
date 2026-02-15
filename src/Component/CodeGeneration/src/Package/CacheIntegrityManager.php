@@ -156,6 +156,13 @@ class CacheIntegrityManager
             'created_at'      => date('c'),
             'file_count'      => $this->countFiles($cacheDir),
             'total_size'      => $this->calculateDirectorySize($cacheDir),
+            // Store full package metadata for offline reconstruction
+            'package_metadata' => [
+                'url'          => $packageMetadata->getUrl(),
+                'description'  => $packageMetadata->getDescription(),
+                'fhirVersions' => $packageMetadata->getFhirVersions(),
+                'dependencies' => $packageMetadata->getDependencies(),
+            ],
         ];
 
         try {
@@ -261,6 +268,47 @@ class CacheIntegrityManager
             $this->logger->error("Cache integrity validation failed for {$packageMetadata->getIdentifier()}: {$e->getMessage()}");
 
             return false;
+        }
+    }
+
+    /**
+     * Reconstruct PackageMetadata from cached integrity metadata
+     *
+     * @param string $cacheDir Cache directory path
+     *
+     * @return PackageMetadata|null Reconstructed package metadata or null if not available
+     *
+     * @throws PackageException When metadata is corrupted
+     */
+    public function reconstructPackageMetadata(string $cacheDir): ?PackageMetadata
+    {
+        $metadata = $this->loadIntegrityMetadata($cacheDir);
+        if ($metadata === null) {
+            return null;
+        }
+
+        // Check if we have the full package metadata stored
+        if (!isset($metadata['package_metadata'])) {
+            $this->logger->debug('Cache integrity file exists but does not contain full package metadata');
+
+            return null;
+        }
+
+        try {
+            $packageData = [
+                'name'         => $metadata['package_name'],
+                'version'      => $metadata['package_version'],
+                'url'          => $metadata['package_metadata']['url']          ?? '',
+                'description'  => $metadata['package_metadata']['description']  ?? '',
+                'fhirVersions' => $metadata['package_metadata']['fhirVersions'] ?? [],
+                'dependencies' => $metadata['package_metadata']['dependencies'] ?? [],
+            ];
+
+            return PackageMetadata::fromPackageData($packageData);
+        } catch (\Exception $e) {
+            $this->logger->warning("Failed to reconstruct package metadata from cache: {$e->getMessage()}");
+
+            return null;
         }
     }
 

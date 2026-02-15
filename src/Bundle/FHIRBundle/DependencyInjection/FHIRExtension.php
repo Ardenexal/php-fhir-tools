@@ -31,6 +31,7 @@ class FHIRExtension extends Extension
         $container->setParameter('fhir.default_version', $config['default_version']);
         $container->setParameter('fhir.validation_enabled', $config['validation']['enabled']);
         $container->setParameter('fhir.validation_strict_mode', $config['validation']['strict_mode']);
+        $container->setParameter('fhir.path.cache_size', $config['path']['cache_size']);
 
         // Set version-specific parameters
         $versionConfig = SymfonyVersionHelper::getVersionSpecificServiceConfig();

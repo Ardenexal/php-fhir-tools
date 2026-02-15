@@ -24,7 +24,7 @@ final class UnionFunction extends AbstractFunction
         $this->validateParameterCount($parameters, 1);
 
         $otherCollection = $parameters[0];
-        if (!($otherCollection instanceof Collection)) {
+        if (!$otherCollection instanceof Collection) {
             return $input;
         }
 

@@ -66,6 +66,10 @@ fhir:
         strict_validation: true                            # Enable strict FHIR validation
         cache_metadata: true                               # Cache metadata for performance
         debug: false                                       # Enable debug mode
+        
+    # FHIRPath Settings
+    path:
+        cache_size: 100                                    # Maximum cached expressions (10-10000)
 ```
 
 ### Environment Variables
@@ -98,6 +102,7 @@ The bundle automatically registers the following services:
 | `fhir.serialization_service` | `FHIRSerializationService` | FHIR serialization and deserialization |
 | `fhir.package_loader` | `PackageLoader` | Loads FHIR packages |
 | `fhir.builder_context` | `BuilderContext` | Code generation context |
+| `fhir.path_service` | `FHIRPathService` | Evaluates FHIRPath expressions |
 
 ### Using Services in Your Code
 
@@ -109,6 +114,7 @@ The bundle automatically registers the following services:
 namespace App\Controller;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\FHIRModelGenerator;
+use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -116,13 +122,21 @@ class FHIRController extends AbstractController
 {
     public function __construct(
         private readonly FHIRModelGenerator $generator,
-        private readonly FHIRSerializationService $serializer
+        private readonly FHIRSerializationService $serializer,
+        private readonly FHIRPathService $pathService
     ) {}
 
     public function generateModels(): Response
     {
         $this->generator->generate('R4B');
         return new Response('FHIR models generated successfully');
+    }
+
+    public function queryPatient($patient): Response
+    {
+        // Evaluate FHIRPath expression
+        $names = $this->pathService->evaluate('name.given', $patient);
+        return new JsonResponse($names->toArray());
     }
 }
 ```
@@ -168,6 +182,23 @@ php bin/console fhir:generate R4B -v
 ```bash
 # Validate FHIR JSON file
 php bin/console fhir:validate patient.json
+```
+
+### FHIRPath Commands
+
+```bash
+# Evaluate FHIRPath expression
+php bin/console fhir:path:evaluate "Patient.name.given" patient.json
+
+# Evaluate with different output formats
+php bin/console fhir:path:evaluate "name.given" patient.json --format=json --pretty
+php bin/console fhir:path:evaluate "name.given" patient.json --format=count
+
+# Show cache statistics
+php bin/console fhir:path:evaluate "name" patient.json -v
+
+# Validate FHIRPath expression syntax
+php bin/console fhir:path:validate "name.where(use = 'official').given.first()"
 ```
 
 ## Usage Examples
