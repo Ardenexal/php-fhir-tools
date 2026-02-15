@@ -38,28 +38,28 @@ composer require ardenexal/fhir-bundle
 ### R4 (4.0.1)
 
 ```php
-use Ardenexal\FHIRModels\R4\Resource\Patient;
-use Ardenexal\FHIRModels\R4\DataType\HumanName;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\HumanName;
 
-$patient = new Patient();
+$patient = new PatientResource();
 ```
 
 ### R4B (4.3.0)
 
 ```php
-use Ardenexal\FHIRModels\R4B\Resource\Patient;
-use Ardenexal\FHIRModels\R4B\DataType\HumanName;
+use Ardenexal\FHIRTools\Component\Models\R4B\Resource\PatientResource;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\HumanName;
 
-$patient = new Patient();
+$patient = new PatientResource();
 ```
 
 ### R5 (5.0.0)
 
 ```php
-use Ardenexal\FHIRModels\R5\Resource\Patient;
-use Ardenexal\FHIRModels\R5\DataType\HumanName;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\PatientResource;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\HumanName;
 
-$patient = new Patient();
+$patient = new PatientResource();
 ```
 
 ## Basic Usage
@@ -67,13 +67,13 @@ $patient = new Patient();
 ### Creating a Patient
 
 ```php
-use Ardenexal\FHIRModels\R4\Resource\Patient;
-use Ardenexal\FHIRModels\R4\DataType\HumanName;
-use Ardenexal\FHIRModels\R4\DataType\ContactPoint;
-use Ardenexal\FHIRModels\R4\DataType\Address;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\HumanName;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactPoint;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Address;
 
 // Create patient
-$patient = new Patient();
+$patient = new PatientResource();
 $patient->setId('patient-123');
 $patient->setActive(true);
 $patient->setGender('male');
@@ -112,13 +112,13 @@ $patient->addAddress($address);
 ### Creating an Observation
 
 ```php
-use Ardenexal\FHIRModels\R4\Resource\Observation;
-use Ardenexal\FHIRModels\R4\DataType\CodeableConcept;
-use Ardenexal\FHIRModels\R4\DataType\Coding;
-use Ardenexal\FHIRModels\R4\DataType\Quantity;
-use Ardenexal\FHIRModels\R4\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\ObservationResource;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 
-$observation = new Observation();
+$observation = new ObservationResource();
 $observation->setId('obs-123');
 $observation->setStatus('final');
 
@@ -137,7 +137,7 @@ $subject->setReference('Patient/patient-123');
 $observation->setSubject($subject);
 
 // Add systolic component
-$systolicComponent = new Observation\ObservationComponent();
+$systolicComponent = new ObservationResource\ObservationComponent();
 $systolicCode = new CodeableConcept();
 $systolicCoding = new Coding();
 $systolicCoding->setSystem('http://loinc.org');
@@ -156,7 +156,7 @@ $systolicComponent->setValueQuantity($systolicValue);
 $observation->addComponent($systolicComponent);
 
 // Add diastolic component
-$diastolicComponent = new Observation\ObservationComponent();
+$diastolicComponent = new ObservationResource\ObservationComponent();
 $diastolicCode = new CodeableConcept();
 $diastolicCoding = new Coding();
 $diastolicCoding->setSystem('http://loinc.org');
@@ -236,9 +236,9 @@ $patient->setBirthDate(new DateTime());  // TypeError
 Models include built-in validation:
 
 ```php
-use Ardenexal\FHIRModels\R4\Validation\ResourceValidator;
+use Ardenexal\FHIRTools\Component\Serialization\Validator\FHIRValidator;
 
-$validator = new ResourceValidator();
+$validator = new FHIRValidator();
 
 // Validate resource
 $result = $validator->validate($patient);
@@ -256,7 +256,7 @@ if (!$result->isValid()) {
 Models work seamlessly with the Serialization component:
 
 ```php
-use Ardenexal\FHIRSerialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 
 $serializer = new FHIRSerializationService();
 
@@ -309,9 +309,9 @@ $name = $patient->getName()[0]->getFamily();  // Type-safe
 ### Generate Models
 
 ```php
-use Ardenexal\FHIRModels\Generator\ModelGenerator;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator;
 
-$generator = new ModelGenerator();
+$generator = new FHIRModelGenerator();
 
 // Generate R4 models
 $generator->generate('R4', '/path/to/output/R4');
@@ -354,7 +354,7 @@ php bin/console fhir:generate-models R4
 ### Custom Extensions
 
 ```php
-use Ardenexal\FHIRModels\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 
 // Add extension to patient
 $extension = new Extension();
@@ -375,7 +375,7 @@ foreach ($patient->getExtension() as $ext) {
 
 ```php
 // Add contained resource
-$practitioner = new Practitioner();
+$practitioner = new PractitionerResource();
 $practitioner->setId('pract-1');
 // ... set practitioner properties
 
@@ -390,7 +390,7 @@ $observation->addPerformer($performer);
 ### Meta Information
 
 ```php
-use Ardenexal\FHIRModels\R4\DataType\Meta;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta;
 
 $meta = new Meta();
 $meta->setVersionId('1');
@@ -418,7 +418,7 @@ Models are designed for efficiency:
 
 ```php
 // Create on demand
-$patient = new Patient();
+$patient = new PatientResource();
 $patient->setId('123');  // Only ID is stored in memory
 
 // Collections are lazy-loaded

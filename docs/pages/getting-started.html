@@ -47,10 +47,10 @@ composer require ardenexal/fhir-models</code></pre>
         
         <h3>1. Create a FHIR Resource</h3>
         <pre><code><?php
-use Ardenexal\FHIRBundle\Models\R4\Resource\Patient;
-use Ardenexal\FHIRBundle\Models\R4\DataType\HumanName;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\HumanName;
 
-$patient = new Patient();
+$patient = new PatientResource();
 $patient->setId('example-123');
 $patient->setActive(true);
 
@@ -61,7 +61,7 @@ $patient->addName($name);</code></pre>
         
         <h3>2. Serialize to JSON</h3>
         <pre><code><?php
-use Ardenexal\FHIRBundle\Serialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 
 $serializer = new FHIRSerializationService();
 $json = $serializer->serialize($patient);
@@ -72,14 +72,14 @@ echo $json;
         <h3>3. Deserialize from JSON</h3>
         <pre><code><?php
 $jsonString = '{"resourceType":"Patient","id":"example-123","active":true}';
-$patient = $serializer->deserialize($jsonString, Patient::class);
+$patient = $serializer->deserialize($jsonString, PatientResource::class);
 
 echo $patient->getId(); // "example-123"
 echo $patient->getActive(); // true</code></pre>
         
         <h3>4. Use FHIRPath</h3>
         <pre><code><?php
-use Ardenexal\FHIRBundle\FHIRPath\FHIRPathEvaluator;
+use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\FHIRPathEvaluator;
 
 $evaluator = new FHIRPathEvaluator();
 
@@ -98,7 +98,7 @@ echo $result[0] ? 'true' : 'false'; // "true"</code></pre>
 // config/bundles.php
 return [
     // ...
-    Ardenexal\FHIRBundle\FHIRBundle::class => ['all' => true],
+    Ardenexal\FHIRTools\Bundle\FHIRBundle\FHIRBundle::class => ['all' => true],
 ];</code></pre>
         
         <h3>2. Configure Services</h3>
@@ -113,7 +113,7 @@ fhir:
         <pre><code><?php
 namespace App\Controller;
 
-use Ardenexal\FHIRBundle\Serialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -125,7 +125,7 @@ class FHIRController extends AbstractController
     
     public function create(): JsonResponse
     {
-        $patient = new Patient();
+        $patient = new PatientResource();
         $patient->setActive(true);
         
         $json = $this->serializer->serialize($patient);

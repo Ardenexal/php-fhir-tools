@@ -40,17 +40,17 @@ composer require ardenexal/fhir-bundle
 Convert a FHIR resource object to JSON:
 
 ```php
-use Ardenexal\FHIRSerialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 
 $serializer = new FHIRSerializationService();
 
 // Create a Patient resource
-$patient = new \Ardenexal\FHIRModels\R4\Resource\Patient();
+$patient = new \Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource();
 $patient->setId('patient-123');
 $patient->setActive(true);
 
 // Add name
-$name = new \Ardenexal\FHIRModels\R4\DataType\HumanName();
+$name = new \Ardenexal\FHIRTools\Component\Models\R4\DataType\HumanName();
 $name->setFamily('Doe');
 $name->setGiven(['John']);
 $patient->addName($name);
@@ -260,7 +260,7 @@ fhir:
 Use via dependency injection:
 
 ```php
-use Ardenexal\FHIRBundle\Service\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 
 class PatientService
 {
@@ -282,16 +282,16 @@ class PatientService
 Serialize a FHIR Bundle with multiple resources:
 
 ```php
-$bundle = new \Ardenexal\FHIRModels\R4\Resource\Bundle();
+$bundle = new \Ardenexal\FHIRTools\Component\Models\R4\Resource\BundleResource();
 $bundle->setType('transaction');
 
 // Add Patient entry
-$patientEntry = new \Ardenexal\FHIRModels\R4\Resource\Bundle\BundleEntry();
+$patientEntry = new \Ardenexal\FHIRTools\Component\Models\R4\Resource\Bundle\BundleEntry();
 $patientEntry->setResource($patient);
 $bundle->addEntry($patientEntry);
 
 // Add Observation entry
-$observationEntry = new \Ardenexal\FHIRModels\R4\Resource\Bundle\BundleEntry();
+$observationEntry = new \Ardenexal\FHIRTools\Component\Models\R4\Resource\Bundle\BundleEntry();
 $observationEntry->setResource($observation);
 $bundle->addEntry($observationEntry);
 
@@ -304,12 +304,12 @@ $json = $serializer->serialize($bundle);
 Work with complex nested structures:
 
 ```php
-$observation = new \Ardenexal\FHIRModels\R4\Resource\Observation();
+$observation = new \Ardenexal\FHIRTools\Component\Models\R4\Resource\ObservationResource();
 $observation->setStatus('final');
 
 // Add code
-$code = new \Ardenexal\FHIRModels\R4\DataType\CodeableConcept();
-$coding = new \Ardenexal\FHIRModels\R4\DataType\Coding();
+$code = new \Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept();
+$coding = new \Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding();
 $coding->setSystem('http://loinc.org');
 $coding->setCode('85354-9');
 $coding->setDisplay('Blood pressure');
@@ -317,15 +317,15 @@ $code->addCoding($coding);
 $observation->setCode($code);
 
 // Add component (systolic)
-$component = new \Ardenexal\FHIRModels\R4\Resource\Observation\ObservationComponent();
-$componentCode = new \Ardenexal\FHIRModels\R4\DataType\CodeableConcept();
-$componentCoding = new \Ardenexal\FHIRModels\R4\DataType\Coding();
+$component = new \Ardenexal\FHIRTools\Component\Models\R4\Resource\Observation\ObservationComponent();
+$componentCode = new \Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept();
+$componentCoding = new \Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding();
 $componentCoding->setSystem('http://loinc.org');
 $componentCoding->setCode('8480-6');
 $componentCode->addCoding($componentCoding);
 $component->setCode($componentCode);
 
-$value = new \Ardenexal\FHIRModels\R4\DataType\Quantity();
+$value = new \Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity();
 $value->setValue(120);
 $value->setUnit('mmHg');
 $component->setValueQuantity($value);
@@ -374,7 +374,7 @@ foreach ($resources as $resource) {
 }
 
 // Or serialize as a Bundle for better performance
-$bundle = new Bundle();
+$bundle = new BundleResource();
 $bundle->setType('collection');
 
 foreach ($resources as $resource) {
