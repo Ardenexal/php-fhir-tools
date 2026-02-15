@@ -24,3 +24,8 @@ phpstan.neon
 /phpunit.phar
 ###< phpunit/phpunit ###
 
+###> node/playwright ###
+/node_modules/
+/test-results/
+###< node/playwright ###
+
