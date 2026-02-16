@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ../:/workspace:cached
+      - composer-cache:/home/vscode/.composer
+    environment:
+      - APP_ENV=dev
+      - XDEBUG_MODE=develop,debug,coverage
+      - XDEBUG_CONFIG=client_host=host.docker.internal client_port=9003 start_with_request=yes
+      - PHP_IDE_CONFIG=serverName=fhir-tools
+    command: sleep infinity
+    networks:
+      - fhir-tools
+
+  # Optional: Add a database if needed for future FHIR data storage
+  # postgres:
+  #   image: postgres:16-alpine
+  #   environment:
+  #     POSTGRES_DB: fhir_tools
+  #     POSTGRES_USER: fhir_user
+  #     POSTGRES_PASSWORD: fhir_password
+  #   volumes:
+  #     - postgres-data:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+  #   networks:
+  #     - fhir-tools
+
+volumes:
+  composer-cache:
+  # postgres-data:
+
+networks:
+  fhir-tools:
+    driver: bridge

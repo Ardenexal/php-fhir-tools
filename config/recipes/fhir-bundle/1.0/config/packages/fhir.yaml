@@ -1,0 +1,48 @@
+fhir:
+    # Output directory for generated FHIR classes
+    output_directory: '%env(FHIR_OUTPUT_DIRECTORY)%'
+    
+    # Cache directory for FHIR packages and metadata
+    cache_directory: '%env(FHIR_CACHE_DIRECTORY)%'
+    
+    # Default FHIR version (R4, R4B, R5)
+    default_version: '%env(FHIR_DEFAULT_VERSION)%'
+    
+    # Validation settings
+    validation:
+        enabled: '%env(bool:FHIR_VALIDATION_ENABLED)%'
+        strict_mode: '%env(bool:FHIR_VALIDATION_STRICT_MODE)%'
+    
+    # FHIR package configuration
+    packages:
+        'hl7.fhir.r4.core':
+            version: '4.0.1'
+            auto_update: false
+        'hl7.fhir.r4b.core':
+            version: '4.3.0'
+            auto_update: false
+        'hl7.fhir.r5.core':
+            version: '5.0.0'
+            auto_update: false
+        'hl7.terminology':
+            version: '5.5.0'
+            auto_update: false
+
+when@dev:
+    fhir:
+        validation:
+            strict_mode: false
+
+when@prod:
+    fhir:
+        validation:
+            enabled: true
+            strict_mode: true
+
+when@test:
+    fhir:
+        output_directory: '%kernel.project_dir%/tests/output'
+        cache_directory: '%kernel.cache_dir%/test_fhir'
+        validation:
+            enabled: true
+            strict_mode: false

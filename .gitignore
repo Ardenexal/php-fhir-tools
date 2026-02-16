@@ -1,0 +1,39 @@
+.idea/
+composer.lock
+nul
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Internal tool configs
+.kiro/
+.claude/
+
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/.env.dev
+/.env.test
+/.env.prod
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+/output/
+!/output/.gitkeep
+/resources/
+###< symfony/framework-bundle ###
+
+###> phpstan/phpstan ###
+phpstan.neon
+###< phpstan/phpstan ###
+
+###> phpunit/phpunit ###
+/phpunit.xml
+/.phpunit.cache/
+/coverage
+/phpunit.phar
+###< phpunit/phpunit ###
+

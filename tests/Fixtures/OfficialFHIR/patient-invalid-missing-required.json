@@ -1,0 +1,23 @@
+{
+    "resourceType": "Patient",
+    "id": "invalid-example",
+    "text": {
+        "status": "generated",
+        "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Invalid Patient - missing required elements</div>"
+    },
+    "identifier": [
+        {
+            "use": "usual",
+            "system": "urn:oid:1.2.36.146.595.217.0.1",
+            "value": "12345"
+        }
+    ],
+    "name": [],
+    "telecom": [
+        {
+            "system": "phone",
+            "value": "555-1234"
+        }
+    ],
+    "birthDate": "1980-01-01"
+}

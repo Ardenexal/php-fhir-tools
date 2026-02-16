@@ -1,0 +1,66 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "test-observation",
+  "url": "http://example.org/StructureDefinition/TestObservation",
+  "version": "1.0.0",
+  "name": "TestObservation",
+  "title": "Test Observation Profile",
+  "status": "active",
+  "experimental": true,
+  "date": "2024-01-01",
+  "publisher": "FHIR Tools Test Suite",
+  "description": "A test observation profile for FHIR Tools testing",
+  "fhirVersion": "4.3.0",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Observation",
+  "differential": {
+    "element": [
+      {
+        "id": "Observation",
+        "path": "Observation",
+        "min": 0,
+        "max": "*"
+      },
+      {
+        "id": "Observation.status",
+        "path": "Observation.status",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "code"
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "Observation.code",
+        "path": "Observation.code",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "CodeableConcept"
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "Observation.subject",
+        "path": "Observation.subject",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "Reference",
+            "targetProfile": [
+              "http://hl7.org/fhir/StructureDefinition/Patient"
+            ]
+          }
+        ],
+        "mustSupport": true
+      }
+    ]
+  }
+}

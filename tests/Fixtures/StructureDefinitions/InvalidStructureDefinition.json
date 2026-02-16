@@ -1,0 +1,38 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "invalid-test",
+  "url": "http://example.org/StructureDefinition/InvalidTest",
+  "version": "1.0.0",
+  "title": "Invalid Test Structure Definition",
+  "status": "active",
+  "experimental": true,
+  "date": "2024-01-01",
+  "publisher": "FHIR Tools Test Suite",
+  "description": "An invalid structure definition for testing error handling",
+  "fhirVersion": "4.3.0",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Patient",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Patient",
+        "min": 0,
+        "max": "*"
+      },
+      {
+        "id": "Patient.invalidElement",
+        "path": "Patient.invalidElement",
+        "min": 2,
+        "max": "0",
+        "type": [
+          {
+            "code": "string"
+          }
+        ]
+      }
+    ]
+  }
+}

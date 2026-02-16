@@ -1,0 +1,88 @@
+name: Regenerate FHIR Models
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit_message:
+        description: 'Commit message for the generated models'
+        required: false
+        default: 'chore: regenerate FHIR models'
+
+jobs:
+  regenerate-models:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        ref: main
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+        extensions: ctype, iconv, zip, curl
+    
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v4
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-8.3-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-8.3-
+    
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress --no-suggest
+    
+    - name: Generate FHIR Models
+      run: |
+        echo "🔄 Starting FHIR model generation..."
+        composer run generate-models-all
+        echo "✅ FHIR model generation completed!"
+    
+    - name: Run Laravel Pint
+      run: |
+        echo "🎨 Running Laravel Pint to format generated code..."
+        composer run lint
+        echo "✅ Code formatting completed!"
+    
+    - name: Check for changes
+      id: check-changes
+      run: |
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "changes=true" >> $GITHUB_OUTPUT
+          echo "📝 Changes detected in generated models"
+          git status --short
+        else
+          echo "changes=false" >> $GITHUB_OUTPUT
+          echo "ℹ️ No changes detected in generated models"
+        fi
+    
+    - name: Commit and push changes
+      if: steps.check-changes.outputs.changes == 'true'
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add .
+        git commit -m "${{ github.event.inputs.commit_message }}"
+        git push origin main
+        echo "✅ Changes committed and pushed to main branch"
+    
+    - name: Summary
+      run: |
+        if [ "${{ steps.check-changes.outputs.changes }}" == "true" ]; then
+          echo "### ✅ FHIR Models Regenerated Successfully" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The FHIR models have been regenerated and committed to the main branch." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit Message:** ${{ github.event.inputs.commit_message }}" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "### ℹ️ No Changes Required" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The FHIR models are already up to date. No changes were committed." >> $GITHUB_STEP_SUMMARY
+        fi

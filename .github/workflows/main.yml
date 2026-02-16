@@ -1,0 +1,149 @@
+name: Main Branch
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  quality-gate:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+        extensions: ctype, iconv, zip
+        coverage: xdebug
+    
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v4
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-8.3-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-8.3-
+    
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress --no-suggest
+    
+    - name: Run linting (Pint) - All Components
+      run: composer run lint
+    
+    - name: Run PHPStan static analysis - All Components
+      run: composer run phpstan
+    
+    - name: Run PHPUnit tests with coverage
+      run: composer run test-coverage
+    
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./coverage/clover.xml
+        fail_ci_if_error: false
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    
+    - name: Run security audit
+      run: composer audit
+    
+    - name: Verify no uncommitted changes
+      run: |
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "Uncommitted changes detected after running quality checks"
+          git status
+          exit 1
+        fi
+
+  component-tests:
+    runs-on: ubuntu-latest
+    needs: quality-gate
+    strategy:
+      matrix:
+        component: [bundle, codegen, serialization]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+        extensions: ctype, iconv, zip
+    
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress --no-suggest
+    
+    - name: Run component-specific linting
+      run: composer run lint:${{ matrix.component }}
+    
+    - name: Run component-specific PHPStan
+      run: composer run phpstan:${{ matrix.component }}
+    
+    - name: Run component-specific tests
+      run: composer run test:${{ matrix.component }}
+
+  integration-test:
+    runs-on: ubuntu-latest
+    needs: [quality-gate, component-tests]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+        extensions: ctype, iconv, zip
+    
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress --no-suggest
+    
+    - name: Run integration tests
+      run: composer run test-integration
+    
+    - name: Run FHIR-specific tests
+      run: composer run test-fhir
+    
+    - name: Test FHIR model generation
+      run: |
+        # Test that the generate command works
+        php bin/console list | grep fhir:generate
+        echo "FHIR generation command is available"
+    
+    - name: Test Symfony Flex recipe
+      run: composer run test-recipe
+    
+    - name: Validate recipe configuration
+      run: composer run validate-recipe
+
+  cross-version-test:
+    runs-on: ubuntu-latest
+    needs: quality-gate
+    strategy:
+      matrix:
+        php-version: ['8.3', '8.4']
+        symfony-version: ['6.4.*', '7.4.*']
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup PHP ${{ matrix.php-version }}
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-version }}
+        extensions: ctype, iconv, zip
+    
+    - name: Install dependencies with Symfony ${{ matrix.symfony-version }}
+      run: |
+        composer require --dev symfony/framework-bundle:${{ matrix.symfony-version }} --no-update
+        composer install --prefer-dist --no-progress --no-suggest
+    
+    - name: Run component tests
+      run: composer run test:components
+    
+    - name: Test bundle integration
+      run: composer run test:bundle

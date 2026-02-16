@@ -1,0 +1,21 @@
+includes:
+    - phpstan-baseline.neon
+
+parameters:
+    level: 8
+    paths:
+        - bin/
+        - config/
+        - public/
+        - src/Bundle/FHIRBundle/
+        - src/Component/CodeGeneration/src/
+        - src/Component/Serialization/src/
+        - src/Component/Models/src/
+        - src/Component/FHIRPath/src/
+    excludePaths:
+        - */vendor/*
+        - src/Component/*/tests/*
+        - src/Component/*/output/*
+        - config/reference.php
+    parallel:
+        maximumNumberOfProcesses: 4

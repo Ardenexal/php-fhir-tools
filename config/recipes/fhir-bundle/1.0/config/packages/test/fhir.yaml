@@ -1,0 +1,18 @@
+fhir:
+    # Test-specific FHIR configuration
+    output_directory: '%kernel.project_dir%/tests/output'
+    cache_directory: '%kernel.cache_dir%/test_fhir'
+    
+    validation:
+        # Enable validation but not strict mode for tests
+        enabled: true
+        strict_mode: false
+    
+    # Use specific test package versions
+    packages:
+        'hl7.fhir.r4b.core':
+            version: '4.3.0'
+            auto_update: false
+        'hl7.terminology':
+            version: '5.5.0'
+            auto_update: false
