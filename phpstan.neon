@@ -6,7 +6,6 @@ parameters:
     paths:
         - bin/
         - config/
-        - public/
         - src/Bundle/FHIRBundle/
         - src/Component/CodeGeneration/src/
         - src/Component/Serialization/src/
@@ -17,5 +16,6 @@ parameters:
         - src/Component/*/tests/*
         - src/Component/*/output/*
         - config/reference.php
+    tmpDir: var/cache/phpstan
     parallel:
         maximumNumberOfProcesses: 4

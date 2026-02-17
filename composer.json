@@ -1,7 +1,7 @@
 {
     "name": "ardenexal/fhir-tools",
-    "description": "PHP CLI tool for generating FHIR types, resources, and profiles from FHIR StructureDefinitions",
-    "type": "project",
+    "description": "PHP monorepo library for FHIR tools - code generation, serialization, FHIRPath, and models",
+    "type": "library",
     "license": "MIT",
     "minimum-stability": "stable",
     "prefer-stable": true,
@@ -14,16 +14,12 @@
         "composer/semver": "^3.4.4",
         "nette/php-generator": "^4.2.1",
         "symfony/console": "^6.4|^7.4",
-        "symfony/dotenv": "^6.4|^7.4",
         "symfony/filesystem": "^6.4|^7.4",
-        "symfony/flex": "^2.10",
-        "symfony/framework-bundle": "^6.4|^7.4",
         "symfony/http-client": "^6.4|^7.4",
         "symfony/intl": "^6.4|^7.4",
         "symfony/polyfill-php84": "^v1.33.0",
         "symfony/polyfill-php85": "^v1.33.0",
         "symfony/property-access": "^6.4|^7.4",
-        "symfony/runtime": "^6.4|^7.4",
         "symfony/serializer": "^6.4|^7.4",
         "symfony/string": "^6.4|^7.4",
         "symfony/validator": "^6.4|^7.4",
@@ -38,14 +34,11 @@
         "symfony/browser-kit": "^6.4|^7.4",
         "symfony/css-selector": "^6.4|^7.4",
         "symfony/dom-crawler": "^6.4|^7.4",
-        "symfony/maker-bundle": "^1.66.0",
         "symfony/phpunit-bridge": "^6.4|^7.4"
     },
     "config": {
         "allow-plugins": {
-            "php-http/discovery": true,
-            "symfony/flex": true,
-            "symfony/runtime": true
+            "php-http/discovery": true
         },
         "bump-after-update": true,
         "sort-packages": true
@@ -76,16 +69,6 @@
         "symfony/polyfill-php82": "*"
     },
     "scripts": {
-        "auto-scripts": {
-            "cache:clear": "symfony-cmd",
-            "assets:install %PUBLIC_DIR%": "symfony-cmd"
-        },
-        "post-install-cmd": [
-            "@auto-scripts"
-        ],
-        "post-update-cmd": [
-            "@auto-scripts"
-        ],
         "phpstan": "php ./vendor/bin/phpstan.phar analyse --configuration=phpstan.neon --memory-limit=-1 -v",
         "phpstan:bundle": "php ./vendor/bin/phpstan.phar analyse src/Bundle/ --configuration=phpstan.neon --memory-limit=-1 -v",
         "phpstan:codegen": "php ./vendor/bin/phpstan.phar analyse src/Component/CodeGeneration/ --configuration=phpstan.neon --memory-limit=-1 -v",
@@ -154,14 +137,5 @@
         "validate-recipe": "php scripts/validate-recipe.php",
         "test-recipe": "php ./vendor/phpunit/phpunit/phpunit tests/Integration/FlexRecipeTest.php",
         "test-package-installation": "php scripts/test-package-installation.php"
-    },
-    "conflict": {
-        "symfony/symfony": "*"
-    },
-    "extra": {
-        "symfony": {
-            "allow-contrib": false,
-            "require": "^6.4|^7.4"
-        }
     }
 }

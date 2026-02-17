@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Exception;
 
+use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationDebugInfo;
 use Ardenexal\FHIRTools\Exception\FHIRToolsException;
-use Ardenexal\FHIRTools\Serialization\FHIRSerializationDebugInfo;
 
 /**
  * Base exception for FHIR serialization errors.

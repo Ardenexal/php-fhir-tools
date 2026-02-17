@@ -1,405 +1,129 @@
 # FHIR Code Generation Component
 
-Standalone PHP library for generating FHIR model classes from StructureDefinitions. This component can be used independently or as part of the FHIRBundle in Symfony applications.
+PHP library for generating FHIR model classes from StructureDefinitions. Produces PHP classes, data types, primitives, and enums from FHIR Implementation Guide packages.
 
 ## Features
 
-- **Standalone Library**: Use independently without Symfony
-- **FHIR Model Generation**: Generate PHP classes from FHIR StructureDefinitions
-- **ValueSet Enums**: Generate PHP enums from FHIR ValueSets
-- **Package Management**: Load and manage FHIR packages from various sources
-- **Minimal Dependencies**: Only essential dependencies for code generation
-- **Extensible Design**: Plugin-based generator system
-- **Error Handling**: Comprehensive error collection and reporting
-- **Performance Optimized**: Parallel generation and caching support
+- Generate PHP classes from FHIR StructureDefinitions
+- Generate PHP enums from FHIR ValueSets
+- Package management with FHIR registry integration
+- Semantic version resolution and dependency handling
+- Local package caching with integrity verification
+- Offline mode for air-gapped environments
 
-## Installation
+## How It Works
 
-### Standalone Installation
+The code generation pipeline:
+
+1. **Package Loading** — Downloads and caches FHIR IG packages (`.tgz`) from `packages.fhir.org`
+2. **Definition Parsing** — Reads StructureDefinition and ValueSet JSON resources from the package
+3. **Class Generation** — Produces PHP classes using [Nette PhpGenerator](https://github.com/nette/php-generator):
+   - Resources (Patient, Observation, etc.)
+   - Data Types (HumanName, Address, etc.)
+   - Primitives (FHIRString, FHIRInteger, etc.)
+   - Backbone Elements (nested within parent resource namespaces)
+4. **Enum Generation** — Produces PHP enums from required ValueSets (AdministrativeGender, etc.)
+
+## Usage
+
+Generation is driven through the `fhir:generate` console command:
 
 ```bash
-composer require ardenexal/fhir-code-generation
+# Generate R4 models
+php bin/console fhir:generate --package=hl7.fhir.r4.core -vvv
+
+# Generate R4B models
+php bin/console fhir:generate --package=hl7.fhir.r4b.core -vvv
+
+# Generate multiple versions at once
+php bin/console fhir:generate --package=hl7.fhir.r4.core --package=hl7.fhir.r4b.core -vvv
+
+# Offline mode (cached packages only)
+php bin/console fhir:generate --package=hl7.fhir.r4.core --offline -vvv
 ```
 
-### With FHIRBundle
+The terminology package (`hl7.terminology.r4`) is automatically included as a dependency.
+
+### Composer Scripts
 
 ```bash
-composer require ardenexal/fhir-bundle
+composer run generate-models-r4      # R4 only
+composer run generate-models-r4b     # R4B only
+composer run generate-models-all     # R4 + R4B + R5
 ```
 
-## Quick Start
-
-### Basic Usage
-
-```php
-<?php
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\FHIRModelGenerator;
-use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
-
-// Create context
-$context = new BuilderContext();
-$context->setOutputDirectory('/path/to/output');
-$context->setBaseNamespace('MyApp\\FHIR');
-
-// Create generator
-$generator = new FHIRModelGenerator($context);
-
-// Generate FHIR models
-$generator->generate('R4B');
-```
-
-### Advanced Configuration
-
-```php
-<?php
-
-// Create context with proper namespaces
-$context = new BuilderContext();
-$elementNamespace = new PhpNamespace('MyApp\\FHIR\\Element');
-$enumNamespace = new PhpNamespace('MyApp\\FHIR\\Enum');
-$context->addElementNamespace('R4B', $elementNamespace);
-$context->addEnumNamespace('R4B', $enumNamespace);
-
-// Create generator
-$generator = new FHIRModelGenerator($context);
-
-// Generate specific resources
-$generator->generateResource('Patient');
-$generator->generateResource('Observation');
-```
-
-## Core Components
+## Core Classes
 
 ### FHIRModelGenerator
 
-Main class for generating FHIR model classes:
+Generates PHP classes from individual StructureDefinitions:
 
 ```php
-<?php
+use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator;
 
-$generator = new FHIRModelGenerator($context);
-
-// Generate all models for a FHIR version
-$generator->generate('R4B');
-
-// Generate specific resources
-$generator->generateResource('Patient');
-$generator->generateResource('Observation');
+// Called internally by the generate command for each StructureDefinition
+$classType = $generator->generate($structureDefinition, $version, $builderContext);
 ```
 
 ### FHIRValueSetGenerator
 
-Generate PHP enums from FHIR ValueSets:
+Generates PHP enums from ValueSet definitions:
 
 ```php
-<?php
+use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRValueSetGenerator;
 
-$generator = new FHIRValueSetGenerator($context);
-
-// Generate specific value sets
-$generator->generateValueSet('administrative-gender');
-$generator->generateValueSet('observation-status');
+$enumType = $generator->generateEnum($valueSetDefinition, $version, $builderContext);
 ```
 
 ### PackageLoader
 
-Load and manage FHIR packages:
+Manages FHIR package downloads, caching, and extraction:
 
 ```php
-<?php
-
 use Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader;
 
-$loader = new PackageLoader();
+// Install a package (downloads if not cached)
+$metadata = $loader->installPackage('hl7.fhir.r4.core', '4.0.1');
 
-// Load package (actual method from implementation)
-$metadata = $loader->installPackage('hl7.fhir.r4b.core', '4.3.0');
+// Load StructureDefinitions into the build context
+$definitions = $loader->loadPackageStructureDefinitions($metadata);
 
-// Load to context
-$loader->loadPackageStructureDefinitions($metadata, 'R4B');
+// Check cache
+$isCached = $loader->isPackageCached('hl7.fhir.r4.core', '4.0.1');
 ```
 
-## Configuration Options
+### BuilderContext
 
-### BuilderContext Configuration
+Holds state during generation — loaded definitions, generated classes, namespace registrations:
 
 ```php
-<?php
+use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 
 $context = new BuilderContext();
-
-// Note: BuilderContext is primarily for managing generated types and namespaces
-// Most configuration is handled through the generator classes themselves
-
-// The BuilderContext manages:
-// - Generated classes and enums
-// - FHIR definitions  
-// - Namespace organization
-// - Pending type resolution
-
-// Add namespaces for a FHIR version
-$elementNamespace = new PhpNamespace('MyApp\\FHIR\\Element');
-$enumNamespace = new PhpNamespace('MyApp\\FHIR\\Enum');
-$context->addElementNamespace('R4B', $elementNamespace);
-$context->addEnumNamespace('R4B', $enumNamespace);
-```
-
-## Advanced Usage
-
-### Custom Generators
-
-```php
-<?php
-
-namespace MyApp\Generator;
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\FHIRModelGenerator;
-
-class CustomFHIRGenerator extends FHIRModelGenerator
-{
-    protected function generateClass(array $structureDefinition): string
-    {
-        $code = parent::generateClass($structureDefinition);
-        
-        // Add custom methods
-        $code .= $this->generateCustomMethods($structureDefinition);
-        
-        return $code;
-    }
-
-    private function generateCustomMethods(array $structureDefinition): string
-    {
-        return "
-    /**
-     * Custom validation method
-     */
-    public function validate(): array
-    {
-        // Custom validation logic
-        return [];
-    }
-        ";
-    }
-}
-```
-
-### Batch Generation
-
-```php
-<?php
-
-class BatchGenerator
-{
-    public function generateMultipleVersions(array $versions): void
-    {
-        foreach ($versions as $version) {
-            $this->generator->getContext()->setOutputDirectory("/output/{$version}");
-            $this->generator->getContext()->setBaseNamespace("FHIR\\{$version}");
-            
-            $this->generator->generate($version);
-        }
-    }
-}
-
-$batchGenerator = new BatchGenerator($generator);
-$batchGenerator->generateMultipleVersions(['R4', 'R4B', 'R5']);
+$context->addDefinition($url, $definition);
 ```
 
 ## Error Handling
 
-### Exception Types
-
 ```php
-<?php
-
 use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\GenerationException;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\PackageException;
 
 try {
-    $generator->generate('R4B');
-} catch (GenerationException $e) {
-    echo "Generation error: " . $e->getMessage();
+    $metadata = $loader->installPackage('hl7.fhir.r4.core');
 } catch (PackageException $e) {
-    echo "Package error: " . $e->getMessage();
-}
-```
-
-### Error Collection
-
-```php
-<?php
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\Service\ErrorCollector;
-
-$errorCollector = new ErrorCollector();
-
-try {
-    $generator->generate('R4B');
+    // Package download, extraction, or integrity failures
 } catch (GenerationException $e) {
-    $errorCollector->addError($e->getMessage());
-}
-
-if ($errorCollector->hasErrors()) {
-    foreach ($errorCollector->getErrors() as $error) {
-        echo "Error: {$error}\n";
-    }
+    // Code generation failures
 }
 ```
 
-## Performance Considerations
-
-### Package Caching
-
-The PackageLoader automatically caches downloaded packages:
-
-```php
-<?php
-
-$loader = new PackageLoader();
-
-// Packages are automatically cached and reused
-$metadata = $loader->installPackage('hl7.fhir.r4b.core', '4.3.0');
-
-// Check cache statistics
-$stats = $loader->getCacheStatistics();
-echo "Cached packages: " . $stats['R4B']['package_count'] . "\n";
-```
-
-### Memory Management
-
-For large FHIR packages, monitor memory usage:
-
-```php
-<?php
-
-// Monitor memory usage during generation
-$memoryBefore = memory_get_usage();
-$generator->generate('R4B');
-$memoryAfter = memory_get_usage();
-
-echo "Memory used: " . ($memoryAfter - $memoryBefore) . " bytes\n";
-
-// Force garbage collection if needed
-gc_collect_cycles();
-```
-
-### Batch Processing
-
-Process multiple resources efficiently:
-
-```php
-<?php
-
-$resources = ['Patient', 'Observation', 'Practitioner'];
-foreach ($resources as $resource) {
-    $generator->generateResource($resource);
-    
-    // Optional: Force garbage collection between resources
-    if (memory_get_usage() > 100 * 1024 * 1024) { // 100MB
-        gc_collect_cycles();
-    }
-}
-```
-
-## Testing
-
-### Unit Testing
-
-```php
-<?php
-
-namespace Tests\CodeGeneration;
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\FHIRModelGenerator;
-use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
-use PHPUnit\Framework\TestCase;
-
-class FHIRModelGeneratorTest extends TestCase
-{
-    public function testGeneratePatientClass(): void
-    {
-        $context = new BuilderContext();
-        $context->setOutputDirectory(sys_get_temp_dir() . '/fhir-test');
-        $context->setBaseNamespace('Test\\FHIR');
-
-        $generator = new FHIRModelGenerator($context);
-        $generator->generateResource('Patient');
-
-        $outputFile = $context->getOutputDirectory() . '/FHIRPatient.php';
-        self::assertFileExists($outputFile);
-
-        $content = file_get_contents($outputFile);
-        self::assertStringContainsString('class FHIRPatient', $content);
-    }
-}
-```
-
-## CLI Usage
-
-### Command Line Interface
-
-```php
-#!/usr/bin/env php
-<?php
-
-require_once 'vendor/autoload.php';
-
-use Ardenexal\FHIRTools\Component\CodeGeneration\FHIRModelGenerator;
-use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
-
-$options = getopt('v:o:n:', ['version:', 'output:', 'namespace:']);
-
-$version = $options['v'] ?? $options['version'] ?? 'R4B';
-$output = $options['o'] ?? $options['output'] ?? './generated';
-$namespace = $options['n'] ?? $options['namespace'] ?? 'Generated\\FHIR';
-
-$context = new BuilderContext();
-$context->setOutputDirectory($output);
-$context->setBaseNamespace($namespace);
-
-$generator = new FHIRModelGenerator($context);
-
-echo "Generating FHIR {$version} models...\n";
-$generator->generate($version);
-echo "Generation completed!\n";
-```
-
-Usage:
-```bash
-php generate.php -v R4B -o /path/to/output -n MyApp\\FHIR
-```
-
-## Core Interfaces
-
-### Generator System
-- `GeneratorInterface`: Contract for FHIR code generators
-- `CodeGenerationServiceInterface`: Main service interface
-- `GenerationResultInterface`: Results from generation operations
-
-### Context Management
-- `BuilderContextInterface`: Manages generation context
-- `GenerationConfigurationInterface`: Configuration interface
-
-### Package Management
-- `PackageLoaderInterface`: Loading FHIR packages
-- `PackageInterface`: Represents a FHIR package
+Non-fatal errors are collected via `ErrorCollector` and reported at the end of generation.
 
 ## Requirements
 
-- **PHP**: 8.2 or higher
-- **Dependencies**:
-  - `nette/php-generator`: ^4.2.0
-  - `composer/semver`: ^3.4.4
-
-## Documentation
-
-For detailed documentation, see:
-
-- **Component Guide**: `/docs/component-guides/code-generation.md`
-- **Architecture Overview**: `/docs/architecture.md`
-- **Migration Guide**: `/docs/migration-guide.md`
+- **PHP**: 8.3 or higher
 
 ## License
 
-This component is released under the MIT License. See the LICENSE file for details.
+This component is released under the MIT License. See the [LICENSE](../../../LICENSE) file for details.
