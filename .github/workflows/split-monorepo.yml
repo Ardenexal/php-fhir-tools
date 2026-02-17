@@ -41,7 +41,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: symplify/monorepo-split-github-action@2.3
+      - uses: danharrin/monorepo-split-github-action@v2.4.0
         with:
           package_directory: ${{ matrix.local_path }}
           repository_organization: Ardenexal
