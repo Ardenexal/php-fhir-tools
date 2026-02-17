@@ -1,5 +1,7 @@
 name: Regenerate FHIR Models
 
+permissions:
+    contents: write
 on:
   workflow_dispatch:
     inputs:
@@ -13,20 +15,20 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
         ref: main
         token: ${{ secrets.GITHUB_TOKEN }}
-    
+
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
         php-version: '8.3'
         extensions: ctype, iconv, zip, curl
-    
+
     - name: Cache Composer packages
       id: composer-cache
       uses: actions/cache@v4
@@ -35,7 +37,7 @@ jobs:
         key: ${{ runner.os }}-php-8.3-${{ hashFiles('**/composer.lock') }}
         restore-keys: |
           ${{ runner.os }}-php-8.3-
-    
+
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress --no-suggest
 
@@ -47,13 +49,13 @@ jobs:
         echo "🔄 Starting FHIR model generation..."
         composer run generate-models-all
         echo "✅ FHIR model generation completed!"
-    
+
     - name: Run Laravel Pint
       run: |
         echo "🎨 Running Laravel Pint to format generated code..."
         composer run lint
         echo "✅ Code formatting completed!"
-    
+
     - name: Check for changes
       id: check-changes
       run: |
@@ -65,7 +67,7 @@ jobs:
           echo "changes=false" >> $GITHUB_OUTPUT
           echo "ℹ️ No changes detected in generated models"
         fi
-    
+
     - name: Commit and push changes
       if: steps.check-changes.outputs.changes == 'true'
       run: |
@@ -75,7 +77,7 @@ jobs:
         git commit -m "${{ github.event.inputs.commit_message }}"
         git push origin main
         echo "✅ Changes committed and pushed to main branch"
-    
+
     - name: Summary
       run: |
         if [ "${{ steps.check-changes.outputs.changes }}" == "true" ]; then
