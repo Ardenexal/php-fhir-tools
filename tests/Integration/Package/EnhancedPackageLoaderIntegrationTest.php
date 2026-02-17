@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Tests\Integration\Package;
 
-use Ardenexal\FHIRTools\BuilderContext;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;

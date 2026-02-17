@@ -28,7 +28,7 @@ class RecipeInstallationTest extends TestCase
     {
         $this->filesystem = new Filesystem();
         $this->tempDir    = sys_get_temp_dir() . '/fhir_recipe_test_' . uniqid();
-        $this->recipeDir  = __DIR__ . '/../../config/recipes/fhir-bundle/1.0';
+        $this->recipeDir  = __DIR__ . '/../../recipe/fhir-bundle/1.0';
 
         // Create temporary project directory
         $this->filesystem->mkdir($this->tempDir);

@@ -18,7 +18,7 @@ class FlexRecipeTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->recipeDir = __DIR__ . '/../../config/recipes/fhir-bundle/1.0';
+        $this->recipeDir = __DIR__ . '/../../recipe/fhir-bundle/1.0';
     }
 
     /**
