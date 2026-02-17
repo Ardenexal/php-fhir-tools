@@ -1,0 +1,41 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\EffectEvidenceSynthesis;
+
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\ExposureStateType;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
+/**
+ * @description A description of the results for each exposure considered in the effect estimate.
+ */
+#[FHIRBackboneElement(parentResource: 'EffectEvidenceSynthesis', elementPath: 'EffectEvidenceSynthesis.resultsByExposure', fhirVersion: 'R4')]
+class EffectEvidenceSynthesisResultsByExposure extends BackboneElement
+{
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        public ?string $id = null,
+        /** @var array<Extension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        public array $modifierExtension = [],
+        /** @var StringPrimitive|string|null description Description of results by exposure */
+        public StringPrimitive|string|null $description = null,
+        /** @var ExposureStateType|null exposureState exposure | exposure-alternative */
+        public ?ExposureStateType $exposureState = null,
+        /** @var CodeableConcept|null variantState Variant exposure states */
+        public ?CodeableConcept $variantState = null,
+        /** @var Reference|null riskEvidenceSynthesis Risk evidence synthesis */
+        #[NotBlank]
+        public ?Reference $riskEvidenceSynthesis = null,
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
+}

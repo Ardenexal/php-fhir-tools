@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Tests\Integration;
 
-use Ardenexal\FHIRTools\Serialization\FHIRSerializationService;
-use Ardenexal\FHIRTools\Serialization\FHIRSerializationContextFactory;
-use Ardenexal\FHIRTools\Serialization\FHIRResourceNormalizer;
-use Ardenexal\FHIRTools\Serialization\FHIRComplexTypeNormalizer;
-use Ardenexal\FHIRTools\Serialization\FHIRPrimitiveTypeNormalizer;
-use Ardenexal\FHIRTools\Serialization\FHIRBackboneElementNormalizer;
-use Ardenexal\FHIRTools\Serialization\FHIRMetadataExtractor;
-use Ardenexal\FHIRTools\Serialization\FHIRTypeResolver;
-use Ardenexal\FHIRTools\Serialization\FHIRSchemaValidator;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContextFactory;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRResourceNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRComplexTypeNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRPrimitiveTypeNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRBackboneElementNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolver;
+use Ardenexal\FHIRTools\Component\Serialization\Validator\FHIRSchemaValidator;
 use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRPatient;
 use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRObservation;
 use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRHumanName;
@@ -22,7 +22,7 @@ use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRExtension;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 use Ardenexal\FHIRTools\Tests\Utilities\FHIRTestCaseRepository;
 use Symfony\Component\Serializer\Serializer;
-use Ardenexal\FHIRTools\Serialization\FHIRSerializationDebugInfo;
+use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationDebugInfo;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 

@@ -50,7 +50,7 @@
             "label": "Generate FHIR Models",
             "type": "shell",
             "command": "php",
-            "args": ["bin/console", "fhir:generate", "-vvv"],
+            "args": ["demo/bin/console", "fhir:generate", "-vvv"],
             "group": "build",
             "presentation": {
                 "echo": true,

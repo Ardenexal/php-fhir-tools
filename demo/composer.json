@@ -1,0 +1,34 @@
+{
+    "name": "ardenexal/fhir-tools-demo",
+    "description": "Demo application for FHIR Tools monorepo - provides a working Symfony console environment",
+    "type": "project",
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
+    "require": {
+        "php": ">=8.3",
+        "ardenexal/fhir-tools": "@dev",
+        "symfony/framework-bundle": "^6.4|^7.4",
+        "symfony/runtime": "^6.4|^7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ardenexal\\FHIRTools\\Demo\\": "src/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "symfony/runtime": true
+        },
+        "sort-packages": true
+    }
+}

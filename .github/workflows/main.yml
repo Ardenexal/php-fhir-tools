@@ -4,6 +4,9 @@ on:
   push:
     branches: [ main ]
 
+permissions:
+  contents: read
+
 jobs:
   quality-gate:
     runs-on: ubuntu-latest
@@ -101,17 +104,20 @@ jobs:
     
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress --no-suggest
-    
+
+    - name: Install demo dependencies
+      run: composer install --working-dir=demo --prefer-dist --no-progress
+
     - name: Run integration tests
       run: composer run test-integration
-    
+
     - name: Run FHIR-specific tests
       run: composer run test-fhir
-    
+
     - name: Test FHIR model generation
       run: |
         # Test that the generate command works
-        php bin/console list | grep fhir:generate
+        php demo/bin/console list | grep fhir:generate
         echo "FHIR generation command is available"
     
     - name: Test Symfony Flex recipe

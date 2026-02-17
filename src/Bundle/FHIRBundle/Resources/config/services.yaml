@@ -4,6 +4,9 @@ services:
         autoconfigure: true
         public: false
 
+    # FHIRPath Service
+    Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService: ~
+
     # FHIRPath Console Commands
     Ardenexal\FHIRTools\Bundle\FHIRBundle\Command\FHIRPathEvaluateCommand:
         arguments:
@@ -15,7 +18,13 @@ services:
             $pathService: '@Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService'
         tags: ['console.command']
 
+    # Code Generation Command
+    Ardenexal\FHIRTools\Component\CodeGeneration\Command\FHIRModelGeneratorCommand:
+        tags: ['console.command']
+
     # Code Generation Services
+    Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext: ~
+
     Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator:
         public: true
 

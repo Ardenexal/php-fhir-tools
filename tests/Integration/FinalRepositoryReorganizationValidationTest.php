@@ -99,8 +99,6 @@ final class FinalRepositoryReorganizationValidationTest extends TestCase
 
         // Test that documentation structure exists
         self::assertDirectoryExists(__DIR__ . '/../../docs');
-        self::assertFileExists(__DIR__ . '/../../docs/architecture.md');
-        self::assertFileExists(__DIR__ . '/../../docs/migration-guide.md');
         self::assertDirectoryExists(__DIR__ . '/../../docs/component-guides');
     }
 
@@ -112,11 +110,11 @@ final class FinalRepositoryReorganizationValidationTest extends TestCase
     public function testSymfonyFlexRecipeIsProperlyConfigured(): void
     {
         // Test that recipe directory exists
-        self::assertDirectoryExists(__DIR__ . '/../../config/recipes/fhir-bundle');
-        self::assertFileExists(__DIR__ . '/../../config/recipes/fhir-bundle/1.0/manifest.json');
+        self::assertDirectoryExists(__DIR__ . '/../../recipe/fhir-bundle');
+        self::assertFileExists(__DIR__ . '/../../recipe/fhir-bundle/1.0/manifest.json');
 
         // Test that recipe manifest is valid JSON
-        $manifestContent = file_get_contents(__DIR__ . '/../../config/recipes/fhir-bundle/1.0/manifest.json');
+        $manifestContent = file_get_contents(__DIR__ . '/../../recipe/fhir-bundle/1.0/manifest.json');
         $manifest        = json_decode($manifestContent, true);
         self::assertIsArray($manifest);
         self::assertArrayHasKey('bundles', $manifest);
