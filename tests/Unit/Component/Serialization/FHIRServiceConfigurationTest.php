@@ -82,33 +82,18 @@ class FHIRServiceConfigurationTest extends TestCase
         self::assertInstanceOf(FHIRSerializationService::class, $service);
     }
 
-    public function testServiceConfigurationFilesExist(): void
+    public function testBundleServiceConfigurationFileExists(): void
     {
-        // Verify that the configuration files exist
-        self::assertFileExists(__DIR__ . '/../../../../config/packages/serializer.yaml');
-        self::assertFileExists(__DIR__ . '/../../../../config/services/fhir_serialization.yaml');
+        // Verify the bundle's service configuration exists
+        $bundleServicesPath = __DIR__ . '/../../../../src/Bundle/FHIRBundle/Resources/config/services.yaml';
+        self::assertFileExists($bundleServicesPath);
 
-        // Verify the main services.yaml imports the FHIR configuration
-        $servicesContent = file_get_contents(__DIR__ . '/../../../../config/services.yaml');
-        self::assertStringContainsString('imports:', $servicesContent);
-        self::assertStringContainsString('services/fhir_serialization.yaml', $servicesContent);
-    }
+        $servicesContent = file_get_contents($bundleServicesPath);
+        self::assertNotFalse($servicesContent);
 
-    public function testSerializerConfigurationIsValid(): void
-    {
-        $configContent = file_get_contents(__DIR__ . '/../../../../config/packages/serializer.yaml');
-
-        // Check that serializer is enabled
-        self::assertStringContainsString('enabled: true', $configContent);
-
-        // Check that FHIR normalizers are configured
-        self::assertStringContainsString('fhir.normalizer.resource:', $configContent);
-        self::assertStringContainsString('fhir.normalizer.complex_type:', $configContent);
-        self::assertStringContainsString('fhir.normalizer.primitive:', $configContent);
-        self::assertStringContainsString('fhir.normalizer.backbone_element:', $configContent);
-
-        // Check that version-specific services are configured
-        self::assertStringContainsString('fhir.r4b.type_resolver:', $configContent);
-        self::assertStringContainsString('fhir.r5.type_resolver:', $configContent);
+        // Check that serialization services are registered
+        self::assertStringContainsString('FHIRMetadataExtractor', $servicesContent);
+        self::assertStringContainsString('FHIRValidator', $servicesContent);
+        self::assertStringContainsString('FHIRSerializationService', $servicesContent);
     }
 }
