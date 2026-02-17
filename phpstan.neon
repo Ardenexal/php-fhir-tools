@@ -15,7 +15,6 @@ parameters:
         - */vendor/*
         - src/Component/*/tests/*
         - src/Component/*/output/*
-        - config/reference.php
     tmpDir: var/cache/phpstan
     parallel:
         maximumNumberOfProcesses: 4
