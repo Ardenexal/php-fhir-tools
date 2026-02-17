@@ -5,18 +5,9 @@
     "license": "MIT",
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../",
-            "options": {
-                "symlink": true
-            }
-        }
-    ],
     "require": {
         "php": ">=8.3",
-        "ardenexal/fhir-tools": "@dev",
+        "ardenexal/fhir-bundle": "^0.0.2",
         "symfony/framework-bundle": "^6.4|^7.4",
         "symfony/runtime": "^6.4|^7.4"
     },
