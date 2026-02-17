@@ -205,7 +205,7 @@ class RecipeValidator
 }
 
 // Main execution
-$recipeDir = __DIR__ . '/../recipes/fhir-bundle/1.0';
+$recipeDir = __DIR__ . '/../recipe/fhir-bundle/1.0';
 
 if (!is_dir($recipeDir)) {
     echo "❌ Recipe directory not found: {$recipeDir}\n";
