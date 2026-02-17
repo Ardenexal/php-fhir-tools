@@ -1,0 +1,53 @@
+name: Split Monorepo
+
+on:
+  push:
+    branches: [main]
+    tags: ['*']
+permissions:
+    contents: read
+jobs:
+  discover:
+    name: Discover packages
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.packages.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Discover packages from composer.json files
+        id: packages
+        run: |
+          PACKAGES='[]'
+          for composer_file in src/Component/*/composer.json src/Bundle/*/composer.json; do
+            [ -f "$composer_file" ] || continue
+            LOCAL_PATH=$(dirname "$composer_file")
+            REPO_NAME=$(jq -r '.name // empty' "$composer_file" | cut -d'/' -f2)
+            if [ -n "$REPO_NAME" ]; then
+              PACKAGES=$(echo "$PACKAGES" | jq -c --arg path "$LOCAL_PATH" --arg repo "$REPO_NAME" '. + [{"local_path": $path, "repo_name": $repo}]')
+            fi
+          done
+          echo "matrix=$(echo $PACKAGES | jq -c '{"include": .}')" >> "$GITHUB_OUTPUT"
+
+  split:
+    name: Split ${{ matrix.repo_name }}
+    needs: discover
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.discover.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: symplify/monorepo-split-github-action@2.3
+        with:
+          package_directory: ${{ matrix.local_path }}
+          repository_organization: Ardenexal
+          repository_name: ${{ matrix.repo_name }}
+          user_name: github-actions[bot]
+          user_email: github-actions[bot]@users.noreply.github.com
+          tag: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.SPLIT_REPO_TOKEN }}
