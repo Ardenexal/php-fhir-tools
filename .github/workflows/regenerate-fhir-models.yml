@@ -38,7 +38,10 @@ jobs:
     
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress --no-suggest
-    
+
+    - name: Install demo dependencies
+      run: composer install --working-dir=demo --prefer-dist --no-progress
+
     - name: Generate FHIR Models
       run: |
         echo "🔄 Starting FHIR model generation..."

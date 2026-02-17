@@ -11,12 +11,6 @@ Thumbs.db
 .claude/
 
 ###> symfony/framework-bundle ###
-/.env.local
-/.env.local.php
-/.env.*.local
-/.env.dev
-/.env.test
-/.env.prod
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
 /var/
@@ -25,6 +19,13 @@ Thumbs.db
 !/output/.gitkeep
 /resources/
 ###< symfony/framework-bundle ###
+
+###> demo app ###
+/demo/vendor/
+/demo/var/
+/demo/.env.local
+/demo/.env.*.local
+###< demo app ###
 
 ###> phpstan/phpstan ###
 phpstan.neon

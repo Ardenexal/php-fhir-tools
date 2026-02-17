@@ -106,11 +106,14 @@ jobs:
     
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress --no-suggest
-    
+
+    - name: Install demo dependencies
+      run: composer install --working-dir=demo --prefer-dist --no-progress
+
     - name: Test command performance
       run: |
         echo "Testing basic command performance..."
-        time php bin/console list > /dev/null
+        time php demo/bin/console list > /dev/null
         echo "✅ Command execution completed successfully"
 
   recipe-validation:
@@ -153,7 +156,10 @@ jobs:
     
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress --no-suggest
-    
+
+    - name: Install demo dependencies
+      run: composer install --working-dir=demo --prefer-dist --no-progress
+
     - name: Test FHIR Model Generation
       id: fhir-test
       run: |
@@ -168,7 +174,7 @@ jobs:
         # Capture both stdout and stderr, and measure execution time
         start_time=$(date +%s)
         
-        if timeout 300 php bin/console fhir:generate --package=hl7.fhir.r4b.core -v >> fhir_output.txt 2>&1; then
+        if timeout 300 php demo/bin/console fhir:generate --package=hl7.fhir.r4b.core -v >> fhir_output.txt 2>&1; then
           end_time=$(date +%s)
           execution_time=$((end_time - start_time))
           

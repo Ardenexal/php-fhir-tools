@@ -59,7 +59,7 @@ composer quality:all       # lint + phpstan + test
 
 ## Key Files
 
-- `bin/console` - Symfony Console entry point
+- `demo/bin/console` - Symfony Console entry point (demo app)
 - `composer.json` - Dependencies and scripts
 - `phpstan.neon` - PHPStan configuration (level 8)
 - `config/services.yaml` - Symfony service definitions
@@ -86,7 +86,7 @@ composer quality:all       # lint + phpstan + test
 The `fhir:generate` command generates PHP classes from FHIR packages:
 
 ```bash
-php bin/console fhir:generate --models-component --package=hl7.fhir.r4.core -vvv
+php demo/bin/console fhir:generate --models-component --package=hl7.fhir.r4.core -vvv
 ```
 
 Generated models go to `src/Component/Models/src/`.

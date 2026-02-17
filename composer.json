@@ -38,7 +38,9 @@
     },
     "config": {
         "allow-plugins": {
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "symfony/flex": true,
+            "symfony/runtime": true
         },
         "bump-after-update": true,
         "sort-packages": true
@@ -124,15 +126,16 @@
             "@quality:serialization",
             "@quality:fhir-path"
         ],
-        "generate-models": "php ./bin/console fhir:generate -vvv",
+        "demo:install": "composer install --working-dir=demo --prefer-dist --no-progress",
+        "generate-models": "php ./demo/bin/console fhir:generate -vvv",
         "generate-models-all": [
             "echo 'Generating FHIR R4 models...'",
-            "php ./bin/console fhir:generate --package=hl7.fhir.r4.core --package=hl7.fhir.r4b.core --package=hl7.fhir.r5.core -vvv",
+            "php ./demo/bin/console fhir:generate --package=hl7.fhir.r4.core --package=hl7.fhir.r4b.core --package=hl7.fhir.r5.core -vvv",
             "echo 'All FHIR models generated successfully!'"
         ],
-        "generate-models-r4": "php ./bin/console fhir:generate --package=hl7.fhir.r4.core -vvv",
-        "generate-models-r4b": "php ./bin/console fhir:generate --package=hl7.fhir.r4b.core -vvv",
-        "generate-models-r5": "php ./bin/console fhir:generate --package=hl7.fhir.r5.core -vvv",
+        "generate-models-r4": "php ./demo/bin/console fhir:generate --package=hl7.fhir.r4.core -vvv",
+        "generate-models-r4b": "php ./demo/bin/console fhir:generate --package=hl7.fhir.r4b.core -vvv",
+        "generate-models-r5": "php ./demo/bin/console fhir:generate --package=hl7.fhir.r5.core -vvv",
         "fix-newlines": "powershell -ExecutionPolicy Bypass -File scripts/fix-newlines.ps1",
         "validate-recipe": "php scripts/validate-recipe.php",
         "test-recipe": "php ./vendor/phpunit/phpunit/phpunit tests/Integration/FlexRecipeTest.php",

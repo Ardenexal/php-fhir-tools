@@ -69,20 +69,23 @@ jobs:
       - name: Create required directories
         run: |
           mkdir -p output var/cache var/log coverage
-          chmod -R 755 bin/console
+          chmod -R 755 demo/bin/console
           chmod -R 777 var/ coverage/
           echo "✅ Required directories created"
-      
+
+      - name: Install demo dependencies
+        run: composer install --working-dir=demo --prefer-dist --no-progress
+
       - name: Verify Symfony Console
         run: |
           echo "=== Symfony Console Version ==="
-          php bin/console --version
+          php demo/bin/console --version
           echo ""
           echo "=== Available Commands ==="
-          php bin/console list
+          php demo/bin/console list
           echo ""
           echo "=== Verifying FHIR Commands ==="
-          php bin/console list | grep -q "fhir:generate" && echo "✅ FHIR generation command available" || exit 1
+          php demo/bin/console list | grep -q "fhir:generate" && echo "✅ FHIR generation command available" || exit 1
       
       - name: Run unit tests
         run: |
@@ -108,7 +111,7 @@ jobs:
           echo "  - composer run test-integration  # Run integration tests"
           echo "  - composer run lint          # Fix code style"
           echo "  - composer run phpstan       # Run static analysis"
-          echo "  - php bin/console fhir:generate  # Generate FHIR models"
+          echo "  - php demo/bin/console fhir:generate  # Generate FHIR models"
           echo ""
           echo "Key Directories:"
           echo "  - src/Bundle/FHIRBundle      # Symfony Bundle"
