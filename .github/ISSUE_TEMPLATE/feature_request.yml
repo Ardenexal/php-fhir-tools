@@ -1,0 +1,66 @@
+name: Feature Request
+description: Suggest a new feature or improvement
+labels: ["enhancement", "triage"]
+body:
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which component does this relate to?
+      options:
+        - CodeGeneration
+        - Serialization
+        - Models (generated)
+        - FHIRPath
+        - FHIRBundle (Symfony)
+        - New component
+        - Other / Unsure
+    validations:
+      required: true
+
+  - type: dropdown
+    id: fhir-version
+    attributes:
+      label: FHIR Version
+      description: Which FHIR version does this relate to, if any?
+      options:
+        - R4
+        - R4B
+        - R5
+        - All versions
+        - Not applicable
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: What problem does this feature solve? Describe the use case or pain point.
+      placeholder: I'm trying to ... but currently ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe what you'd like to happen. Include code examples or API sketches if relevant.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Any alternative solutions or workarounds you've considered.
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other context, mockups, or references that might help.
+    validations:
+      required: false
