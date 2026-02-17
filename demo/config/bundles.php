@@ -1,6 +1,9 @@
 <?php
 
+use Ardenexal\FHIRTools\Bundle\FHIRBundle\FHIRBundle;
+use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+
 return [
-    Symfony\Bundle\FrameworkBundle\FrameworkBundle::class => ['all' => true],
-    Ardenexal\FHIRTools\Bundle\FHIRBundle\FHIRBundle::class => ['all' => true],
+    FrameworkBundle::class => ['all' => true],
+    FHIRBundle::class      => ['all' => true],
 ];

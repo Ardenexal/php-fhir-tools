@@ -1,72 +1,95 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\ClaimProcessingCodesType;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\FinancialResourceStatusCodesType;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Money;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Period;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\PaymentReconciliation\PaymentReconciliationDetail;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\PaymentReconciliation\PaymentReconciliationProcessNote;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
 /**
  * @author Health Level Seven International (Financial Management)
+ *
  * @see http://hl7.org/fhir/StructureDefinition/PaymentReconciliation
+ *
  * @description This resource provides the details including amount of a payment and allocates the payment items being paid.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(
-	type: 'PaymentReconciliation',
-	version: '4.0.1',
-	url: 'http://hl7.org/fhir/StructureDefinition/PaymentReconciliation',
-	fhirVersion: 'R4',
+#[FhirResource(
+    type: 'PaymentReconciliation',
+    version: '4.0.1',
+    url: 'http://hl7.org/fhir/StructureDefinition/PaymentReconciliation',
+    fhirVersion: 'R4',
 )]
 class PaymentReconciliationResource extends DomainResourceResource
 {
-	public function __construct(
-		/** @var null|string id Logical id of this artifact */
-		public ?string $id = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta meta Metadata about the resource */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta $meta = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive implicitRules A set of rules under which this content was created */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive $implicitRules = null,
-		/** @var null|string language Language of the resource content */
-		public ?string $language = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative text Text summary of the resource, for human interpretation */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative $text = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\ResourceResource> contained Contained, inline Resources */
-		public array $contained = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> extension Additional content defined by implementations */
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> modifierExtension Extensions that cannot be ignored */
-		public array $modifierExtension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier> identifier Business Identifier for a payment reconciliation */
-		public array $identifier = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\FinancialResourceStatusCodesType status active | cancelled | draft | entered-in-error */
-		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\FinancialResourceStatusCodesType $status = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Period period Period covered */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Period $period = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive created Creation date */
-		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive $created = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference paymentIssuer Party generating payment */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference $paymentIssuer = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference request Reference to requesting resource */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference $request = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference requestor Responsible practitioner */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference $requestor = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\ClaimProcessingCodesType outcome queued | complete | error | partial */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\ClaimProcessingCodesType $outcome = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string disposition Disposition message */
-		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string|null $disposition = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive paymentDate When payment issued */
-		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive $paymentDate = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Money paymentAmount Total amount of Payment */
-		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Money $paymentAmount = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier paymentIdentifier Business identifier for the payment */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier $paymentIdentifier = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\PaymentReconciliation\PaymentReconciliationDetail> detail Settlement particulars */
-		public array $detail = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept formCode Printed form identifier */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept $formCode = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\PaymentReconciliation\PaymentReconciliationProcessNote> processNote Note concerning processing */
-		public array $processNote = [],
-	) {
-		parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Logical id of this artifact */
+        public ?string $id = null,
+        /** @var Meta|null meta Metadata about the resource */
+        public ?Meta $meta = null,
+        /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
+        public ?UriPrimitive $implicitRules = null,
+        /** @var string|null language Language of the resource content */
+        public ?string $language = null,
+        /** @var Narrative|null text Text summary of the resource, for human interpretation */
+        public ?Narrative $text = null,
+        /** @var array<ResourceResource> contained Contained, inline Resources */
+        public array $contained = [],
+        /** @var array<Extension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
+        public array $modifierExtension = [],
+        /** @var array<Identifier> identifier Business Identifier for a payment reconciliation */
+        public array $identifier = [],
+        /** @var FinancialResourceStatusCodesType|null status active | cancelled | draft | entered-in-error */
+        #[NotBlank]
+        public ?FinancialResourceStatusCodesType $status = null,
+        /** @var Period|null period Period covered */
+        public ?Period $period = null,
+        /** @var DateTimePrimitive|null created Creation date */
+        #[NotBlank]
+        public ?DateTimePrimitive $created = null,
+        /** @var Reference|null paymentIssuer Party generating payment */
+        public ?Reference $paymentIssuer = null,
+        /** @var Reference|null request Reference to requesting resource */
+        public ?Reference $request = null,
+        /** @var Reference|null requestor Responsible practitioner */
+        public ?Reference $requestor = null,
+        /** @var ClaimProcessingCodesType|null outcome queued | complete | error | partial */
+        public ?ClaimProcessingCodesType $outcome = null,
+        /** @var StringPrimitive|string|null disposition Disposition message */
+        public StringPrimitive|string|null $disposition = null,
+        /** @var DatePrimitive|null paymentDate When payment issued */
+        #[NotBlank]
+        public ?DatePrimitive $paymentDate = null,
+        /** @var Money|null paymentAmount Total amount of Payment */
+        #[NotBlank]
+        public ?Money $paymentAmount = null,
+        /** @var Identifier|null paymentIdentifier Business identifier for the payment */
+        public ?Identifier $paymentIdentifier = null,
+        /** @var array<PaymentReconciliationDetail> detail Settlement particulars */
+        public array $detail = [],
+        /** @var CodeableConcept|null formCode Printed form identifier */
+        public ?CodeableConcept $formCode = null,
+        /** @var array<PaymentReconciliationProcessNote> processNote Note concerning processing */
+        public array $processNote = [],
+    ) {
+        parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
+    }
 }

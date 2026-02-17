@@ -1,34 +1,45 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\MedicinalProductAuthorization;
+
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Period;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * @description The regulatory procedure for granting or amending a marketing authorization.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(
-	parentResource: 'MedicinalProductAuthorization',
-	elementPath: 'MedicinalProductAuthorization.procedure',
-	fhirVersion: 'R4',
+#[FHIRBackboneElement(
+    parentResource: 'MedicinalProductAuthorization',
+    elementPath: 'MedicinalProductAuthorization.procedure',
+    fhirVersion: 'R4',
 )]
-class MedicinalProductAuthorizationProcedure extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement
+class MedicinalProductAuthorizationProcedure extends BackboneElement
 {
-	public function __construct(
-		/** @var null|string id Unique id for inter-element referencing */
-		public ?string $id = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> extension Additional content defined by implementations */
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-		public array $modifierExtension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier identifier Identifier for this procedure */
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier $identifier = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept type Type of procedure */
-		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept $type = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Period|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive dateX Date of procedure */
-		public \Ardenexal\FHIRTools\Component\Models\R4\DataType\Period|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive|null $dateX = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\MedicinalProductAuthorization\MedicinalProductAuthorizationProcedure> application Applcations submitted to obtain a marketing authorization */
-		public array $application = [],
-	) {
-		parent::__construct($id, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        public ?string $id = null,
+        /** @var array<Extension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        public array $modifierExtension = [],
+        /** @var Identifier|null identifier Identifier for this procedure */
+        public ?Identifier $identifier = null,
+        /** @var CodeableConcept|null type Type of procedure */
+        #[NotBlank]
+        public ?CodeableConcept $type = null,
+        /** @var Period|DateTimePrimitive|null dateX Date of procedure */
+        public Period|DateTimePrimitive|null $dateX = null,
+        /** @var array<MedicinalProductAuthorizationProcedure> application Applcations submitted to obtain a marketing authorization */
+        public array $application = [],
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
 }

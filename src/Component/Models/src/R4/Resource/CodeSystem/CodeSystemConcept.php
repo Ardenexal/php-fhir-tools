@@ -1,34 +1,43 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\CodeSystem;
+
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * @description Concepts that are in the code system. The concept definitions are inherently hierarchical, but the definitions must be consulted to determine what the meanings of the hierarchical relationships are.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'CodeSystem', elementPath: 'CodeSystem.concept', fhirVersion: 'R4')]
-class CodeSystemConcept extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement
+#[FHIRBackboneElement(parentResource: 'CodeSystem', elementPath: 'CodeSystem.concept', fhirVersion: 'R4')]
+class CodeSystemConcept extends BackboneElement
 {
-	public function __construct(
-		/** @var null|string id Unique id for inter-element referencing */
-		public ?string $id = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> extension Additional content defined by implementations */
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-		public array $modifierExtension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive code Code that identifies concept */
-		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive $code = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string display Text to display to the user */
-		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string|null $display = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string definition Formal definition */
-		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string|null $definition = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\CodeSystem\CodeSystemConceptDesignation> designation Additional representations for the concept */
-		public array $designation = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\CodeSystem\CodeSystemConceptProperty> property Property value for the concept */
-		public array $property = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\CodeSystem\CodeSystemConcept> concept Child Concepts (is-a/contains/categorizes) */
-		public array $concept = [],
-	) {
-		parent::__construct($id, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        public ?string $id = null,
+        /** @var array<Extension> extension Additional content defined by implementations */
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        public array $modifierExtension = [],
+        /** @var CodePrimitive|null code Code that identifies concept */
+        #[NotBlank]
+        public ?CodePrimitive $code = null,
+        /** @var StringPrimitive|string|null display Text to display to the user */
+        public StringPrimitive|string|null $display = null,
+        /** @var StringPrimitive|string|null definition Formal definition */
+        public StringPrimitive|string|null $definition = null,
+        /** @var array<CodeSystemConceptDesignation> designation Additional representations for the concept */
+        public array $designation = [],
+        /** @var array<CodeSystemConceptProperty> property Property value for the concept */
+        public array $property = [],
+        /** @var array<CodeSystemConcept> concept Child Concepts (is-a/contains/categorizes) */
+        public array $concept = [],
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
 }

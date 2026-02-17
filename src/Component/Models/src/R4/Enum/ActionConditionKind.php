@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -10,12 +12,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum ActionConditionKind: string
 {
-	/** Applicability */
-	case applicability = 'applicability';
+    /** Applicability */
+    case applicability = 'applicability';
 
-	/** Start */
-	case start = 'start';
+    /** Start */
+    case start = 'start';
 
-	/** Stop */
-	case stop = 'stop';
+    /** Stop */
+    case stop = 'stop';
 }
