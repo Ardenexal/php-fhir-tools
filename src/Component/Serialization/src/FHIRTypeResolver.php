@@ -121,13 +121,21 @@ class FHIRTypeResolver implements FHIRTypeResolverInterface
             return null;
         }
 
-        // Return the mapped class name if available, otherwise construct a default one
+        // Return the mapped class name if available
         if (isset($this->resourceTypeMapping[$resourceType])) {
             return $this->resourceTypeMapping[$resourceType];
         }
 
-        // Default mapping: assume classes are named FHIR{ResourceType}
-        return 'FHIR' . $resourceType;
+        // Convention-based fallback: try Models namespace for each supported FHIR version.
+        // Whichever version's classes are installed will be found automatically.
+        foreach (['R4', 'R4B', 'R5'] as $version) {
+            $candidate = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\Resource\\{$resourceType}Resource";
+            if (class_exists($candidate)) {
+                return $candidate;
+            }
+        }
+
+        return null;
     }
 
     /**

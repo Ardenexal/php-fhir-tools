@@ -17,13 +17,15 @@ final class EvaluationContext
     /**
      * @param array<string, mixed> $variables         Variable storage ($this, $index, $total)
      * @param array<string, mixed> $externalConstants External constants (%)
+     * @param string|null          $fhirVersion       Optional FHIR version hint, e.g. 'R4', 'R4B', 'R5'
      */
     public function __construct(
         private mixed $rootResource = null,
         private mixed $currentNode = null,
         private array $variables = [],
         private array $externalConstants = [],
-        private ?FHIRPathEvaluator $evaluator = null
+        private ?FHIRPathEvaluator $evaluator = null,
+        private ?string $fhirVersion = null,
     ) {
     }
 
@@ -60,6 +62,26 @@ final class EvaluationContext
     }
 
     /**
+     * Get the FHIR version hint for this evaluation (e.g. 'R4', 'R4B', 'R5').
+     * Used by FHIRPath functions that need to create typed objects.
+     */
+    public function getFhirVersion(): ?string
+    {
+        return $this->fhirVersion;
+    }
+
+    /**
+     * Return an immutable copy of this context with the given FHIR version hint.
+     */
+    public function withFhirVersion(string $version): static
+    {
+        $clone              = clone $this;
+        $clone->fhirVersion = $version;
+
+        return $clone;
+    }
+
+    /**
      * Get the current evaluation node
      */
     public function getCurrentNode(): mixed
@@ -78,6 +100,7 @@ final class EvaluationContext
             $this->variables,
             $this->externalConstants,
             $this->evaluator,
+            $this->fhirVersion,
         );
     }
 
@@ -127,6 +150,7 @@ final class EvaluationContext
             $variables,
             $this->externalConstants,
             $this->evaluator,
+            $this->fhirVersion,
         );
     }
 
@@ -168,6 +192,7 @@ final class EvaluationContext
             $this->variables,
             $externalConstants,
             $this->evaluator,
+            $this->fhirVersion,
         );
     }
 
@@ -187,6 +212,7 @@ final class EvaluationContext
             $variables,
             $this->externalConstants,
             $this->evaluator,
+            $this->fhirVersion,
         );
     }
 }

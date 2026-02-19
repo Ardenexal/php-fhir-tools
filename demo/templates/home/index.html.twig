@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}FHIR Tools Demo{% endblock %}
+
+{% block body %}
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">FHIR Tools Demo</h1>
+    <p class="mt-2 text-gray-600">Interactive playground for the PHP FHIR Tools runtime components.</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <a href="{{ path('app_fhirpath') }}"
+       class="block bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:border-indigo-400 hover:shadow-md transition">
+        <div class="flex items-start gap-4">
+            <div class="text-3xl">🔍</div>
+            <div>
+                <h2 class="text-xl font-semibold text-gray-900">FHIRPath Playground</h2>
+                <p class="mt-1 text-gray-500 text-sm">
+                    Evaluate and validate FHIRPath 2.0 expressions against FHIR resources.
+                    Test navigation expressions, functions, and Boolean operators interactively.
+                </p>
+                <ul class="mt-3 text-xs text-gray-400 space-y-0.5">
+                    <li>• Evaluate expressions against JSON context data</li>
+                    <li>• Validate expression syntax without evaluation</li>
+                    <li>• See result collections item by item</li>
+                </ul>
+            </div>
+        </div>
+    </a>
+
+    <a href="{{ path('app_serialization') }}"
+       class="block bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:border-indigo-400 hover:shadow-md transition">
+        <div class="flex items-start gap-4">
+            <div class="text-3xl">⚙️</div>
+            <div>
+                <h2 class="text-xl font-semibold text-gray-900">Serialization Playground</h2>
+                <p class="mt-1 text-gray-500 text-sm">
+                    Convert, validate, and inspect FHIR resources. Deserialize JSON or XML into typed
+                    PHP objects, then re-serialize or validate against FHIR constraints.
+                </p>
+                <ul class="mt-3 text-xs text-gray-400 space-y-0.5">
+                    <li>• Validate FHIR resource structure</li>
+                    <li>• Convert JSON ↔ XML</li>
+                    <li>• Inspect resource metadata</li>
+                </ul>
+            </div>
+        </div>
+    </a>
+</div>
+
+<div class="mt-8 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <h2 class="text-lg font-semibold text-gray-800 mb-3">About this demo</h2>
+    <p class="text-sm text-gray-600">
+        This app demonstrates the <strong>FHIRPath</strong> and <strong>Serialization</strong> runtime components
+        from the PHP FHIR Tools library. It is a Symfony 7.4 application that uses the
+        <code class="bg-gray-100 px-1 rounded text-xs">FHIRBundle</code> to wire up the services.
+        Code generation is CLI-only and not included here.
+    </p>
+</div>
+{% endblock %}

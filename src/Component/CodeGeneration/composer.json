@@ -1,5 +1,6 @@
 {
     "name": "ardenexal/fhir-code-generation",
+    "version": "0.0.3",
     "description": "FHIR code generation component for PHP FHIRTools",
     "type": "library",
     "license": "MIT",
