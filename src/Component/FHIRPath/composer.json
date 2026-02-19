@@ -1,5 +1,6 @@
 {
     "name": "ardenexal/fhir-path",
+    "version": "0.0.3",
     "description": "FHIRPath 2.0 expression evaluation for PHP",
     "type": "library",
     "license": "MIT",

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}FHIR Tools Demo{% endblock %}</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚕️</text></svg>">
+        <script src="https://cdn.tailwindcss.com"></script>
+        {% block stylesheets %}{% endblock %}
+        {% block javascripts %}
+            {% block importmap %}{{ importmap('app') }}{% endblock %}
+        {% endblock %}
+    </head>
+    <body class="bg-gray-50 min-h-screen">
+        <nav class="bg-indigo-700 text-white shadow">
+            <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-6">
+                <a href="{{ path('app_home') }}" class="font-bold text-lg tracking-tight hover:text-indigo-200">FHIR Tools Demo</a>
+                <a href="{{ path('app_fhirpath') }}" class="text-indigo-200 hover:text-white text-sm font-medium">FHIRPath</a>
+                <a href="{{ path('app_serialization') }}" class="text-indigo-200 hover:text-white text-sm font-medium">Serialization</a>
+            </div>
+        </nav>
+
+        <main class="max-w-6xl mx-auto px-4 py-8">
+            {% block body %}{% endblock %}
+        </main>
+    </body>
+</html>

@@ -1,5 +1,6 @@
 {
     "name": "ardenexal/fhir-models",
+    "version": "0.0.3",
     "description": "Pre-generated FHIR model classes for R4, R4B, and R5 versions",
     "type": "library",
     "license": "MIT",

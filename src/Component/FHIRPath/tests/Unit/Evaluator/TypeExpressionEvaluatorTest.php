@@ -216,7 +216,13 @@ final class TypeExpressionEvaluatorTest extends TestCase
 
     public function testIsOperatorWithFHIRPrimitiveCollection(): void
     {
-        // Create a collection with mixed FHIR primitives
+        // Create a collection with mixed FHIR primitives.
+        // FHIR primitive wrapper objects (marked with #[FHIRPrimitive]) are unwrapped to
+        // their ->value scalars before being placed in the collection. After unwrapping:
+        //   FHIRString{value:'test'}  → 'test'
+        //   FHIRInteger{value:42}     → 42
+        //   FHIRBoolean{value:true}   → true
+        //   FHIRDecimal{value:3.14}   → 3.14
         $data = (object) [
             'items' => [
                 new FHIRString(value: 'test'),
@@ -226,9 +232,9 @@ final class TypeExpressionEvaluatorTest extends TestCase
             ],
         ];
 
-        // Filter only FHIRString items
+        // Only the unwrapped string 'test' matches the 'string' type filter
         $result = $this->evaluate('items is string', $data);
         self::assertSame(1, $result->count());
-        self::assertInstanceOf(FHIRString::class, $result->first());
+        self::assertSame('test', $result->first());
     }
 }

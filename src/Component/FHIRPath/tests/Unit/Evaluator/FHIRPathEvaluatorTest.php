@@ -9,6 +9,10 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\FHIRPathEvaluator;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\FHIRPathLexer;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\FHIRPathParser;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\HumanName;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\NameUseType;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -420,5 +424,49 @@ final class FHIRPathEvaluatorTest extends TestCase
         $result = $this->evaluate('name', $object);
 
         self::assertSame('Test', $result->first());
+    }
+
+    // -------------------------------------------------------------------------
+    // Typed FHIR model object evaluation (Models component integration)
+    // -------------------------------------------------------------------------
+
+    public function testTypedObjectResourceTypeFilter(): void
+    {
+        // PatientResource has #[FhirResource(type: 'Patient', ...)] — the evaluator
+        // must detect it via reflection and treat 'Patient' as a type filter.
+        $patient = new PatientResource(id: 'example');
+        $result  = $this->evaluate('Patient.id', $patient);
+
+        self::assertSame(['example'], $result->toArray());
+    }
+
+    public function testTypedObjectPrimitiveUnwrapping(): void
+    {
+        // StringPrimitive objects in a given[] array should be unwrapped to plain strings.
+        $patient = new PatientResource(name: [
+            new HumanName(
+                use: new NameUseType(value: 'official'),
+                given: [new StringPrimitive(value: 'Peter'), new StringPrimitive(value: 'James')],
+            ),
+        ]);
+
+        $result = $this->evaluate('Patient.name.given', $patient);
+
+        self::assertSame(['Peter', 'James'], $result->toArray());
+    }
+
+    public function testCodePrimitiveComparedToStringLiteral(): void
+    {
+        // NameUseType (a CodePrimitive subclass with ->value = 'official') must be
+        // unwrapped before the comparison so that "use = 'official'" evaluates correctly.
+        $officialName = new HumanName(
+            use: new NameUseType(value: 'official'),
+            family: new StringPrimitive(value: 'Chalmers'),
+        );
+        $patient = new PatientResource(name: [$officialName]);
+
+        $result = $this->evaluate("Patient.name.where(use = 'official').family", $patient);
+
+        self::assertSame(['Chalmers'], $result->toArray());
     }
 }

@@ -36,6 +36,22 @@ final class FHIRPathEvaluator implements ExpressionVisitor
 
     private FHIRTypeResolver $typeResolver;
 
+    /**
+     * Cache of FHIR class name → resolved resource type string (or null if not a resource).
+     * Avoids repeated reflection over the class hierarchy within a single evaluator instance.
+     *
+     * @var array<string, string|null>
+     */
+    private array $resourceTypeCache = [];
+
+    /**
+     * Cache of class name → whether the class is a FHIR primitive wrapper.
+     * Avoids repeated reflection within a single evaluator instance.
+     *
+     * @var array<string, bool>
+     */
+    private array $primitiveCache = [];
+
     public function __construct()
     {
         $this->context      = new EvaluationContext();
@@ -94,6 +110,15 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         $currentNode = $this->context->getCurrentNode();
         if ($currentNode === null) {
             return Collection::empty();
+        }
+
+        // FHIRPath spec: a resource type identifier (e.g. `Patient` in `Patient.name.given`)
+        // acts as a type filter — it returns the current node when the node's resourceType
+        // matches, and returns empty when it does not. This must be checked before falling
+        // through to property navigation so that `Patient.name.given` does not mistakenly
+        // look for a property key named "Patient".
+        if ($this->matchesResourceType($currentNode, $name)) {
+            return Collection::single($currentNode);
         }
 
         return $this->navigateProperty($currentNode, $name);
@@ -322,6 +347,69 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     }
 
     /**
+     * Check whether a node's resourceType matches the given type name.
+     *
+     * Handles plain PHP arrays (json_decode assoc=true), typed PHP objects
+     * with getResourceType()/resourceType, and typed model classes annotated
+     * with a #[FhirResource(type: '...')] PHP attribute.
+     */
+    private function matchesResourceType(mixed $node, string $typeName): bool
+    {
+        if (is_array($node)) {
+            return isset($node['resourceType']) && $node['resourceType'] === $typeName;
+        }
+
+        if (is_object($node)) {
+            if (method_exists($node, 'getResourceType')) {
+                return $node->getResourceType() === $typeName;
+            }
+
+            if (property_exists($node, 'resourceType')) {
+                return $node->resourceType === $typeName;
+            }
+
+            // Check #[FhirResource(type: '...')] PHP attribute — no import of CodeGeneration
+            // classes needed; detection is purely by attribute name string match via reflection.
+            $class = get_class($node);
+            if (!array_key_exists($class, $this->resourceTypeCache)) {
+                $this->resourceTypeCache[$class] = $this->resolveResourceTypeFromAttribute($class);
+            }
+
+            $cachedType = $this->resourceTypeCache[$class];
+            if ($cachedType !== null) {
+                return $cachedType === $typeName;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Resolve the FHIR resource type from a #[FhirResource(type: '...')] attribute.
+     *
+     * Only inspects the class's own attributes (not parents), since resource classes
+     * always carry the attribute directly. Returns null when not found.
+     */
+    private function resolveResourceTypeFromAttribute(string $class): ?string
+    {
+        if (!class_exists($class)) {
+            return null;
+        }
+
+        $reflection = new \ReflectionClass($class);
+        foreach ($reflection->getAttributes() as $attribute) {
+            if (str_ends_with($attribute->getName(), 'FhirResource')) {
+                $args = $attribute->getArguments();
+                $type = $args['type'] ?? $args[0] ?? null;
+
+                return is_string($type) ? $type : null;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Navigate a property on a node
      */
     private function navigateProperty(mixed $node, string $propertyName): Collection
@@ -374,7 +462,11 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     }
 
     /**
-     * Wrap a value in a collection
+     * Wrap a value in a collection, normalising FHIR-specific types along the way.
+     *
+     * For list arrays each element is passed through normalizeValue() so that FHIR
+     * primitive wrappers and BackedEnums are reduced to their scalar PHP equivalents
+     * before being added to the collection.
      */
     private function wrapValue(mixed $value): Collection
     {
@@ -385,13 +477,72 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         if (is_array($value)) {
             // Check if it's an associative array (object) or indexed array (collection)
             if (array_is_list($value)) {
-                return Collection::from($value);
+                return Collection::from(array_map($this->normalizeValue(...), $value));
             }
 
             return Collection::single($value);
         }
 
-        return Collection::single($value);
+        return Collection::single($this->normalizeValue($value));
+    }
+
+    /**
+     * Reduce a FHIR-specific value to its PHP scalar equivalent where possible.
+     *
+     * - BackedEnum → scalar value (e.g. NameUse::Official → 'official')
+     * - FHIR primitive wrapper with #[FHIRPrimitive] attribute → ->value property
+     * - All other types are returned unchanged (complex types, scalars, etc.)
+     */
+    private function normalizeValue(mixed $value): mixed
+    {
+        // BackedEnum → scalar (e.g. PHP 8.1+ enums used in some model fields)
+        if ($value instanceof \BackedEnum) {
+            return $value->value;
+        }
+
+        if (!is_object($value)) {
+            return $value;
+        }
+
+        // FHIR primitive wrapper (classes annotated with #[FHIRPrimitive] on themselves
+        // or any ancestor) → unwrap ->value so comparisons against string literals work.
+        $class = get_class($value);
+        if (!array_key_exists($class, $this->primitiveCache)) {
+            $this->primitiveCache[$class] = $this->isFhirPrimitive($class);
+        }
+
+        if ($this->primitiveCache[$class] && property_exists($value, 'value')) {
+            return $value->value; // e.g. StringPrimitive->value = 'Peter'
+        }
+
+        return $value;
+    }
+
+    /**
+     * Return true when $class or any of its ancestors carries a #[FHIRPrimitive] attribute.
+     *
+     * Walking the hierarchy is necessary because code-type wrappers (e.g. NameUseType,
+     * AdministrativeGenderType) extend CodePrimitive which carries the attribute directly,
+     * rather than redeclaring it on every subclass.
+     */
+    private function isFhirPrimitive(string $class): bool
+    {
+        if (!class_exists($class)) {
+            return false;
+        }
+
+        $reflection = new \ReflectionClass($class);
+        do {
+            foreach ($reflection->getAttributes() as $attribute) {
+                if (str_ends_with($attribute->getName(), 'FHIRPrimitive')) {
+                    return true;
+                }
+            }
+
+            $reflection = $reflection->getParentClass();
+        } while ($reflection !== false);
+
+        return false;
     }
 
     /**

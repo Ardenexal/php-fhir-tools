@@ -5,7 +5,8 @@ services:
         public: false
 
     # FHIRPath Service
-    Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService: ~
+    Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService:
+        public: true
 
     # FHIRPath Console Commands
     Ardenexal\FHIRTools\Bundle\FHIRBundle\Command\FHIRPathEvaluateCommand:
@@ -37,16 +38,66 @@ services:
     Ardenexal\FHIRTools\Component\CodeGeneration\Package\RetryHandler:
         public: true
 
-    # Serialization Services
+    # Serialization - Metadata
     Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor: ~
 
     Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface:
         alias: 'Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor'
+        public: true
 
+    # Serialization - Type Resolver
+    Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolver: ~
+
+    Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface:
+        alias: 'Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolver'
+
+    # Serialization - Context helpers
+    Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContextFactory: ~
+
+    # FHIRSerializationDebugInfo is a value object; provide default scalar args for the DI container.
+    Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationDebugInfo:
+        arguments:
+            $operation: 'initial'
+            $format: 'json'
+
+    # Serialization - Normalizers (tagged so Symfony's Serializer picks them up)
+    # The optional NormalizerInterface/DenormalizerInterface arguments are set to null
+    # to avoid a circular dependency with the Serializer service itself.
+    Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRResourceNormalizer:
+        arguments:
+            $normalizer: null
+            $denormalizer: null
+        tags: ['serializer.normalizer']
+
+    Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRComplexTypeNormalizer:
+        arguments:
+            $normalizer: null
+            $denormalizer: null
+        tags: ['serializer.normalizer']
+
+    Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRBackboneElementNormalizer:
+        arguments:
+            $normalizer: null
+            $denormalizer: null
+        tags: ['serializer.normalizer']
+
+    Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRPrimitiveTypeNormalizer:
+        arguments:
+            $normalizer: null
+            $denormalizer: null
+        tags: ['serializer.normalizer']
+
+    # Serialization - Validator
     Ardenexal\FHIRTools\Component\Serialization\Validator\FHIRValidator:
         public: true
 
+    # Serialization - Main Service (correct namespace)
+    Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService:
+        public: true
+
+    # Legacy alias for backward-compatibility
     Ardenexal\FHIRTools\Serialization\FHIRSerializationService:
+        alias: 'Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService'
         public: true
 
     # Top-level aliases for backward compatibility
@@ -64,7 +115,7 @@ services:
         public: true
 
     fhir.serialization_service:
-        alias: 'Ardenexal\FHIRTools\Serialization\FHIRSerializationService'
+        alias: 'Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService'
         public: true
 
     fhir.package_loader:

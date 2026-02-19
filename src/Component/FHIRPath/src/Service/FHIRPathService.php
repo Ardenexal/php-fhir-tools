@@ -51,17 +51,24 @@ class FHIRPathService
      *
      * Uses caching to avoid re-parsing frequently used expressions.
      *
-     * @param string                 $expression The FHIRPath expression to evaluate
-     * @param mixed                  $resource   The FHIR resource or data to evaluate against
-     * @param EvaluationContext|null $context    Optional evaluation context
+     * @param string                 $expression  The FHIRPath expression to evaluate
+     * @param mixed                  $resource    The FHIR resource or data to evaluate against
+     * @param EvaluationContext|null $context     Optional evaluation context
+     * @param string|null            $fhirVersion Optional FHIR version hint ('R4', 'R4B', 'R5').
+     *                                            Stored in the evaluation context for use by FHIRPath
+     *                                            functions that need to create typed objects.
      *
      * @return Collection The result collection
      *
      * @throws FHIRPathException If the expression is invalid or evaluation fails
      */
-    public function evaluate(string $expression, mixed $resource, ?EvaluationContext $context = null): Collection
+    public function evaluate(string $expression, mixed $resource, ?EvaluationContext $context = null, ?string $fhirVersion = null): Collection
     {
         $compiled = $this->getOrCompile($expression);
+
+        if ($fhirVersion !== null) {
+            $context = ($context ?? new EvaluationContext())->withFhirVersion($fhirVersion);
+        }
 
         return $compiled->evaluate($resource, $context);
     }

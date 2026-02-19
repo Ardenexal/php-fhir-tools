@@ -5,6 +5,19 @@
     "license": "MIT",
     "minimum-stability": "stable",
     "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "fhir/fhir-test-cases",
+                "version": "1.7.49",
+                "dist": {
+                    "url": "https://github.com/FHIR/fhir-test-cases/archive/refs/tags/1.7.49.zip",
+                    "type": "zip"
+                }
+            }
+        }
+    ],
     "require": {
         "php": ">=8.3",
         "ext-ctype": "*",
@@ -26,6 +39,7 @@
         "symfony/yaml": "^6.4|^7.4"
     },
     "require-dev": {
+        "fhir/fhir-test-cases": "1.7.49",
         "giorgiosironi/eris": "^1.0",
         "laravel/pint": "^1.27.1",
         "phpstan/phpstan": "^2.1.39",
