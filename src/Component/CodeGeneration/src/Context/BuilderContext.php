@@ -32,11 +32,6 @@ use Nette\PhpGenerator\PhpNamespace;
 class BuilderContext implements BuilderContextInterface
 {
     /**
-     * Default prefix for all generated FHIR classes
-     */
-    public const DEFAULT_CLASS_PREFIX = 'FHIR';
-
-    /**
      * Namespaces for element classes organized by FHIR version
      *
      * @var array<string, PhpNamespace>

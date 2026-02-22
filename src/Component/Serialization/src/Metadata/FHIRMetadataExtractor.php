@@ -202,9 +202,20 @@ class FHIRMetadataExtractor implements FHIRMetadataExtractorInterface
         }
 
         try {
+            // Walk the parent class hierarchy: generated "Type" wrappers (e.g. NarrativeStatusType)
+            // extend CodePrimitive which carries the #[FHIRPrimitive] attribute.
             $reflection  = new \ReflectionClass($object);
-            $attributes  = $reflection->getAttributes(FHIRPrimitive::class);
-            $isPrimitive = !empty($attributes);
+            $isPrimitive = false;
+            $r           = $reflection;
+
+            do {
+                if (!empty($r->getAttributes(FHIRPrimitive::class))) {
+                    $isPrimitive = true;
+                    break;
+                }
+
+                $r = $r->getParentClass();
+            } while ($r !== false);
 
             $this->cache->cacheStructureTypeMetadata($className, $isPrimitive ? 'primitive-type' : null);
 

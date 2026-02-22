@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Exception;
 
-use Ardenexal\FHIRTools\Exception\FHIRToolsException;
-
 /**
  * Exception thrown when validation fails
  *

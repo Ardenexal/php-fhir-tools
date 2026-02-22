@@ -10,6 +10,8 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\SerializerAwareInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Normalizer for FHIR primitive types with extension support.
@@ -22,13 +24,34 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  *
  * @author Ardenexal
  */
-class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface
+class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface, SerializerAwareInterface
 {
+    private ?NormalizerInterface $normalizer;
+
+    private ?DenormalizerInterface $denormalizer;
+
     public function __construct(
         private readonly FHIRMetadataExtractorInterface $metadataExtractor,
-        private readonly ?NormalizerInterface $normalizer = null,
-        private readonly ?DenormalizerInterface $denormalizer = null
+        ?NormalizerInterface $normalizer = null,
+        ?DenormalizerInterface $denormalizer = null
     ) {
+        $this->normalizer   = $normalizer;
+        $this->denormalizer = $denormalizer;
+    }
+
+    /**
+     * Called automatically by Symfony's Serializer so recursive normalize/denormalize
+     * calls always use the final, fully-wired serializer instance.
+     */
+    public function setSerializer(SerializerInterface $serializer): void
+    {
+        if ($serializer instanceof NormalizerInterface) {
+            $this->normalizer = $serializer;
+        }
+
+        if ($serializer instanceof DenormalizerInterface) {
+            $this->denormalizer = $serializer;
+        }
     }
 
     /**
@@ -101,15 +124,42 @@ class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface
      */
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
-        // Check if the type is a FHIR primitive type class
+        return $this->hasFHIRPrimitiveAttribute($type);
+    }
+
+    /**
+     * Check whether a class or any of its ancestors carries the FHIRPrimitive attribute.
+     *
+     * Generated "Type" wrapper classes (e.g. NarrativeStatusType) extend CodePrimitive
+     * which carries the attribute, so we must walk the parent chain.
+     */
+    private function hasFHIRPrimitiveAttribute(string $type): bool
+    {
+        return $this->findFHIRPrimitiveAttribute($type) !== null;
+    }
+
+    /**
+     * Walk the class hierarchy and return the first FHIRPrimitive attribute instance found, or null.
+     */
+    private function findFHIRPrimitiveAttribute(string $type): ?FHIRPrimitive
+    {
         try {
             /** @var class-string $type */
             $reflection = new \ReflectionClass($type);
-            $attributes = $reflection->getAttributes(FHIRPrimitive::class);
 
-            return !empty($attributes);
+            do {
+                $attributes = $reflection->getAttributes(FHIRPrimitive::class);
+                if (!empty($attributes)) {
+                    /** @var FHIRPrimitive */
+                    return $attributes[0]->newInstance();
+                }
+
+                $reflection = $reflection->getParentClass();
+            } while ($reflection !== false);
+
+            return null;
         } catch (\ReflectionException) {
-            return false;
+            return null;
         }
     }
 
@@ -139,13 +189,21 @@ class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface
         // Extract value
         if ($reflection->hasProperty('value')) {
             $valueProperty = $reflection->getProperty('value');
-            $value         = $valueProperty->getValue($object);
+            if ($valueProperty->isInitialized($object)) {
+                $value = $valueProperty->getValue($object);
+            }
+        }
+
+        // Format DateTimeInterface to string for JSON serialization
+        if ($value instanceof \DateTimeInterface) {
+            $primitiveAttr = $this->findFHIRPrimitiveAttribute(get_class($object));
+            $value         = $this->formatDateTimeValue($value, $primitiveAttr?->primitiveType ?? 'dateTime');
         }
 
         // Extract extensions
         if ($reflection->hasProperty('extension')) {
             $extensionProperty = $reflection->getProperty('extension');
-            $extensionValue    = $extensionProperty->getValue($object);
+            $extensionValue    = $extensionProperty->isInitialized($object) ? $extensionProperty->getValue($object) : null;
 
             if ($extensionValue !== null && !empty($extensionValue)) {
                 if ($this->normalizer !== null) {
@@ -191,7 +249,13 @@ class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface
         // Extract value for XML attribute
         if ($reflection->hasProperty('value')) {
             $valueProperty = $reflection->getProperty('value');
-            $value         = $valueProperty->getValue($object);
+            $value         = $valueProperty->isInitialized($object) ? $valueProperty->getValue($object) : null;
+
+            // Format DateTimeInterface to string for XML serialization
+            if ($value instanceof \DateTimeInterface) {
+                $primitiveAttr = $this->findFHIRPrimitiveAttribute(get_class($object));
+                $value         = $this->formatDateTimeValue($value, $primitiveAttr?->primitiveType ?? 'dateTime');
+            }
 
             if ($value !== null) {
                 $result['@value'] = $value;
@@ -201,7 +265,7 @@ class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface
         // Extract extensions for XML child elements
         if ($reflection->hasProperty('extension')) {
             $extensionProperty = $reflection->getProperty('extension');
-            $extensions        = $extensionProperty->getValue($object);
+            $extensions        = $extensionProperty->isInitialized($object) ? $extensionProperty->getValue($object) : null;
 
             if ($extensions !== null && !empty($extensions)) {
                 if ($this->normalizer !== null) {
@@ -315,31 +379,24 @@ class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface
             return null;
         }
 
-        try {
-            /** @var class-string $type */
-            $reflection = new \ReflectionClass($type);
-            $attributes = $reflection->getAttributes(FHIRPrimitive::class);
+        $primitiveAttribute = $this->findFHIRPrimitiveAttribute($type);
 
-            if (empty($attributes)) {
-                return $value; // Not a FHIR primitive, return as-is
-            }
-
-            /** @var FHIRPrimitive $primitiveAttribute */
-            $primitiveAttribute = $attributes[0]->newInstance();
-            $primitiveType      = $primitiveAttribute->primitiveType;
-
-            return match ($primitiveType) {
-                'string', 'code', 'uri', 'url', 'canonical', 'base64Binary',
-                'instant', 'date', 'dateTime', 'time', 'oid', 'id', 'uuid',
-                'markdown', 'xhtml' => $this->validateString($value),
-                'integer', 'positiveInt', 'unsignedInt' => $this->validateInteger($value),
-                'decimal' => $this->validateDecimal($value),
-                'boolean' => $this->validateBoolean($value),
-                default   => $value, // Unknown type, return as-is
-            };
-        } catch (\ReflectionException) {
-            return $value; // Can't reflect, return as-is
+        if ($primitiveAttribute === null) {
+            return $value; // Not a FHIR primitive, return as-is
         }
+
+        $primitiveType = $primitiveAttribute->primitiveType;
+
+        return match ($primitiveType) {
+            'string', 'code', 'uri', 'url', 'canonical', 'base64Binary',
+            'date', 'time', 'oid', 'id', 'uuid',
+            'markdown', 'xhtml' => $this->validateString($value),
+            'dateTime', 'instant' => $this->validateDateTime($value),
+            'integer', 'positiveInt', 'unsignedInt' => $this->validateInteger($value),
+            'decimal' => $this->validateDecimal($value),
+            'boolean' => $this->validateBoolean($value),
+            default   => $value, // Unknown type, return as-is
+        };
     }
 
     /**
@@ -441,5 +498,46 @@ class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface
         }
 
         throw new NotNormalizableValueException(sprintf('Expected boolean value, got %s', gettype($value)));
+    }
+
+    /**
+     * Validate and convert a dateTime or instant string to DateTimeImmutable.
+     * FHIR allows partial dates (e.g. "2015", "2015-02"), which PHP parses
+     * by filling in defaults (Jan 1 / 1st of month at midnight).
+     */
+    private function validateDateTime(mixed $value): ?\DateTimeImmutable
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        if ($value instanceof \DateTimeImmutable) {
+            return $value;
+        }
+
+        if ($value instanceof \DateTimeInterface) {
+            return \DateTimeImmutable::createFromInterface($value);
+        }
+
+        if (is_string($value)) {
+            try {
+                return new \DateTimeImmutable($value);
+            } catch (\Exception $e) {
+                throw new NotNormalizableValueException(sprintf('Expected dateTime string, got invalid value: %s', $value));
+            }
+        }
+
+        throw new NotNormalizableValueException(sprintf('Expected dateTime string or DateTimeInterface, got %s', gettype($value)));
+    }
+
+    /**
+     * Format a DateTimeInterface to a FHIR-compatible string for the given primitive type.
+     */
+    private function formatDateTimeValue(\DateTimeInterface $value, string $primitiveType): string
+    {
+        return match ($primitiveType) {
+            'instant' => $value->format(\DateTimeInterface::RFC3339_EXTENDED),
+            default   => $value->format(\DateTimeInterface::ATOM),
+        };
     }
 }

@@ -11,6 +11,8 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\SerializerAwareInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Normalizer for FHIR complex type classes (Address, HumanName, etc.).
@@ -22,14 +24,35 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  *
  * @author Ardenexal
  */
-class FHIRComplexTypeNormalizer implements FHIRNormalizerInterface
+class FHIRComplexTypeNormalizer implements FHIRNormalizerInterface, SerializerAwareInterface
 {
+    private ?NormalizerInterface $normalizer;
+
+    private ?DenormalizerInterface $denormalizer;
+
     public function __construct(
         private readonly FHIRMetadataExtractorInterface $metadataExtractor,
         private readonly FHIRTypeResolverInterface $typeResolver,
-        private readonly ?NormalizerInterface $normalizer = null,
-        private readonly ?DenormalizerInterface $denormalizer = null
+        ?NormalizerInterface $normalizer = null,
+        ?DenormalizerInterface $denormalizer = null
     ) {
+        $this->normalizer   = $normalizer;
+        $this->denormalizer = $denormalizer;
+    }
+
+    /**
+     * Called automatically by Symfony's Serializer so recursive normalize/denormalize
+     * calls always use the final, fully-wired serializer instance.
+     */
+    public function setSerializer(SerializerInterface $serializer): void
+    {
+        if ($serializer instanceof NormalizerInterface) {
+            $this->normalizer = $serializer;
+        }
+
+        if ($serializer instanceof DenormalizerInterface) {
+            $this->denormalizer = $serializer;
+        }
     }
 
     /**
@@ -87,9 +110,11 @@ class FHIRComplexTypeNormalizer implements FHIRNormalizerInterface
             $resolvedType = $type;
         }
 
-        // Validate that the resolved type matches the expected type
+        // If the resolver returned an incompatible type (e.g. a short heuristic name like
+        // 'FHIRPeriod' without a namespace), fall back to the expected type from the property
+        // declaration. This avoids false-positive rejections when the type resolver guesses wrong.
         if ($resolvedType !== $type && !is_subclass_of($resolvedType, $type)) {
-            throw new NotNormalizableValueException(sprintf('Resolved type "%s" is not compatible with expected type "%s"', $resolvedType, $type));
+            $resolvedType = $type;
         }
 
         try {
@@ -111,27 +136,19 @@ class FHIRComplexTypeNormalizer implements FHIRNormalizerInterface
                     if ($this->isChoiceElement($propertyName)) {
                         $denormalizedValue = $this->denormalizeChoiceElement($propertyName, $value, $format, $context);
                     } else {
-                        // Handle primitive extensions
-                        $extensionKey = '_' . $propertyName;
-                        if (isset($data[$extensionKey])) {
-                            $denormalizedValue = $this->denormalizePrimitiveWithExtensions(
-                                $value,
-                                $data[$extensionKey],
-                                $format,
-                                $context,
-                            );
-                        } else {
-                            // Use the injected denormalizer if available
-                            if ($this->denormalizer !== null) {
-                                $propertyType = $this->getPropertyType($property);
-                                if ($propertyType !== null) {
-                                    $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, $format, $context);
-                                } else {
-                                    $denormalizedValue = $value;
-                                }
+                        // Always use the denormalizer to create properly-typed instances.
+                        // _property extension keys are implicitly skipped at the loop level.
+                        if ($this->denormalizer !== null) {
+                            $propertyType = $this->getPropertyType($property);
+                            if ($propertyType !== null && !$this->isBuiltinType($propertyType)) {
+                                $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, $format, $context);
                             } else {
-                                $denormalizedValue = $this->denormalizeBasicValue($value, $format, $context);
+                                // For XML, Symfony XmlEncoder wraps primitive values as ['@value' => '...', '#' => ''].
+                                // Unwrap before assigning to string/union-typed properties.
+                                $denormalizedValue = $format === 'xml' ? $this->unwrapXmlValue($value, $propertyType) : $value;
                             }
+                        } else {
+                            $denormalizedValue = $this->denormalizeBasicValue($value, $format, $context);
                         }
                     }
 
@@ -288,14 +305,21 @@ class FHIRComplexTypeNormalizer implements FHIRNormalizerInterface
 
         // Look for value property
         if ($reflection->hasProperty('value')) {
-            $valueProperty   = $reflection->getProperty('value');
-            $result['value'] = $valueProperty->getValue($value);
+            $valueProperty = $reflection->getProperty('value');
+            if ($valueProperty->isInitialized($value)) {
+                $raw = $valueProperty->getValue($value);
+                // Format DateTimeInterface to string for serialization (dateTime / instant primitives)
+                if ($raw instanceof \DateTimeInterface) {
+                    $raw = $raw->format(\DateTimeInterface::ATOM);
+                }
+                $result['value'] = $raw;
+            }
         }
 
         // Look for extension property
         if ($reflection->hasProperty('extension')) {
             $extensionProperty = $reflection->getProperty('extension');
-            $extensions        = $extensionProperty->getValue($value);
+            $extensions        = $extensionProperty->isInitialized($value) ? $extensionProperty->getValue($value) : null;
             if ($extensions !== null && !empty($extensions)) {
                 if ($this->normalizer !== null) {
                     $result['extensions'] = $this->normalizer->normalize($extensions, $format, $context);
@@ -306,18 +330,6 @@ class FHIRComplexTypeNormalizer implements FHIRNormalizerInterface
         }
 
         return $result;
-    }
-
-    /**
-     * Denormalize a primitive value with extensions
-     *
-     * @param array<string, mixed> $context
-     */
-    private function denormalizePrimitiveWithExtensions(mixed $value, mixed $extensions, ?string $format, array $context): mixed
-    {
-        // For now, return the basic value - full primitive handling will be implemented
-        // in the FHIRPrimitiveTypeNormalizer
-        return $value;
     }
 
     /**
@@ -350,6 +362,9 @@ class FHIRComplexTypeNormalizer implements FHIRNormalizerInterface
             $properties = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
 
             foreach ($properties as $property) {
+                if (!$property->isInitialized($value)) {
+                    continue;
+                }
                 $propertyValue = $property->getValue($value);
                 if ($propertyValue !== null) {
                     $result[$property->getName()] = $this->normalizeBasicValue($propertyValue, $format, $context);
@@ -390,6 +405,12 @@ class FHIRComplexTypeNormalizer implements FHIRNormalizerInterface
 
         foreach ($properties as $property) {
             $propertyName = $property->getName();
+
+            // Skip uninitialized typed properties (created via newInstanceWithoutConstructor)
+            if (!$property->isInitialized($object)) {
+                continue;
+            }
+
             $value        = $property->getValue($object);
 
             // Skip null values according to FHIR JSON rules
@@ -453,6 +474,12 @@ class FHIRComplexTypeNormalizer implements FHIRNormalizerInterface
 
         foreach ($properties as $property) {
             $propertyName = $property->getName();
+
+            // Skip uninitialized typed properties (created via newInstanceWithoutConstructor)
+            if (!$property->isInitialized($object)) {
+                continue;
+            }
+
             $value        = $property->getValue($object);
 
             // Skip null values according to FHIR XML rules
@@ -507,5 +534,37 @@ class FHIRComplexTypeNormalizer implements FHIRNormalizerInterface
         }
 
         return null;
+    }
+
+    /**
+     * Return true for PHP built-in types that cannot be passed to the denormalizer.
+     */
+    private function isBuiltinType(string $type): bool
+    {
+        return in_array($type, ['array', 'string', 'int', 'bool', 'float', 'null', 'mixed', 'object', 'callable', 'iterable'], true);
+    }
+
+    /**
+     * Unwrap a FHIR XML value encoded as ['@value' => '...', '#' => ''] by Symfony's XmlEncoder.
+     * XmlEncoder always adds a '#' key for empty text content alongside XML attributes.
+     * Returns the scalar value when the array contains @value and optionally '#', otherwise returns as-is.
+     * When the target property type is 'array' and the unwrapped value is not an array, wraps it in [].
+     */
+    private function unwrapXmlValue(mixed $value, ?string $propertyType): mixed
+    {
+        if (is_array($value) && array_key_exists('@value', $value)) {
+            $otherKeys = array_diff(array_keys($value), ['@value', '#']);
+            if (empty($otherKeys)) {
+                $value = $value['@value'];
+            }
+        }
+
+        // XmlEncoder collapses single XML elements into scalars instead of arrays.
+        // Wrap in an array when the property expects an array type.
+        if ($propertyType === 'array' && !is_array($value)) {
+            $value = [$value];
+        }
+
+        return $value;
     }
 }

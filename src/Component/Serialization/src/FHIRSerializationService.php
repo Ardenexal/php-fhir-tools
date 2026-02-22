@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization;
 
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContextFactory;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationDebugInfo;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
@@ -46,29 +47,18 @@ class FHIRSerializationService
         $metadataExtractor = new FHIRMetadataExtractor();
         $typeResolver      = new FHIRTypeResolver();
 
-        // Phase 1: create normalizers without an inner serializer reference
-        $resourceNormalizer  = new FHIRResourceNormalizer($metadataExtractor, $typeResolver);
-        $complexNormalizer   = new FHIRComplexTypeNormalizer($metadataExtractor, $typeResolver);
-        $primitiveNormalizer = new FHIRPrimitiveTypeNormalizer($metadataExtractor);
-        $backboneNormalizer  = new FHIRBackboneElementNormalizer($metadataExtractor);
+        // Create normalizers without an inner serializer reference.
+        // Each normalizer implements SerializerAwareInterface, so Symfony's Serializer
+        // will call setSerializer() on each one automatically, wiring the final
+        // fully-wired instance back in for recursive normalize/denormalize calls.
+        $normalizers = [
+            new FHIRResourceNormalizer($metadataExtractor, $typeResolver),
+            new FHIRComplexTypeNormalizer($metadataExtractor, $typeResolver),
+            new FHIRPrimitiveTypeNormalizer($metadataExtractor),
+            new FHIRBackboneElementNormalizer($metadataExtractor),
+        ];
 
-        // Phase 2: create the Serializer so we have a concrete instance to inject
-        $serializer = new Serializer(
-            [$resourceNormalizer, $complexNormalizer, $primitiveNormalizer, $backboneNormalizer],
-            [new JsonEncoder(), new XmlEncoder()]
-        );
-
-        // Phase 3: re-create normalizers with the Serializer wired in for recursive calls
-        $resourceNormalizer  = new FHIRResourceNormalizer($metadataExtractor, $typeResolver, $serializer, $serializer);
-        $complexNormalizer   = new FHIRComplexTypeNormalizer($metadataExtractor, $typeResolver, $serializer, $serializer);
-        $primitiveNormalizer = new FHIRPrimitiveTypeNormalizer($metadataExtractor, $serializer, $serializer);
-        $backboneNormalizer  = new FHIRBackboneElementNormalizer($metadataExtractor, $serializer, $serializer);
-
-        // Phase 4: build the final, properly-wired Serializer
-        $serializer = new Serializer(
-            [$resourceNormalizer, $complexNormalizer, $primitiveNormalizer, $backboneNormalizer],
-            [new JsonEncoder(), new XmlEncoder()]
-        );
+        $serializer = new Serializer($normalizers, [new JsonEncoder(), new XmlEncoder()]);
 
         return new self($serializer, new FHIRSerializationContextFactory(), new FHIRSerializationDebugInfo('initial', 'json'));
     }
@@ -105,10 +95,36 @@ class FHIRSerializationService
         try {
             $xmlContext = $this->contextFactory->createXmlContext($context);
 
+            // The FHIR XML root element name must be the resource type (e.g. "Patient").
+            // Symfony XmlEncoder uses XmlEncoder::ROOT_NODE_NAME from context.
+            $resourceType = $this->extractResourceTypeFromObject($fhirObject);
+            if ($resourceType !== null) {
+                $xmlContext[XmlEncoder::ROOT_NODE_NAME] = $resourceType;
+            }
+
             return $this->serializer->serialize($fhirObject, 'xml', $xmlContext);
         } catch (\Exception $e) {
             throw new FHIRSerializationException(sprintf('Failed to serialize FHIR object to XML: %s', $e->getMessage()), 0, $e);
         }
+    }
+
+    /**
+     * Extract the FHIR resource type string from a resource object by reading its FhirResource attribute.
+     */
+    private function extractResourceTypeFromObject(object $fhirObject): ?string
+    {
+        $reflection = new \ReflectionClass($fhirObject);
+
+        do {
+            $attributes = $reflection->getAttributes(FhirResource::class);
+            if (!empty($attributes)) {
+                return $attributes[0]->newInstance()->getResourceType();
+            }
+
+            $reflection = $reflection->getParentClass();
+        } while ($reflection !== false);
+
+        return null;
     }
 
     /**
