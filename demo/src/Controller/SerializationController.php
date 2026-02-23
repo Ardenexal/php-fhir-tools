@@ -141,11 +141,49 @@ class SerializationController extends AbstractController
             default => throw new \InvalidArgumentException("Unsupported target format: {$targetFormat}"),
         };
 
+        $output = $this->prettyPrint($output, $targetFormat);
+
         return [
             'type'   => 'convert',
             'format' => $targetFormat,
             'output' => $output,
         ];
+    }
+
+    /** Pretty-print a JSON or XML string; returns original on failure. */
+    private function prettyPrint(string $output, string $format): string
+    {
+        if ($format === 'json') {
+            $decoded = json_decode($output);
+
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $pretty = json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+                if ($pretty !== false) {
+                    return $pretty;
+                }
+            }
+
+            return $output;
+        }
+
+        if ($format === 'xml') {
+            $dom                   = new \DOMDocument('1.0', 'UTF-8');
+            $dom->preserveWhiteSpace = false;
+            $dom->formatOutput       = true;
+
+            if ($dom->loadXML($output)) {
+                $pretty = $dom->saveXML();
+
+                if ($pretty !== false) {
+                    return $pretty;
+                }
+            }
+
+            return $output;
+        }
+
+        return $output;
     }
 
     /** @return array<string, mixed> */
