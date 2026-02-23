@@ -229,6 +229,30 @@ class FHIRPathParserTest extends TestCase
         self::assertEquals('Patient', $ast->getTypeName());
     }
 
+    public function testParseTypeIsFunctionCall(): void
+    {
+        // resource.is(Patient) is the function-call form — must produce
+        // the same TypeExpressionNode AST as the infix form (resource is Patient)
+        $tokens = $this->lexer->tokenize('resource.is(Patient)');
+        $ast    = $this->parser->parse($tokens);
+
+        self::assertInstanceOf(TypeExpressionNode::class, $ast);
+        self::assertEquals(TokenType::IS, $ast->getOperator());
+        self::assertEquals('Patient', $ast->getTypeName());
+    }
+
+    public function testParseTypeAsFunctionCall(): void
+    {
+        // resource.as(Patient) is the function-call form — must produce
+        // the same TypeExpressionNode AST as the infix form (resource as Patient)
+        $tokens = $this->lexer->tokenize('resource.as(Patient)');
+        $ast    = $this->parser->parse($tokens);
+
+        self::assertInstanceOf(TypeExpressionNode::class, $ast);
+        self::assertEquals(TokenType::AS, $ast->getOperator());
+        self::assertEquals('Patient', $ast->getTypeName());
+    }
+
     // External Constant Tests
 
     public function testParseExternalConstant(): void
@@ -352,6 +376,82 @@ class FHIRPathParserTest extends TestCase
 
         $tokens = $this->lexer->tokenize('{1, 2');
         $this->parser->parse($tokens);
+    }
+
+    // Precedence Tests
+
+    public function testMultiplicativeBindsTighterThanAdditive(): void
+    {
+        // 1+2*3+4 must parse as (1+(2*3))+4, not ((1+2)*3)+4
+        // Root must be additive (+), right child is literal 4,
+        // left child is another additive (+) whose right is multiplicative (*)
+        $tokens = $this->lexer->tokenize('1+2*3+4');
+        $ast    = $this->parser->parse($tokens);
+
+        // Root: +
+        self::assertInstanceOf(BinaryOperatorNode::class, $ast);
+        self::assertEquals(TokenType::PLUS, $ast->getOperator());
+
+        // Right of root: literal 4
+        self::assertInstanceOf(LiteralNode::class, $ast->getRight());
+        self::assertEquals(4, $ast->getRight()->getValue());
+
+        // Left of root: another +
+        $leftPlus = $ast->getLeft();
+        self::assertInstanceOf(BinaryOperatorNode::class, $leftPlus);
+        self::assertEquals(TokenType::PLUS, $leftPlus->getOperator());
+
+        // Right of inner +: the multiply (2*3)
+        $multiply = $leftPlus->getRight();
+        self::assertInstanceOf(BinaryOperatorNode::class, $multiply);
+        self::assertEquals(TokenType::MULTIPLY, $multiply->getOperator());
+        self::assertEquals(2, $multiply->getLeft()->getValue());
+        self::assertEquals(3, $multiply->getRight()->getValue());
+    }
+
+    public function testTwoMultiplicativeGroupsAddedTogether(): void
+    {
+        // 2*3+4*5 must parse as (2*3)+(4*5)
+        $tokens = $this->lexer->tokenize('2*3+4*5');
+        $ast    = $this->parser->parse($tokens);
+
+        // Root: +
+        self::assertInstanceOf(BinaryOperatorNode::class, $ast);
+        self::assertEquals(TokenType::PLUS, $ast->getOperator());
+
+        // Left: (2*3)
+        $leftMul = $ast->getLeft();
+        self::assertInstanceOf(BinaryOperatorNode::class, $leftMul);
+        self::assertEquals(TokenType::MULTIPLY, $leftMul->getOperator());
+        self::assertEquals(2, $leftMul->getLeft()->getValue());
+        self::assertEquals(3, $leftMul->getRight()->getValue());
+
+        // Right: (4*5)
+        $rightMul = $ast->getRight();
+        self::assertInstanceOf(BinaryOperatorNode::class, $rightMul);
+        self::assertEquals(TokenType::MULTIPLY, $rightMul->getOperator());
+        self::assertEquals(4, $rightMul->getLeft()->getValue());
+        self::assertEquals(5, $rightMul->getRight()->getValue());
+    }
+
+    public function testComparisonBindsLooserThanAdditive(): void
+    {
+        // 1+2 > 0 must parse as (1+2) > 0, not 1+(2>0)
+        $tokens = $this->lexer->tokenize('1+2 > 0');
+        $ast    = $this->parser->parse($tokens);
+
+        // Root: >
+        self::assertInstanceOf(BinaryOperatorNode::class, $ast);
+        self::assertEquals(TokenType::GREATER_THAN, $ast->getOperator());
+
+        // Left of >: (1+2)
+        $add = $ast->getLeft();
+        self::assertInstanceOf(BinaryOperatorNode::class, $add);
+        self::assertEquals(TokenType::PLUS, $add->getOperator());
+
+        // Right of >: 0
+        self::assertInstanceOf(LiteralNode::class, $ast->getRight());
+        self::assertEquals(0, $ast->getRight()->getValue());
     }
 
     // ToString Tests

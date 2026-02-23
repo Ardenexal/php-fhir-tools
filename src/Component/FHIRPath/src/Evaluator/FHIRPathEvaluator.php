@@ -219,8 +219,9 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             TokenType::XOR     => $this->evaluateLogicalXor($left, $right),
             TokenType::IMPLIES => $this->evaluateImplies($left, $right),
 
-            // Membership operators (to be fully implemented later)
-            TokenType::IN, TokenType::CONTAINS => throw new EvaluationException("Operator '{$node->getOperator()->value}' not yet fully implemented", $node->getLine(), $node->getColumn()),
+            // Membership operators
+            TokenType::IN       => $this->evaluateMembership($left, $right),
+            TokenType::CONTAINS => $this->evaluateMembership($right, $left),
 
             default => throw new EvaluationException("Unknown operator: {$node->getOperator()->value}", $node->getLine(), $node->getColumn()),
         };
@@ -282,17 +283,18 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         $typeName   = $node->getTypeName();
         $operator   = $node->getOperator();
 
-        // Handle 'is' operator - type checking
+        // Handle 'is' operator — FHIRPath spec: returns a single boolean, not a filtered collection.
+        // Empty input → empty; single item → bool result; multi-item → error.
         if ($operator === TokenType::IS) {
-            // For collections, filter items that match the type
-            $filtered = [];
-            foreach ($collection->toArray() as $item) {
-                if ($this->typeResolver->isOfType($item, $typeName)) {
-                    $filtered[] = $item;
-                }
+            if ($collection->isEmpty()) {
+                return Collection::empty();
             }
 
-            return Collection::from($filtered);
+            if (!$collection->isSingle()) {
+                throw new EvaluationException("'is' operator requires a single-item collection", $node->getLine(), $node->getColumn());
+            }
+
+            return Collection::single($this->typeResolver->isOfType($collection->first(), $typeName));
         }
 
         // Handle 'as' operator - type casting
@@ -543,6 +545,36 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         } while ($reflection !== false);
 
         return false;
+    }
+
+    /**
+     * Evaluate membership: checks whether $needle (single item) is in $haystack.
+     *
+     * FHIRPath semantics:
+     * - Empty needle → empty result
+     * - Needle with more than one item → error
+     * - Needle found in haystack → true; otherwise → false
+     */
+    private function evaluateMembership(Collection $needle, Collection $haystack): Collection
+    {
+        if ($needle->isEmpty()) {
+            return Collection::empty();
+        }
+
+        if ($needle->count() > 1) {
+            throw new EvaluationException("'in' operator requires a single item on the left side");
+        }
+
+        $needleValue = $needle->first();
+
+        foreach ($haystack as $item) {
+            // phpcs:ignore SlevomatCodingStandard.Operators.DisallowEqualOperators
+            if ($item == $needleValue) {
+                return Collection::single(true);
+            }
+        }
+
+        return Collection::single(false);
     }
 
     /**

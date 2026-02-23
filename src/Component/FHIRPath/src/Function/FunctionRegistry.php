@@ -71,6 +71,7 @@ final class FunctionRegistry
         $this->registerSafe(new LowerFunction());
         $this->registerSafe(new ReplaceFunction());
         $this->registerSafe(new MatchesFunction());
+        $this->registerSafe(new MatchesFullFunction());
         $this->registerSafe(new TrimFunction());
         $this->registerSafe(new SplitFunction());
 
@@ -104,6 +105,17 @@ final class FunctionRegistry
         // Combining functions
         $this->registerSafe(new CombineFunction());
         $this->registerSafe(new IifFunction());
+
+        // Type conversion functions
+        $this->registerSafe(new ToDecimalFunction());
+
+        // Precision / boundary functions
+        $this->registerSafe(new PrecisionFunction());
+        $this->registerSafe(new LowBoundaryFunction());
+        $this->registerSafe(new HighBoundaryFunction());
+
+        // Comparison utility
+        $this->registerSafe(new ComparableFunction());
     }
 
     /**
@@ -197,5 +209,19 @@ final class FunctionRegistry
     public function clear(): void
     {
         $this->functions = [];
+    }
+
+    /**
+     * Reset the singleton instance so the next call to getInstance() returns a
+     * fresh registry with all built-in functions re-registered.
+     *
+     * Call this in test tearDown() after using clear(), to prevent the emptied
+     * registry from leaking across test suites running in the same process.
+     *
+     * @internal
+     */
+    public static function reset(): void
+    {
+        self::$instance = null;
     }
 }

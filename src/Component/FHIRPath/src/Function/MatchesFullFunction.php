@@ -9,17 +9,19 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
 
 /**
- * FHIRPath matches() function.
+ * FHIRPath matchesFull() function.
  *
- * Returns true if the input string matches the given regular expression pattern.
+ * Returns true only if the entire input string matches the given regular
+ * expression (anchored full-string match). Equivalent to matches() but the
+ * pattern is automatically wrapped in '^(?:...)$'.
  *
  * @author Ardenexal <https://github.com/Ardenexal>
  */
-final class MatchesFunction extends AbstractFunction
+final class MatchesFullFunction extends AbstractFunction
 {
     public function __construct()
     {
-        parent::__construct('matches');
+        parent::__construct('matchesFull');
     }
 
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection
@@ -51,20 +53,17 @@ final class MatchesFunction extends AbstractFunction
             throw EvaluationException::invalidFunctionParameter($this->getName(), 'pattern', 'string');
         }
 
-        // Add delimiters if not present; always include the DOTALL ('s') flag so that
-        // '.' matches newlines as required by the FHIRPath spec.
-        if (!str_starts_with($pattern, '/')) {
-            $pattern = '/' . $pattern . '/s';
-        } else {
-            // Pattern already delimited — append 's' flag only if not already present.
+        // Strip any existing delimiters before anchoring, then rebuild with DOTALL.
+        if (str_starts_with($pattern, '/')) {
             $lastSlash = strrpos($pattern, '/');
-            $flags     = $lastSlash !== false ? substr($pattern, $lastSlash + 1) : '';
-            if (!str_contains($flags, 's')) {
-                $pattern .= 's';
-            }
+            $inner     = $lastSlash !== false ? substr($pattern, 1, $lastSlash - 1) : $pattern;
+        } else {
+            $inner = $pattern;
         }
 
-        $result = @preg_match($pattern, $string);
+        $anchored = '/^(?:' . $inner . ')$/s';
+
+        $result = @preg_match($anchored, $string);
 
         if ($result === false) {
             throw EvaluationException::invalidFunctionParameter($this->getName(), 'pattern', 'valid regular expression');
