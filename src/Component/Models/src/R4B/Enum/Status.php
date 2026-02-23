@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,21 +12,21 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum Status: string
 {
-	/** Attested */
-	case attested = 'attested';
+    /** Attested */
+    case attested = 'attested';
 
-	/** Validated */
-	case validated = 'validated';
+    /** Validated */
+    case validated = 'validated';
 
-	/** In process */
-	case inprocess = 'in-process';
+    /** In process */
+    case inprocess = 'in-process';
 
-	/** Requires revalidation */
-	case requiresrevalidation = 'req-revalid';
+    /** Requires revalidation */
+    case requiresrevalidation = 'req-revalid';
 
-	/** Validation failed */
-	case validationfailed = 'val-fail';
+    /** Validation failed */
+    case validationfailed = 'val-fail';
 
-	/** Re-Validation failed */
-	case revalidationfailed = 'reval-fail';
+    /** Re-Validation failed */
+    case revalidationfailed = 'reval-fail';
 }

@@ -16,11 +16,11 @@ namespace Ardenexal\FHIRTools\Component\Serialization\Metadata;
 final class PropertyVariantMetadata
 {
     /**
-     * @param string $fhirType    FHIR type code for this variant (e.g. 'boolean', 'dateTime')
+     * @param string $fhirType     FHIR type code for this variant (e.g. 'boolean', 'dateTime')
      * @param string $propertyKind Semantic kind ('scalar', 'primitive', 'complex', etc.)
-     * @param string $phpType     FQCN for class types; 'bool'/'int'/'float'/'string' for builtins
-     * @param string $jsonKey     Concrete FHIR element name used in JSON/XML (e.g. 'deceasedBoolean')
-     * @param bool   $isBuiltin   Pre-computed: true when phpType is a PHP builtin scalar
+     * @param string $phpType      FQCN for class types; 'bool'/'int'/'float'/'string' for builtins
+     * @param string $jsonKey      Concrete FHIR element name used in JSON/XML (e.g. 'deceasedBoolean')
+     * @param bool   $isBuiltin    Pre-computed: true when phpType is a PHP builtin scalar
      */
     public function __construct(
         public readonly string $fhirType,

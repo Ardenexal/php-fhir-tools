@@ -20,9 +20,8 @@ use PHPUnit\Framework\TestCase;
  * supported for the resource type, clearly separating:
  * - Skipped = resource type not yet supported by the deserializer
  * - Failed  = deserialization worked but serialize→deserialize cycle broke
- *
  */
-#[CoversClass(\Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService::class)]
+#[CoversClass(FHIRSerializationService::class)]
 final class SerializationSpecificationTest extends TestCase
 {
     private FHIRSerializationService $service;
@@ -137,7 +136,7 @@ final class SerializationSpecificationTest extends TestCase
      */
     private function assertJsonRoundTrip(string $originalContents, string $reserialized, string $filename): void
     {
-        $originalDecoded = json_decode($originalContents, true);
+        $originalDecoded  = json_decode($originalContents, true);
         $roundTripDecoded = json_decode($reserialized, true);
 
         if (!is_array($originalDecoded) || !is_array($roundTripDecoded)) {
@@ -166,7 +165,7 @@ final class SerializationSpecificationTest extends TestCase
      */
     private function assertXmlRoundTrip(string $originalContents, string $reserialized, string $filename): void
     {
-        $originalXml    = simplexml_load_string($originalContents, 'SimpleXMLElement', LIBXML_NONET | LIBXML_NOERROR);
+        $originalXml     = simplexml_load_string($originalContents, 'SimpleXMLElement', LIBXML_NONET | LIBXML_NOERROR);
         $roundTrippedXml = simplexml_load_string($reserialized, 'SimpleXMLElement', LIBXML_NONET | LIBXML_NOERROR);
 
         if ($originalXml === false || $roundTrippedXml === false) {

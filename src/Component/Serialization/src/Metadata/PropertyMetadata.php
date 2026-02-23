@@ -16,13 +16,13 @@ namespace Ardenexal\FHIRTools\Component\Serialization\Metadata;
 final class PropertyMetadata
 {
     /**
-     * @param string                          $fhirType     FHIR type code ('date', 'HumanName', 'choice', etc.)
-     * @param string                          $propertyKind Semantic category — see FhirProperty attribute doc
-     * @param bool                            $isArray      True when the property holds a list
-     * @param bool                            $isRequired   True when cardinality is 1..*
-     * @param bool                            $isChoice     True for choice elements (value[x])
-     * @param list<PropertyVariantMetadata>|null $variants  Non-null only when isChoice is true
-     * @param string|null                     $jsonKey      Key override; null = use PHP property name
+     * @param string                             $fhirType     FHIR type code ('date', 'HumanName', 'choice', etc.)
+     * @param string                             $propertyKind Semantic category — see FhirProperty attribute doc
+     * @param bool                               $isArray      True when the property holds a list
+     * @param bool                               $isRequired   True when cardinality is 1..*
+     * @param bool                               $isChoice     True for choice elements (value[x])
+     * @param list<PropertyVariantMetadata>|null $variants     Non-null only when isChoice is true
+     * @param string|null                        $jsonKey      Key override; null = use PHP property name
      */
     public function __construct(
         public readonly string $fhirType,

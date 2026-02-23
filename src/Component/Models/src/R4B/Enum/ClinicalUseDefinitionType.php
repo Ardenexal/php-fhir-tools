@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,18 +12,18 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum ClinicalUseDefinitionType: string
 {
-	/** Indication */
-	case indication = 'indication';
+    /** Indication */
+    case indication = 'indication';
 
-	/** Contraindication */
-	case contraindication = 'contraindication';
+    /** Contraindication */
+    case contraindication = 'contraindication';
 
-	/** Interaction */
-	case interaction = 'interaction';
+    /** Interaction */
+    case interaction = 'interaction';
 
-	/** Undesirable Effect */
-	case undesirableeffect = 'undesirable-effect';
+    /** Undesirable Effect */
+    case undesirableeffect = 'undesirable-effect';
 
-	/** Warning */
-	case warning = 'warning';
+    /** Warning */
+    case warning = 'warning';
 }

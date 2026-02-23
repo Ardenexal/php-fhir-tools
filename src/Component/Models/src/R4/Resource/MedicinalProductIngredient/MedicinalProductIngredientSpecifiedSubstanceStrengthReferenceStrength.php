@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\MedicinalProductIngredient;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -22,23 +23,105 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 )]
 class MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength extends BackboneElement
 {
+    public const FHIR_PROPERTY_MAP = [
+        'id' => [
+            'fhirType'     => 'http://hl7.org/fhirpath/System.String',
+            'propertyKind' => 'scalar',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'extension' => [
+            'fhirType'     => 'Extension',
+            'propertyKind' => 'extension',
+            'isArray'      => true,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'modifierExtension' => [
+            'fhirType'     => 'Extension',
+            'propertyKind' => 'modifierExtension',
+            'isArray'      => true,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'substance' => [
+            'fhirType'     => 'CodeableConcept',
+            'propertyKind' => 'complex',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'strength' => [
+            'fhirType'     => 'Ratio',
+            'propertyKind' => 'complex',
+            'isArray'      => false,
+            'isRequired'   => true,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'strengthLowLimit' => [
+            'fhirType'     => 'Ratio',
+            'propertyKind' => 'complex',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'measurementPoint' => [
+            'fhirType'     => 'string',
+            'propertyKind' => 'primitive',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'country' => [
+            'fhirType'     => 'CodeableConcept',
+            'propertyKind' => 'complex',
+            'isArray'      => true,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+    ];
+
     public function __construct(
         /** @var string|null id Unique id for inter-element referencing */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null substance Relevant reference substance */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $substance = null,
         /** @var Ratio|null strength Strength expressed in terms of a reference substance */
-        #[NotBlank]
+        #[FhirProperty(fhirType: 'Ratio', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?Ratio $strength = null,
         /** @var Ratio|null strengthLowLimit Strength expressed in terms of a reference substance */
+        #[FhirProperty(fhirType: 'Ratio', propertyKind: 'complex')]
         public ?Ratio $strengthLowLimit = null,
         /** @var StringPrimitive|string|null measurementPoint For when strength is measured at a particular point or distance */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $measurementPoint = null,
         /** @var array<CodeableConcept> country The country or countries for which the strength range applies */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true)]
         public array $country = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -25,7 +25,7 @@ class FHIRMetadataExtractor implements FHIRMetadataExtractorInterface
 
     public function __construct(?FHIRMetadataCache $cache = null, ?PropertyMetadataProviderInterface $propertyMetadataProvider = null)
     {
-        $this->cache                    = $cache ?? new FHIRMetadataCache();
+        $this->cache                    = $cache                    ?? new FHIRMetadataCache();
         $this->propertyMetadataProvider = $propertyMetadataProvider ?? new PropertyMetadataProvider();
     }
 

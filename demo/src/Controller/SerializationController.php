@@ -12,6 +12,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\BundleResource;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\ConditionResource;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\EncounterResource;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\MedicationRequestResource;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\ObservationResource;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\OrganizationResource;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\PractitionerResource;
 
 /**
  * Interactive FHIR serialization and validation playground.
@@ -28,14 +36,14 @@ class SerializationController extends AbstractController
      * @var array<string, string>
      */
     private const RESOURCE_TYPES = [
-        'Patient'              => \Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource::class,
-        'Observation'          => \Ardenexal\FHIRTools\Component\Models\R4\Resource\ObservationResource::class,
-        'Condition'            => \Ardenexal\FHIRTools\Component\Models\R4\Resource\ConditionResource::class,
-        'Encounter'            => \Ardenexal\FHIRTools\Component\Models\R4\Resource\EncounterResource::class,
-        'MedicationRequest'    => \Ardenexal\FHIRTools\Component\Models\R4\Resource\MedicationRequestResource::class,
-        'Organization'         => \Ardenexal\FHIRTools\Component\Models\R4\Resource\OrganizationResource::class,
-        'Practitioner'         => \Ardenexal\FHIRTools\Component\Models\R4\Resource\PractitionerResource::class,
-        'Bundle'               => \Ardenexal\FHIRTools\Component\Models\R4\Resource\BundleResource::class,
+        'Patient'              => PatientResource::class,
+        'Observation'          => ObservationResource::class,
+        'Condition'            => ConditionResource::class,
+        'Encounter'            => EncounterResource::class,
+        'MedicationRequest'    => MedicationRequestResource::class,
+        'Organization'         => OrganizationResource::class,
+        'Practitioner'         => PractitionerResource::class,
+        'Bundle'               => BundleResource::class,
     ];
 
     public function __construct(
@@ -89,7 +97,7 @@ class SerializationController extends AbstractController
             $object = match ($format) {
                 'json'  => $this->serializationService->deserializeFromJson($input, $targetClass),
                 'xml'   => $this->serializationService->deserializeFromXml($input, $targetClass),
-                default => throw new FHIRSerializationException("Unable to detect format (expected JSON or XML)"),
+                default => throw new FHIRSerializationException('Unable to detect format (expected JSON or XML)'),
             };
 
             $result = match ($action) {
@@ -128,8 +136,8 @@ class SerializationController extends AbstractController
     private function doConvert(object $object, string $targetFormat): array
     {
         $output = match ($targetFormat) {
-            'xml'  => $this->serializationService->serializeToXml($object),
-            'json' => $this->serializationService->serializeToJson($object),
+            'xml'   => $this->serializationService->serializeToXml($object),
+            'json'  => $this->serializationService->serializeToJson($object),
             default => throw new \InvalidArgumentException("Unsupported target format: {$targetFormat}"),
         };
 

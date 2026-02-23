@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,12 +12,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum VariableType: string
 {
-	/** Dichotomous */
-	case dichotomous = 'dichotomous';
+    /** Dichotomous */
+    case dichotomous = 'dichotomous';
 
-	/** Continuous */
-	case continuous = 'continuous';
+    /** Continuous */
+    case continuous = 'continuous';
 
-	/** Descriptive */
-	case descriptive = 'descriptive';
+    /** Descriptive */
+    case descriptive = 'descriptive';
 }

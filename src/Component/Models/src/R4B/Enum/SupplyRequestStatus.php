@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,24 +12,24 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum SupplyRequestStatus: string
 {
-	/** Draft */
-	case draft = 'draft';
+    /** Draft */
+    case draft = 'draft';
 
-	/** Active */
-	case active = 'active';
+    /** Active */
+    case active = 'active';
 
-	/** Suspended */
-	case suspended = 'suspended';
+    /** Suspended */
+    case suspended = 'suspended';
 
-	/** Cancelled */
-	case cancelled = 'cancelled';
+    /** Cancelled */
+    case cancelled = 'cancelled';
 
-	/** Completed */
-	case completed = 'completed';
+    /** Completed */
+    case completed = 'completed';
 
-	/** Entered in Error */
-	case enteredinerror = 'entered-in-error';
+    /** Entered in Error */
+    case enteredinerror = 'entered-in-error';
 
-	/** Unknown */
-	case unknown = 'unknown';
+    /** Unknown */
+    case unknown = 'unknown';
 }

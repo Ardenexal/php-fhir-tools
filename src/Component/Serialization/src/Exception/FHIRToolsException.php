@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Exception;
 
-
 /**
  * Base exception class for all FHIR Tools related errors
  *

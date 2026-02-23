@@ -75,7 +75,7 @@ class FHIRPathController extends AbstractController
 
             if ($contextRaw !== '') {
                 try {
-                    $decoded = json_decode($contextRaw, true, 512, JSON_THROW_ON_ERROR);
+                    $decoded  = json_decode($contextRaw, true, 512, JSON_THROW_ON_ERROR);
                     $resource = $decoded;
                 } catch (\JsonException $e) {
                     $error = 'Invalid JSON context: ' . $e->getMessage();

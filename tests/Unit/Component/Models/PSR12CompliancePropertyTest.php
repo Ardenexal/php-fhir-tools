@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\Tests\Unit;
 
 use Eris\Generator;
 use Eris\TestTrait;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -20,8 +21,8 @@ class PSR12CompliancePropertyTest extends TestCase
     /**
      * Feature: fhir-models-component, Property 5: Code quality standards compliance (PSR-12)
      *
-     * @test
      */
+    #[Test]
     public function testAllGeneratedModelsFollowPSR12Standards(): void
     {
         $this->forAll(
@@ -130,7 +131,6 @@ class PSR12CompliancePropertyTest extends TestCase
 
     /**
      * Test that class declarations follow PSR-12 standards
-     *
      */
     public function testClassDeclarationsFollowPSR12(): void
     {

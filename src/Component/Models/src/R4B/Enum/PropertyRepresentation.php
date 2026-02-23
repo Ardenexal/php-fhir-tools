@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,18 +12,18 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum PropertyRepresentation: string
 {
-	/** XML Attribute */
-	case xmlattribute = 'xmlAttr';
+    /** XML Attribute */
+    case xmlattribute = 'xmlAttr';
 
-	/** XML Text */
-	case xmltext = 'xmlText';
+    /** XML Text */
+    case xmltext = 'xmlText';
 
-	/** Type Attribute */
-	case typeattribute = 'typeAttr';
+    /** Type Attribute */
+    case typeattribute = 'typeAttr';
 
-	/** CDA Text Format */
-	case cdatextformat = 'cdaText';
+    /** CDA Text Format */
+    case cdatextformat = 'cdaText';
 
-	/** XHTML */
-	case xhtml = 'xhtml';
+    /** XHTML */
+    case xhtml = 'xhtml';
 }

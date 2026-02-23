@@ -1,17 +1,23 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
+use Ardenexal\FHIRTools\Component\Models\R4B\Enum\StructureDefinitionKind;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
+
 /**
  * @fhir-code-type StructureDefinitionKind
+ *
  * @description Code type wrapper for StructureDefinitionKind enum
  */
-class StructureDefinitionKindType extends \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive
+class StructureDefinitionKindType extends CodePrimitive
 {
-	public function __construct(
-		/** @param \Ardenexal\FHIRTools\Component\Models\R4B\Enum\StructureDefinitionKind|string|null $value The code value (enum or string) */
-		string|null $value = null,
-	) {
-		parent::__construct(value: $value);
-	}
+    public function __construct(
+        /** @param StructureDefinitionKind|string|null $value The code value (enum or string) */
+        ?string $value = null,
+    ) {
+        parent::__construct(value: $value);
+    }
 }

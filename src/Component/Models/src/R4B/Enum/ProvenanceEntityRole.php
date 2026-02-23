@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,6 +12,6 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum ProvenanceEntityRole: string
 {
-	/** Derivation */
-	case derivation = 'derivation';
+    /** Derivation */
+    case derivation = 'derivation';
 }

@@ -141,6 +141,15 @@
             "@quality:serialization",
             "@quality:fhir-path"
         ],
+        "generate-models": "php ./demo/bin/console fhir:generate -vvv",
+        "generate-models-all": [
+            "echo 'Generating FHIR R4 models...'",
+            "php ./demo/bin/console fhir:generate --package=hl7.fhir.r4.core --package=hl7.fhir.r4b.core --package=hl7.fhir.r5.core -vvv",
+            "echo 'All FHIR models generated successfully!'"
+        ],
+        "generate-models-r4": "php ./demo/bin/console fhir:generate --package=hl7.fhir.r4.core -vvv",
+        "generate-models-r4b": "php ./demo/bin/console fhir:generate --package=hl7.fhir.r4b.core -vvv",
+        "generate-models-r5": "php ./demo/bin/console fhir:generate --package=hl7.fhir.r5.core -vvv",
         "fix-newlines": "powershell -ExecutionPolicy Bypass -File scripts/fix-newlines.ps1",
         "validate-recipe": "php scripts/validate-recipe.php",
         "test-recipe": "php ./vendor/phpunit/phpunit/phpunit tests/Integration/FlexRecipeTest.php",

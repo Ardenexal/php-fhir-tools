@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,15 +12,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum SubscriptionStatusCodes: string
 {
-	/** Requested */
-	case requested = 'requested';
+    /** Requested */
+    case requested = 'requested';
 
-	/** Active */
-	case active = 'active';
+    /** Active */
+    case active = 'active';
 
-	/** Error */
-	case error = 'error';
+    /** Error */
+    case error = 'error';
 
-	/** Off */
-	case off = 'off';
+    /** Off */
+    case off = 'off';
 }

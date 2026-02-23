@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,9 +12,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum AdverseEventActuality: string
 {
-	/** Adverse Event */
-	case adverseevent = 'actual';
+    /** Adverse Event */
+    case adverseevent = 'actual';
 
-	/** Potential Adverse Event */
-	case potentialadverseevent = 'potential';
+    /** Potential Adverse Event */
+    case potentialadverseevent = 'potential';
 }

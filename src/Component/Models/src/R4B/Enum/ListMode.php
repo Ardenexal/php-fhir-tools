@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,12 +12,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum ListMode: string
 {
-	/** Working List */
-	case workinglist = 'working';
+    /** Working List */
+    case workinglist = 'working';
 
-	/** Snapshot List */
-	case snapshotlist = 'snapshot';
+    /** Snapshot List */
+    case snapshotlist = 'snapshot';
 
-	/** Change List */
-	case changelist = 'changes';
+    /** Change List */
+    case changelist = 'changes';
 }

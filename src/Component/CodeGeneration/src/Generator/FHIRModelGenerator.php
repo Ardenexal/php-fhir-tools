@@ -622,8 +622,8 @@ class FHIRModelGenerator implements GeneratorInterface
      * @param PhpNamespace            $namespace
      * @param EnumType|null           $enum
      *
-     * @return array{fhirType: string, propertyKind: string, isArray: bool, isRequired: bool, isChoice: bool, jsonKey: null|string, variants: null|list<array{fhirType: string, propertyKind: string, phpType: string, jsonKey: string, isBuiltin: bool}>}|null
-     *         Entry for FHIR_PROPERTY_MAP, or null when max=0
+     * @return array{fhirType: string, propertyKind: string, isArray: bool, isRequired: bool, isChoice: bool, jsonKey: string|null, variants: list<array{fhirType: string, propertyKind: string, phpType: string, jsonKey: string, isBuiltin: bool}>|null}|null
+     *                                                                                                                                                                                                                                                          Entry for FHIR_PROPERTY_MAP, or null when max=0
      */
     private function addElementAsProperty(array $element, Method $method, string $version, BuilderContextInterface $builderContext, PhpNamespace $namespace, ?EnumType $enum = null): ?array
     {
@@ -701,13 +701,13 @@ class FHIRModelGenerator implements GeneratorInterface
             }
 
             return [
-                'fhirType'    => $fhirType,
+                'fhirType'     => $fhirType,
                 'propertyKind' => $propertyKind,
-                'isArray'     => $isArray,
-                'isRequired'  => $isRequired,
-                'isChoice'    => $isChoice,
-                'jsonKey'     => null,
-                'variants'    => $variants,
+                'isArray'      => $isArray,
+                'isRequired'   => $isRequired,
+                'isChoice'     => $isChoice,
+                'jsonKey'      => null,
+                'variants'     => $variants,
             ];
         }
 
@@ -787,8 +787,8 @@ class FHIRModelGenerator implements GeneratorInterface
      * Returns a PHP builtin ('bool', 'int', 'float', 'string') for scalar types,
      * or a FQCN without leading backslash for class types.
      *
-     * @param string               $code           FHIR type code
-     * @param string               $version        FHIR version
+     * @param string                  $code           FHIR type code
+     * @param string                  $version        FHIR version
      * @param BuilderContextInterface $builderContext Builder context
      */
     private function resolvePhpTypeForCode(string $code, string $version, BuilderContextInterface $builderContext): string
@@ -845,8 +845,8 @@ class FHIRModelGenerator implements GeneratorInterface
      *
      * Each variant maps one FHIR type code to its PHP type and the concrete JSON/XML element name.
      *
-     * @param array<string, mixed>    $element       FHIR element definition (must have type[])
-     * @param string                  $version       FHIR version
+     * @param array<string, mixed>    $element        FHIR element definition (must have type[])
+     * @param string                  $version        FHIR version
      * @param BuilderContextInterface $builderContext Builder context
      *
      * @return list<array{fhirType: string, propertyKind: string, phpType: string, jsonKey: string, isBuiltin: bool}>
@@ -876,11 +876,11 @@ class FHIRModelGenerator implements GeneratorInterface
             }
 
             $variants[] = [
-                'fhirType'    => $code,
+                'fhirType'     => $code,
                 'propertyKind' => $propertyKind,
-                'phpType'     => $phpType,
-                'jsonKey'     => $baseName . $typeLabel,
-                'isBuiltin'   => $isBuiltin,
+                'phpType'      => $phpType,
+                'jsonKey'      => $baseName . $typeLabel,
+                'isBuiltin'    => $isBuiltin,
             ];
         }
 

@@ -1,255 +1,270 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\Contract;
+
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Money;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UnsignedIntPrimitive;
 
 /**
  * @description Contract Valued Item List.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'Contract', elementPath: 'Contract.term.asset.valuedItem', fhirVersion: 'R4B')]
-class ContractTermAssetValuedItem extends \Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement
+#[FHIRBackboneElement(parentResource: 'Contract', elementPath: 'Contract.term.asset.valuedItem', fhirVersion: 'R4B')]
+class ContractTermAssetValuedItem extends BackboneElement
 {
-	public const FHIR_PROPERTY_MAP = [
-		'id' => [
-			'fhirType' => 'http://hl7.org/fhirpath/System.String',
-			'propertyKind' => 'scalar',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'extension' => [
-			'fhirType' => 'Extension',
-			'propertyKind' => 'extension',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'modifierExtension' => [
-			'fhirType' => 'Extension',
-			'propertyKind' => 'modifierExtension',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'entityX' => [
-			'fhirType' => 'choice',
-			'propertyKind' => 'choice',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => true,
-			'jsonKey' => null,
-			'variants' => [
-				[
-					'fhirType' => 'CodeableConcept',
-					'propertyKind' => 'complex',
-					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
-					'jsonKey' => 'entityCodeableConcept',
-					'isBuiltin' => false,
-				],
-				[
-					'fhirType' => 'Reference',
-					'propertyKind' => 'complex',
-					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
-					'jsonKey' => 'entityReference',
-					'isBuiltin' => false,
-				],
-			],
-		],
-		'identifier' => [
-			'fhirType' => 'Identifier',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'effectiveTime' => [
-			'fhirType' => 'dateTime',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'quantity' => [
-			'fhirType' => 'Quantity',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'unitPrice' => [
-			'fhirType' => 'Money',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'factor' => [
-			'fhirType' => 'decimal',
-			'propertyKind' => 'scalar',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'points' => [
-			'fhirType' => 'decimal',
-			'propertyKind' => 'scalar',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'net' => [
-			'fhirType' => 'Money',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'payment' => [
-			'fhirType' => 'string',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'paymentDate' => [
-			'fhirType' => 'dateTime',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'responsible' => [
-			'fhirType' => 'Reference',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'recipient' => [
-			'fhirType' => 'Reference',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'linkId' => [
-			'fhirType' => 'string',
-			'propertyKind' => 'primitive',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'securityLabelNumber' => [
-			'fhirType' => 'unsignedInt',
-			'propertyKind' => 'primitive',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-	];
+    public const FHIR_PROPERTY_MAP = [
+        'id' => [
+            'fhirType'     => 'http://hl7.org/fhirpath/System.String',
+            'propertyKind' => 'scalar',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'extension' => [
+            'fhirType'     => 'Extension',
+            'propertyKind' => 'extension',
+            'isArray'      => true,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'modifierExtension' => [
+            'fhirType'     => 'Extension',
+            'propertyKind' => 'modifierExtension',
+            'isArray'      => true,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'entityX' => [
+            'fhirType'     => 'choice',
+            'propertyKind' => 'choice',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => true,
+            'jsonKey'      => null,
+            'variants'     => [
+                [
+                    'fhirType'     => 'CodeableConcept',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
+                    'jsonKey'      => 'entityCodeableConcept',
+                    'isBuiltin'    => false,
+                ],
+                [
+                    'fhirType'     => 'Reference',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
+                    'jsonKey'      => 'entityReference',
+                    'isBuiltin'    => false,
+                ],
+            ],
+        ],
+        'identifier' => [
+            'fhirType'     => 'Identifier',
+            'propertyKind' => 'complex',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'effectiveTime' => [
+            'fhirType'     => 'dateTime',
+            'propertyKind' => 'primitive',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'quantity' => [
+            'fhirType'     => 'Quantity',
+            'propertyKind' => 'complex',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'unitPrice' => [
+            'fhirType'     => 'Money',
+            'propertyKind' => 'complex',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'factor' => [
+            'fhirType'     => 'decimal',
+            'propertyKind' => 'scalar',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'points' => [
+            'fhirType'     => 'decimal',
+            'propertyKind' => 'scalar',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'net' => [
+            'fhirType'     => 'Money',
+            'propertyKind' => 'complex',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'payment' => [
+            'fhirType'     => 'string',
+            'propertyKind' => 'primitive',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'paymentDate' => [
+            'fhirType'     => 'dateTime',
+            'propertyKind' => 'primitive',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'responsible' => [
+            'fhirType'     => 'Reference',
+            'propertyKind' => 'complex',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'recipient' => [
+            'fhirType'     => 'Reference',
+            'propertyKind' => 'complex',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'linkId' => [
+            'fhirType'     => 'string',
+            'propertyKind' => 'primitive',
+            'isArray'      => true,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'securityLabelNumber' => [
+            'fhirType'     => 'unsignedInt',
+            'propertyKind' => 'primitive',
+            'isArray'      => true,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+    ];
 
-	public function __construct(
-		/** @var null|string id Unique id for inter-element referencing */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
-		public ?string $id = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension> extension Additional content defined by implementations */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
-		public array $modifierExtension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference entityX Contract Valued Item Type */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(
-			fhirType: 'choice',
-			propertyKind: 'choice',
-			isChoice: true,
-			variants: [
-			[
-				'fhirType' => 'CodeableConcept',
-				'propertyKind' => 'complex',
-				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
-				'jsonKey' => 'entityCodeableConcept',
-			],
-			[
-				'fhirType' => 'Reference',
-				'propertyKind' => 'complex',
-				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
-				'jsonKey' => 'entityReference',
-			],
-		],
-		)]
-		public \Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference|null $entityX = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier identifier Contract Valued Item Number */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier $identifier = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive effectiveTime Contract Valued Item Effective Tiem */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive $effectiveTime = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity quantity Count of Contract Valued Items */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity $quantity = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Money unitPrice Contract Valued Item fee, charge, or cost */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Money $unitPrice = null,
-		/** @var null|float factor Contract Valued Item Price Scaling Factor */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-		public ?float $factor = null,
-		/** @var null|float points Contract Valued Item Difficulty Scaling Factor */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-		public ?float $points = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Money net Total Contract Valued Item Value */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Money $net = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive|string payment Terms of valuation */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
-		public \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive|string|null $payment = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive paymentDate When payment is due */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive $paymentDate = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference responsible Who will make payment */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference $responsible = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference recipient Who will receive payment */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference $recipient = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive|string> linkId Pointer to specific item */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
-		public array $linkId = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UnsignedIntPrimitive> securityLabelNumber Security Labels that define affected terms */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'unsignedInt', propertyKind: 'primitive', isArray: true)]
-		public array $securityLabelNumber = [],
-	) {
-		parent::__construct($id, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        public ?string $id = null,
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        public array $modifierExtension = [],
+        /** @var CodeableConcept|Reference|null entityX Contract Valued Item Type */
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'CodeableConcept',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
+                    'jsonKey'      => 'entityCodeableConcept',
+                ],
+                [
+                    'fhirType'     => 'Reference',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
+                    'jsonKey'      => 'entityReference',
+                ],
+            ],
+        )]
+        public CodeableConcept|Reference|null $entityX = null,
+        /** @var Identifier|null identifier Contract Valued Item Number */
+        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
+        public ?Identifier $identifier = null,
+        /** @var DateTimePrimitive|null effectiveTime Contract Valued Item Effective Tiem */
+        #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
+        public ?DateTimePrimitive $effectiveTime = null,
+        /** @var Quantity|null quantity Count of Contract Valued Items */
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        public ?Quantity $quantity = null,
+        /** @var Money|null unitPrice Contract Valued Item fee, charge, or cost */
+        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
+        public ?Money $unitPrice = null,
+        /** @var float|null factor Contract Valued Item Price Scaling Factor */
+        #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
+        public ?float $factor = null,
+        /** @var float|null points Contract Valued Item Difficulty Scaling Factor */
+        #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
+        public ?float $points = null,
+        /** @var Money|null net Total Contract Valued Item Value */
+        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
+        public ?Money $net = null,
+        /** @var StringPrimitive|string|null payment Terms of valuation */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+        public StringPrimitive|string|null $payment = null,
+        /** @var DateTimePrimitive|null paymentDate When payment is due */
+        #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
+        public ?DateTimePrimitive $paymentDate = null,
+        /** @var Reference|null responsible Who will make payment */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $responsible = null,
+        /** @var Reference|null recipient Who will receive payment */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $recipient = null,
+        /** @var array<StringPrimitive|string> linkId Pointer to specific item */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        public array $linkId = [],
+        /** @var array<UnsignedIntPrimitive> securityLabelNumber Security Labels that define affected terms */
+        #[FhirProperty(fhirType: 'unsignedInt', propertyKind: 'primitive', isArray: true)]
+        public array $securityLabelNumber = [],
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
 }

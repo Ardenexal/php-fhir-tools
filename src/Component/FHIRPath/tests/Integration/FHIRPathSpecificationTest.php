@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Tests\Integration;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\FHIRPathException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -26,9 +27,9 @@ use PHPUnit\Framework\TestCase;
  * - An input file referenced by the test XML is not present on disk
  * - The expected output type is not yet supported (e.g. Quantity)
  *
- * @covers \Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\FHIRPathEvaluator
- * @covers \Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService
  */
+#[CoversClass(\Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService::class)]
+#[CoversClass(\Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\FHIRPathEvaluator::class)]
 final class FHIRPathSpecificationTest extends TestCase
 {
     private FHIRPathService $service;
@@ -90,7 +91,7 @@ final class FHIRPathSpecificationTest extends TestCase
 
                 // Make key unique when the same test name appears more than once
                 if (isset($seenKeys[$name])) {
-                    $seenKeys[$name]++;
+                    ++$seenKeys[$name];
                     $key = $name . '_' . $seenKeys[$name];
                 } else {
                     $seenKeys[$name] = 0;

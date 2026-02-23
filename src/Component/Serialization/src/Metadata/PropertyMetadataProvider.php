@@ -31,7 +31,7 @@ class PropertyMetadataProvider implements PropertyMetadataProviderInterface
             return $this->cache[$className];
         }
 
-        $metadata = $this->resolveMetadata($className);
+        $metadata                = $this->resolveMetadata($className);
         $this->cache[$className] = $metadata;
 
         return $metadata;
@@ -48,7 +48,7 @@ class PropertyMetadataProvider implements PropertyMetadataProviderInterface
     {
         // Fast path: read compiled FHIR_PROPERTY_MAP const (no reflection)
         if (defined($className . '::FHIR_PROPERTY_MAP')) {
-            /** @var array<string, array{fhirType: string, propertyKind: string, isArray: bool, isRequired: bool, isChoice: bool, jsonKey: null|string, variants: null|list<array{fhirType: string, propertyKind: string, phpType: string, jsonKey: string, isBuiltin: bool}>}> $map */
+            /** @var array<string, array{fhirType: string, propertyKind: string, isArray: bool, isRequired: bool, isChoice: bool, jsonKey: string|null, variants: list<array{fhirType: string, propertyKind: string, phpType: string, jsonKey: string, isBuiltin: bool}>|null}> $map */
             $map = constant($className . '::FHIR_PROPERTY_MAP');
 
             return $this->hydrateFromMap($map);
@@ -61,7 +61,7 @@ class PropertyMetadataProvider implements PropertyMetadataProviderInterface
     /**
      * Hydrate PropertyMetadata objects from a FHIR_PROPERTY_MAP const value.
      *
-     * @param array<string, array{fhirType: string, propertyKind: string, isArray: bool, isRequired: bool, isChoice: bool, jsonKey: null|string, variants: null|list<array{fhirType: string, propertyKind: string, phpType: string, jsonKey: string, isBuiltin: bool}>}> $map
+     * @param array<string, array{fhirType: string, propertyKind: string, isArray: bool, isRequired: bool, isChoice: bool, jsonKey: string|null, variants: list<array{fhirType: string, propertyKind: string, phpType: string, jsonKey: string, isBuiltin: bool}>|null}> $map
      *
      * @return array<string, PropertyMetadata>
      */

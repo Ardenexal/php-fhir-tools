@@ -28,7 +28,7 @@ final class FhirProperty
 {
     /**
      * @param list<array{fhirType: string, propertyKind: string, phpType: string, jsonKey: string}>|null $variants
-     *        Populated only when isChoice is true. Each variant describes one concrete type in the union.
+     *                                                                                                             Populated only when isChoice is true. Each variant describes one concrete type in the union.
      */
     public function __construct(
         /** FHIR type code: 'date', 'HumanName', 'BackboneElement', 'choice', etc. */

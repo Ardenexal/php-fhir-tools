@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,12 +12,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum ActionGroupingBehavior: string
 {
-	/** Visual Group */
-	case visualgroup = 'visual-group';
+    /** Visual Group */
+    case visualgroup = 'visual-group';
 
-	/** Logical Group */
-	case logicalgroup = 'logical-group';
+    /** Logical Group */
+    case logicalgroup = 'logical-group';
 
-	/** Sentence Group */
-	case sentencegroup = 'sentence-group';
+    /** Sentence Group */
+    case sentencegroup = 'sentence-group';
 }

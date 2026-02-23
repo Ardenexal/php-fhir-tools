@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,18 +12,18 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum BiologicallyDerivedProductCategory: string
 {
-	/** Organ */
-	case organ = 'organ';
+    /** Organ */
+    case organ = 'organ';
 
-	/** Tissue */
-	case tissue = 'tissue';
+    /** Tissue */
+    case tissue = 'tissue';
 
-	/** Fluid */
-	case fluid = 'fluid';
+    /** Fluid */
+    case fluid = 'fluid';
 
-	/** Cells */
-	case cells = 'cells';
+    /** Cells */
+    case cells = 'cells';
 
-	/** BiologicalAgent */
-	case biologicalagent = 'biologicalAgent';
+    /** BiologicalAgent */
+    case biologicalagent = 'biologicalAgent';
 }
