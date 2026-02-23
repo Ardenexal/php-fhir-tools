@@ -21,9 +21,12 @@ class FHIRMetadataExtractor implements FHIRMetadataExtractorInterface
 {
     private FHIRMetadataCache $cache;
 
-    public function __construct(?FHIRMetadataCache $cache = null)
+    private PropertyMetadataProviderInterface $propertyMetadataProvider;
+
+    public function __construct(?FHIRMetadataCache $cache = null, ?PropertyMetadataProviderInterface $propertyMetadataProvider = null)
     {
-        $this->cache = $cache ?? new FHIRMetadataCache();
+        $this->cache                    = $cache ?? new FHIRMetadataCache();
+        $this->propertyMetadataProvider = $propertyMetadataProvider ?? new PropertyMetadataProvider();
     }
 
     /**
@@ -396,6 +399,14 @@ class FHIRMetadataExtractor implements FHIRMetadataExtractorInterface
 
             return null;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getPropertyMetadataProvider(): PropertyMetadataProviderInterface
+    {
+        return $this->propertyMetadataProvider;
     }
 
     /**

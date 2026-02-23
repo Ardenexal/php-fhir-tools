@@ -304,6 +304,11 @@ class FHIRSerializationInterfaceTest extends TestCase
             {
                 return $object->elementPath ?? null;
             }
+
+            public function getPropertyMetadataProvider(): \Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProviderInterface
+            {
+                return new \Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider();
+            }
         };
     }
 

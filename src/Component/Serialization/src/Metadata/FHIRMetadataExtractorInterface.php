@@ -92,4 +92,9 @@ interface FHIRMetadataExtractorInterface
      * @return string|null The element path (e.g., "Patient.contact"), or null if not determinable
      */
     public function extractElementPath(object $object): ?string;
+
+    /**
+     * Return the property metadata provider for reading compiled FHIR_PROPERTY_MAP data.
+     */
+    public function getPropertyMetadataProvider(): PropertyMetadataProviderInterface;
 }

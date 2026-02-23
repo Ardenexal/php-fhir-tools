@@ -10,8 +10,6 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\SerializerAwareInterface;
-use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Normalizer for FHIR primitive types with extension support.
@@ -24,40 +22,19 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @author Ardenexal
  */
-class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface, SerializerAwareInterface
+class FHIRPrimitiveTypeNormalizer extends AbstractFHIRNormalizer
 {
-    private ?NormalizerInterface $normalizer;
-
-    private ?DenormalizerInterface $denormalizer;
-
     public function __construct(
-        private readonly FHIRMetadataExtractorInterface $metadataExtractor,
+        FHIRMetadataExtractorInterface $metadataExtractor,
         ?NormalizerInterface $normalizer = null,
         ?DenormalizerInterface $denormalizer = null
     ) {
-        $this->normalizer   = $normalizer;
-        $this->denormalizer = $denormalizer;
-    }
-
-    /**
-     * Called automatically by Symfony's Serializer so recursive normalize/denormalize
-     * calls always use the final, fully-wired serializer instance.
-     */
-    public function setSerializer(SerializerInterface $serializer): void
-    {
-        if ($serializer instanceof NormalizerInterface) {
-            $this->normalizer = $serializer;
-        }
-
-        if ($serializer instanceof DenormalizerInterface) {
-            $this->denormalizer = $serializer;
-        }
+        parent::__construct($metadataExtractor, $normalizer, $denormalizer);
     }
 
     /**
      * {@inheritDoc}
-     */
-    /**
+     *
      * @param array<string, mixed> $context
      *
      * @return array<string, mixed>|string|int|float|bool|\ArrayObject<string, mixed>|null
@@ -128,6 +105,15 @@ class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface, Serializer
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function getSupportedTypes(?string $format): array
+    {
+        // This normalizer supports any class with the FHIRPrimitive attribute
+        return ['object' => true];
+    }
+
+    /**
      * Check whether a class or any of its ancestors carries the FHIRPrimitive attribute.
      *
      * Generated "Type" wrapper classes (e.g. NarrativeStatusType) extend CodePrimitive
@@ -164,20 +150,8 @@ class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface, Serializer
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function getSupportedTypes(?string $format): array
-    {
-        // This normalizer supports any class with the FHIRPrimitive attribute
-        return ['object' => true];
-    }
-
-    /**
-     * Normalize primitive for JSON format with underscore notation for extensions
+     * Normalize primitive for JSON format with underscore notation for extensions.
      *
-     * @param array<string, mixed> $context
-     */
-    /**
      * @param \ReflectionClass<object> $reflection
      * @param array<string, mixed>     $context
      */
@@ -230,13 +204,8 @@ class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface, Serializer
     }
 
     /**
-     * Normalize primitive for XML format with attributes and child elements
+     * Normalize primitive for XML format with attributes and child elements.
      *
-     * @param array<string, mixed> $context
-     *
-     * @return array<string, mixed>
-     */
-    /**
      * @param \ReflectionClass<object> $reflection
      * @param array<string, mixed>     $context
      *
@@ -280,7 +249,7 @@ class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface, Serializer
     }
 
     /**
-     * Denormalize from array data (complex primitive with extensions)
+     * Denormalize from array data (complex primitive with extensions).
      *
      * @param array<string, mixed> $data
      * @param array<string, mixed> $context
@@ -323,7 +292,7 @@ class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface, Serializer
     }
 
     /**
-     * Create a primitive instance with value and extensions
+     * Create a primitive instance with value and extensions.
      */
     private function createPrimitiveInstance(string $type, mixed $value, mixed $extensions): mixed
     {
@@ -371,7 +340,7 @@ class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface, Serializer
     }
 
     /**
-     * Validate and convert value based on primitive type
+     * Validate and convert value based on primitive type.
      */
     private function validateAndConvertValue(mixed $value, string $type): mixed
     {
@@ -400,7 +369,7 @@ class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface, Serializer
     }
 
     /**
-     * Validate string value
+     * Validate string value.
      */
     private function validateString(mixed $value): ?string
     {
@@ -420,7 +389,7 @@ class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface, Serializer
     }
 
     /**
-     * Validate integer value
+     * Validate integer value.
      */
     private function validateInteger(mixed $value): ?int
     {
@@ -447,7 +416,7 @@ class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface, Serializer
     }
 
     /**
-     * Validate decimal value
+     * Validate decimal value.
      */
     private function validateDecimal(mixed $value): ?float
     {
@@ -471,7 +440,7 @@ class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface, Serializer
     }
 
     /**
-     * Validate boolean value
+     * Validate boolean value.
      */
     private function validateBoolean(mixed $value): ?bool
     {
@@ -502,6 +471,7 @@ class FHIRPrimitiveTypeNormalizer implements FHIRNormalizerInterface, Serializer
 
     /**
      * Validate and convert a dateTime or instant string to DateTimeImmutable.
+     *
      * FHIR allows partial dates (e.g. "2015", "2015-02"), which PHP parses
      * by filling in defaults (Jan 1 / 1st of month at midnight).
      */
