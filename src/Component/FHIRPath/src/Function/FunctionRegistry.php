@@ -139,6 +139,9 @@ final class FunctionRegistry
         $this->registerSafe(new ToStringFunction());
         $this->registerSafe(new ConvertsToStringFunction());
 
+        // FHIR R4-specific functions
+        $this->registerSafe(new ExtensionFunction());
+
         // Precision / boundary functions
         $this->registerSafe(new PrecisionFunction());
         $this->registerSafe(new LowBoundaryFunction());
