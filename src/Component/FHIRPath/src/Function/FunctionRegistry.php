@@ -145,6 +145,7 @@ final class FunctionRegistry
         $this->registerSafe(new ResolveFunction());
         $this->registerSafe(new MemberOfFunction());
         $this->registerSafe(new ConformsToFunction());
+        $this->registerSafe(new HtmlChecksFunction());
 
         // Precision / boundary functions
         $this->registerSafe(new PrecisionFunction());

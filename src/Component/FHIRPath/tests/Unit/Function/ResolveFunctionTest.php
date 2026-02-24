@@ -73,7 +73,7 @@ final class ResolveFunctionTest extends TestCase
 
         $requestFactory = $this->createStub(RequestFactoryInterface::class);
         $requestFactory->method('createRequest')
-            ->willReturnCallback(function (string $method, mixed $uri) use (&$capturedUrl): RequestInterface {
+            ->willReturnCallback(function(string $method, mixed $uri) use (&$capturedUrl): RequestInterface {
                 $capturedUrl = (string) $uri;
 
                 $uriMock = $this->createStub(UriInterface::class);
@@ -87,7 +87,7 @@ final class ResolveFunctionTest extends TestCase
 
         $client = $this->createStub(ClientInterface::class);
         $client->method('sendRequest')
-            ->willReturnCallback(function () use (&$capturedUrl, $urlMap): ResponseInterface {
+            ->willReturnCallback(function() use (&$capturedUrl, $urlMap): ResponseInterface {
                 $body = $urlMap[$capturedUrl] ?? null;
 
                 $stream = $this->createStub(StreamInterface::class);
@@ -175,7 +175,7 @@ final class ResolveFunctionTest extends TestCase
 
     public function testResolveRelativeUrl(): void
     {
-        $fetched = ['resourceType' => 'Patient', 'id' => 'abc'];
+        $fetched            = ['resourceType' => 'Patient', 'id' => 'abc'];
         [$client, $factory] = $this->makeHttpStack(['https://fhir.example.com/Patient/abc' => $fetched]);
 
         $this->evaluator->setFhirServerUrl('https://fhir.example.com');
@@ -231,7 +231,7 @@ final class ResolveFunctionTest extends TestCase
 
     public function testResolveAbsoluteUrl(): void
     {
-        $fetched = ['resourceType' => 'Organization', 'id' => 'org42'];
+        $fetched            = ['resourceType' => 'Organization', 'id' => 'org42'];
         [$client, $factory] = $this->makeHttpStack(['https://fhir.example.com/Organization/org42' => $fetched]);
 
         $this->evaluator->setHttpClient($client, $factory);
@@ -285,7 +285,7 @@ final class ResolveFunctionTest extends TestCase
 
     public function testResolveFromReferenceArrayWithReferenceKey(): void
     {
-        $fetched = ['resourceType' => 'Practitioner', 'id' => 'p1'];
+        $fetched            = ['resourceType' => 'Practitioner', 'id' => 'p1'];
         [$client, $factory] = $this->makeHttpStack(['https://fhir.example.com/Practitioner/p1' => $fetched]);
 
         $this->evaluator->setFhirServerUrl('https://fhir.example.com');
@@ -299,7 +299,7 @@ final class ResolveFunctionTest extends TestCase
 
     public function testResolveFromPlainStringInCollection(): void
     {
-        $fetched = ['resourceType' => 'Patient', 'id' => '99'];
+        $fetched            = ['resourceType' => 'Patient', 'id' => '99'];
         [$client, $factory] = $this->makeHttpStack(['https://fhir.example.com/Patient/99' => $fetched]);
 
         $this->evaluator->setFhirServerUrl('https://fhir.example.com');

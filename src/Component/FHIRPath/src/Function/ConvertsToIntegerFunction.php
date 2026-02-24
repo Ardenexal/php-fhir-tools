@@ -31,9 +31,10 @@ final class ConvertsToIntegerFunction extends AbstractFunction
      *
      * Tests whether the input value can be successfully converted to an integer.
      *
-     * @param Collection $input The input collection to test
+     * @param Collection        $input      The input collection to test
      * @param array<int, mixed> $parameters No parameters expected (empty array)
-     * @param EvaluationContext $context The evaluation context
+     * @param EvaluationContext $context    The evaluation context
+     *
      * @return Collection Single-item boolean (true if convertible, false otherwise), or empty if input is empty
      */
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection

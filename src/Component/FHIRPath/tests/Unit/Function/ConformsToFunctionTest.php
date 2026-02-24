@@ -89,12 +89,12 @@ final class ConformsToFunctionTest extends TestCase
         $capturedUrl      = null;
 
         $this->evaluator->setConformsToValidator(
-            function (mixed $resource, string $url) use (&$capturedResource, &$capturedUrl): bool {
+            function(mixed $resource, string $url) use (&$capturedResource, &$capturedUrl): bool {
                 $capturedResource = $resource;
                 $capturedUrl      = $url;
 
                 return true;
-            }
+            },
         );
 
         $resource = ['resourceType' => 'Patient', 'id' => 'p1'];
@@ -106,16 +106,16 @@ final class ConformsToFunctionTest extends TestCase
 
     public function testValidatorReceivesObjectResource(): void
     {
-        $obj = new \stdClass();
+        $obj               = new \stdClass();
         $obj->resourceType = 'Observation';
 
         $capturedResource = null;
         $this->evaluator->setConformsToValidator(
-            function (mixed $resource, string $url) use (&$capturedResource): bool {
+            function(mixed $resource, string $url) use (&$capturedResource): bool {
                 $capturedResource = $resource;
 
                 return true;
-            }
+            },
         );
 
         // Evaluate directly with the object as root resource
@@ -185,11 +185,11 @@ final class ConformsToFunctionTest extends TestCase
         $capturedUrl      = null;
 
         $this->evaluator->setConformsToValidator(
-            function (mixed $r, string $url) use (&$capturedUrl): bool {
+            function(mixed $r, string $url) use (&$capturedUrl): bool {
                 $capturedUrl = $url;
 
                 return true;
-            }
+            },
         );
 
         $this->evaluate(sprintf("conformsTo('%s')", $versionedUrl), ['resourceType' => 'Patient']);

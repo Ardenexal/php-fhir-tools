@@ -91,7 +91,7 @@ final class ExtensionFunctionTest extends TestCase
         ];
 
         self::assertTrue(
-            $this->evaluate("extension('http://example.com/ext/notfound')", $resource)->isEmpty()
+            $this->evaluate("extension('http://example.com/ext/notfound')", $resource)->isEmpty(),
         );
     }
 
@@ -211,13 +211,13 @@ final class ExtensionFunctionTest extends TestCase
 
         // Different case → no match
         self::assertTrue(
-            $this->evaluate("extension('http://example.com/ext/race')", $resource)->isEmpty()
+            $this->evaluate("extension('http://example.com/ext/race')", $resource)->isEmpty(),
         );
 
         // Exact case → match
         self::assertSame(
             1,
-            $this->evaluate("extension('http://example.com/ext/Race')", $resource)->count()
+            $this->evaluate("extension('http://example.com/ext/Race')", $resource)->count(),
         );
     }
 

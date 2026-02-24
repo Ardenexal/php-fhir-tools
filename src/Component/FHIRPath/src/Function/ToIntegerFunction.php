@@ -49,9 +49,10 @@ final class ToIntegerFunction extends AbstractFunction
      * Converts the first item in the input to an integer according to FHIRPath
      * conversion rules (only converts values without fractional parts).
      *
-     * @param Collection $input The input collection (uses first item)
+     * @param Collection        $input      The input collection (uses first item)
      * @param array<int, mixed> $parameters No parameters expected (empty array)
-     * @param EvaluationContext $context The evaluation context
+     * @param EvaluationContext $context    The evaluation context
+     *
      * @return Collection Single-item collection with the integer, or empty if conversion fails
      */
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection
@@ -80,6 +81,7 @@ final class ToIntegerFunction extends AbstractFunction
      * Used by convertsToInteger() to check convertibility without throwing.
      *
      * @param mixed $value The value to convert to integer
+     *
      * @return int|null The integer value or null if conversion fails
      */
     public static function tryConvert(mixed $value): ?int

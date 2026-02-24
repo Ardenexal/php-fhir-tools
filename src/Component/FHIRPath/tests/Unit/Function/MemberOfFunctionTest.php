@@ -77,7 +77,7 @@ final class MemberOfFunctionTest extends TestCase
 
         $requestFactory = $this->createStub(RequestFactoryInterface::class);
         $requestFactory->method('createRequest')
-            ->willReturnCallback(function (string $method, mixed $uri) use (&$capturedUrl): RequestInterface {
+            ->willReturnCallback(function(string $method, mixed $uri) use (&$capturedUrl): RequestInterface {
                 $capturedUrl = (string) $uri;
 
                 $uriMock = $this->createStub(UriInterface::class);
@@ -91,7 +91,7 @@ final class MemberOfFunctionTest extends TestCase
 
         $client = $this->createStub(ClientInterface::class);
         $client->method('sendRequest')
-            ->willReturnCallback(function () use (&$capturedUrl, $urlMap): ResponseInterface {
+            ->willReturnCallback(function() use (&$capturedUrl, $urlMap): ResponseInterface {
                 $body = $urlMap[$capturedUrl] ?? null;
 
                 $stream = $this->createStub(StreamInterface::class);
@@ -177,8 +177,8 @@ final class MemberOfFunctionTest extends TestCase
 
     public function testCodingReturnsTrueWhenServerSaysTrue(): void
     {
-        $coding = ['system' => 'http://loinc.org', 'code' => 'active'];
-        $url    = $this->codingUrl(['url' => self::VS_URL, 'code' => 'active', 'system' => 'http://loinc.org']);
+        $coding             = ['system' => 'http://loinc.org', 'code' => 'active'];
+        $url                = $this->codingUrl(['url' => self::VS_URL, 'code' => 'active', 'system' => 'http://loinc.org']);
         [$client, $factory] = $this->makeHttpStack([$url => $this->parametersResponse(true)]);
         $this->evaluator->setHttpClient($client, $factory);
 
@@ -191,8 +191,8 @@ final class MemberOfFunctionTest extends TestCase
 
     public function testCodingReturnsFalseWhenServerSaysFalse(): void
     {
-        $coding = ['system' => 'http://loinc.org', 'code' => 'unknown'];
-        $url    = $this->codingUrl(['url' => self::VS_URL, 'code' => 'unknown', 'system' => 'http://loinc.org']);
+        $coding             = ['system' => 'http://loinc.org', 'code' => 'unknown'];
+        $url                = $this->codingUrl(['url' => self::VS_URL, 'code' => 'unknown', 'system' => 'http://loinc.org']);
         [$client, $factory] = $this->makeHttpStack([$url => $this->parametersResponse(false)]);
         $this->evaluator->setHttpClient($client, $factory);
 

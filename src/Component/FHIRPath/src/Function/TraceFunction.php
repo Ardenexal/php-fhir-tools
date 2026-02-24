@@ -40,10 +40,12 @@ final class TraceFunction extends AbstractFunction
      * Logs diagnostic information about the collection (optionally transformed by a projection)
      * and returns the original input unchanged. Useful for debugging FHIRPath expressions.
      *
-     * @param Collection $input The input collection (returned unchanged)
+     * @param Collection        $input      The input collection (returned unchanged)
      * @param array<int, mixed> $parameters [0] = name label expression, [1] = optional projection expression
-     * @param EvaluationContext $context The evaluation context
+     * @param EvaluationContext $context    The evaluation context
+     *
      * @return Collection The original input collection, unchanged
+     *
      * @throws EvaluationException If evaluator is not set in context
      */
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection
@@ -103,6 +105,7 @@ final class TraceFunction extends AbstractFunction
      *   - Objects → '{ClassName}'
      *
      * @param mixed $value The value to format
+     *
      * @return string The formatted string representation
      */
     private function formatValue(mixed $value): string

@@ -18,9 +18,9 @@ final class EvaluationContext
      * @param array<string, mixed> $variables         Variable storage ($this, $index, $total)
      * @param array<string, mixed> $externalConstants External constants (%)
      * @param string|null          $fhirVersion       Optional FHIR version hint, e.g. 'R4', 'R4B', 'R5'
-     * @param Collection|null      $collectionInput   Set by visitMemberAccess when calling a function so that
+     * @param Collection|null      $collectionInput   set by visitMemberAccess when calling a function so that
      *                                                visitFunctionCall receives the full collection as input
-     *                                                instead of a per-item single-item collection.
+     *                                                instead of a per-item single-item collection
      */
     public function __construct(
         private mixed $rootResource = null,

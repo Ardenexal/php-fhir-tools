@@ -32,10 +32,12 @@ final class SubsetOfFunction extends AbstractFunction
      *
      * Returns true if every item in the input collection exists in the other collection.
      *
-     * @param Collection $input The input collection to check
+     * @param Collection        $input      The input collection to check
      * @param array<int, mixed> $parameters [0] = expression evaluating to the other collection
-     * @param EvaluationContext $context The evaluation context
+     * @param EvaluationContext $context    The evaluation context
+     *
      * @return Collection Single-item collection with boolean result (true if subset, false otherwise)
+     *
      * @throws EvaluationException If evaluator is not set in context
      */
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection
@@ -84,7 +86,8 @@ final class SubsetOfFunction extends AbstractFunction
      * This means "1" == 1 (string equals number with type coercion).
      *
      * @param Collection $collection The collection to search in
-     * @param mixed $needle The value to search for
+     * @param mixed      $needle     The value to search for
+     *
      * @return bool True if the value is found, false otherwise
      */
     private function collectionContains(Collection $collection, mixed $needle): bool

@@ -184,7 +184,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      *
      * @var (callable(mixed, string): bool)|null
      */
-    private $conformsToValidator = null;
+    private $conformsToValidator;
 
     /**
      * Set a callable that validates a FHIR resource against a profile.

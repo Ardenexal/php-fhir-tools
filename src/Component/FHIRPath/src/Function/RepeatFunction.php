@@ -36,10 +36,12 @@ final class RepeatFunction extends AbstractFunction
      * Applies the projection expression recursively to discover all reachable items
      * through transitive closure. Tracks visited items by identity to prevent infinite loops.
      *
-     * @param Collection $input The input collection to start from
+     * @param Collection        $input      The input collection to start from
      * @param array<int, mixed> $parameters [0] = projection expression to apply recursively
-     * @param EvaluationContext $context The evaluation context
+     * @param EvaluationContext $context    The evaluation context
+     *
      * @return Collection All items reachable through repeated application of the projection
+     *
      * @throws EvaluationException If evaluator is not available or projection is not an expression
      */
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection
@@ -106,6 +108,7 @@ final class RepeatFunction extends AbstractFunction
      * This prevents infinite loops by ensuring each unique item is processed only once.
      *
      * @param mixed $item The item to generate a key for
+     *
      * @return string A unique string identifier for this item
      */
     private function itemKey(mixed $item): string

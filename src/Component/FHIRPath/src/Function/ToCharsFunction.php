@@ -31,10 +31,12 @@ final class ToCharsFunction extends AbstractFunction
      *
      * Splits the input string into a collection of individual characters (Unicode-safe).
      *
-     * @param Collection $input The input collection (expects single string item)
+     * @param Collection        $input      The input collection (expects single string item)
      * @param array<int, mixed> $parameters No parameters expected (empty array)
-     * @param EvaluationContext $context The evaluation context
+     * @param EvaluationContext $context    The evaluation context
+     *
      * @return Collection Collection of single-character strings, or empty if input is empty/not a string
+     *
      * @throws EvaluationException If input is not a string
      */
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection

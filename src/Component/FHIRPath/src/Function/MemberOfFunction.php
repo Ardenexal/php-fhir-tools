@@ -80,22 +80,14 @@ final class MemberOfFunction extends AbstractFunction
         // Require a terminology server URL (mirrors JS throw behaviour)
         $terminologyUrl = $evaluator->getTerminologyUrl();
         if ($terminologyUrl === null) {
-            throw new EvaluationException(
-                'memberOf() requires a terminology server URL — call setTerminologyUrl() or setFhirServerUrl() on the evaluator',
-                0,
-                0
-            );
+            throw new EvaluationException('memberOf() requires a terminology server URL — call setTerminologyUrl() or setFhirServerUrl() on the evaluator', 0, 0);
         }
 
         // Require an HTTP client (mirrors JS throw behaviour)
         $httpClient     = $evaluator->getHttpClient();
         $requestFactory = $evaluator->getRequestFactory();
         if ($httpClient === null || $requestFactory === null) {
-            throw new EvaluationException(
-                'memberOf() requires an HTTP client — call setHttpClient() on the evaluator',
-                0,
-                0
-            );
+            throw new EvaluationException('memberOf() requires an HTTP client — call setHttpClient() on the evaluator', 0, 0);
         }
 
         return $this->dispatchInput($item, $vsUrl, $terminologyUrl, $httpClient, $requestFactory);
@@ -198,8 +190,8 @@ final class MemberOfFunction extends AbstractFunction
      * Extracts `system`, `code`, and optionally `display` and `version`.
      * Returns null if `code` is absent or empty (required field).
      *
-     * @param  array<string, mixed>   $coding The Coding array
-     * @param  string                 $vsUrl  ValueSet URL (always included as `url`)
+     * @param array<string, mixed> $coding The Coding array
+     * @param string               $vsUrl  ValueSet URL (always included as `url`)
      *
      * @return array<string, string>|null
      */

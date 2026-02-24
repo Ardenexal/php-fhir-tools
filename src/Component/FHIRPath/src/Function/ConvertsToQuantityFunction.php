@@ -35,9 +35,10 @@ final class ConvertsToQuantityFunction extends AbstractFunction
      * Tests whether the input value can be successfully converted to a Quantity,
      * optionally checking if the result would have a specific unit.
      *
-     * @param Collection $input The input collection to test
+     * @param Collection        $input      The input collection to test
      * @param array<int, mixed> $parameters [0] = optional unit filter expression
-     * @param EvaluationContext $context The evaluation context
+     * @param EvaluationContext $context    The evaluation context
+     *
      * @return Collection Single-item boolean (true if convertible, false otherwise), or empty if input is empty
      */
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection
@@ -62,7 +63,8 @@ final class ConvertsToQuantityFunction extends AbstractFunction
      * the unit string. Otherwise returns null.
      *
      * @param array<int, mixed> $parameters The function parameters
-     * @param EvaluationContext $context The evaluation context
+     * @param EvaluationContext $context    The evaluation context
+     *
      * @return string|null The unit string if provided, null otherwise
      */
     private function resolveUnitParameter(array $parameters, EvaluationContext $context): ?string

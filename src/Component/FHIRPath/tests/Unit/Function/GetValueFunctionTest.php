@@ -183,7 +183,7 @@ final class GetValueFunctionTest extends TestCase
 
     public function testGetValueUnwracksBackedEnum(): void
     {
-        $enum     = \Ardenexal\FHIRTools\Component\FHIRPath\Tests\Unit\Function\GetValueFunctionTestEnum::Active;
+        $enum     = GetValueFunctionTestEnum::Active;
         $resource = ['status' => $enum];
         $result   = $this->evaluate('status.getValue()', $resource);
         self::assertSame('active', $result->first());

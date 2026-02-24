@@ -31,9 +31,10 @@ final class IsDistinctFunction extends AbstractFunction
      * Checks if all items in the collection are unique (no duplicates). Returns true
      * for empty or single-item collections.
      *
-     * @param Collection $input The input collection to check
+     * @param Collection        $input      The input collection to check
      * @param array<int, mixed> $parameters No parameters expected (empty array)
-     * @param EvaluationContext $context The evaluation context
+     * @param EvaluationContext $context    The evaluation context
+     *
      * @return Collection Single-item collection with boolean result (true if distinct, false otherwise)
      */
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection
@@ -73,6 +74,7 @@ final class IsDistinctFunction extends AbstractFunction
      *   - Arrays: serialized value
      *
      * @param mixed $item The item to generate a key for
+     *
      * @return string A unique string identifier for this item
      */
     private function itemKey(mixed $item): string

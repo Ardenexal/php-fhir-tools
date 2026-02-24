@@ -33,9 +33,10 @@ final class NotFunction extends AbstractFunction
      * Returns the boolean negation of a single boolean input (true → false, false → true).
      * Returns empty for non-boolean, multi-item, or empty inputs.
      *
-     * @param Collection $input The input collection (expects single boolean item)
+     * @param Collection        $input      The input collection (expects single boolean item)
      * @param array<int, mixed> $parameters No parameters expected (empty array)
-     * @param EvaluationContext $context The evaluation context
+     * @param EvaluationContext $context    The evaluation context
+     *
      * @return Collection Single-item collection with negated boolean, or empty if input is invalid
      */
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection

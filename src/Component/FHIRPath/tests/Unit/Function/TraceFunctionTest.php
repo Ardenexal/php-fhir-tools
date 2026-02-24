@@ -85,7 +85,9 @@ final class TraceFunctionTest extends TestCase
         $logged = [];
         $logger = new class ($logged) extends AbstractLogger {
             /** @param array<int, string> $log */
-            public function __construct(private array &$log) {}
+            public function __construct(private array &$log)
+            {
+            }
 
             public function log(mixed $level, \Stringable|string $message, array $context = []): void
             {
@@ -109,7 +111,9 @@ final class TraceFunctionTest extends TestCase
         $logged = [];
         $logger = new class ($logged) extends AbstractLogger {
             /** @param array<int, string> $log */
-            public function __construct(private array &$log) {}
+            public function __construct(private array &$log)
+            {
+            }
 
             public function log(mixed $level, \Stringable|string $message, array $context = []): void
             {

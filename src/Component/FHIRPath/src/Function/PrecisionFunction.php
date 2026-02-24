@@ -108,14 +108,14 @@ final class PrecisionFunction extends AbstractFunction
         $stripped = preg_replace('/([+-]\d{2}:\d{2}|Z)$/', '', $value) ?? $value;
 
         return match (true) {
-            str_contains($stripped, '.') => 7,
-            preg_match('/T\d{2}:\d{2}:\d{2}$/', $stripped) === 1 => 6,
-            preg_match('/T\d{2}:\d{2}$/', $stripped) === 1       => 5,
-            preg_match('/T\d{2}$/', $stripped) === 1             => 4,
-            preg_match('/^\d{4}-\d{2}-\d{2}$/', $stripped) === 1 => 3,
-            preg_match('/^\d{4}-\d{2}$/', $stripped) === 1       => 2,
-            preg_match('/^\d{4}$/', $stripped) === 1             => 1,
-            default                                               => null,
+            str_contains($stripped, '.')                                     => 7,
+            preg_match('/T\d{2}:\d{2}:\d{2}$/', $stripped) === 1             => 6,
+            preg_match('/T\d{2}:\d{2}$/', $stripped)       === 1             => 5,
+            preg_match('/T\d{2}$/', $stripped)             === 1             => 4,
+            preg_match('/^\d{4}-\d{2}-\d{2}$/', $stripped) === 1             => 3,
+            preg_match('/^\d{4}-\d{2}$/', $stripped)       === 1             => 2,
+            preg_match('/^\d{4}$/', $stripped)             === 1             => 1,
+            default                                                          => null,
         };
     }
 }

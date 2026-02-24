@@ -113,8 +113,8 @@ final class HighBoundaryFunction extends AbstractFunction
 
         $year = substr($stripped, 0, 4);
 
-        $month  = strlen($stripped) >= 7  ? substr($stripped, 5, 2)  : null;
-        $day    = strlen($stripped) >= 10 ? substr($stripped, 8, 2)  : null;
+        $month  = strlen($stripped) >= 7 ? substr($stripped, 5, 2) : null;
+        $day    = strlen($stripped) >= 10 ? substr($stripped, 8, 2) : null;
         $hour   = strlen($stripped) >= 13 ? substr($stripped, 11, 2) : null;
         $minute = strlen($stripped) >= 16 ? substr($stripped, 14, 2) : null;
         $second = strlen($stripped) >= 19 ? substr($stripped, 17, 2) : null;

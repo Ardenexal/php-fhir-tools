@@ -102,9 +102,9 @@ final class ResolveFunction extends AbstractFunction
      *  - FHIR.Reference (array/object with `reference` key) → use reference URL
      *  - String (uri, canonical, FHIR.string) → use as URL directly
      *
-     * @param mixed                   $rootResource    Root resource of the evaluation (for contained lookup)
-     * @param string|null             $fhirServerUrl   Base FHIR server URL (may be null)
-     * @param ClientInterface|null    $httpClient      PSR-18 HTTP client (may be null)
+     * @param mixed                        $rootResource   Root resource of the evaluation (for contained lookup)
+     * @param string|null                  $fhirServerUrl  Base FHIR server URL (may be null)
+     * @param ClientInterface|null         $httpClient     PSR-18 HTTP client (may be null)
      * @param RequestFactoryInterface|null $requestFactory PSR-17 request factory (may be null)
      *
      * @return array<string,mixed>|null Decoded FHIR resource array, or null if unresolvable
@@ -267,7 +267,7 @@ final class ResolveFunction extends AbstractFunction
         if (is_array($resource) && isset($resource['contained']) && is_array($resource['contained'])) {
             $contained = $resource['contained'];
         } elseif (is_object($resource)) {
-            $val = $this->getObjectProperty($resource, 'contained');
+            $val       = $this->getObjectProperty($resource, 'contained');
             $contained = is_array($val) ? $val : null;
         }
 

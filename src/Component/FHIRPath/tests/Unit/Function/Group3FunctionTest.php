@@ -215,8 +215,8 @@ final class Group3FunctionTest extends TestCase
     public function testDescendantsHandlesCyclicObjectGraph(): void
     {
         // PHP objects can form true circular references
-        $nodeA = new \stdClass();
-        $nodeB = new \stdClass();
+        $nodeA       = new \stdClass();
+        $nodeB       = new \stdClass();
         $nodeA->id   = 'a';
         $nodeA->next = $nodeB;
         $nodeB->id   = 'b';

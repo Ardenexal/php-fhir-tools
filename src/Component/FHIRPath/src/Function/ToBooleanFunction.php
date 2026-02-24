@@ -38,9 +38,10 @@ final class ToBooleanFunction extends AbstractFunction
      * Converts the first item in the input to a boolean according to FHIRPath
      * conversion rules (accepts booleans, 0/1, and various string representations).
      *
-     * @param Collection $input The input collection (uses first item)
+     * @param Collection        $input      The input collection (uses first item)
      * @param array<int, mixed> $parameters No parameters expected (empty array)
-     * @param EvaluationContext $context The evaluation context
+     * @param EvaluationContext $context    The evaluation context
+     *
      * @return Collection Single-item collection with the boolean, or empty if conversion fails
      */
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection
@@ -70,6 +71,7 @@ final class ToBooleanFunction extends AbstractFunction
      * Used by convertsToBoolean() to check convertibility without throwing.
      *
      * @param mixed $value The value to convert to boolean
+     *
      * @return bool|null The boolean value or null if conversion fails
      */
     public static function tryConvert(mixed $value): ?bool

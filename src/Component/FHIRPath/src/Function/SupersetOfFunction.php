@@ -32,10 +32,12 @@ final class SupersetOfFunction extends AbstractFunction
      *
      * Returns true if every item in the other collection exists in the input collection.
      *
-     * @param Collection $input The input collection to check
+     * @param Collection        $input      The input collection to check
      * @param array<int, mixed> $parameters [0] = expression evaluating to the other collection
-     * @param EvaluationContext $context The evaluation context
+     * @param EvaluationContext $context    The evaluation context
+     *
      * @return Collection Single-item collection with boolean result (true if superset, false otherwise)
+     *
      * @throws EvaluationException If evaluator is not set in context
      */
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection
@@ -84,7 +86,8 @@ final class SupersetOfFunction extends AbstractFunction
      * This means "1" == 1 (string equals number with type coercion).
      *
      * @param Collection $collection The collection to search in
-     * @param mixed $needle The value to search for
+     * @param mixed      $needle     The value to search for
+     *
      * @return bool True if the value is found, false otherwise
      */
     private function collectionContains(Collection $collection, mixed $needle): bool

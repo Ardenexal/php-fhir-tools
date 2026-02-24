@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Tests\Fixtures\Models\R4B\Primitive\F
 use Ardenexal\FHIRTools\Component\FHIRPath\Tests\Fixtures\Models\R4B\Primitive\FHIRInteger;
 use Ardenexal\FHIRTools\Component\FHIRPath\Tests\Fixtures\Models\R4B\Primitive\FHIRDecimal;
 use PHPUnit\Framework\TestCase;
+use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
 
 /**
  * Tests for type expression evaluation (is/as operators) with FHIR models.
@@ -204,7 +205,7 @@ final class TypeExpressionEvaluatorTest extends TestCase
             'values' => [42, 'hello', true, 3.14],
         ];
 
-        $this->expectException(\Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException::class);
+        $this->expectException(EvaluationException::class);
         $this->evaluate('values is integer', $data);
     }
 
@@ -247,7 +248,7 @@ final class TypeExpressionEvaluatorTest extends TestCase
             ],
         ];
 
-        $this->expectException(\Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException::class);
+        $this->expectException(EvaluationException::class);
         $this->evaluate('items is string', $data);
     }
 

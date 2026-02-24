@@ -36,9 +36,10 @@ final class DescendantsFunction extends AbstractFunction
      * Returns all descendant values (at all nesting levels) using breadth-first traversal.
      * Tracks visited objects to prevent infinite loops on circular references.
      *
-     * @param Collection $input The input collection to get descendants from
+     * @param Collection        $input      The input collection to get descendants from
      * @param array<int, mixed> $parameters No parameters expected (empty array)
-     * @param EvaluationContext $context The evaluation context
+     * @param EvaluationContext $context    The evaluation context
+     *
      * @return Collection All descendant values from all input items
      */
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection

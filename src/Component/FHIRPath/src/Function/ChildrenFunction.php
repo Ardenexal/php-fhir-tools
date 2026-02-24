@@ -34,9 +34,10 @@ final class ChildrenFunction extends AbstractFunction
      *
      * Returns all immediate child values (one level deep) from each item in the input.
      *
-     * @param Collection $input The input collection to get children from
+     * @param Collection        $input      The input collection to get children from
      * @param array<int, mixed> $parameters No parameters expected (empty array)
-     * @param EvaluationContext $context The evaluation context
+     * @param EvaluationContext $context    The evaluation context
+     *
      * @return Collection All direct child values from all input items
      */
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection

@@ -57,16 +57,11 @@ final class ConformsToFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        $evaluator = $context->getEvaluator();
+        $evaluator  = $context->getEvaluator();
         $validator  = $evaluator?->getConformsToValidator();
 
         if ($validator === null) {
-            throw new EvaluationException(
-                'conformsTo() requires a profile validator. '
-                . 'Configure one with FHIRPathEvaluator::setConformsToValidator().',
-                0,
-                0
-            );
+            throw new EvaluationException('conformsTo() requires a profile validator. Configure one with FHIRPathEvaluator::setConformsToValidator().', 0, 0);
         }
 
         // Evaluate the structure parameter in the current context

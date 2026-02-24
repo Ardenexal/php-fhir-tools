@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\FHIRPathEvaluator;
 
 /**
  * Official FHIR FHIRPath specification conformance test.
@@ -26,10 +27,9 @@ use PHPUnit\Framework\TestCase;
  * - The fhir/fhir-test-cases vendor directory is not installed
  * - An input file referenced by the test XML is not present on disk
  * - The expected output type is not yet supported (e.g. Quantity)
- *
  */
-#[CoversClass(\Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService::class)]
-#[CoversClass(\Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\FHIRPathEvaluator::class)]
+#[CoversClass(FHIRPathService::class)]
+#[CoversClass(FHIRPathEvaluator::class)]
 final class FHIRPathSpecificationTest extends TestCase
 {
     private FHIRPathService $service;

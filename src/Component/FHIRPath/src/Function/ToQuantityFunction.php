@@ -42,9 +42,10 @@ final class ToQuantityFunction extends AbstractFunction
      * Converts the first item in the input to a Quantity representation, optionally
      * filtering by a required unit.
      *
-     * @param Collection $input The input collection (uses first item)
+     * @param Collection        $input      The input collection (uses first item)
      * @param array<int, mixed> $parameters [0] = optional unit filter expression
-     * @param EvaluationContext $context The evaluation context
+     * @param EvaluationContext $context    The evaluation context
+     *
      * @return Collection Single-item collection with the Quantity, or empty if conversion fails
      */
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection
@@ -131,6 +132,7 @@ final class ToQuantityFunction extends AbstractFunction
      *  - "-5.5 'kg'" → {value: -5.5, unit: 'kg'}
      *
      * @param string $value The string to parse
+     *
      * @return array{value: float, unit: string}|null The parsed Quantity or null if invalid
      */
     private static function parseQuantityString(string $value): ?array

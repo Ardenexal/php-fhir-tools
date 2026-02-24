@@ -168,7 +168,7 @@ class SerializationController extends AbstractController
         }
 
         if ($format === 'xml') {
-            $dom                   = new \DOMDocument('1.0', 'UTF-8');
+            $dom                     = new \DOMDocument('1.0', 'UTF-8');
             $dom->preserveWhiteSpace = false;
             $dom->formatOutput       = true;
 

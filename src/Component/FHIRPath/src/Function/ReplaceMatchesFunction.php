@@ -35,10 +35,12 @@ final class ReplaceMatchesFunction extends AbstractFunction
      * Replaces all occurrences matching the regex pattern with the substitution string,
      * supporting backreferences using $N notation.
      *
-     * @param Collection $input The input collection (expects single string item)
+     * @param Collection        $input      The input collection (expects single string item)
      * @param array<int, mixed> $parameters [0] = regex pattern expression, [1] = substitution string expression
-     * @param EvaluationContext $context The evaluation context
+     * @param EvaluationContext $context    The evaluation context
+     *
      * @return Collection Single-item collection with the modified string, or empty if input is empty
+     *
      * @throws EvaluationException If input is not a string or regex is invalid
      */
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection

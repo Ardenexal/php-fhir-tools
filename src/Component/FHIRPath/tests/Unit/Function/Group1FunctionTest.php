@@ -279,8 +279,8 @@ final class Group1FunctionTest extends TestCase
     public function testRepeatDoesNotRepeatDuplicates(): void
     {
         // Cycle: a → b → a (object identity prevents infinite loop)
-        $a       = ['id' => 'a'];
-        $b       = ['id' => 'b'];
+        $a          = ['id' => 'a'];
+        $b          = ['id' => 'b'];
         $a['child'] = $b;
         $b['child'] = $a;
 

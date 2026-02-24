@@ -41,9 +41,10 @@ final class ToStringFunction extends AbstractFunction
      * Converts the first item in the input to its string representation according
      * to FHIRPath conversion rules.
      *
-     * @param Collection $input The input collection (uses first item)
+     * @param Collection        $input      The input collection (uses first item)
      * @param array<int, mixed> $parameters No parameters expected (empty array)
-     * @param EvaluationContext $context The evaluation context
+     * @param EvaluationContext $context    The evaluation context
+     *
      * @return Collection Single-item collection with the string, or empty if conversion fails
      */
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection
@@ -113,6 +114,7 @@ final class ToStringFunction extends AbstractFunction
      * decimal point (e.g., '42.0' instead of '42').
      *
      * @param float $value The float value to format
+     *
      * @return string The formatted decimal string
      */
     private static function formatDecimal(float $value): string

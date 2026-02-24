@@ -84,8 +84,8 @@ final class LowBoundaryFunction extends AbstractFunction
     private function decimalLowBoundary(float $value, ?int $precision): float
     {
         if ($precision === null) {
-            $str      = rtrim(rtrim((string) $value, '0'), '.');
-            $dotPos   = strpos($str, '.');
+            $str       = rtrim(rtrim((string) $value, '0'), '.');
+            $dotPos    = strpos($str, '.');
             $precision = $dotPos !== false ? strlen($str) - $dotPos - 1 : 0;
         }
 
@@ -112,7 +112,7 @@ final class LowBoundaryFunction extends AbstractFunction
         $stripped = (string) preg_replace('/([+-]\d{2}:\d{2}|Z)$/', '', $value);
 
         $year   = substr($stripped, 0, 4);
-        $month  = strlen($stripped) >= 7  ? substr($stripped, 5, 2) : '01';
+        $month  = strlen($stripped) >= 7 ? substr($stripped, 5, 2) : '01';
         $day    = strlen($stripped) >= 10 ? substr($stripped, 8, 2) : '01';
         $hour   = strlen($stripped) >= 13 ? substr($stripped, 11, 2) : '00';
         $minute = strlen($stripped) >= 16 ? substr($stripped, 14, 2) : '00';

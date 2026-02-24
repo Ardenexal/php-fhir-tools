@@ -20,7 +20,6 @@ class PSR12CompliancePropertyTest extends TestCase
 
     /**
      * Feature: fhir-models-component, Property 5: Code quality standards compliance (PSR-12)
-     *
      */
     #[Test]
     public function testAllGeneratedModelsFollowPSR12Standards(): void

@@ -171,7 +171,7 @@ class FHIRPrimitiveTypeNormalizer extends AbstractFHIRNormalizer
         // Format DateTimeInterface to string for JSON serialization
         if ($value instanceof \DateTimeInterface) {
             $primitiveAttr = $this->findFHIRPrimitiveAttribute(get_class($object));
-            $value         = $this->formatDateTimeValue($value, $primitiveAttr?->primitiveType ?? 'dateTime');
+            $value         = $this->formatDateTimeValue($value, $primitiveAttr !== null ? $primitiveAttr->primitiveType : 'dateTime');
         }
 
         // Extract extensions
@@ -223,7 +223,7 @@ class FHIRPrimitiveTypeNormalizer extends AbstractFHIRNormalizer
             // Format DateTimeInterface to string for XML serialization
             if ($value instanceof \DateTimeInterface) {
                 $primitiveAttr = $this->findFHIRPrimitiveAttribute(get_class($object));
-                $value         = $this->formatDateTimeValue($value, $primitiveAttr?->primitiveType ?? 'dateTime');
+                $value         = $this->formatDateTimeValue($value, $primitiveAttr !== null ? $primitiveAttr->primitiveType : 'dateTime');
             }
 
             if ($value !== null) {

@@ -41,10 +41,12 @@ final class AggregateFunction extends AbstractFunction
      * expression with access to $this (current item), $index (position), and
      * $total (accumulated result). The final accumulated value is returned.
      *
-     * @param Collection $input The input collection to aggregate
+     * @param Collection        $input      The input collection to aggregate
      * @param array<int, mixed> $parameters [0] = aggregator expression, [1] = optional init value expression
-     * @param EvaluationContext $context The evaluation context
+     * @param EvaluationContext $context    The evaluation context
+     *
      * @return Collection Single-item collection with the final aggregated value, or empty if result is null
+     *
      * @throws EvaluationException If evaluator is not set in context or parameter count is invalid
      */
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection
