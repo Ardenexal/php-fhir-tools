@@ -130,8 +130,10 @@ final class TypeFunction extends AbstractFunction
 
             // Check if it's a FHIR resource method
             if (method_exists($value, 'getResourceType')) {
-                /** @var object{getResourceType(): string} $value */
-                return TypeInfo::fhir($value->getResourceType());
+                /** @var callable(): string $getter */
+                $getter = [$value, 'getResourceType'];
+
+                return TypeInfo::fhir($getter());
             }
 
             // Get type from class name

@@ -684,11 +684,15 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     }
 
     /**
-     * Wrap a value in a collection, preserving FHIR type information.
+     * Wrap a value in a collection, unwrapping FHIR primitive arrays and objects.
      *
-     * For list arrays, each element is added to the collection as-is to preserve
-     * type information for the type() function. Normalization happens later during
-     * comparisons or when explicitly needed.
+     * Per FHIRPath specification, when accessing a property that contains a primitive
+     * value, the evaluator should return the scalar value itself, not a wrapper object.
+     * This method automatically unwraps:
+     * - FHIR primitive arrays (those with '@value' key) to their scalar values
+     * - FHIR primitive objects (those with #[FHIRPrimitive] attribute) to their ->value property
+     *
+     * For list arrays, each element is recursively unwrapped if it's a primitive array or object.
      */
     private function wrapValue(mixed $value): Collection
     {
@@ -697,17 +701,39 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         }
 
         if (is_array($value)) {
+            // FHIR primitive wrapper (e.g., ['@value' => 'Peter']) → unwrap to scalar
+            // This implements FHIRPath spec requirement that property access returns
+            // the primitive value, not a wrapper object
+            if (isset($value['@value']) && count($value) === 1) {
+                return Collection::single($value['@value']);
+            }
+
             // Check if it's an associative array (object) or indexed array (collection)
             if (array_is_list($value)) {
-                // For collection items, preserve them as-is for now
-                // Normalization will happen during comparisons
-                return Collection::from($value);
+                // For collection items, unwrap any primitive wrappers
+                $unwrapped = array_map(function ($item) {
+                    if (is_array($item) && isset($item['@value']) && count($item) === 1) {
+                        return $item['@value'];
+                    }
+
+                    // Also unwrap FHIR primitive objects to their scalar values
+                    return $this->normalizeValue($item);
+                }, $value);
+
+                return Collection::from($unwrapped);
             }
 
             return Collection::single($value);
         }
 
-        // Don't normalize single values - preserve FHIR wrappers for type()
+        // FHIR primitive objects (e.g., DatePrimitive with ->value property)
+        // are normalized to their scalar values using normalizeValue()
+        if (is_object($value)) {
+            $normalized = $this->normalizeValue($value);
+
+            return Collection::single($normalized);
+        }
+
         return Collection::single($value);
     }
 
