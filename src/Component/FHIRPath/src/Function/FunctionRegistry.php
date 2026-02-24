@@ -143,6 +143,8 @@ final class FunctionRegistry
         $this->registerSafe(new ExtensionFunction());
         $this->registerSafe(new GetValueFunction());
         $this->registerSafe(new ResolveFunction());
+        $this->registerSafe(new MemberOfFunction());
+        $this->registerSafe(new ConformsToFunction());
 
         // Precision / boundary functions
         $this->registerSafe(new PrecisionFunction());

@@ -64,6 +64,13 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     private ?string $fhirServerUrl = null;
 
     /**
+     * Terminology server URL used by memberOf() to call ValueSet/$validate-code.
+     * Falls back to fhirServerUrl when not explicitly set.
+     * e.g. "https://tx.fhir.org/r4"
+     */
+    private ?string $terminologyUrl = null;
+
+    /**
      * PSR-18 HTTP client used by resolve() to fetch remote FHIR resources.
      */
     private ?ClientInterface $httpClient = null;
@@ -117,6 +124,26 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     }
 
     /**
+     * Set the terminology server URL used by memberOf() for ValueSet/$validate-code calls.
+     * When not set, memberOf() falls back to the fhirServerUrl.
+     *
+     * Must not have a trailing slash — e.g. "https://tx.fhir.org/r4".
+     */
+    public function setTerminologyUrl(string $url): void
+    {
+        $this->terminologyUrl = rtrim($url, '/');
+    }
+
+    /**
+     * Return the terminology server URL.
+     * Falls back to fhirServerUrl if terminologyUrl was not explicitly set.
+     */
+    public function getTerminologyUrl(): ?string
+    {
+        return $this->terminologyUrl ?? $this->fhirServerUrl;
+    }
+
+    /**
      * Set the PSR-18 HTTP client and PSR-17 request factory used by resolve()
      * to fetch remote FHIR resources.
      *
@@ -149,6 +176,42 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     public function getRequestFactory(): ?RequestFactoryInterface
     {
         return $this->requestFactory;
+    }
+
+    /**
+     * Callable used by conformsTo() to validate a resource against a StructureDefinition profile.
+     * Receives the resource item (array or object) and the canonical URL, and must return bool.
+     *
+     * @var (callable(mixed, string): bool)|null
+     */
+    private $conformsToValidator = null;
+
+    /**
+     * Set a callable that validates a FHIR resource against a profile.
+     *
+     * The callable receives the resource item (array or object) and the canonical
+     * StructureDefinition URL, and must return true if the resource conforms.
+     *
+     * Example:
+     *   $evaluator->setConformsToValidator(function (mixed $resource, string $url): bool {
+     *       return myValidator->validate($resource, $url);
+     *   });
+     *
+     * @param callable(mixed, string): bool $validator
+     */
+    public function setConformsToValidator(callable $validator): void
+    {
+        $this->conformsToValidator = $validator;
+    }
+
+    /**
+     * Return the configured conformsTo validator callable, or null if not set.
+     *
+     * @return (callable(mixed, string): bool)|null
+     */
+    public function getConformsToValidator(): ?callable
+    {
+        return $this->conformsToValidator;
     }
 
     /**
