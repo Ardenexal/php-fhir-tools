@@ -43,6 +43,7 @@ composer test
 composer test-unit
 composer test-integration
 composer test-fhir
+composer test-fhirpath-spec     # FHIRPath specification conformance tests
 
 # Component-specific tests
 composer test:bundle
@@ -80,6 +81,15 @@ composer quality:all       # lint + phpstan + test
 - Use `Ardenexal\FHIRTools\Tests\` namespace
 - Test fixtures in `tests/Fixtures/`
 - Integration tests verify FHIR conformance and serialization round-trips
+
+### FHIRPath Specification Tests
+
+The FHIRPath component includes official specification conformance tests in a separate test suite (`fhirpath-spec`). These tests validate implementation against the official FHIR FHIRPath test cases and are currently in development as the evaluator implementation is being completed.
+
+- Run with: `composer test-fhirpath-spec`
+- Located in: `src/Component/FHIRPath/tests/Integration/`
+- These tests are excluded from the main integration suite to allow focused development
+- Track progress toward full FHIRPath 2.0 specification compliance
 
 ## FHIR Model Generation
 

@@ -26,11 +26,13 @@
         </testsuite>
         <testsuite name="integration">
             <directory>tests/Integration</directory>
-            <directory>src/Component/FHIRPath/tests/Integration</directory>
             <directory>src/Component/Serialization/tests/Integration</directory>
         </testsuite>
         <testsuite name="fhir">
             <directory>tests/FHIR</directory>
+        </testsuite>
+        <testsuite name="fhirpath-spec">
+            <directory>src/Component/FHIRPath/tests/Integration</directory>
         </testsuite>
     </testsuites>
 
