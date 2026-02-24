@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty;
 
 use function Symfony\Component\String\u;
 
@@ -355,6 +356,9 @@ class FHIRModelGenerator implements GeneratorInterface
             throw GenerationException::invalidElementPath('ClassType has no namespace');
         }
 
+        /** @var array<string, mixed> $mapEntries */
+        $mapEntries = [];
+
         foreach ($propertyElements as $propertyElement) {
             // This is a primitive type
             if (! array_key_exists('_properties', $propertyElement) || count($propertyElement['_properties']) === 0) {
@@ -373,7 +377,10 @@ class FHIRModelGenerator implements GeneratorInterface
                 ) {
                     $parentParameters[] = $this->convertToMethodName($element['base']['path']);
                 }
-                $this->addElementAsProperty($propertyElement['_element'], $constructor, $version, $builderContext, $classNamespace);
+                $paramEntry = $this->addElementAsProperty($propertyElement['_element'], $constructor, $version, $builderContext, $classNamespace);
+                if ($paramEntry !== null) {
+                    $mapEntries[$this->convertToMethodName($propertyElement['_element']['path'])] = $paramEntry;
+                }
             } else {
                 $element = $propertyElement['_element'];
 
@@ -451,7 +458,10 @@ class FHIRModelGenerator implements GeneratorInterface
                 ) {
                     $parentParameters[] = $this->convertToMethodName($element['base']['path']);
                 }
-                $this->addElementAsProperty($element, $constructor, $version, $builderContext, $classNamespace);
+                $paramEntry = $this->addElementAsProperty($element, $constructor, $version, $builderContext, $classNamespace);
+                if ($paramEntry !== null) {
+                    $mapEntries[$this->convertToMethodName($element['path'])] = $paramEntry;
+                }
 
                 if (isset($propertyElement['_properties'])) {
                     // Recursively process nested elements for ValueSet dependencies
@@ -462,6 +472,11 @@ class FHIRModelGenerator implements GeneratorInterface
 
         if ($classType->getExtends() !== null && count($parentParameters) > 0) {
             $constructor->addBody('parent::__construct($' . implode(', $', $parentParameters) . ');');
+        }
+
+        if (! empty($mapEntries)) {
+            $classType->addConstant('FHIR_PROPERTY_MAP', $mapEntries)
+                ->setVisibility('public');
         }
 
         return $classType;
@@ -607,9 +622,10 @@ class FHIRModelGenerator implements GeneratorInterface
      * @param PhpNamespace            $namespace
      * @param EnumType|null           $enum
      *
-     * @return void
+     * @return array{fhirType: string, propertyKind: string, isArray: bool, isRequired: bool, isChoice: bool, jsonKey: string|null, variants: list<array{fhirType: string, propertyKind: string, phpType: string, jsonKey: string, isBuiltin: bool}>|null}|null
+     *                                                                                                                                                                                                                                                          Entry for FHIR_PROPERTY_MAP, or null when max=0
      */
-    private function addElementAsProperty(array $element, Method $method, string $version, BuilderContextInterface $builderContext, PhpNamespace $namespace, ?EnumType $enum = null): void
+    private function addElementAsProperty(array $element, Method $method, string $version, BuilderContextInterface $builderContext, PhpNamespace $namespace, ?EnumType $enum = null): ?array
     {
         $types = [];
         if (! isset($element['type']) && isset($element['contentReference'])) {
@@ -635,6 +651,29 @@ class FHIRModelGenerator implements GeneratorInterface
         $isArray    = ! in_array($maxValue, ['1', '0'], true);
         $isNullable = $minValue === 0 && $isArray === false;
 
+        // Build FHIR property metadata for #[FhirProperty] attribute and FHIR_PROPERTY_MAP const
+        $isChoice     = str_contains($element['path'], '[x]');
+        $fhirType     = $isChoice ? 'choice' : ($element['type'][0]['code'] ?? 'unknown');
+        $propertyKind = $this->resolvePropertyKind($parameterName, $element);
+        $isRequired   = (int) ($element['min'] ?? 0) >= 1;
+        $variants     = $isChoice ? $this->buildChoiceVariants($element, $version, $builderContext) : null;
+
+        // Attribute args: variants strip isBuiltin (not part of FhirProperty::$variants schema)
+        $attributeArgs = ['fhirType' => $fhirType, 'propertyKind' => $propertyKind];
+        if ($isArray) {
+            $attributeArgs['isArray'] = true;
+        }
+        if ($isRequired) {
+            $attributeArgs['isRequired'] = true;
+        }
+        if ($isChoice) {
+            $attributeArgs['isChoice'] = true;
+            $attributeArgs['variants'] = array_map(
+                static fn (array $v): array => array_diff_key($v, ['isBuiltin' => true]),
+                $variants ?? [],
+            );
+        }
+
         if ($maxValue !== '0') {
             $shortDescription = $element['short'] ?? '';
             if ($isArray) {
@@ -649,16 +688,218 @@ class FHIRModelGenerator implements GeneratorInterface
                 $method->addPromotedParameter($parameterName, [])
                     ->setNullable(false)
                     ->setType('array')
-                    ->addComment('@var  array<' . $typeHint . '> ' . $parameterName . ' ' . $shortDescription);
+                    ->addComment('@var  array<' . $typeHint . '> ' . $parameterName . ' ' . $shortDescription)
+                    ->addAttribute(FhirProperty::class, $attributeArgs);
             } else {
                 $parameter = $method->addPromotedParameter($parameterName, null)
                     ->setType(implode('|', $types))
                     ->addComment('@var null|' . implode('|', $types) . ' ' . $parameterName . ' ' . $shortDescription);
+                $parameter->addAttribute(FhirProperty::class, $attributeArgs);
                 if ($isNullable === false) {
                     $parameter->addAttribute(NotBlank::class);
                 }
             }
+
+            return [
+                'fhirType'     => $fhirType,
+                'propertyKind' => $propertyKind,
+                'isArray'      => $isArray,
+                'isRequired'   => $isRequired,
+                'isChoice'     => $isChoice,
+                'jsonKey'      => null,
+                'variants'     => $variants,
+            ];
         }
+
+        return null;
+    }
+
+    /**
+     * Resolve the propertyKind for a FHIR element based on its parameter name and type codes.
+     *
+     * @param string               $parameterName PHP parameter name (camelCase)
+     * @param array<string, mixed> $element       FHIR element definition
+     */
+    private function resolvePropertyKind(string $parameterName, array $element): string
+    {
+        if ($parameterName === 'extension') {
+            return 'extension';
+        }
+
+        if ($parameterName === 'modifierExtension') {
+            return 'modifierExtension';
+        }
+
+        if (str_contains($element['path'], '[x]')) {
+            return 'choice';
+        }
+
+        $types = $element['type'] ?? [];
+        if (empty($types)) {
+            return 'complex'; // contentReference or unresolved
+        }
+
+        return $this->resolvePropertyKindFromCode($types[0]['code'] ?? '');
+    }
+
+    /**
+     * Map a single FHIR type code to a propertyKind string.
+     *
+     * @param string $code The FHIR type code (e.g. 'boolean', 'dateTime', 'HumanName')
+     */
+    private function resolvePropertyKindFromCode(string $code): string
+    {
+        // FHIRPath system types resolve to PHP scalar builtins
+        if (str_starts_with($code, 'http://hl7.org/fhirpath/System.')) {
+            return 'scalar';
+        }
+
+        if ($code === 'BackboneElement') {
+            return 'backbone';
+        }
+
+        if (in_array($code, ['Resource', 'DomainResource'], true)) {
+            return 'resource';
+        }
+
+        // boolean/integer/decimal resolve to PHP scalars via resolveClassFromType() early exits
+        if (in_array($code, ['boolean', 'integer', 'decimal'], true)) {
+            return 'scalar';
+        }
+
+        // Remaining FHIR primitive types resolve to FHIR primitive wrapper classes
+        $primitiveTypes = [
+            'integer64', 'string', 'uri', 'url', 'canonical', 'base64Binary', 'instant',
+            'date', 'dateTime', 'time', 'code', 'oid', 'id',
+            'markdown', 'unsignedInt', 'positiveInt', 'uuid', 'xhtml',
+        ];
+
+        if (in_array($code, $primitiveTypes, true)) {
+            return 'primitive';
+        }
+
+        return 'complex';
+    }
+
+    /**
+     * Resolve a FHIR type code to its PHP type string for use in variant metadata.
+     *
+     * Returns a PHP builtin ('bool', 'int', 'float', 'string') for scalar types,
+     * or a FQCN without leading backslash for class types.
+     *
+     * @param string                  $code           FHIR type code
+     * @param string                  $version        FHIR version
+     * @param BuilderContextInterface $builderContext Builder context
+     */
+    private function resolvePhpTypeForCode(string $code, string $version, BuilderContextInterface $builderContext): string
+    {
+        // FHIRPath system types and FHIR scalars → PHP scalar builtins
+        // (mirrors the early-exit logic in resolveClassFromType())
+        switch ($code) {
+            case 'http://hl7.org/fhirpath/System.Boolean':
+            case 'boolean':
+                return 'bool';
+            case 'http://hl7.org/fhirpath/System.Integer':
+            case 'integer':
+                return 'int';
+            case 'http://hl7.org/fhirpath/System.Decimal':
+            case 'decimal':
+                return 'float';
+            case 'http://hl7.org/fhirpath/System.String':
+            case 'http://hl7.org/fhirpath/System.Date':
+            case 'http://hl7.org/fhirpath/System.Time':
+                return 'string';
+            case 'http://hl7.org/fhirpath/System.DateTime':
+                return \DateTimeInterface::class;
+        }
+
+        // Normalize to HL7 URL for context lookup
+        $typeUrl = str_starts_with($code, 'http://') || str_starts_with($code, 'https://')
+            ? $code
+            : 'http://hl7.org/fhir/StructureDefinition/' . $code;
+
+        $typeFound = $builderContext->getType($typeUrl);
+        if ($typeFound !== null) {
+            return ltrim($typeFound->fqcn, '\\');
+        }
+
+        // Fallback: construct FQCN via namespace resolution
+        try {
+            $correctNamespace = $this->getNamespaceForFhirType($code, $version, $builderContext);
+            $primitiveTypes   = [
+                'boolean', 'integer', 'integer64', 'string', 'decimal', 'uri', 'url',
+                'canonical', 'base64Binary', 'instant', 'date', 'dateTime', 'time', 'code',
+                'oid', 'id', 'markdown', 'unsignedInt', 'positiveInt', 'uuid', 'xhtml',
+            ];
+            $suffix    = in_array($code, $primitiveTypes, true) ? 'Primitive' : '';
+            $className = u($code)->pascal()->toString() . $suffix;
+
+            return $correctNamespace . '\\' . $className;
+        } catch (\Throwable) {
+            return 'string';
+        }
+    }
+
+    /**
+     * Build the variants list for a choice element (value[x] / deceased[x]).
+     *
+     * Each variant maps one FHIR type code to its PHP type and the concrete JSON/XML element name.
+     *
+     * @param array<string, mixed>    $element        FHIR element definition (must have type[])
+     * @param string                  $version        FHIR version
+     * @param BuilderContextInterface $builderContext Builder context
+     *
+     * @return list<array{fhirType: string, propertyKind: string, phpType: string, jsonKey: string, isBuiltin: bool}>
+     */
+    private function buildChoiceVariants(array $element, string $version, BuilderContextInterface $builderContext): array
+    {
+        $variants = [];
+        $baseName = $this->getChoiceBaseName($element['path']);
+
+        foreach ($element['type'] ?? [] as $type) {
+            $code = $type['code'] ?? '';
+            if ($code === '') {
+                continue;
+            }
+
+            $propertyKind = $this->resolvePropertyKindFromCode($code);
+            $phpType      = $this->resolvePhpTypeForCode($code, $version, $builderContext);
+            $isBuiltin    = in_array($phpType, ['bool', 'int', 'float', 'string'], true);
+
+            // Compute concrete JSON/XML element name: baseName + ucfirst(typeCode)
+            // For URL-style codes take the last dot-separated segment
+            if (str_contains($code, '/') || str_contains($code, '.')) {
+                $segments  = preg_split('/[\/.]/', $code) ?: [];
+                $typeLabel = $segments !== [] ? ucfirst((string) end($segments)) : ucfirst($code);
+            } else {
+                $typeLabel = ucfirst($code);
+            }
+
+            $variants[] = [
+                'fhirType'     => $code,
+                'propertyKind' => $propertyKind,
+                'phpType'      => $phpType,
+                'jsonKey'      => $baseName . $typeLabel,
+                'isBuiltin'    => $isBuiltin,
+            ];
+        }
+
+        return $variants;
+    }
+
+    /**
+     * Extract the base element name from a choice element path.
+     *
+     * Strips the trailing '[x]' and path prefix.
+     * E.g. 'Patient.deceased[x]' → 'deceased'
+     *
+     * @param string $elementPath FHIR element path
+     */
+    private function getChoiceBaseName(string $elementPath): string
+    {
+        $parts = explode('.', $elementPath);
+
+        return str_replace('[x]', '', end($parts));
     }
 
     /**

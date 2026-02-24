@@ -40,14 +40,28 @@ final class MatchesFunction extends AbstractFunction
             throw new EvaluationException('Evaluator not available in context');
         }
 
-        $pattern = $evaluator->evaluate($parameters[0], $context)->first();
+        // Empty pattern parameter collection → propagate empty per FHIRPath spec
+        $patternResult = $evaluator->evaluate($parameters[0], $context);
+        if ($patternResult->isEmpty()) {
+            return Collection::empty();
+        }
+
+        $pattern = $patternResult->first();
         if (!is_string($pattern)) {
             throw EvaluationException::invalidFunctionParameter($this->getName(), 'pattern', 'string');
         }
 
-        // Add delimiters if not present
+        // Add delimiters if not present; always include the DOTALL ('s') flag so that
+        // '.' matches newlines as required by the FHIRPath spec.
         if (!str_starts_with($pattern, '/')) {
-            $pattern = '/' . $pattern . '/';
+            $pattern = '/' . $pattern . '/s';
+        } else {
+            // Pattern already delimited — append 's' flag only if not already present.
+            $lastSlash = strrpos($pattern, '/');
+            $flags     = $lastSlash !== false ? substr($pattern, $lastSlash + 1) : '';
+            if (!str_contains($flags, 's')) {
+                $pattern .= 's';
+            }
         }
 
         $result = @preg_match($pattern, $string);

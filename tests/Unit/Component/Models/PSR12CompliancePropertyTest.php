@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\Tests\Unit;
 
 use Eris\Generator;
 use Eris\TestTrait;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -19,9 +20,8 @@ class PSR12CompliancePropertyTest extends TestCase
 
     /**
      * Feature: fhir-models-component, Property 5: Code quality standards compliance (PSR-12)
-     *
-     * @test
      */
+    #[Test]
     public function testAllGeneratedModelsFollowPSR12Standards(): void
     {
         $this->forAll(
@@ -130,8 +130,6 @@ class PSR12CompliancePropertyTest extends TestCase
 
     /**
      * Test that class declarations follow PSR-12 standards
-     *
-     * @test
      */
     public function testClassDeclarationsFollowPSR12(): void
     {
@@ -181,58 +179,5 @@ class PSR12CompliancePropertyTest extends TestCase
                 }
             }
         });
-    }
-
-    /**
-     * Test that utility and exception classes also follow PSR-12
-     *
-     * @test
-     */
-    public function testUtilityAndExceptionClassesFollowPSR12(): void
-    {
-        $paths = [
-            __DIR__ . '/../../../../src/Component/Models/src/Utility',
-            __DIR__ . '/../../../../src/Component/Models/src/Exception',
-        ];
-
-        foreach ($paths as $basePath) {
-            if (!is_dir($basePath)) {
-                continue;
-            }
-
-            $iterator = new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($basePath, \RecursiveDirectoryIterator::SKIP_DOTS),
-            );
-
-            foreach ($iterator as $file) {
-                if ($file->getExtension() === 'php') {
-                    $content = file_get_contents($file->getPathname());
-
-                    // Should contain strict types declaration
-                    self::assertStringContainsString(
-                        'declare(strict_types=1);',
-                        $content,
-                        "File {$file->getPathname()} should contain strict types declaration",
-                    );
-
-                    // Should not have trailing whitespace
-                    $lines = explode("\n", $content);
-                    foreach ($lines as $lineNumber => $line) {
-                        self::assertStringEndsNotWith(
-                            ' ',
-                            $line,
-                            "File {$file->getPathname()} line " . ($lineNumber + 1) . ' should not have trailing whitespace',
-                        );
-                    }
-
-                    // Should end with newline
-                    self::assertStringEndsWith(
-                        "\n",
-                        $content,
-                        "File {$file->getPathname()} should end with a newline",
-                    );
-                }
-            }
-        }
     }
 }

@@ -22,20 +22,20 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  *
  * @author Ardenexal
  */
-class FHIRComplexTypeNormalizer implements FHIRNormalizerInterface
+class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
 {
     public function __construct(
-        private readonly FHIRMetadataExtractorInterface $metadataExtractor,
+        FHIRMetadataExtractorInterface $metadataExtractor,
         private readonly FHIRTypeResolverInterface $typeResolver,
-        private readonly ?NormalizerInterface $normalizer = null,
-        private readonly ?DenormalizerInterface $denormalizer = null
+        ?NormalizerInterface $normalizer = null,
+        ?DenormalizerInterface $denormalizer = null
     ) {
+        parent::__construct($metadataExtractor, $normalizer, $denormalizer);
     }
 
     /**
      * {@inheritDoc}
-     */
-    /**
+     *
      * @param array<string, mixed> $context
      *
      * @return array<string, mixed>|string|int|float|bool|\ArrayObject<string, mixed>|null
@@ -87,9 +87,11 @@ class FHIRComplexTypeNormalizer implements FHIRNormalizerInterface
             $resolvedType = $type;
         }
 
-        // Validate that the resolved type matches the expected type
+        // If the resolver returned an incompatible type (e.g. a short heuristic name like
+        // 'FHIRPeriod' without a namespace), fall back to the expected type from the property
+        // declaration. This avoids false-positive rejections when the type resolver guesses wrong.
         if ($resolvedType !== $type && !is_subclass_of($resolvedType, $type)) {
-            throw new NotNormalizableValueException(sprintf('Resolved type "%s" is not compatible with expected type "%s"', $resolvedType, $type));
+            $resolvedType = $type;
         }
 
         try {
@@ -111,27 +113,19 @@ class FHIRComplexTypeNormalizer implements FHIRNormalizerInterface
                     if ($this->isChoiceElement($propertyName)) {
                         $denormalizedValue = $this->denormalizeChoiceElement($propertyName, $value, $format, $context);
                     } else {
-                        // Handle primitive extensions
-                        $extensionKey = '_' . $propertyName;
-                        if (isset($data[$extensionKey])) {
-                            $denormalizedValue = $this->denormalizePrimitiveWithExtensions(
-                                $value,
-                                $data[$extensionKey],
-                                $format,
-                                $context,
-                            );
-                        } else {
-                            // Use the injected denormalizer if available
-                            if ($this->denormalizer !== null) {
-                                $propertyType = $this->getPropertyType($property);
-                                if ($propertyType !== null) {
-                                    $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, $format, $context);
-                                } else {
-                                    $denormalizedValue = $value;
-                                }
+                        // Always use the denormalizer to create properly-typed instances.
+                        // _property extension keys are implicitly skipped at the loop level.
+                        if ($this->denormalizer !== null) {
+                            $propertyType = $this->getPropertyType($property);
+                            if ($propertyType !== null && !$this->isBuiltinType($propertyType)) {
+                                $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, $format, $context);
                             } else {
-                                $denormalizedValue = $this->denormalizeBasicValue($value, $format, $context);
+                                // For XML, Symfony XmlEncoder wraps primitive values as ['@value' => '...', '#' => ''].
+                                // Unwrap before assigning to string/union-typed properties.
+                                $denormalizedValue = $format === 'xml' ? $this->unwrapXmlValue($value, $propertyType) : $value;
                             }
+                        } else {
+                            $denormalizedValue = $this->denormalizeBasicValue($value, $format, $context);
                         }
                     }
 
@@ -176,7 +170,7 @@ class FHIRComplexTypeNormalizer implements FHIRNormalizerInterface
     }
 
     /**
-     * Check if a property name represents a choice element (value[x] pattern)
+     * Check if a property name represents a choice element (value[x] pattern).
      */
     private function isChoiceElement(string $propertyName): bool
     {
@@ -185,7 +179,7 @@ class FHIRComplexTypeNormalizer implements FHIRNormalizerInterface
     }
 
     /**
-     * Normalize a choice element with proper type suffix handling
+     * Normalize a choice element with proper type suffix handling.
      *
      * @param array<string, mixed> $context
      */
@@ -202,7 +196,7 @@ class FHIRComplexTypeNormalizer implements FHIRNormalizerInterface
     }
 
     /**
-     * Denormalize a choice element with proper type handling
+     * Denormalize a choice element with proper type handling.
      *
      * @param array<string, mixed> $context
      */
@@ -224,7 +218,7 @@ class FHIRComplexTypeNormalizer implements FHIRNormalizerInterface
     }
 
     /**
-     * Get the target type for a choice element based on its suffix and value
+     * Get the target type for a choice element based on its suffix and value.
      */
     private function getChoiceElementType(string $typeSuffix, mixed $value): ?string
     {
@@ -259,122 +253,7 @@ class FHIRComplexTypeNormalizer implements FHIRNormalizerInterface
     }
 
     /**
-     * Check if a value is a primitive with extensions
-     */
-    private function isPrimitiveWithExtensions(mixed $value, string $propertyName): bool
-    {
-        if (!is_object($value)) {
-            return false;
-        }
-
-        return $this->metadataExtractor->isPrimitiveType($value);
-    }
-
-    /**
-     * Normalize a primitive value with extensions
-     *
-     * @param array<string, mixed> $context
-     *
-     * @return array<string, mixed>|null
-     */
-    private function normalizePrimitiveWithExtensions(mixed $value, ?string $format, array $context): ?array
-    {
-        if (!is_object($value)) {
-            return null;
-        }
-
-        $result     = [];
-        $reflection = new \ReflectionClass($value);
-
-        // Look for value property
-        if ($reflection->hasProperty('value')) {
-            $valueProperty   = $reflection->getProperty('value');
-            $result['value'] = $valueProperty->getValue($value);
-        }
-
-        // Look for extension property
-        if ($reflection->hasProperty('extension')) {
-            $extensionProperty = $reflection->getProperty('extension');
-            $extensions        = $extensionProperty->getValue($value);
-            if ($extensions !== null && !empty($extensions)) {
-                if ($this->normalizer !== null) {
-                    $result['extensions'] = $this->normalizer->normalize($extensions, $format, $context);
-                } else {
-                    $result['extensions'] = $extensions;
-                }
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Denormalize a primitive value with extensions
-     *
-     * @param array<string, mixed> $context
-     */
-    private function denormalizePrimitiveWithExtensions(mixed $value, mixed $extensions, ?string $format, array $context): mixed
-    {
-        // For now, return the basic value - full primitive handling will be implemented
-        // in the FHIRPrimitiveTypeNormalizer
-        return $value;
-    }
-
-    /**
-     * Normalize basic values (fallback when no normalizer is injected)
-     *
-     * @param array<string, mixed> $context
-     */
-    private function normalizeBasicValue(mixed $value, ?string $format, array $context): mixed
-    {
-        if (is_scalar($value) || is_null($value)) {
-            return $value;
-        }
-
-        if (is_array($value)) {
-            $result = [];
-            foreach ($value as $key => $item) {
-                $normalizedItem = $this->normalizeBasicValue($item, $format, $context);
-                if ($normalizedItem !== null) {
-                    $result[$key] = $normalizedItem;
-                }
-            }
-
-            return $result;
-        }
-
-        if (is_object($value)) {
-            // Basic object normalization - convert public properties to array
-            $result     = [];
-            $reflection = new \ReflectionClass($value);
-            $properties = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
-
-            foreach ($properties as $property) {
-                $propertyValue = $property->getValue($value);
-                if ($propertyValue !== null) {
-                    $result[$property->getName()] = $this->normalizeBasicValue($propertyValue, $format, $context);
-                }
-            }
-
-            return $result;
-        }
-
-        return $value;
-    }
-
-    /**
-     * Denormalize basic values (fallback when no denormalizer is injected)
-     *
-     * @param array<string, mixed> $context
-     */
-    private function denormalizeBasicValue(mixed $value, ?string $format, array $context): mixed
-    {
-        // For basic denormalization, just return the value as-is
-        return $value;
-    }
-
-    /**
-     * Normalize complex type for JSON format
+     * Normalize complex type for JSON format.
      *
      * @param array<string, mixed> $context
      *
@@ -382,7 +261,8 @@ class FHIRComplexTypeNormalizer implements FHIRNormalizerInterface
      */
     private function normalizeForJSON(object $object, array $context): array
     {
-        $data = [];
+        $data    = [];
+        $metaMap = $this->getPropertyMetadataMap($object);
 
         // Normalize all properties of the object
         $reflection = new \ReflectionClass($object);
@@ -390,7 +270,13 @@ class FHIRComplexTypeNormalizer implements FHIRNormalizerInterface
 
         foreach ($properties as $property) {
             $propertyName = $property->getName();
-            $value        = $property->getValue($object);
+
+            // Skip uninitialized typed properties (created via newInstanceWithoutConstructor)
+            if (!$property->isInitialized($object)) {
+                continue;
+            }
+
+            $value = $property->getValue($object);
 
             // Skip null values according to FHIR JSON rules
             if ($value === null) {
@@ -402,33 +288,64 @@ class FHIRComplexTypeNormalizer implements FHIRNormalizerInterface
                 continue;
             }
 
-            // Handle choice elements (value[x] pattern)
-            if ($this->isChoiceElement($propertyName)) {
-                $normalizedValue = $this->normalizeChoiceElement($propertyName, $value, 'json', $context);
-                if ($normalizedValue !== null) {
-                    $data[$propertyName] = $normalizedValue;
-                }
-            } else {
-                // Handle extensions with underscore notation for primitives
-                if ($this->isPrimitiveWithExtensions($value, $propertyName)) {
-                    $normalizedValue = $this->normalizePrimitiveWithExtensions($value, 'json', $context);
-                    if ($normalizedValue !== null) {
-                        $data[$propertyName] = $normalizedValue['value'];
-                        if (isset($normalizedValue['extensions'])) {
-                            $data['_' . $propertyName] = $normalizedValue['extensions'];
+            $meta    = array_key_exists($propertyName, $metaMap) ? $metaMap[$propertyName] : null;
+            $jsonKey = $meta !== null ? ($meta->jsonKey ?? $propertyName) : $propertyName;
+
+            // Handle choice elements: metadata-driven (generated classes) or legacy heuristic
+            $isChoice = ($meta !== null && $meta->isChoice && !empty($meta->variants))
+                || ($meta === null && $this->isChoiceElement($propertyName));
+
+            if ($isChoice && $meta !== null && !empty($meta->variants)) {
+                // Metadata-driven: resolve concrete JSON key and kind from variant map
+                [$resolvedKind, $resolvedKey] = $this->resolveChoiceVariant($value, $meta->variants);
+                if ($resolvedKey !== '') {
+                    $jsonKey = $resolvedKey;
+                    if ($resolvedKind === 'primitive' && $this->isPrimitiveWithExtensions($value)) {
+                        $normalizedValue = $this->normalizePrimitiveWithExtensions($value, 'json', $context);
+                        if ($normalizedValue !== null) {
+                            $data[$jsonKey] = $normalizedValue['value'];
+                            if (isset($normalizedValue['extensions'])) {
+                                $data['_' . $jsonKey] = $normalizedValue['extensions'];
+                            }
+                        }
+                    } else {
+                        $normalizedValue = $this->normalizer !== null
+                            ? $this->normalizer->normalize($value, 'json', $context)
+                            : $this->normalizeBasicValue($value, 'json', $context);
+                        if ($normalizedValue !== null) {
+                            $data[$jsonKey] = $normalizedValue;
                         }
                     }
-                } else {
-                    // Use the injected normalizer if available, otherwise handle basic types
-                    if ($this->normalizer !== null) {
-                        $normalizedValue = $this->normalizer->normalize($value, 'json', $context);
-                    } else {
-                        $normalizedValue = $this->normalizeBasicValue($value, 'json', $context);
-                    }
+                    continue;
+                }
+            } elseif ($isChoice) {
+                // Legacy heuristic fallback for non-generated classes
+                $normalizedValue = $this->normalizeChoiceElement($propertyName, $value, 'json', $context);
+                if ($normalizedValue !== null) {
+                    $data[$jsonKey] = $normalizedValue;
+                }
+                continue;
+            }
 
-                    if ($normalizedValue !== null) {
-                        $data[$propertyName] = $normalizedValue;
+            // Handle extensions with underscore notation for primitives
+            if ($this->isPrimitiveWithExtensions($value)) {
+                $normalizedValue = $this->normalizePrimitiveWithExtensions($value, 'json', $context);
+                if ($normalizedValue !== null) {
+                    $data[$jsonKey] = $normalizedValue['value'];
+                    if (isset($normalizedValue['extensions'])) {
+                        $data['_' . $jsonKey] = $normalizedValue['extensions'];
                     }
+                }
+            } else {
+                // Use the injected normalizer if available, otherwise handle basic types
+                if ($this->normalizer !== null) {
+                    $normalizedValue = $this->normalizer->normalize($value, 'json', $context);
+                } else {
+                    $normalizedValue = $this->normalizeBasicValue($value, 'json', $context);
+                }
+
+                if ($normalizedValue !== null) {
+                    $data[$jsonKey] = $normalizedValue;
                 }
             }
         }
@@ -437,7 +354,7 @@ class FHIRComplexTypeNormalizer implements FHIRNormalizerInterface
     }
 
     /**
-     * Normalize complex type for XML format
+     * Normalize complex type for XML format.
      *
      * @param array<string, mixed> $context
      *
@@ -445,7 +362,8 @@ class FHIRComplexTypeNormalizer implements FHIRNormalizerInterface
      */
     private function normalizeForXML(object $object, array $context): array
     {
-        $data = [];
+        $data    = [];
+        $metaMap = $this->getPropertyMetadataMap($object);
 
         // Normalize all properties of the object
         $reflection = new \ReflectionClass($object);
@@ -453,7 +371,13 @@ class FHIRComplexTypeNormalizer implements FHIRNormalizerInterface
 
         foreach ($properties as $property) {
             $propertyName = $property->getName();
-            $value        = $property->getValue($object);
+
+            // Skip uninitialized typed properties (created via newInstanceWithoutConstructor)
+            if (!$property->isInitialized($object)) {
+                continue;
+            }
+
+            $value = $property->getValue($object);
 
             // Skip null values according to FHIR XML rules
             if ($value === null) {
@@ -465,47 +389,62 @@ class FHIRComplexTypeNormalizer implements FHIRNormalizerInterface
                 continue;
             }
 
-            // Handle choice elements (value[x] pattern) - same as JSON
-            if ($this->isChoiceElement($propertyName)) {
+            $meta   = array_key_exists($propertyName, $metaMap) ? $metaMap[$propertyName] : null;
+            $xmlKey = $meta !== null ? ($meta->jsonKey ?? $propertyName) : $propertyName;
+
+            // Handle choice elements: metadata-driven (generated classes) or legacy heuristic
+            $isChoice = ($meta !== null && $meta->isChoice && !empty($meta->variants))
+                || ($meta === null && $this->isChoiceElement($propertyName));
+
+            if ($isChoice && $meta !== null && !empty($meta->variants)) {
+                // Metadata-driven: resolve concrete XML key and kind from variant map
+                [$resolvedKind, $resolvedKey] = $this->resolveChoiceVariant($value, $meta->variants);
+                if ($resolvedKey !== '') {
+                    $xmlKey = $resolvedKey;
+                    if ($resolvedKind === 'primitive' && $this->isPrimitiveWithExtensions($value)) {
+                        $normalizedValue = $this->normalizePrimitiveWithExtensions($value, 'xml', $context);
+                        if ($normalizedValue !== null) {
+                            $data[$xmlKey] = $normalizedValue;
+                        }
+                    } else {
+                        $normalizedValue = $this->normalizer !== null
+                            ? $this->normalizer->normalize($value, 'xml', $context)
+                            : $this->normalizeBasicValue($value, 'xml', $context);
+                        if ($normalizedValue !== null) {
+                            $data[$xmlKey] = $normalizedValue;
+                        }
+                    }
+                    continue;
+                }
+            } elseif ($isChoice) {
+                // Legacy heuristic fallback for non-generated classes
                 $normalizedValue = $this->normalizeChoiceElement($propertyName, $value, 'xml', $context);
                 if ($normalizedValue !== null) {
-                    $data[$propertyName] = $normalizedValue;
+                    $data[$xmlKey] = $normalizedValue;
+                }
+                continue;
+            }
+
+            // Handle primitive extensions for XML (no underscore notation)
+            if ($this->isPrimitiveWithExtensions($value)) {
+                $normalizedValue = $this->normalizePrimitiveWithExtensions($value, 'xml', $context);
+                if ($normalizedValue !== null) {
+                    $data[$xmlKey] = $normalizedValue;
                 }
             } else {
-                // Handle primitive extensions for XML (no underscore notation)
-                if ($this->isPrimitiveWithExtensions($value, $propertyName)) {
-                    $normalizedValue = $this->normalizePrimitiveWithExtensions($value, 'xml', $context);
-                    if ($normalizedValue !== null) {
-                        $data[$propertyName] = $normalizedValue;
-                    }
+                // Use the injected normalizer if available, otherwise handle basic types
+                if ($this->normalizer !== null) {
+                    $normalizedValue = $this->normalizer->normalize($value, 'xml', $context);
                 } else {
-                    // Use the injected normalizer if available, otherwise handle basic types
-                    if ($this->normalizer !== null) {
-                        $normalizedValue = $this->normalizer->normalize($value, 'xml', $context);
-                    } else {
-                        $normalizedValue = $this->normalizeBasicValue($value, 'xml', $context);
-                    }
+                    $normalizedValue = $this->normalizeBasicValue($value, 'xml', $context);
+                }
 
-                    if ($normalizedValue !== null) {
-                        $data[$propertyName] = $normalizedValue;
-                    }
+                if ($normalizedValue !== null) {
+                    $data[$xmlKey] = $normalizedValue;
                 }
             }
         }
 
         return $data;
-    }
-
-    /**
-     * Get the type of a property from its type hint
-     */
-    private function getPropertyType(\ReflectionProperty $property): ?string
-    {
-        $type = $property->getType();
-        if ($type instanceof \ReflectionNamedType) {
-            return $type->getName();
-        }
-
-        return null;
     }
 }

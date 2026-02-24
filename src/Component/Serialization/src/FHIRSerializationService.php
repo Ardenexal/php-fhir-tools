@@ -4,10 +4,18 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization;
 
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContextFactory;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationDebugInfo;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
+use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRBackboneElementNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRComplexTypeNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRPrimitiveTypeNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRResourceNormalizer;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -25,6 +33,34 @@ class FHIRSerializationService
         private readonly FHIRSerializationContextFactory $contextFactory,
         private readonly FHIRSerializationDebugInfo $debugInfo,
     ) {
+    }
+
+    /**
+     * Create a fully-wired serialization service without Symfony DI.
+     *
+     * Useful in tests or standalone scripts where the Symfony container is not
+     * available. Uses a two-phase construction to inject the Serializer back into
+     * normalizers that need it for recursive object handling.
+     */
+    public static function createDefault(): self
+    {
+        $metadataExtractor = new FHIRMetadataExtractor();
+        $typeResolver      = new FHIRTypeResolver();
+
+        // Create normalizers without an inner serializer reference.
+        // Each normalizer implements SerializerAwareInterface, so Symfony's Serializer
+        // will call setSerializer() on each one automatically, wiring the final
+        // fully-wired instance back in for recursive normalize/denormalize calls.
+        $normalizers = [
+            new FHIRResourceNormalizer($metadataExtractor, $typeResolver),
+            new FHIRComplexTypeNormalizer($metadataExtractor, $typeResolver),
+            new FHIRPrimitiveTypeNormalizer($metadataExtractor),
+            new FHIRBackboneElementNormalizer($metadataExtractor),
+        ];
+
+        $serializer = new Serializer($normalizers, [new JsonEncoder(), new XmlEncoder()]);
+
+        return new self($serializer, new FHIRSerializationContextFactory(), new FHIRSerializationDebugInfo('initial', 'json'));
     }
 
     /**
@@ -59,10 +95,36 @@ class FHIRSerializationService
         try {
             $xmlContext = $this->contextFactory->createXmlContext($context);
 
+            // The FHIR XML root element name must be the resource type (e.g. "Patient").
+            // Symfony XmlEncoder uses XmlEncoder::ROOT_NODE_NAME from context.
+            $resourceType = $this->extractResourceTypeFromObject($fhirObject);
+            if ($resourceType !== null) {
+                $xmlContext[XmlEncoder::ROOT_NODE_NAME] = $resourceType;
+            }
+
             return $this->serializer->serialize($fhirObject, 'xml', $xmlContext);
         } catch (\Exception $e) {
             throw new FHIRSerializationException(sprintf('Failed to serialize FHIR object to XML: %s', $e->getMessage()), 0, $e);
         }
+    }
+
+    /**
+     * Extract the FHIR resource type string from a resource object by reading its FhirResource attribute.
+     */
+    private function extractResourceTypeFromObject(object $fhirObject): ?string
+    {
+        $reflection = new \ReflectionClass($fhirObject);
+
+        do {
+            $attributes = $reflection->getAttributes(FhirResource::class);
+            if (!empty($attributes)) {
+                return $attributes[0]->newInstance()->getResourceType();
+            }
+
+            $reflection = $reflection->getParentClass();
+        } while ($reflection !== false);
+
+        return null;
     }
 
     /**
@@ -206,24 +268,33 @@ class FHIRSerializationService
 
     /**
      * Detect the target class from the data content.
+     *
+     * Tries Models convention (Ardenexal\FHIRTools\Component\Models\{Version}\Resource\{Type}Resource)
+     * across all supported FHIR versions before giving up.
      */
     private function detectTargetClass(string $data, string $format): string
     {
+        $resourceType = null;
+
         if ($format === 'json') {
             $decoded = json_decode($data, true);
-            if (is_array($decoded) && isset($decoded['resourceType'])) {
+            if (is_array($decoded) && isset($decoded['resourceType']) && is_string($decoded['resourceType'])) {
                 $resourceType = $decoded['resourceType'];
-
-                // This would need to be configured with actual class mappings
-                return "Ardenexal\\FHIRTools\\Generated\\FHIR\\{$resourceType}";
             }
         } elseif ($format === 'xml') {
-            // Parse XML to extract root element name
-            $xml = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NONET);
+            // Strip DOCTYPE to prevent XXE, then extract the root element name
+            $xml = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NONET | LIBXML_NOERROR);
             if ($xml !== false) {
-                $rootName = $xml->getName();
+                $resourceType = $xml->getName();
+            }
+        }
 
-                return "Ardenexal\\FHIRTools\\Generated\\FHIR\\{$rootName}";
+        if ($resourceType !== null) {
+            foreach (['R4', 'R4B', 'R5'] as $version) {
+                $candidate = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\Resource\\{$resourceType}Resource";
+                if (class_exists($candidate)) {
+                    return $candidate;
+                }
             }
         }
 

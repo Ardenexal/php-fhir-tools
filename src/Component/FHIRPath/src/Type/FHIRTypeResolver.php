@@ -18,6 +18,24 @@ use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRPrimitive;
 class FHIRTypeResolver
 {
     /**
+     * Maps FHIRPath System.* type specifiers to their canonical FHIR type names.
+     *
+     * Per FHIRPath spec §8, System.Boolean ≡ boolean, System.Integer ≡ integer, etc.
+     *
+     * @var array<string, string>
+     */
+    private const SYSTEM_TYPE_MAP = [
+        'System.Boolean'  => 'boolean',
+        'System.Integer'  => 'integer',
+        'System.Decimal'  => 'decimal',
+        'System.String'   => 'string',
+        'System.Date'     => 'date',
+        'System.DateTime' => 'dateTime',
+        'System.Time'     => 'time',
+        'System.Quantity' => 'Quantity',
+    ];
+
+    /**
      * Primitive FHIR types mapping.
      *
      * @var array<string, string>
@@ -43,6 +61,41 @@ class FHIRTypeResolver
         'unsignedInt'  => 'integer',
         'positiveInt'  => 'integer',
     ];
+
+    /**
+     * Normalise a (potentially namespaced) type specifier to its canonical FHIR type name.
+     *
+     * Handles:
+     *  - System.Boolean  → boolean
+     *  - System.Integer  → integer
+     *  - System.Decimal  → decimal
+     *  - System.String   → string
+     *  - System.Date     → date
+     *  - System.DateTime → dateTime
+     *  - System.Time     → time
+     *  - System.Quantity → Quantity
+     *  - FHIR.Patient    → Patient  (strips FHIR. prefix, returns bare type)
+     *  - FHIR.string     → string   (FHIR primitive aliases)
+     *  - Anything else   → returned as-is
+     *
+     * @param string $typeName Possibly namespaced type specifier
+     *
+     * @return string Canonical FHIR type name
+     */
+    public function normalizeTypeName(string $typeName): string
+    {
+        // System.* explicit mappings
+        if (isset(self::SYSTEM_TYPE_MAP[$typeName])) {
+            return self::SYSTEM_TYPE_MAP[$typeName];
+        }
+
+        // FHIR.* → strip prefix and return bare name
+        if (str_starts_with($typeName, 'FHIR.')) {
+            return substr($typeName, 5);
+        }
+
+        return $typeName;
+    }
 
     /**
      * Infer the FHIR type from a PHP value.
@@ -116,6 +169,7 @@ class FHIRTypeResolver
      */
     public function isOfType(mixed $value, string $typeName): bool
     {
+        $typeName   = $this->normalizeTypeName($typeName);
         $actualType = $this->inferType($value);
 
         // Exact match
@@ -135,6 +189,13 @@ class FHIRTypeResolver
 
         // Check if integer is compatible with decimal (case-insensitive)
         if (strcasecmp($typeName, 'decimal') === 0 && $actualType === 'integer') {
+            return true;
+        }
+
+        // date, dateTime, time, and instant values are stored as plain PHP strings in this
+        // implementation (no dedicated Date/DateTime/Time PHP type). A string value therefore
+        // satisfies an is-date / is-dateTime / is-time / is-instant check.
+        if ($actualType === 'string' && in_array($typeName, ['date', 'dateTime', 'time', 'instant'], true)) {
             return true;
         }
 
@@ -161,6 +222,8 @@ class FHIRTypeResolver
      */
     public function castToType(mixed $value, string $typeName): mixed
     {
+        $typeName = $this->normalizeTypeName($typeName);
+
         // If already the correct type, return as-is
         if ($this->isOfType($value, $typeName)) {
             return $value;

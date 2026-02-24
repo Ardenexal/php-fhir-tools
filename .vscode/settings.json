@@ -114,5 +114,11 @@
     "emmet.includeLanguages": {
         "php": "html"
     },
-    "php.suggest.basic": false
+    "php.suggest.basic": false,
+    "chat.tools.terminal.autoApprove": {
+        "composer": true,
+        "FHIRBundleServiceRegistrationTest": true,
+        "VersionRangeValidityTest": true,
+        "CodeGenerationTestCoverageTest": true
+    }
 }

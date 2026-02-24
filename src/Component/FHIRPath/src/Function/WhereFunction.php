@@ -33,12 +33,20 @@ final class WhereFunction extends AbstractFunction
             throw new EvaluationException('Evaluator not set in context', 0, 0);
         }
 
-        return $input->filter(function($item) use ($criteriaExpr, $context, $evaluator) {
-            $itemContext = $context->withCurrentNode($item);
-            $result      = $criteriaExpr->accept($evaluator);
+        $filtered = [];
 
-            // Item matches if result is true
-            return !$result->isEmpty() && $result->first() === true;
-        });
+        foreach ($input as $index => $item) {
+            $itemContext = $context
+                ->withCurrentNode($item)
+                ->withIterationVariables($item, $index, $input->count());
+
+            $result = $evaluator->evaluateWithContext($criteriaExpr, $itemContext);
+
+            if (!$result->isEmpty() && $result->first() === true) {
+                $filtered[] = $item;
+            }
+        }
+
+        return Collection::from($filtered);
     }
 }

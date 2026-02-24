@@ -10,6 +10,8 @@ use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface;
 use Ardenexal\FHIRTools\Tests\Utilities\FHIRTestDataGenerator;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 use Eris\TestTrait;
+use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider;
+use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProviderInterface;
 
 /**
  * Test cases for FHIR serialization interfaces
@@ -303,6 +305,11 @@ class FHIRSerializationInterfaceTest extends TestCase
             public function extractElementPath(object $object): ?string
             {
                 return $object->elementPath ?? null;
+            }
+
+            public function getPropertyMetadataProvider(): PropertyMetadataProviderInterface
+            {
+                return new PropertyMetadataProvider();
             }
         };
     }

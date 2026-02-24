@@ -32,12 +32,16 @@ use Nette\InvalidStateException;
  * as JSON "StructureDefinitions". This command downloads those definitions and converts
  * them into strongly-typed PHP classes and enums so they can be used in application code.
  *
- * The generation flow works in three phases per package:
+ * The generation flow works in three global phases:
  *
- *  1. **Load** — Download/cache the FHIR package and parse its StructureDefinitions
- *  2. **Build** — Convert each StructureDefinition into a PHP class (via Nette PhpGenerator),
- *     then generate PHP enums for any FHIR ValueSets referenced by those classes
- *  3. **Output** — Write the generated PHP files to `src/Component/Models/src/{version}/`
+ *  1. **Load** — Download/cache every requested FHIR package and parse its StructureDefinitions
+ *     into the version-specific BuilderContext. Collects the set of affected FHIR versions.
+ *  2. **Clear** — Remove only the output directories for the affected FHIR versions (e.g. R4/).
+ *     Unaffected versions (e.g. R4B/) are left untouched, so separate invocations don't clobber
+ *     each other's output.
+ *  3. **Generate** — For each affected FHIR version, convert StructureDefinitions into PHP classes
+ *     (via Nette PhpGenerator), build enums for referenced ValueSets, and write all files to
+ *     `src/Component/Models/src/{version}/`.
  *
  * Generated files are organised by FHIR version and type category:
  *
@@ -163,7 +167,9 @@ class FHIRModelGeneratorCommand extends Command
     }
 
     /**
-     * Main orchestration method — clears output, processes each package, then reports results.
+     * Main orchestration method — loads all packages, clears only affected version directories,
+     * then generates classes. Separating load from generate ensures we only wipe version
+     * directories that are actually being regenerated.
      *
      * @param array<string> $packages
      */
@@ -171,16 +177,17 @@ class FHIRModelGeneratorCommand extends Command
     {
         $output->writeln('<info>Generating FHIR models...</info>');
 
-        $this->clearOutputDirectory($output);
-
-        $loadingPackagesIndicator = new ProgressIndicator($output);
-        $loadingPackagesIndicator->start('Loading FHIR Implementation Guide packages...');
-
         // The terminology package defines shared CodeSystems and ValueSets (e.g. AdministrativeGender).
         // Ensure it's always loaded first so those definitions are available when building classes.
         if (! in_array(self::DEFAULT_TERMINOLOGY_PACKAGE, $packages, true)) {
             array_unshift($packages, self::DEFAULT_TERMINOLOGY_PACKAGE);
         }
+
+        // --- Phase 1: Load all packages, collecting affected FHIR versions ---
+        $loadingPackagesIndicator = new ProgressIndicator($output);
+        $loadingPackagesIndicator->start('Loading FHIR Implementation Guide packages...');
+
+        $affectedVersions = [];
 
         foreach ($packages as $package) {
             // Packages are specified as "name#version", e.g. "hl7.fhir.r4.core#4.0.1"
@@ -191,7 +198,8 @@ class FHIRModelGeneratorCommand extends Command
             $loadingPackagesIndicator->setMessage('Loading package ' . $package . ($version ? " version $version" : ''));
 
             try {
-                $this->processPackage($output, $package, $version, $offlineMode);
+                $versions         = $this->loadPackage($package, $version, $offlineMode);
+                $affectedVersions = array_unique(array_merge($affectedVersions, $versions));
             } catch (\Throwable $e) {
                 // Record the error but keep processing remaining packages
                 $this->errorCollector->addError(
@@ -215,6 +223,14 @@ class FHIRModelGeneratorCommand extends Command
 
         $loadingPackagesIndicator->finish('Finished loading FHIR Implementation Guide packages.');
 
+        // --- Phase 2: Clear only the directories for affected FHIR versions ---
+        $this->clearOutputDirectory($output, $affectedVersions);
+
+        // --- Phase 3: Generate classes for each affected FHIR version ---
+        foreach ($affectedVersions as $fhirVersion) {
+            $this->generateClassesForPackage($output, $fhirVersion);
+        }
+
         // Report final status — any collected errors mean the generation is incomplete
         if ($this->errorCollector->hasErrors()) {
             $output->writeln('<error>Generation completed with errors:</error>');
@@ -236,13 +252,20 @@ class FHIRModelGeneratorCommand extends Command
     }
 
     /**
-     * Download/cache a single FHIR package, then generate classes for each FHIR version it supports.
+     * Download/cache a single FHIR package and load its definitions into the version-specific
+     * BuilderContext. Returns the FHIR versions that were loaded (e.g. ['R4']).
      *
-     * A single package can support multiple FHIR versions (though most support exactly one).
-     * For each version, we load the StructureDefinitions into the version-specific BuilderContext
-     * and run the full generate → build enums → output pipeline.
+     * Intentionally does NOT generate classes — that happens in a separate phase after all
+     * packages are loaded, so we know which version directories to clear before writing.
+     *
+     * Only versions where the package contributes at least one StructureDefinition are
+     * returned as "affected". Terminology-only packages (CodeSystems, ValueSets) are loaded
+     * into context so enum generation can resolve bindings, but they do not own a version
+     * output directory and must not trigger clearing of one.
+     *
+     * @return array<string>
      */
-    private function processPackage(OutputInterface $output, string $package, ?string $version, bool $offlineMode): void
+    private function loadPackage(string $package, ?string $version, bool $offlineMode): array
     {
         $packageMetaData = $this->packageLoader->installPackage(
             packageName: $package,
@@ -252,9 +275,28 @@ class FHIRModelGeneratorCommand extends Command
             offlineMode: $offlineMode,
         );
 
-        foreach ($packageMetaData->getFhirVersions() as $fhirVersion) {
-            $definitions = $this->packageLoader->loadPackageStructureDefinitions($packageMetaData);
+        // Load definitions once — the same set applies to all FHIR versions of this package.
+        $definitions = $this->packageLoader->loadPackageStructureDefinitions($packageMetaData);
 
+        // Determine upfront whether this package contributes any generatable StructureDefinitions.
+        // We mirror the same filter used in buildClasses: skip logical models and constraint
+        // derivations (e.g. Extension profiles in the terminology package). A package that only
+        // contributes constraints or CodeSystems/ValueSets must not trigger a directory clear.
+        $hasGeneratableStructureDefinitions = false;
+        foreach ($definitions as $def) {
+            if (($def['resourceType'] ?? '') !== 'StructureDefinition') {
+                continue;
+            }
+            if (($def['kind'] ?? '') === 'logical' || ($def['derivation'] ?? '') === 'constraint') {
+                continue;
+            }
+            $hasGeneratableStructureDefinitions = true;
+            break;
+        }
+
+        $affectedVersions = [];
+
+        foreach ($packageMetaData->getFhirVersions() as $fhirVersion) {
             // Validate the FHIR version is one we support
             match ($fhirVersion) {
                 'R4', 'R4B', 'R5' => null,
@@ -262,32 +304,35 @@ class FHIRModelGeneratorCommand extends Command
             };
 
             $this->context[$fhirVersion]->loadDefinitions($definitions);
-            $this->generateClassesForPackage($output, $package, $fhirVersion);
+
+            if ($hasGeneratableStructureDefinitions) {
+                $affectedVersions[] = $fhirVersion;
+            }
         }
+
+        return $affectedVersions;
     }
 
     /**
-     * Remove previously generated version directories (R4/, R4B/, R5/) before regenerating.
+     * Remove previously generated directories for the specified FHIR versions only.
      *
-     * Only removes directories matching the FHIR version naming pattern (e.g. "R4", "R4B", "R5")
-     * to avoid accidentally deleting other files in the Models/src directory.
+     * By scoping the clear to only the versions being regenerated, separate invocations
+     * for different FHIR versions (e.g. R4 then R4B) will not clobber each other's output.
+     *
+     * @param array<string> $versions FHIR version identifiers to clear, e.g. ['R4', 'R4B']
      */
-    private function clearOutputDirectory(OutputInterface $output): void
+    private function clearOutputDirectory(OutputInterface $output, array $versions): void
     {
         $basePath = Path::canonicalize(__DIR__ . '/../../../Models/src');
 
         if ($this->filesystem->exists($basePath)) {
             $output->writeln('<comment>Clearing existing output directory...</comment>');
 
-            $versionDirs = glob($basePath . '/*', GLOB_ONLYDIR);
-
-            if ($versionDirs !== false) {
-                foreach ($versionDirs as $versionDir) {
-                    $versionName = basename($versionDir);
-                    if (preg_match('/^R\d+[A-Z]*$/', $versionName)) {
-                        $output->writeln("<comment>Clearing {$versionName} directory...</comment>");
-                        $this->filesystem->remove($versionDir);
-                    }
+            foreach ($versions as $versionName) {
+                $versionDir = $basePath . '/' . $versionName;
+                if ($this->filesystem->exists($versionDir)) {
+                    $output->writeln("<comment>Clearing {$versionName} directory...</comment>");
+                    $this->filesystem->remove($versionDir);
                 }
             }
 
@@ -306,7 +351,7 @@ class FHIRModelGeneratorCommand extends Command
      *
      * @throws \JsonException
      */
-    private function generateClassesForPackage(OutputInterface $output, string $package, string $fhirVersion): void
+    private function generateClassesForPackage(OutputInterface $output, string $fhirVersion): void
     {
         // All generated classes live under this base namespace, e.g.
         // "Ardenexal\FHIRTools\Component\Models\R4"
@@ -334,12 +379,12 @@ class FHIRModelGeneratorCommand extends Command
         } catch (\Throwable $e) {
             $this->errorCollector->addError(
                 "Enum generation failed but continuing with class generation: {$e->getMessage()}",
-                $package,
+                $fhirVersion,
                 'ENUM_GENERATION_PARTIAL_FAILURE',
                 'warning',
                 [
                     'exception_class' => get_class($e),
-                    'package_name'    => $package,
+                    'fhir_version'    => $fhirVersion,
                 ],
             );
             $output->writeln('<comment>Warning: Enum generation failed but continuing with class generation</comment>');

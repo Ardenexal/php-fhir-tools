@@ -40,7 +40,7 @@ final class AllFunction extends AbstractFunction
 
         foreach ($input as $item) {
             $itemContext = $context->withCurrentNode($item);
-            $result      = $criteriaExpr->accept($evaluator);
+            $result      = $evaluator->evaluateWithContext($criteriaExpr, $itemContext);
 
             // If any item doesn't match (false or empty), return false
             if ($result->isEmpty() || $result->first() !== true) {

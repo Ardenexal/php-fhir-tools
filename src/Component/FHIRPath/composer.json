@@ -1,5 +1,6 @@
 {
     "name": "ardenexal/fhir-path",
+    "version": "0.0.3",
     "description": "FHIRPath 2.0 expression evaluation for PHP",
     "type": "library",
     "license": "MIT",
@@ -13,6 +14,10 @@
     "prefer-stable": true,
     "require": {
         "php": ">=8.2",
+        "psr/http-client": "^1.0",
+        "psr/http-factory": "^1.0",
+        "psr/http-message": "^2.0",
+        "psr/log": "^3.0",
         "symfony/string": "^6.4|^7.4",
         "symfony/property-access": "^6.4|^7.4"
     },

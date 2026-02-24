@@ -1,4 +1,5 @@
 fhir:
-    output_directory: '%kernel.project_dir%/../src/Component/Models/src'
-    cache_directory: '%kernel.cache_dir%/fhir'
-    default_version: 'R4B'
+    default_version: R4
+    validation:
+        enabled: true
+        strict_mode: false

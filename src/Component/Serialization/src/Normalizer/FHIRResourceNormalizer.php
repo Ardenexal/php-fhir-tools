@@ -24,20 +24,20 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  *
  * @author Ardenexal
  */
-class FHIRResourceNormalizer implements FHIRNormalizerInterface
+class FHIRResourceNormalizer extends AbstractFHIRNormalizer
 {
     public function __construct(
-        private readonly FHIRMetadataExtractorInterface $metadataExtractor,
+        FHIRMetadataExtractorInterface $metadataExtractor,
         private readonly FHIRTypeResolverInterface $typeResolver,
-        private readonly ?NormalizerInterface $normalizer = null,
-        private readonly ?DenormalizerInterface $denormalizer = null
+        ?NormalizerInterface $normalizer = null,
+        ?DenormalizerInterface $denormalizer = null
     ) {
+        parent::__construct($metadataExtractor, $normalizer, $denormalizer);
     }
 
     /**
      * {@inheritDoc}
-     */
-    /**
+     *
      * @param array<string, mixed> $context
      *
      * @return array<string, mixed>|string|int|float|bool|\ArrayObject<string, mixed>|null
@@ -191,14 +191,15 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
             return false;
         }
 
-        // Must have resourceType field
-        if (!isset($data['resourceType'])) {
+        // JSON requires a resourceType discriminator field.
+        // XML does not include it — the root element name is the resource type and
+        // is already resolved into the $type class parameter before we are called.
+        if ($format !== 'xml' && !isset($data['resourceType'])) {
             return false;
         }
 
         // Check if the type is a FHIR resource class
         try {
-            /** @var class-string $type */
             /** @var class-string $type */
             $reflection = new \ReflectionClass($type);
             $attributes = $reflection->getAttributes(FhirResource::class);
@@ -219,145 +220,7 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
     }
 
     /**
-     * Check if a value is a primitive with extensions
-     */
-    private function isPrimitiveWithExtensions(mixed $value, string $propertyName): bool
-    {
-        if (!is_object($value)) {
-            return false;
-        }
-
-        return $this->metadataExtractor->isPrimitiveType($value);
-    }
-
-    /**
-     * Normalize a primitive value with extensions
-     *
-     * @param array<string, mixed> $context
-     *
-     * @return array<string, mixed>|null
-     */
-    private function normalizePrimitiveWithExtensions(mixed $value, FHIRSerializationContext $fhirContext, array $context): ?array
-    {
-        if (!is_object($value)) {
-            return null;
-        }
-
-        $result     = [];
-        $reflection = new \ReflectionClass($value);
-
-        // Look for value property
-        if ($reflection->hasProperty('value')) {
-            $valueProperty   = $reflection->getProperty('value');
-            $result['value'] = $valueProperty->getValue($value);
-        }
-
-        // Look for extension property
-        if ($reflection->hasProperty('extension') && $fhirContext->includeExtensions) {
-            $extensionProperty = $reflection->getProperty('extension');
-            $extensions        = $extensionProperty->getValue($value);
-            if ($extensions !== null && !empty($extensions)) {
-                if ($this->normalizer !== null) {
-                    $result['extensions'] = $this->normalizer->normalize($extensions, $fhirContext->format, $context);
-                } else {
-                    $result['extensions'] = $extensions;
-                }
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Denormalize a primitive value with extensions
-     *
-     * @param array<string, mixed> $context
-     */
-    private function denormalizePrimitiveWithExtensions(mixed $value, mixed $extensions, FHIRSerializationContext $fhirContext, array $context): mixed
-    {
-        // For now, return the basic value - full primitive handling will be implemented
-        // in the FHIRPrimitiveTypeNormalizer
-        return $value;
-    }
-
-    /**
-     * Normalize basic values (fallback when no normalizer is injected)
-     *
-     * @param array<string, mixed> $context
-     */
-    private function normalizeBasicValue(mixed $value, FHIRSerializationContext $fhirContext, array $context): mixed
-    {
-        if (is_scalar($value) || is_null($value)) {
-            return $value;
-        }
-
-        if (is_array($value)) {
-            $result = [];
-            foreach ($value as $key => $item) {
-                $normalizedItem = $this->normalizeBasicValue($item, $fhirContext, $context);
-                if ($normalizedItem !== null) {
-                    $result[$key] = $normalizedItem;
-                }
-            }
-
-            return $result;
-        }
-
-        if (is_object($value)) {
-            // Basic object normalization - convert public properties to array
-            $result     = [];
-            $reflection = new \ReflectionClass($value);
-            $properties = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
-
-            foreach ($properties as $property) {
-                $propertyValue = $property->getValue($value);
-                if ($propertyValue !== null) {
-                    $result[$property->getName()] = $this->normalizeBasicValue($propertyValue, $fhirContext, $context);
-                }
-            }
-
-            return $result;
-        }
-
-        return $value;
-    }
-
-    /**
-     * Denormalize basic values (fallback when no denormalizer is injected)
-     *
-     * @param array<string, mixed> $context
-     */
-    private function denormalizeBasicValue(mixed $value, FHIRSerializationContext $fhirContext, array $context): mixed
-    {
-        // For basic denormalization, just return the value as-is
-        return $value;
-    }
-
-    /**
-     * Check if a value should be omitted according to FHIR rules and context configuration
-     */
-    private function shouldOmitValue(mixed $value, FHIRSerializationContext $context): bool
-    {
-        // Omit null values if configured
-        if ($value === null && $context->omitNullValues) {
-            return true;
-        }
-
-        // Omit empty arrays if configured
-        if (is_array($value) && empty($value) && $context->omitEmptyArrays) {
-            return true;
-        }
-
-        // Omit empty strings (always for FHIR compliance)
-        if (is_string($value) && $value === '') {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Normalize array with potential sparse extensions
+     * Normalize array with potential sparse extensions.
      *
      * @param array<mixed>         $array
      * @param array<string, mixed> $context
@@ -381,7 +244,7 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
 
             // Check if item has extensions
             if (is_object($item) && $this->metadataExtractor->isPrimitiveType($item)) {
-                $primitiveResult = $this->normalizePrimitiveWithExtensions($item, $fhirContext, $context);
+                $primitiveResult = $this->normalizePrimitiveWithExtensions($item, $fhirContext->format, $context, $fhirContext->includeExtensions);
                 if ($primitiveResult !== null) {
                     $normalizedValues[$index] = $primitiveResult['value'];
                     if (isset($primitiveResult['extensions']) && $fhirContext->includeExtensions) {
@@ -392,11 +255,14 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
                     }
                 }
             } else {
-                // Regular normalization
-                if ($this->normalizer !== null) {
+                // Regular normalization — skip the normalizer chain for raw PHP arrays
+                // (they are already plain data, not FHIR objects)
+                if (is_array($item)) {
+                    $normalizedItem = $item;
+                } elseif ($this->normalizer !== null) {
                     $normalizedItem = $this->normalizer->normalize($item, $fhirContext->format, $context);
                 } else {
-                    $normalizedItem = $this->normalizeBasicValue($item, $fhirContext, $context);
+                    $normalizedItem = $this->normalizeBasicValue($item, $fhirContext->format, $context);
                 }
 
                 if ($normalizedItem !== null && !$this->shouldOmitValue($normalizedItem, $fhirContext)) {
@@ -427,7 +293,7 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
     }
 
     /**
-     * Handle unknown properties according to the configured policy
+     * Handle unknown properties according to the configured policy.
      */
     private function handleUnknownProperty(string $propertyName, mixed $value, string $policy, object $object, ?string $elementPath = null): void
     {
@@ -451,7 +317,7 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
     }
 
     /**
-     * Normalize resource for JSON format
+     * Normalize resource for JSON format.
      *
      * @param array<string, mixed> $context
      *
@@ -467,12 +333,18 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
         // Normalize all properties of the object
         $reflection = new \ReflectionClass($object);
         $properties = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
+        $metaMap    = $this->getPropertyMetadataMap($object);
 
         foreach ($properties as $property) {
             $propertyName = $property->getName();
 
             // Skip resourceType as we already handled it
             if ($propertyName === 'resourceType') {
+                continue;
+            }
+
+            // Skip uninitialized typed properties (created via newInstanceWithoutConstructor)
+            if (!$property->isInitialized($object)) {
                 continue;
             }
 
@@ -483,22 +355,52 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
                 continue;
             }
 
+            $meta    = array_key_exists($propertyName, $metaMap) ? $metaMap[$propertyName] : null;
+            $jsonKey = $meta !== null ? ($meta->jsonKey ?? $propertyName) : $propertyName;
+
+            // Resolve choice element to correct concrete JSON key
+            if ($meta !== null && $meta->isChoice && !empty($meta->variants)) {
+                [$resolvedKind, $resolvedKey] = $this->resolveChoiceVariant($value, $meta->variants);
+                if ($resolvedKey !== '') {
+                    $jsonKey = $resolvedKey;
+                    if ($resolvedKind === 'primitive' && $this->isPrimitiveWithExtensions($value)) {
+                        $normalizedValue = $this->normalizePrimitiveWithExtensions($value, $fhirContext->format, $context, $fhirContext->includeExtensions);
+                        if ($normalizedValue !== null) {
+                            $data[$jsonKey] = $normalizedValue['value'];
+                            if (isset($normalizedValue['extensions']) && $fhirContext->includeExtensions) {
+                                $data['_' . $jsonKey] = $normalizedValue['extensions'];
+                            }
+                        }
+                    } else {
+                        if ($this->normalizer !== null) {
+                            $normalizedValue = $this->normalizer->normalize($value, $fhirContext->format, $context);
+                        } else {
+                            $normalizedValue = $this->normalizeBasicValue($value, $fhirContext->format, $context);
+                        }
+                        if ($normalizedValue !== null && !$this->shouldOmitValue($normalizedValue, $fhirContext)) {
+                            $data[$jsonKey] = $normalizedValue;
+                        }
+                    }
+                    continue;
+                }
+            }
+
             // Handle arrays with potential sparse extensions
             if (is_array($value)) {
-                $normalizedArray = $this->normalizeArrayWithExtensions($value, $propertyName, $fhirContext, $context);
+                $normalizedArray = $this->normalizeArrayWithExtensions($value, $jsonKey, $fhirContext, $context);
                 if ($normalizedArray !== null) {
-                    $data[$propertyName] = $normalizedArray['values'];
+                    $data[$jsonKey] = $normalizedArray['values'];
                     if (isset($normalizedArray['extensions']) && $fhirContext->includeExtensions) {
-                        $data['_' . $propertyName] = $normalizedArray['extensions'];
+                        $data['_' . $jsonKey] = $normalizedArray['extensions'];
                     }
                 }
-            } elseif ($this->isPrimitiveWithExtensions($value, $propertyName)) {
+            } elseif ($this->isPrimitiveWithExtensions($value)) {
                 // Handle extensions with underscore notation for primitives
-                $normalizedValue = $this->normalizePrimitiveWithExtensions($value, $fhirContext, $context);
+                $normalizedValue = $this->normalizePrimitiveWithExtensions($value, $fhirContext->format, $context, $fhirContext->includeExtensions);
                 if ($normalizedValue !== null) {
-                    $data[$propertyName] = $normalizedValue['value'];
+                    $data[$jsonKey] = $normalizedValue['value'];
                     if (isset($normalizedValue['extensions']) && $fhirContext->includeExtensions) {
-                        $data['_' . $propertyName] = $normalizedValue['extensions'];
+                        $data['_' . $jsonKey] = $normalizedValue['extensions'];
                     }
                 }
             } else {
@@ -506,11 +408,11 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
                 if ($this->normalizer !== null) {
                     $normalizedValue = $this->normalizer->normalize($value, $fhirContext->format, $context);
                 } else {
-                    $normalizedValue = $this->normalizeBasicValue($value, $fhirContext, $context);
+                    $normalizedValue = $this->normalizeBasicValue($value, $fhirContext->format, $context);
                 }
 
                 if ($normalizedValue !== null && !$this->shouldOmitValue($normalizedValue, $fhirContext)) {
-                    $data[$propertyName] = $normalizedValue;
+                    $data[$jsonKey] = $normalizedValue;
                 }
             }
         }
@@ -519,7 +421,7 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
     }
 
     /**
-     * Normalize resource for XML format
+     * Normalize resource for XML format.
      *
      * @param array<string, mixed> $context
      *
@@ -540,12 +442,18 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
         // Normalize all properties of the object
         $reflection = new \ReflectionClass($object);
         $properties = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
+        $metaMap    = $this->getPropertyMetadataMap($object);
 
         foreach ($properties as $property) {
             $propertyName = $property->getName();
 
             // Skip resourceType as it's handled as element name
             if ($propertyName === 'resourceType') {
+                continue;
+            }
+
+            // Skip uninitialized typed properties (created via newInstanceWithoutConstructor)
+            if (!$property->isInitialized($object)) {
                 continue;
             }
 
@@ -556,28 +464,55 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
                 continue;
             }
 
+            $meta    = array_key_exists($propertyName, $metaMap) ? $metaMap[$propertyName] : null;
+            $xmlKey  = $meta !== null ? ($meta->jsonKey ?? $propertyName) : $propertyName;
+
+            // Resolve choice element to correct concrete XML element name
+            if ($meta !== null && $meta->isChoice && !empty($meta->variants)) {
+                [$resolvedKind, $resolvedKey] = $this->resolveChoiceVariant($value, $meta->variants);
+                if ($resolvedKey !== '') {
+                    $xmlKey = $resolvedKey;
+                    if ($resolvedKind === 'primitive' && $this->isPrimitiveWithExtensions($value)) {
+                        $normalizedValue = $this->normalizePrimitiveWithExtensions($value, $fhirContext->format, $context, $fhirContext->includeExtensions);
+                        if ($normalizedValue !== null) {
+                            $data[$xmlKey] = $normalizedValue;
+                        }
+                    } else {
+                        if ($this->normalizer !== null) {
+                            $normalizedValue = $this->normalizer->normalize($value, $fhirContext->format, $context);
+                        } else {
+                            $normalizedValue = $this->normalizeBasicValue($value, $fhirContext->format, $context);
+                        }
+                        if ($normalizedValue !== null && !$this->shouldOmitValue($normalizedValue, $fhirContext)) {
+                            $data[$xmlKey] = $normalizedValue;
+                        }
+                    }
+                    continue;
+                }
+            }
+
             // Handle arrays
             if (is_array($value)) {
-                $normalizedArray = $this->normalizeArrayForXML($value, $propertyName, $fhirContext, $context);
+                $normalizedArray = $this->normalizeArrayForXML($value, $xmlKey, $fhirContext, $context);
                 if ($normalizedArray !== null) {
-                    $data[$propertyName] = $normalizedArray;
+                    $data[$xmlKey] = $normalizedArray;
                 }
-            } elseif ($this->isPrimitiveWithExtensions($value, $propertyName)) {
+            } elseif ($this->isPrimitiveWithExtensions($value)) {
                 // Handle primitive extensions for XML (as attributes and child elements)
-                $normalizedValue = $this->normalizePrimitiveWithExtensions($value, $fhirContext, $context);
+                $normalizedValue = $this->normalizePrimitiveWithExtensions($value, $fhirContext->format, $context, $fhirContext->includeExtensions);
                 if ($normalizedValue !== null) {
-                    $data[$propertyName] = $normalizedValue;
+                    $data[$xmlKey] = $normalizedValue;
                 }
             } else {
                 // Use the injected normalizer if available, otherwise handle basic types
                 if ($this->normalizer !== null) {
                     $normalizedValue = $this->normalizer->normalize($value, $fhirContext->format, $context);
                 } else {
-                    $normalizedValue = $this->normalizeBasicValue($value, $fhirContext, $context);
+                    $normalizedValue = $this->normalizeBasicValue($value, $fhirContext->format, $context);
                 }
 
                 if ($normalizedValue !== null && !$this->shouldOmitValue($normalizedValue, $fhirContext)) {
-                    $data[$propertyName] = $normalizedValue;
+                    $data[$xmlKey] = $normalizedValue;
                 }
             }
         }
@@ -586,7 +521,7 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
     }
 
     /**
-     * Normalize array for XML format
+     * Normalize array for XML format.
      *
      * @param array<mixed>         $array
      * @param array<string, mixed> $context
@@ -609,7 +544,7 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
             if ($this->normalizer !== null) {
                 $normalizedItem = $this->normalizer->normalize($item, $fhirContext->format, $context);
             } else {
-                $normalizedItem = $this->normalizeBasicValue($item, $fhirContext, $context);
+                $normalizedItem = $this->normalizeBasicValue($item, $fhirContext->format, $context);
             }
 
             if ($normalizedItem !== null) {
@@ -621,7 +556,7 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
     }
 
     /**
-     * Denormalize from JSON format
+     * Denormalize from JSON format.
      *
      * @param array<string, mixed> $data
      * @param array<string, mixed> $context
@@ -684,29 +619,16 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
                 }
 
                 if ($reflection->hasProperty($propertyName)) {
-                    $property = $reflection->getProperty($propertyName);
+                    $property     = $reflection->getProperty($propertyName);
+                    $propertyType = $this->getPropertyType($property);
 
-                    // Handle primitive extensions
-                    $extensionKey = '_' . $propertyName;
-                    if (isset($data[$extensionKey])) {
-                        $denormalizedValue = $this->denormalizePrimitiveWithExtensions(
-                            $value,
-                            $data[$extensionKey],
-                            $fhirContext,
-                            $context,
-                        );
+                    // Always use the denormalizer to create properly-typed instances.
+                    // The _property extension data is noted but extensions are not yet
+                    // set on the resulting instance (future work).
+                    if ($this->denormalizer !== null && $propertyType !== null && !$this->isBuiltinType($propertyType)) {
+                        $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, 'json', $context);
                     } else {
-                        // Use the injected denormalizer if available
-                        if ($this->denormalizer !== null) {
-                            $propertyType = $this->getPropertyType($property);
-                            if ($propertyType !== null) {
-                                $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, 'json', $context);
-                            } else {
-                                $denormalizedValue = $value;
-                            }
-                        } else {
-                            $denormalizedValue = $this->denormalizeBasicValue($value, $fhirContext, $context);
-                        }
+                        $denormalizedValue = $value;
                     }
 
                     $property->setValue($object, $denormalizedValue);
@@ -723,42 +645,17 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
     }
 
     /**
-     * Denormalize from XML format
+     * Denormalize from XML format.
      *
      * @param array<string, mixed> $data
      * @param array<string, mixed> $context
      */
     private function denormalizeFromXML(array $data, string $type, FHIRSerializationContext $fhirContext, array $context): mixed
     {
-        // Extract resourceType from XML data (could be in @resourceType or element name)
-        $resourceType = $data['@resourceType'] ?? $context['xml_element_name'] ?? null;
-
-        if ($resourceType === null) {
-            throw new NotNormalizableValueException('Missing required resourceType in XML data');
-        }
-
-        if (!is_string($resourceType)) {
-            throw new NotNormalizableValueException('resourceType must be a string');
-        }
-
-        if (empty($resourceType)) {
-            throw new NotNormalizableValueException('resourceType cannot be empty');
-        }
-
-        // Create data array for type resolver
-        $resolverData = ['resourceType' => $resourceType];
-
-        // Use type resolver to get the correct class for the resourceType
-        $resolvedType = $this->typeResolver->resolveResourceType($resolverData);
-        if ($resolvedType === null) {
-            // Fall back to the provided type if resolver can't determine the type
-            $resolvedType = $type;
-        }
-
-        // Validate that the resolved type matches the expected type
-        if ($resolvedType !== $type && !is_subclass_of($resolvedType, $type)) {
-            throw new NotNormalizableValueException(sprintf('Resolved type "%s" is not compatible with expected type "%s"', $resolvedType, $type));
-        }
+        // For XML, the $type parameter is already the correct resolved resource class
+        // (resolved from the XML root element name by FHIRSerializationService before we are called).
+        // We do NOT look for a 'resourceType' key in the data array — it is not present in FHIR XML.
+        $resolvedType = $type;
 
         try {
             /** @var class-string $resolvedType */
@@ -770,24 +667,21 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
 
             // Set properties from the data
             foreach ($data as $propertyName => $value) {
-                // Skip XML-specific properties
-                if (str_starts_with($propertyName, '@')) {
+                // Skip XML-specific keys: attributes (@xmlns), text nodes (#), comments (#comment)
+                if (str_starts_with($propertyName, '@') || str_starts_with($propertyName, '#')) {
                     continue;
                 }
 
                 if ($reflection->hasProperty($propertyName)) {
-                    $property = $reflection->getProperty($propertyName);
+                    $property     = $reflection->getProperty($propertyName);
+                    $propertyType = $this->getPropertyType($property);
 
-                    // Use the injected denormalizer if available
-                    if ($this->denormalizer !== null) {
-                        $propertyType = $this->getPropertyType($property);
-                        if ($propertyType !== null) {
-                            $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, 'xml', $context);
-                        } else {
-                            $denormalizedValue = $value;
-                        }
+                    if ($this->denormalizer !== null && $propertyType !== null && !$this->isBuiltinType($propertyType)) {
+                        $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, 'xml', $context);
                     } else {
-                        $denormalizedValue = $this->denormalizeBasicValue($value, $fhirContext, $context);
+                        // For built-in PHP types, unwrap the FHIR XML @value wrapper if present.
+                        // Symfony XmlEncoder decodes <id value="example"/> as ['@value' => 'example'].
+                        $denormalizedValue = $this->unwrapXmlValue($value, $propertyType);
                     }
 
                     $property->setValue($object, $denormalizedValue);
@@ -801,18 +695,5 @@ class FHIRResourceNormalizer implements FHIRNormalizerInterface
         } catch (\ReflectionException $e) {
             throw new NotNormalizableValueException(sprintf('Cannot create instance of class "%s": %s', $resolvedType, $e->getMessage()), 0, $e);
         }
-    }
-
-    /**
-     * Get the type of a property from its type hint
-     */
-    private function getPropertyType(\ReflectionProperty $property): ?string
-    {
-        $type = $property->getType();
-        if ($type instanceof \ReflectionNamedType) {
-            return $type->getName();
-        }
-
-        return null;
     }
 }

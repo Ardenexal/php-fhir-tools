@@ -6,9 +6,9 @@ namespace Ardenexal\FHIRTools\Tests\Unit\Bundle\FHIRBundle;
 
 use Ardenexal\FHIRTools\Bundle\FHIRBundle\FHIRBundle;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Serialization\Validator\FHIRValidator;
 use Ardenexal\FHIRTools\FHIRModelGenerator;
-use Ardenexal\FHIRTools\Serialization\FHIRSerializationService;
-use Ardenexal\FHIRTools\Serialization\FHIRValidator;
 use Eris\Generator;
 use Eris\TestTrait;
 use PHPUnit\Framework\TestCase;
@@ -72,8 +72,8 @@ class FHIRBundleServiceRegistrationTest extends TestCase
             $essentialServices = [
                 'Ardenexal\FHIRTools\FHIRModelGenerator',
                 'Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader',
-                'Ardenexal\FHIRTools\Serialization\FHIRSerializationService',
-                'Ardenexal\FHIRTools\Serialization\FHIRValidator',
+                'Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService',
+                'Ardenexal\FHIRTools\Component\Serialization\Validator\FHIRValidator',
                 'Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector',
                 'Ardenexal\FHIRTools\Component\CodeGeneration\Package\RetryHandler',
             ];

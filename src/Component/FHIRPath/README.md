@@ -126,6 +126,31 @@ php bin/console fhir:path:validate "name.where(use = 'official').given.first()"
 
 - **PHP**: 8.3 or higher
 
+## Testing
+
+This component includes comprehensive test coverage:
+
+### Unit Tests
+```bash
+composer test:fhir-path
+```
+
+### Specification Conformance Tests
+
+The component includes official FHIR FHIRPath specification conformance tests that validate compliance against the FHIR specification test cases:
+
+```bash
+# Run FHIRPath specification tests
+composer test-fhirpath-spec
+```
+
+**Note**: These tests are currently in development as the FHIRPath evaluator implementation is being completed. The tests automatically load test cases from the official `fhir/fhir-test-cases` package and track implementation progress.
+
+The specification tests are maintained in a separate test suite to:
+- Allow focused development on specific FHIRPath features
+- Track progress toward full specification compliance  
+- Prevent blocking other integration tests during development
+
 ## License
 
 This component is released under the MIT License. See the [LICENSE](../../../LICENSE) file for details.

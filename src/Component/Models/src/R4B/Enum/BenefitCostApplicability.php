@@ -1,0 +1,15 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
+
+/**
+ * ValueSet: BenefitCostApplicability
+ * URL: http://hl7.org/fhir/ValueSet/insuranceplan-applicability
+ * Version: 4.3.0
+ * Description: Whether the cost applies to in-network or out-of-network providers.
+ */
+enum BenefitCostApplicability
+{
+}

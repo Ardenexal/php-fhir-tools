@@ -43,7 +43,7 @@ class SelectFunction extends AbstractFunction
                 ->withCurrentNode($item)
                 ->withIterationVariables($item, $index, $input->count());
 
-            $result = $evaluator->evaluate($projection, $itemContext);
+            $result = $evaluator->evaluateWithContext($projection, $itemContext);
             foreach ($result as $value) {
                 $results[] = $value;
             }

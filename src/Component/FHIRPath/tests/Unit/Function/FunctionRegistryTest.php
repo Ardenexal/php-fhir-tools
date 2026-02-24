@@ -26,6 +26,13 @@ final class FunctionRegistryTest extends TestCase
         $this->registry->clear();
     }
 
+    protected function tearDown(): void
+    {
+        // Reset the singleton so a fresh registry (with all built-ins) is
+        // constructed for subsequent test suites running in the same process.
+        FunctionRegistry::reset();
+    }
+
     public function testGetInstanceReturnsSameInstance(): void
     {
         $instance1 = FunctionRegistry::getInstance();

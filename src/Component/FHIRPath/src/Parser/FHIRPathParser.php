@@ -25,11 +25,14 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Expression\UnaryOperatorNode;
  * member access, and all FHIRPath constructs.
  *
  * Grammar (from FHIRPath spec):
- * - expression: term (('|') term)*
- * - term: factor (('and' | 'or' | 'xor' | 'implies') factor)*
- * - factor: invocation (('*' | '/' | 'div' | 'mod') invocation)*
- * - invocation: primary (typeExpression | invocationExpression)*
- * - primary: literal | externalConstant | '(' expression ')' | '{' '}' | function
+ * - expression:      term (('|') term)*
+ * - term:            comparison (('and' | 'or' | 'xor' | 'implies') comparison)*
+ * - comparison:      additive (('=' | '!=' | '~' | '!~' | '>' | '<' | '>=' | '<=' | 'in' | 'contains') additive)*
+ * - additive:        multiplicative (('+' | '-' | '&') multiplicative)*
+ * - multiplicative:  unary (('*' | '/' | 'div' | 'mod') unary)*
+ * - unary:           invocation | ('-' | '+') unary
+ * - invocation:      primary (typeExpression | '.' primary | '[' expression ']')*
+ * - primary:         literal | externalConstant | '(' expression ')' | '{' '}' | function | identifier
  *
  * @author FHIR Tools Contributors
  */
@@ -89,15 +92,15 @@ class FHIRPathParser
 
     /**
      * Parse a term (logical operators).
-     * term: factor (('and' | 'or' | 'xor' | 'implies') factor)*
+     * term: comparison (('and' | 'or' | 'xor' | 'implies') comparison)*
      */
     private function parseTerm(): ExpressionNode
     {
-        $left = $this->parseFactor();
+        $left = $this->parseComparison();
 
         while ($this->match(TokenType::AND, TokenType::OR, TokenType::XOR, TokenType::IMPLIES)) {
             $operator = $this->previous();
-            $right    = $this->parseFactor();
+            $right    = $this->parseComparison();
             $left     = new BinaryOperatorNode(
                 $left,
                 $operator->type,
@@ -111,14 +114,13 @@ class FHIRPathParser
     }
 
     /**
-     * Parse a factor (multiplicative operators and comparisons).
-     * This combines multiple precedence levels for simplicity.
+     * Parse a comparison expression.
+     * comparison: additive (('=' | '!=' | '~' | '!~' | '>' | '<' | '>=' | '<=' | 'in' | 'contains') additive)*
      */
-    private function parseFactor(): ExpressionNode
+    private function parseComparison(): ExpressionNode
     {
-        $left = $this->parseUnary();
+        $left = $this->parseAdditive();
 
-        // Handle comparison operators
         while ($this->match(
             TokenType::EQUALS,
             TokenType::NOT_EQUALS,
@@ -132,7 +134,7 @@ class FHIRPathParser
             TokenType::CONTAINS,
         )) {
             $operator = $this->previous();
-            $right    = $this->parseUnary();
+            $right    = $this->parseAdditive();
             $left     = new BinaryOperatorNode(
                 $left,
                 $operator->type,
@@ -142,21 +144,41 @@ class FHIRPathParser
             );
         }
 
-        // Handle multiplicative operators
-        while ($this->match(TokenType::MULTIPLY, TokenType::DIVIDE, TokenType::DIV, TokenType::MOD)) {
-            $operator = $this->previous();
-            $right    = $this->parseUnary();
-            $left     = new BinaryOperatorNode(
-                $left,
-                $operator->type,
-                $right,
-                $operator->line,
-                $operator->column,
-            );
-        }
+        return $left;
+    }
 
-        // Handle additive operators
+    /**
+     * Parse an additive expression.
+     * additive: multiplicative (('+' | '-' | '&') multiplicative)*
+     */
+    private function parseAdditive(): ExpressionNode
+    {
+        $left = $this->parseMultiplicative();
+
         while ($this->match(TokenType::PLUS, TokenType::MINUS, TokenType::AMPERSAND)) {
+            $operator = $this->previous();
+            $right    = $this->parseMultiplicative();
+            $left     = new BinaryOperatorNode(
+                $left,
+                $operator->type,
+                $right,
+                $operator->line,
+                $operator->column,
+            );
+        }
+
+        return $left;
+    }
+
+    /**
+     * Parse a multiplicative expression.
+     * multiplicative: unary (('*' | '/' | 'div' | 'mod') unary)*
+     */
+    private function parseMultiplicative(): ExpressionNode
+    {
+        $left = $this->parseUnary();
+
+        while ($this->match(TokenType::MULTIPLY, TokenType::DIVIDE, TokenType::DIV, TokenType::MOD)) {
             $operator = $this->previous();
             $right    = $this->parseUnary();
             $left     = new BinaryOperatorNode(
@@ -203,11 +225,11 @@ class FHIRPathParser
             // Handle type expressions (is, as)
             if ($this->match(TokenType::IS, TokenType::AS)) {
                 $operator   = $this->previous();
-                $typeName   = $this->consume(TokenType::IDENTIFIER, 'type name');
+                $typeName   = $this->parseTypeName();
                 $expression = new TypeExpressionNode(
                     $expression,
                     $operator->type,
-                    $typeName->value,
+                    $typeName,
                     $operator->line,
                     $operator->column,
                 );
@@ -216,7 +238,29 @@ class FHIRPathParser
 
             // Handle member access
             if ($this->match(TokenType::DOT)) {
-                $dot        = $this->previous();
+                $dot = $this->previous();
+
+                // Handle .is(Type) and .as(Type) — function-call form of type expressions.
+                // FHIRPath spec: resource.is(Patient) ≡ resource is Patient
+                // Type specifier may be qualified: .is(System.Boolean), .as(FHIR.Patient)
+                if (
+                    ($this->check(TokenType::IS) || $this->check(TokenType::AS))
+                    && $this->checkNext(TokenType::LPAREN)
+                ) {
+                    $keyword  = $this->advance(); // consume IS/AS keyword
+                    $this->advance();             // consume LPAREN
+                    $typeName = $this->parseTypeName();
+                    $this->consume(TokenType::RPAREN, ')');
+                    $expression = new TypeExpressionNode(
+                        $expression,
+                        $keyword->type,
+                        $typeName,
+                        $keyword->line,
+                        $keyword->column,
+                    );
+                    continue;
+                }
+
                 $member     = $this->parsePrimary();
                 $expression = new MemberAccessNode(
                     $expression,
@@ -338,6 +382,29 @@ class FHIRPathParser
     }
 
     /**
+     * Parse a type specifier, which may be a simple identifier or a qualified
+     * name of the form Namespace.TypeName (e.g. System.Boolean, FHIR.Patient).
+     *
+     * Consumes one or two IDENTIFIER tokens (with an optional DOT in between)
+     * and returns the combined name as a string.
+     */
+    private function parseTypeName(): string
+    {
+        $first  = $this->consume(TokenType::IDENTIFIER, 'type name');
+        $result = $first->value;
+
+        // Check for a qualified name: Identifier DOT Identifier
+        // (e.g. System.Boolean, FHIR.Patient)
+        if ($this->check(TokenType::DOT) && $this->checkNext(TokenType::IDENTIFIER)) {
+            $this->advance(); // consume DOT
+            $second = $this->consume(TokenType::IDENTIFIER, 'type name');
+            $result .= '.' . $second->value;
+        }
+
+        return $result;
+    }
+
+    /**
      * Parse a number value.
      */
     private function parseNumber(string $value): int|float
@@ -375,6 +442,20 @@ class FHIRPathParser
         }
 
         return $this->peek()->type === $type;
+    }
+
+    /**
+     * Check if the next token (one ahead of current) is of the given type.
+     */
+    private function checkNext(TokenType $type): bool
+    {
+        $next = $this->current + 1;
+
+        if ($next >= count($this->tokens)) {
+            return false;
+        }
+
+        return $this->tokens[$next]->type === $type;
     }
 
     /**

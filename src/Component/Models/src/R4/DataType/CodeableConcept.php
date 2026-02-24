@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 
 /**
@@ -17,14 +18,57 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 #[FHIRComplexType(typeName: 'CodeableConcept', fhirVersion: 'R4')]
 class CodeableConcept extends Element
 {
+    public const FHIR_PROPERTY_MAP = [
+        'id' => [
+            'fhirType'     => 'http://hl7.org/fhirpath/System.String',
+            'propertyKind' => 'scalar',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'extension' => [
+            'fhirType'     => 'Extension',
+            'propertyKind' => 'extension',
+            'isArray'      => true,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'coding' => [
+            'fhirType'     => 'Coding',
+            'propertyKind' => 'complex',
+            'isArray'      => true,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'text' => [
+            'fhirType'     => 'string',
+            'propertyKind' => 'primitive',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+    ];
+
     public function __construct(
         /** @var string|null id Unique id for inter-element referencing */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
         public ?string $id = null,
         /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Coding> coding Code defined by a terminology system */
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isArray: true)]
         public array $coding = [],
         /** @var StringPrimitive|string|null text Plain text representation of the concept */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $text = null,
     ) {
         parent::__construct($id, $extension);
