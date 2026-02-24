@@ -225,11 +225,11 @@ class FHIRPathParser
             // Handle type expressions (is, as)
             if ($this->match(TokenType::IS, TokenType::AS)) {
                 $operator   = $this->previous();
-                $typeName   = $this->consume(TokenType::IDENTIFIER, 'type name');
+                $typeName   = $this->parseTypeName();
                 $expression = new TypeExpressionNode(
                     $expression,
                     $operator->type,
-                    $typeName->value,
+                    $typeName,
                     $operator->line,
                     $operator->column,
                 );
@@ -242,18 +242,19 @@ class FHIRPathParser
 
                 // Handle .is(Type) and .as(Type) — function-call form of type expressions.
                 // FHIRPath spec: resource.is(Patient) ≡ resource is Patient
+                // Type specifier may be qualified: .is(System.Boolean), .as(FHIR.Patient)
                 if (
                     ($this->check(TokenType::IS) || $this->check(TokenType::AS))
                     && $this->checkNext(TokenType::LPAREN)
                 ) {
                     $keyword  = $this->advance(); // consume IS/AS keyword
                     $this->advance();             // consume LPAREN
-                    $typeName = $this->consume(TokenType::IDENTIFIER, 'type name');
+                    $typeName = $this->parseTypeName();
                     $this->consume(TokenType::RPAREN, ')');
                     $expression = new TypeExpressionNode(
                         $expression,
                         $keyword->type,
-                        $typeName->value,
+                        $typeName,
                         $keyword->line,
                         $keyword->column,
                     );
@@ -378,6 +379,29 @@ class FHIRPathParser
         }
 
         throw SyntaxException::unexpectedToken('expression', $this->peek()->toString(), $this->peek()->line, $this->peek()->column);
+    }
+
+    /**
+     * Parse a type specifier, which may be a simple identifier or a qualified
+     * name of the form Namespace.TypeName (e.g. System.Boolean, FHIR.Patient).
+     *
+     * Consumes one or two IDENTIFIER tokens (with an optional DOT in between)
+     * and returns the combined name as a string.
+     */
+    private function parseTypeName(): string
+    {
+        $first  = $this->consume(TokenType::IDENTIFIER, 'type name');
+        $result = $first->value;
+
+        // Check for a qualified name: Identifier DOT Identifier
+        // (e.g. System.Boolean, FHIR.Patient)
+        if ($this->check(TokenType::DOT) && $this->checkNext(TokenType::IDENTIFIER)) {
+            $this->advance(); // consume DOT
+            $second = $this->consume(TokenType::IDENTIFIER, 'type name');
+            $result .= '.' . $second->value;
+        }
+
+        return $result;
     }
 
     /**

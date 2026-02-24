@@ -79,6 +79,16 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     }
 
     /**
+     * Return the type resolver used by this evaluator.
+     * Exposed so that functions (e.g. ofType) can reuse the same resolver
+     * instance rather than creating their own.
+     */
+    public function getTypeResolver(): FHIRTypeResolver
+    {
+        return $this->typeResolver;
+    }
+
+    /**
      * Evaluate an expression against a resource
      *
      * @param ExpressionNode         $expression The parsed expression (AST)
@@ -346,8 +356,9 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     {
         // Evaluate the expression to get the collection to check/cast
         $collection = $node->getExpression()->accept($this);
-        $typeName   = $node->getTypeName();
-        $operator   = $node->getOperator();
+        // Normalise namespace-qualified type names: System.Boolean → boolean, FHIR.Patient → Patient
+        $typeName = $this->typeResolver->normalizeTypeName($node->getTypeName());
+        $operator = $node->getOperator();
 
         // Handle 'is' operator — FHIRPath spec: returns a single boolean, not a filtered collection.
         // Empty input → empty; single item → bool result; multi-item → error.

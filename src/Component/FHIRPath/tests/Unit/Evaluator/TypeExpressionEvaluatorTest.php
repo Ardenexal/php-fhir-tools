@@ -261,4 +261,130 @@ final class TypeExpressionEvaluatorTest extends TestCase
         self::assertSame(1, $result->count());
         self::assertTrue($result->first());
     }
+
+    // -------------------------------------------------------------------------
+    // System.* namespace support (task #27)
+    // -------------------------------------------------------------------------
+
+    public function testIsOperatorWithSystemBooleanNamespace(): void
+    {
+        self::assertTrue($this->evaluate('true is System.Boolean', null)->first());
+        self::assertFalse($this->evaluate('42 is System.Boolean', null)->first());
+    }
+
+    public function testIsOperatorWithSystemIntegerNamespace(): void
+    {
+        self::assertTrue($this->evaluate('42 is System.Integer', null)->first());
+        self::assertFalse($this->evaluate("'hello' is System.Integer", null)->first());
+    }
+
+    public function testIsOperatorWithSystemDecimalNamespace(): void
+    {
+        $resource = ['n' => 3.14];
+        self::assertTrue($this->evaluate('n is System.Decimal', $resource)->first());
+        self::assertFalse($this->evaluate("'x' is System.Decimal", null)->first());
+    }
+
+    public function testIsOperatorWithSystemStringNamespace(): void
+    {
+        self::assertTrue($this->evaluate("'hello' is System.String", null)->first());
+        self::assertFalse($this->evaluate('42 is System.String', null)->first());
+    }
+
+    public function testIsOperatorWithSystemDateNamespace(): void
+    {
+        // System.Date is a string type at runtime
+        $resource = ['d' => '2020-06-15'];
+        self::assertTrue($this->evaluate('d is System.Date', $resource)->first());
+    }
+
+    public function testIsOperatorWithSystemDateTimeNamespace(): void
+    {
+        $resource = ['d' => '2020-06-15T10:00:00'];
+        self::assertTrue($this->evaluate('d is System.DateTime', $resource)->first());
+    }
+
+    public function testIsOperatorWithSystemTimeNamespace(): void
+    {
+        $resource = ['t' => 'T14:30:00'];
+        self::assertTrue($this->evaluate('t is System.Time', $resource)->first());
+    }
+
+    public function testFunctionCallFormWithSystemNamespace(): void
+    {
+        // .is(System.Boolean) function-call form
+        self::assertTrue($this->evaluate('true.is(System.Boolean)', null)->first());
+        self::assertFalse($this->evaluate('42.is(System.Boolean)', null)->first());
+    }
+
+    public function testAsOperatorWithSystemNamespace(): void
+    {
+        // 42 as System.String → '42'
+        $result = $this->evaluate('42 as System.String', null);
+        self::assertSame('42', $result->first());
+    }
+
+    // -------------------------------------------------------------------------
+    // FHIR.* namespace support (task #28)
+    // -------------------------------------------------------------------------
+
+    public function testIsOperatorWithFHIRStringNamespace(): void
+    {
+        self::assertTrue($this->evaluate("'hello' is FHIR.string", null)->first());
+        self::assertFalse($this->evaluate('42 is FHIR.string', null)->first());
+    }
+
+    public function testIsOperatorWithFHIRBooleanNamespace(): void
+    {
+        self::assertTrue($this->evaluate('true is FHIR.boolean', null)->first());
+        self::assertFalse($this->evaluate("'hi' is FHIR.boolean", null)->first());
+    }
+
+    public function testIsOperatorWithFHIRIntegerNamespace(): void
+    {
+        self::assertTrue($this->evaluate('42 is FHIR.integer', null)->first());
+    }
+
+    public function testIsOperatorWithFHIRDecimalNamespace(): void
+    {
+        $resource = ['n' => 1.5];
+        self::assertTrue($this->evaluate('n is FHIR.decimal', $resource)->first());
+    }
+
+    public function testFunctionCallFormWithFHIRNamespace(): void
+    {
+        self::assertTrue($this->evaluate("'world'.is(FHIR.string)", null)->first());
+    }
+
+    public function testAsOperatorWithFHIRNamespace(): void
+    {
+        // 42 as FHIR.string → '42'
+        $result = $this->evaluate('42 as FHIR.string', null);
+        self::assertSame('42', $result->first());
+    }
+
+    // -------------------------------------------------------------------------
+    // ofType() with namespaced type specifiers
+    // -------------------------------------------------------------------------
+
+    public function testOfTypeWithSystemNamespace(): void
+    {
+        $resource = ['items' => [42, 'hello', true, 3.14]];
+        $result   = $this->evaluate('items.ofType(System.Integer)', $resource);
+        self::assertSame([42], $result->toArray());
+    }
+
+    public function testOfTypeWithFHIRNamespace(): void
+    {
+        $resource = ['items' => [42, 'hello', true]];
+        $result   = $this->evaluate('items.ofType(FHIR.string)', $resource);
+        self::assertSame(['hello'], $result->toArray());
+    }
+
+    public function testOfTypeWithSystemBoolean(): void
+    {
+        $resource = ['items' => [true, 42, 'hello', false]];
+        $result   = $this->evaluate('items.ofType(System.Boolean)', $resource);
+        self::assertSame([true, false], $result->toArray());
+    }
 }
