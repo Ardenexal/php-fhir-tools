@@ -37,29 +37,35 @@ final class ToDecimalFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        $value = $input->first();
+        $result = self::tryConvert($input->first());
 
+        return $result !== null ? Collection::single($result) : Collection::empty();
+    }
+
+    /**
+     * Attempt to convert a value to float.
+     *
+     * Returns null when the value cannot be converted (becomes empty {} in FHIRPath).
+     * Used by convertsToDecimal() to check convertibility without throwing.
+     */
+    public static function tryConvert(mixed $value): ?float
+    {
         if (is_float($value)) {
-            return Collection::single($value);
+            return $value;
         }
 
         if (is_int($value)) {
-            return Collection::single((float) $value);
+            return (float) $value;
         }
 
         if (is_bool($value)) {
-            return Collection::single($value ? 1.0 : 0.0);
+            return $value ? 1.0 : 0.0;
         }
 
-        if (is_string($value)) {
-            if (is_numeric($value)) {
-                return Collection::single((float) $value);
-            }
-
-            // Non-numeric string → empty (cannot convert)
-            return Collection::empty();
+        if (is_string($value) && is_numeric($value)) {
+            return (float) $value;
         }
 
-        return Collection::empty();
+        return null;
     }
 }

@@ -70,4 +70,60 @@ abstract class AbstractFunction implements FunctionInterface
             throw new EvaluationException(sprintf('Function %s() expects at least %d parameter(s), %d given', $this->name, $min, $count), 0, 0);
         }
     }
+
+    /**
+     * Return the direct child values of a node.
+     *
+     * Mirrors the same unwrapping rules as the evaluator's navigateProperty/wrapValue:
+     * - Associative array or object: each property value; list-valued properties are
+     *   flattened so each element becomes its own child (consistent with collection semantics).
+     * - List array: each element is a direct child.
+     * - Scalars / null: no children.
+     *
+     * Used by children() and descendants().
+     *
+     * @return array<int, mixed>
+     */
+    protected function getNodeChildren(mixed $node): array
+    {
+        if ($node === null || is_scalar($node)) {
+            return [];
+        }
+
+        /** @var array<int, mixed> $rawValues */
+        $rawValues = [];
+
+        if (is_array($node)) {
+            if (array_is_list($node)) {
+                // Each element of the list is a direct child
+                $rawValues = $node;
+            } else {
+                // Associative array — children are all property values
+                $rawValues = array_values($node);
+            }
+        } elseif (is_object($node)) {
+            // Public object properties (no CodeGeneration dependency needed)
+            $rawValues = array_values(get_object_vars($node));
+        }
+
+        $children = [];
+        foreach ($rawValues as $value) {
+            if ($value === null) {
+                continue;
+            }
+
+            if (is_array($value) && array_is_list($value)) {
+                // List-valued properties are unwrapped: each element is a child
+                foreach ($value as $item) {
+                    if ($item !== null) {
+                        $children[] = $item;
+                    }
+                }
+            } else {
+                $children[] = $value;
+            }
+        }
+
+        return $children;
+    }
 }

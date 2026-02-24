@@ -20,6 +20,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\TokenType;
 use Ardenexal\FHIRTools\Component\FHIRPath\Function\FunctionRegistry;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRTypeResolver;
+use Psr\Log\LoggerInterface;
 
 /**
  * FHIRPath expression evaluator
@@ -52,10 +53,29 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      */
     private array $primitiveCache = [];
 
+    private ?LoggerInterface $logger = null;
+
     public function __construct()
     {
         $this->context      = new EvaluationContext();
         $this->typeResolver = new FHIRTypeResolver();
+    }
+
+    /**
+     * Set a PSR-3 logger to receive trace() output.
+     * When set, trace() writes via debug(). Otherwise falls back to error_log().
+     */
+    public function setLogger(LoggerInterface $logger): void
+    {
+        $this->logger = $logger;
+    }
+
+    /**
+     * Return the configured logger, or null if none is set.
+     */
+    public function getLogger(): ?LoggerInterface
+    {
+        return $this->logger;
     }
 
     /**
@@ -77,6 +97,27 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         }
 
         return $expression->accept($this);
+    }
+
+    /**
+     * Evaluate an expression with a specific context, saving and restoring the current context.
+     *
+     * Used by functions that need per-item context evaluation (e.g. repeat(), select()).
+     * Follows the same save/restore pattern used internally by visitMemberAccess().
+     *
+     * @param ExpressionNode    $expression The expression to evaluate
+     * @param EvaluationContext $context    The context to use during evaluation
+     */
+    public function evaluateWithContext(ExpressionNode $expression, EvaluationContext $context): Collection
+    {
+        $savedContext  = $this->context;
+        $this->context = $context;
+
+        try {
+            return $expression->accept($this);
+        } finally {
+            $this->context = $savedContext;
+        }
     }
 
     /**
@@ -126,18 +167,35 @@ final class FHIRPathEvaluator implements ExpressionVisitor
 
     /**
      * Visit a member access node (dot notation)
+     *
+     * Function calls receive the full focus collection as their input (FHIRPath spec §5).
+     * Property navigation operates per-item (standard member-access semantics).
      */
     public function visitMemberAccess(MemberAccessNode $node): Collection
     {
         // Evaluate the object expression
         $objectResult = $node->getObject()->accept($this);
 
-        // If object result is empty, return empty (empty propagation)
+        // Function calls: pass the whole collection (even if empty) as the function's input.
+        // Each function is responsible for its own empty-input behaviour per the FHIRPath spec.
+        // e.g. isDistinct({}) → true, exists({}) → false, count({}) → 0, not({}) → {}
+        if ($node->getMember() instanceof FunctionCallNode) {
+            $oldContext    = $this->context;
+            $this->context = $this->context->withCollectionInput($objectResult);
+
+            try {
+                return $node->getMember()->accept($this);
+            } finally {
+                $this->context = $oldContext;
+            }
+        }
+
+        // Property navigation: empty input propagates as empty (cannot navigate a property of nothing)
         if ($objectResult->isEmpty()) {
             return Collection::empty();
         }
 
-        // Navigate each item in the collection and flatten results
+        // Property navigation: iterate per-item and flatten results
         $results = [];
         foreach ($objectResult as $item) {
             $oldContext    = $this->context;
@@ -157,9 +215,17 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      */
     public function visitFunctionCall(FunctionCallNode $node): Collection
     {
-        // Get the current collection (the input to the function)
-        $input           = $this->context->getCurrentNode();
-        $inputCollection = $input !== null ? $this->wrapValue($input) : Collection::empty();
+        // When called via visitMemberAccess on a function call, collectionInput holds the
+        // full focus collection. Consume it so it doesn't leak to nested evaluations.
+        $collectionInput = $this->context->getCollectionInput();
+        if ($collectionInput !== null) {
+            $inputCollection   = $collectionInput;
+            $this->context     = $this->context->withCollectionInput(null);
+        } else {
+            // Called directly (not via member access) — use the current node
+            $input           = $this->context->getCurrentNode();
+            $inputCollection = $input !== null ? $this->wrapValue($input) : Collection::empty();
+        }
 
         // Get the function from the registry
         $registry = FunctionRegistry::getInstance();

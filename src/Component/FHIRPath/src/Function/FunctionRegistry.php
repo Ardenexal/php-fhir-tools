@@ -43,6 +43,11 @@ final class FunctionRegistry
         $this->registerSafe(new AnyTrueFunction());
         $this->registerSafe(new AllFalseFunction());
         $this->registerSafe(new AnyFalseFunction());
+        $this->registerSafe(new SubsetOfFunction());
+        $this->registerSafe(new SupersetOfFunction());
+        $this->registerSafe(new IsDistinctFunction());
+        $this->registerSafe(new NotFunction());
+        $this->registerSafe(new RepeatFunction());
 
         // Filtering functions
         $this->registerSafe(new WhereFunction());
@@ -70,10 +75,12 @@ final class FunctionRegistry
         $this->registerSafe(new UpperFunction());
         $this->registerSafe(new LowerFunction());
         $this->registerSafe(new ReplaceFunction());
+        $this->registerSafe(new ReplaceMatchesFunction());
         $this->registerSafe(new MatchesFunction());
         $this->registerSafe(new MatchesFullFunction());
         $this->registerSafe(new TrimFunction());
         $this->registerSafe(new SplitFunction());
+        $this->registerSafe(new ToCharsFunction());
 
         // Math functions
         $this->registerSafe(new SumFunction());
@@ -102,12 +109,35 @@ final class FunctionRegistry
         $this->registerSafe(new OfTypeFunction());
         $this->registerSafe(new HasValueFunction());
 
+        // Tree navigation functions
+        $this->registerSafe(new ChildrenFunction());
+        $this->registerSafe(new DescendantsFunction());
+
+        // Utility functions
+        $this->registerSafe(new TraceFunction());
+        $this->registerSafe(new AggregateFunction());
+
         // Combining functions
         $this->registerSafe(new CombineFunction());
         $this->registerSafe(new IifFunction());
 
         // Type conversion functions
+        $this->registerSafe(new ToBooleanFunction());
+        $this->registerSafe(new ConvertsToBooleanFunction());
+        $this->registerSafe(new ToIntegerFunction());
+        $this->registerSafe(new ConvertsToIntegerFunction());
         $this->registerSafe(new ToDecimalFunction());
+        $this->registerSafe(new ConvertsToDecimalFunction());
+        $this->registerSafe(new ToDateFunction());
+        $this->registerSafe(new ConvertsToDateFunction());
+        $this->registerSafe(new ToDateTimeFunction());
+        $this->registerSafe(new ConvertsToDateTimeFunction());
+        $this->registerSafe(new ToTimeFunction());
+        $this->registerSafe(new ConvertsToTimeFunction());
+        $this->registerSafe(new ToQuantityFunction());
+        $this->registerSafe(new ConvertsToQuantityFunction());
+        $this->registerSafe(new ToStringFunction());
+        $this->registerSafe(new ConvertsToStringFunction());
 
         // Precision / boundary functions
         $this->registerSafe(new PrecisionFunction());

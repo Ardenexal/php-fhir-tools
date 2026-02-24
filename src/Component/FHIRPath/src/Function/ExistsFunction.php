@@ -41,7 +41,7 @@ final class ExistsFunction extends AbstractFunction
 
         foreach ($input as $item) {
             $itemContext = $context->withCurrentNode($item);
-            $result      = $criteriaExpr->accept($evaluator);
+            $result      = $evaluator->evaluateWithContext($criteriaExpr, $itemContext);
 
             if (!$result->isEmpty() && $result->first() === true) {
                 return Collection::single(true);
