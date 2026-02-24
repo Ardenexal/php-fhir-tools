@@ -89,6 +89,11 @@ final class HtmlChecksFunction extends AbstractFunction
      */
     private function validateXhtml(string $xhtml): bool
     {
+        // Empty string is not valid XHTML
+        if ($xhtml === '') {
+            return false;
+        }
+
         // Suppress libxml errors so parse failures are captured as a bool return
         $prevErrorSetting = libxml_use_internal_errors(true);
 

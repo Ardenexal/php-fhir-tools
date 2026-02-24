@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\FHIRPathEvaluator;
 use Ardenexal\FHIRTools\Component\FHIRPath\Function\FunctionRegistry;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\FHIRPathLexer;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\FHIRPathParser;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -92,12 +93,13 @@ final class HtmlChecksFunctionTest extends TestCase
     {
         $resource = [
             'text' => [
-                'status' => 'generated',
-                'div'    => self::VALID_DIV,
+                'status'     => 'generated',
+                'divContent' => self::VALID_DIV,  // Renamed to avoid 'div' keyword conflict
             ],
         ];
 
-        $result = $this->evaluate('text.div.htmlChecks()', $resource);
+        // Navigate to divContent property and call htmlChecks
+        $result = $this->evaluate('text.divContent.htmlChecks()', $resource);
 
         self::assertTrue($result->first());
     }
@@ -161,7 +163,7 @@ final class HtmlChecksFunctionTest extends TestCase
     // Forbidden elements → false
     // -------------------------------------------------------------------------
 
-    /** @dataProvider forbiddenElementProvider */
+    #[DataProvider('forbiddenElementProvider')]
     public function testForbiddenElementReturnsFalse(string $tag, string $content): void
     {
         $xhtml = sprintf(
