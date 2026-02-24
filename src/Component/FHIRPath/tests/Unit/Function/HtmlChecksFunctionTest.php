@@ -267,9 +267,10 @@ final class HtmlChecksFunctionTest extends TestCase
 
     public function testMultipleItemsInInputReturnsEmpty(): void
     {
-        // (a | b) produces a two-item collection
-        $resource = ['a' => self::VALID_DIV, 'b' => self::VALID_DIV];
-        $result   = $this->evaluate('(a | b).htmlChecks()', $resource);
+        // (a | b) produces a two-item collection when values are different
+        $VALID_DIV_2 = '<div xmlns="http://www.w3.org/1999/xhtml"><p>World</p></div>';
+        $resource    = ['a' => self::VALID_DIV, 'b' => $VALID_DIV_2];
+        $result      = $this->evaluate('(a | b).htmlChecks()', $resource);
 
         self::assertTrue($result->isEmpty());
     }

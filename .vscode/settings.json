@@ -116,6 +116,9 @@
     },
     "php.suggest.basic": false,
     "chat.tools.terminal.autoApprove": {
-        "composer": true
+        "composer": true,
+        "FHIRBundleServiceRegistrationTest": true,
+        "VersionRangeValidityTest": true,
+        "CodeGenerationTestCoverageTest": true
     }
 }

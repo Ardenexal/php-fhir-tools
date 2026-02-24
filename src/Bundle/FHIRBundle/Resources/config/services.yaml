@@ -123,5 +123,5 @@ services:
         public: true
 
     fhir.validator:
-        alias: 'Ardenexal\FHIRTools\Serialization\FHIRValidator'
+        alias: 'Ardenexal\FHIRTools\Component\Serialization\Validator\FHIRValidator'
         public: true

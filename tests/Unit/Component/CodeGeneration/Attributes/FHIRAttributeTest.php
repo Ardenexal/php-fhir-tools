@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Tests\Unit\Attributes;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRPrimitive;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
 use Ardenexal\FHIRTools\Tests\Utilities\FHIRTestDataGenerator;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
@@ -256,5 +257,45 @@ class FHIRAttributeTest extends TestCase
         self::assertSame('Patient', $backbone->parentResource);
         self::assertSame('Patient.contact', $backbone->elementPath);
         self::assertSame('R5', $backbone->fhirVersion);
+    }
+
+    /**
+     * **Feature: fhir-code-generation, FhirProperty attribute**
+     *
+     * Test that FhirProperty stores metadata correctly for generated classes
+     *
+     * **Validates: Requirements 8.1**
+     */
+    public function testFhirPropertyAttributeStoresMetadata(): void
+    {
+        // Test simple primitive
+        $simplePrimitive = new FhirProperty('string', 'primitive');
+        self::assertSame('string', $simplePrimitive->fhirType);
+        self::assertSame('primitive', $simplePrimitive->propertyKind);
+        self::assertFalse($simplePrimitive->isArray);
+        self::assertFalse($simplePrimitive->isRequired);
+
+        // Test array type
+        $arrayType = new FhirProperty('Reference', 'complex', isArray: true);
+        self::assertSame('Reference', $arrayType->fhirType);
+        self::assertTrue($arrayType->isArray);
+
+        // Test required element
+        $required = new FhirProperty('code', 'primitive', isRequired: true);
+        self::assertTrue($required->isRequired);
+
+        // Test choice type with variants
+        $choice = new FhirProperty(
+            'choice',
+            'choice',
+            isChoice: true,
+            variants: [
+                ['fhirType' => 'boolean', 'propertyKind' => 'primitive', 'phpType' => '?bool', 'jsonKey' => 'deceasedBoolean'],
+                ['fhirType' => 'dateTime', 'propertyKind' => 'primitive', 'phpType' => '?DateTimePrimitive', 'jsonKey' => 'deceasedDateTime'],
+            ],
+        );
+        self::assertTrue($choice->isChoice);
+        self::assertNotNull($choice->variants);
+        self::assertCount(2, $choice->variants);
     }
 }
