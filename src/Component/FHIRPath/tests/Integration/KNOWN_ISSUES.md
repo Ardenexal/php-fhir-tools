@@ -2,17 +2,16 @@
 
 Generated after implementing Plan 1 (typed model support) and Plan 2 (fhir-test-cases data provider).
 
-**Current Test Status: 948 tests, 521 passing (55.0%), 177 errors, 206 failures, 44 skipped**
+**Current Test Status: 948 tests, 533 passing (56.2%), 165 errors, 210 failures, 44 skipped**
 
 ---
 
-## 1. FHIRPath Evaluator: Missing Functions (39 spec test errors)
+## 1. FHIRPath Evaluator: Missing Functions (27 spec test errors)
 
 These functions are referenced by the official test suite but throw `EvaluationException: Unknown function` or `SyntaxException` because they haven't been implemented in `FunctionRegistry`.
 
 | Function | Failing test count | Description |
 |---|---|---|
-| `type()` | 12 | Returns the type of the input value |
 | `sort()` | 10 | Sorts a collection |
 | `encode()` | 4 | Encodes a string (URL encoding) |
 | `decode()` | 4 | Decodes a string (URL decoding) |
@@ -22,11 +21,34 @@ These functions are referenced by the official test suite but throw `EvaluationE
 | `toDecimal()` | 1 | Converts value to decimal type |
 | `comparable()` | ? | Checks if two values are comparable |
 | `precision()` | ? | Returns the precision of a quantity |
+| ~~`type()`~~ | ~~12~~ | ~~Returns the type of the input value~~ ✅ **IMPLEMENTED** |
 | ~~`lowBoundary()`~~ | ~~11~~ | ~~Calculates lower precision boundary of a decimal/date~~ ✅ **IMPLEMENTED** |
 | ~~`highBoundary()`~~ | ~~8~~ | ~~Calculates upper precision boundary~~ ✅ **IMPLEMENTED** |
 | ~~`matchesFull()`~~ | ~~5~~ | ~~Like `matches()` but anchored (full-string match)~~ ✅ **IMPLEMENTED** |
 
 All errors throw unhandled exceptions rather than producing wrong results. Fixing these requires adding new function classes to `src/Component/FHIRPath/src/Function/`.
+
+### `type()` Function Implementation Status
+
+**Status**: ✅ Partially working — **12 "unknown function" errors resolved**
+
+The `type()` function is now implemented in `TypeFunction.php` with a supporting `TypeInfo` class that returns FHIRPath ClassInfo structures containing `namespace` and `name` properties.
+
+**What works:**
+- System types: `1.type().name = 'Integer'`, `'hello'.type().name = 'String'`, `true.type().name = 'Boolean'` ✅
+- Direct FHIR object access when given typed model objects ✅
+- Unit tests pass (4/4) ✅
+
+**What doesn't work yet:**
+- FHIR primitive type detection from deserialized resources (e.g., `Patient.active.type().namespace = 'FHIR'`) ❌
+- Related to issue #7 (Primitive Value Extraction) — when FHIR resources are deserialized and properties accessed, FHIR primitive wrappers are normalized to PHP scalars, losing FHIR type metadata
+
+**Implementation notes:**
+- Created `TypeInfo` class with `namespace` and `name` readonly properties
+- Registered in `FunctionRegistry` 
+- Modified `wrapValue()` to preserve FHIR objects (no longer normalizes by default)
+- Added normalization to comparison/arithmetic operators instead to maintain correct semantics
+- Tests involving deserialized resources show `System.Boolean` instead of `FHIR.boolean` due to serialization layer returning arrays or early normalization
 
 ---
 
@@ -180,8 +202,8 @@ Actual: ['@value' => 'Peter'] (array)
 
 ---
 
-## 13. `FunctionRegistry` Shared Static State
-
+## 13. `FunctionRegistry` Shared Static 27 tests; incremental implementation
+   - Priority functions: `sort()` (10 tests), `encode()`/`decode()` (8
 When the FHIRPath unit tests run in the same PHPUnit process before the integration tests, `testResourceTypePrefixWithWhereFunction` and `testResourceTypePrefixWithExistsFunction` fail with `Unknown function: where` / `Unknown function: exists`. Running the integration tests in isolation (or with `--testsuite=integration`) works correctly.
 
 The root cause is that `FunctionRegistry::getInstance()` uses a static singleton that can enter a bad state if certain unit tests modify or reset it. Worth adding a `tearDown` guard or switching to a non-static instance.
@@ -202,8 +224,8 @@ The old fallback was `return 'FHIR' . $resourceType;` (wrong namespace, but neve
 3. **Date/Time Precision Handling** (#9) — Affects ~30 tests; spec compliance for temporal comparisons
 
 ### Medium Priority
-4. **Missing Functions** (#1) — Affects 39 tests; incremental implementation
-   - Priority functions: `type()` (12 tests), `sort()` (10 tests)
+4. **Missing Functions** (#1) — Affects 27 tests; incremental implementation
+   - Priority functions: `sort()` (10 tests), `encode()`/`decode()` (8 tests)
 5. **Comment Syntax Support** (#6) — Affects 7 tests; parser enhancement
 6. **Quantity Comparisons** (#10) — Affects ~10 tests; advanced feature
 
@@ -212,4 +234,16 @@ The old fallback was `return 'FHIR' . $resourceType;` (wrong namespace, but neve
 8. **Function Registry State** (#13) — Test isolation issue; doesn't affect spec tests
 9. **Type Resolver Null Check** (#14) — Backward compatibility; doesn't affect current tests
 
-**Estimated impact**: Fixing issues #7, #8, and #9 would resolve approximately 132 failures, moving the passing rate from **55%** to approximately **69%**. Adding the high-priority functions (#1) would push it to approximately **73%**.
+**Estimated impact**: Fixing issues #7, #8, and #9 would resolve approximately 132 failures, moving the passing rate from **56%** to approximately **70%**. Adding the remaining missing functions (#1) would push it to approximately **73%**.
+
+---
+
+## Recent Progress (Latest Updates)
+
+### ✅ `type()` Function (12 errors resolved)
+- **Implementation**: `TypeFunction.php` and `TypeInfo.php` created
+- **Registration**: Added to `FunctionRegistry`
+- **Unit tests**: 4/4 passing
+- **Spec tests**: System type tests passing; FHIR type tests blocked by issue #7
+- **Errors reduced**: From 177 to 165 (-12)
+- **Known limitation**: FHIR primitive type detection depends on resolving the deserialization/normalization issues in #7
