@@ -59,6 +59,7 @@ final class FunctionRegistry
         $this->registerSafe(new SkipFunction());
         $this->registerSafe(new SingleFunction());
         $this->registerSafe(new DistinctFunction());
+        $this->registerSafe(new SortFunction());
 
         // Subsetting functions
         $this->registerSafe(new UnionFunction());

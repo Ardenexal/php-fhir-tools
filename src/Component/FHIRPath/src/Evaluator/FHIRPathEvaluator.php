@@ -39,6 +39,8 @@ final class FHIRPathEvaluator implements ExpressionVisitor
 
     private FHIRTypeResolver $typeResolver;
 
+    private ComparisonService $comparisonService;
+
     /**
      * Cache of FHIR class name → resolved resource type string (or null if not a resource).
      * Avoids repeated reflection over the class hierarchy within a single evaluator instance.
@@ -83,8 +85,9 @@ final class FHIRPathEvaluator implements ExpressionVisitor
 
     public function __construct()
     {
-        $this->context      = new EvaluationContext();
-        $this->typeResolver = new FHIRTypeResolver();
+        $this->context           = new EvaluationContext();
+        $this->typeResolver      = new FHIRTypeResolver();
+        $this->comparisonService = new ComparisonService($this);
     }
 
     /**
@@ -414,13 +417,17 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             TokenType::DIV      => $this->evaluateArithmetic($left, $right, fn ($a, $b) => intdiv((int) $a, (int) $b)),
             TokenType::MOD      => $this->evaluateArithmetic($left, $right, fn ($a, $b) => $a % $b),
 
-            // Comparison operators
-            TokenType::EQUALS        => $this->evaluateComparison($left, $right, fn ($a, $b) => $a == $b),
-            TokenType::NOT_EQUALS    => $this->evaluateComparison($left, $right, fn ($a, $b) => $a != $b),
-            TokenType::LESS_THAN     => $this->evaluateComparison($left, $right, fn ($a, $b) => $a < $b),
-            TokenType::GREATER_THAN  => $this->evaluateComparison($left, $right, fn ($a, $b) => $a > $b),
-            TokenType::LESS_EQUAL    => $this->evaluateComparison($left, $right, fn ($a, $b) => $a <= $b),
-            TokenType::GREATER_EQUAL => $this->evaluateComparison($left, $right, fn ($a, $b) => $a >= $b),
+            // Equality/equivalence operators (support collections)
+            TokenType::EQUALS         => $this->comparisonService->compareEquality($left, $right, '='),
+            TokenType::NOT_EQUALS     => $this->comparisonService->compareEquality($left, $right, '!='),
+            TokenType::EQUIVALENT     => $this->comparisonService->compareEquality($left, $right, '~'),
+            TokenType::NOT_EQUIVALENT => $this->comparisonService->compareEquality($left, $right, '!~'),
+
+            // Ordering operators (require single values)
+            TokenType::LESS_THAN     => $this->comparisonService->compareOrdering($left, $right, fn ($a, $b) => $a < $b),
+            TokenType::GREATER_THAN  => $this->comparisonService->compareOrdering($left, $right, fn ($a, $b) => $a > $b),
+            TokenType::LESS_EQUAL    => $this->comparisonService->compareOrdering($left, $right, fn ($a, $b) => $a <= $b),
+            TokenType::GREATER_EQUAL => $this->comparisonService->compareOrdering($left, $right, fn ($a, $b) => $a >= $b),
 
             // String concatenation
             TokenType::AMPERSAND => $this->evaluateStringConcat($left, $right),
@@ -711,7 +718,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      * - FHIR primitive wrapper with #[FHIRPrimitive] attribute → ->value property
      * - All other types are returned unchanged (complex types, scalars, etc.)
      */
-    private function normalizeValue(mixed $value): mixed
+    public function normalizeValue(mixed $value): mixed
     {
         // BackedEnum → scalar (e.g. PHP 8.1+ enums used in some model fields)
         if ($value instanceof \BackedEnum) {

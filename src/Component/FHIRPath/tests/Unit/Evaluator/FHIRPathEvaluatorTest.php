@@ -228,6 +228,107 @@ final class FHIRPathEvaluatorTest extends TestCase
         self::assertTrue($result2->first());
     }
 
+    // Collection equality tests
+    public function testCollectionEqualityOrderIndependent(): void
+    {
+        $result = $this->evaluate('(1 | 2 | 3) = (3 | 2 | 1)', null);
+
+        self::assertTrue($result->first());
+    }
+
+    public function testCollectionEqualitySimple(): void
+    {
+        $result = $this->evaluate('(1 | 2) = (1 | 2)', null);
+
+        self::assertTrue($result->first());
+    }
+
+    public function testCollectionInequalityDifferentValues(): void
+    {
+        $result = $this->evaluate('(1 | 2) = (1 | 3)', null);
+
+        self::assertFalse($result->first());
+    }
+
+    public function testCollectionNotEquals(): void
+    {
+        $result = $this->evaluate('(1 | 2) != (1 | 3)', null);
+
+        self::assertTrue($result->first());
+    }
+
+    public function testCollectionNotEqualsSameValues(): void
+    {
+        $result = $this->evaluate('(1 | 2) != (2 | 1)', null);
+
+        self::assertFalse($result->first());
+    }
+
+    public function testEquivalenceOperator(): void
+    {
+        $result = $this->evaluate('(1 | 1.0) ~ (1 | 1)', null);
+
+        self::assertTrue($result->first());
+    }
+
+    public function testEquivalenceVsEquality(): void
+    {
+        $resultEquivalent = $this->evaluate('1 ~ 1.0', null);
+        $resultEqual      = $this->evaluate('1 = 1.0', null);
+
+        self::assertTrue($resultEquivalent->first());
+        self::assertFalse($resultEqual->first());
+    }
+
+    public function testNotEquivalentOperator(): void
+    {
+        $result = $this->evaluate('1 !~ 2', null);
+
+        self::assertTrue($result->first());
+    }
+
+    public function testDateTimeEqualitySamePrecision(): void
+    {
+        $result = $this->evaluate('@2018-03-01 = @2018-03-01', null);
+
+        self::assertTrue($result->first());
+    }
+
+    public function testDateTimeInequalitySamePrecision(): void
+    {
+        $result = $this->evaluate('@2018-03-01 = @2018-03-02', null);
+
+        self::assertFalse($result->first());
+    }
+
+    public function testDateTimePrecisionMismatchReturnsEmpty(): void
+    {
+        $result = $this->evaluate('@2018-03 = @2018-03-01', null);
+
+        self::assertTrue($result->isEmpty());
+    }
+
+    public function testDateTimePrecisionMismatchFull(): void
+    {
+        $result = $this->evaluate('@2012-04-15 = @2012-04-15T10:00:00', null);
+
+        self::assertTrue($result->isEmpty());
+    }
+
+    public function testOrderingDateTimePrecisionMismatch(): void
+    {
+        $result = $this->evaluate('@2018-03 < @2018-03-01', null);
+
+        self::assertTrue($result->isEmpty());
+    }
+
+    public function testEmptyCollectionEqualityReturnsEmpty(): void
+    {
+        $result = $this->evaluate('{} = {}', null);
+
+        self::assertTrue($result->isEmpty());
+    }
+
     public function testStringConcatenation(): void
     {
         $result = $this->evaluate("'Hello' & ' ' & 'World'", null);
