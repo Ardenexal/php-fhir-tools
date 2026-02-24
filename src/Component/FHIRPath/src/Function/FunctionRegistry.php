@@ -142,6 +142,7 @@ final class FunctionRegistry
         // FHIR R4-specific functions
         $this->registerSafe(new ExtensionFunction());
         $this->registerSafe(new GetValueFunction());
+        $this->registerSafe(new ResolveFunction());
 
         // Precision / boundary functions
         $this->registerSafe(new PrecisionFunction());

@@ -20,6 +20,8 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\TokenType;
 use Ardenexal\FHIRTools\Component\FHIRPath\Function\FunctionRegistry;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRTypeResolver;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -55,6 +57,23 @@ final class FHIRPathEvaluator implements ExpressionVisitor
 
     private ?LoggerInterface $logger = null;
 
+    /**
+     * Base FHIR server URL used by resolve() for relative and canonical references.
+     * e.g. "https://r4.smarthealthit.org"
+     */
+    private ?string $fhirServerUrl = null;
+
+    /**
+     * PSR-18 HTTP client used by resolve() to fetch remote FHIR resources.
+     */
+    private ?ClientInterface $httpClient = null;
+
+    /**
+     * PSR-17 request factory used by resolve() to build GET requests.
+     * Must be provided together with the HTTP client.
+     */
+    private ?RequestFactoryInterface $requestFactory = null;
+
     public function __construct()
     {
         $this->context      = new EvaluationContext();
@@ -76,6 +95,60 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     public function getLogger(): ?LoggerInterface
     {
         return $this->logger;
+    }
+
+    /**
+     * Set the base FHIR server URL used by resolve() when resolving relative
+     * references (e.g. "Patient/123") and canonical search queries.
+     *
+     * Must not have a trailing slash — e.g. "https://r4.smarthealthit.org".
+     */
+    public function setFhirServerUrl(string $url): void
+    {
+        $this->fhirServerUrl = rtrim($url, '/');
+    }
+
+    /**
+     * Return the configured FHIR server URL, or null if not set.
+     */
+    public function getFhirServerUrl(): ?string
+    {
+        return $this->fhirServerUrl;
+    }
+
+    /**
+     * Set the PSR-18 HTTP client and PSR-17 request factory used by resolve()
+     * to fetch remote FHIR resources.
+     *
+     * Both are required together: the factory creates GET requests, the client
+     * sends them. Any PSR-18 compatible client works (Guzzle, Symfony HttpClient
+     * via Psr18Client, etc.).
+     *
+     * Example:
+     *   use Symfony\Component\HttpClient\Psr18Client;
+     *   $psr18 = new Psr18Client();
+     *   $evaluator->setHttpClient($psr18, $psr18);
+     */
+    public function setHttpClient(ClientInterface $client, RequestFactoryInterface $requestFactory): void
+    {
+        $this->httpClient     = $client;
+        $this->requestFactory = $requestFactory;
+    }
+
+    /**
+     * Return the configured PSR-18 HTTP client, or null if not set.
+     */
+    public function getHttpClient(): ?ClientInterface
+    {
+        return $this->httpClient;
+    }
+
+    /**
+     * Return the configured PSR-17 request factory, or null if not set.
+     */
+    public function getRequestFactory(): ?RequestFactoryInterface
+    {
+        return $this->requestFactory;
     }
 
     /**
