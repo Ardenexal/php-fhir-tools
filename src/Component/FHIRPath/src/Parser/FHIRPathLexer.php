@@ -382,8 +382,21 @@ class FHIRPathLexer
         if ($this->peek() === 'T') {
             $value .= $this->advance();
             // Scan time part
-            while (!$this->isAtEnd() && ($this->isDigit($this->peek()) || $this->peek() === ':' || $this->peek() === '.')) {
-                $value .= $this->advance();
+            while (!$this->isAtEnd()) {
+                $char = $this->peek();
+                if ($this->isDigit($char) || $char === ':') {
+                    $value .= $this->advance();
+                } elseif ($char === '.') {
+                    $next = $this->peekNext();
+                    if ($next !== '' && $this->isDigit($next)) {
+                        // Only include '.' if followed by a digit (fractional seconds)
+                        $value .= $this->advance();
+                    } else {
+                        break;
+                    }
+                } else {
+                    break;
+                }
             }
             $this->addToken(TokenType::TIME, $value, $startLine, $startColumn, $start);
 
@@ -399,8 +412,21 @@ class FHIRPathLexer
         if ($this->peek() === 'T') {
             $value .= $this->advance();
             // Scan time and timezone
-            while (!$this->isAtEnd() && ($this->isDigit($this->peek()) || $this->peek() === ':' || $this->peek() === '.' || $this->peek() === '+' || $this->peek() === '-' || $this->peek() === 'Z')) {
-                $value .= $this->advance();
+            while (!$this->isAtEnd()) {
+                $char = $this->peek();
+                if ($this->isDigit($char) || $char === ':' || $char === '+' || $char === '-' || $char === 'Z') {
+                    $value .= $this->advance();
+                } elseif ($char === '.') {
+                    $next = $this->peekNext();
+                    if ($next !== '' && $this->isDigit($next)) {
+                        // Only include '.' if followed by a digit (fractional seconds)
+                        $value .= $this->advance();
+                    } else {
+                        break;
+                    }
+                } else {
+                    break;
+                }
             }
         }
 
@@ -521,6 +547,18 @@ class FHIRPathLexer
         $this->advance();
 
         return true;
+    }
+
+    /**
+     * Peek at the next character without consuming it.
+     */
+    private function peekNext(): string
+    {
+        if ($this->position + 1 >= strlen($this->input)) {
+            return '';
+        }
+
+        return $this->input[$this->position + 1];
     }
 
     /**

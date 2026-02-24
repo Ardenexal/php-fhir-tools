@@ -131,11 +131,30 @@ final readonly class Collection implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Perform a union with another collection (combines items, removes duplicates)
+     * Perform a union with another collection (combines items, removes duplicates).
+     *
+     * Uses strict comparison (===) to determine uniqueness, ensuring that values
+     * of different types (e.g., integer 1 and boolean true) are treated as distinct.
+     * This aligns with FHIRPath's type-aware equality semantics.
      */
     public function union(self $other): self
     {
-        return new self(array_values(array_unique([...$this->items, ...$other->items], SORT_REGULAR)));
+        $result = $this->items;
+
+        foreach ($other->items as $item) {
+            $isDuplicate = false;
+            foreach ($result as $existing) {
+                if ($existing === $item) {
+                    $isDuplicate = true;
+                    break;
+                }
+            }
+            if (!$isDuplicate) {
+                $result[] = $item;
+            }
+        }
+
+        return new self($result);
     }
 
     /**

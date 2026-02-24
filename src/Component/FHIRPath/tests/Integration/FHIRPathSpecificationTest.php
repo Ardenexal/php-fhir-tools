@@ -182,7 +182,7 @@ final class FHIRPathSpecificationTest extends TestCase
 
     /**
      * Deserialize a FHIR resource file (JSON or XML) to a typed model object.
-     * Skips the test when the file cannot be found or deserialized.
+     * Skips the test when the file cannot be found.
      */
     private function loadResourceFile(string $path): object
     {
@@ -192,16 +192,10 @@ final class FHIRPathSpecificationTest extends TestCase
 
         $contents = file_get_contents($path);
         if ($contents === false) {
-            $this->markTestSkipped("Could not read input file: {$path}");
+            self::fail("Could not read input file: {$path}");
         }
 
-        try {
-            return $this->serialization->deserialize($contents);
-        } catch (\Throwable $e) {
-            $this->markTestSkipped(
-                sprintf('Could not deserialize resource file %s: %s', basename($path), $e->getMessage()),
-            );
-        }
+        return $this->serialization->deserialize($contents);
     }
 
     /**

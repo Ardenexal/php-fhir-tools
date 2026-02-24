@@ -84,6 +84,39 @@ final class CollectionTest extends TestCase
         self::assertSame([1, 2, 3, 4, 5], $result->toArray());
     }
 
+    public function testUnionWithMixedTypes(): void
+    {
+        // FHIRPath union should preserve both integer 1 and boolean true as distinct values
+        $collection1 = Collection::from([1]);
+        $collection2 = Collection::from([true]);
+        $result      = $collection1->union($collection2);
+
+        self::assertSame([1, true], $result->toArray());
+        self::assertSame(2, $result->count());
+    }
+
+    public function testUnionWithIntegerAndBooleanPreservesDistinctTypes(): void
+    {
+        // Regression test for precedence bug: (1 | 1 is Integer).count() should return 2
+        // The expression evaluates to (1 | true), which should be [1, true] not [1]
+        $collection1 = Collection::from([1, 2]);
+        $collection2 = Collection::from([true, false]);
+        $result      = $collection1->union($collection2);
+
+        self::assertSame([1, 2, true, false], $result->toArray());
+        self::assertSame(4, $result->count());
+    }
+
+    public function testUnionRemovesDuplicatesWithStrictComparison(): void
+    {
+        // Ensure identical values (same type and value) are deduplicated
+        $collection1 = Collection::from([1, 2, 3]);
+        $collection2 = Collection::from([2, 3, 4]);
+        $result      = $collection1->union($collection2);
+
+        self::assertSame([1, 2, 3, 4], $result->toArray());
+    }
+
     public function testIntersect(): void
     {
         $collection1 = Collection::from([1, 2, 3, 4]);

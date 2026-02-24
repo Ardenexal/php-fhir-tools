@@ -62,11 +62,16 @@ final class LowBoundaryFunction extends AbstractFunction
         $value = $input->first();
 
         if (is_float($value) || is_int($value)) {
+            // Validate precision range per FHIRPath spec (0-31)
+            if ($precision !== null && ($precision < 0 || $precision > 31)) {
+                return Collection::empty();
+            }
+
             return Collection::single($this->decimalLowBoundary((float) $value, $precision));
         }
 
         if (is_string($value)) {
-            $result = $this->dateTimeLowBoundary($value);
+            $result = $this->dateTimeLowBoundary($value, $precision);
             if ($result !== null) {
                 return Collection::single($result);
             }
@@ -100,17 +105,35 @@ final class LowBoundaryFunction extends AbstractFunction
      *
      * Returns the expanded ISO 8601 datetime string with components filled in
      * at their minimum values, or null when the string is not recognised.
+     *
+     * @param string   $value     The datetime literal string
+     * @param int|null $precision Optional precision level (4=year, 6=month, 8=day, etc.)
      */
-    private function dateTimeLowBoundary(string $value): ?string
+    private function dateTimeLowBoundary(string $value, ?int $precision): ?string
     {
-        // Quick sanity check: must start with 4 digits.
-        if (!preg_match('/^\d{4}/', $value)) {
+        // Handle @-prefixed datetime literals
+        $stripped = ltrim($value, '@');
+
+        // Quick sanity check: must start with 4 digits or T for time literals
+        if (!preg_match('/^(T|\d{4})/', $stripped)) {
             return null;
         }
 
-        // Strip timezone suffix before parsing positional components.
-        $stripped = (string) preg_replace('/([+-]\d{2}:\d{2}|Z)$/', '', $value);
+        // Handle time-only literals (@T...)
+        if (str_starts_with($stripped, 'T')) {
+            return $this->timeLowBoundary($stripped, $precision);
+        }
 
+        // Strip timezone suffix before parsing positional components
+        $tzMatch = [];
+        if (preg_match('/([+-]\d{2}:\d{2}|Z)$/', $stripped, $tzMatch)) {
+            $timezone = $tzMatch[1];
+            $stripped = substr($stripped, 0, -strlen($timezone));
+        } else {
+            $timezone = null;
+        }
+
+        // Parse components based on current precision
         $year   = substr($stripped, 0, 4);
         $month  = strlen($stripped) >= 7 ? substr($stripped, 5, 2) : '01';
         $day    = strlen($stripped) >= 10 ? substr($stripped, 8, 2) : '01';
@@ -126,6 +149,67 @@ final class LowBoundaryFunction extends AbstractFunction
             $milli = '000';
         }
 
-        return "{$year}-{$month}-{$day}T{$hour}:{$minute}:{$second}.{$milli}";
+        // If precision is specified, return the appropriate format
+        if ($precision !== null) {
+            if ($precision < 4 || $precision > 17) {
+                return null; // Invalid precision for datetime
+            }
+
+            return match (true) {
+                $precision <= 4  => "@{$year}",
+                $precision <= 6  => "@{$year}-{$month}",
+                $precision <= 8  => "@{$year}-{$month}-{$day}",
+                $precision <= 10 => "@{$year}-{$month}-{$day}T{$hour}",
+                $precision <= 12 => "@{$year}-{$month}-{$day}T{$hour}:{$minute}",
+                $precision <= 14 => "@{$year}-{$month}-{$day}T{$hour}:{$minute}:{$second}",
+                default          => "@{$year}-{$month}-{$day}T{$hour}:{$minute}:{$second}.{$milli}" . ($timezone ?? ''),
+            };
+        }
+
+        // Default: return full datetime with timezone if present
+        $result = "@{$year}-{$month}-{$day}T{$hour}:{$minute}:{$second}.{$milli}";
+        if ($timezone !== null) {
+            $result .= $timezone;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Compute the low boundary for a time literal (@T...).
+     */
+    private function timeLowBoundary(string $value, ?int $precision): ?string
+    {
+        // Strip the T prefix
+        $stripped = substr($value, 1);
+
+        // Parse time components
+        $parts = explode(':', $stripped);
+        $hour  = $parts[0];
+        $min   = $parts[1] ?? '00';
+        $sec   = '00';
+        $milli = '000';
+
+        if (isset($parts[2])) {
+            $secParts = explode('.', $parts[2]);
+            $sec      = $secParts[0];
+            $milli    = isset($secParts[1]) ? str_pad(substr($secParts[1], 0, 3), 3, '0') : '000';
+        }
+
+        // If precision specified, format accordingly
+        if ($precision !== null) {
+            if ($precision < 9 || $precision > 17) {
+                return null; // Invalid precision for time
+            }
+
+            return match (true) {
+                $precision <= 9  => "@T{$hour}",
+                $precision <= 11 => "@T{$hour}:{$min}",
+                $precision <= 13 => "@T{$hour}:{$min}:{$sec}",
+                default          => "@T{$hour}:{$min}:{$sec}.{$milli}",
+            };
+        }
+
+        return "@T{$hour}:{$min}:{$sec}.{$milli}";
     }
 }

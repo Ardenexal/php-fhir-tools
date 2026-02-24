@@ -2,71 +2,169 @@
 
 Generated after implementing Plan 1 (typed model support) and Plan 2 (fhir-test-cases data provider).
 
-## 1. FHIRPath Evaluator: Missing Functions (68 spec test errors)
+**Current Test Status: 948 tests, 514 passing (54.2%), 201 errors, 194 failures, 39 skipped**
 
-These functions are referenced by the official test suite but throw `EvaluationException: Unknown function` because they haven't been implemented in `FunctionRegistry`.
+---
+
+## 1. FHIRPath Evaluator: Missing Functions (58 spec test errors)
+
+These functions are referenced by the official test suite but throw `EvaluationException: Unknown function` or `SyntaxException` because they haven't been implemented in `FunctionRegistry`.
 
 | Function | Failing test count | Description |
 |---|---|---|
-| `lowBoundary()` | 23 | Calculates lower precision boundary of a decimal/date |
-| `highBoundary()` | 20 | Calculates upper precision boundary |
-| `matchesFull()` | 5 | Like `matches()` but anchored (full-string match) |
-| `comparable()` | 3 | Checks if two values are comparable |
-| `precision()` | 2 | Returns the precision of a quantity |
+| `lowBoundary()` | ~11 | Calculates lower precision boundary of a decimal/date (syntax error) |
+| `type()` | 12 | Returns the type of the input value |
+| `sort()` | 10 | Sorts a collection |
+| `highBoundary()` | ~8 | Calculates upper precision boundary (syntax error) |
+| `encode()` | 4 | Encodes a string (URL encoding) |
+| `decode()` | 4 | Decodes a string (URL decoding) |
+| `join()` | 3 | Joins a collection of strings with a separator |
+| `escape()` | 2 | Escapes special characters in a string |
+| `unescape()` | 2 | Unescapes special characters in a string |
 | `toDecimal()` | 1 | Converts value to decimal type |
+| `comparable()` | ? | Checks if two values are comparable |
+| `precision()` | ? | Returns the precision of a quantity |
+| ~~`matchesFull()`~~ | ~~5~~ | ~~Like `matches()` but anchored (full-string match)~~ ✅ **IMPLEMENTED** |
 
-All 68 are errors, not failures — they throw unhandled exceptions rather than producing wrong results. Fixing any of these requires adding a new function class to `src/Component/FHIRPath/src/Function/`.
+Note: `lowBoundary()` and `highBoundary()` produce syntax errors ("Expected end of expression but found IDENTIFIER") suggesting they may require special parsing support or are being called incorrectly in test expressions.
 
----
-
-## 2. FHIRPath Evaluator: Operator Precedence (2 spec test failures)
-
-**`testPrecedence2`** — `1+2*3+4 = 11` expects `true` but the evaluator produces `false`. Multiplication is not being given higher precedence than addition. The parser's precedence climbing for arithmetic operators is incomplete.
-
-**`testPrecedence4`** — `(1 | 1 is Integer).count()` expects `2` but returns `1`. The `is` operator inside a union expression is consuming the `1` before the union can include it. Precedence between `|` and `is` is wrong.
+All errors throw unhandled exceptions rather than producing wrong results. Fixing these requires adding new function classes to `src/Component/FHIRPath/src/Function/`.
 
 ---
 
-## 3. FHIRPath Evaluator: `matches()` Edge Cases (3 spec test failures)
+## 2. FHIRPath Evaluator: Operator Precedence (0 spec test failures) ✅ RESOLVED
 
-**`testMatchesEmpty`**, **`testMatchesEmpty2`**, **`testMatchesEmpty3`** — expressions involving `{}.matches(...)` or `matches({})` return an incorrect result instead of an empty collection. The `matches()` function doesn't handle empty collection arguments per spec.
+~~**`testPrecedence2`** — `1+2*3+4 = 11` expects `true` but the evaluator produces `false`. Multiplication is not being given higher precedence than addition. The parser's precedence climbing for arithmetic operators is incomplete.~~ **FIXED** — Parser precedence was already correct.
 
-**`testMatchesSingleLineMode1`** — `'A\n\t\t\tB'.matches('A.*B')` expects `true`. The FHIRPath spec requires `.` in patterns to match newlines (DOTALL mode), but the current implementation doesn't enable `PREG_DOTALL` / `(?s)` by default.
-
-**`testMatchesFullWithin*`** (5 additional tests in the errors category) — The `matches()` function is applying full-anchor matching when partial matching was expected, or vice-versa. Related to missing `matchesFull()` semantics bleeding into `matches()`.
+~~**`testPrecedence4`** — `(1 | 1 is Integer).count()` expects `2` but returns `1`. The `is` operator inside a union expression is consuming the `1` before the union can include it. Precedence between `|` and `is` is wrong.~~ **FIXED** — The parser precedence was correct (`1 | (1 is Integer)`), but `Collection::union()` used `array_unique()` with loose comparison, treating `1` (integer) and `true` (boolean) as equal. Fixed by implementing strict comparison (===) in the union method.
 
 ---
 
-## 4. FHIRPath Evaluator: `in` Operator Not Implemented (1 spec test failure)
+## 3. FHIRPath Evaluator: `matches()` Edge Cases (0 spec test failures) ✅ RESOLVED
 
-**`testPrecedence5`** — `true and '0215' in ('0215' | '0216')` expects `true` but throws because the `in` operator handler in `visitBinaryOperator()` is an explicit stub:
+~~**`testMatchesEmpty`**, **`testMatchesEmpty2`**, **`testMatchesEmpty3`** — expressions involving `{}.matches(...)` or `matches({})` return an incorrect result instead of an empty collection. The `matches()` function doesn't handle empty collection arguments per spec.~~ **FIXED** — Empty collection handling implemented in `MatchesFunction::execute()` (lines 28-30).
 
-```php
-// src/Component/FHIRPath/src/Evaluator/FHIRPathEvaluator.php:207
-TokenType::IN, TokenType::CONTAINS => throw new EvaluationException("Operator '{$node->getOperator()->value}' not yet fully implemented", ...)
+~~**`testMatchesSingleLineMode1`** — `'A\n\t\t\tB'.matches('A.*B')` expects `true`. The FHIRPath spec requires `.` in patterns to match newlines (DOTALL mode), but the current implementation doesn't enable `PREG_DOTALL` / `(?s)` by default.~~ **FIXED** — DOTALL mode (`/s` flag) is now automatically appended to all regex patterns (lines 55-67).
+
+~~**`testMatchesFullWithin*`** (5 additional tests in the errors category) — The `matches()` function is applying full-anchor matching when partial matching was expected, or vice-versa. Related to missing `matchesFull()` semantics bleeding into `matches()`.~~ **FIXED** — `matchesFull()` function fully implemented with automatic anchoring (`^(?:...)$`) and proper DOTALL support. All 5 testMatchesFull tests passing.
+
+---
+
+## 4. FHIRPath Evaluator: `in` and `contains` Operators (0 spec test failures) ✅ RESOLVED
+
+~~**`testPrecedence5`** — `true and '0215' in ('0215' | '0216')` expects `true` but throws because the `in` operator handler in `visitBinaryOperator()` is an explicit stub.~~ **FIXED** — Both `in` and `contains` operators fully implemented via `evaluateMembership()` method. testPrecedence5 passing.
+
+---
+
+## 5. FHIRPath Evaluator: Comment Syntax Not Supported (7 spec test errors)
+
+**Issue**: The FHIRPath parser does not support single-line (`//`) or multi-line (`/* */`) comments as specified in the FHIRPath grammar. Tests involving comments fail with `SyntaxException: Expected expression but found DIVIDE(/)` because `//` is being interpreted as two division operators.
+
+**Affected tests**: `testComment1` through `testComment7`
+
+**Fix required**: Add comment tokenization to the lexer and comment-aware parsing to the parser. Comments should be stripped during tokenization before parsing begins.
+
+---
+
+## 6. FHIRPath Evaluator: Primitive Value Extraction (62+ spec test failures)
+
+**Issue**: When evaluating paths that should return primitive values (strings, codes, integers, etc.), the evaluator returns FHIR primitive objects (arrays with `'@value'` => actual_value) instead of extracting the primitive values themselves.
+
+**Example failure**:
+```
+Expression: name.given
+Expected: 'Peter' (string)
+Actual: ['@value' => 'Peter'] (array)
 ```
 
-The `contains` operator has the same issue.
+**Impact**: Approximately 62 tests fail because assertions expect scalar values but receive arrays. This affects:
+- Property access on FHIR resources (e.g., `name.given`, `telecom.use`)
+- Comparisons involving primitive values
+- Function calls expecting scalar inputs
+
+**Fix required**: Implement primitive value unwrapping in the evaluator. When a FHIR primitive type is accessed, the evaluator should automatically extract the `@value` field to return the scalar value per FHIRPath specification.
+
+**Location**: Likely in `FHIRPathEvaluator::visitMemberAccess()` or when processing typed model properties.
 
 ---
 
-## 5. FHIRPath Evaluator: `is` Operator Error Handling (1 spec test failure)
+## 7. FHIRPath Evaluator: Collection Comparison (40+ spec test failures)
 
-**`testPrecedence3`** — `1 > 2 is Boolean` is marked `invalid="semantic"` in the spec XML, meaning it should throw a `FHIRPathException`. The evaluator evaluates it successfully instead of rejecting it. The `is` operator currently has no type-safety validation.
+**Issue**: Collection equality operators (`=`, `!=`) are not correctly implementing FHIRPath collection comparison semantics. The spec requires:
+- Collections are equal if they have the same elements in any order
+- Empty collections in comparisons produce empty results (not true/false)
+- Different numeric precisions make values incomparable (empty result)
+
+**Affected test patterns**:
+- `testEquality*` — Collection equality comparisons
+- `testNEquality*` — Collection inequality comparisons
+- Complex object comparisons (e.g., `name.take(2) = name.take(2).last()`)
+
+**Examples**:
+- `(1 | 2) = (1 | 2)` should return `true`
+- `name != name` should return `false` (but currently returns empty or fails)
+- `@2012-04-15 = @2012-04-15T10:00:00` should return empty (different precisions)
+
+**Fix required**: Revise equality/inequality operators in `FHIRPathEvaluator::evaluateComparison()` to properly handle:
+1. Collection-to-collection comparisons
+2. Precision-aware date/time comparisons
+3. Empty result vs. boolean result semantics
 
 ---
 
-## 6. `FHIRPathSpecificationTest`: 854 Skipped Tests Due to Deserialization Failures
+## 8. FHIRPath Evaluator: Date/Time Comparison with Precision (30+ spec test failures)
 
-The majority of spec tests involve loading a resource file (e.g. `patient-example.xml`) via `FHIRSerializationService::createDefault()` and passing the result to the evaluator. Almost all of these are currently skipped with messages like:
+**Issue**: Date and time comparisons don't properly handle different precisions. Per FHIRPath spec:
+- Values with different precisions are incomparable (return empty)
+- `@2018-03 < @2018-03-01` should return empty (year-month vs. full date)
+- `@2018-03-01T10:30 < @2018-03-01T10:30:00` should return empty (minute vs. second precision)
+- Only when precisions match can comparison return true/false
 
-> Could not deserialize resource file patient-example.xml: ...
+**Affected tests**: `testLessThan23-27`, `testLessOrEqual23-25`, `testGreatorOrEqual23-25`, various equality tests
 
-The two-phase `createDefault()` factory is correctly wired, but the FHIR normalizers themselves are complex and may not yet correctly handle round-tripping real FHIR XML/JSON files. This is the highest-impact item to investigate — unblocking deserialisation would convert most of the 854 skips into real test results.
+**Fix required**: Add precision tracking to date/time literals and implement precision-aware comparison logic.
 
 ---
 
-## 7. `FunctionRegistry` Shared Static State
+## 9. FHIRPath Evaluator: Quantity Comparisons (10+ spec test failures)
+
+**Issue**: Tests involving FHIR Quantity values fail because:
+1. Quantity literal syntax (`185 '[lb_av]'`) may not be fully parsed
+2. Quantity comparison operations are not implemented
+3. Unit conversion for comparable units is not supported
+
+**Affected tests**: Tests with expressions like `Observation.value < 200 '[lb_av]'`
+
+**Fix required**: Implement Quantity type support in the evaluator including:
+- Quantity literal parsing
+- Quantity comparison operators
+- Basic unit compatibility checking
+
+---
+
+## 10. FHIRPath Evaluator: Semantic Validation (3 spec test failures)
+
+**`testPrecedence1`** — `-1.convertsToInteger()` is marked `invalid="semantic"` in the spec XML. The evaluator successfully evaluates it (returns `-1`) instead of throwing a `FHIRPathException`. Without parentheses, the expression is ambiguous about whether the unary minus applies to the literal or to the result of the function call. Valid: `(-1).convertsToInteger()`. Invalid: `-1.convertsToInteger()`.
+
+**`testPrecedence3`** — `1 > 2 is Boolean` is marked `invalid="semantic"` in the spec XML, meaning it should throw a `FHIRPathException`. The evaluator evaluates it successfully (returns `true`) instead of rejecting it. The `is` operator is fully implemented but lacks semantic validation to detect ambiguous operator combinations. Per the FHIRPath spec, `is` cannot be applied to the result of a comparison operator without explicit parentheses. Valid: `(1 > 2) is Boolean`. Invalid: `1 > 2 is Boolean`.
+
+**`testPrecedence6`** — Complex expression involving `in` operator within nested `exists()` calls returns `false` instead of expected `true`. Expression: `category.exists(coding.exists(system = '...' and code.trace('c') in ('vital-signs' | 'vital-signs2').trace('codes')))`. The `in` operator works in simple cases (testPrecedence5 passes) but may have issues with complex nested contexts or when combined with `trace()` function output.
+
+---
+
+## 11. `FHIRPathSpecificationTest`: 854 Skipped Tests Due to Deserialization Failures ✅ RESOLVED
+
+~~The majority of spec tests involve loading a resource file (e.g. `patient-example.xml`) via `FHIRSerializationService::createDefault()` and passing the result to the evaluator. Almost all of these are currently skipped with messages like:~~
+
+> ~~Could not deserialize resource file patient-example.xml: ...~~
+
+~~The two-phase `createDefault()` factory is correctly wired, but the FHIR normalizers themselves are complex and may not yet correctly handle round-tripping real FHIR XML/JSON files. This is the highest-impact item to investigate — unblocking deserialisation would convert most of the 854 skips into real test results.~~
+
+**FIXED** — The FHIR serialization service now correctly deserializes XML and JSON resource files. Test count improved from 94 tests (854 skipped) to **948 tests (39 skipped)**. The 39 remaining skips are for unsupported output types (e.g., `Quantity`) and missing input files, not deserialization failures. Deserialization skip logic has been removed from the test suite.
+
+---
+
+## 12. `FunctionRegistry` Shared Static State
 
 When the FHIRPath unit tests run in the same PHPUnit process before the integration tests, `testResourceTypePrefixWithWhereFunction` and `testResourceTypePrefixWithExistsFunction` fail with `Unknown function: where` / `Unknown function: exists`. Running the integration tests in isolation (or with `--testsuite=integration`) works correctly.
 
@@ -74,6 +172,28 @@ The root cause is that `FunctionRegistry::getInstance()` uses a static singleton
 
 ---
 
-## 8. `FHIRTypeResolver::resolveResourceType()` Now Returns `null` as Fallback
+## 13. `FHIRTypeResolver::resolveResourceType()` Now Returns `null` as Fallback
 
 The old fallback was `return 'FHIR' . $resourceType;` (wrong namespace, but never `null`). The new fallback returns `null` when no Models class is found. Callers that previously relied on always getting a string back will now receive `null`. The serialisation code handles `null` gracefully, but any external callers of `FHIRTypeResolver` that don't check for `null` could behave differently.
+
+---
+
+## Summary of Changes Needed (Priority Order)
+
+### High Priority (Biggest Impact)
+1. **Primitive Value Extraction** (#6) — Affects ~62 tests; core functionality blocking comparisons and assertions
+2. **Collection Comparison** (#7) — Affects ~40 tests; fundamental operator semantics  
+3. **Date/Time Precision Handling** (#8) — Affects ~30 tests; spec compliance for temporal comparisons
+
+### Medium Priority
+4. **Missing Functions** (#1) — Affects 58 tests; incremental implementation
+   - Priority functions: `type()` (12 tests), `sort()` (10 tests)
+5. **Comment Syntax Support** (#5) — Affects 7 tests; parser enhancement
+6. **Quantity Comparisons** (#9) — Affects ~10 tests; advanced feature
+
+### Low Priority
+7. **Semantic Validation** (#10) — Affects 3 tests; edge case validation
+8. **Function Registry State** (#12) — Test isolation issue; doesn't affect spec tests
+9. **Type Resolver Null Check** (#13) — Backward compatibility; doesn't affect current tests
+
+**Estimated impact**: Fixing issues #6, #7, and #8 would resolve approximately 132 failures, moving the passing rate from **54%** to approximately **68%**. Adding the high-priority functions (#1) would push it to approximately **74%**.

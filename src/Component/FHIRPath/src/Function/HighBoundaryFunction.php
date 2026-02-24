@@ -62,6 +62,11 @@ final class HighBoundaryFunction extends AbstractFunction
         $value = $input->first();
 
         if (is_float($value) || is_int($value)) {
+            // Validate precision range per FHIRPath spec (0-31)
+            if ($precision !== null && ($precision < 0 || $precision > 31)) {
+                return Collection::empty();
+            }
+
             return Collection::single($this->decimalHighBoundary((float) $value, $precision));
         }
 
