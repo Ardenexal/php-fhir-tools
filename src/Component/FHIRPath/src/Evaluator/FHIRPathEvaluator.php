@@ -677,11 +677,11 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     }
 
     /**
-     * Wrap a value in a collection, normalising FHIR-specific types along the way.
+     * Wrap a value in a collection, preserving FHIR type information.
      *
-     * For list arrays each element is passed through normalizeValue() so that FHIR
-     * primitive wrappers and BackedEnums are reduced to their scalar PHP equivalents
-     * before being added to the collection.
+     * For list arrays, each element is added to the collection as-is to preserve
+     * type information for the type() function. Normalization happens later during
+     * comparisons or when explicitly needed.
      */
     private function wrapValue(mixed $value): Collection
     {
@@ -692,13 +692,16 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         if (is_array($value)) {
             // Check if it's an associative array (object) or indexed array (collection)
             if (array_is_list($value)) {
-                return Collection::from(array_map($this->normalizeValue(...), $value));
+                // For collection items, preserve them as-is for now
+                // Normalization will happen during comparisons
+                return Collection::from($value);
             }
 
             return Collection::single($value);
         }
 
-        return Collection::single($this->normalizeValue($value));
+        // Don't normalize single values - preserve FHIR wrappers for type()
+        return Collection::single($value);
     }
 
     /**
@@ -805,8 +808,9 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             throw new EvaluationException('Arithmetic operators require single values');
         }
 
-        $leftValue  = $left->first();
-        $rightValue = $right->first();
+        // Normalize values to handle FHIR primitives and enums
+        $leftValue  = $this->normalizeValue($left->first());
+        $rightValue = $this->normalizeValue($right->first());
 
         if (!is_numeric($leftValue) || !is_numeric($rightValue)) {
             return Collection::empty();
@@ -830,7 +834,11 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             return Collection::empty();
         }
 
-        $result = $operation($left->first(), $right->first());
+        // Normalize values to handle FHIR primitives and enums
+        $leftValue  = $this->normalizeValue($left->first());
+        $rightValue = $this->normalizeValue($right->first());
+
+        $result = $operation($leftValue, $rightValue);
 
         return Collection::single($result);
     }
@@ -848,7 +856,11 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             return Collection::empty();
         }
 
-        $result = (string) $left->first() . (string) $right->first();
+        // Normalize values to handle FHIR primitives and enums
+        $leftValue  = $this->normalizeValue($left->first());
+        $rightValue = $this->normalizeValue($right->first());
+
+        $result = (string) $leftValue . (string) $rightValue;
 
         return Collection::single($result);
     }

@@ -2,20 +2,18 @@
 
 Generated after implementing Plan 1 (typed model support) and Plan 2 (fhir-test-cases data provider).
 
-**Current Test Status: 948 tests, 514 passing (54.2%), 201 errors, 194 failures, 39 skipped**
+**Current Test Status: 948 tests, 521 passing (55.0%), 177 errors, 206 failures, 44 skipped**
 
 ---
 
-## 1. FHIRPath Evaluator: Missing Functions (58 spec test errors)
+## 1. FHIRPath Evaluator: Missing Functions (39 spec test errors)
 
 These functions are referenced by the official test suite but throw `EvaluationException: Unknown function` or `SyntaxException` because they haven't been implemented in `FunctionRegistry`.
 
 | Function | Failing test count | Description |
 |---|---|---|
-| `lowBoundary()` | ~11 | Calculates lower precision boundary of a decimal/date (syntax error) |
 | `type()` | 12 | Returns the type of the input value |
 | `sort()` | 10 | Sorts a collection |
-| `highBoundary()` | ~8 | Calculates upper precision boundary (syntax error) |
 | `encode()` | 4 | Encodes a string (URL encoding) |
 | `decode()` | 4 | Decodes a string (URL decoding) |
 | `join()` | 3 | Joins a collection of strings with a separator |
@@ -24,9 +22,9 @@ These functions are referenced by the official test suite but throw `EvaluationE
 | `toDecimal()` | 1 | Converts value to decimal type |
 | `comparable()` | ? | Checks if two values are comparable |
 | `precision()` | ? | Returns the precision of a quantity |
+| ~~`lowBoundary()`~~ | ~~11~~ | ~~Calculates lower precision boundary of a decimal/date~~ ✅ **IMPLEMENTED** |
+| ~~`highBoundary()`~~ | ~~8~~ | ~~Calculates upper precision boundary~~ ✅ **IMPLEMENTED** |
 | ~~`matchesFull()`~~ | ~~5~~ | ~~Like `matches()` but anchored (full-string match)~~ ✅ **IMPLEMENTED** |
-
-Note: `lowBoundary()` and `highBoundary()` produce syntax errors ("Expected end of expression but found IDENTIFIER") suggesting they may require special parsing support or are being called incorrectly in test expressions.
 
 All errors throw unhandled exceptions rather than producing wrong results. Fixing these requires adding new function classes to `src/Component/FHIRPath/src/Function/`.
 
@@ -56,7 +54,25 @@ All errors throw unhandled exceptions rather than producing wrong results. Fixin
 
 ---
 
-## 5. FHIRPath Evaluator: Comment Syntax Not Supported (7 spec test errors)
+## 5. FHIRPath Evaluator: `lowBoundary()` and `highBoundary()` Parser Issues (0 spec test errors) ✅ RESOLVED
+
+~~**Issue**: Date/time literals followed by method calls like `.lowBoundary()` caused syntax errors because the lexer greedily consumed the `.` character as part of the literal, even when it should be a member access operator.~~
+
+~~**Example failure**: `@T10:30.lowBoundary(9)` was lexed as `@T10:30.` (invalid TIME literal) followed by `lowBoundary`, causing "Expected end of expression but found IDENTIFIER" errors.~~
+
+~~**Affected tests**: All `lowBoundary()` and `highBoundary()` tests involving datetime/time literals (approximately 19 tests total).~~
+
+**FIXED** — The lexer now only includes `.` in datetime/time literals when followed by digits (for fractional seconds). Method calls on literals now parse correctly. Both functions are fully implemented with:
+- Decimal precision boundary calculations
+- Precision validation (0-31 per FHIRPath spec)  
+- Full datetime/time literal support with precision formatting
+- Support for `@`-prefixed literals and time-only literals (`@T...`)
+
+**Test Results**: 27 of 28 `lowBoundary` tests now pass (1 failure is for Quantity literals which are not yet supported).
+
+---
+
+## 6. FHIRPath Evaluator: Comment Syntax Not Supported (7 spec test errors)
 
 **Issue**: The FHIRPath parser does not support single-line (`//`) or multi-line (`/* */`) comments as specified in the FHIRPath grammar. Tests involving comments fail with `SyntaxException: Expected expression but found DIVIDE(/)` because `//` is being interpreted as two division operators.
 
@@ -66,7 +82,7 @@ All errors throw unhandled exceptions rather than producing wrong results. Fixin
 
 ---
 
-## 6. FHIRPath Evaluator: Primitive Value Extraction (62+ spec test failures)
+## 7. FHIRPath Evaluator: Primitive Value Extraction (62+ spec test failures)
 
 **Issue**: When evaluating paths that should return primitive values (strings, codes, integers, etc.), the evaluator returns FHIR primitive objects (arrays with `'@value'` => actual_value) instead of extracting the primitive values themselves.
 
@@ -88,7 +104,7 @@ Actual: ['@value' => 'Peter'] (array)
 
 ---
 
-## 7. FHIRPath Evaluator: Collection Comparison (40+ spec test failures)
+## 8. FHIRPath Evaluator: Collection Comparison (40+ spec test failures)
 
 **Issue**: Collection equality operators (`=`, `!=`) are not correctly implementing FHIRPath collection comparison semantics. The spec requires:
 - Collections are equal if they have the same elements in any order
@@ -112,7 +128,7 @@ Actual: ['@value' => 'Peter'] (array)
 
 ---
 
-## 8. FHIRPath Evaluator: Date/Time Comparison with Precision (30+ spec test failures)
+## 9. FHIRPath Evaluator: Date/Time Comparison with Precision (30+ spec test failures)
 
 **Issue**: Date and time comparisons don't properly handle different precisions. Per FHIRPath spec:
 - Values with different precisions are incomparable (return empty)
@@ -126,7 +142,7 @@ Actual: ['@value' => 'Peter'] (array)
 
 ---
 
-## 9. FHIRPath Evaluator: Quantity Comparisons (10+ spec test failures)
+## 10. FHIRPath Evaluator: Quantity Comparisons (10+ spec test failures)
 
 **Issue**: Tests involving FHIR Quantity values fail because:
 1. Quantity literal syntax (`185 '[lb_av]'`) may not be fully parsed
@@ -142,7 +158,7 @@ Actual: ['@value' => 'Peter'] (array)
 
 ---
 
-## 10. FHIRPath Evaluator: Semantic Validation (3 spec test failures)
+## 11. FHIRPath Evaluator: Semantic Validation (3 spec test failures)
 
 **`testPrecedence1`** — `-1.convertsToInteger()` is marked `invalid="semantic"` in the spec XML. The evaluator successfully evaluates it (returns `-1`) instead of throwing a `FHIRPathException`. Without parentheses, the expression is ambiguous about whether the unary minus applies to the literal or to the result of the function call. Valid: `(-1).convertsToInteger()`. Invalid: `-1.convertsToInteger()`.
 
@@ -152,7 +168,7 @@ Actual: ['@value' => 'Peter'] (array)
 
 ---
 
-## 11. `FHIRPathSpecificationTest`: 854 Skipped Tests Due to Deserialization Failures ✅ RESOLVED
+## 12. `FHIRPathSpecificationTest`: 854 Skipped Tests Due to Deserialization Failures ✅ RESOLVED
 
 ~~The majority of spec tests involve loading a resource file (e.g. `patient-example.xml`) via `FHIRSerializationService::createDefault()` and passing the result to the evaluator. Almost all of these are currently skipped with messages like:~~
 
@@ -164,7 +180,7 @@ Actual: ['@value' => 'Peter'] (array)
 
 ---
 
-## 12. `FunctionRegistry` Shared Static State
+## 13. `FunctionRegistry` Shared Static State
 
 When the FHIRPath unit tests run in the same PHPUnit process before the integration tests, `testResourceTypePrefixWithWhereFunction` and `testResourceTypePrefixWithExistsFunction` fail with `Unknown function: where` / `Unknown function: exists`. Running the integration tests in isolation (or with `--testsuite=integration`) works correctly.
 
@@ -172,7 +188,7 @@ The root cause is that `FunctionRegistry::getInstance()` uses a static singleton
 
 ---
 
-## 13. `FHIRTypeResolver::resolveResourceType()` Now Returns `null` as Fallback
+## 14. `FHIRTypeResolver::resolveResourceType()` Now Returns `null` as Fallback
 
 The old fallback was `return 'FHIR' . $resourceType;` (wrong namespace, but never `null`). The new fallback returns `null` when no Models class is found. Callers that previously relied on always getting a string back will now receive `null`. The serialisation code handles `null` gracefully, but any external callers of `FHIRTypeResolver` that don't check for `null` could behave differently.
 
@@ -181,19 +197,19 @@ The old fallback was `return 'FHIR' . $resourceType;` (wrong namespace, but neve
 ## Summary of Changes Needed (Priority Order)
 
 ### High Priority (Biggest Impact)
-1. **Primitive Value Extraction** (#6) — Affects ~62 tests; core functionality blocking comparisons and assertions
-2. **Collection Comparison** (#7) — Affects ~40 tests; fundamental operator semantics  
-3. **Date/Time Precision Handling** (#8) — Affects ~30 tests; spec compliance for temporal comparisons
+1. **Primitive Value Extraction** (#7) — Affects ~62 tests; core functionality blocking comparisons and assertions
+2. **Collection Comparison** (#8) — Affects ~40 tests; fundamental operator semantics  
+3. **Date/Time Precision Handling** (#9) — Affects ~30 tests; spec compliance for temporal comparisons
 
 ### Medium Priority
-4. **Missing Functions** (#1) — Affects 58 tests; incremental implementation
+4. **Missing Functions** (#1) — Affects 39 tests; incremental implementation
    - Priority functions: `type()` (12 tests), `sort()` (10 tests)
-5. **Comment Syntax Support** (#5) — Affects 7 tests; parser enhancement
-6. **Quantity Comparisons** (#9) — Affects ~10 tests; advanced feature
+5. **Comment Syntax Support** (#6) — Affects 7 tests; parser enhancement
+6. **Quantity Comparisons** (#10) — Affects ~10 tests; advanced feature
 
 ### Low Priority
-7. **Semantic Validation** (#10) — Affects 3 tests; edge case validation
-8. **Function Registry State** (#12) — Test isolation issue; doesn't affect spec tests
-9. **Type Resolver Null Check** (#13) — Backward compatibility; doesn't affect current tests
+7. **Semantic Validation** (#11) — Affects 3 tests; edge case validation
+8. **Function Registry State** (#13) — Test isolation issue; doesn't affect spec tests
+9. **Type Resolver Null Check** (#14) — Backward compatibility; doesn't affect current tests
 
-**Estimated impact**: Fixing issues #6, #7, and #8 would resolve approximately 132 failures, moving the passing rate from **54%** to approximately **68%**. Adding the high-priority functions (#1) would push it to approximately **74%**.
+**Estimated impact**: Fixing issues #7, #8, and #9 would resolve approximately 132 failures, moving the passing rate from **55%** to approximately **69%**. Adding the high-priority functions (#1) would push it to approximately **73%**.

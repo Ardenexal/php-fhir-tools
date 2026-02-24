@@ -107,6 +107,7 @@ final class FunctionRegistry
 
         // Type functions
         $this->registerSafe(new OfTypeFunction());
+        $this->registerSafe(new TypeFunction());
         $this->registerSafe(new HasValueFunction());
 
         // Tree navigation functions
