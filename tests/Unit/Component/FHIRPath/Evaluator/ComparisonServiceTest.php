@@ -334,4 +334,99 @@ final class ComparisonServiceTest extends TestCase
         self::assertTrue($resultNotEqual->isSingle());
         self::assertFalse($resultNotEqual->first());
     }
+
+    public function testZeroFractionalSecondsNormalization(): void
+    {
+        // .0, .00, .000 should be treated as second precision (6), not millisecond (7)
+        $time1 = Collection::single('@T10:30:00');
+        $time2 = Collection::single('@T10:30:00.0');
+        $time3 = Collection::single('@T10:30:00.00');
+        $time4 = Collection::single('@T10:30:00.000');
+
+        // All should be equal (same precision after normalization)
+        $result1 = $this->service->compareEquality($time1, $time2, '=');
+        $result2 = $this->service->compareEquality($time1, $time3, '=');
+        $result3 = $this->service->compareEquality($time1, $time4, '=');
+        $result4 = $this->service->compareEquality($time2, $time3, '=');
+
+        self::assertTrue($result1->isSingle());
+        self::assertTrue($result1->first(), '@T10:30:00 should equal @T10:30:00.0');
+        self::assertTrue($result2->isSingle());
+        self::assertTrue($result2->first(), '@T10:30:00 should equal @T10:30:00.00');
+        self::assertTrue($result3->isSingle());
+        self::assertTrue($result3->first(), '@T10:30:00 should equal @T10:30:00.000');
+        self::assertTrue($result4->isSingle());
+        self::assertTrue($result4->first(), '@T10:30:00.0 should equal @T10:30:00.00');
+    }
+
+    public function testZeroFractionalSecondsWithDateTime(): void
+    {
+        // Same test with full datetime literals
+        $date1 = Collection::single('@2018-03-01T10:30:00');
+        $date2 = Collection::single('@2018-03-01T10:30:00.0');
+        $date3 = Collection::single('@2018-03-01T10:30:00.000');
+
+        $result1 = $this->service->compareEquality($date1, $date2, '=');
+        $result2 = $this->service->compareEquality($date1, $date3, '=');
+
+        self::assertTrue($result1->isSingle());
+        self::assertTrue($result1->first());
+        self::assertTrue($result2->isSingle());
+        self::assertTrue($result2->first());
+    }
+
+    public function testNonZeroFractionalSecondsRemainMillisecondPrecision(): void
+    {
+        // Non-zero fractional seconds should still be incomparable with second precision
+        $time1 = Collection::single('@T10:30:00');
+        $time2 = Collection::single('@T10:30:00.001');
+        $time3 = Collection::single('@T10:30:00.123');
+
+        // Different precisions (6 vs 7) should return empty
+        $result1 = $this->service->compareEquality($time1, $time2, '=');
+        $result2 = $this->service->compareEquality($time1, $time3, '=');
+
+        self::assertTrue($result1->isEmpty(), '@T10:30:00 vs @T10:30:00.001 should be incomparable');
+        self::assertTrue($result2->isEmpty(), '@T10:30:00 vs @T10:30:00.123 should be incomparable');
+    }
+
+    public function testZeroFractionalSecondsOrderingOperators(): void
+    {
+        // Test with ordering operators
+        $time1 = Collection::single('@T10:30:00');
+        $time2 = Collection::single('@T10:30:00.0');
+
+        // Should be comparable and equal (both are second precision after normalization)
+        $resultLess         = $this->service->compareOrdering($time1, $time2, fn ($a, $b) => $a < $b);
+        $resultLessOrEqual  = $this->service->compareOrdering($time1, $time2, fn ($a, $b) => $a <= $b);
+        $resultGreater      = $this->service->compareOrdering($time1, $time2, fn ($a, $b) => $a > $b);
+        $resultGreaterEqual = $this->service->compareOrdering($time1, $time2, fn ($a, $b) => $a >= $b);
+
+        self::assertTrue($resultLess->isSingle());
+        self::assertFalse($resultLess->first(), '@T10:30:00 < @T10:30:00.0 should be false');
+
+        self::assertTrue($resultLessOrEqual->isSingle());
+        self::assertTrue($resultLessOrEqual->first(), '@T10:30:00 <= @T10:30:00.0 should be true');
+
+        self::assertTrue($resultGreater->isSingle());
+        self::assertFalse($resultGreater->first(), '@T10:30:00 > @T10:30:00.0 should be false');
+
+        self::assertTrue($resultGreaterEqual->isSingle());
+        self::assertTrue($resultGreaterEqual->first(), '@T10:30:00 >= @T10:30:00.0 should be true');
+    }
+
+    public function testZeroFractionalSecondsOrderingWithDateTime(): void
+    {
+        // Same test with full datetime literals
+        $date1 = Collection::single('@2018-03-01T10:30:00');
+        $date2 = Collection::single('@2018-03-01T10:30:00.0');
+
+        $resultLess        = $this->service->compareOrdering($date1, $date2, fn ($a, $b) => $a < $b);
+        $resultGreaterEq   = $this->service->compareOrdering($date1, $date2, fn ($a, $b) => $a >= $b);
+
+        self::assertTrue($resultLess->isSingle());
+        self::assertFalse($resultLess->first());
+        self::assertTrue($resultGreaterEq->isSingle());
+        self::assertTrue($resultGreaterEq->first());
+    }
 }

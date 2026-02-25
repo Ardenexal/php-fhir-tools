@@ -97,9 +97,9 @@ final class ComparisonService
                 return Collection::empty();
             }
 
-            // Strip @ prefix for comparison
-            $leftValue  = ltrim($leftValue, '@');
-            $rightValue = ltrim($rightValue, '@');
+            // Normalize DateTime strings for comparison
+            $leftValue  = $this->normalizeDateTimeString($leftValue);
+            $rightValue = $this->normalizeDateTimeString($rightValue);
         }
 
         $result = $operation($leftValue, $rightValue);
@@ -225,9 +225,9 @@ final class ComparisonService
                 return null;
             }
 
-            // Same precision: compare string values (strip @ prefix)
-            $aValue = ltrim($a, '@');
-            $bValue = ltrim($b, '@');
+            // Same precision: normalize and compare string values
+            $aValue = $this->normalizeDateTimeString($a);
+            $bValue = $this->normalizeDateTimeString($b);
 
             return $aValue === $bValue;
         }
@@ -253,6 +253,27 @@ final class ComparisonService
      *
      * DateTime literals start with @ followed by YYYY or T (for time-only).
      */
+    /**
+     * Normalize a DateTime string for comparison.
+     *
+     * Strips @ prefix and normalizes zero-only fractional seconds.
+     * Preserves timezone information.
+     * E.g., "@T10:30:00.0" becomes "T10:30:00"
+     * E.g., "@2018-03-01T10:30:00.000Z" becomes "2018-03-01T10:30:00Z"
+     */
+    private function normalizeDateTimeString(string $value): string
+    {
+        // Strip @ prefix
+        $normalized = ltrim($value, '@');
+
+        // Strip zero-only fractional seconds (.0, .00, .000)
+        // Must preserve timezone, so we need to be careful
+        // Pattern: fractional seconds are between the time part and optional timezone
+        $normalized = preg_replace('/\.0+(?=([+-]\d{2}:\d{2}|Z)?$)/', '', $normalized) ?? $normalized;
+
+        return $normalized;
+    }
+
     private function isDateTimeString(mixed $value): bool
     {
         if (!is_string($value)) {
@@ -295,8 +316,24 @@ final class ComparisonService
         // Strip timezone suffix for length analysis
         $stripped = preg_replace('/([+-]\d{2}:\d{2}|Z)$/', '', $value) ?? $value;
 
+        // Check for non-zero fractional seconds
+        // .0, .00, .000 are normalized to second precision (6)
+        // .001, .123, etc. are millisecond precision (7)
+        $hasNonZeroFractionalSeconds = false;
+        if (str_contains($stripped, '.')) {
+            if (preg_match('/\.(\d+)/', $stripped, $matches)) {
+                // Check if fractional part contains any non-zero digit
+                $hasNonZeroFractionalSeconds = !preg_match('/^0+$/', $matches[1]);
+
+                // If all zeros, strip them from $stripped for subsequent pattern matching
+                if (!$hasNonZeroFractionalSeconds) {
+                    $stripped = preg_replace('/\.0+$/', '', $stripped) ?? $stripped;
+                }
+            }
+        }
+
         return match (true) {
-            str_contains($stripped, '.')                                     => 7,
+            $hasNonZeroFractionalSeconds                                     => 7,
             preg_match('/T\d{2}:\d{2}:\d{2}$/', $stripped) === 1             => 6,
             preg_match('/T\d{2}:\d{2}$/', $stripped)       === 1             => 5,
             preg_match('/T\d{2}$/', $stripped)             === 1             => 4,

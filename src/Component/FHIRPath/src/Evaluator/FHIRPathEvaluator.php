@@ -711,7 +711,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             // Check if it's an associative array (object) or indexed array (collection)
             if (array_is_list($value)) {
                 // For collection items, unwrap any primitive wrappers
-                $unwrapped = array_map(function ($item) {
+                $unwrapped = array_map(function($item) {
                     if (is_array($item) && isset($item['@value']) && count($item) === 1) {
                         return $item['@value'];
                     }
