@@ -51,35 +51,7 @@ All errors throw unhandled exceptions rather than producing wrong results. Fixin
 
 ---
 
-## 4. FHIRPath Evaluator: Quantity Support — RESOLVED ✅
-
-**Status**: ✅ All quantity features implemented and working
-
-**What's working:**
-- ✅ Quantity literals with UCUM units in single quotes: `185 '[lb_av]'`, `4 'g'`, `1 'wk'`
-- ✅ Calendar duration literals with unquoted keywords: `7 days`, `1 week`, `1 month`
-- ✅ Quantity extraction from FHIR resources (via `ComparisonService::extractQuantity()`)
-- ✅ Quantity comparison with unit conversion: `4 'g' = 4000 'mg'`, `7 days = 1 'wk'`
-- ✅ Equivalence operator (~) with relative tolerance: `4 'g' ~ 4040 'mg'` (1% difference, within 10% tolerance)
-- ✅ Quantity arithmetic operations:
-  - Multiplication: `2.0 'cm' * 2.0 'm' = 0.040 'm2'`
-  - Division: `4.0 'g' / 2.0 'm' = 2 'g/m'`, `1.0 'm' / 1.0 'm' = 1 '1'`
-- ✅ Calendar keyword to UCUM code mapping: `days`→`d`, `week`→`wk`, `month`→`mo`, etc.
-- ✅ toString() preserves integer formatting: `1 'wk'` not `1.0 'wk'`
-- ✅ toString() outputs calendar keywords without quotes: `1 week` not `1 'week'`
-
-**Implementation details:**
-- Lexer recognizes calendar duration keywords after numbers and normalizes to quantity tokens
-- ToQuantityFunction parses both quoted UCUM codes and unquoted calendar keywords
-- ComparisonService maps calendar keywords to UCUM codes for comparison (e.g., `days`→`d`, `wk`→`wk`)
-- Equivalence operator (~) uses 10% relative tolerance per FHIRPath spec
-- Arithmetic operations preserve original units in results (e.g., `'g' / 'm'` → `'g/m'`)
-
-**Tests passing**: All 14 quantity tests in the spec suite now pass
-
----
-
-## 5. FHIRPath Evaluator: Semantic Validation (3 spec test failures)
+## 4. FHIRPath Evaluator: Semantic Validation (3 spec test failures)
 
 **`testPrecedence1`** — `-1.convertsToInteger()` is marked `invalid="semantic"` in the spec XML. The evaluator successfully evaluates it (returns `-1`) instead of throwing a `FHIRPathException`. Without parentheses, the expression is ambiguous about whether the unary minus applies to the literal or to the result of the function call. Valid: `(-1).convertsToInteger()`. Invalid: `-1.convertsToInteger()`.
 
@@ -89,7 +61,7 @@ All errors throw unhandled exceptions rather than producing wrong results. Fixin
 
 ---
 
-## 6. `FunctionRegistry` Shared Static State
+## 5. `FunctionRegistry` Shared Static State
 
 When the FHIRPath unit tests run in the same PHPUnit process before the integration tests, `testResourceTypePrefixWithWhereFunction` and `testResourceTypePrefixWithExistsFunction` fail with `Unknown function: where` / `Unknown function: exists`. Running the integration tests in isolation (or with `--testsuite=integration`) works correctly.
 
@@ -97,7 +69,7 @@ The root cause is that `FunctionRegistry::getInstance()` uses a static singleton
 
 ---
 
-## 7. `FHIRTypeResolver::resolveResourceType()` Now Returns `null` as Fallback
+## 6. `FHIRTypeResolver::resolveResourceType()` Now Returns `null` as Fallback
 
 The old fallback was `return 'FHIR' . $resourceType;` (wrong namespace, but never `null`). The new fallback returns `null` when no Models class is found. Callers that previously relied on always getting a string back will now receive `null`. The serialisation code handles `null` gracefully, but any external callers of `FHIRTypeResolver` that don't check for `null` could behave differently.
 
@@ -114,10 +86,7 @@ The old fallback was `return 'FHIR' . $resourceType;` (wrong namespace, but neve
 3. **`type()` Function FHIR Type Detection** (#3) — Low impact; known trade-off with primitive unwrapping
 
 ### Low Priority
-4. **Semantic Validation** (#5) — Affects 3 tests; edge case validation for ambiguous expressions
-5. **Function Registry State** (#6) — Test isolation issue; doesn't affect spec tests
-6. **Type Resolver Null Check** (#7) — Backward compatibility concern; no current test failures
-
-### Resolved ✅
-- **Quantity Comparisons** (#4) — All quantity features implemented (14 tests passing)
+4. **Semantic Validation** (#4) — Affects 3 tests; edge case validation for ambiguous expressions
+5. **Function Registry State** (#5) — Test isolation issue; doesn't affect spec tests
+6. **Type Resolver Null Check** (#6) — Backward compatibility concern; no current test failures
 
