@@ -82,6 +82,11 @@ final class FunctionRegistry
         $this->registerSafe(new TrimFunction());
         $this->registerSafe(new SplitFunction());
         $this->registerSafe(new ToCharsFunction());
+        $this->registerSafe(new EncodeFunction());
+        $this->registerSafe(new DecodeFunction());
+        $this->registerSafe(new JoinFunction());
+        $this->registerSafe(new EscapeFunction());
+        $this->registerSafe(new UnescapeFunction());
 
         // Math functions
         $this->registerSafe(new SumFunction());
