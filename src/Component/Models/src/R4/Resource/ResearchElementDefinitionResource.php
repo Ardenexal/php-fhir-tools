@@ -197,7 +197,7 @@ class ResearchElementDefinitionResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'subjectX' => [
+        'subject' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -482,7 +482,7 @@ class ResearchElementDefinitionResource extends DomainResourceResource
         /** @var bool|null experimental For testing purposes, not real usage */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $experimental = null,
-        /** @var CodeableConcept|Reference|null subjectX E.g. Patient, Practitioner, RelatedPerson, Organization, Location, Device */
+        /** @var CodeableConcept|Reference|null subject E.g. Patient, Practitioner, RelatedPerson, Organization, Location, Device */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -502,7 +502,7 @@ class ResearchElementDefinitionResource extends DomainResourceResource
                 ],
             ],
         )]
-        public CodeableConcept|Reference|null $subjectX = null,
+        public CodeableConcept|Reference|null $subject = null,
         /** @var DateTimePrimitive|null date Date last changed */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $date = null,

@@ -66,7 +66,7 @@ class PlanDefinitionActionRelatedAction extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'offsetX' => [
+        'offset' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -108,7 +108,7 @@ class PlanDefinitionActionRelatedAction extends BackboneElement
         /** @var ActionRelationshipTypeType|null relationship before-start | before | before-end | concurrent-with-start | concurrent | concurrent-with-end | after-start | after | after-end */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?ActionRelationshipTypeType $relationship = null,
-        /** @var Duration|Range|null offsetX Time offset for the relationship */
+        /** @var Duration|Range|null offset Time offset for the relationship */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -128,7 +128,7 @@ class PlanDefinitionActionRelatedAction extends BackboneElement
                 ],
             ],
         )]
-        public Duration|Range|null $offsetX = null,
+        public Duration|Range|null $offset = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

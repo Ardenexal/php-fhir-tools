@@ -56,7 +56,7 @@ class EvidenceVariableCategory extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'valueX' => [
+        'value' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -102,7 +102,7 @@ class EvidenceVariableCategory extends BackboneElement
         /** @var StringPrimitive|string|null name Description of the grouping */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $name = null,
-        /** @var CodeableConcept|Quantity|Range|null valueX Definition of the grouping */
+        /** @var CodeableConcept|Quantity|Range|null value Definition of the grouping */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -128,7 +128,7 @@ class EvidenceVariableCategory extends BackboneElement
                 ],
             ],
         )]
-        public CodeableConcept|Quantity|Range|null $valueX = null,
+        public CodeableConcept|Quantity|Range|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

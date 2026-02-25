@@ -59,7 +59,7 @@ class GoalTarget extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'detailX' => [
+        'detail' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -118,7 +118,7 @@ class GoalTarget extends BackboneElement
                 ],
             ],
         ],
-        'dueX' => [
+        'due' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -157,7 +157,7 @@ class GoalTarget extends BackboneElement
         /** @var CodeableConcept|null measure The parameter whose value is being tracked */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $measure = null,
-        /** @var Quantity|Range|CodeableConcept|StringPrimitive|string|bool|int|Ratio|null detailX The target value to be achieved */
+        /** @var Quantity|Range|CodeableConcept|StringPrimitive|string|bool|int|Ratio|null detail The target value to be achieved */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -197,8 +197,8 @@ class GoalTarget extends BackboneElement
                 ],
             ],
         )]
-        public Quantity|Range|CodeableConcept|StringPrimitive|string|bool|int|Ratio|null $detailX = null,
-        /** @var DatePrimitive|Duration|null dueX Reach goal on or before */
+        public Quantity|Range|CodeableConcept|StringPrimitive|string|bool|int|Ratio|null $detail = null,
+        /** @var DatePrimitive|Duration|null due Reach goal on or before */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -218,7 +218,7 @@ class GoalTarget extends BackboneElement
                 ],
             ],
         )]
-        public DatePrimitive|Duration|null $dueX = null,
+        public DatePrimitive|Duration|null $due = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

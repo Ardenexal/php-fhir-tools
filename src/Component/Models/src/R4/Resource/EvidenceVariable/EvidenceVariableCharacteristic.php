@@ -66,7 +66,7 @@ class EvidenceVariableCharacteristic extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'definitionX' => [
+        'definition' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -136,7 +136,7 @@ class EvidenceVariableCharacteristic extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'participantEffectiveX' => [
+        'participantEffective' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -207,7 +207,7 @@ class EvidenceVariableCharacteristic extends BackboneElement
         /** @var StringPrimitive|string|null description Natural language description of the characteristic */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $description = null,
-        /** @var Reference|CanonicalPrimitive|CodeableConcept|Expression|DataRequirement|TriggerDefinition|null definitionX What code or expression defines members? */
+        /** @var Reference|CanonicalPrimitive|CodeableConcept|Expression|DataRequirement|TriggerDefinition|null definition What code or expression defines members? */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -253,14 +253,14 @@ class EvidenceVariableCharacteristic extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public Reference|CanonicalPrimitive|CodeableConcept|Expression|DataRequirement|TriggerDefinition|null $definitionX = null,
+        public Reference|CanonicalPrimitive|CodeableConcept|Expression|DataRequirement|TriggerDefinition|null $definition = null,
         /** @var array<UsageContext> usageContext What code/value pairs define members? */
         #[FhirProperty(fhirType: 'UsageContext', propertyKind: 'complex', isArray: true)]
         public array $usageContext = [],
         /** @var bool|null exclude Whether the characteristic includes or excludes members */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $exclude = null,
-        /** @var DateTimePrimitive|Period|Duration|Timing|null participantEffectiveX What time period do participants cover */
+        /** @var DateTimePrimitive|Period|Duration|Timing|null participantEffective What time period do participants cover */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -292,7 +292,7 @@ class EvidenceVariableCharacteristic extends BackboneElement
                 ],
             ],
         )]
-        public DateTimePrimitive|Period|Duration|Timing|null $participantEffectiveX = null,
+        public DateTimePrimitive|Period|Duration|Timing|null $participantEffective = null,
         /** @var Duration|null timeFromStart Observation time from study start */
         #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex')]
         public ?Duration $timeFromStart = null,

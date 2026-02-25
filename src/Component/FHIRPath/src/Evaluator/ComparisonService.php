@@ -15,9 +15,93 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Evaluator;
  */
 final class ComparisonService
 {
+    private const UCUM_SYSTEM_URL = 'http://unitsofmeasure.org';
+
+    private const FLOAT_TOLERANCE = 1.0E-9;
+
+    private const YEAR_MONTH_CONVERSION = [
+        'year'   => 12.0,
+        'years'  => 12.0,
+        'month'  => 1.0,
+        'months' => 1.0,
+    ];
+
+    private const CALENDAR_DURATION_SECONDS = [
+        'year'         => 365   * 24 * 60 * 60,
+        'years'        => 365   * 24 * 60 * 60,
+        'month'        => 30    * 24 * 60 * 60,
+        'months'       => 30    * 24 * 60 * 60,
+        'week'         => 7     * 24 * 60 * 60,
+        'weeks'        => 7     * 24 * 60 * 60,
+        'day'          => 24    * 60 * 60,
+        'days'         => 24    * 60 * 60,
+        'hour'         => 60    * 60,
+        'hours'        => 60    * 60,
+        'minute'       => 60,
+        'minutes'      => 60,
+        'second'       => 1,
+        'seconds'      => 1,
+        'millisecond'  => 0.001,
+        'milliseconds' => 0.001,
+    ];
+
+    private const DURATION_ABOVE_WEEK = [
+        'year'   => true,
+        'years'  => true,
+        'month'  => true,
+        'months' => true,
+    ];
+
+    private const CALENDAR_TO_UCUM = [
+        'year'         => 'a',
+        'years'        => 'a',
+        'month'        => 'mo',
+        'months'       => 'mo',
+        'week'         => 'wk',
+        'weeks'        => 'wk',
+        'day'          => 'd',
+        'days'         => 'd',
+        'hour'         => 'h',
+        'hours'        => 'h',
+        'minute'       => 'min',
+        'minutes'      => 'min',
+        'second'       => 's',
+        'seconds'      => 's',
+        'millisecond'  => 'ms',
+        'milliseconds' => 'ms',
+    ];
+
+    private const UCUM_CONVERSIONS = [
+        '1'       => ['base' => '1', 'factor' => 1.0],
+        'kg'      => ['base' => 'kg', 'factor' => 1.0],
+        'g'       => ['base' => 'kg', 'factor' => 0.001],
+        'mg'      => ['base' => 'kg', 'factor' => 0.000001],
+        '[lb_av]' => ['base' => 'kg', 'factor' => 0.45359237],
+        'm'       => ['base' => 'm', 'factor' => 1.0],
+        'cm'      => ['base' => 'm', 'factor' => 0.01],
+        'mm'      => ['base' => 'm', 'factor' => 0.001],
+        'km'      => ['base' => 'm', 'factor' => 1000.0],
+        'L'       => ['base' => 'L', 'factor' => 1.0],
+        'mL'      => ['base' => 'L', 'factor' => 0.001],
+        'wk'      => ['base' => 'd', 'factor' => 7.0],
+        'd'       => ['base' => 'd', 'factor' => 1.0],
+    ];
+
     public function __construct(
         private readonly FHIRPathEvaluator $evaluator
     ) {
+    }
+
+    /**
+     * Check if a value is a quantity and extract its components.
+     *
+     * Returns extracted quantity array or null if not a quantity.
+     */
+    public function tryExtractQuantity(mixed $value): ?array
+    {
+        [$quantity, $isQuantity] = $this->extractQuantity($value);
+
+        return $quantity;
     }
 
     /**
@@ -86,6 +170,22 @@ final class ComparisonService
         // Normalize values to handle FHIR primitives and enums
         $leftValue  = $this->evaluator->normalizeValue($left->first());
         $rightValue = $this->evaluator->normalizeValue($right->first());
+
+        [$leftQuantity, $leftIsQuantity]   = $this->extractQuantity($leftValue);
+        [$rightQuantity, $rightIsQuantity] = $this->extractQuantity($rightValue);
+
+        if ($leftIsQuantity || $rightIsQuantity) {
+            if (!$leftIsQuantity || !$rightIsQuantity || $leftQuantity === null || $rightQuantity === null) {
+                return Collection::empty();
+            }
+
+            $comparison = $this->compareQuantityValues($leftQuantity, $rightQuantity);
+            if ($comparison === null) {
+                return Collection::empty();
+            }
+
+            return Collection::single($operation($comparison, 0));
+        }
 
         // Check for DateTime precision compatibility
         if ($this->isDateTimeString($leftValue) && $this->isDateTimeString($rightValue)) {
@@ -215,6 +315,37 @@ final class ComparisonService
         $a = $this->evaluator->normalizeValue($a);
         $b = $this->evaluator->normalizeValue($b);
 
+        [$leftQuantity, $leftIsQuantity]   = $this->extractQuantity($a);
+        [$rightQuantity, $rightIsQuantity] = $this->extractQuantity($b);
+
+        if ($leftIsQuantity || $rightIsQuantity) {
+            if (!$leftIsQuantity || !$rightIsQuantity || $leftQuantity === null || $rightQuantity === null) {
+                return null;
+            }
+
+            $comparison = $this->compareQuantityValues($leftQuantity, $rightQuantity);
+            if ($comparison === null) {
+                return null;
+            }
+
+            // For equivalence (~), use relative tolerance (~10% per FHIRPath spec)
+            // For equality (=), use strict absolute tolerance
+            if ($useEquivalence) {
+                $leftValue  = $leftQuantity['value'];
+                $rightValue = $rightQuantity['value'];
+                $maxValue   = max(abs($leftValue), abs($rightValue));
+                
+                // Use 10% relative tolerance, or absolute tolerance for very small values
+                if ($maxValue > 0.0) {
+                    return abs($comparison) <= ($maxValue * 0.10);
+                }
+                
+                return abs($comparison) <= self::FLOAT_TOLERANCE;
+            }
+
+            return abs($comparison) <= self::FLOAT_TOLERANCE;
+        }
+
         // DateTime precision-aware comparison
         if ($this->isDateTimeString($a) && $this->isDateTimeString($b)) {
             $aPrecision = $this->getDateTimePrecision($a);
@@ -342,5 +473,184 @@ final class ComparisonService
             preg_match('/^\d{4}$/', $stripped)             === 1             => 1,
             default                                                          => null,
         };
+    }
+
+    /**
+     * @return array{0: array{value: float, code: string, unit: string, system: string|null}|null, 1: bool}
+     */
+    private function extractQuantity(mixed $value): array
+    {
+        $value = $this->evaluator->normalizeValue($value);
+
+        if (is_array($value)) {
+            $isQuantity = array_key_exists('value', $value)
+                && (array_key_exists('code', $value) || array_key_exists('unit', $value) || array_key_exists('system', $value));
+
+            if (!$isQuantity) {
+                return [null, false];
+            }
+
+            if (!is_numeric($value['value'])) {
+                return [null, true];
+            }
+
+            $code   = is_string($value['code'] ?? null) ? $value['code'] : null;
+            $unit   = is_string($value['unit'] ?? null) ? $value['unit'] : $code;
+            $system = is_string($value['system'] ?? null) ? $value['system'] : null;
+
+            if ($code === null || $code == '') {
+                return [null, true];
+            }
+
+            if ($system !== null && $system !== self::UCUM_SYSTEM_URL) {
+                return [null, true];
+            }
+
+            return [[
+                'value'  => (float) $value['value'],
+                'code'   => $code,
+                'unit'   => $unit ?? $code,
+                'system' => $system,
+            ], true];
+        }
+
+        if (!is_object($value)) {
+            return [null, false];
+        }
+
+        $hasValue  = $this->readObjectProperty($value, 'value', true);
+        $hasCode   = $this->readObjectProperty($value, 'code', true);
+        $hasUnit   = $this->readObjectProperty($value, 'unit', true);
+        $hasSystem = $this->readObjectProperty($value, 'system', true);
+
+        if (!$hasValue || (!$hasCode && !$hasUnit && !$hasSystem)) {
+            return [null, false];
+        }
+
+        $rawValue = $this->readObjectProperty($value, 'value');
+        if (!is_numeric($rawValue)) {
+            return [null, true];
+        }
+
+        $codeValue   = $this->readObjectProperty($value, 'code');
+        $unitValue   = $this->readObjectProperty($value, 'unit');
+        $systemValue = $this->readObjectProperty($value, 'system');
+
+        $code   = is_string($codeValue) ? $codeValue : null;
+        $unit   = is_string($unitValue) ? $unitValue : $code;
+        $system = is_string($systemValue) ? $systemValue : null;
+
+        if ($code === null || $code == '') {
+            return [null, true];
+        }
+
+        if ($system !== null && $system !== self::UCUM_SYSTEM_URL) {
+            return [null, true];
+        }
+
+        return [[
+            'value'  => (float) $rawValue,
+            'code'   => $code,
+            'unit'   => $unit ?? $code,
+            'system' => $system,
+        ], true];
+    }
+
+    private function readObjectProperty(object $value, string $property, bool $existsOnly = false): mixed
+    {
+        if (property_exists($value, $property)) {
+            if ($existsOnly) {
+                return true;
+            }
+
+            return $this->evaluator->normalizeValue($value->$property);
+        }
+
+        $getter = 'get' . ucfirst($property);
+        if (method_exists($value, $getter)) {
+            if ($existsOnly) {
+                return true;
+            }
+
+            return $this->evaluator->normalizeValue($value->$getter());
+        }
+
+        return $existsOnly ? false : null;
+    }
+
+    /**
+     * @param array{value: float, code: string, unit: string, system: string|null} $left
+     * @param array{value: float, code: string, unit: string, system: string|null} $right
+     */
+    private function compareQuantityValues(array $left, array $right): ?float
+    {
+        $leftUnit  = $left['code'];
+        $rightUnit = $right['code'];
+
+        // Normalize calendar duration keywords to UCUM codes
+        $leftUnit  = self::CALENDAR_TO_UCUM[$leftUnit] ?? $leftUnit;
+        $rightUnit = self::CALENDAR_TO_UCUM[$rightUnit] ?? $rightUnit;
+
+        if ($leftUnit === $rightUnit) {
+            return $left['value'] - $right['value'];
+        }
+
+        if ($this->hasIncomparableDurationMix($leftUnit, $rightUnit)) {
+            return null;
+        }
+
+        $leftYearMonth  = self::YEAR_MONTH_CONVERSION[$leftUnit]  ?? null;
+        $rightYearMonth = self::YEAR_MONTH_CONVERSION[$rightUnit] ?? null;
+        if ($leftYearMonth !== null && $rightYearMonth !== null) {
+            return $left['value'] * $leftYearMonth - $right['value'] * $rightYearMonth;
+        }
+
+        $leftSeconds  = self::CALENDAR_DURATION_SECONDS[$leftUnit]  ?? null;
+        $rightSeconds = self::CALENDAR_DURATION_SECONDS[$rightUnit] ?? null;
+        if ($leftSeconds !== null && $rightSeconds !== null) {
+            return $left['value'] * $leftSeconds - $right['value'] * $rightSeconds;
+        }
+
+        $leftConverted  = $this->convertUcumToBase($leftUnit, $left['value']);
+        $rightConverted = $this->convertUcumToBase($rightUnit, $right['value']);
+
+        if ($leftConverted === null || $rightConverted === null) {
+            return null;
+        }
+
+        if ($leftConverted['base'] !== $rightConverted['base']) {
+            return null;
+        }
+
+        return $leftConverted['value'] - $rightConverted['value'];
+    }
+
+    /**
+     * @return array{base: string, value: float}|null
+     */
+    private function convertUcumToBase(string $unit, float $value): ?array
+    {
+        $definition = self::UCUM_CONVERSIONS[$unit] ?? null;
+        if ($definition === null) {
+            return null;
+        }
+
+        return [
+            'base'  => $definition['base'],
+            'value' => $value * $definition['factor'],
+        ];
+    }
+
+    private function hasIncomparableDurationMix(string $leftUnit, string $rightUnit): bool
+    {
+        $leftIsCalendar  = array_key_exists($leftUnit, self::CALENDAR_DURATION_SECONDS);
+        $rightIsCalendar = array_key_exists($rightUnit, self::CALENDAR_DURATION_SECONDS);
+
+        if ($leftIsCalendar === $rightIsCalendar) {
+            return false;
+        }
+
+        return array_key_exists($leftUnit, self::DURATION_ABOVE_WEEK)
+            || array_key_exists($rightUnit, self::DURATION_ABOVE_WEEK);
     }
 }

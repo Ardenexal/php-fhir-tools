@@ -170,7 +170,7 @@ class SupplyDeliveryResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'occurrenceX' => [
+        'occurrence' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -276,7 +276,7 @@ class SupplyDeliveryResource extends DomainResourceResource
         /** @var SupplyDeliverySuppliedItem|null suppliedItem The item that is delivered or supplied */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
         public ?SupplyDeliverySuppliedItem $suppliedItem = null,
-        /** @var DateTimePrimitive|Period|Timing|null occurrenceX When event occurred */
+        /** @var DateTimePrimitive|Period|Timing|null occurrence When event occurred */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -302,7 +302,7 @@ class SupplyDeliveryResource extends DomainResourceResource
                 ],
             ],
         )]
-        public DateTimePrimitive|Period|Timing|null $occurrenceX = null,
+        public DateTimePrimitive|Period|Timing|null $occurrence = null,
         /** @var Reference|null supplier Dispenser */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $supplier = null,

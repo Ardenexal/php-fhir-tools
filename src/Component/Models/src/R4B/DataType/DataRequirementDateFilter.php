@@ -52,7 +52,7 @@ class DataRequirementDateFilter extends Element
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'valueX' => [
+        'value' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -98,7 +98,7 @@ class DataRequirementDateFilter extends Element
         /** @var StringPrimitive|string|null searchParam A date valued parameter to search on */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $searchParam = null,
-        /** @var DateTimePrimitive|Period|Duration|null valueX The value of the filter, as a Period, DateTime, or Duration value */
+        /** @var DateTimePrimitive|Period|Duration|null value The value of the filter, as a Period, DateTime, or Duration value */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -124,7 +124,7 @@ class DataRequirementDateFilter extends Element
                 ],
             ],
         )]
-        public DateTimePrimitive|Period|Duration|null $valueX = null,
+        public DateTimePrimitive|Period|Duration|null $value = null,
     ) {
         parent::__construct($id, $extension);
     }

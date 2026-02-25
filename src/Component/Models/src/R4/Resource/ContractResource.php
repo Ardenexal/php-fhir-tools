@@ -297,7 +297,7 @@ class ContractResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'topicX' => [
+        'topic' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -411,7 +411,7 @@ class ContractResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'legallyBindingX' => [
+        'legallyBinding' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -525,7 +525,7 @@ class ContractResource extends DomainResourceResource
         /** @var CodeableConcept|null scope Range of Legal Concerns */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $scope = null,
-        /** @var CodeableConcept|Reference|null topicX Focus of contract interest */
+        /** @var CodeableConcept|Reference|null topic Focus of contract interest */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -545,7 +545,7 @@ class ContractResource extends DomainResourceResource
                 ],
             ],
         )]
-        public CodeableConcept|Reference|null $topicX = null,
+        public CodeableConcept|Reference|null $topic = null,
         /** @var CodeableConcept|null type Legal instrument category */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $type = null,
@@ -576,7 +576,7 @@ class ContractResource extends DomainResourceResource
         /** @var array<ContractRule> rule Computable Contract Language */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
         public array $rule = [],
-        /** @var Attachment|Reference|null legallyBindingX Binding Contract */
+        /** @var Attachment|Reference|null legallyBinding Binding Contract */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -596,7 +596,7 @@ class ContractResource extends DomainResourceResource
                 ],
             ],
         )]
-        public Attachment|Reference|null $legallyBindingX = null,
+        public Attachment|Reference|null $legallyBinding = null,
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
     }

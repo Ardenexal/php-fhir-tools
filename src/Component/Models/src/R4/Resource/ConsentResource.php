@@ -176,7 +176,7 @@ class ConsentResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'sourceX' => [
+        'source' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -287,7 +287,7 @@ class ConsentResource extends DomainResourceResource
         /** @var array<Reference> organization Custodian of the consent */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isArray: true)]
         public array $organization = [],
-        /** @var Attachment|Reference|null sourceX Source from which this consent is taken */
+        /** @var Attachment|Reference|null source Source from which this consent is taken */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -307,7 +307,7 @@ class ConsentResource extends DomainResourceResource
                 ],
             ],
         )]
-        public Attachment|Reference|null $sourceX = null,
+        public Attachment|Reference|null $source = null,
         /** @var array<ConsentPolicy> policy Policies covered by this consent */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
         public array $policy = [],

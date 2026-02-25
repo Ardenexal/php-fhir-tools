@@ -240,7 +240,7 @@ class ConceptMapResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'sourceX' => [
+        'source' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -264,7 +264,7 @@ class ConceptMapResource extends DomainResourceResource
                 ],
             ],
         ],
-        'targetX' => [
+        'target' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -369,7 +369,7 @@ class ConceptMapResource extends DomainResourceResource
         /** @var MarkdownPrimitive|null copyright Use and/or publishing restrictions */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $copyright = null,
-        /** @var UriPrimitive|CanonicalPrimitive|null sourceX The source value set that contains the concepts that are being mapped */
+        /** @var UriPrimitive|CanonicalPrimitive|null source The source value set that contains the concepts that are being mapped */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -389,8 +389,8 @@ class ConceptMapResource extends DomainResourceResource
                 ],
             ],
         )]
-        public UriPrimitive|CanonicalPrimitive|null $sourceX = null,
-        /** @var UriPrimitive|CanonicalPrimitive|null targetX The target value set which provides context for the mappings */
+        public UriPrimitive|CanonicalPrimitive|null $source = null,
+        /** @var UriPrimitive|CanonicalPrimitive|null target The target value set which provides context for the mappings */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -410,7 +410,7 @@ class ConceptMapResource extends DomainResourceResource
                 ],
             ],
         )]
-        public UriPrimitive|CanonicalPrimitive|null $targetX = null,
+        public UriPrimitive|CanonicalPrimitive|null $target = null,
         /** @var array<ConceptMapGroup> group Same source and target systems */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
         public array $group = [],

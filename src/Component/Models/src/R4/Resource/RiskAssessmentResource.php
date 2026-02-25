@@ -181,7 +181,7 @@ class RiskAssessmentResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'occurrenceX' => [
+        'occurrence' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -328,7 +328,7 @@ class RiskAssessmentResource extends DomainResourceResource
         /** @var Reference|null encounter Where was assessment performed? */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $encounter = null,
-        /** @var DateTimePrimitive|Period|null occurrenceX When was assessment made? */
+        /** @var DateTimePrimitive|Period|null occurrence When was assessment made? */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -348,7 +348,7 @@ class RiskAssessmentResource extends DomainResourceResource
                 ],
             ],
         )]
-        public DateTimePrimitive|Period|null $occurrenceX = null,
+        public DateTimePrimitive|Period|null $occurrence = null,
         /** @var Reference|null condition Condition assessed */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $condition = null,

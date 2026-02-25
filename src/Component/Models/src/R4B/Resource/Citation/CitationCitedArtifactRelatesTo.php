@@ -67,7 +67,7 @@ class CitationCitedArtifactRelatesTo extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'targetX' => [
+        'target' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -123,7 +123,7 @@ class CitationCitedArtifactRelatesTo extends BackboneElement
         /** @var array<CodeableConcept> targetClassifier The clasification of the related artifact */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true)]
         public array $targetClassifier = [],
-        /** @var UriPrimitive|Identifier|Reference|Attachment|null targetX The article or artifact that the cited artifact is related to */
+        /** @var UriPrimitive|Identifier|Reference|Attachment|null target The article or artifact that the cited artifact is related to */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -157,7 +157,7 @@ class CitationCitedArtifactRelatesTo extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public UriPrimitive|Identifier|Reference|Attachment|null $targetX = null,
+        public UriPrimitive|Identifier|Reference|Attachment|null $target = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

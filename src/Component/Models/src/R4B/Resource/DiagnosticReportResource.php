@@ -173,7 +173,7 @@ class DiagnosticReportResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'effectiveX' => [
+        'effective' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -335,7 +335,7 @@ class DiagnosticReportResource extends DomainResourceResource
         /** @var Reference|null encounter Health care event when test ordered */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $encounter = null,
-        /** @var DateTimePrimitive|Period|null effectiveX Clinically relevant time/time-period for report */
+        /** @var DateTimePrimitive|Period|null effective Clinically relevant time/time-period for report */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -355,7 +355,7 @@ class DiagnosticReportResource extends DomainResourceResource
                 ],
             ],
         )]
-        public DateTimePrimitive|Period|null $effectiveX = null,
+        public DateTimePrimitive|Period|null $effective = null,
         /** @var InstantPrimitive|null issued DateTime this version was made */
         #[FhirProperty(fhirType: 'instant', propertyKind: 'primitive')]
         public ?InstantPrimitive $issued = null,

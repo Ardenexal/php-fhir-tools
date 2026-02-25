@@ -23,7 +23,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
  *  - Anything else            → empty {}
  *  - Empty input              → empty {}
  *
- * Internal Quantity representation: ['value' => float, 'unit' => string]
+ * Internal Quantity representation: ['value' => float, 'unit' => string, 'code' => string, 'system' => string|null]
  *
  * The static tryConvert() helper is shared with convertsToQuantity().
  *
@@ -31,6 +31,8 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
  */
 final class ToQuantityFunction extends AbstractFunction
 {
+    private const UCUM_SYSTEM_URL = 'http://unitsofmeasure.org';
+
     public function __construct()
     {
         parent::__construct('toQuantity');
@@ -64,25 +66,31 @@ final class ToQuantityFunction extends AbstractFunction
     }
 
     /**
-     * Attempt to convert a value to a Quantity array ['value' => float, 'unit' => string].
+     * Attempt to convert a value to a Quantity array ['value' => float, 'unit' => string, 'code' => string, 'system' => string|null].
      *
      * Returns null when the value cannot be converted (which becomes empty {} in FHIRPath).
      * Used by convertsToQuantity() to check convertibility without throwing.
      *
-     * @return array{value: float, unit: string}|null
+     * @return array{value: float, unit: string, code: string, system?: string|null}|null
      */
     public static function tryConvert(mixed $value, ?string $requiredUnit = null): ?array
     {
         $quantity = null;
 
         if (is_int($value) || is_float($value)) {
-            $quantity = ['value' => (float) $value, 'unit' => '1'];
+            $quantity = self::buildQuantity((float) $value, '1', '1');
         } elseif (is_bool($value)) {
-            $quantity = ['value' => $value ? 1.0 : 0.0, 'unit' => '1'];
+            $quantity = self::buildQuantity($value ? 1.0 : 0.0, '1', '1');
         } elseif (is_string($value)) {
             $quantity = self::parseQuantityString($value);
-        } elseif (is_array($value) && array_key_exists('value', $value) && array_key_exists('unit', $value) && is_numeric($value['value']) && is_string($value['unit'])) {
-            $quantity = ['value' => (float) $value['value'], 'unit' => $value['unit']];
+        } elseif (is_array($value) && array_key_exists('value', $value) && (array_key_exists('unit', $value) || array_key_exists('code', $value)) && is_numeric($value['value'])) {
+            $unit   = is_string($value['unit'] ?? null) ? $value['unit'] : null;
+            $code   = is_string($value['code'] ?? null) ? $value['code'] : $unit;
+            $system = is_string($value['system'] ?? null) ? $value['system'] : null;
+
+            if ($code !== null) {
+                $quantity = self::buildQuantity((float) $value['value'], $unit ?? $code, $code, $system);
+            }
         }
 
         if ($quantity === null) {
@@ -93,6 +101,7 @@ final class ToQuantityFunction extends AbstractFunction
             return null;
         }
 
+        /** @var array{value: float, unit: string, code: string, system?: string|null} $quantity */
         return $quantity;
     }
 
@@ -130,6 +139,8 @@ final class ToQuantityFunction extends AbstractFunction
      *  - "10'mg'"    → {value: 10.0, unit: 'mg'}   (no space before quote)
      *  - "10"        → {value: 10.0, unit: '1'}    (plain numeric, dimensionless)
      *  - "-5.5 'kg'" → {value: -5.5, unit: 'kg'}
+     *  - "7 days"    → {value: 7.0, unit: 'days'}  (calendar duration)
+     *  - "1 week"    → {value: 1.0, unit: 'week'}  (calendar duration)
      *
      * @param string $value The string to parse
      *
@@ -139,12 +150,20 @@ final class ToQuantityFunction extends AbstractFunction
     {
         $trimmed = trim($value);
 
+        // Calendar duration literals: number followed by duration keyword (e.g. "7 days", "1 week")
+        // Pattern: optional +/-, digits, optional decimal part, space(s), duration keyword
+        $calendarUnits = 'year|years|month|months|week|weeks|day|days|hour|hours|minute|minutes|second|seconds|millisecond|milliseconds';
+        if (preg_match("/^([+-]?\d+(?:\.\d+)?)\s+({$calendarUnits})$/", $trimmed, $matches) === 1) {
+            // $matches[1] = numeric value, $matches[2] = duration keyword
+            return self::buildQuantity((float) $matches[1], $matches[2], $matches[2], self::UCUM_SYSTEM_URL);
+        }
+
         // FHIRPath quantity literal: number followed by a quoted unit (e.g. "10 'mg'")
         // Pattern: optional +/-, digits, optional decimal part, optional space, quoted unit
         // preg_match returns 1 on successful match, 0 on no match
-        if (preg_match("/^([+-]?\d+(?:\.\d+)?)\s*'([^']*)'\$/", $trimmed, $matches) === 1) {
+        if (preg_match("/^([+-]?\d+(?:\.\d+)?)\s*'([^']*)'$/", $trimmed, $matches) === 1) {
             // $matches[1] = the numeric value, $matches[2] = the unit (inside quotes)
-            return ['value' => (float) $matches[1], 'unit' => $matches[2]];
+            return self::buildQuantity((float) $matches[1], $matches[2], $matches[2], self::UCUM_SYSTEM_URL);
         }
 
         // Plain numeric string → dimensionless Quantity with unit '1'
@@ -152,9 +171,29 @@ final class ToQuantityFunction extends AbstractFunction
         // preg_match returns 1 on successful match
         if (preg_match('/^[+-]?\d+(?:\.\d+)?$/', $trimmed) === 1) {
             // '1' represents a dimensionless quantity (no specific unit)
-            return ['value' => (float) $trimmed, 'unit' => '1'];
+            return self::buildQuantity((float) $trimmed, '1', '1');
         }
 
         return null;
+    }
+
+    /**
+     * Build a normalized quantity array.
+     *
+     * @return array{value: float, unit: string, code: string, system?: string|null}
+     */
+    private static function buildQuantity(float $value, string $unit, ?string $code = null, ?string $system = null): array
+    {
+        $quantity = [
+            'value' => $value,
+            'unit'  => $unit,
+            'code'  => $code ?? $unit,
+        ];
+
+        if ($system !== null) {
+            $quantity['system'] = $system;
+        }
+
+        return $quantity;
     }
 }

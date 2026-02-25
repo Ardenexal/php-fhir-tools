@@ -56,7 +56,7 @@ class ExplanationOfBenefitDiagnosis extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'diagnosisX' => [
+        'diagnosis' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -122,7 +122,7 @@ class ExplanationOfBenefitDiagnosis extends BackboneElement
         /** @var PositiveIntPrimitive|null sequence Diagnosis instance identifier */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?PositiveIntPrimitive $sequence = null,
-        /** @var CodeableConcept|Reference|null diagnosisX Nature of illness or problem */
+        /** @var CodeableConcept|Reference|null diagnosis Nature of illness or problem */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -144,7 +144,7 @@ class ExplanationOfBenefitDiagnosis extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public CodeableConcept|Reference|null $diagnosisX = null,
+        public CodeableConcept|Reference|null $diagnosis = null,
         /** @var array<CodeableConcept> type Timing or nature of the diagnosis */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true)]
         public array $type = [],

@@ -146,7 +146,7 @@ class EvidenceResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'citeAsX' => [
+        'citeAs' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -389,7 +389,7 @@ class EvidenceResource extends DomainResourceResource
         /** @var StringPrimitive|string|null title Name for this summary (human friendly) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $title = null,
-        /** @var Reference|MarkdownPrimitive|null citeAsX Citation for this evidence */
+        /** @var Reference|MarkdownPrimitive|null citeAs Citation for this evidence */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -409,7 +409,7 @@ class EvidenceResource extends DomainResourceResource
                 ],
             ],
         )]
-        public Reference|MarkdownPrimitive|null $citeAsX = null,
+        public Reference|MarkdownPrimitive|null $citeAs = null,
         /** @var PublicationStatusType|null status draft | active | retired | unknown */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?PublicationStatusType $status = null,

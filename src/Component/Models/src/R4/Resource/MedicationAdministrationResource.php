@@ -163,7 +163,7 @@ class MedicationAdministrationResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'medicationX' => [
+        'medication' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -214,7 +214,7 @@ class MedicationAdministrationResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'effectiveX' => [
+        'effective' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -355,7 +355,7 @@ class MedicationAdministrationResource extends DomainResourceResource
         /** @var CodeableConcept|null category Type of medication usage */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $category = null,
-        /** @var CodeableConcept|Reference|null medicationX What was administered */
+        /** @var CodeableConcept|Reference|null medication What was administered */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -377,7 +377,7 @@ class MedicationAdministrationResource extends DomainResourceResource
             ],
         )]
         #[NotBlank]
-        public CodeableConcept|Reference|null $medicationX = null,
+        public CodeableConcept|Reference|null $medication = null,
         /** @var Reference|null subject Who received medication */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?Reference $subject = null,
@@ -387,7 +387,7 @@ class MedicationAdministrationResource extends DomainResourceResource
         /** @var array<Reference> supportingInformation Additional information to support administration */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isArray: true)]
         public array $supportingInformation = [],
-        /** @var DateTimePrimitive|Period|null effectiveX Start and end time of administration */
+        /** @var DateTimePrimitive|Period|null effective Start and end time of administration */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -409,7 +409,7 @@ class MedicationAdministrationResource extends DomainResourceResource
             ],
         )]
         #[NotBlank]
-        public DateTimePrimitive|Period|null $effectiveX = null,
+        public DateTimePrimitive|Period|null $effective = null,
         /** @var array<MedicationAdministrationPerformer> performer Who performed the medication administration and what they did */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
         public array $performer = [],

@@ -153,7 +153,7 @@ class DeviceUseStatementResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'timingX' => [
+        'timing' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -289,7 +289,7 @@ class DeviceUseStatementResource extends DomainResourceResource
         /** @var array<Reference> derivedFrom Supporting information */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isArray: true)]
         public array $derivedFrom = [],
-        /** @var Timing|Period|DateTimePrimitive|null timingX How often  the device was used */
+        /** @var Timing|Period|DateTimePrimitive|null timing How often  the device was used */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -315,7 +315,7 @@ class DeviceUseStatementResource extends DomainResourceResource
                 ],
             ],
         )]
-        public Timing|Period|DateTimePrimitive|null $timingX = null,
+        public Timing|Period|DateTimePrimitive|null $timing = null,
         /** @var DateTimePrimitive|null recordedOn When statement was recorded */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $recordedOn = null,

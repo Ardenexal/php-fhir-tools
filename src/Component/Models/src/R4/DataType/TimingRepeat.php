@@ -35,7 +35,7 @@ class TimingRepeat extends Element
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'boundsX' => [
+        'bounds' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -201,7 +201,7 @@ class TimingRepeat extends Element
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
-        /** @var Duration|Range|Period|null boundsX Length/Range of lengths, or (Start and/or end) limits */
+        /** @var Duration|Range|Period|null bounds Length/Range of lengths, or (Start and/or end) limits */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -227,7 +227,7 @@ class TimingRepeat extends Element
                 ],
             ],
         )]
-        public Duration|Range|Period|null $boundsX = null,
+        public Duration|Range|Period|null $bounds = null,
         /** @var PositiveIntPrimitive|null count Number of times to repeat */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]
         public ?PositiveIntPrimitive $count = null,

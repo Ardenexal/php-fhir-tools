@@ -603,23 +603,46 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
             $reflection = new \ReflectionClass($resolvedType);
             $object     = $reflection->newInstanceWithoutConstructor();
 
+            // Get property metadata for choice element mapping
+            $metaMap = $this->getPropertyMetadataMap($object);
+
             // Get unknown property policy from FHIR context
             $unknownPropertyPolicy = $fhirContext->unknownElementPolicy;
 
             // Set properties from the data
-            foreach ($data as $propertyName => $value) {
+            foreach ($data as $elementName => $value) {
                 // Skip underscore-prefixed extension properties, they're handled with their base property
-                if (str_starts_with($propertyName, '_')) {
+                if (str_starts_with($elementName, '_')) {
                     continue;
                 }
 
                 // Skip XML-specific properties
-                if (str_starts_with($propertyName, '@')) {
+                if (str_starts_with($elementName, '@')) {
                     continue;
                 }
 
-                if ($reflection->hasProperty($propertyName)) {
-                    $property     = $reflection->getProperty($propertyName);
+                // First, check if this is a choice element variant (e.g., 'valueQuantity' -> 'value')
+                $choiceMapping = $this->findChoicePropertyByKey($metaMap, $elementName);
+                if ($choiceMapping !== null) {
+                    [$propertyName, $phpType] = $choiceMapping;
+                    
+                    if ($reflection->hasProperty($propertyName)) {
+                        $property = $reflection->getProperty($propertyName);
+
+                        if ($this->denormalizer !== null && !$this->isBuiltinType($phpType)) {
+                            $denormalizedValue = $this->denormalizer->denormalize($value, $phpType, 'json', $context);
+                        } else {
+                            $denormalizedValue = $value;
+                        }
+
+                        $property->setValue($object, $denormalizedValue);
+                        continue;
+                    }
+                }
+
+                // Standard property mapping
+                if ($reflection->hasProperty($elementName)) {
+                    $property     = $reflection->getProperty($elementName);
                     $propertyType = $this->getPropertyType($property);
 
                     // Always use the denormalizer to create properly-typed instances.
@@ -634,7 +657,7 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
                     $property->setValue($object, $denormalizedValue);
                 } else {
                     // Handle unknown properties according to policy
-                    $this->handleUnknownProperty($propertyName, $value, $unknownPropertyPolicy, $object, $propertyName);
+                    $this->handleUnknownProperty($elementName, $value, $unknownPropertyPolicy, $object, $elementName);
                 }
             }
 
@@ -662,18 +685,41 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
             $reflection = new \ReflectionClass($resolvedType);
             $object     = $reflection->newInstanceWithoutConstructor();
 
+            // Get property metadata for choice element mapping
+            $metaMap = $this->getPropertyMetadataMap($object);
+
             // Get unknown property policy from FHIR context
             $unknownPropertyPolicy = $fhirContext->unknownElementPolicy;
 
             // Set properties from the data
-            foreach ($data as $propertyName => $value) {
+            foreach ($data as $elementName => $value) {
                 // Skip XML-specific keys: attributes (@xmlns), text nodes (#), comments (#comment)
-                if (str_starts_with($propertyName, '@') || str_starts_with($propertyName, '#')) {
+                if (str_starts_with($elementName, '@') || str_starts_with($elementName, '#')) {
                     continue;
                 }
 
-                if ($reflection->hasProperty($propertyName)) {
-                    $property     = $reflection->getProperty($propertyName);
+                // First, check if this is a choice element variant (e.g., 'valueQuantity' -> 'value')
+                $choiceMapping = $this->findChoicePropertyByKey($metaMap, $elementName);
+                if ($choiceMapping !== null) {
+                    [$propertyName, $phpType] = $choiceMapping;
+                    
+                    if ($reflection->hasProperty($propertyName)) {
+                        $property = $reflection->getProperty($propertyName);
+
+                        if ($this->denormalizer !== null && !$this->isBuiltinType($phpType)) {
+                            $denormalizedValue = $this->denormalizer->denormalize($value, $phpType, 'xml', $context);
+                        } else {
+                            $denormalizedValue = $this->unwrapXmlValue($value, $phpType);
+                        }
+
+                        $property->setValue($object, $denormalizedValue);
+                        continue;
+                    }
+                }
+
+                // Standard property mapping
+                if ($reflection->hasProperty($elementName)) {
+                    $property     = $reflection->getProperty($elementName);
                     $propertyType = $this->getPropertyType($property);
 
                     if ($this->denormalizer !== null && $propertyType !== null && !$this->isBuiltinType($propertyType)) {
@@ -687,7 +733,7 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
                     $property->setValue($object, $denormalizedValue);
                 } else {
                     // Handle unknown properties according to policy
-                    $this->handleUnknownProperty($propertyName, $value, $unknownPropertyPolicy, $object, $propertyName);
+                    $this->handleUnknownProperty($elementName, $value, $unknownPropertyPolicy, $object, $elementName);
                 }
             }
 

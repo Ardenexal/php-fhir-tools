@@ -287,6 +287,32 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     }
 
     /**
+     * Find the property name and PHP type for a choice element by its JSON/XML key.
+     *
+     * Reverse lookup: given an element name like 'valueQuantity', find the base property
+     * name ('value') and the concrete PHP type for that variant.
+     *
+     * @param array<string, PropertyMetadata> $metaMap The property metadata map
+     * @param string                           $elementKey The JSON/XML element name (e.g., 'valueQuantity')
+     *
+     * @return array{0: string, 1: string}|null [propertyName, phpType] or null if not found
+     */
+    protected function findChoicePropertyByKey(array $metaMap, string $elementKey): ?array
+    {
+        foreach ($metaMap as $propertyName => $meta) {
+            if ($meta->isChoice && !empty($meta->variants)) {
+                foreach ($meta->variants as $variant) {
+                    if ($variant->jsonKey === $elementKey) {
+                        return [$propertyName, $variant->phpType];
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Check if a value should be omitted according to FHIR rules and context configuration.
      */
     protected function shouldOmitValue(mixed $value, FHIRSerializationContext $context): bool

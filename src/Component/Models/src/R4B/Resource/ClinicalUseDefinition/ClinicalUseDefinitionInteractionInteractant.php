@@ -50,7 +50,7 @@ class ClinicalUseDefinitionInteractionInteractant extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'itemX' => [
+        'item' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -86,7 +86,7 @@ class ClinicalUseDefinitionInteractionInteractant extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
-        /** @var Reference|CodeableConcept|null itemX The specific medication, food or laboratory test that interacts */
+        /** @var Reference|CodeableConcept|null item The specific medication, food or laboratory test that interacts */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -108,7 +108,7 @@ class ClinicalUseDefinitionInteractionInteractant extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public Reference|CodeableConcept|null $itemX = null,
+        public Reference|CodeableConcept|null $item = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

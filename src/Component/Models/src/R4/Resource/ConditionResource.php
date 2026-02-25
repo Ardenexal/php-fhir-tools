@@ -187,7 +187,7 @@ class ConditionResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'onsetX' => [
+        'onset' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -232,7 +232,7 @@ class ConditionResource extends DomainResourceResource
                 ],
             ],
         ],
-        'abatementX' => [
+        'abatement' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -385,7 +385,7 @@ class ConditionResource extends DomainResourceResource
         /** @var Reference|null encounter Encounter created as part of */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $encounter = null,
-        /** @var DateTimePrimitive|Age|Period|Range|StringPrimitive|string|null onsetX Estimated or actual date,  date-time, or age */
+        /** @var DateTimePrimitive|Age|Period|Range|StringPrimitive|string|null onset Estimated or actual date,  date-time, or age */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -423,8 +423,8 @@ class ConditionResource extends DomainResourceResource
                 ],
             ],
         )]
-        public DateTimePrimitive|Age|Period|Range|StringPrimitive|string|null $onsetX = null,
-        /** @var DateTimePrimitive|Age|Period|Range|StringPrimitive|string|null abatementX When in resolution/remission */
+        public DateTimePrimitive|Age|Period|Range|StringPrimitive|string|null $onset = null,
+        /** @var DateTimePrimitive|Age|Period|Range|StringPrimitive|string|null abatement When in resolution/remission */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -462,7 +462,7 @@ class ConditionResource extends DomainResourceResource
                 ],
             ],
         )]
-        public DateTimePrimitive|Age|Period|Range|StringPrimitive|string|null $abatementX = null,
+        public DateTimePrimitive|Age|Period|Range|StringPrimitive|string|null $abatement = null,
         /** @var DateTimePrimitive|null recordedDate Date record was first recorded */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $recordedDate = null,

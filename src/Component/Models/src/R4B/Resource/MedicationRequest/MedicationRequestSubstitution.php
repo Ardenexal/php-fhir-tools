@@ -45,7 +45,7 @@ class MedicationRequestSubstitution extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'allowedX' => [
+        'allowed' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -90,7 +90,7 @@ class MedicationRequestSubstitution extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
-        /** @var bool|CodeableConcept|null allowedX Whether substitution is allowed or not */
+        /** @var bool|CodeableConcept|null allowed Whether substitution is allowed or not */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -107,7 +107,7 @@ class MedicationRequestSubstitution extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public bool|CodeableConcept|null $allowedX = null,
+        public bool|CodeableConcept|null $allowed = null,
         /** @var CodeableConcept|null reason Why should (not) substitution be made */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $reason = null,

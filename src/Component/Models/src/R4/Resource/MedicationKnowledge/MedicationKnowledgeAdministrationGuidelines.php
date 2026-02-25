@@ -54,7 +54,7 @@ class MedicationKnowledgeAdministrationGuidelines extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'indicationX' => [
+        'indication' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -102,7 +102,7 @@ class MedicationKnowledgeAdministrationGuidelines extends BackboneElement
         /** @var array<MedicationKnowledgeAdministrationGuidelinesDosage> dosage Dosage for the medication for the specific guidelines */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
         public array $dosage = [],
-        /** @var CodeableConcept|Reference|null indicationX Indication for use that apply to the specific administration guidelines */
+        /** @var CodeableConcept|Reference|null indication Indication for use that apply to the specific administration guidelines */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -122,7 +122,7 @@ class MedicationKnowledgeAdministrationGuidelines extends BackboneElement
                 ],
             ],
         )]
-        public CodeableConcept|Reference|null $indicationX = null,
+        public CodeableConcept|Reference|null $indication = null,
         /** @var array<MedicationKnowledgeAdministrationGuidelinesPatientCharacteristics> patientCharacteristics Characteristics of the patient that are relevant to the administration guidelines */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
         public array $patientCharacteristics = [],

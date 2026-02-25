@@ -156,7 +156,7 @@ class CoverageEligibilityRequestResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'servicedX' => [
+        'serviced' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -294,7 +294,7 @@ class CoverageEligibilityRequestResource extends DomainResourceResource
         /** @var Reference|null patient Intended recipient of products and services */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?Reference $patient = null,
-        /** @var DatePrimitive|Period|null servicedX Estimated date or dates of service */
+        /** @var DatePrimitive|Period|null serviced Estimated date or dates of service */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -314,7 +314,7 @@ class CoverageEligibilityRequestResource extends DomainResourceResource
                 ],
             ],
         )]
-        public DatePrimitive|Period|null $servicedX = null,
+        public DatePrimitive|Period|null $serviced = null,
         /** @var DateTimePrimitive|null created Creation date */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?DateTimePrimitive $created = null,

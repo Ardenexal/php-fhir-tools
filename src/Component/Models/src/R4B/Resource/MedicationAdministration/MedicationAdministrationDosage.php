@@ -92,7 +92,7 @@ class MedicationAdministrationDosage extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'rateX' => [
+        'rate' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -143,7 +143,7 @@ class MedicationAdministrationDosage extends BackboneElement
         /** @var Quantity|null dose Amount of medication per dose */
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
         public ?Quantity $dose = null,
-        /** @var Ratio|Quantity|null rateX Dose quantity per unit of time */
+        /** @var Ratio|Quantity|null rate Dose quantity per unit of time */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -163,7 +163,7 @@ class MedicationAdministrationDosage extends BackboneElement
                 ],
             ],
         )]
-        public Ratio|Quantity|null $rateX = null,
+        public Ratio|Quantity|null $rate = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

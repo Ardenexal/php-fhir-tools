@@ -98,9 +98,30 @@ final class ToStringFunction extends AbstractFunction
         // Quantity array representation: ['value' => numeric, 'unit' => string]
         if (is_array($value) && array_key_exists('value', $value) && array_key_exists('unit', $value) && is_numeric($value['value']) && is_string($value['unit'])) {
             $floatVal = (float) $value['value'];
-            $strVal   = self::formatDecimal($floatVal);
+            
+            // Preserve integer formatting if value is a whole number
+            // This ensures '1 'wk'' instead of '1.0 'wk''
+            if ((float) (int) $floatVal === $floatVal) {
+                $strVal = (string) (int) $floatVal;
+            } else {
+                $strVal = self::formatDecimal($floatVal);
+            }
 
-            return "{$strVal} '{$value['unit']}'";
+            $unit = $value['unit'];
+            
+            // Calendar duration keywords should be output without quotes
+            // e.g., '1 week' not '1 'week''
+            $calendarKeywords = [
+                'year', 'years', 'month', 'months', 'week', 'weeks', 'day', 'days',
+                'hour', 'hours', 'minute', 'minutes', 'second', 'seconds',
+                'millisecond', 'milliseconds',
+            ];
+            
+            if (in_array($unit, $calendarKeywords, true)) {
+                return "{$strVal} {$unit}";
+            }
+
+            return "{$strVal} '{$unit}'";
         }
 
         // Other complex types (non-Quantity arrays, objects) → empty

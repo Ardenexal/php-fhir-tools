@@ -85,7 +85,7 @@ class ImplementationGuideDefinitionResource extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'exampleX' => [
+        'example' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -142,7 +142,7 @@ class ImplementationGuideDefinitionResource extends BackboneElement
         /** @var StringPrimitive|string|null description Reason why included in guide */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $description = null,
-        /** @var bool|CanonicalPrimitive|null exampleX Is an example/What is this an example of? */
+        /** @var bool|CanonicalPrimitive|null example Is an example/What is this an example of? */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -157,7 +157,7 @@ class ImplementationGuideDefinitionResource extends BackboneElement
                 ],
             ],
         )]
-        public bool|CanonicalPrimitive|null $exampleX = null,
+        public bool|CanonicalPrimitive|null $example = null,
         /** @var IdPrimitive|null groupingId Grouping this is part of */
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive')]
         public ?IdPrimitive $groupingId = null,

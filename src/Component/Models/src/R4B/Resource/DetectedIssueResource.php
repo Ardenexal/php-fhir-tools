@@ -155,7 +155,7 @@ class DetectedIssueResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'identifiedX' => [
+        'identified' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -275,7 +275,7 @@ class DetectedIssueResource extends DomainResourceResource
         /** @var Reference|null patient Associated patient */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $patient = null,
-        /** @var DateTimePrimitive|Period|null identifiedX When identified */
+        /** @var DateTimePrimitive|Period|null identified When identified */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -295,7 +295,7 @@ class DetectedIssueResource extends DomainResourceResource
                 ],
             ],
         )]
-        public DateTimePrimitive|Period|null $identifiedX = null,
+        public DateTimePrimitive|Period|null $identified = null,
         /** @var Reference|null author The provider or device that identified the issue */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $author = null,

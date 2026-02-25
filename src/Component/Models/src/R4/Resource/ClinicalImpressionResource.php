@@ -173,7 +173,7 @@ class ClinicalImpressionResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'effectiveX' => [
+        'effective' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -353,7 +353,7 @@ class ClinicalImpressionResource extends DomainResourceResource
         /** @var Reference|null encounter Encounter created as part of */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $encounter = null,
-        /** @var DateTimePrimitive|Period|null effectiveX Time of assessment */
+        /** @var DateTimePrimitive|Period|null effective Time of assessment */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -373,7 +373,7 @@ class ClinicalImpressionResource extends DomainResourceResource
                 ],
             ],
         )]
-        public DateTimePrimitive|Period|null $effectiveX = null,
+        public DateTimePrimitive|Period|null $effective = null,
         /** @var DateTimePrimitive|null date When the assessment was documented */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $date = null,

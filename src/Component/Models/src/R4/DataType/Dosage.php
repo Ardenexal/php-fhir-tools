@@ -91,7 +91,7 @@ class Dosage extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'asNeededX' => [
+        'asNeeded' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -205,7 +205,7 @@ class Dosage extends BackboneElement
         /** @var Timing|null timing When medication should be administered */
         #[FhirProperty(fhirType: 'Timing', propertyKind: 'complex')]
         public ?Timing $timing = null,
-        /** @var bool|CodeableConcept|null asNeededX Take "as needed" (for x) */
+        /** @var bool|CodeableConcept|null asNeeded Take "as needed" (for x) */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -220,7 +220,7 @@ class Dosage extends BackboneElement
                 ],
             ],
         )]
-        public bool|CodeableConcept|null $asNeededX = null,
+        public bool|CodeableConcept|null $asNeeded = null,
         /** @var CodeableConcept|null site Body site to administer to */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $site = null,

@@ -276,7 +276,7 @@ class MessageDefinitionResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'eventX' => [
+        'event' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -426,7 +426,7 @@ class MessageDefinitionResource extends DomainResourceResource
         /** @var array<CanonicalPrimitive> parent Protocol/workflow this is part of */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true)]
         public array $parent = [],
-        /** @var Coding|UriPrimitive|null eventX Event code  or link to the EventDefinition */
+        /** @var Coding|UriPrimitive|null event Event code  or link to the EventDefinition */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -448,7 +448,7 @@ class MessageDefinitionResource extends DomainResourceResource
             ],
         )]
         #[NotBlank]
-        public Coding|UriPrimitive|null $eventX = null,
+        public Coding|UriPrimitive|null $event = null,
         /** @var MessageSignificanceCategoryType|null category consequence | currency | notification */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
         public ?MessageSignificanceCategoryType $category = null,

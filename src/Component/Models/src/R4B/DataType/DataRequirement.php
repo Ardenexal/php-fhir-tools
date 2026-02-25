@@ -58,7 +58,7 @@ class DataRequirement extends Element
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'subjectX' => [
+        'subject' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -142,7 +142,7 @@ class DataRequirement extends Element
         /** @var array<CanonicalPrimitive> profile The profile of the required data */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true)]
         public array $profile = [],
-        /** @var CodeableConcept|Reference|null subjectX E.g. Patient, Practitioner, RelatedPerson, Organization, Location, Device */
+        /** @var CodeableConcept|Reference|null subject E.g. Patient, Practitioner, RelatedPerson, Organization, Location, Device */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -162,7 +162,7 @@ class DataRequirement extends Element
                 ],
             ],
         )]
-        public CodeableConcept|Reference|null $subjectX = null,
+        public CodeableConcept|Reference|null $subject = null,
         /** @var array<StringPrimitive|string> mustSupport Indicates specific structure elements that are referenced by the knowledge module */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
         public array $mustSupport = [],

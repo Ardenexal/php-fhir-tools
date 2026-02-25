@@ -83,7 +83,7 @@ class ClinicalUseDefinitionIndication extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'durationX' => [
+        'duration' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -149,7 +149,7 @@ class ClinicalUseDefinitionIndication extends BackboneElement
         /** @var CodeableReference|null intendedEffect The intended effect, aim or strategy to be achieved */
         #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex')]
         public ?CodeableReference $intendedEffect = null,
-        /** @var Range|StringPrimitive|string|null durationX Timing or duration information */
+        /** @var Range|StringPrimitive|string|null duration Timing or duration information */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -169,7 +169,7 @@ class ClinicalUseDefinitionIndication extends BackboneElement
                 ],
             ],
         )]
-        public Range|StringPrimitive|string|null $durationX = null,
+        public Range|StringPrimitive|string|null $duration = null,
         /** @var array<Reference> undesirableEffect An unwanted side effect or negative outcome of the subject of this resource when being used for this indication */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isArray: true)]
         public array $undesirableEffect = [],

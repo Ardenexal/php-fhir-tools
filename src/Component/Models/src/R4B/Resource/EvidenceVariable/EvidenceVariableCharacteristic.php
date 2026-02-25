@@ -59,7 +59,7 @@ class EvidenceVariableCharacteristic extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'definitionX' => [
+        'definition' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -157,7 +157,7 @@ class EvidenceVariableCharacteristic extends BackboneElement
         /** @var StringPrimitive|string|null description Natural language description of the characteristic */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $description = null,
-        /** @var Reference|CanonicalPrimitive|CodeableConcept|Expression|null definitionX What code or expression defines members? */
+        /** @var Reference|CanonicalPrimitive|CodeableConcept|Expression|null definition What code or expression defines members? */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -191,7 +191,7 @@ class EvidenceVariableCharacteristic extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public Reference|CanonicalPrimitive|CodeableConcept|Expression|null $definitionX = null,
+        public Reference|CanonicalPrimitive|CodeableConcept|Expression|null $definition = null,
         /** @var CodeableConcept|null method Method used for describing characteristic */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $method = null,

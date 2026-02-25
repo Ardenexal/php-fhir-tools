@@ -175,7 +175,7 @@ class MedicationRequestResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'reportedX' => [
+        'reported' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -199,7 +199,7 @@ class MedicationRequestResource extends DomainResourceResource
                 ],
             ],
         ],
-        'medicationX' => [
+        'medication' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -478,7 +478,7 @@ class MedicationRequestResource extends DomainResourceResource
         /** @var bool|null doNotPerform True if request is prohibiting action */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $doNotPerform = null,
-        /** @var bool|Reference|null reportedX Reported rather than primary record */
+        /** @var bool|Reference|null reported Reported rather than primary record */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -493,8 +493,8 @@ class MedicationRequestResource extends DomainResourceResource
                 ],
             ],
         )]
-        public bool|Reference|null $reportedX = null,
-        /** @var CodeableConcept|Reference|null medicationX Medication to be taken */
+        public bool|Reference|null $reported = null,
+        /** @var CodeableConcept|Reference|null medication Medication to be taken */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -516,7 +516,7 @@ class MedicationRequestResource extends DomainResourceResource
             ],
         )]
         #[NotBlank]
-        public CodeableConcept|Reference|null $medicationX = null,
+        public CodeableConcept|Reference|null $medication = null,
         /** @var Reference|null subject Who or group medication request is for */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?Reference $subject = null,

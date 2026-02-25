@@ -70,7 +70,7 @@ class QuestionnaireItemEnableWhen extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'answerX' => [
+        'answer' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -168,7 +168,7 @@ class QuestionnaireItemEnableWhen extends BackboneElement
         /** @var QuestionnaireItemOperatorType|null operator exists | = | != | > | < | >= | <= */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?QuestionnaireItemOperatorType $operator = null,
-        /** @var bool|float|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|string|Coding|Quantity|Reference|null answerX Value for question comparison based on operator */
+        /** @var bool|float|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|string|Coding|Quantity|Reference|null answer Value for question comparison based on operator */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -223,7 +223,7 @@ class QuestionnaireItemEnableWhen extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public bool|float|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|string|Coding|Quantity|Reference|null $answerX = null,
+        public bool|float|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|string|Coding|Quantity|Reference|null $answer = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

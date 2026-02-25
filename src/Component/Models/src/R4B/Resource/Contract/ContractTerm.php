@@ -77,7 +77,7 @@ class ContractTerm extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'topicX' => [
+        'topic' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -194,7 +194,7 @@ class ContractTerm extends BackboneElement
         /** @var Period|null applies Contract Term Effective Time */
         #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
         public ?Period $applies = null,
-        /** @var CodeableConcept|Reference|null topicX Term Concern */
+        /** @var CodeableConcept|Reference|null topic Term Concern */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -214,7 +214,7 @@ class ContractTerm extends BackboneElement
                 ],
             ],
         )]
-        public CodeableConcept|Reference|null $topicX = null,
+        public CodeableConcept|Reference|null $topic = null,
         /** @var CodeableConcept|null type Contract Term Type or Form */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $type = null,

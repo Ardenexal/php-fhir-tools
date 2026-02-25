@@ -188,7 +188,7 @@ class DeviceRequestResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'codeX' => [
+        'code' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -239,7 +239,7 @@ class DeviceRequestResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'occurrenceX' => [
+        'occurrence' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -414,7 +414,7 @@ class DeviceRequestResource extends DomainResourceResource
         /** @var RequestPriorityType|null priority routine | urgent | asap | stat */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
         public ?RequestPriorityType $priority = null,
-        /** @var Reference|CodeableConcept|null codeX Device requested */
+        /** @var Reference|CodeableConcept|null code Device requested */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -436,7 +436,7 @@ class DeviceRequestResource extends DomainResourceResource
             ],
         )]
         #[NotBlank]
-        public Reference|CodeableConcept|null $codeX = null,
+        public Reference|CodeableConcept|null $code = null,
         /** @var array<DeviceRequestParameter> parameter Device details */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
         public array $parameter = [],
@@ -446,7 +446,7 @@ class DeviceRequestResource extends DomainResourceResource
         /** @var Reference|null encounter Encounter motivating request */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $encounter = null,
-        /** @var DateTimePrimitive|Period|Timing|null occurrenceX Desired time or schedule for use */
+        /** @var DateTimePrimitive|Period|Timing|null occurrence Desired time or schedule for use */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -472,7 +472,7 @@ class DeviceRequestResource extends DomainResourceResource
                 ],
             ],
         )]
-        public DateTimePrimitive|Period|Timing|null $occurrenceX = null,
+        public DateTimePrimitive|Period|Timing|null $occurrence = null,
         /** @var DateTimePrimitive|null authoredOn When recorded */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $authoredOn = null,

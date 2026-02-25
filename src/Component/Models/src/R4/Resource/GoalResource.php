@@ -166,7 +166,7 @@ class GoalResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'startX' => [
+        'start' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -310,7 +310,7 @@ class GoalResource extends DomainResourceResource
         /** @var Reference|null subject Who this goal is intended for */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?Reference $subject = null,
-        /** @var DatePrimitive|CodeableConcept|null startX When goal pursuit begins */
+        /** @var DatePrimitive|CodeableConcept|null start When goal pursuit begins */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -330,7 +330,7 @@ class GoalResource extends DomainResourceResource
                 ],
             ],
         )]
-        public DatePrimitive|CodeableConcept|null $startX = null,
+        public DatePrimitive|CodeableConcept|null $start = null,
         /** @var array<GoalTarget> target Target outcome for the goal */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
         public array $target = [],

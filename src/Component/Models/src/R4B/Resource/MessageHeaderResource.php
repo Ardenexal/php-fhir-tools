@@ -107,7 +107,7 @@ class MessageHeaderResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'eventX' => [
+        'event' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -248,7 +248,7 @@ class MessageHeaderResource extends DomainResourceResource
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
-        /** @var Coding|UriPrimitive|null eventX Code for the event this message represents or link to event definition */
+        /** @var Coding|UriPrimitive|null event Code for the event this message represents or link to event definition */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -270,7 +270,7 @@ class MessageHeaderResource extends DomainResourceResource
             ],
         )]
         #[NotBlank]
-        public Coding|UriPrimitive|null $eventX = null,
+        public Coding|UriPrimitive|null $event = null,
         /** @var array<MessageHeaderDestination> destination Message destination application(s) */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
         public array $destination = [],

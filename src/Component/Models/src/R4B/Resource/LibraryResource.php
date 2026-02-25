@@ -191,7 +191,7 @@ class LibraryResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'subjectX' => [
+        'subject' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -458,7 +458,7 @@ class LibraryResource extends DomainResourceResource
         /** @var CodeableConcept|null type logic-library | model-definition | asset-collection | module-definition */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?CodeableConcept $type = null,
-        /** @var CodeableConcept|Reference|null subjectX Type of individual the library content is focused on */
+        /** @var CodeableConcept|Reference|null subject Type of individual the library content is focused on */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -478,7 +478,7 @@ class LibraryResource extends DomainResourceResource
                 ],
             ],
         )]
-        public CodeableConcept|Reference|null $subjectX = null,
+        public CodeableConcept|Reference|null $subject = null,
         /** @var DateTimePrimitive|null date Date last changed */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $date = null,

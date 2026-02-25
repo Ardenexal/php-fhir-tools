@@ -99,34 +99,52 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
             $reflection = new \ReflectionClass($resolvedType);
             $object     = $reflection->newInstanceWithoutConstructor();
 
+            // Get property metadata for choice element mapping
+            $metaMap = $this->getPropertyMetadataMap($object);
+
             // Set properties from the data
-            foreach ($data as $propertyName => $value) {
+            foreach ($data as $elementName => $value) {
                 // Skip underscore-prefixed extension properties, they're handled with their base property
-                if (str_starts_with($propertyName, '_')) {
+                if (str_starts_with($elementName, '_')) {
                     continue;
                 }
 
-                if ($reflection->hasProperty($propertyName)) {
-                    $property = $reflection->getProperty($propertyName);
+                // First, check if this is a choice element variant (e.g., 'valueQuantity' -> 'value')
+                $choiceMapping = $this->findChoicePropertyByKey($metaMap, $elementName);
+                if ($choiceMapping !== null) {
+                    [$propertyName, $phpType] = $choiceMapping;
+                    
+                    if ($reflection->hasProperty($propertyName)) {
+                        $property = $reflection->getProperty($propertyName);
 
-                    // Handle choice elements (value[x] pattern)
-                    if ($this->isChoiceElement($propertyName)) {
-                        $denormalizedValue = $this->denormalizeChoiceElement($propertyName, $value, $format, $context);
-                    } else {
-                        // Always use the denormalizer to create properly-typed instances.
-                        // _property extension keys are implicitly skipped at the loop level.
-                        if ($this->denormalizer !== null) {
-                            $propertyType = $this->getPropertyType($property);
-                            if ($propertyType !== null && !$this->isBuiltinType($propertyType)) {
-                                $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, $format, $context);
-                            } else {
-                                // For XML, Symfony XmlEncoder wraps primitive values as ['@value' => '...', '#' => ''].
-                                // Unwrap before assigning to string/union-typed properties.
-                                $denormalizedValue = $format === 'xml' ? $this->unwrapXmlValue($value, $propertyType) : $value;
-                            }
+                        if ($this->denormalizer !== null && !$this->isBuiltinType($phpType)) {
+                            $denormalizedValue = $this->denormalizer->denormalize($value, $phpType, $format, $context);
                         } else {
-                            $denormalizedValue = $this->denormalizeBasicValue($value, $format, $context);
+                            $denormalizedValue = $format === 'xml' ? $this->unwrapXmlValue($value, $phpType) : $value;
                         }
+
+                        $property->setValue($object, $denormalizedValue);
+                        continue;
+                    }
+                }
+
+                // Standard property mapping
+                if ($reflection->hasProperty($elementName)) {
+                    $property = $reflection->getProperty($elementName);
+
+                    // Always use the denormalizer to create properly-typed instances.
+                    // _property extension keys are implicitly skipped at the loop level.
+                    if ($this->denormalizer !== null) {
+                        $propertyType = $this->getPropertyType($property);
+                        if ($propertyType !== null && !$this->isBuiltinType($propertyType)) {
+                            $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, $format, $context);
+                        } else {
+                            // For XML, Symfony XmlEncoder wraps primitive values as ['@value' => '...', '#' => ''].
+                            // Unwrap before assigning to string/union-typed properties.
+                            $denormalizedValue = $format === 'xml' ? $this->unwrapXmlValue($value, $propertyType) : $value;
+                        }
+                    } else {
+                        $denormalizedValue = $this->denormalizeBasicValue($value, $format, $context);
                     }
 
                     $property->setValue($object, $denormalizedValue);

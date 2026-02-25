@@ -75,7 +75,7 @@ class SpecimenProcessing extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'timeX' => [
+        'time' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -120,7 +120,7 @@ class SpecimenProcessing extends BackboneElement
         /** @var array<Reference> additive Material used in the processing step */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isArray: true)]
         public array $additive = [],
-        /** @var DateTimePrimitive|Period|null timeX Date and time of specimen processing */
+        /** @var DateTimePrimitive|Period|null time Date and time of specimen processing */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -140,7 +140,7 @@ class SpecimenProcessing extends BackboneElement
                 ],
             ],
         )]
-        public DateTimePrimitive|Period|null $timeX = null,
+        public DateTimePrimitive|Period|null $time = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -49,7 +49,7 @@ class CoverageEligibilityRequestItemDiagnosis extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'diagnosisX' => [
+        'diagnosis' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -85,7 +85,7 @@ class CoverageEligibilityRequestItemDiagnosis extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
-        /** @var CodeableConcept|Reference|null diagnosisX Nature of illness or problem */
+        /** @var CodeableConcept|Reference|null diagnosis Nature of illness or problem */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -105,7 +105,7 @@ class CoverageEligibilityRequestItemDiagnosis extends BackboneElement
                 ],
             ],
         )]
-        public CodeableConcept|Reference|null $diagnosisX = null,
+        public CodeableConcept|Reference|null $diagnosis = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

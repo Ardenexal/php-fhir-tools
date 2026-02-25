@@ -93,7 +93,7 @@ class SpecimenContainer extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'additiveX' => [
+        'additive' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -144,7 +144,7 @@ class SpecimenContainer extends BackboneElement
         /** @var Quantity|null specimenQuantity Quantity of specimen within container */
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
         public ?Quantity $specimenQuantity = null,
-        /** @var CodeableConcept|Reference|null additiveX Additive associated with container */
+        /** @var CodeableConcept|Reference|null additive Additive associated with container */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -164,7 +164,7 @@ class SpecimenContainer extends BackboneElement
                 ],
             ],
         )]
-        public CodeableConcept|Reference|null $additiveX = null,
+        public CodeableConcept|Reference|null $additive = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -141,7 +141,7 @@ class SupplyRequestResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'itemX' => [
+        'item' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -183,7 +183,7 @@ class SupplyRequestResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'occurrenceX' => [
+        'occurrence' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -316,7 +316,7 @@ class SupplyRequestResource extends DomainResourceResource
         /** @var RequestPriorityType|null priority routine | urgent | asap | stat */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
         public ?RequestPriorityType $priority = null,
-        /** @var CodeableConcept|Reference|null itemX Medication, Substance, or Device requested to be supplied */
+        /** @var CodeableConcept|Reference|null item Medication, Substance, or Device requested to be supplied */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -338,14 +338,14 @@ class SupplyRequestResource extends DomainResourceResource
             ],
         )]
         #[NotBlank]
-        public CodeableConcept|Reference|null $itemX = null,
+        public CodeableConcept|Reference|null $item = null,
         /** @var Quantity|null quantity The requested amount of the item indicated */
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?Quantity $quantity = null,
         /** @var array<SupplyRequestParameter> parameter Ordered item details */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
         public array $parameter = [],
-        /** @var DateTimePrimitive|Period|Timing|null occurrenceX When the request should be fulfilled */
+        /** @var DateTimePrimitive|Period|Timing|null occurrence When the request should be fulfilled */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -371,7 +371,7 @@ class SupplyRequestResource extends DomainResourceResource
                 ],
             ],
         )]
-        public DateTimePrimitive|Period|Timing|null $occurrenceX = null,
+        public DateTimePrimitive|Period|Timing|null $occurrence = null,
         /** @var DateTimePrimitive|null authoredOn When the request was made */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $authoredOn = null,

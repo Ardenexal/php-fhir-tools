@@ -61,7 +61,7 @@ class CoverageEligibilityResponseInsuranceItemBenefit extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'allowedX' => [
+        'allowed' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -92,7 +92,7 @@ class CoverageEligibilityResponseInsuranceItemBenefit extends BackboneElement
                 ],
             ],
         ],
-        'usedX' => [
+        'used' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -138,7 +138,7 @@ class CoverageEligibilityResponseInsuranceItemBenefit extends BackboneElement
         /** @var CodeableConcept|null type Benefit classification */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?CodeableConcept $type = null,
-        /** @var UnsignedIntPrimitive|StringPrimitive|string|Money|null allowedX Benefits allowed */
+        /** @var UnsignedIntPrimitive|StringPrimitive|string|Money|null allowed Benefits allowed */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -164,8 +164,8 @@ class CoverageEligibilityResponseInsuranceItemBenefit extends BackboneElement
                 ],
             ],
         )]
-        public UnsignedIntPrimitive|StringPrimitive|string|Money|null $allowedX = null,
-        /** @var UnsignedIntPrimitive|StringPrimitive|string|Money|null usedX Benefits used */
+        public UnsignedIntPrimitive|StringPrimitive|string|Money|null $allowed = null,
+        /** @var UnsignedIntPrimitive|StringPrimitive|string|Money|null used Benefits used */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -191,7 +191,7 @@ class CoverageEligibilityResponseInsuranceItemBenefit extends BackboneElement
                 ],
             ],
         )]
-        public UnsignedIntPrimitive|StringPrimitive|string|Money|null $usedX = null,
+        public UnsignedIntPrimitive|StringPrimitive|string|Money|null $used = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

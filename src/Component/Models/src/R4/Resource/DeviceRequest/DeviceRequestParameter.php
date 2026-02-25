@@ -55,7 +55,7 @@ class DeviceRequestParameter extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'valueX' => [
+        'value' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -108,7 +108,7 @@ class DeviceRequestParameter extends BackboneElement
         /** @var CodeableConcept|null code Device detail */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $code = null,
-        /** @var CodeableConcept|Quantity|Range|bool|null valueX Value of detail */
+        /** @var CodeableConcept|Quantity|Range|bool|null value Value of detail */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -135,7 +135,7 @@ class DeviceRequestParameter extends BackboneElement
                 ['fhirType' => 'boolean', 'propertyKind' => 'scalar', 'phpType' => 'bool', 'jsonKey' => 'valueBoolean'],
             ],
         )]
-        public CodeableConcept|Quantity|Range|bool|null $valueX = null,
+        public CodeableConcept|Quantity|Range|bool|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

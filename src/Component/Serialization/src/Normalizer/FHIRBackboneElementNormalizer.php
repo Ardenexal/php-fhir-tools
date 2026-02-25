@@ -97,18 +97,41 @@ class FHIRBackboneElementNormalizer extends AbstractFHIRNormalizer
                 $object = $reflection->newInstanceWithoutConstructor();
             }
 
+            // Get property metadata for choice element mapping
+            $metaMap = $this->getPropertyMetadataMap($object);
+
             // Set properties from the data while maintaining parent-child relationships
-            foreach ($data as $propertyName => $value) {
+            foreach ($data as $elementName => $value) {
                 // Skip underscore-prefixed extension properties, they're handled with their base property
-                if (str_starts_with($propertyName, '_')) {
+                if (str_starts_with($elementName, '_')) {
                     continue;
                 }
 
-                if ($reflection->hasProperty($propertyName)) {
-                    $property = $reflection->getProperty($propertyName);
+                // First, check if this is a choice element variant (e.g., 'valueQuantity' -> 'value')
+                $choiceMapping = $this->findChoicePropertyByKey($metaMap, $elementName);
+                if ($choiceMapping !== null) {
+                    [$propertyName, $phpType] = $choiceMapping;
+                    
+                    if ($reflection->hasProperty($propertyName)) {
+                        $property = $reflection->getProperty($propertyName);
+
+                        if ($this->denormalizer !== null && !$this->isBuiltinType($phpType)) {
+                            $denormalizedValue = $this->denormalizer->denormalize($value, $phpType, $format, $context);
+                        } else {
+                            $denormalizedValue = $format === 'xml' ? $this->unwrapXmlValue($value, $phpType) : $value;
+                        }
+
+                        $property->setValue($object, $denormalizedValue);
+                        continue;
+                    }
+                }
+
+                // Standard property mapping
+                if ($reflection->hasProperty($elementName)) {
+                    $property = $reflection->getProperty($elementName);
 
                     // Handle extensions and modifierExtensions specially
-                    if ($propertyName === 'extension' || $propertyName === 'modifierExtension') {
+                    if ($elementName === 'extension' || $elementName === 'modifierExtension') {
                         $denormalizedValue = $this->denormalizeExtensions($value, $format, $context);
                     } else {
                         // Always use the denormalizer to create properly-typed instances.

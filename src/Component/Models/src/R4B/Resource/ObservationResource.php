@@ -193,7 +193,7 @@ class ObservationResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'effectiveX' => [
+        'effective' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -249,7 +249,7 @@ class ObservationResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'valueX' => [
+        'value' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -489,7 +489,7 @@ class ObservationResource extends DomainResourceResource
         /** @var Reference|null encounter Healthcare event during which this observation is made */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $encounter = null,
-        /** @var DateTimePrimitive|Period|Timing|InstantPrimitive|null effectiveX Clinically relevant time/time-period for observation */
+        /** @var DateTimePrimitive|Period|Timing|InstantPrimitive|null effective Clinically relevant time/time-period for observation */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -521,14 +521,14 @@ class ObservationResource extends DomainResourceResource
                 ],
             ],
         )]
-        public DateTimePrimitive|Period|Timing|InstantPrimitive|null $effectiveX = null,
+        public DateTimePrimitive|Period|Timing|InstantPrimitive|null $effective = null,
         /** @var InstantPrimitive|null issued Date/Time this version was made available */
         #[FhirProperty(fhirType: 'instant', propertyKind: 'primitive')]
         public ?InstantPrimitive $issued = null,
         /** @var array<Reference> performer Who is responsible for the observation */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isArray: true)]
         public array $performer = [],
-        /** @var Quantity|CodeableConcept|StringPrimitive|string|bool|int|Range|Ratio|SampledData|TimePrimitive|DateTimePrimitive|Period|null valueX Actual result */
+        /** @var Quantity|CodeableConcept|StringPrimitive|string|bool|int|Range|Ratio|SampledData|TimePrimitive|DateTimePrimitive|Period|null value Actual result */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -592,7 +592,7 @@ class ObservationResource extends DomainResourceResource
                 ],
             ],
         )]
-        public Quantity|CodeableConcept|StringPrimitive|string|bool|int|Range|Ratio|SampledData|TimePrimitive|DateTimePrimitive|Period|null $valueX = null,
+        public Quantity|CodeableConcept|StringPrimitive|string|bool|int|Range|Ratio|SampledData|TimePrimitive|DateTimePrimitive|Period|null $value = null,
         /** @var CodeableConcept|null dataAbsentReason Why the result is missing */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $dataAbsentReason = null,

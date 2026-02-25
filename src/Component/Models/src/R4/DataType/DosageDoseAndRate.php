@@ -41,7 +41,7 @@ class DosageDoseAndRate extends Element
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'doseX' => [
+        'dose' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -65,7 +65,7 @@ class DosageDoseAndRate extends Element
                 ],
             ],
         ],
-        'rateX' => [
+        'rate' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -108,7 +108,7 @@ class DosageDoseAndRate extends Element
         /** @var CodeableConcept|null type The kind of dose or rate specified */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $type = null,
-        /** @var Range|Quantity|null doseX Amount of medication per dose */
+        /** @var Range|Quantity|null dose Amount of medication per dose */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -128,8 +128,8 @@ class DosageDoseAndRate extends Element
                 ],
             ],
         )]
-        public Range|Quantity|null $doseX = null,
-        /** @var Ratio|Range|Quantity|null rateX Amount of medication per unit of time */
+        public Range|Quantity|null $dose = null,
+        /** @var Ratio|Range|Quantity|null rate Amount of medication per unit of time */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -155,7 +155,7 @@ class DosageDoseAndRate extends Element
                 ],
             ],
         )]
-        public Ratio|Range|Quantity|null $rateX = null,
+        public Ratio|Range|Quantity|null $rate = null,
     ) {
         parent::__construct($id, $extension);
     }

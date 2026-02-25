@@ -161,7 +161,7 @@ class PatientResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'deceasedX' => [
+        'deceased' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -203,7 +203,7 @@ class PatientResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'multipleBirthX' => [
+        'multipleBirth' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -326,7 +326,7 @@ class PatientResource extends DomainResourceResource
         /** @var DatePrimitive|null birthDate The date of birth for the individual */
         #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
         public ?DatePrimitive $birthDate = null,
-        /** @var bool|DateTimePrimitive|null deceasedX Indicates if the individual is deceased or not */
+        /** @var bool|DateTimePrimitive|null deceased Indicates if the individual is deceased or not */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -341,14 +341,14 @@ class PatientResource extends DomainResourceResource
                 ],
             ],
         )]
-        public bool|DateTimePrimitive|null $deceasedX = null,
+        public bool|DateTimePrimitive|null $deceased = null,
         /** @var array<Address> address An address for the individual */
         #[FhirProperty(fhirType: 'Address', propertyKind: 'complex', isArray: true)]
         public array $address = [],
         /** @var CodeableConcept|null maritalStatus Marital (civil) status of a patient */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $maritalStatus = null,
-        /** @var bool|int|null multipleBirthX Whether patient is part of a multiple birth */
+        /** @var bool|int|null multipleBirth Whether patient is part of a multiple birth */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -358,7 +358,7 @@ class PatientResource extends DomainResourceResource
                 ['fhirType' => 'integer', 'propertyKind' => 'scalar', 'phpType' => 'int', 'jsonKey' => 'multipleBirthInteger'],
             ],
         )]
-        public bool|int|null $multipleBirthX = null,
+        public bool|int|null $multipleBirth = null,
         /** @var array<Attachment> photo Image of the patient */
         #[FhirProperty(fhirType: 'Attachment', propertyKind: 'complex', isArray: true)]
         public array $photo = [],

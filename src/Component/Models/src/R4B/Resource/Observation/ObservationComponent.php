@@ -62,7 +62,7 @@ class ObservationComponent extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'valueX' => [
+        'value' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -191,7 +191,7 @@ class ObservationComponent extends BackboneElement
         /** @var CodeableConcept|null code Type of component observation (code / type) */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?CodeableConcept $code = null,
-        /** @var Quantity|CodeableConcept|StringPrimitive|string|bool|int|Range|Ratio|SampledData|TimePrimitive|DateTimePrimitive|Period|null valueX Actual component result */
+        /** @var Quantity|CodeableConcept|StringPrimitive|string|bool|int|Range|Ratio|SampledData|TimePrimitive|DateTimePrimitive|Period|null value Actual component result */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -255,7 +255,7 @@ class ObservationComponent extends BackboneElement
                 ],
             ],
         )]
-        public Quantity|CodeableConcept|StringPrimitive|string|bool|int|Range|Ratio|SampledData|TimePrimitive|DateTimePrimitive|Period|null $valueX = null,
+        public Quantity|CodeableConcept|StringPrimitive|string|bool|int|Range|Ratio|SampledData|TimePrimitive|DateTimePrimitive|Period|null $value = null,
         /** @var CodeableConcept|null dataAbsentReason Why the component result is missing */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $dataAbsentReason = null,

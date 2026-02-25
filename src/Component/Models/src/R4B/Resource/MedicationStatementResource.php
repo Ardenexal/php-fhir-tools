@@ -164,7 +164,7 @@ class MedicationStatementResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'medicationX' => [
+        'medication' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -206,7 +206,7 @@ class MedicationStatementResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'effectiveX' => [
+        'effective' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -338,7 +338,7 @@ class MedicationStatementResource extends DomainResourceResource
         /** @var CodeableConcept|null category Type of medication usage */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $category = null,
-        /** @var CodeableConcept|Reference|null medicationX What medication was taken */
+        /** @var CodeableConcept|Reference|null medication What medication was taken */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -360,14 +360,14 @@ class MedicationStatementResource extends DomainResourceResource
             ],
         )]
         #[NotBlank]
-        public CodeableConcept|Reference|null $medicationX = null,
+        public CodeableConcept|Reference|null $medication = null,
         /** @var Reference|null subject Who is/was taking  the medication */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?Reference $subject = null,
         /** @var Reference|null context Encounter / Episode associated with MedicationStatement */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $context = null,
-        /** @var DateTimePrimitive|Period|null effectiveX The date/time or interval when the medication is/was/will be taken */
+        /** @var DateTimePrimitive|Period|null effective The date/time or interval when the medication is/was/will be taken */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -387,7 +387,7 @@ class MedicationStatementResource extends DomainResourceResource
                 ],
             ],
         )]
-        public DateTimePrimitive|Period|null $effectiveX = null,
+        public DateTimePrimitive|Period|null $effective = null,
         /** @var DateTimePrimitive|null dateAsserted When the statement was asserted? */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $dateAsserted = null,

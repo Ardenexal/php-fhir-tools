@@ -50,7 +50,7 @@ class SpecimenDefinitionTypeTestedContainerAdditive extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'additiveX' => [
+        'additive' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -86,7 +86,7 @@ class SpecimenDefinitionTypeTestedContainerAdditive extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
-        /** @var CodeableConcept|Reference|null additiveX Additive associated with container */
+        /** @var CodeableConcept|Reference|null additive Additive associated with container */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -108,7 +108,7 @@ class SpecimenDefinitionTypeTestedContainerAdditive extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public CodeableConcept|Reference|null $additiveX = null,
+        public CodeableConcept|Reference|null $additive = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

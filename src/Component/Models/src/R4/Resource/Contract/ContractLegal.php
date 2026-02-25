@@ -46,7 +46,7 @@ class ContractLegal extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'contentX' => [
+        'content' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -82,7 +82,7 @@ class ContractLegal extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
-        /** @var Attachment|Reference|null contentX Contract Legal Text */
+        /** @var Attachment|Reference|null content Contract Legal Text */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -104,7 +104,7 @@ class ContractLegal extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public Attachment|Reference|null $contentX = null,
+        public Attachment|Reference|null $content = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

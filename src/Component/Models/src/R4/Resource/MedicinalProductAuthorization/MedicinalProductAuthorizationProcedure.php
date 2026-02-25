@@ -70,7 +70,7 @@ class MedicinalProductAuthorizationProcedure extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'dateX' => [
+        'date' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -121,7 +121,7 @@ class MedicinalProductAuthorizationProcedure extends BackboneElement
         /** @var CodeableConcept|null type Type of procedure */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?CodeableConcept $type = null,
-        /** @var Period|DateTimePrimitive|null dateX Date of procedure */
+        /** @var Period|DateTimePrimitive|null date Date of procedure */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -141,7 +141,7 @@ class MedicinalProductAuthorizationProcedure extends BackboneElement
                 ],
             ],
         )]
-        public Period|DateTimePrimitive|null $dateX = null,
+        public Period|DateTimePrimitive|null $date = null,
         /** @var array<MedicinalProductAuthorizationProcedure> application Applcations submitted to obtain a marketing authorization */
         #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex', isArray: true)]
         public array $application = [],

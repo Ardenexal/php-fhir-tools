@@ -115,7 +115,7 @@ class ExplanationOfBenefitAddItem extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'servicedX' => [
+        'serviced' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -139,7 +139,7 @@ class ExplanationOfBenefitAddItem extends BackboneElement
                 ],
             ],
         ],
-        'locationX' => [
+        'location' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -284,7 +284,7 @@ class ExplanationOfBenefitAddItem extends BackboneElement
         /** @var array<CodeableConcept> programCode Program the product or service is provided under */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true)]
         public array $programCode = [],
-        /** @var DatePrimitive|Period|null servicedX Date or dates of service or product delivery */
+        /** @var DatePrimitive|Period|null serviced Date or dates of service or product delivery */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -304,8 +304,8 @@ class ExplanationOfBenefitAddItem extends BackboneElement
                 ],
             ],
         )]
-        public DatePrimitive|Period|null $servicedX = null,
-        /** @var CodeableConcept|Address|Reference|null locationX Place of service or where product was supplied */
+        public DatePrimitive|Period|null $serviced = null,
+        /** @var CodeableConcept|Address|Reference|null location Place of service or where product was supplied */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -331,7 +331,7 @@ class ExplanationOfBenefitAddItem extends BackboneElement
                 ],
             ],
         )]
-        public CodeableConcept|Address|Reference|null $locationX = null,
+        public CodeableConcept|Address|Reference|null $location = null,
         /** @var Quantity|null quantity Count of products or services */
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
         public ?Quantity $quantity = null,

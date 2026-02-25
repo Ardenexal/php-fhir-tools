@@ -58,7 +58,7 @@ class TriggerDefinition extends Element
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'timingX' => [
+        'timing' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -129,7 +129,7 @@ class TriggerDefinition extends Element
         /** @var StringPrimitive|string|null name Name or URI that identifies the event */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $name = null,
-        /** @var Timing|Reference|DatePrimitive|DateTimePrimitive|null timingX Timing of the event */
+        /** @var Timing|Reference|DatePrimitive|DateTimePrimitive|null timing Timing of the event */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -161,7 +161,7 @@ class TriggerDefinition extends Element
                 ],
             ],
         )]
-        public Timing|Reference|DatePrimitive|DateTimePrimitive|null $timingX = null,
+        public Timing|Reference|DatePrimitive|DateTimePrimitive|null $timing = null,
         /** @var array<DataRequirement> data Triggering data of the event (multiple = 'and') */
         #[FhirProperty(fhirType: 'DataRequirement', propertyKind: 'complex', isArray: true)]
         public array $data = [],

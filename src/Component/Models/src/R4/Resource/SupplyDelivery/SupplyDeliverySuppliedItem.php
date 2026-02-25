@@ -55,7 +55,7 @@ class SupplyDeliverySuppliedItem extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'itemX' => [
+        'item' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -94,7 +94,7 @@ class SupplyDeliverySuppliedItem extends BackboneElement
         /** @var Quantity|null quantity Amount dispensed */
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
         public ?Quantity $quantity = null,
-        /** @var CodeableConcept|Reference|null itemX Medication, Substance, or Device supplied */
+        /** @var CodeableConcept|Reference|null item Medication, Substance, or Device supplied */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -114,7 +114,7 @@ class SupplyDeliverySuppliedItem extends BackboneElement
                 ],
             ],
         )]
-        public CodeableConcept|Reference|null $itemX = null,
+        public CodeableConcept|Reference|null $item = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

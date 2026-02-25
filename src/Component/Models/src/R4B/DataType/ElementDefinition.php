@@ -215,7 +215,7 @@ class ElementDefinition extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'defaultValueX' => [
+        'defaultValue' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -600,7 +600,7 @@ class ElementDefinition extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'fixedX' => [
+        'fixed' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -967,7 +967,7 @@ class ElementDefinition extends BackboneElement
                 ],
             ],
         ],
-        'patternX' => [
+        'pattern' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -1343,7 +1343,7 @@ class ElementDefinition extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'minValueX' => [
+        'minValue' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -1416,7 +1416,7 @@ class ElementDefinition extends BackboneElement
                 ],
             ],
         ],
-        'maxValueX' => [
+        'maxValue' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -1633,7 +1633,7 @@ class ElementDefinition extends BackboneElement
         /** @var array<ElementDefinitionType> type Data type and Profile for this element */
         #[FhirProperty(fhirType: 'Element', propertyKind: 'complex', isArray: true)]
         public array $type = [],
-        /** @var Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|float|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|string|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|CodeableReference|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|RatioRange|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|null defaultValueX Specified value if missing from instance */
+        /** @var Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|float|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|string|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|CodeableReference|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|RatioRange|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|null defaultValue Specified value if missing from instance */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -1932,14 +1932,14 @@ class ElementDefinition extends BackboneElement
                 ],
             ],
         )]
-        public Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|float|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|string|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|CodeableReference|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|RatioRange|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|null $defaultValueX = null,
+        public Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|float|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|string|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|CodeableReference|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|RatioRange|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|null $defaultValue = null,
         /** @var MarkdownPrimitive|null meaningWhenMissing Implicit meaning when this element is missing */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $meaningWhenMissing = null,
         /** @var StringPrimitive|string|null orderMeaning What the order of the elements means */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $orderMeaning = null,
-        /** @var Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|float|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|string|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|CodeableReference|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|RatioRange|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|null fixedX Value must be exactly this */
+        /** @var Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|float|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|string|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|CodeableReference|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|RatioRange|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|null fixed Value must be exactly this */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -2238,8 +2238,8 @@ class ElementDefinition extends BackboneElement
                 ],
             ],
         )]
-        public Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|float|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|string|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|CodeableReference|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|RatioRange|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|null $fixedX = null,
-        /** @var Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|float|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|string|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|CodeableReference|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|RatioRange|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|null patternX Value must have at least these property values */
+        public Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|float|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|string|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|CodeableReference|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|RatioRange|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|null $fixed = null,
+        /** @var Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|float|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|string|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|CodeableReference|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|RatioRange|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|null pattern Value must have at least these property values */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -2538,11 +2538,11 @@ class ElementDefinition extends BackboneElement
                 ],
             ],
         )]
-        public Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|float|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|string|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|CodeableReference|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|RatioRange|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|null $patternX = null,
+        public Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|float|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|string|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|CodeableReference|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|RatioRange|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|null $pattern = null,
         /** @var array<ElementDefinitionExample> example Example value (as defined for type) */
         #[FhirProperty(fhirType: 'Element', propertyKind: 'complex', isArray: true)]
         public array $example = [],
-        /** @var DatePrimitive|DateTimePrimitive|InstantPrimitive|TimePrimitive|float|int|PositiveIntPrimitive|UnsignedIntPrimitive|Quantity|null minValueX Minimum Allowed Value (for some types) */
+        /** @var DatePrimitive|DateTimePrimitive|InstantPrimitive|TimePrimitive|float|int|PositiveIntPrimitive|UnsignedIntPrimitive|Quantity|null minValue Minimum Allowed Value (for some types) */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -2594,8 +2594,8 @@ class ElementDefinition extends BackboneElement
                 ],
             ],
         )]
-        public DatePrimitive|DateTimePrimitive|InstantPrimitive|TimePrimitive|float|int|PositiveIntPrimitive|UnsignedIntPrimitive|Quantity|null $minValueX = null,
-        /** @var DatePrimitive|DateTimePrimitive|InstantPrimitive|TimePrimitive|float|int|PositiveIntPrimitive|UnsignedIntPrimitive|Quantity|null maxValueX Maximum Allowed Value (for some types) */
+        public DatePrimitive|DateTimePrimitive|InstantPrimitive|TimePrimitive|float|int|PositiveIntPrimitive|UnsignedIntPrimitive|Quantity|null $minValue = null,
+        /** @var DatePrimitive|DateTimePrimitive|InstantPrimitive|TimePrimitive|float|int|PositiveIntPrimitive|UnsignedIntPrimitive|Quantity|null maxValue Maximum Allowed Value (for some types) */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -2647,7 +2647,7 @@ class ElementDefinition extends BackboneElement
                 ],
             ],
         )]
-        public DatePrimitive|DateTimePrimitive|InstantPrimitive|TimePrimitive|float|int|PositiveIntPrimitive|UnsignedIntPrimitive|Quantity|null $maxValueX = null,
+        public DatePrimitive|DateTimePrimitive|InstantPrimitive|TimePrimitive|float|int|PositiveIntPrimitive|UnsignedIntPrimitive|Quantity|null $maxValue = null,
         /** @var int|null maxLength Max length for strings */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
         public ?int $maxLength = null,

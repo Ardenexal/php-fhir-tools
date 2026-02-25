@@ -235,7 +235,7 @@ class CommunicationRequestResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'occurrenceX' => [
+        'occurrence' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -391,7 +391,7 @@ class CommunicationRequestResource extends DomainResourceResource
         /** @var array<CommunicationRequestPayload> payload Message payload */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
         public array $payload = [],
-        /** @var DateTimePrimitive|Period|null occurrenceX When scheduled */
+        /** @var DateTimePrimitive|Period|null occurrence When scheduled */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -411,7 +411,7 @@ class CommunicationRequestResource extends DomainResourceResource
                 ],
             ],
         )]
-        public DateTimePrimitive|Period|null $occurrenceX = null,
+        public DateTimePrimitive|Period|null $occurrence = null,
         /** @var DateTimePrimitive|null authoredOn When request transitioned to being actionable */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $authoredOn = null,

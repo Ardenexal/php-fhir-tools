@@ -429,4 +429,85 @@ final class ComparisonServiceTest extends TestCase
         self::assertTrue($resultGreaterEq->isSingle());
         self::assertTrue($resultGreaterEq->first());
     }
+
+    public function testQuantityEqualityWithSameUnit(): void
+    {
+        $left = Collection::single([
+            'value'  => 10.0,
+            'unit'   => 'mg',
+            'code'   => 'mg',
+            'system' => 'http://unitsofmeasure.org',
+        ]);
+        $right = Collection::single([
+            'value'  => 10.0,
+            'unit'   => 'mg',
+            'code'   => 'mg',
+            'system' => 'http://unitsofmeasure.org',
+        ]);
+
+        $result = $this->service->compareEquality($left, $right, '=');
+
+        self::assertTrue($result->isSingle());
+        self::assertTrue($result->first());
+    }
+
+    public function testQuantityEqualityWithConversion(): void
+    {
+        $left = Collection::single([
+            'value'  => 1000.0,
+            'unit'   => 'mg',
+            'code'   => 'mg',
+            'system' => 'http://unitsofmeasure.org',
+        ]);
+        $right = Collection::single([
+            'value'  => 1.0,
+            'unit'   => 'g',
+            'code'   => 'g',
+            'system' => 'http://unitsofmeasure.org',
+        ]);
+
+        $result = $this->service->compareEquality($left, $right, '=');
+
+        self::assertTrue($result->isSingle());
+        self::assertTrue($result->first());
+    }
+
+    public function testQuantityOrderingWithConversion(): void
+    {
+        $left = Collection::single([
+            'value'  => 10.0,
+            'unit'   => '[lb_av]',
+            'code'   => '[lb_av]',
+            'system' => 'http://unitsofmeasure.org',
+        ]);
+        $right = Collection::single([
+            'value'  => 1.0,
+            'unit'   => 'kg',
+            'code'   => 'kg',
+            'system' => 'http://unitsofmeasure.org',
+        ]);
+
+        $result = $this->service->compareOrdering($left, $right, fn ($a, $b) => $a > $b);
+
+        self::assertTrue($result->isSingle());
+        self::assertTrue($result->first());
+    }
+
+    public function testQuantityComparisonMissingCodeReturnsEmpty(): void
+    {
+        $left = Collection::single([
+            'value' => 10.0,
+            'unit'  => 'mg',
+        ]);
+        $right = Collection::single([
+            'value'  => 10.0,
+            'unit'   => 'mg',
+            'code'   => 'mg',
+            'system' => 'http://unitsofmeasure.org',
+        ]);
+
+        $result = $this->service->compareEquality($left, $right, '=');
+
+        self::assertTrue($result->isEmpty());
+    }
 }

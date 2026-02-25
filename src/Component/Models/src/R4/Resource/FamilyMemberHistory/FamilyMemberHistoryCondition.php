@@ -77,7 +77,7 @@ class FamilyMemberHistoryCondition extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'onsetX' => [
+        'onset' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -145,7 +145,7 @@ class FamilyMemberHistoryCondition extends BackboneElement
         /** @var bool|null contributedToDeath Whether the condition contributed to the cause of death */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $contributedToDeath = null,
-        /** @var Age|Range|Period|StringPrimitive|string|null onsetX When condition first manifested */
+        /** @var Age|Range|Period|StringPrimitive|string|null onset When condition first manifested */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -177,7 +177,7 @@ class FamilyMemberHistoryCondition extends BackboneElement
                 ],
             ],
         )]
-        public Age|Range|Period|StringPrimitive|string|null $onsetX = null,
+        public Age|Range|Period|StringPrimitive|string|null $onset = null,
         /** @var array<Annotation> note Extra information about condition */
         #[FhirProperty(fhirType: 'Annotation', propertyKind: 'complex', isArray: true)]
         public array $note = [],

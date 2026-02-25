@@ -206,7 +206,7 @@ class ImmunizationEvaluationResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'doseNumberX' => [
+        'doseNumber' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -230,7 +230,7 @@ class ImmunizationEvaluationResource extends DomainResourceResource
                 ],
             ],
         ],
-        'seriesDosesX' => [
+        'seriesDoses' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -314,7 +314,7 @@ class ImmunizationEvaluationResource extends DomainResourceResource
         /** @var StringPrimitive|string|null series Name of vaccine series */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $series = null,
-        /** @var PositiveIntPrimitive|StringPrimitive|string|null doseNumberX Dose number within series */
+        /** @var PositiveIntPrimitive|StringPrimitive|string|null doseNumber Dose number within series */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -334,8 +334,8 @@ class ImmunizationEvaluationResource extends DomainResourceResource
                 ],
             ],
         )]
-        public PositiveIntPrimitive|StringPrimitive|string|null $doseNumberX = null,
-        /** @var PositiveIntPrimitive|StringPrimitive|string|null seriesDosesX Recommended number of doses for immunity */
+        public PositiveIntPrimitive|StringPrimitive|string|null $doseNumber = null,
+        /** @var PositiveIntPrimitive|StringPrimitive|string|null seriesDoses Recommended number of doses for immunity */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -355,7 +355,7 @@ class ImmunizationEvaluationResource extends DomainResourceResource
                 ],
             ],
         )]
-        public PositiveIntPrimitive|StringPrimitive|string|null $seriesDosesX = null,
+        public PositiveIntPrimitive|StringPrimitive|string|null $seriesDoses = null,
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
     }

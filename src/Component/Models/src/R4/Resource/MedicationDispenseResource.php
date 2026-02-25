@@ -137,7 +137,7 @@ class MedicationDispenseResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'statusReasonX' => [
+        'statusReason' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -170,7 +170,7 @@ class MedicationDispenseResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'medicationX' => [
+        'medication' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -392,7 +392,7 @@ class MedicationDispenseResource extends DomainResourceResource
         /** @var MedicationDispenseStatusCodesType|null status preparation | in-progress | cancelled | on-hold | completed | entered-in-error | stopped | declined | unknown */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?MedicationDispenseStatusCodesType $status = null,
-        /** @var CodeableConcept|Reference|null statusReasonX Why a dispense was not performed */
+        /** @var CodeableConcept|Reference|null statusReason Why a dispense was not performed */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -412,11 +412,11 @@ class MedicationDispenseResource extends DomainResourceResource
                 ],
             ],
         )]
-        public CodeableConcept|Reference|null $statusReasonX = null,
+        public CodeableConcept|Reference|null $statusReason = null,
         /** @var CodeableConcept|null category Type of medication dispense */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $category = null,
-        /** @var CodeableConcept|Reference|null medicationX What medication was supplied */
+        /** @var CodeableConcept|Reference|null medication What medication was supplied */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -438,7 +438,7 @@ class MedicationDispenseResource extends DomainResourceResource
             ],
         )]
         #[NotBlank]
-        public CodeableConcept|Reference|null $medicationX = null,
+        public CodeableConcept|Reference|null $medication = null,
         /** @var Reference|null subject Who the dispense is for */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $subject = null,

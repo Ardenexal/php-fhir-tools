@@ -94,7 +94,7 @@ class SubstanceReferenceInformationTarget extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'amountX' => [
+        'amount' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -170,7 +170,7 @@ class SubstanceReferenceInformationTarget extends BackboneElement
         /** @var CodeableConcept|null organismType Todo */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $organismType = null,
-        /** @var Quantity|Range|StringPrimitive|string|null amountX Todo */
+        /** @var Quantity|Range|StringPrimitive|string|null amount Todo */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -196,7 +196,7 @@ class SubstanceReferenceInformationTarget extends BackboneElement
                 ],
             ],
         )]
-        public Quantity|Range|StringPrimitive|string|null $amountX = null,
+        public Quantity|Range|StringPrimitive|string|null $amount = null,
         /** @var CodeableConcept|null amountType Todo */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $amountType = null,

@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Expression\MemberAccessNode;
 use Ardenexal\FHIRTools\Component\FHIRPath\Expression\TypeExpressionNode;
 use Ardenexal\FHIRTools\Component\FHIRPath\Expression\UnaryOperatorNode;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
+use Ardenexal\FHIRTools\Component\FHIRPath\Function\ToQuantityFunction;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\TokenType;
 use Ardenexal\FHIRTools\Component\FHIRPath\Function\FunctionRegistry;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRTypeResolver;
@@ -274,6 +275,12 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      */
     public function visitLiteral(LiteralNode $node): Collection
     {
+        if ($node->getType() === TokenType::QUANTITY) {
+            $quantity = ToQuantityFunction::tryConvert($node->getValue());
+
+            return $quantity !== null ? Collection::single($quantity) : Collection::single($node->getValue());
+        }
+
         return Collection::single($node->getValue());
     }
 
@@ -410,12 +417,12 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             TokenType::PIPE => $left->union($right),
 
             // Arithmetic operators (require single values)
-            TokenType::PLUS     => $this->evaluateArithmetic($left, $right, fn ($a, $b) => $a + $b),
-            TokenType::MINUS    => $this->evaluateArithmetic($left, $right, fn ($a, $b) => $a - $b),
-            TokenType::MULTIPLY => $this->evaluateArithmetic($left, $right, fn ($a, $b) => $a * $b),
-            TokenType::DIVIDE   => $this->evaluateArithmetic($left, $right, fn ($a, $b) => (float) ($a / $b)),
-            TokenType::DIV      => $this->evaluateArithmetic($left, $right, fn ($a, $b) => intdiv((int) $a, (int) $b)),
-            TokenType::MOD      => $this->evaluateArithmetic($left, $right, fn ($a, $b) => $a % $b),
+            TokenType::PLUS     => $this->evaluateArithmetic($left, $right, fn ($a, $b) => $a + $b, TokenType::PLUS),
+            TokenType::MINUS    => $this->evaluateArithmetic($left, $right, fn ($a, $b) => $a - $b, TokenType::MINUS),
+            TokenType::MULTIPLY => $this->evaluateArithmetic($left, $right, fn ($a, $b) => $a * $b, TokenType::MULTIPLY),
+            TokenType::DIVIDE   => $this->evaluateArithmetic($left, $right, fn ($a, $b) => (float) ($a / $b), TokenType::DIVIDE),
+            TokenType::DIV      => $this->evaluateArithmetic($left, $right, fn ($a, $b) => intdiv((int) $a, (int) $b), TokenType::DIV),
+            TokenType::MOD      => $this->evaluateArithmetic($left, $right, fn ($a, $b) => $a % $b, TokenType::MOD),
 
             // Equality/equivalence operators (support collections)
             TokenType::EQUALS         => $this->comparisonService->compareEquality($left, $right, '='),
@@ -830,8 +837,9 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      * Evaluate arithmetic operation
      *
      * @param callable(mixed, mixed): mixed $operation
+     * @param TokenType                     $operator
      */
-    private function evaluateArithmetic(Collection $left, Collection $right, callable $operation): Collection
+    private function evaluateArithmetic(Collection $left, Collection $right, callable $operation, TokenType $operator): Collection
     {
         if ($left->isEmpty() || $right->isEmpty()) {
             return Collection::empty();
@@ -839,6 +847,15 @@ final class FHIRPathEvaluator implements ExpressionVisitor
 
         if (!$left->isSingle() || !$right->isSingle()) {
             throw new EvaluationException('Arithmetic operators require single values');
+        }
+
+        // Try to extract quantities from both values
+        $leftQty  = $this->comparisonService->tryExtractQuantity($left->first());
+        $rightQty = $this->comparisonService->tryExtractQuantity($right->first());
+
+        // If both are quantities, perform quantity arithmetic
+        if ($leftQty !== null && $rightQty !== null) {
+            return $this->performQuantityArithmetic($leftQty, $rightQty, $operation, $operator);
         }
 
         // Normalize values to handle FHIR primitives and enums
@@ -850,6 +867,103 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         }
 
         return Collection::single($operation($leftValue, $rightValue));
+    }
+
+    /**
+     * Perform arithmetic on two quantities
+     *
+     * @param array{value: float, code: string, unit: string, system: string|null} $left
+     * @param array{value: float, code: string, unit: string, system: string|null} $right
+     * @param callable(float, float): float                                        $operation
+     * @param TokenType                                                            $operator
+     */
+    private function performQuantityArithmetic(array $left, array $right, callable $operation, TokenType $operator): Collection
+    {
+        $leftCode  = $left['code'];
+        $rightCode = $right['code'];
+
+        // Handle multiplication and division specially
+        if ($operator === TokenType::MULTIPLY) {
+            // Convert both to base units
+            $leftBase  = $this->tryConvertToBaseUnit($leftCode, $left['value']);
+            $rightBase = $this->tryConvertToBaseUnit($rightCode, $right['value']);
+
+            if ($leftBase !== null && $rightBase !== null) {
+                // Multiply base values
+                $resultValue = $leftBase['value'] * $rightBase['value'];
+
+                // Combine units: m * m = m2, etc.
+                if ($leftBase['base'] === $rightBase['base']) {
+                    $resultCode = $leftBase['base'] . '2';
+                } else {
+                    $resultCode = $leftBase['base'] . '.' . $rightBase['base'];
+                }
+
+                return Collection::single([
+                    'value'  => $resultValue,
+                    'code'   => $resultCode,
+                    'unit'   => $resultCode,
+                    'system' => $left['system'] ?? 'http://unitsofmeasure.org',
+                ]);
+            }
+        } elseif ($operator === TokenType::DIVIDE) {
+            // Don't convert to base units - preserve original units in result
+            $resultValue = $left['value'] / $right['value'];
+
+            if ($leftCode === $rightCode) {
+                $resultCode = '1';
+            } else {
+                $resultCode = $leftCode . '/' . $rightCode;
+            }
+
+            return Collection::single([
+                'value'  => $resultValue,
+                'code'   => $resultCode,
+                'unit'   => $resultCode,
+                'system' => $left['system'] ?? 'http://unitsofmeasure.org',
+            ]);
+        }
+
+        // For addition/subtraction, just compute the result with the left unit
+        // (ideally we'd convert right to left's unit first)
+        $resultValue = $operation($left['value'], $right['value']);
+        $resultCode  = $leftCode;
+
+        return Collection::single([
+            'value'  => $resultValue,
+            'code'   => $resultCode,
+            'unit'   => $resultCode,
+            'system' => $left['system'] ?? 'http://unitsofmeasure.org',
+        ]);
+    }
+
+    /**
+     * Try to convert a quantity to its base unit
+     *
+     * @return array{base: string, value: float}|null
+     */
+    private function tryConvertToBaseUnit(string $unit, float $value): ?array
+    {
+        // Use the same conversion logic from ComparisonService
+        $conversions = [
+            'kg' => ['base' => 'kg', 'factor' => 1.0],
+            'g'  => ['base' => 'kg', 'factor' => 0.001],
+            'mg' => ['base' => 'kg', 'factor' => 0.000001],
+            'm'  => ['base' => 'm', 'factor' => 1.0],
+            'cm' => ['base' => 'm', 'factor' => 0.01],
+            'mm' => ['base' => 'm', 'factor' => 0.001],
+            'km' => ['base' => 'm', 'factor' => 1000.0],
+        ];
+
+        $definition = $conversions[$unit] ?? null;
+        if ($definition === null) {
+            return null;
+        }
+
+        return [
+            'base'  => $definition['base'],
+            'value' => $value * $definition['factor'],
+        ];
     }
 
     /**

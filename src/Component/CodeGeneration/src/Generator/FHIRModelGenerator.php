@@ -1244,7 +1244,11 @@ class FHIRModelGenerator implements GeneratorInterface
             throw GenerationException::invalidElementPath($path);
         }
 
-        return lcfirst($lastPart->camel()->toString());
+        // Strip [x] suffix for choice elements (e.g., "value[x]" → "value")
+        // The [x] is FHIR notation for polymorphism, not part of the property name
+        $propertyName = str_replace('[x]', '', $lastPart->toString());
+
+        return lcfirst(u($propertyName)->camel()->toString());
     }
 
     /**

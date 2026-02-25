@@ -59,7 +59,7 @@ class PackagedProductDefinitionPackageShelfLifeStorage extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'periodX' => [
+        'period' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -107,7 +107,7 @@ class PackagedProductDefinitionPackageShelfLifeStorage extends BackboneElement
         /** @var CodeableConcept|null type This describes the shelf life, taking into account various scenarios such as shelf life of the packaged Medicinal Product itself, shelf life after transformation where necessary and shelf life after the first opening of a bottle, etc. The shelf life type shall be specified using an appropriate controlled vocabulary The controlled term and the controlled term identifier shall be specified */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $type = null,
-        /** @var Duration|StringPrimitive|string|null periodX The shelf life time period can be specified using a numerical value for the period of time and its unit of time measurement The unit of measurement shall be specified in accordance with ISO 11240 and the resulting terminology The symbol and the symbol identifier shall be used */
+        /** @var Duration|StringPrimitive|string|null period The shelf life time period can be specified using a numerical value for the period of time and its unit of time measurement The unit of measurement shall be specified in accordance with ISO 11240 and the resulting terminology The symbol and the symbol identifier shall be used */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -127,7 +127,7 @@ class PackagedProductDefinitionPackageShelfLifeStorage extends BackboneElement
                 ],
             ],
         )]
-        public Duration|StringPrimitive|string|null $periodX = null,
+        public Duration|StringPrimitive|string|null $period = null,
         /** @var array<CodeableConcept> specialPrecautionsForStorage Special precautions for storage, if any, can be specified using an appropriate controlled vocabulary. The controlled term and the controlled term identifier shall be specified */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true)]
         public array $specialPrecautionsForStorage = [],

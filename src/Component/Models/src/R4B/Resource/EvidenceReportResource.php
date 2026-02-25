@@ -158,7 +158,7 @@ class EvidenceReportResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'citeAsX' => [
+        'citeAs' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -332,7 +332,7 @@ class EvidenceReportResource extends DomainResourceResource
         /** @var array<Identifier> relatedIdentifier Identifiers for articles that may relate to more than one evidence report */
         #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex', isArray: true)]
         public array $relatedIdentifier = [],
-        /** @var Reference|MarkdownPrimitive|null citeAsX Citation for this report */
+        /** @var Reference|MarkdownPrimitive|null citeAs Citation for this report */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -352,7 +352,7 @@ class EvidenceReportResource extends DomainResourceResource
                 ],
             ],
         )]
-        public Reference|MarkdownPrimitive|null $citeAsX = null,
+        public Reference|MarkdownPrimitive|null $citeAs = null,
         /** @var CodeableConcept|null type Kind of report */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $type = null,

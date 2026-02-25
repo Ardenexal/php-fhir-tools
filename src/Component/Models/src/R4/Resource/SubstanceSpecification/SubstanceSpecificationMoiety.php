@@ -101,7 +101,7 @@ class SubstanceSpecificationMoiety extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'amountX' => [
+        'amount' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -155,7 +155,7 @@ class SubstanceSpecificationMoiety extends BackboneElement
         /** @var StringPrimitive|string|null molecularFormula Molecular formula */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $molecularFormula = null,
-        /** @var Quantity|StringPrimitive|string|null amountX Quantitative value for this moiety */
+        /** @var Quantity|StringPrimitive|string|null amount Quantitative value for this moiety */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -175,7 +175,7 @@ class SubstanceSpecificationMoiety extends BackboneElement
                 ],
             ],
         )]
-        public Quantity|StringPrimitive|string|null $amountX = null,
+        public Quantity|StringPrimitive|string|null $amount = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

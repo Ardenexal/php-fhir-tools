@@ -65,7 +65,7 @@ class ExplanationOfBenefitAccident extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'locationX' => [
+        'location' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -107,7 +107,7 @@ class ExplanationOfBenefitAccident extends BackboneElement
         /** @var CodeableConcept|null type The nature of the accident */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $type = null,
-        /** @var Address|Reference|null locationX Where the event occurred */
+        /** @var Address|Reference|null location Where the event occurred */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -127,7 +127,7 @@ class ExplanationOfBenefitAccident extends BackboneElement
                 ],
             ],
         )]
-        public Address|Reference|null $locationX = null,
+        public Address|Reference|null $location = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

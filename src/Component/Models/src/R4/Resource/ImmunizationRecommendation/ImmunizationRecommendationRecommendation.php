@@ -124,7 +124,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'doseNumberX' => [
+        'doseNumber' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -148,7 +148,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
                 ],
             ],
         ],
-        'seriesDosesX' => [
+        'seriesDoses' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -226,7 +226,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
         /** @var StringPrimitive|string|null series Name of vaccination series */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $series = null,
-        /** @var PositiveIntPrimitive|StringPrimitive|string|null doseNumberX Recommended dose number within series */
+        /** @var PositiveIntPrimitive|StringPrimitive|string|null doseNumber Recommended dose number within series */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -246,8 +246,8 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
                 ],
             ],
         )]
-        public PositiveIntPrimitive|StringPrimitive|string|null $doseNumberX = null,
-        /** @var PositiveIntPrimitive|StringPrimitive|string|null seriesDosesX Recommended number of doses for immunity */
+        public PositiveIntPrimitive|StringPrimitive|string|null $doseNumber = null,
+        /** @var PositiveIntPrimitive|StringPrimitive|string|null seriesDoses Recommended number of doses for immunity */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -267,7 +267,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
                 ],
             ],
         )]
-        public PositiveIntPrimitive|StringPrimitive|string|null $seriesDosesX = null,
+        public PositiveIntPrimitive|StringPrimitive|string|null $seriesDoses = null,
         /** @var array<Reference> supportingImmunization Past immunizations supporting recommendation */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isArray: true)]
         public array $supportingImmunization = [],

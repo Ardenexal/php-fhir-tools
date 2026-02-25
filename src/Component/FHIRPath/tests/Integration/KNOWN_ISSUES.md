@@ -1,18 +1,17 @@
-# Known Issues — Post-Implementation Report
+# Known Issues — Outstanding Items
 
-Generated after implementing Plan 1 (typed model support) and Plan 2 (fhir-test-cases data provider).
+**Current Test Status: 948 tests, 633 passing (66.8%), 85 errors, 186 failures, 44 skipped**
 
-**Current Test Status: 948 tests, 589 passing (62.1%), 109 errors, 206 failures, 44 skipped**
+This document tracks **unresolved** issues only. Completed work has been removed.
 
 ---
 
-## 1. FHIRPath Evaluator: Missing Functions (17 spec test errors)
+## 1. FHIRPath Evaluator: Missing Functions
 
 These functions are referenced by the official test suite but throw `EvaluationException: Unknown function` or `SyntaxException` because they haven't been implemented in `FunctionRegistry`.
 
 | Function | Failing test count | Description |
 |---|---|---|
-| ~~`sort()`~~ | ~~10~~ | ~~Sorts a collection~~ ✅ **IMPLEMENTED** (see note below) |
 | `encode()` | 4 | Encodes a string (URL encoding) |
 | `decode()` | 4 | Decodes a string (URL decoding) |
 | `join()` | 3 | Joins a collection of strings with a separator |
@@ -21,100 +20,12 @@ These functions are referenced by the official test suite but throw `EvaluationE
 | `toDecimal()` | 1 | Converts value to decimal type |
 | `comparable()` | ? | Checks if two values are comparable |
 | `precision()` | ? | Returns the precision of a quantity |
-| ~~`type()`~~ | ~~12~~ | ~~Returns the type of the input value~~ ✅ **IMPLEMENTED** |
-| ~~`lowBoundary()`~~ | ~~11~~ | ~~Calculates lower precision boundary of a decimal/date~~ ✅ **IMPLEMENTED** |
-| ~~`highBoundary()`~~ | ~~8~~ | ~~Calculates upper precision boundary~~ ✅ **IMPLEMENTED** |
-| ~~`matchesFull()`~~ | ~~5~~ | ~~Like `matches()` but anchored (full-string match)~~ ✅ **IMPLEMENTED** |
 
 All errors throw unhandled exceptions rather than producing wrong results. Fixing these requires adding new function classes to `src/Component/FHIRPath/src/Function/`.
 
-### `sort()` Function Implementation Status
-
-**Status**: ✅ **FULLY IMPLEMENTED AND VERIFIED** — All tests passing
-
-The `sort()` function is fully implemented in `SortFunction.php` with support for:
-- Natural sort (no parameters): `(3 | 2 | 1).sort()` → `(1 | 2 | 3)` ✅
-- Expression-based sort: `collection.sort($this)` ✅
-- Descending order via unary minus: `collection.sort(-$this)` ✅
-- Multi-key sorting: `collection.sort(key1, key2)` ✅
-- Type validation and null handling ✅
-
-**Unit tests**: 23/23 passing ✅
-
-**Spec tests**: ✅ **All 10 spec tests now passing** (previously blocked by issue #8 - Collection Comparison, now resolved)
-
-**Implementation details**:
-- File: `src/Component/FHIRPath/src/Function/SortFunction.php`
-- Registration: `FunctionRegistry::registerBuiltInFunctions()` line ~67
-- Tests: `tests/Unit/Component/FHIRPath/Function/SortFunctionTest.php`
-
-### `type()` Function Implementation Status
-
-**Status**: ✅ Partially working — **12 "unknown function" errors resolved**
-
-The `type()` function is now implemented in `TypeFunction.php` with a supporting `TypeInfo` class that returns FHIRPath ClassInfo structures containing `namespace` and `name` properties.
-
-**What works:**
-- System types: `1.type().name = 'Integer'`, `'hello'.type().name = 'String'`, `true.type().name = 'Boolean'` ✅
-- Direct FHIR object access when given typed model objects ✅
-- Unit tests pass (4/4) ✅
-
-**What doesn't work yet:**
-- FHIR primitive type detection from deserialized resources (e.g., `Patient.active.type().namespace = 'FHIR'`) ❌
-- Related to issue #7 (Primitive Value Extraction) — when FHIR resources are deserialized and properties accessed, FHIR primitive wrappers are normalized to PHP scalars, losing FHIR type metadata
-
-**Implementation notes:**
-- Created `TypeInfo` class with `namespace` and `name` readonly properties
-- Registered in `FunctionRegistry` 
-- Modified `wrapValue()` to preserve FHIR objects (no longer normalizes by default)
-- Added normalization to comparison/arithmetic operators instead to maintain correct semantics
-- Tests involving deserialized resources show `System.Boolean` instead of `FHIR.boolean` due to serialization layer returning arrays or early normalization
-
 ---
 
-## 2. FHIRPath Evaluator: Operator Precedence (0 spec test failures) ✅ RESOLVED
-
-~~**`testPrecedence2`** — `1+2*3+4 = 11` expects `true` but the evaluator produces `false`. Multiplication is not being given higher precedence than addition. The parser's precedence climbing for arithmetic operators is incomplete.~~ **FIXED** — Parser precedence was already correct.
-
-~~**`testPrecedence4`** — `(1 | 1 is Integer).count()` expects `2` but returns `1`. The `is` operator inside a union expression is consuming the `1` before the union can include it. Precedence between `|` and `is` is wrong.~~ **FIXED** — The parser precedence was correct (`1 | (1 is Integer)`), but `Collection::union()` used `array_unique()` with loose comparison, treating `1` (integer) and `true` (boolean) as equal. Fixed by implementing strict comparison (===) in the union method.
-
----
-
-## 3. FHIRPath Evaluator: `matches()` Edge Cases (0 spec test failures) ✅ RESOLVED
-
-~~**`testMatchesEmpty`**, **`testMatchesEmpty2`**, **`testMatchesEmpty3`** — expressions involving `{}.matches(...)` or `matches({})` return an incorrect result instead of an empty collection. The `matches()` function doesn't handle empty collection arguments per spec.~~ **FIXED** — Empty collection handling implemented in `MatchesFunction::execute()` (lines 28-30).
-
-~~**`testMatchesSingleLineMode1`** — `'A\n\t\t\tB'.matches('A.*B')` expects `true`. The FHIRPath spec requires `.` in patterns to match newlines (DOTALL mode), but the current implementation doesn't enable `PREG_DOTALL` / `(?s)` by default.~~ **FIXED** — DOTALL mode (`/s` flag) is now automatically appended to all regex patterns (lines 55-67).
-
-~~**`testMatchesFullWithin*`** (5 additional tests in the errors category) — The `matches()` function is applying full-anchor matching when partial matching was expected, or vice-versa. Related to missing `matchesFull()` semantics bleeding into `matches()`.~~ **FIXED** — `matchesFull()` function fully implemented with automatic anchoring (`^(?:...)$`) and proper DOTALL support. All 5 testMatchesFull tests passing.
-
----
-
-## 4. FHIRPath Evaluator: `in` and `contains` Operators (0 spec test failures) ✅ RESOLVED
-
-~~**`testPrecedence5`** — `true and '0215' in ('0215' | '0216')` expects `true` but throws because the `in` operator handler in `visitBinaryOperator()` is an explicit stub.~~ **FIXED** — Both `in` and `contains` operators fully implemented via `evaluateMembership()` method. testPrecedence5 passing.
-
----
-
-## 5. FHIRPath Evaluator: `lowBoundary()` and `highBoundary()` Parser Issues (0 spec test errors) ✅ RESOLVED
-
-~~**Issue**: Date/time literals followed by method calls like `.lowBoundary()` caused syntax errors because the lexer greedily consumed the `.` character as part of the literal, even when it should be a member access operator.~~
-
-~~**Example failure**: `@T10:30.lowBoundary(9)` was lexed as `@T10:30.` (invalid TIME literal) followed by `lowBoundary`, causing "Expected end of expression but found IDENTIFIER" errors.~~
-
-~~**Affected tests**: All `lowBoundary()` and `highBoundary()` tests involving datetime/time literals (approximately 19 tests total).~~
-
-**FIXED** — The lexer now only includes `.` in datetime/time literals when followed by digits (for fractional seconds). Method calls on literals now parse correctly. Both functions are fully implemented with:
-- Decimal precision boundary calculations
-- Precision validation (0-31 per FHIRPath spec)  
-- Full datetime/time literal support with precision formatting
-- Support for `@`-prefixed literals and time-only literals (`@T...`)
-
-**Test Results**: 27 of 28 `lowBoundary` tests now pass (1 failure is for Quantity literals which are not yet supported).
-
----
-
-## 6. FHIRPath Evaluator: Comment Syntax Not Supported (7 spec test errors)
+## 2. FHIRPath Evaluator: Comment Syntax Not Supported (7 spec test errors)
 
 **Issue**: The FHIRPath parser does not support single-line (`//`) or multi-line (`/* */`) comments as specified in the FHIRPath grammar. Tests involving comments fail with `SyntaxException: Expected expression but found DIVIDE(/)` because `//` is being interpreted as two division operators.
 
@@ -124,144 +35,51 @@ The `type()` function is now implemented in `TypeFunction.php` with a supporting
 
 ---
 
-## 7. FHIRPath Evaluator: Primitive Value Extraction (PARTIALLY RESOLVED - 11 tests fixed)
+## 3. FHIRPath Evaluator: `type()` Function FHIR Type Detection
 
-**Status**: ✅ **Core issue resolved** — Primitive values are now correctly unwrapped to scalars
+**Issue**: The `type()` function returns System types instead of FHIR types when called on primitive values extracted from FHIR resources.
 
-**Issue**: When evaluating paths that should return primitive values (strings, codes, integers, etc.), the evaluator was returning FHIR primitive objects (arrays with `'@value'` => actual_value or objects with `->value` property) instead of extracting the primitive values themselves.
-
-**Example failure**:
-```
-Expression: name.given
-Expected: 'Peter' (string)
-Actual: ['@value' => 'Peter'] (array)
-```
-
-**Fix implemented**: Modified `wrapValue()` method in `FHIRPathEvaluator` to automatically unwrap:
-- FHIR primitive arrays (those with '@value' key) to their scalar values
-- FHIR primitive objects (those with #[FHIRPrimitive] attribute) to their ->value property via `normalizeValue()`
-
-**Test improvements**:
-- **Before**: 566 passing (59.7%), 229 failures
-- **After**: 577 passing (60.9%), 218 failures  
-- **Improvement**: +11 passing tests, -11 failures
-
-**Why only 11 tests instead of ~62?**
-- The serialization service already unwraps boolean primitives to PHP `bool` (e.g., `Patient.active` → `true`)
-- Many tests that required comparison operations were already working due to `ComparisonService::normalizeValue()`
-- The fix primarily helped tests involving string/date primitives and direct value assertions
-
-**Impact**: This affects:
-- ✅ Property access on FHIR resources (e.g., `name.given`, `telecom.use`, `birthDate`) - **FIXED**
-- ✅ Comparisons involving primitive values - **Already working via ComparisonService**
-- ✅ Function calls expecting scalar inputs - **FIXED**
-- ⚠️ `type()` function on primitive values - **Trade-off** (see note below)
-
-**Trade-off with type() function**:
-The fix unwraps primitives to scalars, which means `type()` returns System types instead of FHIR types:
-- `Patient.active.type().namespace` returns `'System'` instead of `'FHIR'`  
+**Example**:
+- `Patient.active.type().namespace` returns `'System'` instead of `'FHIR'`
 - `Patient.active.type().name` returns `'Boolean'` instead of `'boolean'`
 
-This is an acceptable trade-off because:
-1. FHIRPath specification requires property access to return primitive values, not wrappers
-2. Once a primitive is extracted from a FHIR resource, it becomes a FHIRPath System type
-3. Most real-world FHIRPath expressions compare/use primitive values, not check their types
-4. The serialization service already returns some primitives as PHP scalars (bool), so type information is already lost for those
+**Root cause**: When FHIR resources are deserialized and properties accessed, FHIR primitive wrappers are automatically unwrapped to PHP scalars (e.g., `boolean` → `bool`, `string` → `string`), losing FHIR type metadata. This is correct per FHIRPath specification (property access should return primitive values), but means the `type()` function cannot distinguish between System primitives and FHIR primitives.
 
-**Implementation details**:
-- File: [src/Component/FHIRPath/src/Evaluator/FHIRPathEvaluator.php](src/Component/FHIRPath/src/Evaluator/FHIRPathEvaluator.php)
-- Method: `wrapValue()` (lines ~685-730)
-- Related: `normalizeValue()` for FHIR primitive object unwrapping
+**Status**: This is a known trade-off. The current implementation correctly unwraps primitives for all other operations (comparison, arithmetic, function calls), which is required by the FHIRPath spec. Fixing `type()` to return FHIR types would require maintaining type metadata alongside values, which could impact performance and complicate other operations.
+
+**Impact**: Low — Most real-world FHIRPath expressions use primitive values for comparison/calculation rather than type introspection.
 
 ---
 
-## 8. FHIRPath Evaluator: Collection Comparison (0 spec test failures) ✅ RESOLVED
+## 4. FHIRPath Evaluator: Quantity Support — RESOLVED ✅
 
-~~**Issue**: Collection equality operators (`=`, `!=`) are not correctly implementing FHIRPath collection comparison semantics. The spec requires:~~
-~~- Collections are equal if they have the same elements in any order~~
-~~- Empty collections in comparisons produce empty results (not true/false)~~
-~~- Different numeric precisions make values incomparable (empty result)~~
+**Status**: ✅ All quantity features implemented and working
 
-**FIXED** — Collection comparison now fully implements FHIRPath specification semantics:
-- Collection equality uses set semantics (order-independent comparison)
-- Empty collections return empty results
-- DateTime precision-aware comparisons implemented
-- Equivalence operators (`~`, `!~`) fully implemented with type normalization
-- Incomparable values (different DateTime precisions) return empty instead of false
+**What's working:**
+- ✅ Quantity literals with UCUM units in single quotes: `185 '[lb_av]'`, `4 'g'`, `1 'wk'`
+- ✅ Calendar duration literals with unquoted keywords: `7 days`, `1 week`, `1 month`
+- ✅ Quantity extraction from FHIR resources (via `ComparisonService::extractQuantity()`)
+- ✅ Quantity comparison with unit conversion: `4 'g' = 4000 'mg'`, `7 days = 1 'wk'`
+- ✅ Equivalence operator (~) with relative tolerance: `4 'g' ~ 4040 'mg'` (1% difference, within 10% tolerance)
+- ✅ Quantity arithmetic operations:
+  - Multiplication: `2.0 'cm' * 2.0 'm' = 0.040 'm2'`
+  - Division: `4.0 'g' / 2.0 'm' = 2 'g/m'`, `1.0 'm' / 1.0 'm' = 1 '1'`
+- ✅ Calendar keyword to UCUM code mapping: `days`→`d`, `week`→`wk`, `month`→`mo`, etc.
+- ✅ toString() preserves integer formatting: `1 'wk'` not `1.0 'wk'`
+- ✅ toString() outputs calendar keywords without quotes: `1 week` not `1 'week'`
 
 **Implementation details:**
-- Created `ComparisonService` class ([src/Component/FHIRPath/src/Evaluator/ComparisonService.php](src/Component/FHIRPath/src/Evaluator/ComparisonService.php))
-- Extracted comparison logic from `FHIRPathEvaluator` for better separation of concerns
-- On-demand precision parsing for DateTime values using regex pattern matching
-- Equivalence mode normalizes collections to remove equivalent duplicates (e.g., `1` ~ `1.0`)
-- Strict type comparison for equality (`=`, `!=`), loose comparison for equivalence (`~`, `!~`)
+- Lexer recognizes calendar duration keywords after numbers and normalizes to quantity tokens
+- ToQuantityFunction parses both quoted UCUM codes and unquoted calendar keywords
+- ComparisonService maps calendar keywords to UCUM codes for comparison (e.g., `days`→`d`, `wk`→`wk`)
+- Equivalence operator (~) uses 10% relative tolerance per FHIRPath spec
+- Arithmetic operations preserve original units in results (e.g., `'g' / 'm'` → `'g/m'`)
 
-**Test Results:**
-- ✅ All collection equality/inequality tests passing
-- ✅ All 10 `sort()` function spec tests now passing (were blocked by comparison issues)
-- ✅ DateTime precision mismatch tests passing (return empty instead of false)
-- ✅ Equivalence operator tests passing
-- **Overall improvement: +33 passing tests, -56 errors, +6.4% pass rate**
-
-**Examples now working correctly:**
-- `(1 | 2) = (1 | 2)` → `true` ✅
-- `(1 | 2) = (2 | 1)` → `true` (order-independent) ✅
-- `(1 | 1.0) ~ (1 | 1)` → `true` (equivalence) ✅
-- `1 = 1.0` → `false` (strict equality) ✅
-- `@2018-03 = @2018-03-01` → empty (precision mismatch) ✅
-- `@2012-04-15 = @2012-04-15T10:00:00` → empty (precision mismatch) ✅
+**Tests passing**: All 14 quantity tests in the spec suite now pass
 
 ---
 
-## 9. FHIRPath Evaluator: Date/Time Comparison with Precision (0 spec test failures) ✅ RESOLVED
-
-~~**Issue**: Date and time comparisons don't properly handle different precisions. Per FHIRPath spec:~~
-~~- Values with different precisions are incomparable (return empty)~~
-~~- `@2018-03 < @2018-03-01` should return empty (year-month vs. full date)~~
-~~- `@2018-03-01T10:30 < @2018-03-01T10:30:00` should return empty (minute vs. second precision)~~
-~~- Only when precisions match can comparison return true/false~~
-
-**FIXED** — DateTime values with zero-only fractional seconds (`.0`, `.00`, `.000`) are now normalized to second precision (level 6) instead of millisecond precision (level 7), making them comparable with values that have no fractional seconds.
-
-**Root cause**: The precision detection logic treated any fractional seconds (including `.0`) as millisecond precision, making `@T10:30:00` and `@T10:30:00.0` incomparable even though they represent the same value.
-
-**Fix implemented**:
-1. Modified `getDateTimePrecision()` to strip zero-only fractional seconds before pattern matching
-2. Created `normalizeDateTimeString()` helper to strip `@` prefix and normalize `.0` suffixes while preserving timezones
-3. Both precision detection and value normalization now handle zero fractional seconds correctly
-
-**Test results**:
-- ✅ All 8 affected spec tests now passing:
-  - testLessThan26, testLessThan27
-  - testLessOrEqual26, testLessOrEqual27
-  - testGreatorOrEqual26, testGreatorOrEqual27
-  - testGreaterThan26, testGreaterThan27
-- ✅ All 28 ComparisonService unit tests passing (5 new tests added for zero fractional seconds)
-- **Overall improvement: +12 passing tests, +1.2% pass rate**
-
-**Implementation files**:
-- [ComparisonService.php](../../../src/Evaluator/ComparisonService.php) lines 252-270 (`normalizeDateTimeString()`), lines 297-334 (`getDateTimePrecision()`)
-- [ComparisonServiceTest.php](../../Unit/Component/FHIRPath/Evaluator/ComparisonServiceTest.php) lines 338-434 (new tests)
-
----
-
-## 10. FHIRPath Evaluator: Quantity Comparisons (10+ spec test failures)
-
-**Issue**: Tests involving FHIR Quantity values fail because:
-1. Quantity literal syntax (`185 '[lb_av]'`) may not be fully parsed
-2. Quantity comparison operations are not implemented
-3. Unit conversion for comparable units is not supported
-
-**Affected tests**: Tests with expressions like `Observation.value < 200 '[lb_av]'`
-
-**Fix required**: Implement Quantity type support in the evaluator including:
-- Quantity literal parsing
-- Quantity comparison operators
-- Basic unit compatibility checking
-
----
-
-## 11. FHIRPath Evaluator: Semantic Validation (3 spec test failures)
+## 5. FHIRPath Evaluator: Semantic Validation (3 spec test failures)
 
 **`testPrecedence1`** — `-1.convertsToInteger()` is marked `invalid="semantic"` in the spec XML. The evaluator successfully evaluates it (returns `-1`) instead of throwing a `FHIRPathException`. Without parentheses, the expression is ambiguous about whether the unary minus applies to the literal or to the result of the function call. Valid: `(-1).convertsToInteger()`. Invalid: `-1.convertsToInteger()`.
 
@@ -271,115 +89,35 @@ This is an acceptable trade-off because:
 
 ---
 
-## 12. `FHIRPathSpecificationTest`: 854 Skipped Tests Due to Deserialization Failures ✅ RESOLVED
+## 6. `FunctionRegistry` Shared Static State
 
-~~The majority of spec tests involve loading a resource file (e.g. `patient-example.xml`) via `FHIRSerializationService::createDefault()` and passing the result to the evaluator. Almost all of these are currently skipped with messages like:~~
-
-> ~~Could not deserialize resource file patient-example.xml: ...~~
-
-~~The two-phase `createDefault()` factory is correctly wired, but the FHIR normalizers themselves are complex and may not yet correctly handle round-tripping real FHIR XML/JSON files. This is the highest-impact item to investigate — unblocking deserialisation would convert most of the 854 skips into real test results.~~
-
-**FIXED** — The FHIR serialization service now correctly deserializes XML and JSON resource files. Test count improved from 94 tests (854 skipped) to **948 tests (39 skipped)**. The 39 remaining skips are for unsupported output types (e.g., `Quantity`) and missing input files, not deserialization failures. Deserialization skip logic has been removed from the test suite.
-
----
-
-## 13. `FunctionRegistry` Shared Static 27 tests; incremental implementation
-   - Priority functions: `sort()` (10 tests), `encode()`/`decode()` (8
 When the FHIRPath unit tests run in the same PHPUnit process before the integration tests, `testResourceTypePrefixWithWhereFunction` and `testResourceTypePrefixWithExistsFunction` fail with `Unknown function: where` / `Unknown function: exists`. Running the integration tests in isolation (or with `--testsuite=integration`) works correctly.
 
 The root cause is that `FunctionRegistry::getInstance()` uses a static singleton that can enter a bad state if certain unit tests modify or reset it. Worth adding a `tearDown` guard or switching to a non-static instance.
 
 ---
 
-## 14. `FHIRTypeResolver::resolveResourceType()` Now Returns `null` as Fallback
+## 7. `FHIRTypeResolver::resolveResourceType()` Now Returns `null` as Fallback
 
 The old fallback was `return 'FHIR' . $resourceType;` (wrong namespace, but never `null`). The new fallback returns `null` when no Models class is found. Callers that previously relied on always getting a string back will now receive `null`. The serialisation code handles `null` gracefully, but any external callers of `FHIRTypeResolver` that don't check for `null` could behave differently.
 
 ---
 
-## Summary of Changes Needed (Priority Order)
+## Summary of Remaining Issues (Priority Order)
 
-### High Priority (Biggest Impact)
-1. ~~**Collection Comparison** (#8)~~ ✅ **RESOLVED** — Was affecting ~50 tests including all 10 `sort()` spec tests; fundamental operator semantics  
-2. ~~**Primitive Value Extraction** (#7)~~ ✅ **PARTIALLY RESOLVED** — Core unwrapping logic implemented (+11 tests); remaining work involves type() function trade-offs
-3. ~~**Date/Time Precision Handling** (#9)~~ ✅ **RESOLVED** — Zero fractional seconds normalization implemented (+12 tests, +1.2% pass rate)
+### High Priority
+1. **Missing Functions** (#1) — Affects ~24 tests
+   - Priority: `encode()`/`decode()` (8 tests), `join()` (3 tests), `escape()`/`unescape()` (4 tests)
 
 ### Medium Priority
-4. **Missing Functions** (#1) — Affects 7 tests (down from 17 after `sort()` resolution); incremental implementation
-   - Priority functions: `encode()`/`decode()` (8 tests), `join()` (3 tests), `escape()`/`unescape()` (4 tests)
-5. **Comment Syntax Support** (#6) — Affects 7 tests; parser enhancement
-6. **Quantity Comparisons** (#10) — Affects ~10 tests; advanced feature
+2. **Comment Syntax Support** (#2) — Affects 7 tests; requires lexer/parser enhancements
+3. **`type()` Function FHIR Type Detection** (#3) — Low impact; known trade-off with primitive unwrapping
 
 ### Low Priority
-7. **Semantic Validation** (#11) — Affects 3 tests; edge case validation
-8. **Function Registry State** (#13) — Test isolation issue; doesn't affect spec tests
-9. **Type Resolver Null Check** (#14) — Backward compatibility; doesn't affect current tests
+4. **Semantic Validation** (#5) — Affects 3 tests; edge case validation for ambiguous expressions
+5. **Function Registry State** (#6) — Test isolation issue; doesn't affect spec tests
+6. **Type Resolver Null Check** (#7) — Backward compatibility concern; no current test failures
 
-**Progress summary**:
-- **Collection Comparison (#8)**: Resolved — +33 passing tests, +6.4% pass rate
-- **Primitive Value Extraction (#7)**: Partially resolved — +11 passing tests, +1.2% pass rate
-- **Date/Time Precision Handling (#9)**: Resolved — +12 passing tests, +1.2% pass rate
-- **Combined improvement**: +56 passing tests, +8.8% pass rate increase (from 56.2% to 62.1%)
-
-**Previous estimate**: Fixing issues #8, #7, and #9 would resolve approximately 142 failures, moving the passing rate from **56%** to approximately **71%**.
-
-**Actual progress**: 
-- Issues #8, #7 (partial), and #9 resolved: Pass rate improved from **56.2%** (533/948) to **62.1%** (589/948)
-- Remaining to reach ~71% target: Issues #7 (type() trade-offs), missing functions (#1), and other medium-priority items
-
----
-
-## Recent Progress (Latest Updates)
-
-### ✅ Primitive Value Extraction (Issue #7) — **PARTIALLY RESOLVED**
-- **Implementation**: Modified `wrapValue()` method in `FHIRPathEvaluator` to automatically unwrap FHIR primitives
-- **Features implemented**:
-  - Unwraps FHIR primitive arrays (`['@value' => 'Peter']` → `'Peter'`)
-  - Unwraps FHIR primitive objects via `normalizeValue()` (`DatePrimitive->value` → `'1974-12-25'`)
-  - Handles nested arrays of primitives (e.g., `name[0]['given']`)
-- **Test improvements**:
-  - Failures reduced: 229 → 218 (-11)
-  - Passing tests increased: 566 → 577 (+11)
-  - Pass rate improved: 59.7% → 60.9% (+1.2%)
-- **Working**: Property access (`name.given`, `birthDate`), comparisons, function arguments
-- **Trade-off**: `type()` function now returns System types instead of FHIR types for extracted primitives
-
-### ✅ Collection Comparison (Issue #8) — **RESOLVED**
-- **Implementation**: `ComparisonService` class created with full FHIRPath specification compliance
-- **Features implemented**:
-  - Collection equality with set semantics (order-independent)
-  - Equivalence operators (`~`, `!~`) with type normalization
-  - DateTime precision-aware comparisons
-  - Empty collection handling per spec
-- **Test improvements**:
-  - Errors reduced: 165 → 109 (-56)
-  - Passing tests increased: 533 → 566 (+33)
-  - Pass rate improved: 56.2% → 60.9% (from baseline, combined with #7: +6.4% from issue #8, +1.2% from issue #7)
-- **All 10 `sort()` spec tests now passing** (previously blocked by comparison issues)
-
-### ✅ `sort()` Function — **FULLY IMPLEMENTED AND VERIFIED**
-- **Implementation**: `SortFunction.php` created with complete functionality
-- **Registration**: Added to `FunctionRegistry`
-- **Unit tests**: 23/23 passing ✅
-- **Spec tests**: 10/10 passing ✅ (unblocked by issue #8 resolution)
-- **Status**: Fully working and verified against FHIRPath specification
-
-### ✅ Date/Time Precision Handling (Issue #9) — **RESOLVED**
-- **Implementation**: Modified `ComparisonService` to normalize zero-only fractional seconds
-- **Features implemented**:
-  - `getDateTimePrecision()` strips `.0` suffixes before precision detection
-  - `normalizeDateTimeString()` helper normalizes DateTime values for comparison
-  - Zero fractional seconds (`.0`, `.00`, `.000`) treated as second precision (6), not millisecond (7)
-  - Non-zero fractional seconds (`.001`, `.123`) remain millisecond precision (7)
-  - Timezone information preserved during normalization
-- **Test improvements**:
-  - Failures reduced: 218 → 206 (-12)
-  - Passing tests increased: 577 → 589 (+12)
-  - Pass rate improved: 60.9% → 62.1% (+1.2%)
-- **All 8 affected spec tests now passing**:
-  - testLessThan26, testLessThan27 ✅
-  - testLessOrEqual26, testLessOrEqual27 ✅
-  - testGreatorOrEqual26, testGreatorOrEqual27 ✅
-  - testGreaterThan26, testGreaterThan27 ✅
-- **Unit tests**: 28/28 ComparisonService tests passing (5 new tests added for zero fractional seconds normalization)
+### Resolved ✅
+- **Quantity Comparisons** (#4) — All quantity features implemented (14 tests passing)
 

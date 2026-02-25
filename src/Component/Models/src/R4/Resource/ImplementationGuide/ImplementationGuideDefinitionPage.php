@@ -48,7 +48,7 @@ class ImplementationGuideDefinitionPage extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'nameX' => [
+        'name' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -111,7 +111,7 @@ class ImplementationGuideDefinitionPage extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
-        /** @var UrlPrimitive|Reference|null nameX Where to find that page */
+        /** @var UrlPrimitive|Reference|null name Where to find that page */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -133,7 +133,7 @@ class ImplementationGuideDefinitionPage extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public UrlPrimitive|Reference|null $nameX = null,
+        public UrlPrimitive|Reference|null $name = null,
         /** @var StringPrimitive|string|null title Short title shown for navigational assistance */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $title = null,

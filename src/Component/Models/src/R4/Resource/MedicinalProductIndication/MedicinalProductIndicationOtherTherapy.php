@@ -55,7 +55,7 @@ class MedicinalProductIndicationOtherTherapy extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'medicationX' => [
+        'medication' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -94,7 +94,7 @@ class MedicinalProductIndicationOtherTherapy extends BackboneElement
         /** @var CodeableConcept|null therapyRelationshipType The type of relationship between the medicinal product indication or contraindication and another therapy */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?CodeableConcept $therapyRelationshipType = null,
-        /** @var CodeableConcept|Reference|null medicationX Reference to a specific medication (active substance, medicinal product or class of products) as part of an indication or contraindication */
+        /** @var CodeableConcept|Reference|null medication Reference to a specific medication (active substance, medicinal product or class of products) as part of an indication or contraindication */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -116,7 +116,7 @@ class MedicinalProductIndicationOtherTherapy extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public CodeableConcept|Reference|null $medicationX = null,
+        public CodeableConcept|Reference|null $medication = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

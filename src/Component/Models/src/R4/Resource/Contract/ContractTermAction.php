@@ -124,7 +124,7 @@ class ContractTermAction extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'occurrenceX' => [
+        'occurrence' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -299,7 +299,7 @@ class ContractTermAction extends BackboneElement
         /** @var array<StringPrimitive|string> contextLinkId Pointer to specific item */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
         public array $contextLinkId = [],
-        /** @var DateTimePrimitive|Period|Timing|null occurrenceX When action happens */
+        /** @var DateTimePrimitive|Period|Timing|null occurrence When action happens */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -325,7 +325,7 @@ class ContractTermAction extends BackboneElement
                 ],
             ],
         )]
-        public DateTimePrimitive|Period|Timing|null $occurrenceX = null,
+        public DateTimePrimitive|Period|Timing|null $occurrence = null,
         /** @var array<Reference> requester Who asked for action */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isArray: true)]
         public array $requester = [],

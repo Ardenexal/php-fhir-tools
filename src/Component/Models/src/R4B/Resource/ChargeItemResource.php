@@ -180,7 +180,7 @@ class ChargeItemResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'occurrenceX' => [
+        'occurrence' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -328,7 +328,7 @@ class ChargeItemResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'productX' => [
+        'product' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -430,7 +430,7 @@ class ChargeItemResource extends DomainResourceResource
         /** @var Reference|null context Encounter / Episode associated with event */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $context = null,
-        /** @var DateTimePrimitive|Period|Timing|null occurrenceX When the charged service was applied */
+        /** @var DateTimePrimitive|Period|Timing|null occurrence When the charged service was applied */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -456,7 +456,7 @@ class ChargeItemResource extends DomainResourceResource
                 ],
             ],
         )]
-        public DateTimePrimitive|Period|Timing|null $occurrenceX = null,
+        public DateTimePrimitive|Period|Timing|null $occurrence = null,
         /** @var array<ChargeItemPerformer> performer Who performed charged service */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
         public array $performer = [],
@@ -496,7 +496,7 @@ class ChargeItemResource extends DomainResourceResource
         /** @var array<Reference> service Which rendered service is being charged? */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isArray: true)]
         public array $service = [],
-        /** @var Reference|CodeableConcept|null productX Product charged */
+        /** @var Reference|CodeableConcept|null product Product charged */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -516,7 +516,7 @@ class ChargeItemResource extends DomainResourceResource
                 ],
             ],
         )]
-        public Reference|CodeableConcept|null $productX = null,
+        public Reference|CodeableConcept|null $product = null,
         /** @var array<Reference> account Account to place this charge */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isArray: true)]
         public array $account = [],

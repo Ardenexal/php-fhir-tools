@@ -196,7 +196,7 @@ class ActivityDefinitionResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'subjectX' => [
+        'subject' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -452,7 +452,7 @@ class ActivityDefinitionResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'timingX' => [
+        'timing' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -522,7 +522,7 @@ class ActivityDefinitionResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'productX' => [
+        'product' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -669,7 +669,7 @@ class ActivityDefinitionResource extends DomainResourceResource
         /** @var bool|null experimental For testing purposes, not real usage */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $experimental = null,
-        /** @var CodeableConcept|Reference|CanonicalPrimitive|null subjectX Type of individual the activity definition is intended for */
+        /** @var CodeableConcept|Reference|CanonicalPrimitive|null subject Type of individual the activity definition is intended for */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -695,7 +695,7 @@ class ActivityDefinitionResource extends DomainResourceResource
                 ],
             ],
         )]
-        public CodeableConcept|Reference|CanonicalPrimitive|null $subjectX = null,
+        public CodeableConcept|Reference|CanonicalPrimitive|null $subject = null,
         /** @var DateTimePrimitive|null date Date last changed */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $date = null,
@@ -771,7 +771,7 @@ class ActivityDefinitionResource extends DomainResourceResource
         /** @var bool|null doNotPerform True if the activity should not be performed */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $doNotPerform = null,
-        /** @var Timing|DateTimePrimitive|Age|Period|Range|Duration|null timingX When activity is to occur */
+        /** @var Timing|DateTimePrimitive|Age|Period|Range|Duration|null timing When activity is to occur */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -815,14 +815,14 @@ class ActivityDefinitionResource extends DomainResourceResource
                 ],
             ],
         )]
-        public Timing|DateTimePrimitive|Age|Period|Range|Duration|null $timingX = null,
+        public Timing|DateTimePrimitive|Age|Period|Range|Duration|null $timing = null,
         /** @var Reference|null location Where it should happen */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $location = null,
         /** @var array<ActivityDefinitionParticipant> participant Who should participate in the action */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
         public array $participant = [],
-        /** @var Reference|CodeableConcept|null productX What's administered/supplied */
+        /** @var Reference|CodeableConcept|null product What's administered/supplied */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -842,7 +842,7 @@ class ActivityDefinitionResource extends DomainResourceResource
                 ],
             ],
         )]
-        public Reference|CodeableConcept|null $productX = null,
+        public Reference|CodeableConcept|null $product = null,
         /** @var Quantity|null quantity How much is administered/consumed/supplied */
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
         public ?Quantity $quantity = null,

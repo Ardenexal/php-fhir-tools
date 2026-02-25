@@ -58,7 +58,7 @@ class SpecimenCollection extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'collectedX' => [
+        'collected' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -118,7 +118,7 @@ class SpecimenCollection extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'fastingStatusX' => [
+        'fastingStatus' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -157,7 +157,7 @@ class SpecimenCollection extends BackboneElement
         /** @var Reference|null collector Who collected the specimen */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $collector = null,
-        /** @var DateTimePrimitive|Period|null collectedX Collection time */
+        /** @var DateTimePrimitive|Period|null collected Collection time */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -177,7 +177,7 @@ class SpecimenCollection extends BackboneElement
                 ],
             ],
         )]
-        public DateTimePrimitive|Period|null $collectedX = null,
+        public DateTimePrimitive|Period|null $collected = null,
         /** @var Duration|null duration How long it took to collect specimen */
         #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex')]
         public ?Duration $duration = null,
@@ -190,7 +190,7 @@ class SpecimenCollection extends BackboneElement
         /** @var CodeableConcept|null bodySite Anatomical collection site */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $bodySite = null,
-        /** @var CodeableConcept|Duration|null fastingStatusX Whether or how long patient abstained from food and/or drink */
+        /** @var CodeableConcept|Duration|null fastingStatus Whether or how long patient abstained from food and/or drink */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -210,7 +210,7 @@ class SpecimenCollection extends BackboneElement
                 ],
             ],
         )]
-        public CodeableConcept|Duration|null $fastingStatusX = null,
+        public CodeableConcept|Duration|null $fastingStatus = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -1,0 +1,21 @@
+<?php declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
+
+/**
+ * ValueSet: List Mode
+ * URL: http://hl7.org/fhir/ValueSet/list-mode
+ * Version: 5.0.0
+ * Description: The processing mode that applies to this list.
+ */
+enum ListMode: string
+{
+	/** Working List */
+	case workinglist = 'working';
+
+	/** Snapshot List */
+	case snapshotlist = 'snapshot';
+
+	/** Change List */
+	case changelist = 'changes';
+}

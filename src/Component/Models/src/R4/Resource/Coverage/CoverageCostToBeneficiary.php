@@ -56,7 +56,7 @@ class CoverageCostToBeneficiary extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'valueX' => [
+        'value' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -104,7 +104,7 @@ class CoverageCostToBeneficiary extends BackboneElement
         /** @var CodeableConcept|null type Cost category */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $type = null,
-        /** @var Quantity|Money|null valueX The amount or percentage due from the beneficiary */
+        /** @var Quantity|Money|null value The amount or percentage due from the beneficiary */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -126,7 +126,7 @@ class CoverageCostToBeneficiary extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public Quantity|Money|null $valueX = null,
+        public Quantity|Money|null $value = null,
         /** @var array<CoverageCostToBeneficiaryException> exception Exceptions for patient payments */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
         public array $exception = [],

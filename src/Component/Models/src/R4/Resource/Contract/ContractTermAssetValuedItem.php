@@ -51,7 +51,7 @@ class ContractTermAssetValuedItem extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'entityX' => [
+        'entity' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -204,7 +204,7 @@ class ContractTermAssetValuedItem extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
-        /** @var CodeableConcept|Reference|null entityX Contract Valued Item Type */
+        /** @var CodeableConcept|Reference|null entity Contract Valued Item Type */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -224,7 +224,7 @@ class ContractTermAssetValuedItem extends BackboneElement
                 ],
             ],
         )]
-        public CodeableConcept|Reference|null $entityX = null,
+        public CodeableConcept|Reference|null $entity = null,
         /** @var Identifier|null identifier Contract Valued Item Number */
         #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
         public ?Identifier $identifier = null,

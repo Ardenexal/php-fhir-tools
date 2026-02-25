@@ -57,7 +57,7 @@ class ValueSetExpansionParameter extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'valueX' => [
+        'value' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -131,7 +131,7 @@ class ValueSetExpansionParameter extends BackboneElement
         /** @var StringPrimitive|string|null name Name as assigned by the client or server */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $name = null,
-        /** @var StringPrimitive|string|bool|int|float|UriPrimitive|CodePrimitive|DateTimePrimitive|null valueX Value of the named parameter */
+        /** @var StringPrimitive|string|bool|int|float|UriPrimitive|CodePrimitive|DateTimePrimitive|null value Value of the named parameter */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -166,7 +166,7 @@ class ValueSetExpansionParameter extends BackboneElement
                 ],
             ],
         )]
-        public StringPrimitive|string|bool|int|float|UriPrimitive|CodePrimitive|DateTimePrimitive|null $valueX = null,
+        public StringPrimitive|string|bool|int|float|UriPrimitive|CodePrimitive|DateTimePrimitive|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

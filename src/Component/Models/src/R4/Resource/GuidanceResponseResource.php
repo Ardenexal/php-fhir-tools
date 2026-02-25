@@ -126,7 +126,7 @@ class GuidanceResponseResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'moduleX' => [
+        'module' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -298,7 +298,7 @@ class GuidanceResponseResource extends DomainResourceResource
         /** @var array<Identifier> identifier Business identifier */
         #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex', isArray: true)]
         public array $identifier = [],
-        /** @var UriPrimitive|CanonicalPrimitive|CodeableConcept|null moduleX What guidance was requested */
+        /** @var UriPrimitive|CanonicalPrimitive|CodeableConcept|null module What guidance was requested */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -326,7 +326,7 @@ class GuidanceResponseResource extends DomainResourceResource
             ],
         )]
         #[NotBlank]
-        public UriPrimitive|CanonicalPrimitive|CodeableConcept|null $moduleX = null,
+        public UriPrimitive|CanonicalPrimitive|CodeableConcept|null $module = null,
         /** @var GuidanceResponseStatusType|null status success | data-requested | data-required | in-progress | failure | entered-in-error */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?GuidanceResponseStatusType $status = null,

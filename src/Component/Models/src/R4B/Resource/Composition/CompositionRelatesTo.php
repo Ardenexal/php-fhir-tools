@@ -56,7 +56,7 @@ class CompositionRelatesTo extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'targetX' => [
+        'target' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -95,7 +95,7 @@ class CompositionRelatesTo extends BackboneElement
         /** @var DocumentRelationshipTypeType|null code replaces | transforms | signs | appends */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?DocumentRelationshipTypeType $code = null,
-        /** @var Identifier|Reference|null targetX Target of the relationship */
+        /** @var Identifier|Reference|null target Target of the relationship */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -117,7 +117,7 @@ class CompositionRelatesTo extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public Identifier|Reference|null $targetX = null,
+        public Identifier|Reference|null $target = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

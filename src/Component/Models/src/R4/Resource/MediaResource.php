@@ -187,7 +187,7 @@ class MediaResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'createdX' => [
+        'created' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -373,7 +373,7 @@ class MediaResource extends DomainResourceResource
         /** @var Reference|null encounter Encounter associated with media */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $encounter = null,
-        /** @var DateTimePrimitive|Period|null createdX When Media was collected */
+        /** @var DateTimePrimitive|Period|null created When Media was collected */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -393,7 +393,7 @@ class MediaResource extends DomainResourceResource
                 ],
             ],
         )]
-        public DateTimePrimitive|Period|null $createdX = null,
+        public DateTimePrimitive|Period|null $created = null,
         /** @var InstantPrimitive|null issued Date/Time this version was made available */
         #[FhirProperty(fhirType: 'instant', propertyKind: 'primitive')]
         public ?InstantPrimitive $issued = null,

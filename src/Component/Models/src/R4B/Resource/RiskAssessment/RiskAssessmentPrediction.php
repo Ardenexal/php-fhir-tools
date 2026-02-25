@@ -56,7 +56,7 @@ class RiskAssessmentPrediction extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'probabilityX' => [
+        'probability' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -98,7 +98,7 @@ class RiskAssessmentPrediction extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'whenX' => [
+        'when' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -146,7 +146,7 @@ class RiskAssessmentPrediction extends BackboneElement
         /** @var CodeableConcept|null outcome Possible outcome for the subject */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $outcome = null,
-        /** @var float|Range|null probabilityX Likelihood of specified outcome */
+        /** @var float|Range|null probability Likelihood of specified outcome */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -161,14 +161,14 @@ class RiskAssessmentPrediction extends BackboneElement
                 ],
             ],
         )]
-        public float|Range|null $probabilityX = null,
+        public float|Range|null $probability = null,
         /** @var CodeableConcept|null qualitativeRisk Likelihood of specified outcome as a qualitative value */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $qualitativeRisk = null,
         /** @var float|null relativeRisk Relative likelihood */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
         public ?float $relativeRisk = null,
-        /** @var Period|Range|null whenX Timeframe or age range */
+        /** @var Period|Range|null when Timeframe or age range */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -188,7 +188,7 @@ class RiskAssessmentPrediction extends BackboneElement
                 ],
             ],
         )]
-        public Period|Range|null $whenX = null,
+        public Period|Range|null $when = null,
         /** @var StringPrimitive|string|null rationale Explanation of prediction */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $rationale = null,

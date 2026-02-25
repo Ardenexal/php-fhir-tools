@@ -140,7 +140,7 @@ class RequestGroupAction extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'timingX' => [
+        'timing' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -312,7 +312,7 @@ class RequestGroupAction extends BackboneElement
         /** @var array<RequestGroupActionRelatedAction> relatedAction Relationship to another action */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
         public array $relatedAction = [],
-        /** @var DateTimePrimitive|Age|Period|Duration|Range|Timing|null timingX When the action should take place */
+        /** @var DateTimePrimitive|Age|Period|Duration|Range|Timing|null timing When the action should take place */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -356,7 +356,7 @@ class RequestGroupAction extends BackboneElement
                 ],
             ],
         )]
-        public DateTimePrimitive|Age|Period|Duration|Range|Timing|null $timingX = null,
+        public DateTimePrimitive|Age|Period|Duration|Range|Timing|null $timing = null,
         /** @var array<Reference> participant Who should perform the action */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isArray: true)]
         public array $participant = [],

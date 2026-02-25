@@ -75,7 +75,7 @@ class ExplanationOfBenefitProcedure extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'procedureX' => [
+        'procedure' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -129,7 +129,7 @@ class ExplanationOfBenefitProcedure extends BackboneElement
         /** @var DateTimePrimitive|null date When the procedure was performed */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $date = null,
-        /** @var CodeableConcept|Reference|null procedureX Specific clinical procedure */
+        /** @var CodeableConcept|Reference|null procedure Specific clinical procedure */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -151,7 +151,7 @@ class ExplanationOfBenefitProcedure extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public CodeableConcept|Reference|null $procedureX = null,
+        public CodeableConcept|Reference|null $procedure = null,
         /** @var array<Reference> udi Unique device identifier */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isArray: true)]
         public array $udi = [],

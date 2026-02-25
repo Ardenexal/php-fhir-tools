@@ -232,7 +232,7 @@ class ServiceRequestResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'quantityX' => [
+        'quantity' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -281,7 +281,7 @@ class ServiceRequestResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'occurrenceX' => [
+        'occurrence' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -312,7 +312,7 @@ class ServiceRequestResource extends DomainResourceResource
                 ],
             ],
         ],
-        'asNeededX' => [
+        'asNeeded' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -537,7 +537,7 @@ class ServiceRequestResource extends DomainResourceResource
         /** @var array<CodeableConcept> orderDetail Additional order information */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true)]
         public array $orderDetail = [],
-        /** @var Quantity|Ratio|Range|null quantityX Service amount */
+        /** @var Quantity|Ratio|Range|null quantity Service amount */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -563,14 +563,14 @@ class ServiceRequestResource extends DomainResourceResource
                 ],
             ],
         )]
-        public Quantity|Ratio|Range|null $quantityX = null,
+        public Quantity|Ratio|Range|null $quantity = null,
         /** @var Reference|null subject Individual or Entity the service is ordered for */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?Reference $subject = null,
         /** @var Reference|null encounter Encounter in which the request was created */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $encounter = null,
-        /** @var DateTimePrimitive|Period|Timing|null occurrenceX When service should occur */
+        /** @var DateTimePrimitive|Period|Timing|null occurrence When service should occur */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -596,8 +596,8 @@ class ServiceRequestResource extends DomainResourceResource
                 ],
             ],
         )]
-        public DateTimePrimitive|Period|Timing|null $occurrenceX = null,
-        /** @var bool|CodeableConcept|null asNeededX Preconditions for service */
+        public DateTimePrimitive|Period|Timing|null $occurrence = null,
+        /** @var bool|CodeableConcept|null asNeeded Preconditions for service */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -612,7 +612,7 @@ class ServiceRequestResource extends DomainResourceResource
                 ],
             ],
         )]
-        public bool|CodeableConcept|null $asNeededX = null,
+        public bool|CodeableConcept|null $asNeeded = null,
         /** @var DateTimePrimitive|null authoredOn Date request signed */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $authoredOn = null,

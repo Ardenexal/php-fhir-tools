@@ -1,0 +1,30 @@
+<?php declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
+
+/**
+ * ValueSet: Action Selection Behavior
+ * URL: http://hl7.org/fhir/ValueSet/action-selection-behavior
+ * Version: 5.0.0
+ * Description: Defines selection behavior of a group.
+ */
+enum ActionSelectionBehavior: string
+{
+	/** Any */
+	case any = 'any';
+
+	/** All */
+	case all = 'all';
+
+	/** All Or None */
+	case allornone = 'all-or-none';
+
+	/** Exactly One */
+	case exactlyone = 'exactly-one';
+
+	/** At Most One */
+	case atmostone = 'at-most-one';
+
+	/** One Or More */
+	case oneormore = 'one-or-more';
+}

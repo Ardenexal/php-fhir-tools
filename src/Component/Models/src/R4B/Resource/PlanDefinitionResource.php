@@ -196,7 +196,7 @@ class PlanDefinitionResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'subjectX' => [
+        'subject' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -470,7 +470,7 @@ class PlanDefinitionResource extends DomainResourceResource
         /** @var bool|null experimental For testing purposes, not real usage */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $experimental = null,
-        /** @var CodeableConcept|Reference|CanonicalPrimitive|null subjectX Type of individual the plan definition is focused on */
+        /** @var CodeableConcept|Reference|CanonicalPrimitive|null subject Type of individual the plan definition is focused on */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -496,7 +496,7 @@ class PlanDefinitionResource extends DomainResourceResource
                 ],
             ],
         )]
-        public CodeableConcept|Reference|CanonicalPrimitive|null $subjectX = null,
+        public CodeableConcept|Reference|CanonicalPrimitive|null $subject = null,
         /** @var DateTimePrimitive|null date Date last changed */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $date = null,

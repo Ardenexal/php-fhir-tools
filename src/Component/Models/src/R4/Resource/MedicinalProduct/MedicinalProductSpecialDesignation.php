@@ -74,7 +74,7 @@ class MedicinalProductSpecialDesignation extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'indicationX' => [
+        'indication' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -146,7 +146,7 @@ class MedicinalProductSpecialDesignation extends BackboneElement
         /** @var CodeableConcept|null intendedUse The intended use of the product, e.g. prevention, treatment */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $intendedUse = null,
-        /** @var CodeableConcept|Reference|null indicationX Condition for which the medicinal use applies */
+        /** @var CodeableConcept|Reference|null indication Condition for which the medicinal use applies */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -166,7 +166,7 @@ class MedicinalProductSpecialDesignation extends BackboneElement
                 ],
             ],
         )]
-        public CodeableConcept|Reference|null $indicationX = null,
+        public CodeableConcept|Reference|null $indication = null,
         /** @var CodeableConcept|null status For example granted, pending, expired or withdrawn */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $status = null,

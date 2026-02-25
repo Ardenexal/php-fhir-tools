@@ -347,7 +347,7 @@ class FHIRPathLexer
             }
         }
 
-        // Check for quantity unit
+        // Check for quantity unit (quoted UCUM units like '185 'mg'')
         if ($this->peek() === ' ' && $this->peek(1) === "'") {
             $this->advance(); // consume space
             $this->advance(); // consume opening quote
@@ -366,6 +366,33 @@ class FHIRPathLexer
             $this->addToken(TokenType::QUANTITY, $value . " '" . $unit . "'", $startLine, $startColumn, $start);
 
             return;
+        }
+
+        // Check for calendar duration unit (unquoted keywords like '7 days', '1 week')
+        if ($this->peek() === ' ' && $this->isAlpha($this->peek(1))) {
+            $this->advance(); // consume space
+
+            $keyword = '';
+            while ($this->isAlpha($this->peek())) {
+                $keyword .= $this->advance();
+            }
+
+            // Valid calendar duration keywords (singular and plural)
+            $validKeywords = [
+                'year', 'years', 'month', 'months', 'week', 'weeks', 'day', 'days',
+                'hour', 'hours', 'minute', 'minutes', 'second', 'seconds',
+                'millisecond', 'milliseconds',
+            ];
+
+            if (in_array($keyword, $validKeywords, true)) {
+                // Normalize to quoted format for consistency with UCUM quantities
+                $this->addToken(TokenType::QUANTITY, $value . " '" . $keyword . "'", $startLine, $startColumn, $start);
+
+                return;
+            }
+
+            // Not a valid calendar duration keyword - reset position and treat as NUMBER
+            $this->current = $unitStart;
         }
 
         $this->addToken(TokenType::NUMBER, $value, $startLine, $startColumn, $start);

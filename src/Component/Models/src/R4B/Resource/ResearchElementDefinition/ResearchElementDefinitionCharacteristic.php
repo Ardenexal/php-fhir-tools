@@ -55,7 +55,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'definitionX' => [
+        'definition' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -129,7 +129,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'studyEffectiveX' => [
+        'studyEffective' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -194,7 +194,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'participantEffectiveX' => [
+        'participantEffective' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -262,7 +262,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
-        /** @var CodeableConcept|CanonicalPrimitive|Expression|DataRequirement|null definitionX What code or expression defines members? */
+        /** @var CodeableConcept|CanonicalPrimitive|Expression|DataRequirement|null definition What code or expression defines members? */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -296,7 +296,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public CodeableConcept|CanonicalPrimitive|Expression|DataRequirement|null $definitionX = null,
+        public CodeableConcept|CanonicalPrimitive|Expression|DataRequirement|null $definition = null,
         /** @var array<UsageContext> usageContext What code/value pairs define members? */
         #[FhirProperty(fhirType: 'UsageContext', propertyKind: 'complex', isArray: true)]
         public array $usageContext = [],
@@ -309,7 +309,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
         /** @var StringPrimitive|string|null studyEffectiveDescription What time period does the study cover */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $studyEffectiveDescription = null,
-        /** @var DateTimePrimitive|Period|Duration|Timing|null studyEffectiveX What time period does the study cover */
+        /** @var DateTimePrimitive|Period|Duration|Timing|null studyEffective What time period does the study cover */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -341,7 +341,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
                 ],
             ],
         )]
-        public DateTimePrimitive|Period|Duration|Timing|null $studyEffectiveX = null,
+        public DateTimePrimitive|Period|Duration|Timing|null $studyEffective = null,
         /** @var Duration|null studyEffectiveTimeFromStart Observation time from study start */
         #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex')]
         public ?Duration $studyEffectiveTimeFromStart = null,
@@ -351,7 +351,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
         /** @var StringPrimitive|string|null participantEffectiveDescription What time period do participants cover */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $participantEffectiveDescription = null,
-        /** @var DateTimePrimitive|Period|Duration|Timing|null participantEffectiveX What time period do participants cover */
+        /** @var DateTimePrimitive|Period|Duration|Timing|null participantEffective What time period do participants cover */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -383,7 +383,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
                 ],
             ],
         )]
-        public DateTimePrimitive|Period|Duration|Timing|null $participantEffectiveX = null,
+        public DateTimePrimitive|Period|Duration|Timing|null $participantEffective = null,
         /** @var Duration|null participantEffectiveTimeFromStart Observation time from study start */
         #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex')]
         public ?Duration $participantEffectiveTimeFromStart = null,

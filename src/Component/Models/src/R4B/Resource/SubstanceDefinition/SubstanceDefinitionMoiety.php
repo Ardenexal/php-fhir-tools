@@ -101,7 +101,7 @@ class SubstanceDefinitionMoiety extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'amountX' => [
+        'amount' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -164,7 +164,7 @@ class SubstanceDefinitionMoiety extends BackboneElement
         /** @var StringPrimitive|string|null molecularFormula Molecular formula for this moiety (e.g. with the Hill system) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $molecularFormula = null,
-        /** @var Quantity|StringPrimitive|string|null amountX Quantitative value for this moiety */
+        /** @var Quantity|StringPrimitive|string|null amount Quantitative value for this moiety */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -184,7 +184,7 @@ class SubstanceDefinitionMoiety extends BackboneElement
                 ],
             ],
         )]
-        public Quantity|StringPrimitive|string|null $amountX = null,
+        public Quantity|StringPrimitive|string|null $amount = null,
         /** @var CodeableConcept|null measurementType The measurement type of the quantitative value */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $measurementType = null,

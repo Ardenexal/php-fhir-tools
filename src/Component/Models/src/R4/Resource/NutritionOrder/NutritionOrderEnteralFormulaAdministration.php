@@ -64,7 +64,7 @@ class NutritionOrderEnteralFormulaAdministration extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'rateX' => [
+        'rate' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -106,7 +106,7 @@ class NutritionOrderEnteralFormulaAdministration extends BackboneElement
         /** @var Quantity|null quantity The volume of formula to provide */
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
         public ?Quantity $quantity = null,
-        /** @var Quantity|Ratio|null rateX Speed with which the formula is provided per period of time */
+        /** @var Quantity|Ratio|null rate Speed with which the formula is provided per period of time */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -126,7 +126,7 @@ class NutritionOrderEnteralFormulaAdministration extends BackboneElement
                 ],
             ],
         )]
-        public Quantity|Ratio|null $rateX = null,
+        public Quantity|Ratio|null $rate = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

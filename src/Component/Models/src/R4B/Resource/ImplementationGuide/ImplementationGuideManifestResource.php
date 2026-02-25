@@ -56,7 +56,7 @@ class ImplementationGuideManifestResource extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'exampleX' => [
+        'example' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -104,7 +104,7 @@ class ImplementationGuideManifestResource extends BackboneElement
         /** @var Reference|null reference Location of the resource */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?Reference $reference = null,
-        /** @var bool|CanonicalPrimitive|null exampleX Is an example/What is this an example of? */
+        /** @var bool|CanonicalPrimitive|null example Is an example/What is this an example of? */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -119,7 +119,7 @@ class ImplementationGuideManifestResource extends BackboneElement
                 ],
             ],
         )]
-        public bool|CanonicalPrimitive|null $exampleX = null,
+        public bool|CanonicalPrimitive|null $example = null,
         /** @var UrlPrimitive|null relativePath Relative path for page in IG */
         #[FhirProperty(fhirType: 'url', propertyKind: 'primitive')]
         public ?UrlPrimitive $relativePath = null,

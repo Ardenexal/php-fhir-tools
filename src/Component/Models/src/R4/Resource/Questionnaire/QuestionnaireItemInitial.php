@@ -53,7 +53,7 @@ class QuestionnaireItemInitial extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'valueX' => [
+        'value' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -159,7 +159,7 @@ class QuestionnaireItemInitial extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
-        /** @var bool|float|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|string|UriPrimitive|Attachment|Coding|Quantity|Reference|null valueX Actual value for initializing the question */
+        /** @var bool|float|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|string|UriPrimitive|Attachment|Coding|Quantity|Reference|null value Actual value for initializing the question */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -226,7 +226,7 @@ class QuestionnaireItemInitial extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public bool|float|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|string|UriPrimitive|Attachment|Coding|Quantity|Reference|null $valueX = null,
+        public bool|float|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|string|UriPrimitive|Attachment|Coding|Quantity|Reference|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

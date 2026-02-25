@@ -58,7 +58,7 @@ class NutritionProductProductCharacteristic extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'valueX' => [
+        'value' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -125,7 +125,7 @@ class NutritionProductProductCharacteristic extends BackboneElement
         /** @var CodeableConcept|null type Code specifying the type of characteristic */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?CodeableConcept $type = null,
-        /** @var CodeableConcept|StringPrimitive|string|Quantity|Base64BinaryPrimitive|Attachment|bool|null valueX The value of the characteristic */
+        /** @var CodeableConcept|StringPrimitive|string|Quantity|Base64BinaryPrimitive|Attachment|bool|null value The value of the characteristic */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -166,7 +166,7 @@ class NutritionProductProductCharacteristic extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public CodeableConcept|StringPrimitive|string|Quantity|Base64BinaryPrimitive|Attachment|bool|null $valueX = null,
+        public CodeableConcept|StringPrimitive|string|Quantity|Base64BinaryPrimitive|Attachment|bool|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

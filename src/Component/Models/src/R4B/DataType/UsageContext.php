@@ -46,7 +46,7 @@ class UsageContext extends Element
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'valueX' => [
+        'value' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -96,7 +96,7 @@ class UsageContext extends Element
         /** @var Coding|null code Type of context being specified */
         #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?Coding $code = null,
-        /** @var CodeableConcept|Quantity|Range|Reference|null valueX Value that defines the context */
+        /** @var CodeableConcept|Quantity|Range|Reference|null value Value that defines the context */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -130,7 +130,7 @@ class UsageContext extends Element
             ],
         )]
         #[NotBlank]
-        public CodeableConcept|Quantity|Range|Reference|null $valueX = null,
+        public CodeableConcept|Quantity|Range|Reference|null $value = null,
     ) {
         parent::__construct($id, $extension);
     }

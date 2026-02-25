@@ -203,7 +203,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'bornX' => [
+        'born' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -234,7 +234,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
                 ],
             ],
         ],
-        'ageX' => [
+        'age' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -274,7 +274,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'deceasedX' => [
+        'deceased' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -412,7 +412,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
         /** @var CodeableConcept|null sex male | female | other | unknown */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $sex = null,
-        /** @var Period|DatePrimitive|StringPrimitive|string|null bornX (approximate) date of birth */
+        /** @var Period|DatePrimitive|StringPrimitive|string|null born (approximate) date of birth */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -438,8 +438,8 @@ class FamilyMemberHistoryResource extends DomainResourceResource
                 ],
             ],
         )]
-        public Period|DatePrimitive|StringPrimitive|string|null $bornX = null,
-        /** @var Age|Range|StringPrimitive|string|null ageX (approximate) age */
+        public Period|DatePrimitive|StringPrimitive|string|null $born = null,
+        /** @var Age|Range|StringPrimitive|string|null age (approximate) age */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -465,11 +465,11 @@ class FamilyMemberHistoryResource extends DomainResourceResource
                 ],
             ],
         )]
-        public Age|Range|StringPrimitive|string|null $ageX = null,
+        public Age|Range|StringPrimitive|string|null $age = null,
         /** @var bool|null estimatedAge Age is estimated? */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $estimatedAge = null,
-        /** @var bool|Age|Range|DatePrimitive|StringPrimitive|string|null deceasedX Dead? How old/when? */
+        /** @var bool|Age|Range|DatePrimitive|StringPrimitive|string|null deceased Dead? How old/when? */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -502,7 +502,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
                 ],
             ],
         )]
-        public bool|Age|Range|DatePrimitive|StringPrimitive|string|null $deceasedX = null,
+        public bool|Age|Range|DatePrimitive|StringPrimitive|string|null $deceased = null,
         /** @var array<CodeableConcept> reasonCode Why was family member history performed? */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true)]
         public array $reasonCode = [],

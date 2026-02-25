@@ -162,7 +162,7 @@ class ImmunizationResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'occurrenceX' => [
+        'occurrence' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -420,7 +420,7 @@ class ImmunizationResource extends DomainResourceResource
         /** @var Reference|null encounter Encounter immunization was part of */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $encounter = null,
-        /** @var DateTimePrimitive|StringPrimitive|string|null occurrenceX Vaccine administration date */
+        /** @var DateTimePrimitive|StringPrimitive|string|null occurrence Vaccine administration date */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -442,7 +442,7 @@ class ImmunizationResource extends DomainResourceResource
             ],
         )]
         #[NotBlank]
-        public DateTimePrimitive|StringPrimitive|string|null $occurrenceX = null,
+        public DateTimePrimitive|StringPrimitive|string|null $occurrence = null,
         /** @var DateTimePrimitive|null recorded When the immunization was first captured in the subject's record */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $recorded = null,

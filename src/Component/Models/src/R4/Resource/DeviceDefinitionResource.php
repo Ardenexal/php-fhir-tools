@@ -132,7 +132,7 @@ class DeviceDefinitionResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'manufacturerX' => [
+        'manufacturer' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -360,7 +360,7 @@ class DeviceDefinitionResource extends DomainResourceResource
         /** @var array<DeviceDefinitionUdiDeviceIdentifier> udiDeviceIdentifier Unique Device Identifier (UDI) Barcode string */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
         public array $udiDeviceIdentifier = [],
-        /** @var StringPrimitive|string|Reference|null manufacturerX Name of device manufacturer */
+        /** @var StringPrimitive|string|Reference|null manufacturer Name of device manufacturer */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -380,7 +380,7 @@ class DeviceDefinitionResource extends DomainResourceResource
                 ],
             ],
         )]
-        public StringPrimitive|string|Reference|null $manufacturerX = null,
+        public StringPrimitive|string|Reference|null $manufacturer = null,
         /** @var array<DeviceDefinitionDeviceName> deviceName A name given to the device to identify it */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
         public array $deviceName = [],

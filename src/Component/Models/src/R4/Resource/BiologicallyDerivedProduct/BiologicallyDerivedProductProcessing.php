@@ -75,7 +75,7 @@ class BiologicallyDerivedProductProcessing extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'timeX' => [
+        'time' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -120,7 +120,7 @@ class BiologicallyDerivedProductProcessing extends BackboneElement
         /** @var Reference|null additive Substance added during processing */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $additive = null,
-        /** @var DateTimePrimitive|Period|null timeX Time of processing */
+        /** @var DateTimePrimitive|Period|null time Time of processing */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -140,7 +140,7 @@ class BiologicallyDerivedProductProcessing extends BackboneElement
                 ],
             ],
         )]
-        public DateTimePrimitive|Period|null $timeX = null,
+        public DateTimePrimitive|Period|null $time = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -194,7 +194,7 @@ class AllergyIntoleranceResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'onsetX' => [
+        'onset' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -347,7 +347,7 @@ class AllergyIntoleranceResource extends DomainResourceResource
         /** @var Reference|null encounter Encounter when the allergy or intolerance was asserted */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $encounter = null,
-        /** @var DateTimePrimitive|Age|Period|Range|StringPrimitive|string|null onsetX When allergy or intolerance was identified */
+        /** @var DateTimePrimitive|Age|Period|Range|StringPrimitive|string|null onset When allergy or intolerance was identified */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -385,7 +385,7 @@ class AllergyIntoleranceResource extends DomainResourceResource
                 ],
             ],
         )]
-        public DateTimePrimitive|Age|Period|Range|StringPrimitive|string|null $onsetX = null,
+        public DateTimePrimitive|Age|Period|Range|StringPrimitive|string|null $onset = null,
         /** @var DateTimePrimitive|null recordedDate Date first version of the resource instance was recorded */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $recordedDate = null,

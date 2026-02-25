@@ -112,7 +112,7 @@ class ProvenanceResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'occurredX' => [
+        'occurred' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -238,7 +238,7 @@ class ProvenanceResource extends DomainResourceResource
         /** @var array<Reference> target Target Reference(s) (usually version specific) */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isArray: true, isRequired: true)]
         public array $target = [],
-        /** @var Period|DateTimePrimitive|null occurredX When the activity occurred */
+        /** @var Period|DateTimePrimitive|null occurred When the activity occurred */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -258,7 +258,7 @@ class ProvenanceResource extends DomainResourceResource
                 ],
             ],
         )]
-        public Period|DateTimePrimitive|null $occurredX = null,
+        public Period|DateTimePrimitive|null $occurred = null,
         /** @var InstantPrimitive|null recorded When the activity was recorded / updated */
         #[FhirProperty(fhirType: 'instant', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?InstantPrimitive $recorded = null,

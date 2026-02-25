@@ -61,7 +61,7 @@ class MedicinalProductDefinitionCharacteristic extends BackboneElement
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'valueX' => [
+        'value' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -121,7 +121,7 @@ class MedicinalProductDefinitionCharacteristic extends BackboneElement
         /** @var CodeableConcept|null type A code expressing the type of characteristic */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?CodeableConcept $type = null,
-        /** @var CodeableConcept|Quantity|DatePrimitive|bool|Attachment|null valueX A value for the characteristic */
+        /** @var CodeableConcept|Quantity|DatePrimitive|bool|Attachment|null value A value for the characteristic */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -154,7 +154,7 @@ class MedicinalProductDefinitionCharacteristic extends BackboneElement
                 ],
             ],
         )]
-        public CodeableConcept|Quantity|DatePrimitive|bool|Attachment|null $valueX = null,
+        public CodeableConcept|Quantity|DatePrimitive|bool|Attachment|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

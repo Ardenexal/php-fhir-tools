@@ -207,7 +207,7 @@ class ProcedureResource extends DomainResourceResource
             'jsonKey'      => null,
             'variants'     => null,
         ],
-        'performedX' => [
+        'performed' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
@@ -456,7 +456,7 @@ class ProcedureResource extends DomainResourceResource
         /** @var Reference|null encounter Encounter created as part of */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $encounter = null,
-        /** @var DateTimePrimitive|Period|StringPrimitive|string|Age|Range|null performedX When the procedure was performed */
+        /** @var DateTimePrimitive|Period|StringPrimitive|string|Age|Range|null performed When the procedure was performed */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -494,7 +494,7 @@ class ProcedureResource extends DomainResourceResource
                 ],
             ],
         )]
-        public DateTimePrimitive|Period|StringPrimitive|string|Age|Range|null $performedX = null,
+        public DateTimePrimitive|Period|StringPrimitive|string|Age|Range|null $performed = null,
         /** @var Reference|null recorder Who recorded the procedure */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $recorder = null,
