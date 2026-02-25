@@ -204,6 +204,21 @@ class FHIRPathLexer
         }
 
         if ($char === '/') {
+            // Check for single-line comment //
+            if ($this->peek() === '/') {
+                $this->advance(); // consume second /
+                $this->skipSingleLineComment();
+
+                return;
+            }
+            // Check for multi-line comment /*
+            if ($this->peek() === '*') {
+                $this->advance(); // consume *
+                $this->skipMultiLineComment($startLine, $startColumn, $start);
+
+                return;
+            }
+            // Otherwise it's a division operator
             $this->addToken(TokenType::DIVIDE, '/', $startLine, $startColumn, $start);
 
             return;
@@ -370,6 +385,7 @@ class FHIRPathLexer
 
         // Check for calendar duration unit (unquoted keywords like '7 days', '1 week')
         if ($this->peek() === ' ' && $this->isAlpha($this->peek(1))) {
+            $unitStart = $this->position; // Save position before parsing unit
             $this->advance(); // consume space
 
             $keyword = '';
@@ -392,7 +408,7 @@ class FHIRPathLexer
             }
 
             // Not a valid calendar duration keyword - reset position and treat as NUMBER
-            $this->current = $unitStart;
+            $this->position = $unitStart;
         }
 
         $this->addToken(TokenType::NUMBER, $value, $startLine, $startColumn, $start);
@@ -527,6 +543,41 @@ class FHIRPathLexer
                 break;
             }
         }
+    }
+
+    /**
+     * Skip a single-line comment (// to end of line).
+     */
+    private function skipSingleLineComment(): void
+    {
+        // Consume characters until newline or EOF
+        while (!$this->isAtEnd() && $this->peek() !== "\n") {
+            $this->advance();
+        }
+        // The newline (if present) will be consumed by skipWhitespace on next scanToken iteration
+    }
+
+    /**
+     * Skip a multi-line comment (slash-asterisk ... asterisk-slash).
+     *
+     * @throws TokenException If the comment is not terminated before EOF
+     */
+    private function skipMultiLineComment(int $startLine, int $startColumn, int $start): void
+    {
+        // Consume characters until we find */
+        while (!$this->isAtEnd()) {
+            if ($this->peek() === '*' && $this->peek(1) === '/') {
+                // Found closing */
+                $this->advance(); // consume *
+                $this->advance(); // consume /
+
+                return;
+            }
+            $this->advance();
+        }
+
+        // Reached EOF without finding */
+        throw TokenException::unterminatedComment($startLine, $startColumn, $this->getContext($start));
     }
 
     /**

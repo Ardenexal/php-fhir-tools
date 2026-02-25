@@ -428,6 +428,100 @@ class FHIRPathLexerTest extends TestCase
         $this->lexer->tokenize('name ! age');
     }
 
+    // Comment Tests
+
+    public function testTokenizeSingleLineComment(): void
+    {
+        $tokens = $this->lexer->tokenize('2 + 2 // This is a comment + 4');
+
+        // Should tokenize: 2, +, 2, EOF (comment is stripped)
+        self::assertCount(4, $tokens);
+        self::assertEquals(TokenType::NUMBER, $tokens[0]->type);
+        self::assertEquals('2', $tokens[0]->value);
+        self::assertEquals(TokenType::PLUS, $tokens[1]->type);
+        self::assertEquals(TokenType::NUMBER, $tokens[2]->type);
+        self::assertEquals('2', $tokens[2]->value);
+        self::assertEquals(TokenType::EOF, $tokens[3]->type);
+    }
+
+    public function testTokenizeMultiLineSingleSlashComments(): void
+    {
+        $expression = "// This is a comment\n// Another comment line\n2 + 2";
+        $tokens     = $this->lexer->tokenize($expression);
+
+        // Should tokenize: 2, +, 2, EOF (comments are stripped)
+        self::assertCount(4, $tokens);
+        self::assertEquals(TokenType::NUMBER, $tokens[0]->type);
+        self::assertEquals('2', $tokens[0]->value);
+        self::assertEquals(TokenType::PLUS, $tokens[1]->type);
+        self::assertEquals(TokenType::NUMBER, $tokens[2]->type);
+        self::assertEquals('2', $tokens[2]->value);
+    }
+
+    public function testTokenizeMultiLineComment(): void
+    {
+        $expression = "2 + 2\n/* This is a\nmulti-line comment\n+2 */";
+        $tokens     = $this->lexer->tokenize($expression);
+
+        // Should tokenize: 2, +, 2, EOF (comment is stripped)
+        self::assertCount(4, $tokens);
+        self::assertEquals(TokenType::NUMBER, $tokens[0]->type);
+        self::assertEquals('2', $tokens[0]->value);
+        self::assertEquals(TokenType::PLUS, $tokens[1]->type);
+        self::assertEquals(TokenType::NUMBER, $tokens[2]->type);
+        self::assertEquals('2', $tokens[2]->value);
+    }
+
+    public function testTokenizeInlineComment(): void
+    {
+        $expression = '2 + /* inline $@%^+ * */ 2';
+        $tokens     = $this->lexer->tokenize($expression);
+
+        // Should tokenize: 2, +, 2, EOF (comment is stripped)
+        self::assertCount(4, $tokens);
+        self::assertEquals(TokenType::NUMBER, $tokens[0]->type);
+        self::assertEquals('2', $tokens[0]->value);
+        self::assertEquals(TokenType::PLUS, $tokens[1]->type);
+        self::assertEquals(TokenType::NUMBER, $tokens[2]->type);
+        self::assertEquals('2', $tokens[2]->value);
+    }
+
+    public function testTokenizeCommentBeforeDivide(): void
+    {
+        $expression = "2 // comment\n/ 2";
+        $tokens     = $this->lexer->tokenize($expression);
+
+        // Should tokenize: 2, /, 2, EOF
+        self::assertCount(4, $tokens);
+        self::assertEquals(TokenType::NUMBER, $tokens[0]->type);
+        self::assertEquals('2', $tokens[0]->value);
+        self::assertEquals(TokenType::DIVIDE, $tokens[1]->type);
+        self::assertEquals(TokenType::NUMBER, $tokens[2]->type);
+        self::assertEquals('2', $tokens[2]->value);
+    }
+
+    public function testTokenizeMultiLineCommentAtStart(): void
+    {
+        $expression = "/* comment at start */\n2 + 2";
+        $tokens     = $this->lexer->tokenize($expression);
+
+        // Should tokenize: 2, +, 2, EOF
+        self::assertCount(4, $tokens);
+        self::assertEquals(TokenType::NUMBER, $tokens[0]->type);
+        self::assertEquals('2', $tokens[0]->value);
+        self::assertEquals(TokenType::PLUS, $tokens[1]->type);
+        self::assertEquals(TokenType::NUMBER, $tokens[2]->type);
+        self::assertEquals('2', $tokens[2]->value);
+    }
+
+    public function testUnterminatedMultiLineCommentThrowsException(): void
+    {
+        $this->expectException(TokenException::class);
+        $this->expectExceptionMessage('Unterminated multi-line comment');
+
+        $this->lexer->tokenize('2 + 2 /* not finished');
+    }
+
     // Real-world FHIRPath Expression Tests
 
     public function testComplexFHIRPathExpression(): void

@@ -1,23 +1,13 @@
 # Known Issues — Outstanding Items
 
 **Last Updated:** February 25, 2026  
-**Current Test Status:** 948 tests, 633 passing (66.8%), 85 errors, 186 failures, 44 skipped
+**Current Test Status:** 948 tests, 642 passing (67.7%), 67 errors, 189 failures, 44 skipped
 
 This document tracks **unresolved** issues only. Completed work has been removed.
 
 ---
 
-## 1. FHIRPath Evaluator: Comment Syntax Not Supported (7 spec test errors)
-
-**Issue**: The FHIRPath parser does not support single-line (`//`) or multi-line (`/* */`) comments as specified in the FHIRPath grammar. Tests involving comments fail with `SyntaxException: Expected expression but found DIVIDE(/)` because `//` is being interpreted as two division operators.
-
-**Affected tests**: `testComment1` through `testComment7`
-
-**Fix required**: Add comment tokenization to the lexer and comment-aware parsing to the parser. Comments should be stripped during tokenization before parsing begins.
-
----
-
-## 2. FHIRPath Evaluator: `type()` Function FHIR Type Detection
+## 1. FHIRPath Evaluator: `type()` Function FHIR Type Detection
 
 **Issue**: The `type()` function returns System types instead of FHIR types when called on primitive values extracted from FHIR resources.
 
@@ -33,7 +23,7 @@ This document tracks **unresolved** issues only. Completed work has been removed
 
 ---
 
-## 3. FHIRPath Evaluator: Semantic Validation (3 spec test failures)
+## 2. FHIRPath Evaluator: Semantic Validation (3 spec test failures)
 
 **`testPrecedence1`** — `-1.convertsToInteger()` is marked `invalid="semantic"` in the spec XML. The evaluator successfully evaluates it (returns `-1`) instead of throwing a `FHIRPathException`. Without parentheses, the expression is ambiguous about whether the unary minus applies to the literal or to the result of the function call. Valid: `(-1).convertsToInteger()`. Invalid: `-1.convertsToInteger()`.
 
@@ -43,7 +33,7 @@ This document tracks **unresolved** issues only. Completed work has been removed
 
 ---
 
-## 4. `FunctionRegistry` Shared Static State
+## 3. `FunctionRegistry` Shared Static State
 
 When the FHIRPath unit tests run in the same PHPUnit process before the integration tests, `testResourceTypePrefixWithWhereFunction` and `testResourceTypePrefixWithExistsFunction` fail with `Unknown function: where` / `Unknown function: exists`. Running the integration tests in isolation (or with `--testsuite=integration`) works correctly.
 
@@ -51,7 +41,7 @@ The root cause is that `FunctionRegistry::getInstance()` uses a static singleton
 
 ---
 
-## 5. `FHIRTypeResolver::resolveResourceType()` Now Returns `null` as Fallback
+## 4. `FHIRTypeResolver::resolveResourceType()` Now Returns `null` as Fallback
 
 The old fallback was `return 'FHIR' . $resourceType;` (wrong namespace, but never `null`). The new fallback returns `null` when no Models class is found. Callers that previously relied on always getting a string back will now receive `null`. The serialisation code handles `null` gracefully, but any external callers of `FHIRTypeResolver` that don't check for `null` could behave differently.
 
@@ -60,13 +50,13 @@ The old fallback was `return 'FHIR' . $resourceType;` (wrong namespace, but neve
 ## Summary of Remaining Issues (Priority Order)
 
 ### High Priority
-1. **Comment Syntax Support** (#1) — Affects 7 tests; requires lexer/parser enhancements
+_(No high priority issues remaining)_
 
 ### Medium Priority
-2. **`type()` Function FHIR Type Detection** (#2) — Low impact; known trade-off with primitive unwrapping
-3. **Semantic Validation** (#3) — Affects 3 tests; edge case validation for ambiguous expressions
+1. **`type()` Function FHIR Type Detection** (#1) — Low impact; known trade-off with primitive unwrapping
+2. **Semantic Validation** (#2) — Affects 3 tests; edge case validation for ambiguous expressions
 
 ### Low Priority
-4. **Function Registry State** (#4) — Test isolation issue; doesn't affect spec tests
-5. **Type Resolver Null Check** (#5) — Backward compatibility concern; no current test failures
+3. **Function Registry State** (#3) — Test isolation issue; doesn't affect spec tests
+4. **Type Resolver Null Check** (#4) — Backward compatibility concern; no current test failures
 
