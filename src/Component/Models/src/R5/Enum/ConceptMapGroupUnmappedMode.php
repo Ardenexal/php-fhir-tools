@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,12 +12,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum ConceptMapGroupUnmappedMode: string
 {
-	/** Use Provided Source Code */
-	case useprovidedsourcecode = 'use-source-code';
+    /** Use Provided Source Code */
+    case useprovidedsourcecode = 'use-source-code';
 
-	/** Fixed Code */
-	case fixedcode = 'fixed';
+    /** Fixed Code */
+    case fixedcode = 'fixed';
 
-	/** Other Map */
-	case othermap = 'other-map';
+    /** Other Map */
+    case othermap = 'other-map';
 }

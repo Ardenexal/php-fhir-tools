@@ -1,31 +1,13 @@
 # Known Issues — Outstanding Items
 
-**Current Test Status: 948 tests, 633 passing (66.8%), 85 errors, 186 failures, 44 skipped**
+**Last Updated:** February 25, 2026  
+**Current Test Status:** 948 tests, 633 passing (66.8%), 85 errors, 186 failures, 44 skipped
 
 This document tracks **unresolved** issues only. Completed work has been removed.
 
 ---
 
-## 1. FHIRPath Evaluator: Missing Functions
-
-These functions are referenced by the official test suite but throw `EvaluationException: Unknown function` or `SyntaxException` because they haven't been implemented in `FunctionRegistry`.
-
-| Function | Failing test count | Description |
-|---|---|---|
-| `encode()` | 4 | Encodes a string (URL encoding) |
-| `decode()` | 4 | Decodes a string (URL decoding) |
-| `join()` | 3 | Joins a collection of strings with a separator |
-| `escape()` | 2 | Escapes special characters in a string |
-| `unescape()` | 2 | Unescapes special characters in a string |
-| `toDecimal()` | 1 | Converts value to decimal type |
-| `comparable()` | ? | Checks if two values are comparable |
-| `precision()` | ? | Returns the precision of a quantity |
-
-All errors throw unhandled exceptions rather than producing wrong results. Fixing these requires adding new function classes to `src/Component/FHIRPath/src/Function/`.
-
----
-
-## 2. FHIRPath Evaluator: Comment Syntax Not Supported (7 spec test errors)
+## 1. FHIRPath Evaluator: Comment Syntax Not Supported (7 spec test errors)
 
 **Issue**: The FHIRPath parser does not support single-line (`//`) or multi-line (`/* */`) comments as specified in the FHIRPath grammar. Tests involving comments fail with `SyntaxException: Expected expression but found DIVIDE(/)` because `//` is being interpreted as two division operators.
 
@@ -35,7 +17,7 @@ All errors throw unhandled exceptions rather than producing wrong results. Fixin
 
 ---
 
-## 3. FHIRPath Evaluator: `type()` Function FHIR Type Detection
+## 2. FHIRPath Evaluator: `type()` Function FHIR Type Detection
 
 **Issue**: The `type()` function returns System types instead of FHIR types when called on primitive values extracted from FHIR resources.
 
@@ -51,7 +33,7 @@ All errors throw unhandled exceptions rather than producing wrong results. Fixin
 
 ---
 
-## 4. FHIRPath Evaluator: Semantic Validation (3 spec test failures)
+## 3. FHIRPath Evaluator: Semantic Validation (3 spec test failures)
 
 **`testPrecedence1`** — `-1.convertsToInteger()` is marked `invalid="semantic"` in the spec XML. The evaluator successfully evaluates it (returns `-1`) instead of throwing a `FHIRPathException`. Without parentheses, the expression is ambiguous about whether the unary minus applies to the literal or to the result of the function call. Valid: `(-1).convertsToInteger()`. Invalid: `-1.convertsToInteger()`.
 
@@ -61,7 +43,7 @@ All errors throw unhandled exceptions rather than producing wrong results. Fixin
 
 ---
 
-## 5. `FunctionRegistry` Shared Static State
+## 4. `FunctionRegistry` Shared Static State
 
 When the FHIRPath unit tests run in the same PHPUnit process before the integration tests, `testResourceTypePrefixWithWhereFunction` and `testResourceTypePrefixWithExistsFunction` fail with `Unknown function: where` / `Unknown function: exists`. Running the integration tests in isolation (or with `--testsuite=integration`) works correctly.
 
@@ -69,7 +51,7 @@ The root cause is that `FunctionRegistry::getInstance()` uses a static singleton
 
 ---
 
-## 6. `FHIRTypeResolver::resolveResourceType()` Now Returns `null` as Fallback
+## 5. `FHIRTypeResolver::resolveResourceType()` Now Returns `null` as Fallback
 
 The old fallback was `return 'FHIR' . $resourceType;` (wrong namespace, but never `null`). The new fallback returns `null` when no Models class is found. Callers that previously relied on always getting a string back will now receive `null`. The serialisation code handles `null` gracefully, but any external callers of `FHIRTypeResolver` that don't check for `null` could behave differently.
 
@@ -78,15 +60,13 @@ The old fallback was `return 'FHIR' . $resourceType;` (wrong namespace, but neve
 ## Summary of Remaining Issues (Priority Order)
 
 ### High Priority
-1. **Missing Functions** (#1) — Affects ~24 tests
-   - Priority: `encode()`/`decode()` (8 tests), `join()` (3 tests), `escape()`/`unescape()` (4 tests)
+1. **Comment Syntax Support** (#1) — Affects 7 tests; requires lexer/parser enhancements
 
 ### Medium Priority
-2. **Comment Syntax Support** (#2) — Affects 7 tests; requires lexer/parser enhancements
-3. **`type()` Function FHIR Type Detection** (#3) — Low impact; known trade-off with primitive unwrapping
+2. **`type()` Function FHIR Type Detection** (#2) — Low impact; known trade-off with primitive unwrapping
+3. **Semantic Validation** (#3) — Affects 3 tests; edge case validation for ambiguous expressions
 
 ### Low Priority
-4. **Semantic Validation** (#4) — Affects 3 tests; edge case validation for ambiguous expressions
-5. **Function Registry State** (#5) — Test isolation issue; doesn't affect spec tests
-6. **Type Resolver Null Check** (#6) — Backward compatibility concern; no current test failures
+4. **Function Registry State** (#4) — Test isolation issue; doesn't affect spec tests
+5. **Type Resolver Null Check** (#5) — Backward compatibility concern; no current test failures
 

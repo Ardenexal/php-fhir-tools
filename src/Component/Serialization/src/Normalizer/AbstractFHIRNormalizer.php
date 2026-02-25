@@ -292,8 +292,8 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
      * Reverse lookup: given an element name like 'valueQuantity', find the base property
      * name ('value') and the concrete PHP type for that variant.
      *
-     * @param array<string, PropertyMetadata> $metaMap The property metadata map
-     * @param string                           $elementKey The JSON/XML element name (e.g., 'valueQuantity')
+     * @param array<string, PropertyMetadata> $metaMap    The property metadata map
+     * @param string                          $elementKey The JSON/XML element name (e.g., 'valueQuantity')
      *
      * @return array{0: string, 1: string}|null [propertyName, phpType] or null if not found
      */

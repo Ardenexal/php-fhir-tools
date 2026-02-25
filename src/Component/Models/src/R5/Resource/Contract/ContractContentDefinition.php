@@ -1,126 +1,139 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\Contract;
+
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\ContractResourcePublicationStatusCodesType;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * @description Precusory content developed with a focus and intent of supporting the formation a Contract instance, which may be associated with and transformable into a Contract.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'Contract', elementPath: 'Contract.contentDefinition', fhirVersion: 'R5')]
-class ContractContentDefinition extends \Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement
+#[FHIRBackboneElement(parentResource: 'Contract', elementPath: 'Contract.contentDefinition', fhirVersion: 'R5')]
+class ContractContentDefinition extends BackboneElement
 {
-	public const FHIR_PROPERTY_MAP = [
-		'id' => [
-			'fhirType' => 'http://hl7.org/fhirpath/System.String',
-			'propertyKind' => 'scalar',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'extension' => [
-			'fhirType' => 'Extension',
-			'propertyKind' => 'extension',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'modifierExtension' => [
-			'fhirType' => 'Extension',
-			'propertyKind' => 'modifierExtension',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'type' => [
-			'fhirType' => 'CodeableConcept',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => true,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'subType' => [
-			'fhirType' => 'CodeableConcept',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'publisher' => [
-			'fhirType' => 'Reference',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'publicationDate' => [
-			'fhirType' => 'dateTime',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'publicationStatus' => [
-			'fhirType' => 'code',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => true,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'copyright' => [
-			'fhirType' => 'markdown',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-	];
+    public const FHIR_PROPERTY_MAP = [
+        'id' => [
+            'fhirType'     => 'http://hl7.org/fhirpath/System.String',
+            'propertyKind' => 'scalar',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'extension' => [
+            'fhirType'     => 'Extension',
+            'propertyKind' => 'extension',
+            'isArray'      => true,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'modifierExtension' => [
+            'fhirType'     => 'Extension',
+            'propertyKind' => 'modifierExtension',
+            'isArray'      => true,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'type' => [
+            'fhirType'     => 'CodeableConcept',
+            'propertyKind' => 'complex',
+            'isArray'      => false,
+            'isRequired'   => true,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'subType' => [
+            'fhirType'     => 'CodeableConcept',
+            'propertyKind' => 'complex',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'publisher' => [
+            'fhirType'     => 'Reference',
+            'propertyKind' => 'complex',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'publicationDate' => [
+            'fhirType'     => 'dateTime',
+            'propertyKind' => 'primitive',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'publicationStatus' => [
+            'fhirType'     => 'code',
+            'propertyKind' => 'primitive',
+            'isArray'      => false,
+            'isRequired'   => true,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'copyright' => [
+            'fhirType'     => 'markdown',
+            'propertyKind' => 'primitive',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+    ];
 
-	public function __construct(
-		/** @var null|string id Unique id for inter-element referencing */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
-		public ?string $id = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension> extension Additional content defined by implementations */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
-		public array $modifierExtension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept type Content structure and use */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), \Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept $type = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept subType Detailed Content Type Definition */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept $subType = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference publisher Publisher Entity */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference $publisher = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive publicationDate When published */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive $publicationDate = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\ContractResourcePublicationStatusCodesType publicationStatus amended | appended | cancelled | disputed | entered-in-error | executable + */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), \Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\ContractResourcePublicationStatusCodesType $publicationStatus = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive copyright Publication Ownership */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive $copyright = null,
-	) {
-		parent::__construct($id, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        public ?string $id = null,
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        public array $modifierExtension = [],
+        /** @var CodeableConcept|null type Content structure and use */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        public ?CodeableConcept $type = null,
+        /** @var CodeableConcept|null subType Detailed Content Type Definition */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $subType = null,
+        /** @var Reference|null publisher Publisher Entity */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $publisher = null,
+        /** @var DateTimePrimitive|null publicationDate When published */
+        #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
+        public ?DateTimePrimitive $publicationDate = null,
+        /** @var ContractResourcePublicationStatusCodesType|null publicationStatus amended | appended | cancelled | disputed | entered-in-error | executable + */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        public ?ContractResourcePublicationStatusCodesType $publicationStatus = null,
+        /** @var MarkdownPrimitive|null copyright Publication Ownership */
+        #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
+        public ?MarkdownPrimitive $copyright = null,
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
 }

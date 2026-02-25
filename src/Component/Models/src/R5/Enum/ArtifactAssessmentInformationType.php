@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,21 +12,21 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum ArtifactAssessmentInformationType: string
 {
-	/** Comment */
-	case comment = 'comment';
+    /** Comment */
+    case comment = 'comment';
 
-	/** Classifier */
-	case classifier = 'classifier';
+    /** Classifier */
+    case classifier = 'classifier';
 
-	/** Rating */
-	case rating = 'rating';
+    /** Rating */
+    case rating = 'rating';
 
-	/** Container */
-	case container = 'container';
+    /** Container */
+    case container = 'container';
 
-	/** Response */
-	case response = 'response';
+    /** Response */
+    case response = 'response';
 
-	/** Change Request */
-	case changerequest = 'change-request';
+    /** Change Request */
+    case changerequest = 'change-request';
 }

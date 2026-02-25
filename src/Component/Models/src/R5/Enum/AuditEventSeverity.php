@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,27 +12,27 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum AuditEventSeverity: string
 {
-	/** Emergency */
-	case emergency = 'emergency';
+    /** Emergency */
+    case emergency = 'emergency';
 
-	/** Alert */
-	case alert = 'alert';
+    /** Alert */
+    case alert = 'alert';
 
-	/** Critical */
-	case critical = 'critical';
+    /** Critical */
+    case critical = 'critical';
 
-	/** Error */
-	case error = 'error';
+    /** Error */
+    case error = 'error';
 
-	/** Warning */
-	case warning = 'warning';
+    /** Warning */
+    case warning = 'warning';
 
-	/** Notice */
-	case notice = 'notice';
+    /** Notice */
+    case notice = 'notice';
 
-	/** Informational */
-	case informational = 'informational';
+    /** Informational */
+    case informational = 'informational';
 
-	/** Debug */
-	case debug = 'debug';
+    /** Debug */
+    case debug = 'debug';
 }

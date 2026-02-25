@@ -1,17 +1,23 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
+use Ardenexal\FHIRTools\Component\Models\R5\Enum\StructureMapModelMode;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
+
 /**
  * @fhir-code-type StructureMapModelMode
+ *
  * @description Code type wrapper for StructureMapModelMode enum
  */
-class StructureMapModelModeType extends \Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive
+class StructureMapModelModeType extends CodePrimitive
 {
-	public function __construct(
-		/** @param \Ardenexal\FHIRTools\Component\Models\R5\Enum\StructureMapModelMode|string|null $value The code value (enum or string) */
-		string|null $value = null,
-	) {
-		parent::__construct(value: $value);
-	}
+    public function __construct(
+        /** @param StructureMapModelMode|string|null $value The code value (enum or string) */
+        ?string $value = null,
+    ) {
+        parent::__construct(value: $value);
+    }
 }

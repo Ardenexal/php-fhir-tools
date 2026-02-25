@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,12 +12,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum SearchProcessingModeType: string
 {
-	/** Normal */
-	case normal = 'normal';
+    /** Normal */
+    case normal = 'normal';
 
-	/** Phonetic */
-	case phonetic = 'phonetic';
+    /** Phonetic */
+    case phonetic = 'phonetic';
 
-	/** Other */
-	case other = 'other';
+    /** Other */
+    case other = 'other';
 }

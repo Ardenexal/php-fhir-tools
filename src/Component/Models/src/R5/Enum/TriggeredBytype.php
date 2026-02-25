@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,12 +12,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum TriggeredBytype: string
 {
-	/** Reflex */
-	case reflex = 'reflex';
+    /** Reflex */
+    case reflex = 'reflex';
 
-	/** Repeat (per policy) */
-	case repeatperpolicy = 'repeat';
+    /** Repeat (per policy) */
+    case repeatperpolicy = 'repeat';
 
-	/** Re-run (per policy) */
-	case rerunperpolicy = 're-run';
+    /** Re-run (per policy) */
+    case rerunperpolicy = 're-run';
 }

@@ -1,126 +1,135 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\ResearchSubject;
+
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 
 /**
  * @description The current state (status) of the subject and resons for status change where appropriate.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'ResearchSubject', elementPath: 'ResearchSubject.progress', fhirVersion: 'R5')]
-class ResearchSubjectProgress extends \Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement
+#[FHIRBackboneElement(parentResource: 'ResearchSubject', elementPath: 'ResearchSubject.progress', fhirVersion: 'R5')]
+class ResearchSubjectProgress extends BackboneElement
 {
-	public const FHIR_PROPERTY_MAP = [
-		'id' => [
-			'fhirType' => 'http://hl7.org/fhirpath/System.String',
-			'propertyKind' => 'scalar',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'extension' => [
-			'fhirType' => 'Extension',
-			'propertyKind' => 'extension',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'modifierExtension' => [
-			'fhirType' => 'Extension',
-			'propertyKind' => 'modifierExtension',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'type' => [
-			'fhirType' => 'CodeableConcept',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'subjectState' => [
-			'fhirType' => 'CodeableConcept',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'milestone' => [
-			'fhirType' => 'CodeableConcept',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'reason' => [
-			'fhirType' => 'CodeableConcept',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'startDate' => [
-			'fhirType' => 'dateTime',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'endDate' => [
-			'fhirType' => 'dateTime',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-	];
+    public const FHIR_PROPERTY_MAP = [
+        'id' => [
+            'fhirType'     => 'http://hl7.org/fhirpath/System.String',
+            'propertyKind' => 'scalar',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'extension' => [
+            'fhirType'     => 'Extension',
+            'propertyKind' => 'extension',
+            'isArray'      => true,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'modifierExtension' => [
+            'fhirType'     => 'Extension',
+            'propertyKind' => 'modifierExtension',
+            'isArray'      => true,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'type' => [
+            'fhirType'     => 'CodeableConcept',
+            'propertyKind' => 'complex',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'subjectState' => [
+            'fhirType'     => 'CodeableConcept',
+            'propertyKind' => 'complex',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'milestone' => [
+            'fhirType'     => 'CodeableConcept',
+            'propertyKind' => 'complex',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'reason' => [
+            'fhirType'     => 'CodeableConcept',
+            'propertyKind' => 'complex',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'startDate' => [
+            'fhirType'     => 'dateTime',
+            'propertyKind' => 'primitive',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'endDate' => [
+            'fhirType'     => 'dateTime',
+            'propertyKind' => 'primitive',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+    ];
 
-	public function __construct(
-		/** @var null|string id Unique id for inter-element referencing */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
-		public ?string $id = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension> extension Additional content defined by implementations */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
-		public array $modifierExtension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept type state | milestone */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept $type = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept subjectState candidate | eligible | follow-up | ineligible | not-registered | off-study | on-study | on-study-intervention | on-study-observation | pending-on-study | potential-candidate | screening | withdrawn */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept $subjectState = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept milestone SignedUp | Screened | Randomized */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept $milestone = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept reason State change reason */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept $reason = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive startDate State change date */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive $startDate = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive endDate State change date */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive $endDate = null,
-	) {
-		parent::__construct($id, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        public ?string $id = null,
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        public array $modifierExtension = [],
+        /** @var CodeableConcept|null type state | milestone */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $type = null,
+        /** @var CodeableConcept|null subjectState candidate | eligible | follow-up | ineligible | not-registered | off-study | on-study | on-study-intervention | on-study-observation | pending-on-study | potential-candidate | screening | withdrawn */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $subjectState = null,
+        /** @var CodeableConcept|null milestone SignedUp | Screened | Randomized */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $milestone = null,
+        /** @var CodeableConcept|null reason State change reason */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $reason = null,
+        /** @var DateTimePrimitive|null startDate State change date */
+        #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
+        public ?DateTimePrimitive $startDate = null,
+        /** @var DateTimePrimitive|null endDate State change date */
+        #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
+        public ?DateTimePrimitive $endDate = null,
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
 }

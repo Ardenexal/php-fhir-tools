@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,24 +12,24 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum ConceptMapPropertyType: string
 {
-	/** Coding (external reference) */
-	case codingexternalreference = 'Coding';
+    /** Coding (external reference) */
+    case codingexternalreference = 'Coding';
 
-	/** string */
-	case string = 'string';
+    /** string */
+    case string = 'string';
 
-	/** integer */
-	case integer = 'integer';
+    /** integer */
+    case integer = 'integer';
 
-	/** boolean */
-	case boolean = 'boolean';
+    /** boolean */
+    case boolean = 'boolean';
 
-	/** dateTime */
-	case datetime = 'dateTime';
+    /** dateTime */
+    case datetime = 'dateTime';
 
-	/** decimal */
-	case decimal = 'decimal';
+    /** decimal */
+    case decimal = 'decimal';
 
-	/** code */
-	case code = 'code';
+    /** code */
+    case code = 'code';
 }

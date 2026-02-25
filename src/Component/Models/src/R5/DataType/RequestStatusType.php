@@ -1,17 +1,23 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
+use Ardenexal\FHIRTools\Component\Models\R5\Enum\RequestStatus;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
+
 /**
  * @fhir-code-type RequestStatus
+ *
  * @description Code type wrapper for RequestStatus enum
  */
-class RequestStatusType extends \Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive
+class RequestStatusType extends CodePrimitive
 {
-	public function __construct(
-		/** @param \Ardenexal\FHIRTools\Component\Models\R5\Enum\RequestStatus|string|null $value The code value (enum or string) */
-		string|null $value = null,
-	) {
-		parent::__construct(value: $value);
-	}
+    public function __construct(
+        /** @param RequestStatus|string|null $value The code value (enum or string) */
+        ?string $value = null,
+    ) {
+        parent::__construct(value: $value);
+    }
 }

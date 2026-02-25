@@ -1,78 +1,85 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\TestScript;
+
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 
 /**
  * @description Action would contain either an operation or an assertion.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'TestScript', elementPath: 'TestScript.setup.action', fhirVersion: 'R5')]
-class TestScriptSetupAction extends \Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement
+#[FHIRBackboneElement(parentResource: 'TestScript', elementPath: 'TestScript.setup.action', fhirVersion: 'R5')]
+class TestScriptSetupAction extends BackboneElement
 {
-	public const FHIR_PROPERTY_MAP = [
-		'id' => [
-			'fhirType' => 'http://hl7.org/fhirpath/System.String',
-			'propertyKind' => 'scalar',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'extension' => [
-			'fhirType' => 'Extension',
-			'propertyKind' => 'extension',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'modifierExtension' => [
-			'fhirType' => 'Extension',
-			'propertyKind' => 'modifierExtension',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'operation' => [
-			'fhirType' => 'BackboneElement',
-			'propertyKind' => 'backbone',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'assert' => [
-			'fhirType' => 'BackboneElement',
-			'propertyKind' => 'backbone',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-	];
+    public const FHIR_PROPERTY_MAP = [
+        'id' => [
+            'fhirType'     => 'http://hl7.org/fhirpath/System.String',
+            'propertyKind' => 'scalar',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'extension' => [
+            'fhirType'     => 'Extension',
+            'propertyKind' => 'extension',
+            'isArray'      => true,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'modifierExtension' => [
+            'fhirType'     => 'Extension',
+            'propertyKind' => 'modifierExtension',
+            'isArray'      => true,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'operation' => [
+            'fhirType'     => 'BackboneElement',
+            'propertyKind' => 'backbone',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'assert' => [
+            'fhirType'     => 'BackboneElement',
+            'propertyKind' => 'backbone',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+    ];
 
-	public function __construct(
-		/** @var null|string id Unique id for inter-element referencing */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
-		public ?string $id = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension> extension Additional content defined by implementations */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
-		public array $modifierExtension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\TestScript\TestScriptSetupActionOperation operation The setup operation to perform */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
-		public ?TestScriptSetupActionOperation $operation = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\TestScript\TestScriptSetupActionAssert assert The assertion to perform */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
-		public ?TestScriptSetupActionAssert $assert = null,
-	) {
-		parent::__construct($id, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        public ?string $id = null,
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        public array $modifierExtension = [],
+        /** @var TestScriptSetupActionOperation|null operation The setup operation to perform */
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        public ?TestScriptSetupActionOperation $operation = null,
+        /** @var TestScriptSetupActionAssert|null assert The assertion to perform */
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        public ?TestScriptSetupActionAssert $assert = null,
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
 }

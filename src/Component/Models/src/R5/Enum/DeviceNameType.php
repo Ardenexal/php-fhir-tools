@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,12 +12,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum DeviceNameType: string
 {
-	/** Registered name */
-	case registeredname = 'registered-name';
+    /** Registered name */
+    case registeredname = 'registered-name';
 
-	/** User Friendly name */
-	case userfriendlyname = 'user-friendly-name';
+    /** User Friendly name */
+    case userfriendlyname = 'user-friendly-name';
 
-	/** Patient Reported name */
-	case patientreportedname = 'patient-reported-name';
+    /** Patient Reported name */
+    case patientreportedname = 'patient-reported-name';
 }

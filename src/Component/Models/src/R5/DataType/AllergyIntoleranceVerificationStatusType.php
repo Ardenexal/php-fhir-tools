@@ -1,17 +1,23 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
+use Ardenexal\FHIRTools\Component\Models\R5\Enum\AllergyIntoleranceVerificationStatus;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
+
 /**
  * @fhir-code-type AllergyIntoleranceVerificationStatus
+ *
  * @description Code type wrapper for AllergyIntoleranceVerificationStatus enum
  */
-class AllergyIntoleranceVerificationStatusType extends \Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive
+class AllergyIntoleranceVerificationStatusType extends CodePrimitive
 {
-	public function __construct(
-		/** @param \Ardenexal\FHIRTools\Component\Models\R5\Enum\AllergyIntoleranceVerificationStatus|string|null $value The code value (enum or string) */
-		string|null $value = null,
-	) {
-		parent::__construct(value: $value);
-	}
+    public function __construct(
+        /** @param AllergyIntoleranceVerificationStatus|string|null $value The code value (enum or string) */
+        ?string $value = null,
+    ) {
+        parent::__construct(value: $value);
+    }
 }

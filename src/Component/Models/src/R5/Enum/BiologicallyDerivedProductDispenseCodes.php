@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,27 +12,27 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum BiologicallyDerivedProductDispenseCodes: string
 {
-	/** Preparation */
-	case preparation = 'preparation';
+    /** Preparation */
+    case preparation = 'preparation';
 
-	/** In Progress */
-	case inprogress = 'in-progress';
+    /** In Progress */
+    case inprogress = 'in-progress';
 
-	/** Allocated */
-	case allocated = 'allocated';
+    /** Allocated */
+    case allocated = 'allocated';
 
-	/** Issued */
-	case issued = 'issued';
+    /** Issued */
+    case issued = 'issued';
 
-	/** Unfulfilled */
-	case unfulfilled = 'unfulfilled';
+    /** Unfulfilled */
+    case unfulfilled = 'unfulfilled';
 
-	/** Returned */
-	case returned = 'returned';
+    /** Returned */
+    case returned = 'returned';
 
-	/** Entered in Error */
-	case enteredinerror = 'entered-in-error';
+    /** Entered in Error */
+    case enteredinerror = 'entered-in-error';
 
-	/** Unknown */
-	case unknown = 'unknown';
+    /** Unknown */
+    case unknown = 'unknown';
 }

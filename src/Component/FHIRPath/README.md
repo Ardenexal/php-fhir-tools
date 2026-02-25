@@ -5,7 +5,7 @@ PHP implementation of the [FHIRPath 2.0 specification](http://hl7.org/fhirpath/N
 ## Features
 
 - FHIRPath 2.0 expression evaluation (partial implementation - see [Implementation Status](#implementation-status))
-- 90+ built-in functions (existence, filtering, string, math, date/time, type conversion, FHIR-specific)
+- 98 built-in functions (existence, filtering, string, math, date/time, type conversion, FHIR-specific)
 - 15+ operators (arithmetic, comparison, logical, membership, type)
 - FHIR-aligned type system with `is`/`as` operators
 - Expression caching with LRU eviction
@@ -102,14 +102,14 @@ $service->evaluate('name | telecom', $patient);
 
 ### ✅ Implemented Features
 
-#### Functions (90+)
+#### Functions (98)
 
 | Category | Functions | Status |
 |----------|-----------|--------|
 | **Existence** (13) | `empty()`, `exists()`, `all()`, `count()`, `allTrue()`, `anyTrue()`, `allFalse()`, `anyFalse()`, `subsetOf()`, `supersetOf()`, `isDistinct()`, `not()`, `repeat()` | ✅ Complete |
 | **Filtering** (9) | `where()`, `select()`, `first()`, `last()`, `tail()`, `take()`, `skip()`, `single()`, `distinct()` | ✅ Complete |
 | **Subsetting** (3) | `union()`, `intersect()`, `exclude()` | ✅ Complete |
-| **String** (13) | `substring()`, `length()`, `startsWith()`, `endsWith()`, `contains()`, `indexOf()`, `upper()`, `lower()`, `replace()`, `replaceMatches()`, `matches()`, `matchesFull()`, `trim()`, `split()`, `toChars()` | ✅ Complete |
+| **String** (20) | `substring()`, `length()`, `startsWith()`, `endsWith()`, `contains()`, `indexOf()`, `upper()`, `lower()`, `replace()`, `replaceMatches()`, `matches()`, `matchesFull()`, `trim()`, `split()`, `toChars()`, `encode()`, `decode()`, `join()`, `escape()`, `unescape()` | ✅ Complete |
 | **Math** (14) | `sum()`, `abs()`, `ceiling()`, `floor()`, `truncate()`, `round()`, `exp()`, `ln()`, `log()`, `power()`, `sqrt()`, `min()`, `max()`, `avg()` | ✅ Complete |
 | **Date/Time** (5) | `now()`, `timeOfDay()`, `today()`, `toMilliseconds()`, `toSeconds()` | ✅ Complete |
 | **Type** (2) | `ofType()`, `hasValue()` | ✅ Complete |

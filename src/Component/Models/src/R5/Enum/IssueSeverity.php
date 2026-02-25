@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,18 +12,18 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum IssueSeverity: string
 {
-	/** Fatal */
-	case fatal = 'fatal';
+    /** Fatal */
+    case fatal = 'fatal';
 
-	/** Error */
-	case error = 'error';
+    /** Error */
+    case error = 'error';
 
-	/** Warning */
-	case warning = 'warning';
+    /** Warning */
+    case warning = 'warning';
 
-	/** Information */
-	case information = 'information';
+    /** Information */
+    case information = 'information';
 
-	/** Operation Successful */
-	case operationsuccessful = 'success';
+    /** Operation Successful */
+    case operationsuccessful = 'success';
 }

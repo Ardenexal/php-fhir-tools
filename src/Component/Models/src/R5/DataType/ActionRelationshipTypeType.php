@@ -1,17 +1,23 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
+use Ardenexal\FHIRTools\Component\Models\R5\Enum\ActionRelationshipType;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
+
 /**
  * @fhir-code-type ActionRelationshipType
+ *
  * @description Code type wrapper for ActionRelationshipType enum
  */
-class ActionRelationshipTypeType extends \Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive
+class ActionRelationshipTypeType extends CodePrimitive
 {
-	public function __construct(
-		/** @param \Ardenexal\FHIRTools\Component\Models\R5\Enum\ActionRelationshipType|string|null $value The code value (enum or string) */
-		string|null $value = null,
-	) {
-		parent::__construct(value: $value);
-	}
+    public function __construct(
+        /** @param ActionRelationshipType|string|null $value The code value (enum or string) */
+        ?string $value = null,
+    ) {
+        parent::__construct(value: $value);
+    }
 }

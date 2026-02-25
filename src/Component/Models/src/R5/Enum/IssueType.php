@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,21 +12,21 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum IssueType: string
 {
-	/** Invalid Content */
-	case invalidcontent = 'invalid';
+    /** Invalid Content */
+    case invalidcontent = 'invalid';
 
-	/** Security Problem */
-	case securityproblem = 'security';
+    /** Security Problem */
+    case securityproblem = 'security';
 
-	/** Processing Failure */
-	case processingfailure = 'processing';
+    /** Processing Failure */
+    case processingfailure = 'processing';
 
-	/** Transient Issue */
-	case transientissue = 'transient';
+    /** Transient Issue */
+    case transientissue = 'transient';
 
-	/** Informational Note */
-	case informationalnote = 'informational';
+    /** Informational Note */
+    case informationalnote = 'informational';
 
-	/** Operation Successful */
-	case operationsuccessful = 'success';
+    /** Operation Successful */
+    case operationsuccessful = 'success';
 }

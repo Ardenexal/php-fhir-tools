@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,15 +12,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum DeviceMetricCalibrationType: string
 {
-	/** Unspecified */
-	case unspecified = 'unspecified';
+    /** Unspecified */
+    case unspecified = 'unspecified';
 
-	/** Offset */
-	case offset = 'offset';
+    /** Offset */
+    case offset = 'offset';
 
-	/** Gain */
-	case gain = 'gain';
+    /** Gain */
+    case gain = 'gain';
 
-	/** Two Point */
-	case twopoint = 'two-point';
+    /** Two Point */
+    case twopoint = 'two-point';
 }

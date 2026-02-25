@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,30 +12,30 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum EncounterStatus: string
 {
-	/** Planned */
-	case planned = 'planned';
+    /** Planned */
+    case planned = 'planned';
 
-	/** In Progress */
-	case inprogress = 'in-progress';
+    /** In Progress */
+    case inprogress = 'in-progress';
 
-	/** On Hold */
-	case onhold = 'on-hold';
+    /** On Hold */
+    case onhold = 'on-hold';
 
-	/** Discharged */
-	case discharged = 'discharged';
+    /** Discharged */
+    case discharged = 'discharged';
 
-	/** Completed */
-	case completed = 'completed';
+    /** Completed */
+    case completed = 'completed';
 
-	/** Cancelled */
-	case cancelled = 'cancelled';
+    /** Cancelled */
+    case cancelled = 'cancelled';
 
-	/** Discontinued */
-	case discontinued = 'discontinued';
+    /** Discontinued */
+    case discontinued = 'discontinued';
 
-	/** Entered in Error */
-	case enteredinerror = 'entered-in-error';
+    /** Entered in Error */
+    case enteredinerror = 'entered-in-error';
 
-	/** Unknown */
-	case unknown = 'unknown';
+    /** Unknown */
+    case unknown = 'unknown';
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,12 +12,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum MedicationStatementStatusCodes: string
 {
-	/** Recorded */
-	case recorded = 'recorded';
+    /** Recorded */
+    case recorded = 'recorded';
 
-	/** Entered in Error */
-	case enteredinerror = 'entered-in-error';
+    /** Entered in Error */
+    case enteredinerror = 'entered-in-error';
 
-	/** Draft */
-	case draft = 'draft';
+    /** Draft */
+    case draft = 'draft';
 }

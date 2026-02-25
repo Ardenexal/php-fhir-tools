@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,15 +12,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum MeasureReportType: string
 {
-	/** Individual */
-	case individual = 'individual';
+    /** Individual */
+    case individual = 'individual';
 
-	/** Subject List */
-	case subjectlist = 'subject-list';
+    /** Subject List */
+    case subjectlist = 'subject-list';
 
-	/** Summary */
-	case summary = 'summary';
+    /** Summary */
+    case summary = 'summary';
 
-	/** Data Exchange */
-	case dataexchange = 'data-exchange';
+    /** Data Exchange */
+    case dataexchange = 'data-exchange';
 }

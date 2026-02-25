@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,9 +12,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum QuestionnaireItemDisabledDisplay: string
 {
-	/** Hidden */
-	case hidden = 'hidden';
+    /** Hidden */
+    case hidden = 'hidden';
 
-	/** Protected */
-	case protected = 'protected';
+    /** Protected */
+    case protected = 'protected';
 }

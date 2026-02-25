@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,12 +12,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum SupplyDeliverySupplyItemType: string
 {
-	/** Medication */
-	case medication = 'medication';
+    /** Medication */
+    case medication = 'medication';
 
-	/** Device */
-	case device = 'device';
+    /** Device */
+    case device = 'device';
 
-	/** Biologically Derived Product */
-	case biologicallyderivedproduct = 'biologicallyderivedproduct';
+    /** Biologically Derived Product */
+    case biologicallyderivedproduct = 'biologicallyderivedproduct';
 }

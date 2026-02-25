@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,18 +12,18 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum AuditEventAction: string
 {
-	/** Create */
-	case create = 'C';
+    /** Create */
+    case create = 'C';
 
-	/** Read */
-	case read = 'R';
+    /** Read */
+    case read = 'R';
 
-	/** Update */
-	case update = 'U';
+    /** Update */
+    case update = 'U';
 
-	/** Delete */
-	case delete = 'D';
+    /** Delete */
+    case delete = 'D';
 
-	/** Execute */
-	case execute = 'E';
+    /** Execute */
+    case execute = 'E';
 }

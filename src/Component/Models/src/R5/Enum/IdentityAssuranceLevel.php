@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,15 +12,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum IdentityAssuranceLevel: string
 {
-	/** Level 1 */
-	case level1 = 'level1';
+    /** Level 1 */
+    case level1 = 'level1';
 
-	/** Level 2 */
-	case level2 = 'level2';
+    /** Level 2 */
+    case level2 = 'level2';
 
-	/** Level 3 */
-	case level3 = 'level3';
+    /** Level 3 */
+    case level3 = 'level3';
 
-	/** Level 4 */
-	case level4 = 'level4';
+    /** Level 4 */
+    case level4 = 'level4';
 }

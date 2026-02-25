@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,135 +12,135 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum AssertionResponseTypes: string
 {
-	/** Continue */
-	case continue = 'continue';
+    /** Continue */
+    case continue = 'continue';
 
-	/** Switching Protocols */
-	case switchingprotocols = 'switchingProtocols';
+    /** Switching Protocols */
+    case switchingprotocols = 'switchingProtocols';
 
-	/** OK */
-	case ok = 'okay';
+    /** OK */
+    case ok = 'okay';
 
-	/** Created */
-	case created = 'created';
+    /** Created */
+    case created = 'created';
 
-	/** Accepted */
-	case accepted = 'accepted';
+    /** Accepted */
+    case accepted = 'accepted';
 
-	/** Non-Authoritative Information */
-	case nonauthoritativeinformation = 'nonAuthoritativeInformation';
+    /** Non-Authoritative Information */
+    case nonauthoritativeinformation = 'nonAuthoritativeInformation';
 
-	/** No Content */
-	case nocontent = 'noContent';
+    /** No Content */
+    case nocontent = 'noContent';
 
-	/** Reset Content */
-	case resetcontent = 'resetContent';
+    /** Reset Content */
+    case resetcontent = 'resetContent';
 
-	/** Partial Content */
-	case partialcontent = 'partialContent';
+    /** Partial Content */
+    case partialcontent = 'partialContent';
 
-	/** Multiple Choices */
-	case multiplechoices = 'multipleChoices';
+    /** Multiple Choices */
+    case multiplechoices = 'multipleChoices';
 
-	/** Moved Permanently */
-	case movedpermanently = 'movedPermanently';
+    /** Moved Permanently */
+    case movedpermanently = 'movedPermanently';
 
-	/** Found */
-	case found = 'found';
+    /** Found */
+    case found = 'found';
 
-	/** See Other */
-	case seeother = 'seeOther';
+    /** See Other */
+    case seeother = 'seeOther';
 
-	/** Not Modified */
-	case notmodified = 'notModified';
+    /** Not Modified */
+    case notmodified = 'notModified';
 
-	/** Use Proxy */
-	case useproxy = 'useProxy';
+    /** Use Proxy */
+    case useproxy = 'useProxy';
 
-	/** Temporary Redirect */
-	case temporaryredirect = 'temporaryRedirect';
+    /** Temporary Redirect */
+    case temporaryredirect = 'temporaryRedirect';
 
-	/** Permanent Redirect */
-	case permanentredirect = 'permanentRedirect';
+    /** Permanent Redirect */
+    case permanentredirect = 'permanentRedirect';
 
-	/** Bad Request */
-	case badrequest = 'badRequest';
+    /** Bad Request */
+    case badrequest = 'badRequest';
 
-	/** Unauthorized */
-	case unauthorized = 'unauthorized';
+    /** Unauthorized */
+    case unauthorized = 'unauthorized';
 
-	/** Payment Required */
-	case paymentrequired = 'paymentRequired';
+    /** Payment Required */
+    case paymentrequired = 'paymentRequired';
 
-	/** Forbidden */
-	case forbidden = 'forbidden';
+    /** Forbidden */
+    case forbidden = 'forbidden';
 
-	/** Not Found */
-	case notfound = 'notFound';
+    /** Not Found */
+    case notfound = 'notFound';
 
-	/** Method Not Allowed */
-	case methodnotallowed = 'methodNotAllowed';
+    /** Method Not Allowed */
+    case methodnotallowed = 'methodNotAllowed';
 
-	/** Not Acceptable */
-	case notacceptable = 'notAcceptable';
+    /** Not Acceptable */
+    case notacceptable = 'notAcceptable';
 
-	/** Proxy Authentication Required */
-	case proxyauthenticationrequired = 'proxyAuthenticationRequired';
+    /** Proxy Authentication Required */
+    case proxyauthenticationrequired = 'proxyAuthenticationRequired';
 
-	/** Request Timeout */
-	case requesttimeout = 'requestTimeout';
+    /** Request Timeout */
+    case requesttimeout = 'requestTimeout';
 
-	/** Conflict */
-	case conflict = 'conflict';
+    /** Conflict */
+    case conflict = 'conflict';
 
-	/** Gone */
-	case gone = 'gone';
+    /** Gone */
+    case gone = 'gone';
 
-	/** Length Required */
-	case lengthrequired = 'lengthRequired';
+    /** Length Required */
+    case lengthrequired = 'lengthRequired';
 
-	/** Precondition Failed */
-	case preconditionfailed = 'preconditionFailed';
+    /** Precondition Failed */
+    case preconditionfailed = 'preconditionFailed';
 
-	/** Content Too Large */
-	case contenttoolarge = 'contentTooLarge';
+    /** Content Too Large */
+    case contenttoolarge = 'contentTooLarge';
 
-	/** URI Too Long */
-	case uritoolong = 'uriTooLong';
+    /** URI Too Long */
+    case uritoolong = 'uriTooLong';
 
-	/** Unsupported Media Type */
-	case unsupportedmediatype = 'unsupportedMediaType';
+    /** Unsupported Media Type */
+    case unsupportedmediatype = 'unsupportedMediaType';
 
-	/** Range Not Satisfiable */
-	case rangenotsatisfiable = 'rangeNotSatisfiable';
+    /** Range Not Satisfiable */
+    case rangenotsatisfiable = 'rangeNotSatisfiable';
 
-	/** Expectation Failed */
-	case expectationfailed = 'expectationFailed';
+    /** Expectation Failed */
+    case expectationfailed = 'expectationFailed';
 
-	/** Misdirected Request */
-	case misdirectedrequest = 'misdirectedRequest';
+    /** Misdirected Request */
+    case misdirectedrequest = 'misdirectedRequest';
 
-	/** Unprocessable Content */
-	case unprocessablecontent = 'unprocessableContent';
+    /** Unprocessable Content */
+    case unprocessablecontent = 'unprocessableContent';
 
-	/** Upgrade Required */
-	case upgraderequired = 'upgradeRequired';
+    /** Upgrade Required */
+    case upgraderequired = 'upgradeRequired';
 
-	/** Internal Server Error */
-	case internalservererror = 'internalServerError';
+    /** Internal Server Error */
+    case internalservererror = 'internalServerError';
 
-	/** Not Implemented */
-	case notimplemented = 'notImplemented';
+    /** Not Implemented */
+    case notimplemented = 'notImplemented';
 
-	/** Bad Gateway */
-	case badgateway = 'badGateway';
+    /** Bad Gateway */
+    case badgateway = 'badGateway';
 
-	/** Service Unavailable */
-	case serviceunavailable = 'serviceUnavailable';
+    /** Service Unavailable */
+    case serviceunavailable = 'serviceUnavailable';
 
-	/** Gateway Timeout */
-	case gatewaytimeout = 'gatewayTimeout';
+    /** Gateway Timeout */
+    case gatewaytimeout = 'gatewayTimeout';
 
-	/** HTTP Version Not Supported */
-	case httpversionnotsupported = 'httpVersionNotSupported';
+    /** HTTP Version Not Supported */
+    case httpversionnotsupported = 'httpVersionNotSupported';
 }

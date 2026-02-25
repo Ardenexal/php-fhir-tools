@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,15 +12,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum GraphCompartmentRule: string
 {
-	/** Identical */
-	case identical = 'identical';
+    /** Identical */
+    case identical = 'identical';
 
-	/** Matching */
-	case matching = 'matching';
+    /** Matching */
+    case matching = 'matching';
 
-	/** Different */
-	case different = 'different';
+    /** Different */
+    case different = 'different';
 
-	/** Custom */
-	case custom = 'custom';
+    /** Custom */
+    case custom = 'custom';
 }

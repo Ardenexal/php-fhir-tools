@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,21 +12,21 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum DiscriminatorType: string
 {
-	/** Value */
-	case value = 'value';
+    /** Value */
+    case value = 'value';
 
-	/** Exists */
-	case exists = 'exists';
+    /** Exists */
+    case exists = 'exists';
 
-	/** Pattern */
-	case pattern = 'pattern';
+    /** Pattern */
+    case pattern = 'pattern';
 
-	/** Type */
-	case type = 'type';
+    /** Type */
+    case type = 'type';
 
-	/** Profile */
-	case profile = 'profile';
+    /** Profile */
+    case profile = 'profile';
 
-	/** Position */
-	case position = 'position';
+    /** Position */
+    case position = 'position';
 }

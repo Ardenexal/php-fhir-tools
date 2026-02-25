@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,24 +12,24 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum CharacteristicCombination: string
 {
-	/** All of */
-	case allof = 'all-of';
+    /** All of */
+    case allof = 'all-of';
 
-	/** Any of */
-	case anyof = 'any-of';
+    /** Any of */
+    case anyof = 'any-of';
 
-	/** At least */
-	case atleast = 'at-least';
+    /** At least */
+    case atleast = 'at-least';
 
-	/** At most */
-	case atmost = 'at-most';
+    /** At most */
+    case atmost = 'at-most';
 
-	/** Statistical */
-	case statistical = 'statistical';
+    /** Statistical */
+    case statistical = 'statistical';
 
-	/** Net effect */
-	case neteffect = 'net-effect';
+    /** Net effect */
+    case neteffect = 'net-effect';
 
-	/** Dataset */
-	case dataset = 'dataset';
+    /** Dataset */
+    case dataset = 'dataset';
 }

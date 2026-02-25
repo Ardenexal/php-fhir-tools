@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,18 +12,18 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum ArtifactAssessmentDisposition: string
 {
-	/** Unresolved */
-	case unresolved = 'unresolved';
+    /** Unresolved */
+    case unresolved = 'unresolved';
 
-	/** Not Persuasive */
-	case notpersuasive = 'not-persuasive';
+    /** Not Persuasive */
+    case notpersuasive = 'not-persuasive';
 
-	/** Persuasive */
-	case persuasive = 'persuasive';
+    /** Persuasive */
+    case persuasive = 'persuasive';
 
-	/** Persuasive with Modification */
-	case persuasivewithmodification = 'persuasive-with-modification';
+    /** Persuasive with Modification */
+    case persuasivewithmodification = 'persuasive-with-modification';
 
-	/** Not Persuasive with Modification */
-	case notpersuasivewithmodification = 'not-persuasive-with-modification';
+    /** Not Persuasive with Modification */
+    case notpersuasivewithmodification = 'not-persuasive-with-modification';
 }

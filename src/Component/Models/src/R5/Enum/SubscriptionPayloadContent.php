@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,12 +12,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum SubscriptionPayloadContent: string
 {
-	/** Empty */
-	case empty = 'empty';
+    /** Empty */
+    case empty = 'empty';
 
-	/** Id-only */
-	case idonly = 'id-only';
+    /** Id-only */
+    case idonly = 'id-only';
 
-	/** Full-resource */
-	case fullresource = 'full-resource';
+    /** Full-resource */
+    case fullresource = 'full-resource';
 }

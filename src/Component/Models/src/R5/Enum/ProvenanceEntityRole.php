@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,18 +12,18 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum ProvenanceEntityRole: string
 {
-	/** Revision */
-	case revision = 'revision';
+    /** Revision */
+    case revision = 'revision';
 
-	/** Quotation */
-	case quotation = 'quotation';
+    /** Quotation */
+    case quotation = 'quotation';
 
-	/** Source */
-	case source = 'source';
+    /** Source */
+    case source = 'source';
 
-	/** Instantiates */
-	case instantiates = 'instantiates';
+    /** Instantiates */
+    case instantiates = 'instantiates';
 
-	/** Removal */
-	case removal = 'removal';
+    /** Removal */
+    case removal = 'removal';
 }

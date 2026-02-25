@@ -1,126 +1,136 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\ClaimResponse;
+
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\PositiveIntPrimitive;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * @description A claim line. Either a simple (a product or service) or a 'group' of details which can also be a simple items or groups of sub-details.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'ClaimResponse', elementPath: 'ClaimResponse.item', fhirVersion: 'R5')]
-class ClaimResponseItem extends \Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement
+#[FHIRBackboneElement(parentResource: 'ClaimResponse', elementPath: 'ClaimResponse.item', fhirVersion: 'R5')]
+class ClaimResponseItem extends BackboneElement
 {
-	public const FHIR_PROPERTY_MAP = [
-		'id' => [
-			'fhirType' => 'http://hl7.org/fhirpath/System.String',
-			'propertyKind' => 'scalar',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'extension' => [
-			'fhirType' => 'Extension',
-			'propertyKind' => 'extension',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'modifierExtension' => [
-			'fhirType' => 'Extension',
-			'propertyKind' => 'modifierExtension',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'itemSequence' => [
-			'fhirType' => 'positiveInt',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => true,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'traceNumber' => [
-			'fhirType' => 'Identifier',
-			'propertyKind' => 'complex',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'noteNumber' => [
-			'fhirType' => 'positiveInt',
-			'propertyKind' => 'primitive',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'reviewOutcome' => [
-			'fhirType' => 'BackboneElement',
-			'propertyKind' => 'backbone',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'adjudication' => [
-			'fhirType' => 'BackboneElement',
-			'propertyKind' => 'backbone',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'detail' => [
-			'fhirType' => 'BackboneElement',
-			'propertyKind' => 'backbone',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-	];
+    public const FHIR_PROPERTY_MAP = [
+        'id' => [
+            'fhirType'     => 'http://hl7.org/fhirpath/System.String',
+            'propertyKind' => 'scalar',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'extension' => [
+            'fhirType'     => 'Extension',
+            'propertyKind' => 'extension',
+            'isArray'      => true,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'modifierExtension' => [
+            'fhirType'     => 'Extension',
+            'propertyKind' => 'modifierExtension',
+            'isArray'      => true,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'itemSequence' => [
+            'fhirType'     => 'positiveInt',
+            'propertyKind' => 'primitive',
+            'isArray'      => false,
+            'isRequired'   => true,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'traceNumber' => [
+            'fhirType'     => 'Identifier',
+            'propertyKind' => 'complex',
+            'isArray'      => true,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'noteNumber' => [
+            'fhirType'     => 'positiveInt',
+            'propertyKind' => 'primitive',
+            'isArray'      => true,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'reviewOutcome' => [
+            'fhirType'     => 'BackboneElement',
+            'propertyKind' => 'backbone',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'adjudication' => [
+            'fhirType'     => 'BackboneElement',
+            'propertyKind' => 'backbone',
+            'isArray'      => true,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'detail' => [
+            'fhirType'     => 'BackboneElement',
+            'propertyKind' => 'backbone',
+            'isArray'      => true,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+    ];
 
-	public function __construct(
-		/** @var null|string id Unique id for inter-element referencing */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
-		public ?string $id = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension> extension Additional content defined by implementations */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
-		public array $modifierExtension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\PositiveIntPrimitive itemSequence Claim item instance identifier */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isRequired: true), \Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\Primitive\PositiveIntPrimitive $itemSequence = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier> traceNumber Number for tracking */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'Identifier', propertyKind: 'complex', isArray: true)]
-		public array $traceNumber = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Primitive\PositiveIntPrimitive> noteNumber Applicable note numbers */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isArray: true)]
-		public array $noteNumber = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Resource\ClaimResponse\ClaimResponseItemReviewOutcome reviewOutcome Adjudication results */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
-		public ?ClaimResponseItemReviewOutcome $reviewOutcome = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\ClaimResponse\ClaimResponseItemAdjudication> adjudication Adjudication details */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
-		public array $adjudication = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\Resource\ClaimResponse\ClaimResponseItemDetail> detail Adjudication for claim details */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
-		public array $detail = [],
-	) {
-		parent::__construct($id, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        public ?string $id = null,
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        public array $modifierExtension = [],
+        /** @var PositiveIntPrimitive|null itemSequence Claim item instance identifier */
+        #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isRequired: true), NotBlank]
+        public ?PositiveIntPrimitive $itemSequence = null,
+        /** @var array<Identifier> traceNumber Number for tracking */
+        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex', isArray: true)]
+        public array $traceNumber = [],
+        /** @var array<PositiveIntPrimitive> noteNumber Applicable note numbers */
+        #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isArray: true)]
+        public array $noteNumber = [],
+        /** @var ClaimResponseItemReviewOutcome|null reviewOutcome Adjudication results */
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        public ?ClaimResponseItemReviewOutcome $reviewOutcome = null,
+        /** @var array<ClaimResponseItemAdjudication> adjudication Adjudication details */
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
+        public array $adjudication = [],
+        /** @var array<ClaimResponseItemDetail> detail Adjudication for claim details */
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
+        public array $detail = [],
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
 }

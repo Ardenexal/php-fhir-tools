@@ -334,12 +334,12 @@ final class ComparisonService
                 $leftValue  = $leftQuantity['value'];
                 $rightValue = $rightQuantity['value'];
                 $maxValue   = max(abs($leftValue), abs($rightValue));
-                
+
                 // Use 10% relative tolerance, or absolute tolerance for very small values
                 if ($maxValue > 0.0) {
                     return abs($comparison) <= ($maxValue * 0.10);
                 }
-                
+
                 return abs($comparison) <= self::FLOAT_TOLERANCE;
             }
 
@@ -588,7 +588,7 @@ final class ComparisonService
         $rightUnit = $right['code'];
 
         // Normalize calendar duration keywords to UCUM codes
-        $leftUnit  = self::CALENDAR_TO_UCUM[$leftUnit] ?? $leftUnit;
+        $leftUnit  = self::CALENDAR_TO_UCUM[$leftUnit]  ?? $leftUnit;
         $rightUnit = self::CALENDAR_TO_UCUM[$rightUnit] ?? $rightUnit;
 
         if ($leftUnit === $rightUnit) {

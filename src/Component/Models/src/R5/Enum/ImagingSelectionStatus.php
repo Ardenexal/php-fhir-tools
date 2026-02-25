@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,12 +12,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum ImagingSelectionStatus: string
 {
-	/** Available */
-	case available = 'available';
+    /** Available */
+    case available = 'available';
 
-	/** Entered in Error */
-	case enteredinerror = 'entered-in-error';
+    /** Entered in Error */
+    case enteredinerror = 'entered-in-error';
 
-	/** Unknown */
-	case unknown = 'unknown';
+    /** Unknown */
+    case unknown = 'unknown';
 }

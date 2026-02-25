@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,15 +12,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum StructureMapTargetListMode: string
 {
-	/** First */
-	case first = 'first';
+    /** First */
+    case first = 'first';
 
-	/** Share */
-	case share = 'share';
+    /** Share */
+    case share = 'share';
 
-	/** Last */
-	case last = 'last';
+    /** Last */
+    case last = 'last';
 
-	/** single */
-	case single = 'single';
+    /** single */
+    case single = 'single';
 }

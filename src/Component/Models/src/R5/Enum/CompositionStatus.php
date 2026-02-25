@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,27 +12,27 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum CompositionStatus: string
 {
-	/** Registered */
-	case registered = 'registered';
+    /** Registered */
+    case registered = 'registered';
 
-	/** Partial */
-	case partial = 'partial';
+    /** Partial */
+    case partial = 'partial';
 
-	/** Final */
-	case final = 'final';
+    /** Final */
+    case final = 'final';
 
-	/** Amended */
-	case amended = 'amended';
+    /** Amended */
+    case amended = 'amended';
 
-	/** Cancelled */
-	case cancelled = 'cancelled';
+    /** Cancelled */
+    case cancelled = 'cancelled';
 
-	/** Entered in Error */
-	case enteredinerror = 'entered-in-error';
+    /** Entered in Error */
+    case enteredinerror = 'entered-in-error';
 
-	/** Deprecated */
-	case deprecated = 'deprecated';
+    /** Deprecated */
+    case deprecated = 'deprecated';
 
-	/** Unknown */
-	case unknown = 'unknown';
+    /** Unknown */
+    case unknown = 'unknown';
 }

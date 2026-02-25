@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,15 +12,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum MedicationRequestIntent: string
 {
-	/** Proposal */
-	case proposal = 'proposal';
+    /** Proposal */
+    case proposal = 'proposal';
 
-	/** Plan */
-	case plan = 'plan';
+    /** Plan */
+    case plan = 'plan';
 
-	/** Order */
-	case order = 'order';
+    /** Order */
+    case order = 'order';
 
-	/** Option */
-	case option = 'option';
+    /** Option */
+    case option = 'option';
 }

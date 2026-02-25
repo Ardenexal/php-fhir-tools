@@ -625,7 +625,7 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
                 $choiceMapping = $this->findChoicePropertyByKey($metaMap, $elementName);
                 if ($choiceMapping !== null) {
                     [$propertyName, $phpType] = $choiceMapping;
-                    
+
                     if ($reflection->hasProperty($propertyName)) {
                         $property = $reflection->getProperty($propertyName);
 
@@ -702,7 +702,7 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
                 $choiceMapping = $this->findChoicePropertyByKey($metaMap, $elementName);
                 if ($choiceMapping !== null) {
                     [$propertyName, $phpType] = $choiceMapping;
-                    
+
                     if ($reflection->hasProperty($propertyName)) {
                         $property = $reflection->getProperty($propertyName);
 

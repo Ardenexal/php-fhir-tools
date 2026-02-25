@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,33 +12,33 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum GroupType: string
 {
-	/** Person */
-	case person = 'person';
+    /** Person */
+    case person = 'person';
 
-	/** Animal */
-	case animal = 'animal';
+    /** Animal */
+    case animal = 'animal';
 
-	/** Practitioner */
-	case practitioner = 'practitioner';
+    /** Practitioner */
+    case practitioner = 'practitioner';
 
-	/** Device */
-	case device = 'device';
+    /** Device */
+    case device = 'device';
 
-	/** CareTeam */
-	case careteam = 'careteam';
+    /** CareTeam */
+    case careteam = 'careteam';
 
-	/** HealthcareService */
-	case healthcareservice = 'healthcareservice';
+    /** HealthcareService */
+    case healthcareservice = 'healthcareservice';
 
-	/** Location */
-	case location = 'location';
+    /** Location */
+    case location = 'location';
 
-	/** Organization */
-	case organization = 'organization';
+    /** Organization */
+    case organization = 'organization';
 
-	/** RelatedPerson */
-	case relatedperson = 'relatedperson';
+    /** RelatedPerson */
+    case relatedperson = 'relatedperson';
 
-	/** Specimen */
-	case specimen = 'specimen';
+    /** Specimen */
+    case specimen = 'specimen';
 }

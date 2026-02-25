@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,447 +12,447 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum ColorCodesOrRGB: string
 {
-	/** aliceblue */
-	case aliceblue = 'aliceblue';
+    /** aliceblue */
+    case aliceblue = 'aliceblue';
 
-	/** antiquewhite */
-	case antiquewhite = 'antiquewhite';
+    /** antiquewhite */
+    case antiquewhite = 'antiquewhite';
 
-	/** aqua */
-	case aqua = 'aqua';
+    /** aqua */
+    case aqua = 'aqua';
 
-	/** aquamarine */
-	case aquamarine = 'aquamarine';
+    /** aquamarine */
+    case aquamarine = 'aquamarine';
 
-	/** azure */
-	case azure = 'azure';
+    /** azure */
+    case azure = 'azure';
 
-	/** beige */
-	case beige = 'beige';
+    /** beige */
+    case beige = 'beige';
 
-	/** bisque */
-	case bisque = 'bisque';
+    /** bisque */
+    case bisque = 'bisque';
 
-	/** black */
-	case black = 'black';
+    /** black */
+    case black = 'black';
 
-	/** blanchedalmond */
-	case blanchedalmond = 'blanchedalmond';
+    /** blanchedalmond */
+    case blanchedalmond = 'blanchedalmond';
 
-	/** blue */
-	case blue = 'blue';
+    /** blue */
+    case blue = 'blue';
 
-	/** blueviolet */
-	case blueviolet = 'blueviolet';
+    /** blueviolet */
+    case blueviolet = 'blueviolet';
 
-	/** brown */
-	case brown = 'brown';
+    /** brown */
+    case brown = 'brown';
 
-	/** burlywood */
-	case burlywood = 'burlywood';
+    /** burlywood */
+    case burlywood = 'burlywood';
 
-	/** cadetblue */
-	case cadetblue = 'cadetblue';
+    /** cadetblue */
+    case cadetblue = 'cadetblue';
 
-	/** chartreuse */
-	case chartreuse = 'chartreuse';
+    /** chartreuse */
+    case chartreuse = 'chartreuse';
 
-	/** chocolate */
-	case chocolate = 'chocolate';
+    /** chocolate */
+    case chocolate = 'chocolate';
 
-	/** coral */
-	case coral = 'coral';
+    /** coral */
+    case coral = 'coral';
 
-	/** cornflowerblue */
-	case cornflowerblue = 'cornflowerblue';
+    /** cornflowerblue */
+    case cornflowerblue = 'cornflowerblue';
 
-	/** cornsilk */
-	case cornsilk = 'cornsilk';
+    /** cornsilk */
+    case cornsilk = 'cornsilk';
 
-	/** crimson */
-	case crimson = 'crimson';
+    /** crimson */
+    case crimson = 'crimson';
 
-	/** cyan */
-	case cyan = 'cyan';
+    /** cyan */
+    case cyan = 'cyan';
 
-	/** darkblue */
-	case darkblue = 'darkblue';
+    /** darkblue */
+    case darkblue = 'darkblue';
 
-	/** darkcyan */
-	case darkcyan = 'darkcyan';
+    /** darkcyan */
+    case darkcyan = 'darkcyan';
 
-	/** darkgoldenrod */
-	case darkgoldenrod = 'darkgoldenrod';
+    /** darkgoldenrod */
+    case darkgoldenrod = 'darkgoldenrod';
 
-	/** darkgray */
-	case darkgray = 'darkgray';
+    /** darkgray */
+    case darkgray = 'darkgray';
 
-	/** darkgreen */
-	case darkgreen = 'darkgreen';
+    /** darkgreen */
+    case darkgreen = 'darkgreen';
 
-	/** darkgrey */
-	case darkgrey = 'darkgrey';
+    /** darkgrey */
+    case darkgrey = 'darkgrey';
 
-	/** darkkhaki */
-	case darkkhaki = 'darkkhaki';
+    /** darkkhaki */
+    case darkkhaki = 'darkkhaki';
 
-	/** darkmagenta */
-	case darkmagenta = 'darkmagenta';
+    /** darkmagenta */
+    case darkmagenta = 'darkmagenta';
 
-	/** darkolivegreen */
-	case darkolivegreen = 'darkolivegreen';
+    /** darkolivegreen */
+    case darkolivegreen = 'darkolivegreen';
 
-	/** darkorange */
-	case darkorange = 'darkorange';
+    /** darkorange */
+    case darkorange = 'darkorange';
 
-	/** darkorchid */
-	case darkorchid = 'darkorchid';
+    /** darkorchid */
+    case darkorchid = 'darkorchid';
 
-	/** darkred */
-	case darkred = 'darkred';
+    /** darkred */
+    case darkred = 'darkred';
 
-	/** darksalmon */
-	case darksalmon = 'darksalmon';
+    /** darksalmon */
+    case darksalmon = 'darksalmon';
 
-	/** darkseagreen */
-	case darkseagreen = 'darkseagreen';
+    /** darkseagreen */
+    case darkseagreen = 'darkseagreen';
 
-	/** darkslateblue */
-	case darkslateblue = 'darkslateblue';
+    /** darkslateblue */
+    case darkslateblue = 'darkslateblue';
 
-	/** darkslategray */
-	case darkslategray = 'darkslategray';
+    /** darkslategray */
+    case darkslategray = 'darkslategray';
 
-	/** darkslategrey */
-	case darkslategrey = 'darkslategrey';
+    /** darkslategrey */
+    case darkslategrey = 'darkslategrey';
 
-	/** darkturquoise */
-	case darkturquoise = 'darkturquoise';
+    /** darkturquoise */
+    case darkturquoise = 'darkturquoise';
 
-	/** darkviolet */
-	case darkviolet = 'darkviolet';
+    /** darkviolet */
+    case darkviolet = 'darkviolet';
 
-	/** deeppink */
-	case deeppink = 'deeppink';
+    /** deeppink */
+    case deeppink = 'deeppink';
 
-	/** deepskyblue */
-	case deepskyblue = 'deepskyblue';
+    /** deepskyblue */
+    case deepskyblue = 'deepskyblue';
 
-	/** dimgray */
-	case dimgray = 'dimgray';
+    /** dimgray */
+    case dimgray = 'dimgray';
 
-	/** dimgrey */
-	case dimgrey = 'dimgrey';
+    /** dimgrey */
+    case dimgrey = 'dimgrey';
 
-	/** dodgerblue */
-	case dodgerblue = 'dodgerblue';
+    /** dodgerblue */
+    case dodgerblue = 'dodgerblue';
 
-	/** firebrick */
-	case firebrick = 'firebrick';
+    /** firebrick */
+    case firebrick = 'firebrick';
 
-	/** floralwhite */
-	case floralwhite = 'floralwhite';
+    /** floralwhite */
+    case floralwhite = 'floralwhite';
 
-	/** forestgreen */
-	case forestgreen = 'forestgreen';
+    /** forestgreen */
+    case forestgreen = 'forestgreen';
 
-	/** fuchsia */
-	case fuchsia = 'fuchsia';
+    /** fuchsia */
+    case fuchsia = 'fuchsia';
 
-	/** gainsboro */
-	case gainsboro = 'gainsboro';
+    /** gainsboro */
+    case gainsboro = 'gainsboro';
 
-	/** ghostwhite */
-	case ghostwhite = 'ghostwhite';
+    /** ghostwhite */
+    case ghostwhite = 'ghostwhite';
 
-	/** gold */
-	case gold = 'gold';
+    /** gold */
+    case gold = 'gold';
 
-	/** goldenrod */
-	case goldenrod = 'goldenrod';
+    /** goldenrod */
+    case goldenrod = 'goldenrod';
 
-	/** gray */
-	case gray = 'gray';
+    /** gray */
+    case gray = 'gray';
 
-	/** green */
-	case green = 'green';
+    /** green */
+    case green = 'green';
 
-	/** greenyellow */
-	case greenyellow = 'greenyellow';
+    /** greenyellow */
+    case greenyellow = 'greenyellow';
 
-	/** grey */
-	case grey = 'grey';
+    /** grey */
+    case grey = 'grey';
 
-	/** honeydew */
-	case honeydew = 'honeydew';
+    /** honeydew */
+    case honeydew = 'honeydew';
 
-	/** hotpink */
-	case hotpink = 'hotpink';
+    /** hotpink */
+    case hotpink = 'hotpink';
 
-	/** indianred */
-	case indianred = 'indianred';
+    /** indianred */
+    case indianred = 'indianred';
 
-	/** indigo */
-	case indigo = 'indigo';
+    /** indigo */
+    case indigo = 'indigo';
 
-	/** ivory */
-	case ivory = 'ivory';
+    /** ivory */
+    case ivory = 'ivory';
 
-	/** khaki */
-	case khaki = 'khaki';
+    /** khaki */
+    case khaki = 'khaki';
 
-	/** lavender */
-	case lavender = 'lavender';
+    /** lavender */
+    case lavender = 'lavender';
 
-	/** lavenderblush */
-	case lavenderblush = 'lavenderblush';
+    /** lavenderblush */
+    case lavenderblush = 'lavenderblush';
 
-	/** lawngreen */
-	case lawngreen = 'lawngreen';
+    /** lawngreen */
+    case lawngreen = 'lawngreen';
 
-	/** lemonchiffon */
-	case lemonchiffon = 'lemonchiffon';
+    /** lemonchiffon */
+    case lemonchiffon = 'lemonchiffon';
 
-	/** lightblue */
-	case lightblue = 'lightblue';
+    /** lightblue */
+    case lightblue = 'lightblue';
 
-	/** lightcoral */
-	case lightcoral = 'lightcoral';
+    /** lightcoral */
+    case lightcoral = 'lightcoral';
 
-	/** lightcyan */
-	case lightcyan = 'lightcyan';
+    /** lightcyan */
+    case lightcyan = 'lightcyan';
 
-	/** lightgoldenrodyellow */
-	case lightgoldenrodyellow = 'lightgoldenrodyellow';
+    /** lightgoldenrodyellow */
+    case lightgoldenrodyellow = 'lightgoldenrodyellow';
 
-	/** lightgray */
-	case lightgray = 'lightgray';
+    /** lightgray */
+    case lightgray = 'lightgray';
 
-	/** lightgreen */
-	case lightgreen = 'lightgreen';
+    /** lightgreen */
+    case lightgreen = 'lightgreen';
 
-	/** lightgrey */
-	case lightgrey = 'lightgrey';
+    /** lightgrey */
+    case lightgrey = 'lightgrey';
 
-	/** lightpink */
-	case lightpink = 'lightpink';
+    /** lightpink */
+    case lightpink = 'lightpink';
 
-	/** lightsalmon */
-	case lightsalmon = 'lightsalmon';
+    /** lightsalmon */
+    case lightsalmon = 'lightsalmon';
 
-	/** lightseagreen */
-	case lightseagreen = 'lightseagreen';
+    /** lightseagreen */
+    case lightseagreen = 'lightseagreen';
 
-	/** lightskyblue */
-	case lightskyblue = 'lightskyblue';
+    /** lightskyblue */
+    case lightskyblue = 'lightskyblue';
 
-	/** lightslategray */
-	case lightslategray = 'lightslategray';
+    /** lightslategray */
+    case lightslategray = 'lightslategray';
 
-	/** lightslategrey */
-	case lightslategrey = 'lightslategrey';
+    /** lightslategrey */
+    case lightslategrey = 'lightslategrey';
 
-	/** lightsteelblue */
-	case lightsteelblue = 'lightsteelblue';
+    /** lightsteelblue */
+    case lightsteelblue = 'lightsteelblue';
 
-	/** lightyellow */
-	case lightyellow = 'lightyellow';
+    /** lightyellow */
+    case lightyellow = 'lightyellow';
 
-	/** lime */
-	case lime = 'lime';
+    /** lime */
+    case lime = 'lime';
 
-	/** limegreen */
-	case limegreen = 'limegreen';
+    /** limegreen */
+    case limegreen = 'limegreen';
 
-	/** linen */
-	case linen = 'linen';
+    /** linen */
+    case linen = 'linen';
 
-	/** magenta */
-	case magenta = 'magenta';
+    /** magenta */
+    case magenta = 'magenta';
 
-	/** maroon */
-	case maroon = 'maroon';
+    /** maroon */
+    case maroon = 'maroon';
 
-	/** mediumaquamarine */
-	case mediumaquamarine = 'mediumaquamarine';
+    /** mediumaquamarine */
+    case mediumaquamarine = 'mediumaquamarine';
 
-	/** mediumblue */
-	case mediumblue = 'mediumblue';
+    /** mediumblue */
+    case mediumblue = 'mediumblue';
 
-	/** mediumorchid */
-	case mediumorchid = 'mediumorchid';
+    /** mediumorchid */
+    case mediumorchid = 'mediumorchid';
 
-	/** mediumpurple */
-	case mediumpurple = 'mediumpurple';
+    /** mediumpurple */
+    case mediumpurple = 'mediumpurple';
 
-	/** mediumseagreen */
-	case mediumseagreen = 'mediumseagreen';
+    /** mediumseagreen */
+    case mediumseagreen = 'mediumseagreen';
 
-	/** mediumslateblue */
-	case mediumslateblue = 'mediumslateblue';
+    /** mediumslateblue */
+    case mediumslateblue = 'mediumslateblue';
 
-	/** mediumspringgreen */
-	case mediumspringgreen = 'mediumspringgreen';
+    /** mediumspringgreen */
+    case mediumspringgreen = 'mediumspringgreen';
 
-	/** mediumturquoise */
-	case mediumturquoise = 'mediumturquoise';
+    /** mediumturquoise */
+    case mediumturquoise = 'mediumturquoise';
 
-	/** mediumvioletred */
-	case mediumvioletred = 'mediumvioletred';
+    /** mediumvioletred */
+    case mediumvioletred = 'mediumvioletred';
 
-	/** midnightblue */
-	case midnightblue = 'midnightblue';
+    /** midnightblue */
+    case midnightblue = 'midnightblue';
 
-	/** mintcream */
-	case mintcream = 'mintcream';
+    /** mintcream */
+    case mintcream = 'mintcream';
 
-	/** mistyrose */
-	case mistyrose = 'mistyrose';
+    /** mistyrose */
+    case mistyrose = 'mistyrose';
 
-	/** moccasin */
-	case moccasin = 'moccasin';
+    /** moccasin */
+    case moccasin = 'moccasin';
 
-	/** navajowhite */
-	case navajowhite = 'navajowhite';
+    /** navajowhite */
+    case navajowhite = 'navajowhite';
 
-	/** navy */
-	case navy = 'navy';
+    /** navy */
+    case navy = 'navy';
 
-	/** oldlace */
-	case oldlace = 'oldlace';
+    /** oldlace */
+    case oldlace = 'oldlace';
 
-	/** olive */
-	case olive = 'olive';
+    /** olive */
+    case olive = 'olive';
 
-	/** olivedrab */
-	case olivedrab = 'olivedrab';
+    /** olivedrab */
+    case olivedrab = 'olivedrab';
 
-	/** orange */
-	case orange = 'orange';
+    /** orange */
+    case orange = 'orange';
 
-	/** orangered */
-	case orangered = 'orangered';
+    /** orangered */
+    case orangered = 'orangered';
 
-	/** orchid */
-	case orchid = 'orchid';
+    /** orchid */
+    case orchid = 'orchid';
 
-	/** palegoldenrod */
-	case palegoldenrod = 'palegoldenrod';
+    /** palegoldenrod */
+    case palegoldenrod = 'palegoldenrod';
 
-	/** palegreen */
-	case palegreen = 'palegreen';
+    /** palegreen */
+    case palegreen = 'palegreen';
 
-	/** paleturquoise */
-	case paleturquoise = 'paleturquoise';
+    /** paleturquoise */
+    case paleturquoise = 'paleturquoise';
 
-	/** palevioletred */
-	case palevioletred = 'palevioletred';
+    /** palevioletred */
+    case palevioletred = 'palevioletred';
 
-	/** papayawhip */
-	case papayawhip = 'papayawhip';
+    /** papayawhip */
+    case papayawhip = 'papayawhip';
 
-	/** peachpuff */
-	case peachpuff = 'peachpuff';
+    /** peachpuff */
+    case peachpuff = 'peachpuff';
 
-	/** peru */
-	case peru = 'peru';
+    /** peru */
+    case peru = 'peru';
 
-	/** pink */
-	case pink = 'pink';
+    /** pink */
+    case pink = 'pink';
 
-	/** plum */
-	case plum = 'plum';
+    /** plum */
+    case plum = 'plum';
 
-	/** powderblue */
-	case powderblue = 'powderblue';
+    /** powderblue */
+    case powderblue = 'powderblue';
 
-	/** purple */
-	case purple = 'purple';
+    /** purple */
+    case purple = 'purple';
 
-	/** rebeccapurple */
-	case rebeccapurple = 'rebeccapurple';
+    /** rebeccapurple */
+    case rebeccapurple = 'rebeccapurple';
 
-	/** red */
-	case red = 'red';
+    /** red */
+    case red = 'red';
 
-	/** rosybrown */
-	case rosybrown = 'rosybrown';
+    /** rosybrown */
+    case rosybrown = 'rosybrown';
 
-	/** royalblue */
-	case royalblue = 'royalblue';
+    /** royalblue */
+    case royalblue = 'royalblue';
 
-	/** saddlebrown */
-	case saddlebrown = 'saddlebrown';
+    /** saddlebrown */
+    case saddlebrown = 'saddlebrown';
 
-	/** salmon */
-	case salmon = 'salmon';
+    /** salmon */
+    case salmon = 'salmon';
 
-	/** sandybrown */
-	case sandybrown = 'sandybrown';
+    /** sandybrown */
+    case sandybrown = 'sandybrown';
 
-	/** seagreen */
-	case seagreen = 'seagreen';
+    /** seagreen */
+    case seagreen = 'seagreen';
 
-	/** seashell */
-	case seashell = 'seashell';
+    /** seashell */
+    case seashell = 'seashell';
 
-	/** sienna */
-	case sienna = 'sienna';
+    /** sienna */
+    case sienna = 'sienna';
 
-	/** silver */
-	case silver = 'silver';
+    /** silver */
+    case silver = 'silver';
 
-	/** skyblue */
-	case skyblue = 'skyblue';
+    /** skyblue */
+    case skyblue = 'skyblue';
 
-	/** slateblue */
-	case slateblue = 'slateblue';
+    /** slateblue */
+    case slateblue = 'slateblue';
 
-	/** slategray */
-	case slategray = 'slategray';
+    /** slategray */
+    case slategray = 'slategray';
 
-	/** slategrey */
-	case slategrey = 'slategrey';
+    /** slategrey */
+    case slategrey = 'slategrey';
 
-	/** snow */
-	case snow = 'snow';
+    /** snow */
+    case snow = 'snow';
 
-	/** springgreen */
-	case springgreen = 'springgreen';
+    /** springgreen */
+    case springgreen = 'springgreen';
 
-	/** steelblue */
-	case steelblue = 'steelblue';
+    /** steelblue */
+    case steelblue = 'steelblue';
 
-	/** tan */
-	case tan = 'tan';
+    /** tan */
+    case tan = 'tan';
 
-	/** teal */
-	case teal = 'teal';
+    /** teal */
+    case teal = 'teal';
 
-	/** thistle */
-	case thistle = 'thistle';
+    /** thistle */
+    case thistle = 'thistle';
 
-	/** tomato */
-	case tomato = 'tomato';
+    /** tomato */
+    case tomato = 'tomato';
 
-	/** turquoise */
-	case turquoise = 'turquoise';
+    /** turquoise */
+    case turquoise = 'turquoise';
 
-	/** violet */
-	case violet = 'violet';
+    /** violet */
+    case violet = 'violet';
 
-	/** wheat */
-	case wheat = 'wheat';
+    /** wheat */
+    case wheat = 'wheat';
 
-	/** white */
-	case white = 'white';
+    /** white */
+    case white = 'white';
 
-	/** whitesmoke */
-	case whitesmoke = 'whitesmoke';
+    /** whitesmoke */
+    case whitesmoke = 'whitesmoke';
 
-	/** yellow */
-	case yellow = 'yellow';
+    /** yellow */
+    case yellow = 'yellow';
 
-	/** yellowgreen */
-	case yellowgreen = 'yellowgreen';
+    /** yellowgreen */
+    case yellowgreen = 'yellowgreen';
 }

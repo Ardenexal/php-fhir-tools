@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,24 +12,24 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum UDIEntryType: string
 {
-	/** Barcode */
-	case barcode = 'barcode';
+    /** Barcode */
+    case barcode = 'barcode';
 
-	/** RFID */
-	case rfid = 'rfid';
+    /** RFID */
+    case rfid = 'rfid';
 
-	/** Manual */
-	case manual = 'manual';
+    /** Manual */
+    case manual = 'manual';
 
-	/** Card */
-	case card = 'card';
+    /** Card */
+    case card = 'card';
 
-	/** Self Reported */
-	case selfreported = 'self-reported';
+    /** Self Reported */
+    case selfreported = 'self-reported';
 
-	/** Electronic Transmission */
-	case electronictransmission = 'electronic-transmission';
+    /** Electronic Transmission */
+    case electronictransmission = 'electronic-transmission';
 
-	/** Unknown */
-	case unknown = 'unknown';
+    /** Unknown */
+    case unknown = 'unknown';
 }

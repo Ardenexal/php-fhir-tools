@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,12 +12,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum CodeSearchSupport: string
 {
-	/** In Compose */
-	case incompose = 'in-compose';
+    /** In Compose */
+    case incompose = 'in-compose';
 
-	/** In Expansion */
-	case inexpansion = 'in-expansion';
+    /** In Expansion */
+    case inexpansion = 'in-expansion';
 
-	/** In Compose Or Expansion */
-	case incomposeorexpansion = 'in-compose-or-expansion';
+    /** In Compose Or Expansion */
+    case incomposeorexpansion = 'in-compose-or-expansion';
 }

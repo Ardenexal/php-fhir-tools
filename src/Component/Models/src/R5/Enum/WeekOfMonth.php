@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,18 +12,18 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum WeekOfMonth: string
 {
-	/** First */
-	case first = 'first';
+    /** First */
+    case first = 'first';
 
-	/** Second */
-	case second = 'second';
+    /** Second */
+    case second = 'second';
 
-	/** Third */
-	case third = 'third';
+    /** Third */
+    case third = 'third';
 
-	/** Fourth */
-	case fourth = 'fourth';
+    /** Fourth */
+    case fourth = 'fourth';
 
-	/** Last */
-	case last = 'last';
+    /** Last */
+    case last = 'last';
 }

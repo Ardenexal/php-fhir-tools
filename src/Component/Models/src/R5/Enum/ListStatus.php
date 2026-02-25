@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 
@@ -10,12 +12,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
  */
 enum ListStatus: string
 {
-	/** Current */
-	case current = 'current';
+    /** Current */
+    case current = 'current';
 
-	/** Retired */
-	case retired = 'retired';
+    /** Retired */
+    case retired = 'retired';
 
-	/** Entered In Error */
-	case enteredinerror = 'entered-in-error';
+    /** Entered In Error */
+    case enteredinerror = 'entered-in-error';
 }

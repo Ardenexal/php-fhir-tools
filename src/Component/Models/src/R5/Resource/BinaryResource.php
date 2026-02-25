@@ -1,104 +1,118 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Meta;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\MimeTypesType;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\Base64BinaryPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
 /**
  * @author Health Level Seven International (FHIR Infrastructure)
+ *
  * @see http://hl7.org/fhir/StructureDefinition/Binary
+ *
  * @description A resource that represents the data of a single raw artifact as digital content accessible in its native format.  A Binary resource can contain any content, whether text, image, pdf, zip archive, etc.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource(type: 'Binary', version: '5.0.0', url: 'http://hl7.org/fhir/StructureDefinition/Binary', fhirVersion: 'R5')]
+#[FhirResource(type: 'Binary', version: '5.0.0', url: 'http://hl7.org/fhir/StructureDefinition/Binary', fhirVersion: 'R5')]
 class BinaryResource extends ResourceResource
 {
-	public const FHIR_PROPERTY_MAP = [
-		'id' => [
-			'fhirType' => 'http://hl7.org/fhirpath/System.String',
-			'propertyKind' => 'scalar',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'meta' => [
-			'fhirType' => 'Meta',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'implicitRules' => [
-			'fhirType' => 'uri',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'language' => [
-			'fhirType' => 'code',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'contentType' => [
-			'fhirType' => 'code',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => true,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'securityContext' => [
-			'fhirType' => 'Reference',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'data' => [
-			'fhirType' => 'base64Binary',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-	];
+    public const FHIR_PROPERTY_MAP = [
+        'id' => [
+            'fhirType'     => 'http://hl7.org/fhirpath/System.String',
+            'propertyKind' => 'scalar',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'meta' => [
+            'fhirType'     => 'Meta',
+            'propertyKind' => 'complex',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'implicitRules' => [
+            'fhirType'     => 'uri',
+            'propertyKind' => 'primitive',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'language' => [
+            'fhirType'     => 'code',
+            'propertyKind' => 'primitive',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'contentType' => [
+            'fhirType'     => 'code',
+            'propertyKind' => 'primitive',
+            'isArray'      => false,
+            'isRequired'   => true,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'securityContext' => [
+            'fhirType'     => 'Reference',
+            'propertyKind' => 'complex',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'data' => [
+            'fhirType'     => 'base64Binary',
+            'propertyKind' => 'primitive',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+    ];
 
-	public function __construct(
-		/** @var null|string id Logical id of this artifact */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
-		public ?string $id = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\Meta meta Metadata about the resource */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\Meta $meta = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive implicitRules A set of rules under which this content was created */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive $implicitRules = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType language Language of the resource content */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType $language = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\MimeTypesType contentType MimeType of the binary content */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), \Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\MimeTypesType $contentType = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference securityContext Identifies another resource to use as proxy when enforcing access control */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference $securityContext = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\Primitive\Base64BinaryPrimitive data The actual content */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'base64Binary', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\Primitive\Base64BinaryPrimitive $data = null,
-	) {
-		parent::__construct($id, $meta, $implicitRules, $language);
-	}
+    public function __construct(
+        /** @var string|null id Logical id of this artifact */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        public ?string $id = null,
+        /** @var Meta|null meta Metadata about the resource */
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        public ?Meta $meta = null,
+        /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        public ?UriPrimitive $implicitRules = null,
+        /** @var AllLanguagesType|null language Language of the resource content */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        public ?AllLanguagesType $language = null,
+        /** @var MimeTypesType|null contentType MimeType of the binary content */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        public ?MimeTypesType $contentType = null,
+        /** @var Reference|null securityContext Identifies another resource to use as proxy when enforcing access control */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $securityContext = null,
+        /** @var Base64BinaryPrimitive|null data The actual content */
+        #[FhirProperty(fhirType: 'base64Binary', propertyKind: 'primitive')]
+        public ?Base64BinaryPrimitive $data = null,
+    ) {
+        parent::__construct($id, $meta, $implicitRules, $language);
+    }
 }

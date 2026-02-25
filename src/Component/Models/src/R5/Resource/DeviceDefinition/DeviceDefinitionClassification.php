@@ -1,78 +1,88 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\DeviceDefinition;
+
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\RelatedArtifact;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * @description What kind of device or device system this is.
  */
-#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement(parentResource: 'DeviceDefinition', elementPath: 'DeviceDefinition.classification', fhirVersion: 'R5')]
-class DeviceDefinitionClassification extends \Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement
+#[FHIRBackboneElement(parentResource: 'DeviceDefinition', elementPath: 'DeviceDefinition.classification', fhirVersion: 'R5')]
+class DeviceDefinitionClassification extends BackboneElement
 {
-	public const FHIR_PROPERTY_MAP = [
-		'id' => [
-			'fhirType' => 'http://hl7.org/fhirpath/System.String',
-			'propertyKind' => 'scalar',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'extension' => [
-			'fhirType' => 'Extension',
-			'propertyKind' => 'extension',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'modifierExtension' => [
-			'fhirType' => 'Extension',
-			'propertyKind' => 'modifierExtension',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'type' => [
-			'fhirType' => 'CodeableConcept',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => true,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-		'justification' => [
-			'fhirType' => 'RelatedArtifact',
-			'propertyKind' => 'complex',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'variants' => null,
-		],
-	];
+    public const FHIR_PROPERTY_MAP = [
+        'id' => [
+            'fhirType'     => 'http://hl7.org/fhirpath/System.String',
+            'propertyKind' => 'scalar',
+            'isArray'      => false,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'extension' => [
+            'fhirType'     => 'Extension',
+            'propertyKind' => 'extension',
+            'isArray'      => true,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'modifierExtension' => [
+            'fhirType'     => 'Extension',
+            'propertyKind' => 'modifierExtension',
+            'isArray'      => true,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'type' => [
+            'fhirType'     => 'CodeableConcept',
+            'propertyKind' => 'complex',
+            'isArray'      => false,
+            'isRequired'   => true,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+        'justification' => [
+            'fhirType'     => 'RelatedArtifact',
+            'propertyKind' => 'complex',
+            'isArray'      => true,
+            'isRequired'   => false,
+            'isChoice'     => false,
+            'jsonKey'      => null,
+            'variants'     => null,
+        ],
+    ];
 
-	public function __construct(
-		/** @var null|string id Unique id for inter-element referencing */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
-		public ?string $id = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension> extension Additional content defined by implementations */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
-		public array $modifierExtension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept type A classification or risk class of the device model */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), \Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept $type = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R5\DataType\RelatedArtifact> justification Further information qualifying this classification of the device model */
-		#[\Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty(fhirType: 'RelatedArtifact', propertyKind: 'complex', isArray: true)]
-		public array $justification = [],
-	) {
-		parent::__construct($id, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        public ?string $id = null,
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        public array $modifierExtension = [],
+        /** @var CodeableConcept|null type A classification or risk class of the device model */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        public ?CodeableConcept $type = null,
+        /** @var array<RelatedArtifact> justification Further information qualifying this classification of the device model */
+        #[FhirProperty(fhirType: 'RelatedArtifact', propertyKind: 'complex', isArray: true)]
+        public array $justification = [],
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
 }
