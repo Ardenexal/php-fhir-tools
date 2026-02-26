@@ -31,7 +31,7 @@ class EndsWithFunction extends AbstractFunction
 
         $string = $input->first();
         if (!is_string($string)) {
-            return Collection::single(false);
+            throw new EvaluationException('endsWith() requires a string input');
         }
 
         /** @var ExpressionNode $suffixExpr */

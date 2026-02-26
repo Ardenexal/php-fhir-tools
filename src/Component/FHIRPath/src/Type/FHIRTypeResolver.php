@@ -266,6 +266,50 @@ class FHIRTypeResolver
     }
 
     /**
+     * Check if a raw type specifier (before normalization) is a recognized FHIRPath/FHIR type.
+     *
+     * Accepts:
+     *  - System.* qualified names (System.Boolean, System.Integer, …)
+     *  - FHIR primitive types (boolean, string, integer, decimal, …)
+     *  - The special 'Any' wildcard
+     *  - FHIR complex/resource type names (capitalized identifiers, e.g. Patient, HumanName)
+     *  - FHIR.* qualified names (FHIR.Patient, …)
+     *
+     * Rejects names that don't match any of these patterns (e.g. 'string1').
+     *
+     * @param string $rawTypeName The type name as it appears in the expression (before normalization)
+     *
+     * @return bool
+     */
+    public function isKnownTypeName(string $rawTypeName): bool
+    {
+        // Fully-qualified System.* names
+        if (isset(self::SYSTEM_TYPE_MAP[$rawTypeName])) {
+            return true;
+        }
+
+        // Normalize and check the resolved name
+        $normalized = $this->normalizeTypeName($rawTypeName);
+
+        // Known FHIR primitive types
+        if (isset(self::PRIMITIVE_TYPES[$normalized])) {
+            return true;
+        }
+
+        // Special wildcard accepted by isOfType
+        if ($normalized === 'Any') {
+            return true;
+        }
+
+        // FHIR complex/resource types are CamelCase (start with uppercase, letters/digits only)
+        if (preg_match('/^[A-Z][a-zA-Z0-9]*$/', $normalized)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Get the PHP type for a FHIR primitive type.
      *
      * @param string $fhirType

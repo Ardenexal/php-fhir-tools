@@ -33,15 +33,28 @@ class IifFunction extends AbstractFunction
             throw new EvaluationException('Evaluator not available in context');
         }
 
+        // iif() cannot be applied to a multi-item collection
+        if ($input->count() > 1) {
+            throw new EvaluationException('iif() requires a single-item or empty input collection');
+        }
+
         // Evaluate condition
         $conditionResult = $evaluator->evaluate($parameters[0], $context);
 
-        // If condition is empty or not boolean, return empty
+        // Condition must evaluate to a single boolean per FHIRPath spec
         if ($conditionResult->isEmpty()) {
             return Collection::empty();
         }
 
+        if (!$conditionResult->isSingle()) {
+            throw new EvaluationException('iif() condition must evaluate to a single boolean');
+        }
+
         $condition = $conditionResult->first();
+
+        if (!is_bool($condition)) {
+            throw new EvaluationException('iif() condition must be a boolean value');
+        }
 
         // If condition is true, evaluate and return ifTrue branch
         if ($condition === true) {

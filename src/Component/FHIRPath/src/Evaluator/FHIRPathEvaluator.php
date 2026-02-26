@@ -584,13 +584,23 @@ final class FHIRPathEvaluator implements ExpressionVisitor
 
         // Handle 'as' operator - type casting
         if ($operator === TokenType::AS) {
-            // For collections, cast each item to the target type
+            if ($collection->isEmpty()) {
+                return Collection::empty();
+            }
+
+            // Unknown type specifiers are execution errors per the FHIRPath spec
+            if (!$this->typeResolver->isKnownTypeName($node->getTypeName())) {
+                throw new EvaluationException("'as' operator used with unknown type: '{$node->getTypeName()}'");
+            }
+
+            // For each item in the collection, attempt the cast; skip items that cannot be cast
+            // (FHIRPath 'as' is a filter/cast: items of the wrong type are excluded, not an error)
             $casted = [];
             foreach ($collection->toArray() as $item) {
                 try {
                     $casted[] = $this->typeResolver->castToType($item, $typeName);
-                } catch (\InvalidArgumentException $e) {
-                    // If cast fails, skip the item (FHIRPath semantics)
+                } catch (\InvalidArgumentException) {
+                    // Value is not compatible with the target type — skip it
                     continue;
                 }
             }
@@ -930,7 +940,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         }
 
         if (!is_numeric($leftValue) || !is_numeric($rightValue)) {
-            return Collection::empty();
+            throw new EvaluationException('Arithmetic operators require numeric operands');
         }
 
         return Collection::single($operation($leftValue, $rightValue));
@@ -1292,7 +1302,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         }
 
         if (!$left->isSingle() || !$right->isSingle()) {
-            return Collection::empty();
+            throw new EvaluationException('String concatenation (&) requires single-item operands');
         }
 
         // Normalize values to handle FHIR primitives and enums

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Evaluator;
 
+use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
+
 /**
  * Handles FHIRPath comparison operations with collection semantics and precision-aware temporal comparisons.
  *
@@ -222,6 +224,11 @@ final class ComparisonService
 
             $leftValue  = $leftNorm;
             $rightValue = $rightNorm;
+        }
+
+        // Operands must be the same primitive type; mixed-type ordering is an error
+        if (is_numeric($leftValue) !== is_numeric($rightValue)) {
+            throw new EvaluationException('Ordering comparison requires operands of the same type');
         }
 
         $result = $operation($leftValue, $rightValue);

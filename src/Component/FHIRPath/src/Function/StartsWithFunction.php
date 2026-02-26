@@ -31,7 +31,7 @@ class StartsWithFunction extends AbstractFunction
 
         $string = $input->first();
         if (!is_string($string)) {
-            return Collection::single(false);
+            throw new EvaluationException('startsWith() requires a string input');
         }
 
         /** @var ExpressionNode $prefixExpr */

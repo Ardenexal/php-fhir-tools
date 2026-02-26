@@ -47,9 +47,10 @@ class OfTypeFunction extends AbstractFunction
         // like System.Boolean and FHIR.Patient (which are not valid expression paths).
         $rawTypeName = $this->extractTypeSpecifier($parameters[0]);
 
+        $evaluator = $context->getEvaluator();
+
         if ($rawTypeName === null) {
             // Fall back: evaluate as expression and expect a string result
-            $evaluator = $context->getEvaluator();
             if ($evaluator === null) {
                 throw new EvaluationException('ofType() requires a type name', 0, 0);
             }
@@ -62,9 +63,13 @@ class OfTypeFunction extends AbstractFunction
             $rawTypeName = $typeResult->first();
         }
 
+        // Validate that the type name is a recognized FHIRPath/FHIR type specifier
+        if ($evaluator !== null && !$evaluator->getTypeResolver()->isKnownTypeName($rawTypeName)) {
+            throw new EvaluationException("ofType() received unknown type name: '{$rawTypeName}'");
+        }
+
         // Resolve namespace qualifiers: System.Boolean → boolean, FHIR.Patient → Patient
-        $evaluator = $context->getEvaluator();
-        $typeName  = $evaluator !== null
+        $typeName = $evaluator !== null
             ? $evaluator->getTypeResolver()->normalizeTypeName($rawTypeName)
             : $rawTypeName;
 
