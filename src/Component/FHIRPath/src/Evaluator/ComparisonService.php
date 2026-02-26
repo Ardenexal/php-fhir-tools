@@ -96,6 +96,8 @@ final class ComparisonService
      * Check if a value is a quantity and extract its components.
      *
      * Returns extracted quantity array or null if not a quantity.
+     *
+     * @return array{value: float, code: string, unit: string, system: string|null}|null
      */
     public function tryExtractQuantity(mixed $value): ?array
     {
@@ -187,19 +189,39 @@ final class ComparisonService
             return Collection::single($operation($comparison, 0));
         }
 
-        // Check for DateTime precision compatibility
+        // DateTime: precision/timezone-aware ordering
         if ($this->isDateTimeString($leftValue) && $this->isDateTimeString($rightValue)) {
-            $leftPrecision  = $this->getDateTimePrecision($leftValue);
-            $rightPrecision = $this->getDateTimePrecision($rightValue);
+            $leftNorm  = $this->normalizeDateTimeString($leftValue);
+            $rightNorm = $this->normalizeDateTimeString($rightValue);
 
-            // Different precisions are incomparable
+            $leftPrecision  = $this->getDateTimePrecision($leftNorm);
+            $rightPrecision = $this->getDateTimePrecision($rightNorm);
+
             if ($leftPrecision !== $rightPrecision) {
                 return Collection::empty();
             }
 
-            // Normalize DateTime strings for comparison
-            $leftValue  = $this->normalizeDateTimeString($leftValue);
-            $rightValue = $this->normalizeDateTimeString($rightValue);
+            $leftHasTz  = $this->hasTimezone($leftNorm);
+            $rightHasTz = $this->hasTimezone($rightNorm);
+
+            if ($leftHasTz !== $rightHasTz) {
+                return Collection::empty();
+            }
+
+            if ($leftHasTz) {
+                // Both have timezone: compare as UTC timestamps
+                $leftUtc  = $this->toUtcTimestamp($leftNorm);
+                $rightUtc = $this->toUtcTimestamp($rightNorm);
+
+                if ($leftUtc === null || $rightUtc === null) {
+                    return Collection::empty();
+                }
+
+                return Collection::single($operation($leftUtc, $rightUtc));
+            }
+
+            $leftValue  = $leftNorm;
+            $rightValue = $rightNorm;
         }
 
         $result = $operation($leftValue, $rightValue);
@@ -370,19 +392,7 @@ final class ComparisonService
 
         // DateTime precision-aware comparison
         if ($this->isDateTimeString($a) && $this->isDateTimeString($b)) {
-            $aPrecision = $this->getDateTimePrecision($a);
-            $bPrecision = $this->getDateTimePrecision($b);
-
-            // Different precisions are incomparable
-            if ($aPrecision !== $bPrecision) {
-                return null;
-            }
-
-            // Same precision: normalize and compare string values
-            $aValue = $this->normalizeDateTimeString($a);
-            $bValue = $this->normalizeDateTimeString($b);
-
-            return $aValue === $bValue;
+            return $this->compareDateTimeEquality($a, $b, $useEquivalence);
         }
 
         // For equivalence mode: apply type normalization
@@ -402,10 +412,140 @@ final class ComparisonService
     }
 
     /**
-     * Detect if a value is a DateTime string literal.
+     * Compare two date/time strings with precision and timezone awareness.
      *
-     * DateTime literals start with @ followed by YYYY or T (for time-only).
+     * FHIRPath spec rules for equality (=):
+     * - Date-only vs DateTime (no T vs has T) → null (incomparable/unknown)
+     * - DateTime vs DateTime with different sub-precision → false (definitively not equal)
+     * - One has TZ, other doesn't → null (incomparable)
+     * - Both have TZ → normalize to UTC for comparison
+     *
+     * For equivalence (~): any precision difference → false (never returns null)
+     *
+     * @return bool|null true=equal, false=not equal, null=incomparable
      */
+    private function compareDateTimeEquality(string $a, string $b, bool $useEquivalence): ?bool
+    {
+        // Normalize zero-only fractional seconds before precision check
+        $aNorm = $this->normalizeDateTimeString($a);
+        $bNorm = $this->normalizeDateTimeString($b);
+
+        $aPrecision = $this->getDateTimePrecision($aNorm);
+        $bPrecision = $this->getDateTimePrecision($bNorm);
+
+        if ($aPrecision === null || $bPrecision === null) {
+            return $useEquivalence ? false : null;
+        }
+
+        if ($aPrecision !== $bPrecision) {
+            if ($useEquivalence) {
+                // Equivalence: any precision mismatch → not equivalent
+                return false;
+            }
+
+            // Detect time-only strings (start with T, e.g. "T10:30:00")
+            $aIsTimeOnly = str_starts_with($aNorm, 'T');
+            $bIsTimeOnly = str_starts_with($bNorm, 'T');
+
+            // Date/datetime vs time-only: fundamentally different types → not equal
+            if ($aIsTimeOnly !== $bIsTimeOnly) {
+                return false;
+            }
+
+            // Both time-only with different precision → incomparable (unknown)
+            if ($aIsTimeOnly) {
+                return null;
+            }
+
+            // Date-only vs datetime (one has T, other doesn't) → incomparable
+            $aHasTime = $this->hasTimeComponent($aNorm);
+            $bHasTime = $this->hasTimeComponent($bNorm);
+
+            if ($aHasTime !== $bHasTime) {
+                return null;
+            }
+
+            // Both date-only with different date precision → incomparable
+            if (!$aHasTime) {
+                return null;
+            }
+
+            // Both full datetimes (date+time): return false ONLY for seconds vs milliseconds
+            // (precision 6 vs 7). The millisecond value is explicit and makes them definitively
+            // unequal. All other datetime precision differences are incomparable.
+            $minPrec = min($aPrecision, $bPrecision);
+            $maxPrec = max($aPrecision, $bPrecision);
+
+            if ($minPrec === 6 && $maxPrec === 7) {
+                return false;
+            }
+
+            // Other datetime precision mismatches (e.g. hours vs minutes) → incomparable
+            return null;
+        }
+
+        // Same precision: check timezone compatibility
+        $aHasTz = $this->hasTimezone($aNorm);
+        $bHasTz = $this->hasTimezone($bNorm);
+
+        if ($aHasTz !== $bHasTz) {
+            // One has explicit TZ, other doesn't → unknown what offset the other uses
+            return $useEquivalence ? false : null;
+        }
+
+        if ($aHasTz) {
+            // Both have timezone: normalize to UTC for comparison
+            $aUtc = $this->toUtcTimestamp($aNorm);
+            $bUtc = $this->toUtcTimestamp($bNorm);
+
+            if ($aUtc === null || $bUtc === null) {
+                return $useEquivalence ? false : null;
+            }
+
+            return abs($aUtc - $bUtc) < 0.001;
+        }
+
+        // Same precision, no timezone: compare normalized strings
+        return $aNorm === $bNorm;
+    }
+
+    /**
+     * Detect whether a date/time string has an explicit timezone offset.
+     *
+     * Matches trailing Z (UTC) or +/-HH:MM offset.
+     */
+    private function hasTimezone(string $value): bool
+    {
+        return preg_match('/([+-]\d{2}:\d{2}|Z)$/', $value) === 1;
+    }
+
+    /**
+     * Detect whether a date/time string has a time component (contains T).
+     */
+    private function hasTimeComponent(string $value): bool
+    {
+        return str_contains($value, 'T');
+    }
+
+    /**
+     * Convert a datetime string with timezone info to a UTC floating-point timestamp.
+     *
+     * Returns null if the string cannot be parsed or has no timezone info.
+     */
+    private function toUtcTimestamp(string $value): ?float
+    {
+        // Strip any legacy @ prefix
+        $value = ltrim($value, '@');
+
+        try {
+            $dt = new \DateTimeImmutable($value);
+
+            return (float) $dt->format('U') + ((float) $dt->format('u')) / 1_000_000.0;
+        } catch (\Exception) {
+            return null;
+        }
+    }
+
     /**
      * Normalize a DateTime string for comparison.
      *
@@ -427,14 +567,23 @@ final class ComparisonService
         return $normalized;
     }
 
-    private function isDateTimeString(mixed $value): bool
+    /**
+     * Detect if a value is a date/datetime/time string.
+     *
+     * Detects bare ISO date strings (YYYY-MM...) and time strings (THH:MM...).
+     * Requires at least year+hyphen for dates to avoid false-positives on plain integers.
+     * Also accepts legacy @ -prefixed literals for safety.
+     */
+    public function isDateTimeString(mixed $value): bool
     {
         if (!is_string($value)) {
             return false;
         }
 
-        // Check for @ prefix followed by year (YYYY) or time (T)
-        return preg_match('/^@(\d{4}|T)/', $value) === 1;
+        // Bare ISO date: starts with YYYY- (e.g. "2020-01-15")
+        // Bare time: starts with T + digits (e.g. "T10:30:00")
+        // Legacy @ -prefixed (e.g. "@2020-01-15") accepted for safety
+        return preg_match('/^(@?\d{4}-|@?T\d{2})/', $value) === 1;
     }
 
     /**
@@ -451,7 +600,7 @@ final class ComparisonService
      *
      * @return int|null Precision level 1-7, or null if not a valid DateTime
      */
-    private function getDateTimePrecision(string $value): ?int
+    public function getDateTimePrecision(string $value): ?int
     {
         // Strip @ prefix
         $value = ltrim($value, '@');

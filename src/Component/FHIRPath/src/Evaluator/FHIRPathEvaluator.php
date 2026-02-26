@@ -281,6 +281,15 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             return $quantity !== null ? Collection::single($quantity) : Collection::single($node->getValue());
         }
 
+        // Strip @ prefix from date/time literals so they match bare ISO strings
+        // returned by resource property navigation (e.g. Patient.birthDate → "1974-12-25")
+        if ($node->getType() === TokenType::DATETIME || $node->getType() === TokenType::TIME) {
+            $value = $node->getValue();
+            if (is_string($value) && str_starts_with($value, '@')) {
+                return Collection::single(substr($value, 1));
+            }
+        }
+
         return Collection::single($node->getValue());
     }
 
@@ -911,6 +920,15 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         $leftValue  = $this->normalizeValue($left->first());
         $rightValue = $this->normalizeValue($right->first());
 
+        // Date/DateTime arithmetic: date +/- quantity (duration)
+        if (($operator === TokenType::PLUS || $operator === TokenType::MINUS)
+            && is_string($leftValue)
+            && $this->comparisonService->isDateTimeString($leftValue)
+            && $rightQty !== null
+        ) {
+            return $this->performDateArithmetic($leftValue, $rightQty, $operator);
+        }
+
         if (!is_numeric($leftValue) || !is_numeric($rightValue)) {
             return Collection::empty();
         }
@@ -984,6 +1002,231 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             'unit'   => $resultCode,
             'system' => $left['system'] ?? 'http://unitsofmeasure.org',
         ]);
+    }
+
+    /**
+     * Maps UCUM duration codes and calendar keywords to canonical duration keywords.
+     *
+     * UCUM codes 'a' and 'mo' are intentionally absent — they are not supported for
+     * date arithmetic per the FHIRPath spec (tests marked invalid="execution").
+     *
+     * @var array<string, string>
+     */
+    private const DATE_UNIT_MAP = [
+        // Calendar keywords (singular)
+        'year'        => 'year',
+        'years'       => 'year',
+        'month'       => 'month',
+        'months'      => 'month',
+        'week'        => 'week',
+        'weeks'       => 'week',
+        'day'         => 'day',
+        'days'        => 'day',
+        'hour'        => 'hour',
+        'hours'       => 'hour',
+        'minute'      => 'minute',
+        'minutes'     => 'minute',
+        'second'      => 'second',
+        'seconds'     => 'second',
+        'millisecond' => 'millisecond',
+        'milliseconds' => 'millisecond',
+        // UCUM codes (year 'a' and month 'mo' are intentionally absent)
+        'wk'  => 'week',
+        'd'   => 'day',
+        'h'   => 'hour',
+        'min' => 'minute',
+        's'   => 'second',
+        'ms'  => 'millisecond',
+    ];
+
+    /**
+     * Perform date/datetime arithmetic: date +/- duration quantity.
+     *
+     * Per the FHIRPath spec, the quantity value is truncated to an integer before applying.
+     * Output is formatted at the same precision as the input date string.
+     *
+     * @param array{value: float, code: string, unit: string, system: string|null} $quantity
+     */
+    private function performDateArithmetic(string $dateStr, array $quantity, TokenType $operator): Collection
+    {
+        $unitCode     = $quantity['code'];
+        $canonicalUnit = self::DATE_UNIT_MAP[$unitCode] ?? null;
+
+        if ($canonicalUnit === null) {
+            // Unknown or unsupported unit (e.g. UCUM 'a', 'mo', or 'cm')
+            throw new EvaluationException(
+                "Date arithmetic with unit '{$unitCode}' is not supported",
+                0,
+                0
+            );
+        }
+
+        // Truncate to integer per FHIRPath spec (7.7 days = 7 days, 0.1 s = 0 s)
+        $intValue = (int) $quantity['value'];
+
+        if ($operator === TokenType::MINUS) {
+            $intValue = -$intValue;
+        }
+
+        // Parse the date string (strip any legacy @ prefix)
+        $dateStr = ltrim($dateStr, '@');
+
+        // Determine input precision — using getDateTimePrecision which normalizes .000 → sec (6).
+        // We separately track whether the input had explicit fractional seconds (even .000)
+        // so the output format can preserve them.
+        $inputPrecision = $this->comparisonService->getDateTimePrecision($dateStr);
+
+        $fracDigits = 0;
+
+        if (preg_match('/\.(\d+)/', $dateStr, $fracMatch)) {
+            $fracDigits = strlen($fracMatch[1]);
+            // Input has explicit fractional seconds: format output at millisecond level
+            $inputPrecision = 7;
+        }
+
+        // Detect timezone suffix to preserve it in output
+        $tzSuffix = '';
+        $usesZ    = false;
+
+        if (preg_match('/([+-]\d{2}:\d{2}|Z)$/', $dateStr, $tzMatch)) {
+            $tzSuffix = $tzMatch[1];
+            $usesZ    = $tzSuffix === 'Z';
+        }
+
+        // Build a parseable datetime string (pad partial dates to full datetime)
+        $parseable = $this->makeDateParseable($dateStr);
+
+        try {
+            $dt = new \DateTimeImmutable($parseable);
+        } catch (\Exception $e) {
+            return Collection::empty();
+        }
+
+        // Apply the integer duration
+        $dt = $this->applyDateDuration($dt, $canonicalUnit, $intValue);
+
+        // Format output at the original input precision (with fractional seconds if present)
+        $result = $this->formatDateAtPrecision($dt, $inputPrecision, $tzSuffix, $usesZ, $fracDigits);
+
+        return Collection::single($result);
+    }
+
+    /**
+     * Pad a partial date string to a full datetime so DateTimeImmutable can parse it.
+     *
+     * E.g. "1973-12-25" stays as-is (parseable), "1973-12" becomes "1973-12-01".
+     */
+    private function makeDateParseable(string $dateStr): string
+    {
+        // Already has time component — use as-is
+        if (str_contains($dateStr, 'T')) {
+            return $dateStr;
+        }
+
+        // YYYY-MM-DD — parseable
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateStr)) {
+            return $dateStr;
+        }
+
+        // YYYY-MM — pad day
+        if (preg_match('/^\d{4}-\d{2}$/', $dateStr)) {
+            return $dateStr . '-01';
+        }
+
+        // YYYY — pad month and day
+        if (preg_match('/^\d{4}$/', $dateStr)) {
+            return $dateStr . '-01-01';
+        }
+
+        return $dateStr;
+    }
+
+    /**
+     * Apply an integer calendar duration to a DateTimeImmutable.
+     *
+     * Uses DateInterval for calendar-correct arithmetic (e.g. adding 1 month to Jan 31 = Feb 28).
+     */
+    private function applyDateDuration(\DateTimeImmutable $dt, string $unit, int $value): \DateTimeImmutable
+    {
+        $absValue = abs($value);
+        $invert   = $value < 0 ? 1 : 0;
+
+        $interval = match ($unit) {
+            'year'        => new \DateInterval("P{$absValue}Y"),
+            'month'       => new \DateInterval("P{$absValue}M"),
+            'week'        => new \DateInterval('P' . ($absValue * 7) . 'D'),
+            'day'         => new \DateInterval("P{$absValue}D"),
+            'hour'        => new \DateInterval("PT{$absValue}H"),
+            'minute'      => new \DateInterval("PT{$absValue}M"),
+            'second'      => new \DateInterval("PT{$absValue}S"),
+            'millisecond' => null,
+            default       => null,
+        };
+
+        if ($unit === 'millisecond') {
+            // PHP DateTimeImmutable doesn't have millisecond intervals, use microseconds
+            $microseconds = $value * 1000;
+            $sign         = $microseconds >= 0 ? '+' : '-';
+            $abs          = abs($microseconds);
+
+            return $dt->modify("{$sign}{$abs} microseconds");
+        }
+
+        if ($interval === null) {
+            return $dt;
+        }
+
+        $interval->invert = $invert;
+
+        return $dt->add($interval);
+    }
+
+    /**
+     * Format a DateTimeImmutable back to an ISO string at the original input precision.
+     *
+     * @param int|null $precision  Precision level 1-7 (see ComparisonService::getDateTimePrecision)
+     * @param string   $tzSuffix   Original timezone suffix (e.g. "+10:00", "Z", "")
+     * @param bool     $usesZ      Whether the original used "Z" instead of "+00:00"
+     * @param int      $fracDigits Number of fractional-second digits in the original (0 = none)
+     */
+    private function formatDateAtPrecision(\DateTimeImmutable $dt, ?int $precision, string $tzSuffix, bool $usesZ, int $fracDigits = 0): string
+    {
+        $hasTz = $tzSuffix !== '';
+        $tz    = $hasTz ? $this->formatTzSuffix($dt, $usesZ) : '';
+
+        if ($precision === 7) {
+            // Format fractional seconds from microseconds, padded to $fracDigits (min 3)
+            $digits   = max($fracDigits, 3);
+            $us       = (int) $dt->format('u'); // microseconds 0-999999
+            $ms       = (int) round($us / 1000); // milliseconds 0-999
+            $fracPart = str_pad((string) $ms, $digits, '0', STR_PAD_LEFT);
+
+            return $dt->format('Y-m-d\TH:i:s') . '.' . $fracPart . $tz;
+        }
+
+        return match ($precision) {
+            1       => $dt->format('Y'),
+            2       => $dt->format('Y-m'),
+            3       => $dt->format('Y-m-d'),
+            4       => $dt->format('Y-m-d\TH') . $tz,
+            5       => $dt->format('Y-m-d\TH:i') . $tz,
+            6       => $dt->format('Y-m-d\TH:i:s') . $tz,
+            default => $dt->format('Y-m-d'),
+        };
+    }
+
+    /**
+     * Format the timezone suffix of a DateTimeImmutable, preserving Z vs +00:00.
+     */
+    private function formatTzSuffix(\DateTimeImmutable $dt, bool $usesZ): string
+    {
+        $offset = $dt->format('P'); // "+10:00" or "+00:00"
+
+        if ($usesZ && $offset === '+00:00') {
+            return 'Z';
+        }
+
+        return $offset;
     }
 
     /**
