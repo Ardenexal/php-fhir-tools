@@ -24,10 +24,11 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Expression\UnaryOperatorNode;
  * following the FHIRPath 2.0 grammar. Handles operator precedence, function calls,
  * member access, and all FHIRPath constructs.
  *
- * Grammar (from FHIRPath spec):
- * - expression:      term (('|') term)*
+ * Grammar (from FHIRPath spec, ordered highest to lowest precedence):
+ * - expression:      term
  * - term:            comparison (('and' | 'or' | 'xor' | 'implies') comparison)*
- * - comparison:      additive (('=' | '!=' | '~' | '!~' | '>' | '<' | '>=' | '<=' | 'in' | 'contains') additive)*
+ * - comparison:      union (('=' | '!=' | '~' | '!~' | '>' | '<' | '>=' | '<=' | 'in' | 'contains') union)*
+ * - union:           additive (('|') additive)*
  * - additive:        multiplicative (('+' | '-' | '&') multiplicative)*
  * - multiplicative:  unary (('*' | '/' | 'div' | 'mod') unary)*
  * - unary:           invocation | ('-' | '+') unary
@@ -69,25 +70,11 @@ class FHIRPathParser
 
     /**
      * Parse an expression (top-level rule).
-     * expression: term (('|') term)*
+     * expression: term
      */
     private function parseExpression(): ExpressionNode
     {
-        $left = $this->parseTerm();
-
-        while ($this->match(TokenType::PIPE)) {
-            $operator = $this->previous();
-            $right    = $this->parseTerm();
-            $left     = new BinaryOperatorNode(
-                $left,
-                $operator->type,
-                $right,
-                $operator->line,
-                $operator->column,
-            );
-        }
-
-        return $left;
+        return $this->parseTerm();
     }
 
     /**
@@ -114,12 +101,38 @@ class FHIRPathParser
     }
 
     /**
+     * Parse a union expression.
+     * union: additive (('|') additive)*
+     *
+     * Per the FHIRPath spec, the union operator has higher precedence than
+     * comparison and equality operators, so `a = b | c` means `a = (b | c)`.
+     */
+    private function parseUnion(): ExpressionNode
+    {
+        $left = $this->parseAdditive();
+
+        while ($this->match(TokenType::PIPE)) {
+            $operator = $this->previous();
+            $right    = $this->parseAdditive();
+            $left     = new BinaryOperatorNode(
+                $left,
+                $operator->type,
+                $right,
+                $operator->line,
+                $operator->column,
+            );
+        }
+
+        return $left;
+    }
+
+    /**
      * Parse a comparison expression.
-     * comparison: additive (('=' | '!=' | '~' | '!~' | '>' | '<' | '>=' | '<=' | 'in' | 'contains') additive)*
+     * comparison: union (('=' | '!=' | '~' | '!~' | '>' | '<' | '>=' | '<=' | 'in' | 'contains') union)*
      */
     private function parseComparison(): ExpressionNode
     {
-        $left = $this->parseAdditive();
+        $left = $this->parseUnion();
 
         while ($this->match(
             TokenType::EQUALS,
@@ -134,7 +147,7 @@ class FHIRPathParser
             TokenType::CONTAINS,
         )) {
             $operator = $this->previous();
-            $right    = $this->parseAdditive();
+            $right    = $this->parseUnion();
             $left     = new BinaryOperatorNode(
                 $left,
                 $operator->type,

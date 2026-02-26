@@ -24,8 +24,13 @@ final class SkipFunction extends AbstractFunction
     {
         $this->validateParameterCount($parameters, 1);
 
-        $numCollection = $parameters[0];
-        if (!($numCollection instanceof Collection) || $numCollection->isEmpty()) {
+        $evaluator = $context->getEvaluator();
+        if ($evaluator === null) {
+            throw new EvaluationException('Evaluator not available in context');
+        }
+
+        $numCollection = $evaluator->evaluate($parameters[0], $context);
+        if ($numCollection->isEmpty()) {
             throw EvaluationException::invalidFunctionParameter('skip', 'num', 'non-empty integer collection');
         }
 

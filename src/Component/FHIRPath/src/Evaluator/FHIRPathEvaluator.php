@@ -409,10 +409,29 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      */
     public function visitBinaryOperator(BinaryOperatorNode $node): Collection
     {
+        // Semantic validation: detect ambiguous type expressions in comparison operators
+        // Per FHIRPath spec, expressions like "1 > 2 is Boolean" are invalid because
+        // it's unclear whether it means "(1 > 2) is Boolean" or "1 > (2 is Boolean)"
+        $operator = $node->getOperator();
+        if (in_array($operator, [
+            TokenType::EQUALS,
+            TokenType::NOT_EQUALS,
+            TokenType::LESS_THAN,
+            TokenType::GREATER_THAN,
+            TokenType::LESS_EQUAL,
+            TokenType::GREATER_EQUAL,
+            TokenType::EQUIVALENT,
+            TokenType::NOT_EQUIVALENT,
+        ], true)) {
+            if ($node->getLeft() instanceof TypeExpressionNode || $node->getRight() instanceof TypeExpressionNode) {
+                throw new EvaluationException("Ambiguous expression: 'is'/'as' operator cannot be used within comparison without parentheses", $node->getLine(), $node->getColumn());
+            }
+        }
+
         $left  = $node->getLeft()->accept($this);
         $right = $node->getRight()->accept($this);
 
-        return match ($node->getOperator()) {
+        return match ($operator) {
             // Union operator
             TokenType::PIPE => $left->union($right),
 
@@ -470,6 +489,13 @@ final class FHIRPathEvaluator implements ExpressionVisitor
 
         $value = $operand->first();
 
+        // Semantic validation: unary +/- operators require numeric operands
+        // Per FHIRPath spec, expressions like "-1.convertsToInteger()" are invalid
+        // because they're ambiguous (-(1.convertsToInteger()) attempts to negate a boolean)
+        if (!is_numeric($value)) {
+            throw new EvaluationException('Unary +/- operators require numeric operands', $node->getLine(), $node->getColumn());
+        }
+
         return match ($node->getOperator()) {
             TokenType::MINUS => Collection::single(-$value),
             TokenType::PLUS  => Collection::single(+$value),
@@ -504,6 +530,29 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      */
     public function visitTypeExpression(TypeExpressionNode $node): Collection
     {
+        // Semantic validation: detect ambiguous 'is' operator usage with comparison operators
+        // Per FHIRPath spec, expressions like "1 > 2 is Boolean" are invalid because they're
+        // ambiguous about precedence. Valid: "(1 > 2) is Boolean". Invalid: "1 > 2 is Boolean".
+        if ($node->getOperator() === TokenType::IS) {
+            $expression = $node->getExpression();
+            if ($expression instanceof BinaryOperatorNode) {
+                $operator = $expression->getOperator();
+                // Check if it's a comparison operator
+                if (in_array($operator, [
+                    TokenType::EQUALS,
+                    TokenType::NOT_EQUALS,
+                    TokenType::LESS_THAN,
+                    TokenType::GREATER_THAN,
+                    TokenType::LESS_EQUAL,
+                    TokenType::GREATER_EQUAL,
+                    TokenType::EQUIVALENT,
+                    TokenType::NOT_EQUIVALENT,
+                ], true)) {
+                    throw new EvaluationException("Ambiguous expression: 'is' operator cannot be applied to comparison result without parentheses", $node->getLine(), $node->getColumn());
+                }
+            }
+        }
+
         // Evaluate the expression to get the collection to check/cast
         $collection = $node->getExpression()->accept($this);
         // Normalise namespace-qualified type names: System.Boolean → boolean, FHIR.Patient → Patient

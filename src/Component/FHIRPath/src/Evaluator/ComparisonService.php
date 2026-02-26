@@ -112,7 +112,7 @@ final class ComparisonService
      * FHIRPath semantics:
      * - Empty collections return empty result
      * - Single-item collections compared by value
-     * - Multi-item collections compared as sets (order-independent)
+     * - Multi-item collections: = is positional (order-dependent), ~ is set-based (order-independent)
      * - DateTime values with different precisions are incomparable (return empty)
      *
      * @param string $operator One of: '=', '!=', '~', '!~'
@@ -208,12 +208,18 @@ final class ComparisonService
     }
 
     /**
-     * Compare two collections for equality using set semantics (order-independent).
+     * Compare two collections for equality or equivalence.
+     *
+     * Per the FHIRPath spec:
+     * - Equality (`=`): positional, order-dependent — each item at position i must
+     *   equal the item at position i in the other collection.
+     * - Equivalence (`~`): set semantics, order-independent — each item must have
+     *   a matching item somewhere in the other collection.
      *
      * @param array<mixed> $left
      * @param array<mixed> $right
      *
-     * @return bool|null True if equal, false if not equal, null if incomparable
+     * @return bool|null True if equal/equivalent, false if not, null if incomparable
      */
     private function collectionsEqual(array $left, array $right, bool $useEquivalence): ?bool
     {
@@ -233,22 +239,39 @@ final class ComparisonService
             return true;
         }
 
+        if (!$useEquivalence) {
+            // Equality mode: positional (order-dependent) comparison
+            $rightValues = array_values($right);
+
+            foreach (array_values($left) as $i => $leftItem) {
+                $isEqual = $this->valuesEqual($leftItem, $rightValues[$i], false);
+
+                if ($isEqual === null) {
+                    return null;
+                }
+
+                if (!$isEqual) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // Equivalence mode: set matching (order-independent)
         // Track which right items have been matched to prevent double-matching
         $matchedIndices = [];
 
-        // For each left item, find a matching right item
         foreach ($left as $leftItem) {
             $foundMatch = false;
 
             foreach ($right as $rightIndex => $rightItem) {
-                // Skip already matched items
                 if (in_array($rightIndex, $matchedIndices, true)) {
                     continue;
                 }
 
-                $isEqual = $this->valuesEqual($leftItem, $rightItem, $useEquivalence);
+                $isEqual = $this->valuesEqual($leftItem, $rightItem, true);
 
-                // If incomparable (null), the entire comparison is incomparable
                 if ($isEqual === null) {
                     return null;
                 }
@@ -260,7 +283,6 @@ final class ComparisonService
                 }
             }
 
-            // If any left item has no match, collections are not equal
             if (!$foundMatch) {
                 return false;
             }
