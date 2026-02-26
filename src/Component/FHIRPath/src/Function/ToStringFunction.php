@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathTemporalTypeInterface;
 
 /**
  * toString(): String
@@ -70,6 +71,11 @@ final class ToStringFunction extends AbstractFunction
     {
         if (is_string($value)) {
             return $value;
+        }
+
+        // Date/DateTime/Time wrapper objects → return their ISO string value
+        if ($value instanceof FHIRPathTemporalTypeInterface) {
+            return $value->getValue();
         }
 
         if (is_bool($value)) {

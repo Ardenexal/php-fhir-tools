@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Evaluator;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathTemporalTypeInterface;
 
 /**
  * Handles FHIRPath comparison operations with collection semantics and precision-aware temporal comparisons.
@@ -175,6 +176,15 @@ final class ComparisonService
         $leftValue  = $this->evaluator->normalizeValue($left->first());
         $rightValue = $this->evaluator->normalizeValue($right->first());
 
+        // Unwrap FHIRPath date/time literal wrappers to plain strings for ordering
+        if ($leftValue instanceof FHIRPathTemporalTypeInterface) {
+            $leftValue = $leftValue->getValue();
+        }
+
+        if ($rightValue instanceof FHIRPathTemporalTypeInterface) {
+            $rightValue = $rightValue->getValue();
+        }
+
         [$leftQuantity, $leftIsQuantity]   = $this->extractQuantity($leftValue);
         [$rightQuantity, $rightIsQuantity] = $this->extractQuantity($rightValue);
 
@@ -200,7 +210,38 @@ final class ComparisonService
             $rightPrecision = $this->getDateTimePrecision($rightNorm);
 
             if ($leftPrecision !== $rightPrecision) {
-                return Collection::empty();
+                $leftIsTimeOnly  = str_starts_with($leftNorm, 'T');
+                $rightIsTimeOnly = str_starts_with($rightNorm, 'T');
+
+                // Date/datetime vs time-only: incomparable types → empty
+                if ($leftIsTimeOnly !== $rightIsTimeOnly) {
+                    return Collection::empty();
+                }
+
+                $leftHasTime  = $this->hasTimeComponent($leftNorm);
+                $rightHasTime = $this->hasTimeComponent($rightNorm);
+
+                // Both have time components (datetime vs datetime different precision) → ambiguous → empty
+                if ($leftHasTime && $rightHasTime) {
+                    return Collection::empty();
+                }
+
+                // One is date-only, the other is datetime: truncate to date precision.
+                // If equal at that precision the comparison is ambiguous → empty.
+                // If clearly ordered at that precision the result is definitive.
+                if ($leftPrecision === null || $rightPrecision === null) {
+                    return Collection::empty();
+                }
+
+                $minPrecision = min($leftPrecision, $rightPrecision);
+                $leftTrunc    = $this->truncateToMinPrecision($leftNorm, $minPrecision);
+                $rightTrunc   = $this->truncateToMinPrecision($rightNorm, $minPrecision);
+
+                if ($leftTrunc === $rightTrunc) {
+                    return Collection::empty();
+                }
+
+                return Collection::single($operation($leftTrunc, $rightTrunc));
             }
 
             $leftHasTz  = $this->hasTimezone($leftNorm);
@@ -365,6 +406,15 @@ final class ComparisonService
         // Normalize FHIR primitives and enums to PHP scalars
         $a = $this->evaluator->normalizeValue($a);
         $b = $this->evaluator->normalizeValue($b);
+
+        // Unwrap FHIRPath date/time literal wrappers to plain strings for comparison
+        if ($a instanceof FHIRPathTemporalTypeInterface) {
+            $a = $a->getValue();
+        }
+
+        if ($b instanceof FHIRPathTemporalTypeInterface) {
+            $b = $b->getValue();
+        }
 
         [$leftQuantity, $leftIsQuantity]   = $this->extractQuantity($a);
         [$rightQuantity, $rightIsQuantity] = $this->extractQuantity($b);
@@ -583,6 +633,11 @@ final class ComparisonService
      */
     public function isDateTimeString(mixed $value): bool
     {
+        // FHIRPath literal wrappers are always date/time values
+        if ($value instanceof FHIRPathTemporalTypeInterface) {
+            return true;
+        }
+
         if (!is_string($value)) {
             return false;
         }
@@ -817,6 +872,39 @@ final class ComparisonService
             'base'  => $definition['base'],
             'value' => $value * $definition['factor'],
         ];
+    }
+
+    /**
+     * Truncate a normalized date/time string to the given precision level.
+     *
+     * Strips the timezone suffix then takes the leading characters that correspond
+     * to the requested precision. Used for ordering comparisons between a date-only
+     * value and a datetime value (one has time components, the other does not).
+     *
+     * Precision levels: 1=year, 2=month, 3=day, 4=hour, 5=minute, 6=second
+     */
+    private function truncateToMinPrecision(string $value, int $precision): string
+    {
+        // Strip timezone suffix
+        $stripped = (string) preg_replace('/([+-]\d{2}:\d{2}|Z)$/', '', $value);
+
+        // Time-only strings (T-prefixed) use shorter character positions
+        if (str_starts_with($stripped, 'T')) {
+            return match (true) {
+                $precision >= 6 => substr($stripped, 0, 9), // "THH:MM:SS"
+                $precision >= 5 => substr($stripped, 0, 6), // "THH:MM"
+                default         => substr($stripped, 0, 3), // "THH"
+            };
+        }
+
+        return match (true) {
+            $precision >= 6 => substr($stripped, 0, 19), // "YYYY-MM-DDTHH:MM:SS"
+            $precision >= 5 => substr($stripped, 0, 16), // "YYYY-MM-DDTHH:MM"
+            $precision >= 4 => substr($stripped, 0, 13), // "YYYY-MM-DDTHH"
+            $precision >= 3 => substr($stripped, 0, 10), // "YYYY-MM-DD"
+            $precision >= 2 => substr($stripped, 0, 7),  // "YYYY-MM"
+            default         => substr($stripped, 0, 4),  // "YYYY"
+        };
     }
 
     private function hasIncomparableDurationMix(string $leftUnit, string $rightUnit): bool

@@ -6,11 +6,12 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDate;
 
 /**
  * FHIRPath today() function.
  *
- * Returns the current date (date only, no time).
+ * Returns the current date (date only, no time) as a FHIRPathDate wrapper.
  * Takes no parameters.
  *
  * @author Ardenexal <info@ardenexal.com>
@@ -26,9 +27,8 @@ class TodayFunction extends AbstractFunction
     {
         $this->validateParameterCount($parameters, 0, 0);
 
-        // Return date portion as string in format YYYY-MM-DD
-        $now = new \DateTime();
+        $now = new \DateTimeImmutable();
 
-        return Collection::single($now->format('Y-m-d'));
+        return Collection::single(new FHIRPathDate($now->format('Y-m-d')));
     }
 }

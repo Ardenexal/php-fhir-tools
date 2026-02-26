@@ -20,6 +20,10 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Function\ToQuantityFunction;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\TokenType;
 use Ardenexal\FHIRTools\Component\FHIRPath\Function\FunctionRegistry;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDate;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDateTime;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathTemporalTypeInterface;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathTime;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRTypeResolver;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
@@ -281,12 +285,26 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             return $quantity !== null ? Collection::single($quantity) : Collection::single($node->getValue());
         }
 
-        // Strip @ prefix from date/time literals so they match bare ISO strings
-        // returned by resource property navigation (e.g. Patient.birthDate → "1974-12-25")
+        // Wrap date/time literals in typed value objects so that inferType() can distinguish
+        // Date/DateTime/Time from plain PHP strings (e.g. resource property values).
+        // The @ prefix is stripped so the bare ISO string matches resource property values.
         if ($node->getType() === TokenType::DATETIME || $node->getType() === TokenType::TIME) {
             $value = $node->getValue();
             if (is_string($value) && str_starts_with($value, '@')) {
-                return Collection::single(substr($value, 1));
+                $bare = substr($value, 1);
+
+                // Time-only literal: @T14, @T14:34:28, etc.
+                if (str_starts_with($bare, 'T')) {
+                    return Collection::single(new FHIRPathTime($bare));
+                }
+
+                // DateTime literal: @2015-02-04T, @2015-02-04T14:34:28+10:00, etc.
+                if (str_contains($bare, 'T')) {
+                    return Collection::single(new FHIRPathDateTime($bare));
+                }
+
+                // Date-only literal: @2015, @2015-02, @2015-02-04, etc.
+                return Collection::single(new FHIRPathDate($bare));
             }
         }
 
@@ -929,6 +947,16 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         // Normalize values to handle FHIR primitives and enums
         $leftValue  = $this->normalizeValue($left->first());
         $rightValue = $this->normalizeValue($right->first());
+
+        // Unwrap FHIRPath date/time literal wrappers to plain strings so the
+        // is_string() check below and performDateArithmetic() receive bare ISO strings.
+        if ($leftValue instanceof FHIRPathTemporalTypeInterface) {
+            $leftValue = $leftValue->getValue();
+        }
+
+        if ($rightValue instanceof FHIRPathTemporalTypeInterface) {
+            $rightValue = $rightValue->getValue();
+        }
 
         // Date/DateTime arithmetic: date +/- quantity (duration)
         if (($operator === TokenType::PLUS || $operator === TokenType::MINUS)

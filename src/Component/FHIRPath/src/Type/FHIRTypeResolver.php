@@ -122,6 +122,11 @@ class FHIRTypeResolver
             return 'decimal';
         }
 
+        // FHIRPath literal wrappers carry explicit type information
+        if ($value instanceof FHIRPathTemporalTypeInterface) {
+            return $value->getTemporalTypeName();
+        }
+
         if (is_string($value)) {
             return 'string';
         }
