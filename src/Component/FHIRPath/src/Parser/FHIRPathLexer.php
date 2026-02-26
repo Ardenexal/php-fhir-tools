@@ -252,6 +252,13 @@ class FHIRPathLexer
             return;
         }
 
+        // Backtick-delimited escaped identifiers
+        if ($char === '`') {
+            $this->scanBacktickIdentifier($startLine, $startColumn, $start);
+
+            return;
+        }
+
         // Numbers
         if ($this->isDigit($char)) {
             $this->scanNumber($char, $startLine, $startColumn, $start);
@@ -288,6 +295,8 @@ class FHIRPathLexer
                     "'"     => "'",
                     '"'     => '"',
                     '\\'    => '\\',
+                    '`'     => '`',
+                    '/'     => '/',
                     't'     => "\t",
                     'n'     => "\n",
                     'r'     => "\r",
@@ -520,6 +529,39 @@ class FHIRPathLexer
         $type = self::KEYWORDS[strtolower($value)] ?? TokenType::IDENTIFIER;
 
         $this->addToken($type, $value, $startLine, $startColumn, $start);
+    }
+
+    /**
+     * Scan a backtick-delimited escaped identifier (e.g., `given`, `vs-administrative-gender`).
+     *
+     * Per the FHIRPath spec, backtick identifiers allow reserved words, hyphens, and other
+     * special characters in identifiers. The backticks are stripped and the inner content is
+     * emitted as a regular IDENTIFIER token.
+     *
+     * @throws TokenException If the identifier is unterminated before EOF
+     */
+    private function scanBacktickIdentifier(int $startLine, int $startColumn, int $start): void
+    {
+        $value = '';
+
+        while (!$this->isAtEnd() && $this->peek() !== '`') {
+            if ($this->peek() === '\\' && $this->peek(1) === '`') {
+                $this->advance(); // consume backslash
+                $this->advance(); // consume backtick
+                $value .= '`';
+            } else {
+                $value .= $this->advance();
+            }
+        }
+
+        if ($this->isAtEnd()) {
+            throw TokenException::unterminatedString($startLine, $startColumn, $this->getContext($start));
+        }
+
+        // Consume closing backtick
+        $this->advance();
+
+        $this->addToken(TokenType::IDENTIFIER, $value, $startLine, $startColumn, $start);
     }
 
     /**
