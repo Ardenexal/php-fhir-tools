@@ -40,7 +40,7 @@ class ContainsStringFunction extends AbstractFunction
         if ($evaluator === null) {
             throw new EvaluationException('Evaluator not available in context');
         }
-        $substringResult = $evaluator->evaluate($substringExpr, $context);
+        $substringResult = $evaluator->evaluateWithContext($substringExpr, $context);
 
         if ($substringResult->isEmpty()) {
             return Collection::single(false);

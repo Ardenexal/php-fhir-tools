@@ -275,6 +275,25 @@ class FHIRPathParser
                     continue;
                 }
 
+                // Handle .contains('x') — 'contains' is lexed as TokenType::CONTAINS (keyword),
+                // not IDENTIFIER, so parsePrimary() won't treat it as a function call.
+                // Parse it explicitly as a FunctionCallNode named 'contains'.
+                if ($this->check(TokenType::CONTAINS) && $this->checkNext(TokenType::LPAREN)) {
+                    $keyword = $this->advance(); // consume CONTAINS
+                    $this->advance();            // consume LPAREN
+                    $arguments = [];
+                    if (!$this->check(TokenType::RPAREN)) {
+                        $arguments[] = $this->parseExpression();
+                        while ($this->match(TokenType::COMMA)) {
+                            $arguments[] = $this->parseExpression();
+                        }
+                    }
+                    $this->consume(TokenType::RPAREN, ')');
+                    $funcNode   = new FunctionCallNode('contains', $arguments, $keyword->line, $keyword->column);
+                    $expression = new MemberAccessNode($expression, $funcNode, $keyword->line, $keyword->column);
+                    continue;
+                }
+
                 $member     = $this->parsePrimary();
                 $expression = new MemberAccessNode(
                     $expression,

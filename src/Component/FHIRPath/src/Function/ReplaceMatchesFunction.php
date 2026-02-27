@@ -82,6 +82,11 @@ final class ReplaceMatchesFunction extends AbstractFunction
             throw EvaluationException::invalidFunctionParameter($this->getName(), 'substitution', 'string');
         }
 
+        // Per FHIRPath spec: empty pattern string returns the original string unchanged
+        if ($pattern === '') {
+            return Collection::single($string);
+        }
+
         // Add PCRE delimiters and DOTALL flag if not already present — same logic as MatchesFunction
         if (!str_starts_with($pattern, '/')) {
             // 's' flag enables DOTALL mode (makes '.' match newlines too)

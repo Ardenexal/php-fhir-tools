@@ -14,6 +14,10 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
  * Returns the input string with all occurrences of the search string replaced
  * with the replacement string.
  *
+ * Per FHIRPath spec:
+ * - Empty search string: replacement is inserted at every position (before each char and at end)
+ * - Empty collection args propagate empty
+ *
  * @author Ardenexal <https://github.com/Ardenexal>
  */
 final class ReplaceFunction extends AbstractFunction
@@ -41,14 +45,37 @@ final class ReplaceFunction extends AbstractFunction
             throw new EvaluationException('Evaluator not available in context');
         }
 
-        $search = $evaluator->evaluate($parameters[0], $context)->first();
+        $searchCollection = $evaluator->evaluateWithContext($parameters[0], $context);
+        if ($searchCollection->isEmpty()) {
+            return Collection::empty();
+        }
+
+        $search = $searchCollection->first();
         if (!is_string($search)) {
             throw EvaluationException::invalidFunctionParameter($this->getName(), 'search', 'string');
         }
 
-        $replace = $evaluator->evaluate($parameters[1], $context)->first();
+        $replaceCollection = $evaluator->evaluateWithContext($parameters[1], $context);
+        if ($replaceCollection->isEmpty()) {
+            return Collection::empty();
+        }
+
+        $replace = $replaceCollection->first();
         if (!is_string($replace)) {
             throw EvaluationException::invalidFunctionParameter($this->getName(), 'replacement', 'string');
+        }
+
+        // Per FHIRPath spec: empty search string inserts replacement at every position
+        // e.g. 'abc'.replace('', 'x') = 'xaxbxcx'
+        if ($search === '') {
+            if ($string === '') {
+                return Collection::single($replace);
+            }
+
+            $chars  = str_split($string, 1);
+            $result = $replace . implode($replace, $chars) . $replace;
+
+            return Collection::single($result);
         }
 
         return Collection::single(str_replace($search, $replace, $string));
