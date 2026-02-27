@@ -6,24 +6,33 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathTemporalTypeInterface;
 
 /**
  * FHIRPath precision() function.
  *
- * Returns the precision of the input value:
- *  - Decimal:       number of digits after the decimal point (e.g. 1.58 → 2)
- *  - Integer:       0 (no fractional digits)
- *  - Date string:   number of date/time components present:
- *                     "2020"                     → 1  (year)
- *                     "2020-01"                  → 2  (month)
- *                     "2020-01-15"               → 3  (day)
- *                     "2020-01-15T10"            → 4  (hour)
- *                     "2020-01-15T10:30"         → 5  (minute)
- *                     "2020-01-15T10:30:00"      → 6  (second)
- *                     "2020-01-15T10:30:00.000"  → 7  (millisecond)
- *  - Anything else: empty
+ * Returns the precision of the input value using the FHIRPath positional
+ * numbering scheme:
  *
- * @author Ardenexal <https://github.com/Ardenexal>
+ *  - FHIRPathDecimal:  number of digits after the decimal point (trailing
+ *                      zeros preserved, e.g. 1.58700 → 5)
+ *  - float/integer:    number of digits after decimal point (0 for integers)
+ *  - Date string:
+ *                        YYYY         → 4
+ *                        YYYY-MM      → 6
+ *                        YYYY-MM-DD   → 8
+ *  - DateTime string:
+ *                        YYYY-MM-DDTHH           → 10
+ *                        YYYY-MM-DDTHH:MM        → 12
+ *                        YYYY-MM-DDTHH:MM:SS     → 14
+ *                        YYYY-MM-DDTHH:MM:SS.mmm → 17
+ *  - Time string:
+ *                        THH          → 2
+ *                        THH:MM       → 4
+ *                        THH:MM:SS    → 6
+ *                        THH:MM:SS.mmm → 9
+ *  - Anything else:    empty
  */
 final class PrecisionFunction extends AbstractFunction
 {
@@ -42,8 +51,19 @@ final class PrecisionFunction extends AbstractFunction
 
         $value = $input->first();
 
+        // FHIRPathDecimal preserves trailing zeros in its string, so ->precision is exact
+        if ($value instanceof FHIRPathDecimal) {
+            return Collection::single($value->precision);
+        }
+
+        if ($value instanceof FHIRPathTemporalTypeInterface) {
+            $p = $this->temporalPrecision($value->getValue(), $value->getTemporalTypeName() === 'time');
+
+            return $p !== null ? Collection::single($p) : Collection::empty();
+        }
+
         if (is_float($value)) {
-            return Collection::single($this->decimalPrecision($value));
+            return Collection::single($this->floatPrecision($value));
         }
 
         if (is_int($value)) {
@@ -51,10 +71,9 @@ final class PrecisionFunction extends AbstractFunction
         }
 
         if (is_string($value)) {
-            $datePrecision = $this->dateTimePrecision($value);
-            if ($datePrecision !== null) {
-                return Collection::single($datePrecision);
-            }
+            $p = $this->stringPrecision($value);
+
+            return $p !== null ? Collection::single($p) : Collection::empty();
         }
 
         return Collection::empty();
@@ -62,8 +81,9 @@ final class PrecisionFunction extends AbstractFunction
 
     /**
      * Count digits after the decimal point in a float.
+     * NOTE: PHP floats may strip trailing zeros; use FHIRPathDecimal for exact results.
      */
-    private function decimalPrecision(float $value): int
+    private function floatPrecision(float $value): int
     {
         $str = (string) $value;
 
@@ -72,7 +92,6 @@ final class PrecisionFunction extends AbstractFunction
             return 0;
         }
 
-        // Strip scientific notation suffix if present (e.g. "1.5E-5")
         $fractionalPart = substr($str, $dotPos + 1);
         $ePos           = stripos($fractionalPart, 'e');
         if ($ePos !== false) {
@@ -83,39 +102,94 @@ final class PrecisionFunction extends AbstractFunction
     }
 
     /**
-     * Determine the precision level of an ISO 8601 date/datetime string.
-     * Returns null when the string does not look like a date.
+     * Compute the positional precision of a temporal value string.
+     *
+     * @param string $value     Bare ISO string (@ prefix already stripped by the value object)
+     * @param bool   $timeOnly  True for FHIRPathTime (T-prefixed time-only strings)
+     */
+    private function temporalPrecision(string $value, bool $timeOnly): ?int
+    {
+        if ($timeOnly) {
+            return $this->timePrecision($value);
+        }
+
+        // Detect datetime vs date by presence of T
+        if (str_contains($value, 'T')) {
+            return $this->dateTimePrecision($value);
+        }
+
+        return $this->datePrecision($value);
+    }
+
+    /**
+     * Positional precision for date strings (YYYY, YYYY-MM, YYYY-MM-DD).
+     */
+    private function datePrecision(string $value): ?int
+    {
+        return match (true) {
+            (bool) preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) => 8,
+            (bool) preg_match('/^\d{4}-\d{2}$/', $value)        => 6,
+            (bool) preg_match('/^\d{4}$/', $value)              => 4,
+            default                                              => null,
+        };
+    }
+
+    /**
+     * Positional precision for datetime strings.
+     * The time component after T may have a trailing timezone (+HH:MM/-HH:MM/Z).
      */
     private function dateTimePrecision(string $value): ?int
     {
-        // Match ISO 8601 date/datetime patterns and count components
-        // Patterns (from least to most precise):
-        //   YYYY                    → 1
-        //   YYYY-MM                 → 2
-        //   YYYY-MM-DD              → 3
-        //   YYYY-MM-DDTHH           → 4
-        //   YYYY-MM-DDTHH:MM        → 5
-        //   YYYY-MM-DDTHH:MM:SS     → 6
-        //   YYYY-MM-DDTHH:MM:SS.mmm → 7
-
-        $pattern = '/^\d{4}(-\d{2}(-\d{2}(T\d{2}(:\d{2}(:\d{2}(\.\d+)?)?)?)?)?)?([+-]\d{2}:\d{2}|Z)?$/';
-
-        if (!preg_match($pattern, $value)) {
-            return null;
-        }
-
-        // Strip timezone suffix for length analysis
-        $stripped = preg_replace('/([+-]\d{2}:\d{2}|Z)$/', '', $value) ?? $value;
+        // Strip timezone suffix
+        $stripped = (string) preg_replace('/([+-]\d{2}:\d{2}|Z)$/', '', $value);
 
         return match (true) {
-            str_contains($stripped, '.')                                     => 7,
-            preg_match('/T\d{2}:\d{2}:\d{2}$/', $stripped) === 1             => 6,
-            preg_match('/T\d{2}:\d{2}$/', $stripped)       === 1             => 5,
-            preg_match('/T\d{2}$/', $stripped)             === 1             => 4,
-            preg_match('/^\d{4}-\d{2}-\d{2}$/', $stripped) === 1             => 3,
-            preg_match('/^\d{4}-\d{2}$/', $stripped)       === 1             => 2,
-            preg_match('/^\d{4}$/', $stripped)             === 1             => 1,
-            default                                                          => null,
+            (bool) preg_match('/T\d{2}:\d{2}:\d{2}\.\d+$/', $stripped) => 17,
+            (bool) preg_match('/T\d{2}:\d{2}:\d{2}$/', $stripped)       => 14,
+            (bool) preg_match('/T\d{2}:\d{2}$/', $stripped)             => 12,
+            (bool) preg_match('/T\d{2}$/', $stripped)                   => 10,
+            default                                                      => null,
         };
+    }
+
+    /**
+     * Positional precision for time-only strings (T-prefixed).
+     */
+    private function timePrecision(string $value): ?int
+    {
+        // Normalise: strip leading T if present
+        $t = str_starts_with($value, 'T') ? substr($value, 1) : $value;
+
+        return match (true) {
+            (bool) preg_match('/^\d{2}:\d{2}:\d{2}\.\d+$/', $t) => 9,
+            (bool) preg_match('/^\d{2}:\d{2}:\d{2}$/', $t)       => 6,
+            (bool) preg_match('/^\d{2}:\d{2}$/', $t)             => 4,
+            (bool) preg_match('/^\d{2}$/', $t)                   => 2,
+            default                                               => null,
+        };
+    }
+
+    /**
+     * Detect precision from a plain string (resource property values arrive as strings).
+     * Tries time-only format first, then datetime, then date.
+     */
+    private function stringPrecision(string $value): ?int
+    {
+        // Strip optional @ prefix
+        $bare = ltrim($value, '@');
+
+        if (str_starts_with($bare, 'T')) {
+            return $this->timePrecision($bare);
+        }
+
+        if (str_contains($bare, 'T')) {
+            return $this->dateTimePrecision($bare);
+        }
+
+        if (preg_match('/^\d{4}/', $bare)) {
+            return $this->datePrecision($bare);
+        }
+
+        return null;
     }
 }
