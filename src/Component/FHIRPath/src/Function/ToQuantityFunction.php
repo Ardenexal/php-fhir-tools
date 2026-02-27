@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
 
 /**
  * toQuantity([unit : String]) : Quantity
@@ -77,7 +78,9 @@ final class ToQuantityFunction extends AbstractFunction
     {
         $quantity = null;
 
-        if (is_int($value) || is_float($value)) {
+        if ($value instanceof FHIRPathDecimal) {
+            $quantity = self::buildQuantity($value->toFloat(), '1', '1');
+        } elseif (is_int($value) || is_float($value)) {
             $quantity = self::buildQuantity((float) $value, '1', '1');
         } elseif (is_bool($value)) {
             $quantity = self::buildQuantity($value ? 1.0 : 0.0, '1', '1');

@@ -30,11 +30,12 @@ final class CeilingFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        $value = $input->first();
-        if (!is_numeric($value)) {
+        $value   = $input->first();
+        $numeric = $this->extractNumeric($value);
+        if ($numeric === null) {
             throw EvaluationException::invalidFunctionParameter($this->getName(), 'input', 'number');
         }
 
-        return Collection::single((int) ceil((float) $value));
+        return Collection::single((int) ceil((float) $numeric));
     }
 }

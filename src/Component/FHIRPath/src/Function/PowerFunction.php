@@ -42,18 +42,26 @@ class PowerFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        $exponent = $exponentResult->first();
-        if (!is_numeric($exponent)) {
+        $exponent        = $exponentResult->first();
+        $exponentNumeric = $this->extractNumeric($exponent);
+        if ($exponentNumeric === null) {
             throw EvaluationException::invalidFunctionParameter('power', 'exponent', 'number');
         }
 
         $items = [];
         foreach ($input as $item) {
-            if (!is_numeric($item)) {
+            $numeric = $this->extractNumeric($item);
+            if ($numeric === null) {
                 throw EvaluationException::invalidFunctionParameter('power', 'input', 'number');
             }
 
-            $items[] = pow((float) $item, (float) $exponent);
+            $result = pow((float) $numeric, (float) $exponentNumeric);
+
+            if (is_nan($result) || is_infinite($result)) {
+                return Collection::empty();
+            }
+
+            $items[] = $result;
         }
 
         return Collection::from($items);

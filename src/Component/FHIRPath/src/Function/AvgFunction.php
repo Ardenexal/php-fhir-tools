@@ -36,11 +36,12 @@ class AvgFunction extends AbstractFunction
         $count = 0;
 
         foreach ($input as $item) {
-            if (!is_numeric($item)) {
+            $numeric = $this->extractNumeric($item);
+            if ($numeric === null) {
                 throw EvaluationException::invalidFunctionParameter('avg', 'numeric values', gettype($item));
             }
 
-            $sum += $item;
+            $sum += $numeric;
             ++$count;
         }
 

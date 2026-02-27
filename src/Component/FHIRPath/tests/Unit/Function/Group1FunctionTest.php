@@ -76,11 +76,14 @@ final class Group1FunctionTest extends TestCase
         self::assertTrue($result->isEmpty());
     }
 
-    public function testNotReturnsEmptyForNonBoolean(): void
+    public function testNotReturnsFalseForNonBoolean(): void
     {
+        // Per FHIRPath spec §6.1 singleton evaluation: a non-boolean single item
+        // evaluates to true in a boolean context, so not(true) = false.
         $result = $this->evaluate("'hello'.not()", null);
 
-        self::assertTrue($result->isEmpty());
+        self::assertFalse($result->isEmpty());
+        self::assertFalse($result->first());
     }
 
     public function testNotCanChainWithComparison(): void

@@ -34,11 +34,12 @@ class ExpFunction extends AbstractFunction
 
         $items = [];
         foreach ($input as $item) {
-            if (!is_numeric($item)) {
+            $numeric = $this->extractNumeric($item);
+            if ($numeric === null) {
                 throw EvaluationException::invalidFunctionParameter('exp', 'numeric value', gettype($item));
             }
 
-            $items[] = exp((float) $item);
+            $items[] = exp((float) $numeric);
         }
 
         return Collection::from($items);

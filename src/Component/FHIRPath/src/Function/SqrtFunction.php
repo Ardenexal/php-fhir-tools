@@ -35,13 +35,14 @@ class SqrtFunction extends AbstractFunction
 
         $items = [];
         foreach ($input as $item) {
-            if (!is_numeric($item)) {
+            $numeric = $this->extractNumeric($item);
+            if ($numeric === null) {
                 throw EvaluationException::invalidFunctionParameter('sqrt', 'numeric value', gettype($item));
             }
 
-            $value = (float) $item;
+            $value = (float) $numeric;
             if ($value < 0) {
-                throw EvaluationException::invalidFunctionParameter('sqrt', 'non-negative number', 'negative number');
+                return Collection::empty();
             }
 
             $items[] = sqrt($value);

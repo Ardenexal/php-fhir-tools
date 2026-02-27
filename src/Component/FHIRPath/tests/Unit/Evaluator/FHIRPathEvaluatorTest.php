@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\FHIRPathEvaluator;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\FHIRPathLexer;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\FHIRPathParser;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\HumanName;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\NameUseType;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
@@ -144,7 +145,9 @@ final class FHIRPathEvaluatorTest extends TestCase
     {
         $result = $this->evaluate('15 / 3', null);
 
-        self::assertSame(5.0, $result->first());
+        // Division always returns Decimal per FHIRPath spec
+        self::assertInstanceOf(FHIRPathDecimal::class, $result->first());
+        self::assertSame('5.0', $result->first()->value);
     }
 
     public function testArithmeticIntegerDivision(): void
@@ -276,8 +279,11 @@ final class FHIRPathEvaluatorTest extends TestCase
         $resultEquivalent = $this->evaluate('1 ~ 1.0', null);
         $resultEqual      = $this->evaluate('1 = 1.0', null);
 
+        // Per FHIRPath spec, Integer is implicitly promoted to Decimal for comparison,
+        // so both equality and equivalence are true for numerically equal values.
+        // (Confirmed by spec conformance test: 1 / 1 = 1 → true)
         self::assertTrue($resultEquivalent->first());
-        self::assertFalse($resultEqual->first());
+        self::assertTrue($resultEqual->first());
     }
 
     public function testNotEquivalentOperator(): void

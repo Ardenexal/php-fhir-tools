@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Type;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRPrimitive;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
 
 /**
  * Resolves and validates FHIR types using the generated FHIR models.
@@ -118,6 +119,10 @@ class FHIRTypeResolver
             return 'integer';
         }
 
+        if ($value instanceof FHIRPathDecimal) {
+            return 'decimal';
+        }
+
         if (is_float($value)) {
             return 'decimal';
         }
@@ -189,11 +194,6 @@ class FHIRTypeResolver
 
         // Check for type compatibility
         if ($typeName === 'Any') {
-            return true;
-        }
-
-        // Check if integer is compatible with decimal (case-insensitive)
-        if (strcasecmp($typeName, 'decimal') === 0 && $actualType === 'integer') {
             return true;
         }
 

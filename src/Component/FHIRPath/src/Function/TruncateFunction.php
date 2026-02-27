@@ -34,11 +34,12 @@ class TruncateFunction extends AbstractFunction
 
         $items = [];
         foreach ($input as $item) {
-            if (!is_numeric($item)) {
+            $numeric = $this->extractNumeric($item);
+            if ($numeric === null) {
                 throw EvaluationException::invalidFunctionParameter('truncate', 'numeric value', gettype($item));
             }
 
-            $items[] = (int) $item;
+            $items[] = (int) $numeric;
         }
 
         return Collection::from($items);

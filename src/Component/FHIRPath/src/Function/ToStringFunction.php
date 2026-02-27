@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathTemporalTypeInterface;
 
 /**
@@ -76,6 +77,13 @@ final class ToStringFunction extends AbstractFunction
         // Date/DateTime/Time wrapper objects → return their ISO string value
         if ($value instanceof FHIRPathTemporalTypeInterface) {
             return $value->getValue();
+        }
+
+        // Decimal wrapper: use exact string representation, ensuring a decimal point
+        if ($value instanceof FHIRPathDecimal) {
+            $str = $value->value;
+
+            return str_contains($str, '.') ? $str : $str . '.0';
         }
 
         if (is_bool($value)) {

@@ -11,10 +11,12 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
 /**
  * FHIRPath log() function.
  *
- * Returns the logarithm base 10 of the input value.
- * For single item: log(), returns base 10 logarithm
- * For empty collection: returns empty
- * Throws exception if value <= 0
+ * Returns the logarithm of the input value. If no base is given, returns the
+ * base-10 logarithm. If a base is given, returns log_base(value).
+ *
+ * Returns empty for any mathematically undefined case:
+ *  - input value <= 0
+ *  - base <= 0 or base == 1 (undefined logarithm base)
  *
  * @author Ardenexal <info@ardenexal.com>
  */
@@ -27,24 +29,50 @@ class LogFunction extends AbstractFunction
 
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection
     {
-        $this->validateParameterCount($parameters, 0, 0);
+        $this->validateParameterCount($parameters, 0, 1);
 
         if ($input->isEmpty()) {
             return Collection::empty();
         }
 
+        // Resolve optional base parameter
+        $base = null;
+        if (!empty($parameters)) {
+            $evaluator = $context->getEvaluator();
+            if ($evaluator === null) {
+                throw new EvaluationException('Evaluator not available in context');
+            }
+
+            $baseResult = $evaluator->evaluate($parameters[0], $context);
+            if (!$baseResult->isEmpty()) {
+                $baseValue   = $baseResult->first();
+                $baseNumeric = $this->extractNumeric($baseValue);
+                if ($baseNumeric === null) {
+                    throw EvaluationException::invalidFunctionParameter('log', 'base', 'number');
+                }
+
+                $base = (float) $baseNumeric;
+
+                // base <= 0 or base == 1 makes the logarithm undefined
+                if ($base <= 0.0 || $base === 1.0) {
+                    return Collection::empty();
+                }
+            }
+        }
+
         $items = [];
         foreach ($input as $item) {
-            if (!is_numeric($item)) {
+            $numeric = $this->extractNumeric($item);
+            if ($numeric === null) {
                 throw EvaluationException::invalidFunctionParameter('log', 'numeric value', gettype($item));
             }
 
-            $value = (float) $item;
+            $value = (float) $numeric;
             if ($value <= 0) {
-                throw EvaluationException::invalidFunctionParameter('log', 'positive number', 'number <= 0');
+                return Collection::empty();
             }
 
-            $items[] = log10($value);
+            $items[] = $base !== null ? log($value, $base) : log10($value);
         }
 
         return Collection::from($items);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Evaluator;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathTemporalTypeInterface;
 
 /**
@@ -183,6 +184,30 @@ final class ComparisonService
 
         if ($rightValue instanceof FHIRPathTemporalTypeInterface) {
             $rightValue = $rightValue->getValue();
+        }
+
+        // FHIRPathDecimal ordering: use bccomp for precision-safe comparison
+        $leftIsDecimal  = $leftValue instanceof FHIRPathDecimal;
+        $rightIsDecimal = $rightValue instanceof FHIRPathDecimal;
+
+        if ($leftIsDecimal || $rightIsDecimal) {
+            $leftStr  = $leftIsDecimal  ? $leftValue->value  : (is_numeric($leftValue)  ? (string) $leftValue  : null);
+            $rightStr = $rightIsDecimal ? $rightValue->value : (is_numeric($rightValue) ? (string) $rightValue : null);
+
+            if ($leftStr === null || $rightStr === null) {
+                return Collection::empty();
+            }
+
+            // Both strings are guaranteed numeric at this point
+            assert(is_numeric($leftStr) && is_numeric($rightStr));
+
+            $maxPrec = max(
+                ($dotPos = strpos($leftStr, '.'))  !== false ? strlen($leftStr)  - $dotPos - 1 : 0,
+                ($dotPos = strpos($rightStr, '.')) !== false ? strlen($rightStr) - $dotPos - 1 : 0
+            );
+            $cmp = bccomp($leftStr, $rightStr, $maxPrec + 2);
+
+            return Collection::single($operation($cmp, 0));
         }
 
         [$leftQuantity, $leftIsQuantity]   = $this->extractQuantity($leftValue);
@@ -416,6 +441,44 @@ final class ComparisonService
             $b = $b->getValue();
         }
 
+        // FHIRPathDecimal comparison: use bccomp for precision-safe equality
+        $aIsDecimal = $a instanceof FHIRPathDecimal;
+        $bIsDecimal = $b instanceof FHIRPathDecimal;
+
+        if ($aIsDecimal || $bIsDecimal) {
+            $aStr = $aIsDecimal ? $a->value : (is_numeric($a) ? (string) $a : null);
+            $bStr = $bIsDecimal ? $b->value : (is_numeric($b) ? (string) $b : null);
+
+            if ($aStr === null || $bStr === null) {
+                return false;
+            }
+
+            // Both strings are guaranteed numeric at this point
+            assert(is_numeric($aStr) && is_numeric($bStr));
+
+            if ($useEquivalence) {
+                // Equivalence: round both values to the least-precise operand's scale.
+                // bcadd with a lower scale truncates; we need half-up rounding instead.
+                $precA   = ($dotPos = strpos($aStr, '.')) !== false ? strlen($aStr) - $dotPos - 1 : 0;
+                $precB   = ($dotPos = strpos($bStr, '.')) !== false ? strlen($bStr) - $dotPos - 1 : 0;
+                $minPrec = min($precA, $precB);
+
+                return bccomp(
+                    $this->bcRoundHalfUp($aStr, $minPrec),
+                    $this->bcRoundHalfUp($bStr, $minPrec),
+                    $minPrec
+                ) === 0;
+            }
+
+            // Equality: compare at max precision
+            $maxPrec = max(
+                ($dotPos = strpos($aStr, '.')) !== false ? strlen($aStr) - $dotPos - 1 : 0,
+                ($dotPos = strpos($bStr, '.')) !== false ? strlen($bStr) - $dotPos - 1 : 0
+            );
+
+            return bccomp($aStr, $bStr, $maxPrec + 2) === 0;
+        }
+
         [$leftQuantity, $leftIsQuantity]   = $this->extractQuantity($a);
         [$rightQuantity, $rightIsQuantity] = $this->extractQuantity($b);
 
@@ -454,6 +517,11 @@ final class ComparisonService
 
         // For equivalence mode: apply type normalization
         if ($useEquivalence) {
+            // String equivalence: case-insensitive per FHIRPath spec
+            if (is_string($a) && is_string($b)) {
+                return strcasecmp($a, $b) === 0;
+            }
+
             // Numeric equivalence: 1 ~ 1.0 should be true
             if (is_numeric($a) && is_numeric($b)) {
                 // Use loose comparison for numeric values
@@ -464,8 +532,45 @@ final class ComparisonService
             return $a == $b;
         }
 
-        // For equality mode: strict type-preserving comparison
+        // For equality mode: strict type-preserving comparison with implicit numeric promotion.
+        // FHIRPath spec: Integer is implicitly convertible to Decimal for comparisons,
+        // so float(1.0) = int(1) must return true.
+        if (is_float($a) && is_int($b)) {
+            return $a === (float) $b;
+        }
+
+        if (is_int($a) && is_float($b)) {
+            return (float) $a === $b;
+        }
+
         return $a === $b;
+    }
+
+    /**
+     * Round a bcmath numeric string to $scale decimal places using half-up rounding.
+     *
+     * bcadd($x, '0', $scale) truncates (floors toward zero), which produces incorrect
+     * results for equivalence comparisons. This method adds half-a-ULP at the target
+     * scale before truncating to get true half-up rounding.
+     *
+     * @param  numeric-string $value
+     * @return numeric-string
+     */
+    private function bcRoundHalfUp(string $value, int $scale): string
+    {
+        if ($scale < 0) {
+            return bcadd($value, '0', 0);
+        }
+
+        // half-a-unit at the target scale: "0.005" for scale=2, "0.05" for scale=1, etc.
+        $half = '0.' . str_repeat('0', $scale) . '5';
+        assert(is_numeric($half));
+
+        if (str_starts_with(ltrim($value), '-')) {
+            return bcsub($value, $half, $scale);
+        }
+
+        return bcadd($value, $half, $scale);
     }
 
     /**

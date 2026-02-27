@@ -624,6 +624,8 @@ class FHIRPathLexer
 
     /**
      * Advance to the next character and return it.
+     *
+     * @phpstan-impure
      */
     private function advance(): string
     {
@@ -645,6 +647,8 @@ class FHIRPathLexer
 
     /**
      * Peek at the current character without advancing.
+     *
+     * @phpstan-impure
      */
     private function peek(int $offset = 0): string
     {

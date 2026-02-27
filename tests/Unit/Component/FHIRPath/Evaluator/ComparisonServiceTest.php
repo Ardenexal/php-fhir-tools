@@ -164,9 +164,10 @@ final class ComparisonServiceTest extends TestCase
         self::assertTrue($resultEquivalence->isSingle());
         self::assertTrue($resultEquivalence->first());
 
-        // Equality should preserve types: 1 = 1.0 = false (strict comparison)
+        // Equality applies implicit Integer→Decimal promotion per FHIRPath spec:
+        // 1 = 1.0 is true (Integer 1 is promoted to Decimal 1.0 before comparison)
         self::assertTrue($resultEquality->isSingle());
-        self::assertFalse($resultEquality->first());
+        self::assertTrue($resultEquality->first());
     }
 
     public function testNotEquivalentOperator(): void

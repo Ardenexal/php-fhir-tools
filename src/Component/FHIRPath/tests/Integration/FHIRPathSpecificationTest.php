@@ -11,6 +11,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\FHIRPathEvaluator;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
 
 /**
  * Official FHIR FHIRPath specification conformance test.
@@ -172,9 +173,14 @@ final class FHIRPathSpecificationTest extends TestCase
         self::assertCount(count($expectedOutputs), $result, "Result count mismatch for expression: {$expression}");
 
         foreach ($expectedOutputs as $i => $expected) {
+            $actual = $result->toArray()[$i];
+            if ($actual instanceof FHIRPathDecimal) {
+                $actual = $actual->toFloat();
+            }
+
             self::assertSame(
                 $this->castOutputValue($expected['value'], $expected['type']),
-                $result->toArray()[$i],
+                $actual,
                 "Result item [{$i}] mismatch for expression: {$expression}",
             );
         }

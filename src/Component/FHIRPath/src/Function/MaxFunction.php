@@ -32,16 +32,22 @@ class MaxFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        $max = null;
+        $max    = null;
+        $maxVal = null;
         foreach ($input as $item) {
-            if (!is_numeric($item)) {
+            $numeric = $this->extractNumeric($item);
+            if ($numeric === null) {
                 throw EvaluationException::invalidFunctionParameter('max', 'numeric values', gettype($item));
             }
 
-            if ($max === null || $item > $max) {
-                $max = $item;
+            $floatVal = (float) $numeric;
+            if ($maxVal === null || $floatVal > $maxVal) {
+                $maxVal = $floatVal;
+                $max    = $numeric;
             }
         }
+
+        assert($max !== null);
 
         return Collection::single($max);
     }

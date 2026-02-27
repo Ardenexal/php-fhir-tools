@@ -22,6 +22,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Parser\TokenType;
 use Ardenexal\FHIRTools\Component\FHIRPath\Function\FunctionRegistry;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDate;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDateTime;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathTemporalTypeInterface;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathTime;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRTypeResolver;
@@ -516,11 +517,33 @@ final class FHIRPathEvaluator implements ExpressionVisitor
 
         $value = $operand->first();
 
-        // Semantic validation: unary +/- operators require numeric operands
+        // Semantic validation: unary +/- operators require numeric or Quantity operands
         // Per FHIRPath spec, expressions like "-1.convertsToInteger()" are invalid
         // because they're ambiguous (-(1.convertsToInteger()) attempts to negate a boolean)
-        if (!is_numeric($value)) {
+        $isQuantity = is_array($value) && array_key_exists('value', $value) && is_numeric($value['value']);
+        if (!is_numeric($value) && !($value instanceof FHIRPathDecimal) && !$isQuantity) {
             throw new EvaluationException('Unary +/- operators require numeric operands', $node->getLine(), $node->getColumn());
+        }
+
+        if ($value instanceof FHIRPathDecimal) {
+            return match ($node->getOperator()) {
+                TokenType::MINUS => Collection::single(new FHIRPathDecimal(str_starts_with($value->value, '-') ? substr($value->value, 1) : '-' . $value->value)),
+                TokenType::PLUS  => Collection::single($value),
+                default          => throw new EvaluationException("Unknown unary operator: {$node->getOperator()->value}", $node->getLine(), $node->getColumn()),
+            };
+        }
+
+        // Quantity: negate the numeric value, preserve unit
+        if ($isQuantity) {
+            /** @var array<string, mixed> $value */
+            $result          = $value;
+            $result['value'] = match ($node->getOperator()) {
+                TokenType::MINUS => -(float) $value['value'],
+                TokenType::PLUS  => +(float) $value['value'],
+                default          => throw new EvaluationException("Unknown unary operator: {$node->getOperator()->value}", $node->getLine(), $node->getColumn()),
+            };
+
+            return Collection::single($result);
         }
 
         return match ($node->getOperator()) {
@@ -967,11 +990,128 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             return $this->performDateArithmetic($leftValue, $rightQty, $operator);
         }
 
+        // String concatenation via + operator (per FHIRPath spec, + works on strings too)
+        if (is_string($leftValue) && is_string($rightValue) && $operator === TokenType::PLUS) {
+            return Collection::single($leftValue . $rightValue);
+        }
+
+        // bcmath arithmetic when either operand is a FHIRPathDecimal (exact precision),
+        // or when the operator is DIVIDE (FHIRPath spec: division always yields Decimal).
+        $leftIsDecimal  = $leftValue instanceof FHIRPathDecimal;
+        $rightIsDecimal = $rightValue instanceof FHIRPathDecimal;
+
+        if ($leftIsDecimal || $rightIsDecimal || $operator === TokenType::DIVIDE) {
+            $leftStr  = $leftIsDecimal  ? $leftValue->value  : $this->numericToBcString($leftValue);
+            $rightStr = $rightIsDecimal ? $rightValue->value : $this->numericToBcString($rightValue);
+
+            if ($leftStr === null || $rightStr === null) {
+                throw new EvaluationException('Arithmetic operators require numeric operands');
+            }
+
+            return $this->performBcArithmetic($leftStr, $rightStr, $operator);
+        }
+
         if (!is_numeric($leftValue) || !is_numeric($rightValue)) {
             throw new EvaluationException('Arithmetic operators require numeric operands');
         }
 
-        return Collection::single($operation($leftValue, $rightValue));
+        try {
+            return Collection::single($operation($leftValue, $rightValue));
+        } catch (\DivisionByZeroError) {
+            return Collection::empty();
+        }
+    }
+
+    /**
+     * Perform bcmath arithmetic on two decimal strings, returning a FHIRPathDecimal result.
+     */
+    private function performBcArithmetic(string $left, string $right, TokenType $operator): Collection
+    {
+        // Both strings are guaranteed numeric at this point (from FHIRPathDecimal->value or numericToBcString)
+        assert(is_numeric($left) && is_numeric($right));
+
+        $leftPrec  = ($dotPos = strpos($left, '.')) !== false ? strlen($left) - $dotPos - 1 : 0;
+        $rightPrec = ($dotPos = strpos($right, '.')) !== false ? strlen($right) - $dotPos - 1 : 0;
+        $maxPrec   = max($leftPrec, $rightPrec);
+
+        // Division and modulo by zero return empty per FHIRPath spec
+        if (in_array($operator, [TokenType::DIVIDE, TokenType::DIV, TokenType::MOD], true)
+            && bccomp($right, '0', $maxPrec + 2) === 0
+        ) {
+            return Collection::empty();
+        }
+
+        $result = match ($operator) {
+            TokenType::PLUS     => bcadd($left, $right, $maxPrec),
+            TokenType::MINUS    => bcsub($left, $right, $maxPrec),
+            TokenType::MULTIPLY => bcmul($left, $right, $leftPrec + $rightPrec),
+            TokenType::DIVIDE   => bcdiv($left, $right, max($maxPrec + self::DIVISION_GUARD_DIGITS, self::DIVISION_GUARD_DIGITS)),
+            TokenType::DIV      => bcdiv($left, $right, 0),
+            TokenType::MOD      => bcmod($left, $right, $maxPrec),
+            default             => throw new EvaluationException("Operator {$operator->value} not supported for decimal arithmetic"),
+        };
+
+        // For DIV, return integer
+        if ($operator === TokenType::DIV) {
+            return Collection::single((int) $result);
+        }
+
+        // Trim trailing zeros after decimal point, preserving at least one decimal place
+        if (str_contains($result, '.')) {
+            $result = rtrim($result, '0');
+
+            if (str_ends_with($result, '.')) {
+                $result .= '0';
+            }
+        }
+
+        return Collection::single(new FHIRPathDecimal($result));
+    }
+
+    /**
+     * Convert a PHP numeric value to a bcmath-compatible string.
+     *
+     * For floats, sprintf('%.17g') is used instead of number_format() because:
+     * - It captures all 17 significant digits of an IEEE 754 double, whereas
+     *   a fixed decimal-place count (e.g. 14) under-represents small values
+     *   (e.g. 1.23e-5 has only ~9 significant decimal places at 14dp).
+     * - The %g format strips trailing zeros automatically.
+     * - bcmath requires plain decimal notation, so any scientific-notation
+     *   result (exponent outside [-4, 17)) is converted: the number of decimal
+     *   places is derived from the exponent so that 17 significant digits are
+     *   preserved in the fixed-point form.
+     *
+     * @return string|null Bcmath string, or null if the value is not numeric
+     */
+    private function numericToBcString(mixed $value): ?string
+    {
+        if (is_int($value)) {
+            return (string) $value;
+        }
+
+        if (is_float($value)) {
+            // 17 significant digits covers the full range of IEEE 754 double precision.
+            $str = sprintf('%.17g', $value);
+
+            // bcmath requires plain decimal notation; %g uses scientific notation when
+            // the exponent is outside [-4, 17). Convert that to fixed-point when needed.
+            if (stripos($str, 'e') !== false) {
+                preg_match('/[eE]([+-]?\d+)/', $str, $m);
+                $exp      = (int) ($m[1] ?? '0');
+                // Negative exponent: need |exp| + 16 decimal places for 17 sig digits.
+                // Positive exponent: integer part grows, fewer decimal places needed.
+                $decimals = $exp < 0 ? abs($exp) + 16 : max(0, 16 - $exp);
+                $str      = number_format($value, $decimals, '.', '');
+            }
+
+            return rtrim(rtrim($str, '0'), '.');
+        }
+
+        if (is_string($value) && is_numeric($value)) {
+            return $value;
+        }
+
+        return null;
     }
 
     /**
@@ -1045,6 +1185,19 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     /**
      * Maps UCUM duration codes and calendar keywords to canonical duration keywords.
      *
+     * Extra decimal places computed beyond the operands' own precision during division.
+     *
+     * Division can produce non-terminating decimals (e.g. 1/3 = 0.333...). Guard digits
+     * are appended so that the stored result retains meaningful precision even after the
+     * trailing-zero trim in performBcArithmetic(). Eight places cover the full range of
+     * UCUM/FHIR decimal quantities (typically ≤ 4 dp) with comfortable headroom, without
+     * generating excessively long strings for every division.
+     *
+     * The effective bcmath scale for a division is max($maxOperandPrec + DIVISION_GUARD_DIGITS, DIVISION_GUARD_DIGITS).
+     */
+    private const DIVISION_GUARD_DIGITS = 8;
+
+    /**
      * UCUM codes 'a' and 'mo' are intentionally absent — they are not supported for
      * date arithmetic per the FHIRPath spec (tests marked invalid="execution").
      *
@@ -1322,24 +1475,26 @@ final class FHIRPathEvaluator implements ExpressionVisitor
 
     /**
      * Evaluate string concatenation
+     *
+     * Per FHIRPath spec §6.7: unlike +, the & operator treats empty collections as
+     * empty strings rather than propagating empty. So 'a' & {} = 'a', not {}.
      */
     private function evaluateStringConcat(Collection $left, Collection $right): Collection
     {
-        if ($left->isEmpty() || $right->isEmpty()) {
-            return Collection::empty();
-        }
-
-        if (!$left->isSingle() || !$right->isSingle()) {
+        // Non-empty multi-item collections are still an error
+        if (!$left->isEmpty() && !$left->isSingle()) {
             throw new EvaluationException('String concatenation (&) requires single-item operands');
         }
 
-        // Normalize values to handle FHIR primitives and enums
-        $leftValue  = $this->normalizeValue($left->first());
-        $rightValue = $this->normalizeValue($right->first());
+        if (!$right->isEmpty() && !$right->isSingle()) {
+            throw new EvaluationException('String concatenation (&) requires single-item operands');
+        }
 
-        $result = (string) $leftValue . (string) $rightValue;
+        // Empty collection treated as empty string (per spec)
+        $leftValue  = $left->isEmpty()  ? '' : (string) $this->normalizeValue($left->first());
+        $rightValue = $right->isEmpty() ? '' : (string) $this->normalizeValue($right->first());
 
-        return Collection::single($result);
+        return Collection::single($leftValue . $rightValue);
     }
 
     /**
@@ -1456,7 +1611,8 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             return null;
         }
 
-        // Other types can't be converted to boolean in FHIRPath
-        return null;
+        // Per FHIRPath spec §6.1 singleton evaluation: any non-null single value
+        // in a boolean context evaluates to true.
+        return true;
     }
 }

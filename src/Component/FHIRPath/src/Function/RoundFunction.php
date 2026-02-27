@@ -41,21 +41,23 @@ class RoundFunction extends AbstractFunction
 
             $precisionResult = $evaluator->evaluate($parameters[0], $context);
             if (!$precisionResult->isEmpty()) {
-                $precisionValue = $precisionResult->first();
-                if (!is_numeric($precisionValue)) {
+                $precisionValue   = $precisionResult->first();
+                $precisionNumeric = $this->extractNumeric($precisionValue);
+                if ($precisionNumeric === null) {
                     throw EvaluationException::invalidFunctionParameter('round', 'precision', 'number');
                 }
-                $precision = (int) $precisionValue;
+                $precision = (int) $precisionNumeric;
             }
         }
 
         $items = [];
         foreach ($input as $item) {
-            if (!is_numeric($item)) {
+            $numeric = $this->extractNumeric($item);
+            if ($numeric === null) {
                 throw EvaluationException::invalidFunctionParameter('round', 'input', 'number');
             }
 
-            $items[] = round((float) $item, $precision);
+            $items[] = round((float) $numeric, $precision);
         }
 
         return Collection::from($items);

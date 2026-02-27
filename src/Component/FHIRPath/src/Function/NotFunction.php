@@ -58,8 +58,9 @@ final class NotFunction extends AbstractFunction
         $value = $input->first();
 
         if (!is_bool($value)) {
-            // Can only negate boolean values (true/false)
-            return Collection::empty();
+            // Per FHIRPath spec §6.1 singleton evaluation: a non-boolean single item
+            // evaluates to true in a boolean context, so not(true) = false.
+            return Collection::single(false);
         }
 
         // Flip the boolean: true → false, false → true

@@ -30,11 +30,12 @@ final class FloorFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        $value = $input->first();
-        if (!is_numeric($value)) {
+        $value   = $input->first();
+        $numeric = $this->extractNumeric($value);
+        if ($numeric === null) {
             throw EvaluationException::invalidFunctionParameter($this->getName(), 'input', 'number');
         }
 
-        return Collection::single((int) floor((float) $value));
+        return Collection::single((int) floor((float) $numeric));
     }
 }

@@ -32,16 +32,22 @@ class MinFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        $min = null;
+        $min    = null;
+        $minVal = null;
         foreach ($input as $item) {
-            if (!is_numeric($item)) {
+            $numeric = $this->extractNumeric($item);
+            if ($numeric === null) {
                 throw EvaluationException::invalidFunctionParameter('min', 'numeric values', gettype($item));
             }
 
-            if ($min === null || $item < $min) {
-                $min = $item;
+            $floatVal = (float) $numeric;
+            if ($minVal === null || $floatVal < $minVal) {
+                $minVal = $floatVal;
+                $min    = $numeric;
             }
         }
+
+        assert($min !== null);
 
         return Collection::single($min);
     }

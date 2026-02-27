@@ -119,15 +119,16 @@ final class TypeExpressionEvaluatorTest extends TestCase
 
     public function testIsOperatorWithIntegerDecimalCompatibility(): void
     {
-        // Integer is compatible with decimal — returns true (per FHIRTypeResolver).
+        // Per FHIRPath spec, `is` is strict type identity — Integer is NOT Decimal.
+        // Implicit integer→decimal promotion applies in arithmetic/comparison contexts, not `is`.
         $result = $this->evaluate('42 is decimal', null);
         self::assertSame(1, $result->count());
-        self::assertTrue($result->first());
+        self::assertFalse($result->first());
 
         $fhirInteger = new FHIRInteger(value: 100);
         $result      = $this->evaluate('$this is decimal', $fhirInteger);
         self::assertSame(1, $result->count());
-        self::assertTrue($result->first());
+        self::assertFalse($result->first());
     }
 
     public function testAsOperatorWithPrimitiveValues(): void

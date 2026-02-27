@@ -94,9 +94,10 @@ final class FHIRTypeResolverTest extends TestCase
 
     public function testIsOfTypeIntegerDecimalCompatibility(): void
     {
-        // Integer should be compatible with decimal
-        self::assertTrue($this->resolver->isOfType(42, 'decimal'));
-        self::assertTrue($this->resolver->isOfType(new FHIRInteger(value: 42), 'decimal'));
+        // Per FHIRPath spec, `is` uses strict type identity — Integer is NOT Decimal.
+        // Implicit promotion applies in arithmetic/comparison contexts only.
+        self::assertFalse($this->resolver->isOfType(42, 'decimal'));
+        self::assertFalse($this->resolver->isOfType(new FHIRInteger(value: 42), 'decimal'));
     }
 
     public function testCastToBoolean(): void

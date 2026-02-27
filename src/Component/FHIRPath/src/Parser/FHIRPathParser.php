@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Expression\LiteralNode;
 use Ardenexal\FHIRTools\Component\FHIRPath\Expression\MemberAccessNode;
 use Ardenexal\FHIRTools\Component\FHIRPath\Expression\TypeExpressionNode;
 use Ardenexal\FHIRTools\Component\FHIRPath\Expression\UnaryOperatorNode;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
 
 /**
  * Recursive descent parser for FHIRPath expressions.
@@ -419,11 +420,15 @@ class FHIRPathParser
 
     /**
      * Parse a number value.
+     *
+     * Integers are returned as PHP int. Decimal numbers are wrapped in FHIRPathDecimal
+     * to preserve their exact string representation for bcmath arithmetic, avoiding
+     * IEEE 754 floating-point rounding errors in FHIRPath expressions.
      */
-    private function parseNumber(string $value): int|float
+    private function parseNumber(string $value): int|FHIRPathDecimal
     {
         if (str_contains($value, '.') || str_contains($value, 'e') || str_contains($value, 'E')) {
-            return (float) $value;
+            return new FHIRPathDecimal($value);
         }
 
         return (int) $value;
@@ -431,6 +436,8 @@ class FHIRPathParser
 
     /**
      * Check if current token matches any of the given types and advance if so.
+     *
+     * @phpstan-impure
      */
     private function match(TokenType ...$types): bool
     {
@@ -493,6 +500,8 @@ class FHIRPathParser
 
     /**
      * Get the current token without advancing.
+     *
+     * @phpstan-impure
      */
     private function peek(): Token
     {
