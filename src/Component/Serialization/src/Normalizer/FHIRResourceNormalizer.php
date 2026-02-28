@@ -650,6 +650,16 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
                     // set on the resulting instance (future work).
                     if ($this->denormalizer !== null && $propertyType !== null && !$this->isBuiltinType($propertyType)) {
                         $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, 'json', $context);
+                    } elseif ($propertyType === 'array' && is_array($value) && $this->denormalizer !== null) {
+                        $meta = $metaMap[$elementName] ?? null;
+                        if ($meta !== null) {
+                            $elementClass = $this->resolveArrayElementClass($resolvedType, $elementName, $meta);
+                            $denormalizedValue = $elementClass !== null
+                                ? $this->denormalizeArrayProperty($value, $elementClass, 'json', $context)
+                                : $value;
+                        } else {
+                            $denormalizedValue = $value;
+                        }
                     } else {
                         $denormalizedValue = $value;
                     }
@@ -724,6 +734,17 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
 
                     if ($this->denormalizer !== null && $propertyType !== null && !$this->isBuiltinType($propertyType)) {
                         $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, 'xml', $context);
+                    } elseif ($propertyType === 'array' && $this->denormalizer !== null) {
+                        $meta = $metaMap[$elementName] ?? null;
+                        if ($meta !== null) {
+                            $elementClass      = $this->resolveArrayElementClass($resolvedType, $elementName, $meta);
+                            $unwrapped         = $this->unwrapXmlValue($value, $propertyType);
+                            $denormalizedValue = $elementClass !== null && is_array($unwrapped)
+                                ? $this->denormalizeArrayProperty($unwrapped, $elementClass, 'xml', $context)
+                                : $unwrapped;
+                        } else {
+                            $denormalizedValue = $this->unwrapXmlValue($value, $propertyType);
+                        }
                     } else {
                         // For built-in PHP types, unwrap the FHIR XML @value wrapper if present.
                         // Symfony XmlEncoder decodes <id value="example"/> as ['@value' => 'example'].

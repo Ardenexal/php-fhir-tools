@@ -497,6 +497,16 @@ class FHIRPrimitiveTypeNormalizer extends AbstractFHIRNormalizer
             }
         }
 
+        // XmlEncoder converts <foo value="2012"/> to ['@value' => 2012] (integer).
+        // Year-only FHIR partial dates are valid dateTime values — coerce to string.
+        if (is_int($value)) {
+            try {
+                return new \DateTimeImmutable((string) $value);
+            } catch (\Exception $e) {
+                throw new NotNormalizableValueException(sprintf('Expected dateTime string, got invalid integer value: %d', $value));
+            }
+        }
+
         throw new NotNormalizableValueException(sprintf('Expected dateTime string or DateTimeInterface, got %s', gettype($value)));
     }
 

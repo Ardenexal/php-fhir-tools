@@ -140,10 +140,31 @@ class FHIRBackboneElementNormalizer extends AbstractFHIRNormalizer
                             $propertyType = $this->getPropertyType($property);
                             if ($propertyType !== null && !$this->isBuiltinType($propertyType)) {
                                 $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, $format, $context);
+                            } elseif ($propertyType === 'array' && is_array($value)) {
+                                $meta = $metaMap[$elementName] ?? null;
+                                if ($meta !== null) {
+                                    $elementClass = $this->resolveArrayElementClass($type, $elementName, $meta);
+                                    if ($elementClass !== null) {
+                                        $unwrapped         = $format === 'xml' ? $this->unwrapXmlValue($value, $propertyType) : $value;
+                                        $denormalizedValue = is_array($unwrapped)
+                                            ? $this->denormalizeArrayProperty($unwrapped, $elementClass, $format, $context)
+                                            : $unwrapped;
+                                    } else {
+                                        $denormalizedValue = $format === 'xml' ? $this->unwrapXmlValue($value, $propertyType) : $value;
+                                    }
+                                } else {
+                                    $denormalizedValue = $format === 'xml' ? $this->unwrapXmlValue($value, $propertyType) : $value;
+                                }
                             } else {
                                 // For XML, Symfony XmlEncoder wraps primitive values as ['@value' => '...', '#' => ''].
                                 // Unwrap before assigning to string/union-typed properties.
                                 $denormalizedValue = $format === 'xml' ? $this->unwrapXmlValue($value, $propertyType) : $value;
+                                // If unwrapping still leaves an array (e.g. a primitive with child
+                                // extension elements: ['@value' => '...', 'extension' => [...]]),
+                                // try the denormalizer against each non-built-in type in the union.
+                                if (is_array($denormalizedValue)) {
+                                    $denormalizedValue = $this->tryDenormalizeForUnionType($property, $denormalizedValue, $format, $context);
+                                }
                             }
                         } else {
                             // Without a denormalizer, we can only handle scalar values properly

@@ -259,6 +259,93 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     }
 
     /**
+     * Resolve the PHP element class for an array-typed FHIR property.
+     *
+     * Inspects the PropertyMetadata to determine what concrete PHP class each element of an
+     * `array`-typed property should be denormalized to. Returns null when the class cannot be
+     * determined or when denormalization per element is not needed (scalars, raw resources, etc.).
+     *
+     * Resolution rules:
+     * - 'complex'  → Ardenexal\FHIRTools\Component\Models\{version}\DataType\{fhirType}
+     * - 'backbone' → {ownerNamespace}\{ResourceType}\{ResourceType}{ucfirst($propertyName)}
+     *
+     * @param string           $ownerClass    Fully-qualified class name of the object being denormalized
+     * @param string           $propertyName  The PHP property name (e.g. 'name', 'parameter')
+     * @param PropertyMetadata $meta          Metadata for this property
+     */
+    protected function resolveArrayElementClass(string $ownerClass, string $propertyName, PropertyMetadata $meta): ?string
+    {
+        // Only act on kinds that produce typed sub-objects
+        if (!in_array($meta->propertyKind, ['complex', 'backbone'], true)) {
+            return null;
+        }
+
+        // Extract FHIR version from owner class namespace: ...Models\{version}\...
+        $version = null;
+        if (preg_match('/\\\\Models\\\\(R\\d+[AB]?)\\\\/', $ownerClass, $m)) {
+            $version = $m[1];
+        }
+
+        if ($version === null) {
+            return null;
+        }
+
+        if ($meta->propertyKind === 'complex') {
+            $candidate = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\DataType\\{$meta->fhirType}";
+
+            return class_exists($candidate) ? $candidate : null;
+        }
+
+        // backbone: derive nested class from owner class name + property name
+        // Pattern: {ownerNamespace}\{ResourceType}\{ResourceType}{ucfirst(propertyName)}
+        // e.g. ParametersResource + 'parameter' → ..\Parameters\ParametersParameter
+        $parts           = explode('\\', $ownerClass);
+        $ownerShortName  = end($parts);
+        $resourceTypeName = str_ends_with($ownerShortName, 'Resource')
+            ? substr($ownerShortName, 0, -8)
+            : $ownerShortName;
+        $ownerNamespace = implode('\\', array_slice($parts, 0, -1));
+        $backboneName   = $resourceTypeName . ucfirst($propertyName);
+        $candidate      = "{$ownerNamespace}\\{$resourceTypeName}\\{$backboneName}";
+
+        return class_exists($candidate) ? $candidate : null;
+    }
+
+    /**
+     * Denormalize all elements of a raw array property into typed objects.
+     *
+     * Handles both JSON (always a list) and XML (single element = assoc array, multiple = list).
+     *
+     * @param mixed                $rawValue     The raw value from the deserializer
+     * @param string               $elementClass The PHP class to denormalize each element to
+     * @param string|null          $format       'json', 'xml', or null
+     * @param array<string, mixed> $context      Symfony serializer context
+     *
+     * @return array<mixed>
+     */
+    protected function denormalizeArrayProperty(mixed $rawValue, string $elementClass, ?string $format, array $context): array
+    {
+        if (!is_array($rawValue) || $this->denormalizer === null) {
+            return is_array($rawValue) ? $rawValue : [];
+        }
+
+        // JSON and XML (multiple elements): already a list array — denormalize each item
+        if (array_is_list($rawValue)) {
+            $result = [];
+            foreach ($rawValue as $item) {
+                $result[] = is_array($item)
+                    ? $this->denormalizer->denormalize($item, $elementClass, $format, $context)
+                    : $item;
+            }
+
+            return $result;
+        }
+
+        // XML single element: an assoc array representing one sub-object — wrap after denormalizing
+        return [$this->denormalizer->denormalize($rawValue, $elementClass, $format, $context)];
+    }
+
+    /**
      * Resolve the concrete propertyKind and JSON/XML key for a choice element value.
      *
      * Iterates over the compiled variant list and matches the runtime value by PHP type.
@@ -310,6 +397,42 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         }
 
         return null;
+    }
+
+    /**
+     * Attempt to denormalize a value for a union-typed property by trying each
+     * non-built-in candidate type in the union.
+     *
+     * Returns the original value when no candidate type supports denormalization.
+     * Used after `unwrapXmlValue` when the result is still an array — for example,
+     * a FHIR primitive XML element that carries child extension elements alongside
+     * its `@value` attribute (e.g. `['@value' => 'du Marché', 'extension' => [...]]`).
+     *
+     * @param array<string, mixed> $context
+     */
+    protected function tryDenormalizeForUnionType(\ReflectionProperty $property, mixed $value, ?string $format, array $context): mixed
+    {
+        if ($this->denormalizer === null) {
+            return $value;
+        }
+
+        $type = $property->getType();
+        if (!$type instanceof \ReflectionUnionType) {
+            return $value;
+        }
+
+        foreach ($type->getTypes() as $t) {
+            if (!$t instanceof \ReflectionNamedType || $t->isBuiltin()) {
+                continue;
+            }
+
+            $candidateType = $t->getName();
+            if ($this->denormalizer->supportsDenormalization($value, $candidateType, $format, $context)) {
+                return $this->denormalizer->denormalize($value, $candidateType, $format, $context);
+            }
+        }
+
+        return $value;
     }
 
     /**

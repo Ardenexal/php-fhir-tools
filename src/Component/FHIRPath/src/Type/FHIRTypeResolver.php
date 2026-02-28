@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Type;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRPrimitive;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
 
 /**
@@ -146,6 +147,16 @@ class FHIRTypeResolver
                 $primitive = $attrs[0]->newInstance();
 
                 return $primitive->primitiveType;
+            }
+
+            // Check if the object has a FhirResource attribute — gives the canonical FHIR
+            // resource type (e.g. 'Patient') rather than the PHP class name ('PatientResource').
+            $resourceAttrs = $ref->getAttributes(FhirResource::class);
+            if (!empty($resourceAttrs)) {
+                /** @var FhirResource $resourceAttr */
+                $resourceAttr = $resourceAttrs[0]->newInstance();
+
+                return $resourceAttr->type;
             }
 
             // Get the class name and extract the FHIR type
