@@ -29,6 +29,11 @@ final class FhirProperty
     /**
      * @param list<array{fhirType: string, propertyKind: string, phpType: string, jsonKey: string}>|null $variants
      *                                                                                                             Populated only when isChoice is true. Each variant describes one concrete type in the union.
+     * @param string|null                                                                                  $phpClass
+     *                                                                                                             Fully-qualified PHP class name for each element of an array-typed complex or backbone
+     *                                                                                                             property (e.g. 'Ardenexal\...\R4\DataType\HumanName'). Null for non-array, primitive,
+     *                                                                                                             scalar, choice, and resource properties. Used by the serializer to denormalize array
+     *                                                                                                             elements to typed objects without namespace heuristics.
      */
     public function __construct(
         /** FHIR type code: 'date', 'HumanName', 'BackboneElement', 'choice', etc. */
@@ -49,6 +54,7 @@ final class FhirProperty
          * element name (e.g. 'deceasedBoolean', 'deceasedDateTime').
          */
         public readonly ?string $jsonKey = null,
+        public readonly ?string $phpClass = null,
     ) {
     }
 }

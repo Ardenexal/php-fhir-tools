@@ -658,6 +658,14 @@ class FHIRModelGenerator implements GeneratorInterface
         $isRequired   = (int) ($element['min'] ?? 0) >= 1;
         $variants     = $isChoice ? $this->buildChoiceVariants($element, $version, $builderContext) : null;
 
+        // phpClass: FQCN of each element for array complex/backbone properties.
+        // The generator already computed $types — we just persist types[0] stripped of its
+        // leading backslash so the serializer never needs namespace heuristics at runtime.
+        $phpClass = null;
+        if ($isArray && !$isChoice && in_array($propertyKind, ['complex', 'backbone'], true) && !empty($types)) {
+            $phpClass = ltrim($types[0], '\\');
+        }
+
         // Attribute args: variants strip isBuiltin (not part of FhirProperty::$variants schema)
         $attributeArgs = ['fhirType' => $fhirType, 'propertyKind' => $propertyKind];
         if ($isArray) {
@@ -672,6 +680,9 @@ class FHIRModelGenerator implements GeneratorInterface
                 static fn (array $v): array => array_diff_key($v, ['isBuiltin' => true]),
                 $variants ?? [],
             );
+        }
+        if ($phpClass !== null) {
+            $attributeArgs['phpClass'] = $phpClass;
         }
 
         if ($maxValue !== '0') {
@@ -708,6 +719,7 @@ class FHIRModelGenerator implements GeneratorInterface
                 'isChoice'     => $isChoice,
                 'jsonKey'      => null,
                 'variants'     => $variants,
+                'phpClass'     => $phpClass,
             ];
         }
 

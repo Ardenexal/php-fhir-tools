@@ -261,26 +261,23 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     /**
      * Resolve the PHP element class for an array-typed FHIR property.
      *
-     * Inspects the PropertyMetadata to determine what concrete PHP class each element of an
-     * `array`-typed property should be denormalized to. Returns null when the class cannot be
-     * determined or when denormalization per element is not needed (scalars, raw resources, etc.).
+     * Primary path: return PropertyMetadata::$phpClass, which the code generator populates
+     * with the FQCN of the element type for array complex/backbone properties.
      *
-     * Resolution rules:
-     * - 'complex'  → Ardenexal\FHIRTools\Component\Models\{version}\DataType\{fhirType}
-     * - 'backbone' → {ownerNamespace}\{ResourceType}\{ResourceType}{ucfirst($propertyName)}
-     *
-     * @param string           $ownerClass    Fully-qualified class name of the object being denormalized
-     * @param string           $propertyName  The PHP property name (e.g. 'name', 'parameter')
-     * @param PropertyMetadata $meta          Metadata for this property
+     * Fallback path: heuristic namespace derivation for models generated before phpClass was
+     * added to FHIR_PROPERTY_MAP. Remove once all models have been regenerated.
      */
     protected function resolveArrayElementClass(string $ownerClass, string $propertyName, PropertyMetadata $meta): ?string
     {
-        // Only act on kinds that produce typed sub-objects
+        if ($meta->phpClass !== null) {
+            return $meta->phpClass;
+        }
+
+        // Legacy fallback: heuristic derivation from owner class namespace + property metadata.
         if (!in_array($meta->propertyKind, ['complex', 'backbone'], true)) {
             return null;
         }
 
-        // Extract FHIR version from owner class namespace: ...Models\{version}\...
         $version = null;
         if (preg_match('/\\\\Models\\\\(R\\d+[AB]?)\\\\/', $ownerClass, $m)) {
             $version = $m[1];
@@ -296,17 +293,14 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             return class_exists($candidate) ? $candidate : null;
         }
 
-        // backbone: derive nested class from owner class name + property name
-        // Pattern: {ownerNamespace}\{ResourceType}\{ResourceType}{ucfirst(propertyName)}
-        // e.g. ParametersResource + 'parameter' → ..\Parameters\ParametersParameter
-        $parts           = explode('\\', $ownerClass);
-        $ownerShortName  = end($parts);
+        $parts            = explode('\\', $ownerClass);
+        $ownerShortName   = end($parts);
         $resourceTypeName = str_ends_with($ownerShortName, 'Resource')
             ? substr($ownerShortName, 0, -8)
             : $ownerShortName;
-        $ownerNamespace = implode('\\', array_slice($parts, 0, -1));
-        $backboneName   = $resourceTypeName . ucfirst($propertyName);
-        $candidate      = "{$ownerNamespace}\\{$resourceTypeName}\\{$backboneName}";
+        $ownerNamespace   = implode('\\', array_slice($parts, 0, -1));
+        $backboneName     = $resourceTypeName . ucfirst($propertyName);
+        $candidate        = "{$ownerNamespace}\\{$resourceTypeName}\\{$backboneName}";
 
         return class_exists($candidate) ? $candidate : null;
     }
