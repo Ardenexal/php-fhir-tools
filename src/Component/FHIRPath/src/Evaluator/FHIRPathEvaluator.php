@@ -233,6 +233,11 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         return $this->typeResolver;
     }
 
+    public function getComparisonService(): ComparisonService
+    {
+        return $this->comparisonService;
+    }
+
     /**
      * Evaluate an expression against a resource
      *

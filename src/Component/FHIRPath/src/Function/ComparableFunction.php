@@ -47,6 +47,28 @@ final class ComparableFunction extends AbstractFunction
         $inputValue = $input->first();
         $paramValue = $paramResult->first();
 
+        // Detect Quantity arrays (produced by FHIRPath Quantity literals like `1 'cm'`).
+        // Plain scalars (int/float) are excluded — they lack the 'unit'/'code' keys.
+        $isQty = static fn(mixed $v): bool =>
+            is_array($v)
+            && array_key_exists('value', $v)
+            && array_key_exists('unit', $v)
+            && array_key_exists('code', $v);
+
+        if ($isQty($inputValue) || $isQty($paramValue)) {
+            if (!$isQty($inputValue) || !$isQty($paramValue)) {
+                // One is a Quantity, the other is not — incomparable.
+                return Collection::single(false);
+            }
+
+            // Both are Quantities — comparable only when their units are commensurable.
+            /** @var array{value: float, code: string, unit: string, system: string|null} $inputValue */
+            /** @var array{value: float, code: string, unit: string, system: string|null} $paramValue */
+            $cs = $evaluator->getComparisonService();
+
+            return Collection::single($cs->quantitiesAreComparable($inputValue, $paramValue));
+        }
+
         // Both must be the same comparable type.
         // Integers and floats are mutually comparable (numeric).
         $inputType = $this->comparableType($inputValue);

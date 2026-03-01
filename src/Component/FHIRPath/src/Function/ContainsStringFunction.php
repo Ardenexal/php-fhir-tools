@@ -31,7 +31,7 @@ class ContainsStringFunction extends AbstractFunction
 
         $string = $input->first();
         if (!is_string($string)) {
-            return Collection::single(false);
+            throw EvaluationException::invalidFunctionParameter($this->getName(), 'input', 'string');
         }
 
         /** @var ExpressionNode $substringExpr */

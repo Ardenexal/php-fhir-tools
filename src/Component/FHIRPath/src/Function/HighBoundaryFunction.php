@@ -65,6 +65,23 @@ final class HighBoundaryFunction extends AbstractFunction
 
         $value = $input->first();
 
+        // --- Quantity input (e.g. `1.587 'm'` → array with 'value', 'unit', 'code') ---
+        // Apply the decimal high boundary to the numeric value and preserve the unit.
+        if (is_array($value) && array_key_exists('value', $value) && array_key_exists('unit', $value)) {
+            $numericValue = $value['value'];
+            if ($numericValue instanceof FHIRPathDecimal || is_float($numericValue) || is_int($numericValue)) {
+                if ($precision !== null && ($precision < 0 || $precision > 28)) {
+                    return Collection::empty();
+                }
+
+                $bounded        = $this->decimalHighBoundary($numericValue, $precision);
+                $result         = $value;
+                $result['value'] = $bounded->toFloat();
+
+                return Collection::single($result);
+            }
+        }
+
         // --- Decimal / integer input ---
         if ($value instanceof FHIRPathDecimal || is_float($value) || is_int($value)) {
             // Validate precision range per FHIRPath spec (0-28)
@@ -155,8 +172,11 @@ final class HighBoundaryFunction extends AbstractFunction
     {
         $truncated = bcadd($value, '0', $scale);
 
-        // If value > truncated (truncation went toward -∞), add 1 ULP
-        if (bccomp($value, $truncated, 20) > 0) {
+        // If value > truncated (truncation went toward -∞), add 1 ULP.
+        // Skip the adjustment when truncated is zero: the value is in the
+        // (0, step) band and truncation toward zero already gives the correct
+        // high-boundary representation (e.g. 0.0034.highBoundary(1) = 0.0).
+        if (bccomp($value, $truncated, 20) > 0 && bccomp($truncated, '0', $scale) !== 0) {
             $step = $scale === 0 ? '1' : '0.' . str_repeat('0', $scale - 1) . '1';
             assert(is_numeric($step));
             $truncated = bcadd($truncated, $step, $scale);
@@ -242,14 +262,14 @@ final class HighBoundaryFunction extends AbstractFunction
         $resolvedSecond = $second ?? '59';
 
         return match (true) {
-            $outPrec <= 4  => "@{$year}",
-            $outPrec <= 6  => "@{$year}-{$resolvedMonth}",
-            $outPrec <= 8  => "@{$year}-{$resolvedMonth}-{$resolvedDay}",
-            $outPrec <= 10 => "@{$year}-{$resolvedMonth}-{$resolvedDay}T{$resolvedHour}",
-            $outPrec <= 12 => "@{$year}-{$resolvedMonth}-{$resolvedDay}T{$resolvedHour}:{$resolvedMinute}",
-            $outPrec <= 14 => "@{$year}-{$resolvedMonth}-{$resolvedDay}T{$resolvedHour}:{$resolvedMinute}:{$resolvedSecond}",
+            $outPrec <= 4  => "{$year}",
+            $outPrec <= 6  => "{$year}-{$resolvedMonth}",
+            $outPrec <= 8  => "{$year}-{$resolvedMonth}-{$resolvedDay}",
+            $outPrec <= 10 => "{$year}-{$resolvedMonth}-{$resolvedDay}T{$resolvedHour}",
+            $outPrec <= 12 => "{$year}-{$resolvedMonth}-{$resolvedDay}T{$resolvedHour}:{$resolvedMinute}",
+            $outPrec <= 14 => "{$year}-{$resolvedMonth}-{$resolvedDay}T{$resolvedHour}:{$resolvedMinute}:{$resolvedSecond}",
             // Millisecond: append timezone (existing or -12:00 for widest high bound)
-            default        => "@{$year}-{$resolvedMonth}-{$resolvedDay}T{$resolvedHour}:{$resolvedMinute}:{$resolvedSecond}.999"
+            default        => "{$year}-{$resolvedMonth}-{$resolvedDay}T{$resolvedHour}:{$resolvedMinute}:{$resolvedSecond}.999"
                 . ($timezone ?? '-12:00'),
         };
     }
@@ -283,10 +303,10 @@ final class HighBoundaryFunction extends AbstractFunction
         $resolvedSecond = $second ?? '59';
 
         return match (true) {
-            $outPrec <= 2 => "@T{$hour}",
-            $outPrec <= 4 => "@T{$hour}:{$resolvedMinute}",
-            $outPrec <= 6 => "@T{$hour}:{$resolvedMinute}:{$resolvedSecond}",
-            default       => "@T{$hour}:{$resolvedMinute}:{$resolvedSecond}.999",
+            $outPrec <= 2 => "T{$hour}",
+            $outPrec <= 4 => "T{$hour}:{$resolvedMinute}",
+            $outPrec <= 6 => "T{$hour}:{$resolvedMinute}:{$resolvedSecond}",
+            default       => "T{$hour}:{$resolvedMinute}:{$resolvedSecond}.999",
         };
     }
 

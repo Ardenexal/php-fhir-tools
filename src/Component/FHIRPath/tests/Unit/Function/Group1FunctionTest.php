@@ -250,12 +250,12 @@ final class Group1FunctionTest extends TestCase
 
     public function testRepeatWithNoChildrenIsStable(): void
     {
-        // Scalar has no 'children' property → repeat returns just the input
+        // Scalar has no 'nothing' property → projection returns empty → result is empty
+        // Per spec, repeat() returns only projected items, NOT the original input.
         $resource = ['value' => 1];
         $result   = $this->evaluate('value.repeat(nothing)', $resource);
 
-        // nothing produces empty → repeat returns original single item
-        self::assertSame(1, $result->count());
+        self::assertTrue($result->isEmpty());
     }
 
     public function testRepeatBuildsTransitiveClosure(): void
@@ -265,11 +265,10 @@ final class Group1FunctionTest extends TestCase
         $b = ['id' => 'b', 'child' => $c];
         $a = ['id' => 'a', 'child' => $b];
 
-        // repeat(child) from a should give [a, b, c]
+        // repeat(child) from a returns projected items only (not the input itself): {b, c}
         $result = $this->evaluate('repeat(child)', $a);
 
-        // $a itself is the input, so result = {a, b, c}
-        self::assertSame(3, $result->count());
+        self::assertSame(2, $result->count());
     }
 
     public function testRepeatReturnsEmptyForEmptyInput(): void
@@ -281,16 +280,18 @@ final class Group1FunctionTest extends TestCase
 
     public function testRepeatDoesNotRepeatDuplicates(): void
     {
-        // Cycle: a → b → a (object identity prevents infinite loop)
+        // PHP arrays are value-typed: $a['child'] = copy of $b at assignment time.
+        // After all assignments, $a = ['id' => 'a', 'child' => ['id' => 'b']] (no cycle in $a).
+        // Per spec, repeat() returns only projected items (not the input).
+        // Frontier [$a] → projects to [$b_copy] → [$b_copy] projects to empty → result = [$b_copy].
         $a          = ['id' => 'a'];
         $b          = ['id' => 'b'];
         $a['child'] = $b;
         $b['child'] = $a;
 
-        // Objects are tracked by key, so this terminates
+        // Terminates with one projected item (the copy of $b that $a references)
         $result = $this->evaluate('repeat(child)', $a);
 
-        // Should contain $a and $b, no infinite loop
-        self::assertSame(2, $result->count());
+        self::assertSame(1, $result->count());
     }
 }

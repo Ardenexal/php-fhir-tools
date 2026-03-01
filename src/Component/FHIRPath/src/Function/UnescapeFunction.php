@@ -41,7 +41,7 @@ final class UnescapeFunction extends AbstractFunction
             throw new EvaluationException('Evaluator not available in context');
         }
 
-        $format = $evaluator->evaluate($parameters[0], $context)->first();
+        $format = $evaluator->evaluateWithContext($parameters[0], $context)->first();
         if (!is_string($format)) {
             throw EvaluationException::invalidFunctionParameter($this->getName(), 'format', 'string');
         }
@@ -57,15 +57,36 @@ final class UnescapeFunction extends AbstractFunction
 
     /**
      * Unescape a JSON-escaped string (without surrounding quotes).
+     *
+     * Processes JSON escape sequences directly via regex, avoiding the json_decode
+     * wrapping strategy which breaks when the input contains literal double-quote characters.
      */
     private function unescapeJson(string $string): string
     {
-        // Wrap in quotes, decode, and unwrap
-        $decoded = json_decode('"' . $string . '"');
-        if ($decoded === null && json_last_error() !== JSON_ERROR_NONE) {
-            throw new EvaluationException('Failed to unescape string from JSON: ' . json_last_error_msg());
-        }
+        $result = preg_replace_callback(
+            '/\\\\(?:["\\\\\\/bfnrt]|u[0-9a-fA-F]{4})/',
+            static function (array $matches): string {
+                $seq = $matches[0];
 
-        return $decoded;
+                // \uXXXX unicode escape sequence
+                if ($seq[1] === 'u') {
+                    return mb_chr((int) hexdec(substr($seq, 2)), 'UTF-8');
+                }
+
+                return match ($seq) {
+                    '\\"'  => '"',
+                    '\\\\'  => '\\',
+                    '\\/'  => '/',
+                    '\\b'  => "\x08",
+                    '\\f'  => "\x0C",
+                    '\\n'  => "\n",
+                    '\\r'  => "\r",
+                    default => "\t",
+                };
+            },
+            $string
+        );
+
+        return $result ?? $string;
     }
 }

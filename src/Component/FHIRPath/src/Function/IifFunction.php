@@ -26,7 +26,7 @@ class IifFunction extends AbstractFunction
 
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection
     {
-        $this->validateParameterCount($parameters, 3, 3);
+        $this->validateParameterCount($parameters, 2, 3);
 
         $evaluator = $context->getEvaluator();
         if ($evaluator === null) {
@@ -38,8 +38,14 @@ class IifFunction extends AbstractFunction
             throw new EvaluationException('iif() requires a single-item or empty input collection');
         }
 
+        // When input has a single item, expose it as $this and as the current node so that
+        // condition/branches can reference $this to mean the iif's focus (e.g. $this = 'context').
+        $evalContext = !$input->isEmpty()
+            ? $context->withCurrentNode($input->first())->withVariable('this', $input->first())
+            : $context;
+
         // Evaluate condition
-        $conditionResult = $evaluator->evaluate($parameters[0], $context);
+        $conditionResult = $evaluator->evaluateWithContext($parameters[0], $evalContext);
 
         // Condition must evaluate to a single boolean per FHIRPath spec
         if ($conditionResult->isEmpty()) {
@@ -58,10 +64,14 @@ class IifFunction extends AbstractFunction
 
         // If condition is true, evaluate and return ifTrue branch
         if ($condition === true) {
-            return $evaluator->evaluate($parameters[1], $context);
+            return $evaluator->evaluateWithContext($parameters[1], $evalContext);
         }
 
-        // Otherwise, evaluate and return ifFalse branch
-        return $evaluator->evaluate($parameters[2], $context);
+        // Otherwise, evaluate and return ifFalse branch (optional — returns empty if omitted)
+        if (count($parameters) < 3) {
+            return Collection::empty();
+        }
+
+        return $evaluator->evaluateWithContext($parameters[2], $evalContext);
     }
 }

@@ -85,6 +85,8 @@ final class ComparisonService
         'cm'      => ['base' => 'm', 'factor' => 0.01],
         'mm'      => ['base' => 'm', 'factor' => 0.001],
         'km'      => ['base' => 'm', 'factor' => 1000.0],
+        '[in_i]'  => ['base' => 'm', 'factor' => 0.0254],
+        '[ft_i]'  => ['base' => 'm', 'factor' => 0.3048],
         'L'       => ['base' => 'L', 'factor' => 1.0],
         'mL'      => ['base' => 'L', 'factor' => 0.001],
         'wk'      => ['base' => 'd', 'factor' => 7.0],
@@ -94,6 +96,22 @@ final class ComparisonService
     public function __construct(
         private readonly FHIRPathEvaluator $evaluator
     ) {
+    }
+
+    /**
+     * Determine whether two quantities are of the same physical dimension and
+     * can therefore be compared using ordering operators.
+     *
+     * Returns true when both units can be converted to a common base unit
+     * (i.e. they are commensurable). Returns false when the units belong to
+     * different physical dimensions or are not recognised.
+     *
+     * @param array{value: float, code: string, unit: string, system: string|null} $left
+     * @param array{value: float, code: string, unit: string, system: string|null} $right
+     */
+    public function quantitiesAreComparable(array $left, array $right): bool
+    {
+        return $this->compareQuantityValues($left, $right) !== null;
     }
 
     /**

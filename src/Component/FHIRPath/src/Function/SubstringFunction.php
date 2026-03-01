@@ -36,7 +36,7 @@ final class SubstringFunction extends AbstractFunction
 
         $str = $input->first();
         if (!is_string($str)) {
-            throw EvaluationException::invalidFunctionParameter('substring', 'input', 'string');
+            return Collection::empty();
         }
 
         $evaluator = $context->getEvaluator();

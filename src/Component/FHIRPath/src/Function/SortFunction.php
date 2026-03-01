@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Expression\ExpressionNode;
 use Ardenexal\FHIRTools\Component\FHIRPath\Expression\UnaryOperatorNode;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\TokenType;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
 
 /**
  * sort() function - Sorts a collection by natural order or by projection expressions.
@@ -60,8 +61,8 @@ final class SortFunction extends AbstractFunction
             }
         }
 
-        // Sort using PHP's natural comparison
-        usort($items, fn ($a, $b) => $a <=> $b);
+        // Sort using compareValues for consistent type handling
+        usort($items, fn ($a, $b) => $this->compareValues($a, $b));
 
         return Collection::from($items);
     }
@@ -172,15 +173,24 @@ final class SortFunction extends AbstractFunction
      */
     private function compareValues(mixed $a, mixed $b): int
     {
-        // Nulls sort before any value
+        // Per FHIRPath spec: items with empty sort keys are placed at the END of the sorted sequence.
+        // This means null sorts LAST in ascending order (NULLS LAST).
         if ($a === null && $b === null) {
             return 0;
         }
         if ($a === null) {
-            return -1;
+            return 1;   // null > non-null → null sorts after (at end)
         }
         if ($b === null) {
-            return 1;
+            return -1;  // non-null < null → non-null sorts before
+        }
+
+        // Normalize non-decimal Stringable objects (e.g. FHIR primitive wrappers) to strings
+        if ($a instanceof \Stringable && !($a instanceof FHIRPathDecimal)) {
+            $a = (string) $a;
+        }
+        if ($b instanceof \Stringable && !($b instanceof FHIRPathDecimal)) {
+            $b = (string) $b;
         }
 
         // Type validation
@@ -191,7 +201,22 @@ final class SortFunction extends AbstractFunction
             throw new EvaluationException(sprintf('Cannot compare incompatible types for sorting: %s and %s', $aType ?? 'unknown', $bType ?? 'unknown'));
         }
 
-        // Use spaceship operator for natural comparison
+        // FHIRPathDecimal uses bccomp for arbitrary-precision numeric comparison
+        if ($a instanceof FHIRPathDecimal || $b instanceof FHIRPathDecimal) {
+            $aStr  = $a instanceof FHIRPathDecimal ? $a->value : (string) $a;
+            $bStr  = $b instanceof FHIRPathDecimal ? $b->value : (string) $b;
+            $scale = max(
+                $a instanceof FHIRPathDecimal ? $a->precision : 0,
+                $b instanceof FHIRPathDecimal ? $b->precision : 0,
+            ) + 4;
+
+            // Assert numeric-string so bccomp receives the correct type per PHPStan
+            assert(is_numeric($aStr));
+            assert(is_numeric($bStr));
+
+            return bccomp($aStr, $bStr, $scale);
+        }
+
         return $a <=> $b;
     }
 
@@ -200,10 +225,12 @@ final class SortFunction extends AbstractFunction
      */
     private function getComparableType(mixed $value): ?string
     {
-        if (is_int($value) || is_float($value)) {
+        if ($value instanceof FHIRPathDecimal || is_int($value) || is_float($value)) {
             return 'numeric';
         }
-        if (is_string($value)) {
+        // FHIRPathDecimal is already handled above; the instanceof check here is always false
+        // but we keep \Stringable for other wrapper objects (e.g. FHIR primitive wrappers).
+        if (is_string($value) || $value instanceof \Stringable) {
             return 'string';
         }
         if (is_bool($value)) {

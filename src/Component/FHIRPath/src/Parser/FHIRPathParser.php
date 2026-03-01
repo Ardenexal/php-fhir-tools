@@ -383,6 +383,29 @@ class FHIRPathParser
             return new IdentifierNode($token->value, $token->line, $token->column);
         }
 
+        // Contextual keywords: 'contains' and 'in' can appear as property names in expression
+        // position (e.g. repeat(contains), expansion.contains). When followed by '(' treat as
+        // a function call; otherwise treat as an identifier (member/property name).
+        if ($this->match(TokenType::CONTAINS, TokenType::IN)) {
+            $token = $this->previous();
+
+            if ($this->match(TokenType::LPAREN)) {
+                $parameters = [];
+
+                if (!$this->check(TokenType::RPAREN)) {
+                    do {
+                        $parameters[] = $this->parseExpression();
+                    } while ($this->match(TokenType::COMMA));
+                }
+
+                $this->consume(TokenType::RPAREN, ')');
+
+                return new FunctionCallNode($token->value, $parameters, $token->line, $token->column);
+            }
+
+            return new IdentifierNode($token->value, $token->line, $token->column);
+        }
+
         // Function call or identifier
         if ($this->match(TokenType::IDENTIFIER)) {
             $identifier = $this->previous();

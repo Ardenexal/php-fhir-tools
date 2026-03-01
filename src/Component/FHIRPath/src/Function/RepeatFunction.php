@@ -62,21 +62,19 @@ final class RepeatFunction extends AbstractFunction
             throw new EvaluationException('Evaluator not available in context', 0, 0);
         }
 
-        // Seed result with the input items
-        $result = [];
-        $seen   = [];
+        // Per spec: repeat(expr) returns only items produced by applying the projection,
+        // NOT the original input. Start with empty result and use input as the first frontier.
+        $result   = [];
+        $seen     = [];
+        $frontier = [];
 
         foreach ($input as $item) {
             $key = $this->itemKey($item);
             if (!isset($seen[$key])) {
                 $seen[$key] = true;
-                $result[]   = $item;
+                $frontier[] = $item;
             }
         }
-
-        // Iteratively apply the projection to newly added items only.
-        // $frontier holds items that have not yet had the projection applied.
-        $frontier = $result;
 
         while (!empty($frontier)) {
             $nextFrontier = [];

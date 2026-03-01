@@ -68,6 +68,23 @@ final class LowBoundaryFunction extends AbstractFunction
 
         $value = $input->first();
 
+        // --- Quantity input (e.g. `1.587 'cm'` → array with 'value', 'unit', 'code') ---
+        // Apply the decimal low boundary to the numeric value and preserve the unit.
+        if (is_array($value) && array_key_exists('value', $value) && array_key_exists('unit', $value)) {
+            $numericValue = $value['value'];
+            if ($numericValue instanceof FHIRPathDecimal || is_float($numericValue) || is_int($numericValue)) {
+                if ($precision !== null && ($precision < 0 || $precision > 28)) {
+                    return Collection::empty();
+                }
+
+                $bounded        = $this->decimalLowBoundary($numericValue, $precision);
+                $result         = $value;
+                $result['value'] = $bounded->toFloat();
+
+                return Collection::single($result);
+            }
+        }
+
         // --- Decimal / integer input ---
         if ($value instanceof FHIRPathDecimal || is_float($value) || is_int($value)) {
             // Validate precision range per FHIRPath spec (0-28)
@@ -166,8 +183,11 @@ final class LowBoundaryFunction extends AbstractFunction
     {
         $truncated = bcadd($value, '0', $scale);
 
-        // If value < truncated (truncation went toward +∞), subtract 1 ULP
-        if (bccomp($value, $truncated, 20) < 0) {
+        // If value < truncated (truncation went toward +∞), subtract 1 ULP.
+        // Skip the adjustment when truncated is zero: the value is in the
+        // (-step, 0) band and truncation toward zero already gives the correct
+        // low-boundary representation (e.g. (-0.0034).lowBoundary(1) = -0.0).
+        if (bccomp($value, $truncated, 20) < 0 && bccomp($truncated, '0', $scale) !== 0) {
             $step = $scale === 0 ? '1' : '0.' . str_repeat('0', $scale - 1) . '1';
             assert(is_numeric($step));
             $truncated = bcsub($truncated, $step, $scale);
@@ -259,14 +279,14 @@ final class LowBoundaryFunction extends AbstractFunction
         $outMilli  = $milli  ?? '000';
 
         return match (true) {
-            $outPrec <= 4  => "@{$outYear}",
-            $outPrec <= 6  => "@{$outYear}-{$outMonth}",
-            $outPrec <= 8  => "@{$outYear}-{$outMonth}-{$outDay}",
-            $outPrec <= 10 => "@{$outYear}-{$outMonth}-{$outDay}T{$outHour}",
-            $outPrec <= 12 => "@{$outYear}-{$outMonth}-{$outDay}T{$outHour}:{$outMinute}",
-            $outPrec <= 14 => "@{$outYear}-{$outMonth}-{$outDay}T{$outHour}:{$outMinute}:{$outSecond}",
+            $outPrec <= 4  => "{$outYear}",
+            $outPrec <= 6  => "{$outYear}-{$outMonth}",
+            $outPrec <= 8  => "{$outYear}-{$outMonth}-{$outDay}",
+            $outPrec <= 10 => "{$outYear}-{$outMonth}-{$outDay}T{$outHour}",
+            $outPrec <= 12 => "{$outYear}-{$outMonth}-{$outDay}T{$outHour}:{$outMinute}",
+            $outPrec <= 14 => "{$outYear}-{$outMonth}-{$outDay}T{$outHour}:{$outMinute}:{$outSecond}",
             // Millisecond precision: append timezone (existing or +14:00 for widest low bound)
-            default        => "@{$outYear}-{$outMonth}-{$outDay}T{$outHour}:{$outMinute}:{$outSecond}.{$outMilli}"
+            default        => "{$outYear}-{$outMonth}-{$outDay}T{$outHour}:{$outMinute}:{$outSecond}.{$outMilli}"
                 . ($timezone ?? '+14:00'),
         };
     }
@@ -306,10 +326,10 @@ final class LowBoundaryFunction extends AbstractFunction
         $outMilli  = $milli  ?? '000';
 
         return match (true) {
-            $outPrec <= 2 => "@T{$hour}",
-            $outPrec <= 4 => "@T{$hour}:{$outMinute}",
-            $outPrec <= 6 => "@T{$hour}:{$outMinute}:{$outSecond}",
-            default       => "@T{$hour}:{$outMinute}:{$outSecond}.{$outMilli}",
+            $outPrec <= 2 => "T{$hour}",
+            $outPrec <= 4 => "T{$hour}:{$outMinute}",
+            $outPrec <= 6 => "T{$hour}:{$outMinute}:{$outSecond}",
+            default       => "T{$hour}:{$outMinute}:{$outSecond}.{$outMilli}",
         };
     }
 }

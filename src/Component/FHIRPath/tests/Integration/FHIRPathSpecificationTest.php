@@ -178,8 +178,59 @@ final class FHIRPathSpecificationTest extends TestCase
                 $actual = $actual->toFloat();
             }
 
+            $expectedType  = $expected['type'];
+            $expectedValue = $expected['value'];
+
+            // Handle Quantity array output (e.g. from lowBoundary/highBoundary on a Quantity
+            // input). A Quantity result is an array with 'value' (float) and 'unit' (string).
+            // Expected format: "1.58650000 'cm'" — compare value and unit separately.
+            if (is_array($actual) && array_key_exists('value', $actual) && array_key_exists('unit', $actual)) {
+                if (preg_match("/^(-?[\d.]+(?:[eE][+-]?\d+)?)\s+'([^']+)'$/", $expectedValue, $m)) {
+                    $qtyActualValue = $actual['value'];
+                    self::assertSame(
+                        (float) $m[1],
+                        is_float($qtyActualValue) ? $qtyActualValue : (float) $qtyActualValue,
+                        "Quantity value mismatch [{$i}] for expression: {$expression}",
+                    );
+                    self::assertSame(
+                        $m[2],
+                        (string) $actual['unit'],
+                        "Quantity unit mismatch [{$i}] for expression: {$expression}",
+                    );
+                } else {
+                    $this->markTestSkipped("Cannot compare Quantity output for expression: {$expression}");
+                }
+                continue;
+            }
+
+            // Infer expected type from the actual result type when the XML provides no type
+            // attribute. This covers functions like lowBoundary, highBoundary, precision, and
+            // comparable whose <output> elements omit the type attribute in the FHIR test XML.
+            if ($expectedType === '') {
+                if (is_bool($actual)) {
+                    $expectedType = 'boolean';
+                } elseif (is_float($actual)) {
+                    $expectedType = 'decimal';
+                } elseif (is_int($actual)) {
+                    $expectedType = 'integer';
+                } elseif (is_string($actual)) {
+                    if (str_starts_with($expectedValue, '@T')) {
+                        $expectedType = 'time';
+                    } elseif (str_starts_with($expectedValue, '@')) {
+                        $expectedType = 'dateTime'; // covers both date and dateTime (stripped identically)
+                    } elseif (str_contains($expectedValue, "'")) {
+                        // Quantity output (e.g. "1.58650000 'cm'") — not yet supported
+                        $this->markTestSkipped("Quantity output not yet supported: {$expectedValue}");
+                    } else {
+                        $expectedType = 'string';
+                    }
+                } else {
+                    $this->markTestSkipped("Cannot compare non-scalar output for expression: {$expression}");
+                }
+            }
+
             self::assertSame(
-                $this->castOutputValue($expected['value'], $expected['type']),
+                $this->castOutputValue($expectedValue, $expectedType),
                 $actual,
                 "Result item [{$i}] mismatch for expression: {$expression}",
             );
@@ -222,7 +273,7 @@ final class FHIRPathSpecificationTest extends TestCase
             'integer'          => (int) $value,
             'decimal'          => (float) $value,
             'string', 'code'   => $value,
-            'date', 'dateTime' => ltrim($value, '@'), // strip FHIRPath date literal prefix
+            'date', 'dateTime', 'time' => ltrim($value, '@'), // strip FHIRPath date/time literal prefix
             default            => $this->markTestSkipped("Unsupported output type: {$type}"),
         };
     }
