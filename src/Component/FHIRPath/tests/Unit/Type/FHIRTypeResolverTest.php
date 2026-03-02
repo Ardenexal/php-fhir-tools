@@ -71,17 +71,20 @@ final class FHIRTypeResolverTest extends TestCase
 
     public function testIsOfTypeWithFHIRPrimitives(): void
     {
+        // FHIR primitive wrappers (FHIRBoolean, FHIRString, etc.) are FHIR namespace types.
+        // Per FHIRPath spec: 'Boolean' = System.Boolean, 'boolean' = FHIR.boolean.
+        // A FHIR.boolean wrapper should match 'boolean' but NOT System.Boolean ('Boolean').
         $fhirBoolean = new FHIRBoolean(value: true);
         self::assertTrue($this->resolver->isOfType($fhirBoolean, 'boolean'));
-        self::assertTrue($this->resolver->isOfType($fhirBoolean, 'Boolean'));
+        self::assertFalse($this->resolver->isOfType($fhirBoolean, 'Boolean'));  // System.Boolean ≠ FHIR.boolean
 
         $fhirString = new FHIRString(value: 'test');
         self::assertTrue($this->resolver->isOfType($fhirString, 'string'));
-        self::assertTrue($this->resolver->isOfType($fhirString, 'String'));
+        self::assertFalse($this->resolver->isOfType($fhirString, 'String'));    // System.String ≠ FHIR.string
 
         $fhirInteger = new FHIRInteger(value: 123);
         self::assertTrue($this->resolver->isOfType($fhirInteger, 'integer'));
-        self::assertTrue($this->resolver->isOfType($fhirInteger, 'Integer'));
+        self::assertFalse($this->resolver->isOfType($fhirInteger, 'Integer'));  // System.Integer ≠ FHIR.integer
     }
 
     public function testIsOfTypeWithAny(): void

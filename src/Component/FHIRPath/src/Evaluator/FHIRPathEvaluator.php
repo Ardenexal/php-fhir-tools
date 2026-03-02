@@ -26,6 +26,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathTemporalTypeInterface;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathTime;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRTypeResolver;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRTypedScalar;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Log\LoggerInterface;
@@ -624,12 +625,14 @@ final class FHIRPathEvaluator implements ExpressionVisitor
 
         // Evaluate the expression to get the collection to check/cast
         $collection = $node->getExpression()->accept($this);
-        // Normalise namespace-qualified type names: System.Boolean → boolean, FHIR.Patient → Patient
-        $typeName = $this->typeResolver->normalizeTypeName($node->getTypeName());
-        $operator = $node->getOperator();
+        $operator   = $node->getOperator();
 
         // Handle 'is' operator — FHIRPath spec: returns a single boolean, not a filtered collection.
         // Empty input → empty; single item → bool result; multi-item → error.
+        //
+        // IMPORTANT: pass the raw (un-normalized) type name so that isOfType() can detect
+        // the System.* namespace distinction before normalization. e.g. 'System.Boolean' and
+        // 'Boolean' both normalize to 'boolean', but they refer to System namespace, not FHIR.
         if ($operator === TokenType::IS) {
             if ($collection->isEmpty()) {
                 return Collection::empty();
@@ -639,8 +642,11 @@ final class FHIRPathEvaluator implements ExpressionVisitor
                 throw new EvaluationException("'is' operator requires a single-item collection", $node->getLine(), $node->getColumn());
             }
 
-            return Collection::single($this->typeResolver->isOfType($collection->first(), $typeName));
+            return Collection::single($this->typeResolver->isOfType($collection->first(), $node->getTypeName()));
         }
+
+        // Normalise namespace-qualified type names: System.Boolean → boolean, FHIR.Patient → Patient
+        $typeName = $this->typeResolver->normalizeTypeName($node->getTypeName());
 
         // Handle 'as' operator - type casting
         if ($operator === TokenType::AS) {
@@ -825,6 +831,58 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     }
 
     /**
+     * Look up the FHIR type of a property on an object using its FHIR_PROPERTY_MAP constant.
+     *
+     * Returns the canonical FHIR type name (e.g. 'boolean', 'integer') only when the
+     * property is a scalar FHIR primitive type (not a System.* URL type). Returns null
+     * when the FHIR_PROPERTY_MAP is absent, the property is not in the map, the property
+     * is not a scalar, or the fhirType is a FHIRPath System type URL.
+     */
+    private function resolveFhirPropertyType(object $node, string $propertyName): ?string
+    {
+        $class = get_class($node);
+        if (!defined("{$class}::FHIR_PROPERTY_MAP")) {
+            return null;
+        }
+
+        /** @var array<string, array{fhirType?: string, propertyKind?: string, variants?: array<int, array{fhirType?: string, propertyKind?: string, phpType?: string, jsonKey?: string, isBuiltin?: bool}>|null}> $map */
+        $map = constant("{$class}::FHIR_PROPERTY_MAP");
+
+        // Direct property lookup
+        if (isset($map[$propertyName])) {
+            $meta = $map[$propertyName];
+            // Only wrap scalar properties with FHIR (not System.*) type names
+            if (($meta['propertyKind'] ?? '') === 'scalar'
+                && isset($meta['fhirType'])
+                && !str_starts_with($meta['fhirType'], 'http://')
+            ) {
+                return $meta['fhirType'];
+            }
+        }
+
+        // Check if this property is a variant of a choice property (e.g. 'valueBoolean' as part of 'value[x]')
+        // Walk all entries looking for a choice property whose variants include this prop name (via jsonKey)
+        foreach ($map as $propMeta) {
+            if (empty($propMeta['variants'])) {
+                continue;
+            }
+
+            foreach ($propMeta['variants'] as $variant) {
+                $jsonKey = $variant['jsonKey'] ?? null;
+                if ($jsonKey === $propertyName
+                    && ($variant['propertyKind'] ?? '') === 'scalar'
+                    && isset($variant['fhirType'])
+                    && !str_starts_with($variant['fhirType'], 'http://')
+                ) {
+                    return $variant['fhirType'];
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Navigate a property on a node
      */
     private function navigateProperty(mixed $node, string $propertyName): Collection
@@ -847,6 +905,13 @@ final class FHIRPathEvaluator implements ExpressionVisitor
                 try {
                     $value = $node->$propertyName;
 
+                    // Wrap PHP scalar values that have a known FHIR primitive type in FHIR_PROPERTY_MAP,
+                    // so that type() and is() can distinguish FHIR.boolean from System.Boolean.
+                    $fhirType = $this->resolveFhirPropertyType($node, $propertyName);
+                    if ($fhirType !== null && is_scalar($value)) {
+                        return Collection::single(new FHIRTypedScalar($value, $fhirType));
+                    }
+
                     return $this->wrapValue($value);
                 } catch (\Error $e) {
                     // Property exists but is not accessible (e.g., private/protected)
@@ -866,6 +931,12 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             // Look for properties like valueString, valueInteger, etc.
             foreach (get_object_vars($node) as $prop => $value) {
                 if (str_starts_with($prop, $propertyName) && $prop !== $propertyName) {
+                    // Look up FHIR type for the resolved variant property
+                    $fhirType = $this->resolveFhirPropertyType($node, $prop);
+                    if ($fhirType !== null && is_scalar($value)) {
+                        return Collection::single(new FHIRTypedScalar($value, $fhirType));
+                    }
+
                     return $this->wrapValue($value);
                 }
             }
@@ -944,6 +1015,11 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      */
     public function normalizeValue(mixed $value): mixed
     {
+        // FHIRTypedScalar → unwrap to PHP scalar (type context no longer needed in final output)
+        if ($value instanceof FHIRTypedScalar) {
+            return $value->value;
+        }
+
         // BackedEnum → scalar (e.g. PHP 8.1+ enums used in some model fields)
         if ($value instanceof \BackedEnum) {
             return $value->value;

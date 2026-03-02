@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Type;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRPrimitive;
-use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
 
 /**
  * Resolves and validates FHIR types using the generated FHIR models.
@@ -134,6 +133,12 @@ class FHIRTypeResolver
             return 'undefined';
         }
 
+        // FHIRTypedScalar wraps a PHP scalar with its FHIR type name to preserve
+        // FHIR type context for resource properties stored as PHP scalars.
+        if ($value instanceof FHIRTypedScalar) {
+            return $value->fhirType;
+        }
+
         if (is_bool($value)) {
             return 'boolean';
         }
@@ -184,6 +189,14 @@ class FHIRTypeResolver
                 return $primitive->primitiveType;
             }
 
+            // FHIR resources carry a canonical type name in their #[FhirResource(type: '...')]
+            // attribute (e.g. PatientResource → 'Patient'). Prefer this over the PHP class
+            // short name to avoid 'PatientResource' ≠ 'Patient' mismatches.
+            $resourceType = $this->findResourceTypeFromAttribute($ref);
+            if ($resourceType !== null) {
+                return $resourceType;
+            }
+
             // Get the class name and extract the FHIR type
             $class = get_class($value);
 
@@ -219,15 +232,35 @@ class FHIRTypeResolver
      */
     public function isOfType(mixed $value, string $typeName, bool $strict = false): bool
     {
+        // Detect FHIRPath System.* type specifiers BEFORE normalization so that
+        // 'Boolean' (= System.Boolean) can be distinguished from 'boolean' (= FHIR.boolean).
+        $fhirPathSystemPrimitives = ['Boolean', 'Integer', 'Decimal', 'String', 'Date', 'DateTime', 'Time', 'Quantity'];
+        $isRequestingSystemType   = str_starts_with($typeName, 'System.')
+            || in_array($typeName, $fhirPathSystemPrimitives, true);
+
         $typeName   = $this->normalizeTypeName($typeName);
         $actualType = $this->inferType($value);
+
+        // FHIR typed scalars (PHP bools/ints/floats/strings from FHIR resource properties)
+        // and FHIR model objects (primitive wrappers, resources, complex types) are FHIR
+        // namespace types, not System types.  Block System.* matching for both.
+        if ($isRequestingSystemType) {
+            if ($value instanceof FHIRTypedScalar) {
+                return false;
+            }
+
+            if (is_object($value) && $this->isFhirModelObject($value)) {
+                return false;
+            }
+        }
 
         // Exact match
         if ($actualType === $typeName) {
             return true;
         }
 
-        // Case-insensitive match
+        // Case-insensitive match — kept for PHP scalar vs capitalized System type:
+        // e.g. PHP bool `true` should match `Boolean` (System.Boolean)
         if (strcasecmp($actualType, $typeName) === 0) {
             return true;
         }
@@ -372,10 +405,68 @@ class FHIRTypeResolver
     }
 
     /**
+     * Walk the class hierarchy of $ref looking for a #[FhirResource(type: '...')] attribute.
+     *
+     * Returns the canonical FHIR resource type string (e.g. 'Patient') when found,
+     * or null when the class tree carries no such attribute.
+     *
+     * @param \ReflectionClass<object> $ref
+     */
+    private function findResourceTypeFromAttribute(\ReflectionClass $ref): ?string
+    {
+        do {
+            foreach ($ref->getAttributes() as $attr) {
+                if (str_ends_with($attr->getName(), 'FhirResource')) {
+                    $args = $attr->getArguments();
+                    $type = $args['type'] ?? $args[0] ?? null;
+
+                    return is_string($type) ? $type : null;
+                }
+            }
+
+            $ref = $ref->getParentClass();
+        } while ($ref !== false);
+
+        return null;
+    }
+
+    /**
+     * Returns true if the object is a generated FHIR model class.
+     *
+     * Detection: walks the class hierarchy looking for any PHP attribute whose short
+     * class name begins with 'Fhir' or 'FHIR'. All generated model classes carry at
+     * least one such attribute (FHIRPrimitive, FhirResource, FhirComplexType, etc.).
+     * This approach is namespace-independent and survives refactors.
+     */
+    private function isFhirModelObject(mixed $value): bool
+    {
+        if (!is_object($value)) {
+            return false;
+        }
+
+        $ref = new \ReflectionClass($value);
+        do {
+            foreach ($ref->getAttributes() as $attr) {
+                $name      = $attr->getName();
+                $shortName = substr($name, strrpos($name, '\\') + 1);
+                if (str_starts_with($shortName, 'Fhir') || str_starts_with($shortName, 'FHIR')) {
+                    return true;
+                }
+            }
+
+            $ref = $ref->getParentClass();
+        } while ($ref !== false);
+
+        return false;
+    }
+
+    /**
      * Walk the class hierarchy of $ref looking for a #[FHIRPrimitive] attribute.
      *
      * Returns the first FHIRPrimitive instance found, or null when the class tree
      * carries no such attribute.
+     *
+     * @param \ReflectionClass<object> $ref
      */
     private function findPrimitiveAttribute(\ReflectionClass $ref): ?FHIRPrimitive
     {
