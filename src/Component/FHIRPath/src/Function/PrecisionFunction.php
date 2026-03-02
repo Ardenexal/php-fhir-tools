@@ -49,7 +49,7 @@ final class PrecisionFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        $value = $input->first();
+        $value = $context->normalizeValue($input->first());
 
         // FHIRPathDecimal preserves trailing zeros in its string, so ->precision is exact
         if ($value instanceof FHIRPathDecimal) {

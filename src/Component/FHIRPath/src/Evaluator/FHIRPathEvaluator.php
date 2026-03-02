@@ -256,7 +256,21 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             $this->context->setCurrentNode($resource);
         }
 
-        return $expression->accept($this);
+        $result = $expression->accept($this);
+
+        // Normalize FHIR primitive wrapper objects to their scalar values in the final
+        // output collection. Internal evaluation keeps wrappers for sub-element navigation
+        // (e.g. DatePrimitive.extension), but callers expect plain PHP scalars.
+        if ($result->isEmpty()) {
+            return $result;
+        }
+
+        $normalized = [];
+        foreach ($result as $item) {
+            $normalized[] = $this->normalizeValue($item);
+        }
+
+        return Collection::from($normalized);
     }
 
     /**
@@ -662,13 +676,71 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      */
     public function visitExternalConstant(ExternalConstantNode $node): Collection
     {
-        if ($this->context->hasExternalConstant($node->getName())) {
-            $value = $this->context->getExternalConstant($node->getName());
+        $name = $node->getName();
+
+        // User-supplied constants take priority over built-ins
+        if ($this->context->hasExternalConstant($name)) {
+            $value = $this->context->getExternalConstant($name);
 
             return $value !== null ? Collection::single($value) : Collection::empty();
         }
 
-        throw new EvaluationException("External constant '%{$node->getName()}' not found", $node->getLine(), $node->getColumn());
+        // Spec-mandated environment variables
+        $resolved = $this->resolveEnvironmentVariable($name);
+        if ($resolved !== null) {
+            return $resolved instanceof Collection ? $resolved : Collection::single($resolved);
+        }
+
+        throw new EvaluationException("External constant '%{$name}' not found", $node->getLine(), $node->getColumn());
+    }
+
+    /**
+     * Resolve spec-mandated environment variables.
+     *
+     * Returns a string for well-known URL constants, a Collection for node
+     * references (%context, %resource, %rootResource), or null if the name
+     * is not a built-in variable.
+     *
+     * Spec references:
+     *   - FHIRPath core spec §3.3: %ucum, %context
+     *   - FHIR R4 FHIRPath supplement: %resource, %rootResource, %sct, %loinc,
+     *     %vs-<name>, %ext-<name>
+     *
+     * Note: %resource differs from %rootResource when navigating contained
+     * resources via resolve() — for now both return rootResource since contained
+     * resource navigation is not yet implemented.
+     */
+    private function resolveEnvironmentVariable(string $name): Collection|string|null
+    {
+        // Node references
+        if ($name === 'context' || $name === 'resource' || $name === 'rootResource') {
+            $root = $this->context->getRootResource();
+
+            return $root !== null ? Collection::single($root) : Collection::empty();
+        }
+
+        // Static URL constants
+        static $known = [
+            'ucum'  => 'http://unitsofmeasure.org',
+            'sct'   => 'http://snomed.info/sct',
+            'loinc' => 'http://loinc.org',
+        ];
+
+        if (array_key_exists($name, $known)) {
+            return $known[$name];
+        }
+
+        // Dynamic ValueSet pattern: %vs-<name> → http://hl7.org/fhir/ValueSet/<name>
+        if (str_starts_with($name, 'vs-')) {
+            return 'http://hl7.org/fhir/ValueSet/' . substr($name, 3);
+        }
+
+        // Dynamic StructureDefinition pattern: %ext-<name> → http://hl7.org/fhir/StructureDefinition/<name>
+        if (str_starts_with($name, 'ext-')) {
+            return 'http://hl7.org/fhir/StructureDefinition/' . substr($name, 4);
+        }
+
+        return null;
     }
 
     /**
@@ -831,14 +903,16 @@ final class FHIRPathEvaluator implements ExpressionVisitor
 
             // Check if it's an associative array (object) or indexed array (collection)
             if (array_is_list($value)) {
-                // For collection items, unwrap any primitive wrappers
+                // For collection items, unwrap @value arrays but keep FHIR primitive
+                // wrapper objects as-is — sub-element access (e.g. .extension) and type
+                // inference require the wrapper to be preserved. Consumers that need the
+                // scalar call normalizeValue() themselves.
                 $unwrapped = array_map(function($item) {
                     if (is_array($item) && isset($item['@value']) && count($item) === 1) {
                         return $item['@value'];
                     }
 
-                    // Also unwrap FHIR primitive objects to their scalar values
-                    return $this->normalizeValue($item);
+                    return $item;
                 }, $value);
 
                 return Collection::from($unwrapped);
@@ -847,12 +921,15 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             return Collection::single($value);
         }
 
-        // FHIR primitive objects (e.g., DatePrimitive with ->value property)
-        // are normalized to their scalar values using normalizeValue()
+        // Keep FHIR primitive wrapper objects in the collection; BackedEnum values
+        // (which have no sub-elements) are the only objects unwrapped eagerly here.
+        // Every scalar-consuming function calls normalizeValue() on items it reads.
         if (is_object($value)) {
-            $normalized = $this->normalizeValue($value);
+            if ($value instanceof \BackedEnum) {
+                return Collection::single($value->value);
+            }
 
-            return Collection::single($normalized);
+            return Collection::single($value);
         }
 
         return Collection::single($value);
@@ -935,11 +1012,12 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             throw new EvaluationException("'in' operator requires a single item on the left side");
         }
 
-        $needleValue = $needle->first();
+        // Normalize to unwrap FHIR primitive wrappers before comparison
+        $needleValue = $this->normalizeValue($needle->first());
 
         foreach ($haystack as $item) {
             // phpcs:ignore SlevomatCodingStandard.Operators.DisallowEqualOperators
-            if ($item == $needleValue) {
+            if ($this->normalizeValue($item) == $needleValue) {
                 return Collection::single(true);
             }
         }
@@ -1606,7 +1684,10 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             return null;
         }
 
-        $value = $collection->first();
+        // Normalize FHIR primitive wrappers (e.g. BooleanPrimitive → bool) before
+        // applying singleton evaluation so that Patient.active (a BooleanPrimitive)
+        // evaluates to the correct false/true instead of always returning true.
+        $value = $this->normalizeValue($collection->first());
 
         if (is_bool($value)) {
             return $value;

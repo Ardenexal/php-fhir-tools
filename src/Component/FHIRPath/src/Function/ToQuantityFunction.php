@@ -61,7 +61,7 @@ final class ToQuantityFunction extends AbstractFunction
 
         $requiredUnit = $this->resolveUnitParameter($parameters, $context);
 
-        $result = self::tryConvert($input->first(), $requiredUnit);
+        $result = self::tryConvert($context->normalizeValue($input->first()), $requiredUnit);
 
         return $result !== null ? Collection::single($result) : Collection::empty();
     }

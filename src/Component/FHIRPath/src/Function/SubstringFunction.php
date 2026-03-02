@@ -34,7 +34,7 @@ final class SubstringFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        $str = $input->first();
+        $str = $context->normalizeValue($input->first());
         if (!is_string($str)) {
             return Collection::empty();
         }

@@ -35,6 +35,7 @@ class MinFunction extends AbstractFunction
         $min    = null;
         $minVal = null;
         foreach ($input as $item) {
+            $item    = $context->normalizeValue($item);
             $numeric = $this->extractNumeric($item);
             if ($numeric === null) {
                 throw EvaluationException::invalidFunctionParameter('min', 'numeric values', gettype($item));

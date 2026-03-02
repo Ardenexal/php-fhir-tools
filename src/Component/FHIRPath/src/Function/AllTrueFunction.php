@@ -30,6 +30,7 @@ class AllTrueFunction extends AbstractFunction
         }
 
         foreach ($input as $item) {
+            $item = $context->normalizeValue($item);
             if (!is_bool($item)) {
                 throw new EvaluationException('allTrue() requires all items to be boolean');
             }

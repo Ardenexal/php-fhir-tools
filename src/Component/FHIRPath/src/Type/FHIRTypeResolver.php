@@ -37,6 +37,29 @@ class FHIRTypeResolver
     ];
 
     /**
+     * FHIR type hierarchy: maps each derived type to its immediate parent.
+     *
+     * Used by isOfType() to test conformance ("is a subtype of"), e.g.
+     * code → string means 'code is string' returns true.
+     *
+     * @var array<string, string>
+     */
+    private const TYPE_PARENTS = [
+        'code'         => 'string',
+        'id'           => 'string',
+        'markdown'     => 'string',
+        'base64Binary' => 'string',
+        'uri'          => 'string',
+        'url'          => 'uri',
+        'canonical'    => 'uri',
+        'oid'          => 'uri',
+        'uuid'         => 'uri',
+        'positiveInt'  => 'integer',
+        'unsignedInt'  => 'integer',
+        'instant'      => 'dateTime',
+    ];
+
+    /**
      * Primitive FHIR types mapping.
      *
      * @var array<string, string>
@@ -133,18 +156,31 @@ class FHIRTypeResolver
         }
 
         if (is_string($value)) {
+            // Detect temporal string patterns from plain PHP strings in resource arrays.
+            // FHIRPath literal dates/times use FHIRPathTemporalTypeInterface (handled above),
+            // but resource property values arrive as plain strings and need the same treatment.
+            if (str_starts_with($value, 'T') && preg_match('/^T\d{2}/', $value)) {
+                return 'time';
+            }
+
+            if (preg_match('/^\d{4}-\d{2}-\d{2}T/', $value)) {
+                return 'dateTime';
+            }
+
+            if (preg_match('/^\d{4}(-\d{2}(-\d{2})?)?$/', $value)) {
+                return 'date';
+            }
+
             return 'string';
         }
 
         if (is_object($value)) {
-            // Check if the object has a FHIRPrimitive attribute
-            $ref   = new \ReflectionClass($value);
-            $attrs = $ref->getAttributes(FHIRPrimitive::class);
+            // Walk the class hierarchy to find a FHIRPrimitive attribute — subclasses
+            // (e.g. NameUseType → CodePrimitive → StringPrimitive) carry it on an ancestor.
+            $ref       = new \ReflectionClass($value);
+            $primitive = $this->findPrimitiveAttribute($ref);
 
-            if (!empty($attrs)) {
-                /** @var FHIRPrimitive $primitive */
-                $primitive = $attrs[0]->newInstance();
-
+            if ($primitive !== null) {
                 return $primitive->primitiveType;
             }
 
@@ -174,10 +210,14 @@ class FHIRTypeResolver
      *
      * @param mixed  $value    The value to check
      * @param string $typeName The FHIR type name to check against
+     * @param bool   $strict   When false (default), walks the FHIR type hierarchy so that
+     *                         subtypes conform to their parents (e.g. 'code is string' = true).
+     *                         When true, only exact type identity is tested — used by ofType()
+     *                         and as() which must NOT include subtypes per the FHIRPath spec.
      *
      * @return bool True if the value is of the specified type
      */
-    public function isOfType(mixed $value, string $typeName): bool
+    public function isOfType(mixed $value, string $typeName, bool $strict = false): bool
     {
         $typeName   = $this->normalizeTypeName($typeName);
         $actualType = $this->inferType($value);
@@ -197,11 +237,16 @@ class FHIRTypeResolver
             return true;
         }
 
-        // date, dateTime, time, and instant values are stored as plain PHP strings in this
-        // implementation (no dedicated Date/DateTime/Time PHP type). A string value therefore
-        // satisfies an is-date / is-dateTime / is-time / is-instant check.
-        if ($actualType === 'string' && in_array($typeName, ['date', 'dateTime', 'time', 'instant'], true)) {
-            return true;
+        // Walk the FHIR type hierarchy: e.g. 'code' conforms to 'string'.
+        // Only for the `is` operator — ofType() and as() use strict matching.
+        if (!$strict) {
+            $checkType = $actualType;
+            while (isset(self::TYPE_PARENTS[$checkType])) {
+                $checkType = self::TYPE_PARENTS[$checkType];
+                if ($checkType === $typeName || strcasecmp($checkType, $typeName) === 0) {
+                    return true;
+                }
+            }
         }
 
         // Check if value is an instance of the FHIR resource type
@@ -324,6 +369,27 @@ class FHIRTypeResolver
     public function getPhpType(string $fhirType): ?string
     {
         return self::PRIMITIVE_TYPES[$fhirType] ?? null;
+    }
+
+    /**
+     * Walk the class hierarchy of $ref looking for a #[FHIRPrimitive] attribute.
+     *
+     * Returns the first FHIRPrimitive instance found, or null when the class tree
+     * carries no such attribute.
+     */
+    private function findPrimitiveAttribute(\ReflectionClass $ref): ?FHIRPrimitive
+    {
+        do {
+            $attrs = $ref->getAttributes(FHIRPrimitive::class);
+            if (!empty($attrs)) {
+                /** @var FHIRPrimitive */
+                return $attrs[0]->newInstance();
+            }
+
+            $ref = $ref->getParentClass();
+        } while ($ref !== false);
+
+        return null;
     }
 
     /**

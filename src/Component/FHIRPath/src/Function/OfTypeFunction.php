@@ -79,7 +79,7 @@ class OfTypeFunction extends AbstractFunction
         $items = [];
         foreach ($input as $item) {
             if ($typeResolver !== null) {
-                if ($typeResolver->isOfType($item, $typeName)) {
+                if ($typeResolver->isOfType($item, $typeName, strict: true)) {
                     $items[] = $item;
                 }
             } else {

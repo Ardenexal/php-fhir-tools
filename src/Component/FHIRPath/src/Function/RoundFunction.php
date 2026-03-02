@@ -52,6 +52,7 @@ class RoundFunction extends AbstractFunction
 
         $items = [];
         foreach ($input as $item) {
+            $item    = $context->normalizeValue($item);
             $numeric = $this->extractNumeric($item);
             if ($numeric === null) {
                 throw EvaluationException::invalidFunctionParameter('round', 'input', 'number');

@@ -29,7 +29,7 @@ class StartsWithFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        $string = $input->first();
+        $string = $context->normalizeValue($input->first());
         if (!is_string($string)) {
             throw new EvaluationException('startsWith() requires a string input');
         }

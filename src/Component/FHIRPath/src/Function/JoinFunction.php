@@ -43,6 +43,7 @@ final class JoinFunction extends AbstractFunction
         // Validate all collection items are strings
         $strings = [];
         foreach ($input->toArray() as $item) {
+            $item = $context->normalizeValue($item);
             if (!is_string($item)) {
                 throw EvaluationException::invalidFunctionParameter($this->getName(), 'collection item', 'string');
             }

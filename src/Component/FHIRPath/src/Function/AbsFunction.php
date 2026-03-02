@@ -30,7 +30,7 @@ final class AbsFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        $value = $input->first();
+        $value = $context->normalizeValue($input->first());
 
         // Handle Quantity: abs() the numeric value, preserve the unit
         if (is_array($value) && array_key_exists('value', $value) && is_numeric($value['value'])) {

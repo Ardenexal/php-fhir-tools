@@ -69,7 +69,7 @@ final class SupersetOfFunction extends AbstractFunction
 
         // Check if every item in other exists in input
         foreach ($other as $otherItem) {
-            if (!$this->collectionContains($input, $otherItem)) {
+            if (!$this->collectionContains($input, $otherItem, $context)) {
                 // Found an item in other that's not in input - not a superset
                 return Collection::single(false);
             }
@@ -90,12 +90,13 @@ final class SupersetOfFunction extends AbstractFunction
      *
      * @return bool True if the value is found, false otherwise
      */
-    private function collectionContains(Collection $collection, mixed $needle): bool
+    private function collectionContains(Collection $collection, mixed $needle, EvaluationContext $context): bool
     {
+        $normalizedNeedle = $context->normalizeValue($needle);
         foreach ($collection as $item) {
             // Use loose equality (==) instead of strict (===) per FHIRPath spec
             // phpcs:ignore SlevomatCodingStandard.Operators.DisallowEqualOperators
-            if ($item == $needle) {
+            if ($context->normalizeValue($item) == $normalizedNeedle) {
                 return true;
             }
         }

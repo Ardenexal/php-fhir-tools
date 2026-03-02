@@ -34,6 +34,18 @@ final class EvaluationContext
     }
 
     /**
+     * Normalize a value using the evaluator's normalizeValue() method.
+     *
+     * Convenience wrapper for function classes that need to unwrap FHIR primitive
+     * objects (e.g. DatePrimitive → string) before scalar type-checks.
+     * Returns the value unchanged when no evaluator is set.
+     */
+    public function normalizeValue(mixed $value): mixed
+    {
+        return $this->evaluator !== null ? $this->evaluator->normalizeValue($value) : $value;
+    }
+
+    /**
      * Get the root resource being evaluated
      */
     public function getRootResource(): mixed

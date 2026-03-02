@@ -29,6 +29,7 @@ final class SumFunction extends AbstractFunction
 
         $sum = 0;
         foreach ($input as $item) {
+            $item    = $context->normalizeValue($item);
             $numeric = $this->extractNumeric($item);
             if ($numeric !== null) {
                 $sum += $numeric;

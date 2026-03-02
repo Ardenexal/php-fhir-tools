@@ -47,6 +47,6 @@ final class ConvertsToIntegerFunction extends AbstractFunction
         }
 
         // Try the conversion and check if it succeeded (returns non-null)
-        return Collection::single(ToIntegerFunction::tryConvert($input->first()) !== null);
+        return Collection::single(ToIntegerFunction::tryConvert($context->normalizeValue($input->first())) !== null);
     }
 }

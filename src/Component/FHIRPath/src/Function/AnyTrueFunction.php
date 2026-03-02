@@ -25,7 +25,7 @@ class AnyTrueFunction extends AbstractFunction
         $this->validateParameterCount($parameters, 0);
 
         foreach ($input as $item) {
-            if ($item === true) {
+            if ($context->normalizeValue($item) === true) {
                 return Collection::single(true);
             }
         }

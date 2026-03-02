@@ -38,7 +38,7 @@ final class ToDecimalFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        $result = self::tryConvert($input->first());
+        $result = self::tryConvert($context->normalizeValue($input->first()));
 
         return $result !== null ? Collection::single($result) : Collection::empty();
     }

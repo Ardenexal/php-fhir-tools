@@ -36,6 +36,7 @@ class AvgFunction extends AbstractFunction
         $count = 0;
 
         foreach ($input as $item) {
+            $item    = $context->normalizeValue($item);
             $numeric = $this->extractNumeric($item);
             if ($numeric === null) {
                 throw EvaluationException::invalidFunctionParameter('avg', 'numeric values', gettype($item));

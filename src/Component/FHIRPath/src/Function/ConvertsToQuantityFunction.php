@@ -53,7 +53,7 @@ final class ConvertsToQuantityFunction extends AbstractFunction
         $requiredUnit = $this->resolveUnitParameter($parameters, $context);
 
         // Try the conversion and check if it succeeded (returns non-null)
-        return Collection::single(ToQuantityFunction::tryConvert($input->first(), $requiredUnit) !== null);
+        return Collection::single(ToQuantityFunction::tryConvert($context->normalizeValue($input->first()), $requiredUnit) !== null);
     }
 
     /**

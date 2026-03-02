@@ -69,7 +69,7 @@ final class SubsetOfFunction extends AbstractFunction
 
         // Check if every item in input exists in other
         foreach ($input as $item) {
-            if (!$this->collectionContains($other, $item)) {
+            if (!$this->collectionContains($other, $item, $context)) {
                 // Found an item in input that's not in other - not a subset
                 return Collection::single(false);
             }
@@ -90,12 +90,13 @@ final class SubsetOfFunction extends AbstractFunction
      *
      * @return bool True if the value is found, false otherwise
      */
-    private function collectionContains(Collection $collection, mixed $needle): bool
+    private function collectionContains(Collection $collection, mixed $needle, EvaluationContext $context): bool
     {
+        $normalizedNeedle = $context->normalizeValue($needle);
         foreach ($collection as $item) {
             // Use loose equality (==) instead of strict (===) per FHIRPath spec
             // phpcs:ignore SlevomatCodingStandard.Operators.DisallowEqualOperators
-            if ($item == $needle) {
+            if ($context->normalizeValue($item) == $normalizedNeedle) {
                 return true;
             }
         }

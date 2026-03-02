@@ -30,7 +30,7 @@ final class FloorFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        $value   = $input->first();
+        $value   = $context->normalizeValue($input->first());
         $numeric = $this->extractNumeric($value);
         if ($numeric === null) {
             throw EvaluationException::invalidFunctionParameter($this->getName(), 'input', 'number');

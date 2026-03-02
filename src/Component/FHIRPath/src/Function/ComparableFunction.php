@@ -44,8 +44,8 @@ final class ComparableFunction extends AbstractFunction
             return Collection::single(false);
         }
 
-        $inputValue = $input->first();
-        $paramValue = $paramResult->first();
+        $inputValue = $context->normalizeValue($input->first());
+        $paramValue = $context->normalizeValue($paramResult->first());
 
         // Detect Quantity arrays (produced by FHIRPath Quantity literals like `1 'cm'`).
         // Plain scalars (int/float) are excluded — they lack the 'unit'/'code' keys.

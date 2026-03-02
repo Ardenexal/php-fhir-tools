@@ -66,7 +66,7 @@ final class LowBoundaryFunction extends AbstractFunction
             }
         }
 
-        $value = $input->first();
+        $value = $context->normalizeValue($input->first());
 
         // --- Quantity input (e.g. `1.587 'cm'` → array with 'value', 'unit', 'code') ---
         // Apply the decimal low boundary to the numeric value and preserve the unit.
