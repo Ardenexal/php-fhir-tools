@@ -12,8 +12,7 @@ If you discover a security vulnerability in this project, please report it respo
 
 ### How to Report
 
-1. **Email:** Send a detailed report to **security@ardenexal.com**
-2. **GitHub:** Use [GitHub's private vulnerability reporting](https://github.com/Ardenexal/php-fhir-tools/security/advisories/new) if available
+ **GitHub:** Use [GitHub's private vulnerability reporting](https://github.com/Ardenexal/php-fhir-tools/security/advisories/new) if available
 
 ### What to Include
 
