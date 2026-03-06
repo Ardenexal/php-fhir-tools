@@ -113,7 +113,13 @@ final class ExtensionFunction extends AbstractFunction
     private function getPropertyValue(mixed $item, string $property): mixed
     {
         if (is_array($item)) {
-            return array_key_exists($property, $item) ? $item[$property] : null;
+            if (array_key_exists($property, $item)) {
+                return $item[$property];
+            }
+            // XmlEncoder stores XML attributes as @attributeName keys
+            $attrKey = '@' . $property;
+
+            return array_key_exists($attrKey, $item) ? $item[$attrKey] : null;
         }
 
         if (is_object($item)) {

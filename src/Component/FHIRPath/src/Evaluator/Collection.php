@@ -162,7 +162,35 @@ final readonly class Collection implements \IteratorAggregate, \Countable
      */
     public function intersect(self $other): self
     {
-        return new self(array_values(array_intersect($this->items, $other->items)));
+        $result = [];
+
+        foreach ($this->items as $item) {
+            $inOther = false;
+            foreach ($other->items as $otherItem) {
+                if ($item === $otherItem) {
+                    $inOther = true;
+                    break;
+                }
+            }
+
+            if (!$inOther) {
+                continue;
+            }
+
+            $alreadyIn = false;
+            foreach ($result as $existing) {
+                if ($item === $existing) {
+                    $alreadyIn = true;
+                    break;
+                }
+            }
+
+            if (!$alreadyIn) {
+                $result[] = $item;
+            }
+        }
+
+        return new self($result);
     }
 
     /**

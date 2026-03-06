@@ -234,7 +234,7 @@ class FHIRTypeResolver
     {
         // Detect FHIRPath System.* type specifiers BEFORE normalization so that
         // 'Boolean' (= System.Boolean) can be distinguished from 'boolean' (= FHIR.boolean).
-        $fhirPathSystemPrimitives = ['Boolean', 'Integer', 'Decimal', 'String', 'Date', 'DateTime', 'Time', 'Quantity'];
+        $fhirPathSystemPrimitives = ['Boolean', 'Integer', 'Decimal', 'String', 'Date', 'DateTime', 'Time'];
         $isRequestingSystemType   = str_starts_with($typeName, 'System.')
             || in_array($typeName, $fhirPathSystemPrimitives, true);
 

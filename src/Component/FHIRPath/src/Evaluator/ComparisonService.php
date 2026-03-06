@@ -143,13 +143,25 @@ final class ComparisonService
      */
     public function compareEquality(Collection $left, Collection $right, string $operator): Collection
     {
-        // Empty collections always return empty
-        if ($left->isEmpty() || $right->isEmpty()) {
-            return Collection::empty();
-        }
-
         $useEquivalence = in_array($operator, ['~', '!~'], true);
         $isNegated      = in_array($operator, ['!=', '!~'], true);
+
+        // Equivalence operators (~, !~) do not propagate empty per FHIRPath spec.
+        // Instead: {} ~ {} → true, {} ~ x → false, x ~ {} → false.
+        // Equality operators (=, !=) always propagate empty.
+        if ($useEquivalence) {
+            if ($left->isEmpty() && $right->isEmpty()) {
+                // Two empty collections are equivalent
+                return Collection::single(!$isNegated);
+            }
+
+            if ($left->isEmpty() || $right->isEmpty()) {
+                // One empty and one non-empty are not equivalent
+                return Collection::single($isNegated);
+            }
+        } elseif ($left->isEmpty() || $right->isEmpty()) {
+            return Collection::empty();
+        }
 
         // Get items from collections
         $leftItems  = $left->toArray();

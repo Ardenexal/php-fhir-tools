@@ -282,9 +282,13 @@ class FHIRPrimitiveTypeNormalizer extends AbstractFHIRNormalizer
                 $value = $data['@value'];
             }
 
-            // Extensions are in extension child elements
+            // Extensions are in extension child elements.
+            // XmlEncoder gives a single <extension> as an associative array and multiple
+            // <extension> elements as a list array. Normalise to a list so that
+            // createPrimitiveInstance() iterates over individual extension items.
             if (isset($data['extension'])) {
-                $extensions = $data['extension'];
+                $raw        = $data['extension'];
+                $extensions = (is_array($raw) && !array_is_list($raw)) ? [$raw] : $raw;
             }
         }
 

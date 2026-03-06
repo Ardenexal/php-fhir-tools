@@ -895,6 +895,29 @@ final class FHIRPathEvaluator implements ExpressionVisitor
                 return $this->wrapValue($value);
             }
 
+            // Polymorphic prefix matching for choice elements on raw FHIR data arrays.
+            // e.g., looking for 'value' finds key 'valueString', 'valueUuid', etc.
+            foreach ($node as $key => $rawValue) {
+                if (!is_string($key) || !str_starts_with($key, $propertyName)) {
+                    continue;
+                }
+                $suffix = substr($key, strlen($propertyName));
+                if ($suffix === '' || !ctype_upper($suffix[0])) {
+                    continue;
+                }
+                $fhirType = lcfirst($suffix); // 'String'→'string', 'Uuid'→'uuid', etc.
+                // Unwrap XML-encoded primitive: ['@value' => scalar, '#' => ''] → scalar
+                if (is_array($rawValue)) {
+                    $otherKeys = array_diff(array_keys($rawValue), ['@value', '#']);
+                    if (empty($otherKeys) && array_key_exists('@value', $rawValue)) {
+                        $scalar = $rawValue['@value'];
+                        return Collection::single(new FHIRTypedScalar($scalar, $fhirType));
+                    }
+                }
+
+                return $this->wrapValue($rawValue);
+            }
+
             return Collection::empty();
         }
 
