@@ -232,28 +232,6 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
     }
 
     /**
-     * Denormalize a choice element with proper type handling.
-     *
-     * @param array<string, mixed> $context
-     */
-    private function denormalizeChoiceElement(string $propertyName, mixed $value, ?string $format, array $context): mixed
-    {
-        // For choice elements, the property name contains the type information
-        // Extract the type from the property name (e.g., valueString -> string)
-        $typeSuffix = substr($propertyName, 5); // Remove 'value' prefix
-
-        if ($this->denormalizer !== null) {
-            // Try to determine the appropriate type for denormalization
-            $targetType = $this->getChoiceElementType($typeSuffix, $value);
-            if ($targetType !== null) {
-                return $this->denormalizer->denormalize($value, $targetType, $format, $context);
-            }
-        }
-
-        return $this->denormalizeBasicValue($value, $format, $context);
-    }
-
-    /**
      * Get the target type for a choice element based on its suffix and value.
      */
     private function getChoiceElementType(string $typeSuffix, mixed $value): ?string
