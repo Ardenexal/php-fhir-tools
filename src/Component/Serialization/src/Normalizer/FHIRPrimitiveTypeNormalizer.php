@@ -277,9 +277,12 @@ class FHIRPrimitiveTypeNormalizer extends AbstractFHIRNormalizer
 
         // Handle XML format
         if ($format === 'xml') {
-            // In XML, value is in @value attribute
+            // In XML, value is in @value attribute (FHIR spec requirement)
             if (isset($data['@value'])) {
                 $value = $data['@value'];
+            } elseif (isset($data['value'])) {
+                // Detect non-standard child element format and reject with helpful message
+                throw new NotNormalizableValueException('Invalid FHIR XML format: Primitive values must use attributes, not child elements. Found: <element><value>X</value></element> — Expected: <element value="X"/> — See FHIR XML specification for primitive types.');
             }
 
             // Extensions are in extension child elements.
