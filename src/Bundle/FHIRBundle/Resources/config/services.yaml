@@ -97,7 +97,7 @@ services:
 
     # Named service aliases
     fhir.model_generator:
-        alias: 'Ardenexal\FHIRTools\FHIRModelGenerator'
+        alias: 'Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator'
         public: true
 
     fhir.serialization_service:

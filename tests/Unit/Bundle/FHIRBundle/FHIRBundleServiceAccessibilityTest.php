@@ -67,9 +67,9 @@ class FHIRBundleServiceAccessibilityTest extends TestCase
 
             // Verify public services are marked as public
             $publicServices = [
-                'Ardenexal\FHIRTools\FHIRModelGenerator',
+                'Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator',
                 'Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader',
-                'Ardenexal\FHIRTools\Serialization\FHIRValidator',
+                'Ardenexal\FHIRTools\Component\Serialization\Validator\FHIRValidator',
                 'Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector',
                 'Ardenexal\FHIRTools\Component\CodeGeneration\Package\RetryHandler',
             ];
@@ -104,7 +104,7 @@ class FHIRBundleServiceAccessibilityTest extends TestCase
 
             // Verify that services have proper autowiring configuration
             $autowiredServices = [
-                'Ardenexal\FHIRTools\BuilderContext',
+                'Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext',
                 'Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector',
                 'Ardenexal\FHIRTools\Component\CodeGeneration\Package\RetryHandler',
             ];
@@ -121,10 +121,10 @@ class FHIRBundleServiceAccessibilityTest extends TestCase
 
             // Verify that normalizers are properly tagged
             $normalizers = [
-                'Ardenexal\FHIRTools\Serialization\FHIRResourceNormalizer',
-                'Ardenexal\FHIRTools\Serialization\FHIRComplexTypeNormalizer',
-                'Ardenexal\FHIRTools\Serialization\FHIRPrimitiveTypeNormalizer',
-                'Ardenexal\FHIRTools\Serialization\FHIRBackboneElementNormalizer',
+                'Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRResourceNormalizer',
+                'Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRComplexTypeNormalizer',
+                'Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRPrimitiveTypeNormalizer',
+                'Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRBackboneElementNormalizer',
             ];
 
             foreach ($normalizers as $normalizerId) {

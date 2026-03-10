@@ -90,7 +90,7 @@ class Symfony74CompatibilityTest extends TestCase
 
             // Verify that all essential services are still registered regardless of version
             $essentialServices = [
-                'Ardenexal\FHIRTools\FHIRModelGenerator',
+                'Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator',
                 'Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader',
                 'Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector',
             ];

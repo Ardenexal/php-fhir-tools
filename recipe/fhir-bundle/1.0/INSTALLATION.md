@@ -127,7 +127,7 @@ Inject FHIR services into your controllers or services:
 
 ```php
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
-use Ardenexal\FHIRTools\FHIRModelGenerator;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator;
 
 class MyController
 {
