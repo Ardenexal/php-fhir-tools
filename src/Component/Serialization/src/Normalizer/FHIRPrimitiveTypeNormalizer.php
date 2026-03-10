@@ -495,9 +495,39 @@ class FHIRPrimitiveTypeNormalizer extends AbstractFHIRNormalizer
 
         if (is_string($value)) {
             try {
-                return new \DateTimeImmutable($value);
+                // FHIR allows partial dates: YYYY, YYYY-MM, YYYY-MM-DD.
+                // PHP's constructor misinterprets bare 4-digit strings, e.g. "2002" is
+                // parsed as time "20:02" on today's date rather than the year 2002.
+                // Use format-based parsing with '!' (resets unspecified fields to epoch).
+                if (preg_match('/^\d{4}$/', $value) === 1) {
+                    $result = \DateTimeImmutable::createFromFormat('!Y', $value, new \DateTimeZone('UTC'));
+                } elseif (preg_match('/^\d{4}-\d{2}$/', $value) === 1) {
+                    $result = \DateTimeImmutable::createFromFormat('!Y-m', $value, new \DateTimeZone('UTC'));
+                } elseif (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) === 1) {
+                    $result = \DateTimeImmutable::createFromFormat('!Y-m-d', $value, new \DateTimeZone('UTC'));
+                } else {
+                    $result = new \DateTimeImmutable($value);
+                }
+
+                if ($result === false) {
+                    throw new NotNormalizableValueException(sprintf('Expected dateTime string, got invalid value: %s', $value));
+                }
+
+                return $result;
+            } catch (NotNormalizableValueException $e) {
+                throw $e;
             } catch (\Exception $e) {
                 throw new NotNormalizableValueException(sprintf('Expected dateTime string, got invalid value: %s', $value));
+            }
+        }
+
+        // XmlEncoder parses numeric-looking attribute values (e.g. value="2012") as integers.
+        // FHIR allows partial dates such as year-only, so coerce to string and re-try.
+        if (is_int($value) || is_float($value)) {
+            try {
+                return new \DateTimeImmutable((string) $value);
+            } catch (\Exception) {
+                // Fall through to the error below
             }
         }
 

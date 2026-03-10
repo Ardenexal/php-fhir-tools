@@ -184,6 +184,229 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     }
 
     /**
+     * Denormalize a single primitive-kind property to its Primitive class.
+     *
+     * For array primitives, each item (including nulls) is denormalized individually.
+     * For non-array primitives, the value is denormalized as a single instance.
+     * Falls back to the raw value when the primitive class cannot be resolved.
+     *
+     * @param \ReflectionClass<object>        $reflection
+     * @param array<string, PropertyMetadata> $metaMap
+     * @param array<string, mixed>            $context
+     */
+    protected function denormalizePrimitiveProperty(
+        PropertyMetadata $meta,
+        \ReflectionProperty $property,
+        \ReflectionClass $reflection,
+        mixed $value,
+        ?string $format,
+        array $context,
+        array $metaMap,
+    ): mixed {
+        if ($this->denormalizer === null) {
+            return $value;
+        }
+
+        if ($meta->isArray && is_array($value)) {
+            $primitiveClass = $this->resolvePrimitiveArrayItemClass($reflection, $meta->fhirType, $metaMap);
+            if ($primitiveClass === null) {
+                return $value;
+            }
+
+            $result = [];
+            foreach ($value as $item) {
+                $result[] = $this->denormalizer->denormalize($item, $primitiveClass, $format, $context);
+            }
+
+            return $result;
+        }
+
+        if (!$meta->isArray) {
+            $primitiveClass = $this->getFirstNonBuiltinTypeFromProperty($property);
+            if ($primitiveClass === null) {
+                return $value;
+            }
+
+            return $this->denormalizer->denormalize($value, $primitiveClass, $format, $context);
+        }
+
+        return $value;
+    }
+
+    /**
+     * Return the first non-builtin, non-null type name from a property declaration.
+     *
+     * Handles both named types (e.g. `?DateTimePrimitive`) and union types
+     * (e.g. `StringPrimitive|string|null`), returning the FQCN of the first
+     * non-builtin entry — typically the FHIR primitive wrapper class.
+     */
+    protected function getFirstNonBuiltinTypeFromProperty(\ReflectionProperty $property): ?string
+    {
+        $type = $property->getType();
+
+        if ($type instanceof \ReflectionNamedType && !$type->isBuiltin()) {
+            return $type->getName();
+        }
+
+        if ($type instanceof \ReflectionUnionType) {
+            foreach ($type->getTypes() as $member) {
+                if ($member instanceof \ReflectionNamedType && !$member->isBuiltin() && $member->getName() !== 'null') {
+                    return $member->getName();
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Resolve the primitive item class for an array-typed FHIR primitive property.
+     *
+     * Array primitive properties (e.g. `array $given`) carry no per-item type in their
+     * declaration. We resolve the item class by scanning sibling properties that share
+     * the same fhirType and are non-array, then extracting the non-builtin type from
+     * their union declaration (e.g. `StringPrimitive|string|null` → `StringPrimitive`).
+     *
+     * @param \ReflectionClass<object>  $class
+     * @param array<string, PropertyMetadata> $metaMap
+     */
+    protected function resolvePrimitiveArrayItemClass(\ReflectionClass $class, string $fhirType, array $metaMap): ?string
+    {
+        foreach ($metaMap as $siblingName => $siblingMeta) {
+            if ($siblingMeta->propertyKind !== 'primitive' || $siblingMeta->isArray || $siblingMeta->fhirType !== $fhirType) {
+                continue;
+            }
+
+            if (!$class->hasProperty($siblingName)) {
+                continue;
+            }
+
+            $primitiveClass = $this->getFirstNonBuiltinTypeFromProperty($class->getProperty($siblingName));
+            if ($primitiveClass !== null) {
+                return $primitiveClass;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Second-pass: apply underscore-prefixed extension data to already-denormalized primitive properties.
+     *
+     * In FHIR JSON, a property like `_given` carries extension objects that correspond
+     * element-by-element to the values in `given`. After the main denormalization loop has
+     * already created `StringPrimitive` instances for each `given` item, this method walks
+     * all `_name` keys and sets `->extension` on the matching primitive objects.
+     *
+     * For non-array primitives (e.g. `_family`), the value is `{"extension": [...]}`.
+     * For array primitives (e.g. `_given`), the value is `[{"extension": [...]}, null, ...]`.
+     *
+     * If the corresponding primitive object does not yet exist (base key absent from JSON),
+     * a new primitive instance is created with `value = null`.
+     *
+     * @param \ReflectionClass<object>         $reflection
+     * @param array<string, mixed>             $data
+     * @param array<string, PropertyMetadata>  $metaMap
+     * @param array<string, mixed>             $context
+     */
+    protected function applyPrimitiveExtensions(
+        \ReflectionClass $reflection,
+        object $object,
+        array $data,
+        array $metaMap,
+        ?string $format,
+        array $context,
+    ): void {
+        foreach ($data as $elementName => $extData) {
+            if (!str_starts_with($elementName, '_')) {
+                continue;
+            }
+
+            $baseName = substr($elementName, 1);
+            $meta     = $metaMap[$baseName] ?? null;
+
+            if ($meta === null || $meta->propertyKind !== 'primitive' || !$reflection->hasProperty($baseName)) {
+                continue;
+            }
+
+            $property = $reflection->getProperty($baseName);
+
+            if (!$meta->isArray) {
+                // Non-array: $extData is {"extension": [...]}
+                if (!is_array($extData) || !isset($extData['extension']) || !is_array($extData['extension'])) {
+                    continue;
+                }
+
+                $current = $property->isInitialized($object) ? $property->getValue($object) : null;
+
+                if (!is_object($current)) {
+                    // Property was absent or was a raw scalar — create a primitive with the raw value.
+                    $primitiveClass = $this->getFirstNonBuiltinTypeFromProperty($property);
+                    if ($primitiveClass === null || $this->denormalizer === null) {
+                        continue;
+                    }
+
+                    $rawValue = is_scalar($current) ? $current : null;
+                    $current  = $this->denormalizer->denormalize($rawValue, $primitiveClass, $format, $context);
+                    $property->setValue($object, $current);
+                }
+
+                $primitiveRefl = new \ReflectionClass($current);
+                if ($primitiveRefl->hasProperty('extension')) {
+                    $primitiveRefl->getProperty('extension')->setValue($current, $extData['extension']);
+                }
+            } else {
+                // Array: $extData is [{extension:[...]}, null, ...]
+                if (!is_array($extData)) {
+                    continue;
+                }
+
+                $currentArray = $property->isInitialized($object) ? $property->getValue($object) : [];
+                if (!is_array($currentArray)) {
+                    continue;
+                }
+
+                $maxLen = max(count($currentArray), count($extData));
+
+                for ($i = 0; $i < $maxLen; $i++) {
+                    $extEntry = $extData[$i] ?? null;
+                    $hasExtensionData = is_array($extEntry) && isset($extEntry['extension']) && is_array($extEntry['extension']);
+
+                    if (!isset($currentArray[$i]) || !is_object($currentArray[$i])) {
+                        if (!$hasExtensionData) {
+                            continue;
+                        }
+
+                        // No corresponding value — create a null-value primitive.
+                        $primitiveClass = $this->resolvePrimitiveArrayItemClass($reflection, $meta->fhirType, $metaMap);
+                        if ($primitiveClass === null || $this->denormalizer === null) {
+                            continue;
+                        }
+
+                        $currentArray[$i] = $this->denormalizer->denormalize(null, $primitiveClass, $format, $context);
+                    }
+
+                    $primitiveRefl   = new \ReflectionClass($currentArray[$i]);
+                    $extensionProp   = $primitiveRefl->hasProperty('extension') ? $primitiveRefl->getProperty('extension') : null;
+
+                    if ($extensionProp === null) {
+                        continue;
+                    }
+
+                    if ($hasExtensionData) {
+                        $extensionProp->setValue($currentArray[$i], $extEntry['extension']);
+                    } elseif (!$extensionProp->isInitialized($currentArray[$i])) {
+                        // Initialize to empty array to prevent "must not be accessed before initialization" errors.
+                        $extensionProp->setValue($currentArray[$i], []);
+                    }
+                }
+
+                $property->setValue($object, $currentArray);
+            }
+        }
+    }
+
+    /**
      * Return true for PHP built-in types that cannot be passed to the denormalizer.
      */
     protected function isBuiltinType(string $type): bool

@@ -643,13 +643,26 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
                 // Standard property mapping
                 if ($reflection->hasProperty($elementName)) {
                     $property     = $reflection->getProperty($elementName);
-                    $propertyType = $this->getPropertyType($property);
+                    $meta         = $metaMap[$elementName] ?? null;
+                    $phpItemClass = $meta?->phpItemClass;
 
-                    // Always use the denormalizer to create properly-typed instances.
-                    // The _property extension data is noted but extensions are not yet
-                    // set on the resulting instance (future work).
-                    if ($this->denormalizer !== null && $propertyType !== null && !$this->isBuiltinType($propertyType)) {
-                        $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, 'json', $context);
+                    if ($phpItemClass !== null && $this->denormalizer !== null && is_array($value)) {
+                        // Complex/backbone array property: denormalize each JSON array item to a typed object.
+                        $denormalizedValue = [];
+                        foreach ($value as $item) {
+                            $denormalizedValue[] = $this->denormalizer->denormalize($item, $phpItemClass, 'json', $context);
+                        }
+                    } elseif ($this->denormalizer !== null && $meta !== null && $meta->propertyKind === 'primitive') {
+                        // Always produce Primitive objects so that _property extension data
+                        // can be attached to the instances in the second pass below.
+                        $denormalizedValue = $this->denormalizePrimitiveProperty($meta, $property, $reflection, $value, 'json', $context, $metaMap);
+                    } elseif ($this->denormalizer !== null) {
+                        $propertyType = $this->getPropertyType($property);
+                        if ($propertyType !== null && !$this->isBuiltinType($propertyType)) {
+                            $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, 'json', $context);
+                        } else {
+                            $denormalizedValue = $value;
+                        }
                     } else {
                         $denormalizedValue = $value;
                     }
@@ -660,6 +673,9 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
                     $this->handleUnknownProperty($elementName, $value, $unknownPropertyPolicy, $object, $elementName);
                 }
             }
+
+            // Apply _property extension data to already-denormalized primitive properties.
+            $this->applyPrimitiveExtensions($reflection, $object, $data, $metaMap, 'json', $context);
 
             return $object;
         } catch (\ReflectionException $e) {
@@ -721,8 +737,21 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
                 if ($reflection->hasProperty($elementName)) {
                     $property     = $reflection->getProperty($elementName);
                     $propertyType = $this->getPropertyType($property);
+                    $phpItemClass = ($metaMap[$elementName] ?? null)?->phpItemClass;
 
-                    if ($this->denormalizer !== null && $propertyType !== null && !$this->isBuiltinType($propertyType)) {
+                    if ($phpItemClass !== null && $this->denormalizer !== null) {
+                        // Complex/backbone array property: denormalize each item to a typed object.
+                        // unwrapXmlValue strips XmlEncoder meta-keys; the single-element case produces
+                        // an associative array (not a list) — wrap it so we always iterate a list.
+                        $items = $this->unwrapXmlValue($value, 'array');
+                        if (is_array($items) && !array_is_list($items)) {
+                            $items = [$items];
+                        }
+                        $denormalizedValue = [];
+                        foreach ((array) $items as $item) {
+                            $denormalizedValue[] = $this->denormalizer->denormalize($item, $phpItemClass, 'xml', $context);
+                        }
+                    } elseif ($this->denormalizer !== null && $propertyType !== null && !$this->isBuiltinType($propertyType)) {
                         $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, 'xml', $context);
                     } else {
                         // For built-in PHP types, unwrap the FHIR XML @value wrapper if present.
