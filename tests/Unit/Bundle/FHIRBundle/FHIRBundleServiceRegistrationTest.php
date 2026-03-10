@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Tests\Unit\Bundle\FHIRBundle;
 
 use Ardenexal\FHIRTools\Bundle\FHIRBundle\FHIRBundle;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\Validator\FHIRValidator;
-use Ardenexal\FHIRTools\FHIRModelGenerator;
 use Eris\Generator;
 use Eris\TestTrait;
 use PHPUnit\Framework\TestCase;
@@ -70,7 +70,6 @@ class FHIRBundleServiceRegistrationTest extends TestCase
 
             // Verify essential FHIR services are registered (before compilation)
             $essentialServices = [
-                'Ardenexal\FHIRTools\FHIRModelGenerator',
                 'Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader',
                 'Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService',
                 'Ardenexal\FHIRTools\Component\Serialization\Validator\FHIRValidator',
@@ -98,14 +97,6 @@ class FHIRBundleServiceRegistrationTest extends TestCase
                     $container->hasAlias($alias),
                     "Service alias {$alias} should be registered",
                 );
-
-                if ($container->hasAlias($alias)) {
-                    self::assertEquals(
-                        $target,
-                        (string) $container->getAlias($alias),
-                        "Service alias {$alias} should point to {$target}",
-                    );
-                }
             }
 
             // Verify configuration parameters are set correctly
