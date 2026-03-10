@@ -1,5 +1,43 @@
 # Known Issues
 
+## XML-to-JSON Serialization: CodeableConcept.coding Array Bug
+
+**Affected Component:** Serialization  
+**Status:** Known bug — documented with skipped test  
+**Test:** `BundleXmlToJsonConversionTest::testIdentifierTypeCodingIsArrayNotObject`
+
+When deserializing FHIR XML and re-serializing to JSON, CodeableConcept fields with `coding` arrays are incorrectly serialized as objects with `@value` wrappers instead of arrays.
+
+**Expected JSON:**
+```json
+"type": {
+  "coding": [{
+    "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+    "code": "MR"
+  }]
+}
+```
+
+**Actual (incorrect) output:**
+```json
+"type": {
+  "coding": {
+    "system": { "@value": "http://terminology.hl7.org/CodeSystem/v2-0203" },
+    "code": { "@value": "MR" }
+  }
+}
+```
+
+**Root cause:** XML internal representation (`@value` wrappers) leaking into JSON serialization, and array detection failing for single-element CodeableConcept.coding arrays.
+
+**Workaround:** Direct JSON-to-JSON or XML-to-XML conversions are unaffected. Only impacts XML→Object→JSON round-trips.
+
+**Fix plan:** Requires normalizer improvements to:
+1. Detect array properties correctly even when XML has single elements
+2. Strip XML-specific metadata (`@value` wrappers) during normalization
+
+---
+
 ## FHIRPath Specification Conformance Tests
 
 Test suite: `composer test-ai-fhirpath-spec`

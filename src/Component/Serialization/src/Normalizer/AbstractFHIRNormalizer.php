@@ -92,7 +92,9 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
                 if ($raw instanceof \DateTimeInterface) {
                     $raw = $raw->format(\DateTimeInterface::ATOM);
                 }
-                $result['value'] = $raw;
+                // For XML, use @ prefix to create attribute; for JSON use plain key
+                $valueKey          = ($format === 'xml') ? '@value' : 'value';
+                $result[$valueKey] = $raw;
             }
         }
 
@@ -102,10 +104,13 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             $extensions        = $extensionProperty->isInitialized($value) ? $extensionProperty->getValue($value) : null;
             if ($extensions !== null && !empty($extensions)) {
                 if ($this->normalizer !== null) {
-                    $result['extensions'] = $this->normalizer->normalize($extensions, $format, $context);
+                    $normalizedExtensions = $this->normalizer->normalize($extensions, $format, $context);
                 } else {
-                    $result['extensions'] = $extensions;
+                    $normalizedExtensions = $extensions;
                 }
+                // For XML, use 'extension' (singular); for JSON use 'extensions' (plural)
+                $extensionKey          = ($format === 'xml') ? 'extension' : 'extensions';
+                $result[$extensionKey] = $normalizedExtensions;
             }
         }
 
@@ -353,7 +358,8 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
 
                 $primitiveRefl = new \ReflectionClass($current);
                 if ($primitiveRefl->hasProperty('extension')) {
-                    $primitiveRefl->getProperty('extension')->setValue($current, $extData['extension']);
+                    $denormalizedExtensions = $this->denormalizeExtensionArray($extData['extension'], $format, $context);
+                    $primitiveRefl->getProperty('extension')->setValue($current, $denormalizedExtensions);
                 }
             } else {
                 // Array: $extData is [{extension:[...]}, null, ...]
@@ -394,7 +400,8 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
                     }
 
                     if ($hasExtensionData) {
-                        $extensionProp->setValue($currentArray[$i], $extEntry['extension']);
+                        $denormalizedExtensions = $this->denormalizeExtensionArray($extEntry['extension'], $format, $context);
+                        $extensionProp->setValue($currentArray[$i], $denormalizedExtensions);
                     } elseif (!$extensionProp->isInitialized($currentArray[$i])) {
                         // Initialize to empty array to prevent "must not be accessed before initialization" errors.
                         $extensionProp->setValue($currentArray[$i], []);
@@ -404,6 +411,34 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
                 $property->setValue($object, $currentArray);
             }
         }
+    }
+
+    /**
+     * Denormalize an extension array from JSON/_property data to Extension objects.
+     *
+     * @param array<array<string, mixed>|object> $extensionData Raw extension array from JSON
+     * @param string|null                        $format        The format being processed ('json', 'xml')
+     * @param array<string, mixed>               $context       Denormalization context
+     *
+     * @return array<array<string, mixed>|object> Array of Extension objects (or raw arrays as fallback)
+     */
+    protected function denormalizeExtensionArray(array $extensionData, ?string $format, array $context): array
+    {
+        if ($this->denormalizer === null) {
+            // Fallback: return raw data if denormalizer not available
+            return $extensionData;
+        }
+
+        $denormalizedExtensions = [];
+        $extensionClass         = 'Ardenexal\\FHIRTools\\Component\\Models\\R4\\DataType\\Extension';
+
+        foreach ($extensionData as $extension) {
+            $denormalizedExtensions[] = is_array($extension)
+                ? $this->denormalizer->denormalize($extension, $extensionClass, $format, $context)
+                : $extension; // Already an object
+        }
+
+        return $denormalizedExtensions;
     }
 
     /**
@@ -486,7 +521,8 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     {
         $cleaned = [];
         foreach ($data as $key => $value) {
-            // Only process string keys (skip numeric array indices)
+            // Handle non-string keys (numeric array indices)
+            // @phpstan-ignore-next-line function.alreadyNarrowedType (false positive: keys can be int|string in foreach)
             if (!is_string($key)) {
                 $cleaned[$key] = is_array($value) ? $this->cleanXmlArtifacts($value) : $value;
                 continue;

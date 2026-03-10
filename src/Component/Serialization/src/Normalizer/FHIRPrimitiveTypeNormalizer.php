@@ -333,7 +333,7 @@ class FHIRPrimitiveTypeNormalizer extends AbstractFHIRNormalizer
                     foreach ($extensions as $extension) {
                         if (is_array($extension)) {
                             // Denormalize to Extension object (cleanXmlArtifacts already handled @ prefixes)
-                            $extensionClass = 'Ardenexal\\FHIRTools\\Component\\Models\\R4\\DataType\\Extension';
+                            $extensionClass           = 'Ardenexal\\FHIRTools\\Component\\Models\\R4\\DataType\\Extension';
                             $denormalizedExtensions[] = $this->denormalizer->denormalize($extension, $extensionClass, $format, $context);
                         } else {
                             $denormalizedExtensions[] = $extension;

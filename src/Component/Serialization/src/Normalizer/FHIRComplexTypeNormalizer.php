@@ -410,6 +410,9 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
                 if ($normalizedValue !== null) {
                     $data[$xmlKey] = $normalizedValue;
                 }
+            } elseif (is_scalar($value)) {
+                // Scalar values become XML attributes
+                $data['@' . $xmlKey] = $value;
             } else {
                 // Use the injected normalizer if available, otherwise handle basic types
                 if ($this->normalizer !== null) {
