@@ -136,6 +136,26 @@ class FHIRBackboneElementNormalizer extends AbstractFHIRNormalizer
                     } else {
                         $meta = $metaMap[$elementName] ?? null;
 
+                        // Special handling for polymorphic resource properties (e.g., Bundle.entry.resource)
+                        // In XML, the actual resource type is determined by the nested element name
+                        if ($meta !== null && $meta->propertyKind === 'resource' && $format === 'xml') {
+                            $resourceElementName = $this->extractResourceElementName($value);
+                            if ($resourceElementName !== null && $this->denormalizer !== null) {
+                                $resolvedClass = $this->resolveResourceType($resourceElementName);
+                                if ($resolvedClass !== null) {
+                                    $denormalizedValue = $this->denormalizer->denormalize(
+                                        $value[$resourceElementName],
+                                        $resolvedClass,
+                                        $format,
+                                        $context,
+                                    );
+                                    $property->setValue($object, $denormalizedValue);
+                                    continue;
+                                }
+                            }
+                            // If we couldn't resolve, fall through to default handling
+                        }
+
                         if ($this->denormalizer !== null) {
                             if ($meta !== null && $meta->propertyKind === 'primitive' && $format !== 'xml') {
                                 // Always produce Primitive objects so that _property extension data
@@ -462,5 +482,53 @@ class FHIRBackboneElementNormalizer extends AbstractFHIRNormalizer
         }
 
         return $data;
+    }
+
+    /**
+     * Extract the resource element name from XML data for polymorphic resource properties.
+     *
+     * In FHIR XML, polymorphic resource properties (e.g., Bundle.entry.resource) contain
+     * a nested element whose name indicates the resource type:
+     * <resource><Patient>...</Patient></resource>
+     *
+     * @param mixed $value The XML data (already decoded to array by XmlEncoder)
+     *
+     * @return string|null The resource element name (e.g., 'Patient'), or null if not found
+     */
+    private function extractResourceElementName(mixed $value): ?string
+    {
+        if (!is_array($value)) {
+            return null;
+        }
+
+        // Look for the first non-XML-metadata key (ignore @attributes, #text, #comment, etc.)
+        foreach ($value as $key => $data) {
+            if (!str_starts_with($key, '@') && !str_starts_with($key, '#')) {
+                // This should be the resource element name
+                return $key;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Resolve resource type name to fully qualified class name.
+     *
+     * @param string $resourceType The FHIR resource type (e.g., 'Patient', 'Bundle')
+     *
+     * @return string|null The fully qualified class name, or null if not found
+     */
+    private function resolveResourceType(string $resourceType): ?string
+    {
+        // Try each supported FHIR version
+        foreach (['R4', 'R4B', 'R5'] as $version) {
+            $candidate = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\Resource\\{$resourceType}Resource";
+            if (class_exists($candidate)) {
+                return $candidate;
+            }
+        }
+
+        return null;
     }
 }

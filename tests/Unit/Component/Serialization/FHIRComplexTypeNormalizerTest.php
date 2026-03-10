@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 use Eris\Generator;
 use Eris\TestTrait;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\HumanName;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRBackboneElementNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRPrimitiveTypeNormalizer;
@@ -358,7 +359,8 @@ class FHIRComplexTypeNormalizerTest extends TestCase
         self::assertInstanceOf(StringPrimitive::class, $first);
         self::assertNull($first->value);
         self::assertNotEmpty($first->extension);
-        self::assertSame('https://example.org/syllable-count', $first->extension[0]['url']);
+        self::assertInstanceOf(Extension::class, $first->extension[0]);
+        self::assertSame('https://example.org/syllable-count', $first->extension[0]->url);
 
         // Second entry: "James" with no extension
         $second = $result->given[1];
@@ -390,7 +392,8 @@ class FHIRComplexTypeNormalizerTest extends TestCase
         self::assertInstanceOf(StringPrimitive::class, $family);
         self::assertSame('Windsor', $family->value);
         self::assertNotEmpty($family->extension);
-        self::assertSame('https://example.org/humanname-own-name', $family->extension[0]['url']);
+        self::assertInstanceOf(Extension::class, $family->extension[0]);
+        self::assertSame('https://example.org/humanname-own-name', $family->extension[0]->url);
     }
 
     /**

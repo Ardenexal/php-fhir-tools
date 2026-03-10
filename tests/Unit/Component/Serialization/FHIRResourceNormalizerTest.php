@@ -929,13 +929,8 @@ class FHIRResourceNormalizerTest extends TestCase
             self::assertArrayHasKey('@xmlns', $normalized);
             self::assertEquals('http://hl7.org/fhir', $normalized['@xmlns']);
 
-            // Must have resourceType information
-            self::assertArrayHasKey('@resourceType', $normalized);
-            self::assertIsString($normalized['@resourceType']);
-
-            // resourceType should match the resource's type
-            $expectedResourceType = $this->metadataExtractor->extractResourceType($resource);
-            self::assertEquals($expectedResourceType, $normalized['@resourceType']);
+            // Note: resourceType is NOT in the normalized array - it's set by FHIRSerializationService
+            // as XML root element name via XmlEncoder::ROOT_NODE_NAME context parameter
 
             // Should not contain null values (FHIR XML rule)
             $this->assertNoNullValues($normalized);
@@ -1039,16 +1034,12 @@ class FHIRResourceNormalizerTest extends TestCase
 
             // Must have required XML structure elements
             self::assertArrayHasKey('@xmlns', $normalized);
-            self::assertArrayHasKey('@resourceType', $normalized);
+
+            // Note: @resourceType is NOT in normalized array - set by FHIRSerializationService
+            // as XML root element name via XmlEncoder::ROOT_NODE_NAME
 
             // Namespace must be valid FHIR namespace
             self::assertEquals('http://hl7.org/fhir', $normalized['@xmlns']);
-
-            // ResourceType must be valid
-            $resourceType = $normalized['@resourceType'];
-            self::assertIsString($resourceType);
-            self::assertNotEmpty($resourceType);
-            self::assertMatchesRegularExpression('/^[A-Z][a-zA-Z0-9]*$/', $resourceType);
 
             // All element names should follow FHIR XML naming conventions
             $this->assertValidFHIRXMLStructure($normalized);
@@ -1186,8 +1177,8 @@ class FHIRResourceNormalizerTest extends TestCase
         // Must have namespace
         self::assertArrayHasKey('@xmlns', $data);
 
-        // Must have resourceType
-        self::assertArrayHasKey('@resourceType', $data);
+        // Note: resourceType is NOT in the data array - it's set as XML root element name
+        // by FHIRSerializationService via XmlEncoder::ROOT_NODE_NAME
 
         // All primitive values should be in @value attributes or proper structure
         $this->assertValidXMLPrimitiveStructure($data);

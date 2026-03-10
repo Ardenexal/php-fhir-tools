@@ -436,8 +436,8 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
             $data['@xmlns'] = 'http://hl7.org/fhir';
         }
 
-        // Add resourceType as XML element name (handled by parent serializer)
-        $data['@resourceType'] = $resourceType;
+        // Note: resourceType is set as XML root element name by FHIRSerializationService
+        // via XmlEncoder::ROOT_NODE_NAME, so we don't add it to the data array
 
         // Normalize all properties of the object
         $reflection = new \ReflectionClass($object);
@@ -735,9 +735,33 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
 
                 // Standard property mapping
                 if ($reflection->hasProperty($elementName)) {
-                    $property     = $reflection->getProperty($elementName);
-                    $propertyType = $this->getPropertyType($property);
-                    $phpItemClass = ($metaMap[$elementName] ?? null)?->phpItemClass;
+                    $property         = $reflection->getProperty($elementName);
+                    $propertyType     = $this->getPropertyType($property);
+                    $propertyMetadata = $metaMap[$elementName] ?? null;
+                    $phpItemClass     = $propertyMetadata?->phpItemClass;
+
+                    // Special handling for polymorphic resource properties (e.g., Bundle.entry.resource)
+                    // In XML, the actual resource type is determined by the nested element name
+                    if ($propertyMetadata !== null && $propertyMetadata->propertyKind === 'resource') {
+                        $resourceElementName = $this->extractResourceElementName($value);
+                        if ($resourceElementName !== null) {
+                            $resolvedClass = $this->typeResolver->resolveResourceType([
+                                'resourceType' => $resourceElementName,
+                            ]);
+
+                            if ($resolvedClass !== null && $this->denormalizer !== null) {
+                                $denormalizedValue = $this->denormalizer->denormalize(
+                                    $value[$resourceElementName],
+                                    $resolvedClass,
+                                    'xml',
+                                    $context,
+                                );
+                                $property->setValue($object, $denormalizedValue);
+                                continue;
+                            }
+                        }
+                        // If we couldn't resolve, fall through to default handling
+                    }
 
                     if ($phpItemClass !== null && $this->denormalizer !== null) {
                         // Complex/backbone array property: denormalize each item to a typed object.
@@ -770,5 +794,33 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
         } catch (\ReflectionException $e) {
             throw new NotNormalizableValueException(sprintf('Cannot create instance of class "%s": %s', $resolvedType, $e->getMessage()), 0, $e);
         }
+    }
+
+    /**
+     * Extract the resource element name from XML data for polymorphic resource properties.
+     *
+     * In FHIR XML, polymorphic resource properties (e.g., Bundle.entry.resource) contain
+     * a nested element whose name indicates the resource type:
+     * <resource><Patient>...</Patient></resource>
+     *
+     * @param mixed $value The XML data (already decoded to array by XmlEncoder)
+     *
+     * @return string|null The resource element name (e.g., 'Patient'), or null if not found
+     */
+    private function extractResourceElementName(mixed $value): ?string
+    {
+        if (!is_array($value)) {
+            return null;
+        }
+
+        // Look for the first non-XML-metadata key (ignore @attributes, #text, #comment, etc.)
+        foreach ($value as $key => $data) {
+            if (!str_starts_with($key, '@') && !str_starts_with($key, '#')) {
+                // This should be the resource element name
+                return $key;
+            }
+        }
+
+        return null;
     }
 }

@@ -120,7 +120,7 @@ final class ToStringFunction extends AbstractFunction
                 $strVal = self::formatDecimal((float) $rawVal);
             }
 
-            $unit = $value['unit'];
+            $unit             = $value['unit'];
             $calendarKeywords = [
                 'year', 'years', 'month', 'months', 'week', 'weeks', 'day', 'days',
                 'hour', 'hours', 'minute', 'minutes', 'second', 'seconds',
