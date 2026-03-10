@@ -470,6 +470,48 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     }
 
     /**
+     * Clean XML encoder artifacts from denormalized data.
+     *
+     * Symfony's XmlEncoder adds prefixes and meta-keys to the decoded array:
+     * - XML attributes become keys with @ prefix (url="X" → @url)
+     * - Empty text nodes become # keys
+     *
+     * This method strips these artifacts to prepare data for property mapping.
+     *
+     * @param array<string, mixed> $data Raw data from XmlEncoder
+     *
+     * @return array<string, mixed> Cleaned data ready for denormalization
+     */
+    protected function cleanXmlArtifacts(array $data): array
+    {
+        $cleaned = [];
+        foreach ($data as $key => $value) {
+            // Only process string keys (skip numeric array indices)
+            if (!is_string($key)) {
+                $cleaned[$key] = is_array($value) ? $this->cleanXmlArtifacts($value) : $value;
+                continue;
+            }
+
+            // Strip @ prefix from keys (XML attributes)
+            $cleanKey = str_starts_with($key, '@') ? substr($key, 1) : $key;
+
+            // Skip # empty text nodes
+            if ($cleanKey === '#') {
+                continue;
+            }
+
+            // Recursively clean nested arrays
+            if (is_array($value)) {
+                $value = $this->cleanXmlArtifacts($value);
+            }
+
+            $cleaned[$cleanKey] = $value;
+        }
+
+        return $cleaned;
+    }
+
+    /**
      * Return the compiled property metadata map for the given object's class.
      *
      * Warm-cache hit from PropertyMetadataProvider on every call after the first.
