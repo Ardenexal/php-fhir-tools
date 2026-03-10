@@ -284,7 +284,7 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
                         if ($normalizedValue !== null) {
                             $data[$jsonKey] = $normalizedValue['value'];
                             if (isset($normalizedValue['extensions'])) {
-                                $data['_' . $jsonKey] = $normalizedValue['extensions'];
+                                $data['_' . $jsonKey] = ['extension' => $normalizedValue['extensions']];
                             }
                         }
                     } else {
@@ -312,7 +312,7 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
                 if ($normalizedValue !== null) {
                     $data[$jsonKey] = $normalizedValue['value'];
                     if (isset($normalizedValue['extensions'])) {
-                        $data['_' . $jsonKey] = $normalizedValue['extensions'];
+                        $data['_' . $jsonKey] = ['extension' => $normalizedValue['extensions']];
                     }
                 }
             } else {

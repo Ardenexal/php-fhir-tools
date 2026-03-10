@@ -368,7 +368,7 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
                         if ($normalizedValue !== null) {
                             $data[$jsonKey] = $normalizedValue['value'];
                             if (isset($normalizedValue['extensions']) && $fhirContext->includeExtensions) {
-                                $data['_' . $jsonKey] = $normalizedValue['extensions'];
+                                $data['_' . $jsonKey] = ['extension' => $normalizedValue['extensions']];
                             }
                         }
                     } else {
@@ -400,7 +400,7 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
                 if ($normalizedValue !== null) {
                     $data[$jsonKey] = $normalizedValue['value'];
                     if (isset($normalizedValue['extensions']) && $fhirContext->includeExtensions) {
-                        $data['_' . $jsonKey] = $normalizedValue['extensions'];
+                        $data['_' . $jsonKey] = ['extension' => $normalizedValue['extensions']];
                     }
                 }
             } else {
