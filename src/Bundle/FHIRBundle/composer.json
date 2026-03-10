@@ -1,6 +1,6 @@
 {
     "name": "ardenexal/fhir-bundle",
-    "version": "0.0.3",
+    "version": "0.1.2",
     "description": "Symfony Bundle for integrating FHIR Tools components",
     "type": "symfony-bundle",
     "license": "MIT",
