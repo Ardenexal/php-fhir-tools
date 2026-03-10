@@ -232,41 +232,6 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
     }
 
     /**
-     * Get the target type for a choice element based on its suffix and value.
-     */
-    private function getChoiceElementType(string $typeSuffix, mixed $value): ?string
-    {
-        // Map FHIR type suffixes to PHP types
-        $typeMap = [
-            'String'       => 'string',
-            'Integer'      => 'int',
-            'Boolean'      => 'bool',
-            'Decimal'      => 'float',
-            'Date'         => 'string',
-            'DateTime'     => 'string',
-            'Time'         => 'string',
-            'Code'         => 'string',
-            'Uri'          => 'string',
-            'Url'          => 'string',
-            'Canonical'    => 'string',
-            'Base64Binary' => 'string',
-            'Instant'      => 'string',
-            'Oid'          => 'string',
-            'Id'           => 'string',
-            'Uuid'         => 'string',
-            'Markdown'     => 'string',
-            'Xhtml'        => 'string',
-        ];
-
-        if (isset($typeMap[$typeSuffix])) {
-            return $typeMap[$typeSuffix];
-        }
-
-        // For complex types (like CodeableConcept), return null to use basic handling
-        return null;
-    }
-
-    /**
      * Normalize complex type for JSON format.
      *
      * @param array<string, mixed> $context
