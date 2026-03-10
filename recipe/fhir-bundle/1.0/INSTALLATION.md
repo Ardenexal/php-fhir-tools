@@ -126,7 +126,7 @@ php bin/console fhir:generate R4B --output-dir=/custom/path
 Inject FHIR services into your controllers or services:
 
 ```php
-use Ardenexal\FHIRTools\Serialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\FHIRModelGenerator;
 
 class MyController

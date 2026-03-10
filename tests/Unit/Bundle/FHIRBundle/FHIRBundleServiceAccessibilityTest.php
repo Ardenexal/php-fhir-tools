@@ -69,7 +69,6 @@ class FHIRBundleServiceAccessibilityTest extends TestCase
             $publicServices = [
                 'Ardenexal\FHIRTools\FHIRModelGenerator',
                 'Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader',
-                'Ardenexal\FHIRTools\Serialization\FHIRSerializationService',
                 'Ardenexal\FHIRTools\Serialization\FHIRValidator',
                 'Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector',
                 'Ardenexal\FHIRTools\Component\CodeGeneration\Package\RetryHandler',

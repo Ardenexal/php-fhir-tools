@@ -92,7 +92,6 @@ class Symfony74CompatibilityTest extends TestCase
             $essentialServices = [
                 'Ardenexal\FHIRTools\FHIRModelGenerator',
                 'Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader',
-                'Ardenexal\FHIRTools\Serialization\FHIRSerializationService',
                 'Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector',
             ];
 

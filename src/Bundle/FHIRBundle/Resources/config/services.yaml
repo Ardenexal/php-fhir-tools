@@ -95,11 +95,6 @@ services:
     Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService:
         public: true
 
-    # Legacy alias for backward-compatibility
-    Ardenexal\FHIRTools\Serialization\FHIRSerializationService:
-        alias: 'Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService'
-        public: true
-
     # Top-level aliases for backward compatibility
     Ardenexal\FHIRTools\FHIRModelGenerator:
         alias: 'Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator'
