@@ -28,6 +28,7 @@ class ManufacturedItemDefinitionProperty extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -37,6 +38,7 @@ class ManufacturedItemDefinitionProperty extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -46,6 +48,7 @@ class ManufacturedItemDefinitionProperty extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -55,15 +58,17 @@ class ManufacturedItemDefinitionProperty extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'valueX' => [
+        'value' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'CodeableConcept',
@@ -117,7 +122,7 @@ class ManufacturedItemDefinitionProperty extends BackboneElement
         /** @var CodeableConcept|null type A code expressing the type of characteristic */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?CodeableConcept $type = null,
-        /** @var CodeableConcept|Quantity|DatePrimitive|bool|Attachment|null valueX A value for the characteristic */
+        /** @var CodeableConcept|Quantity|DatePrimitive|bool|Attachment|null value A value for the characteristic */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -150,7 +155,7 @@ class ManufacturedItemDefinitionProperty extends BackboneElement
                 ],
             ],
         )]
-        public CodeableConcept|Quantity|DatePrimitive|bool|Attachment|null $valueX = null,
+        public CodeableConcept|Quantity|DatePrimitive|bool|Attachment|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -29,6 +29,7 @@ class CitationCitedArtifactContributorshipEntryAffiliationInfo extends BackboneE
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -38,6 +39,7 @@ class CitationCitedArtifactContributorshipEntryAffiliationInfo extends BackboneE
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -47,6 +49,7 @@ class CitationCitedArtifactContributorshipEntryAffiliationInfo extends BackboneE
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'affiliation' => [
@@ -56,6 +59,7 @@ class CitationCitedArtifactContributorshipEntryAffiliationInfo extends BackboneE
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'role' => [
@@ -65,6 +69,7 @@ class CitationCitedArtifactContributorshipEntryAffiliationInfo extends BackboneE
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'identifier' => [
@@ -74,6 +79,7 @@ class CitationCitedArtifactContributorshipEntryAffiliationInfo extends BackboneE
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier',
             'variants'     => null,
         ],
     ];

@@ -26,29 +26,57 @@ class IifFunction extends AbstractFunction
 
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection
     {
-        $this->validateParameterCount($parameters, 3, 3);
+        $this->validateParameterCount($parameters, 2, 3);
 
         $evaluator = $context->getEvaluator();
         if ($evaluator === null) {
             throw new EvaluationException('Evaluator not available in context');
         }
 
-        // Evaluate condition
-        $conditionResult = $evaluator->evaluate($parameters[0], $context);
+        // iif() cannot be applied to a multi-item collection
+        if ($input->count() > 1) {
+            throw new EvaluationException('iif() requires a single-item or empty input collection');
+        }
 
-        // If condition is empty or not boolean, return empty
+        // When input has a single item, expose it as $this and as the current node so that
+        // condition/branches can reference $this to mean the iif's focus (e.g. $this = 'context').
+        $evalContext = !$input->isEmpty()
+            ? $context->withCurrentNode($input->first())->withVariable('this', $input->first())
+            : $context;
+
+        // Evaluate condition
+        $conditionResult = $evaluator->evaluateWithContext($parameters[0], $evalContext);
+
+        // Per FHIRPath spec: if criterion is true, return true-result,
+        // otherwise (false or empty) return otherwise-result (or empty if omitted).
         if ($conditionResult->isEmpty()) {
+            if (count($parameters) >= 3) {
+                return $evaluator->evaluateWithContext($parameters[2], $evalContext);
+            }
+
             return Collection::empty();
+        }
+
+        if (!$conditionResult->isSingle()) {
+            throw new EvaluationException('iif() condition must evaluate to a single boolean');
         }
 
         $condition = $conditionResult->first();
 
-        // If condition is true, evaluate and return ifTrue branch
-        if ($condition === true) {
-            return $evaluator->evaluate($parameters[1], $context);
+        if (!is_bool($condition)) {
+            throw new EvaluationException('iif() condition must be a boolean value');
         }
 
-        // Otherwise, evaluate and return ifFalse branch
-        return $evaluator->evaluate($parameters[2], $context);
+        // If condition is true, evaluate and return ifTrue branch
+        if ($condition === true) {
+            return $evaluator->evaluateWithContext($parameters[1], $evalContext);
+        }
+
+        // Otherwise, evaluate and return ifFalse branch (optional — returns empty if omitted)
+        if (count($parameters) < 3) {
+            return Collection::empty();
+        }
+
+        return $evaluator->evaluateWithContext($parameters[2], $evalContext);
     }
 }

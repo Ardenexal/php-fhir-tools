@@ -30,6 +30,7 @@ class ClinicalUseDefinitionContraindicationOtherTherapy extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -39,6 +40,7 @@ class ClinicalUseDefinitionContraindicationOtherTherapy extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -48,6 +50,7 @@ class ClinicalUseDefinitionContraindicationOtherTherapy extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'relationshipType' => [
@@ -57,6 +60,7 @@ class ClinicalUseDefinitionContraindicationOtherTherapy extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'therapy' => [
@@ -66,6 +70,7 @@ class ClinicalUseDefinitionContraindicationOtherTherapy extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

@@ -34,7 +34,8 @@
                         <option value="validate"      {% if action == 'validate'      %}selected{% endif %}>Validate</option>
                         <option value="json_to_xml"   {% if action == 'json_to_xml'   %}selected{% endif %}>JSON → XML</option>
                         <option value="xml_to_json"   {% if action == 'xml_to_json'   %}selected{% endif %}>XML → JSON</option>
-                        <option value="show_metadata" {% if action == 'show_metadata' %}selected{% endif %}>Show metadata</option>
+                        <option value="show_metadata"  {% if action == 'show_metadata'  %}selected{% endif %}>Show metadata</option>
+                        <option value="dump_structure" {% if action == 'dump_structure' %}selected{% endif %}>Dump structure</option>
                     </select>
                 </div>
             </div>
@@ -92,6 +93,14 @@
                 <pre class="text-xs font-mono bg-gray-50 rounded p-3 overflow-x-auto max-h-96">{{ result.output }}</pre>
             </div>
 
+            {% elseif result.type == 'dump_structure' %}
+            <div class="bg-white border border-gray-200 rounded-xl p-4">
+                <h3 class="text-sm font-semibold text-gray-700 mb-3">Deserialized Object Structure</h3>
+                <div class="overflow-x-auto">
+                    {{ dump(result.object) }}
+                </div>
+            </div>
+
             {% elseif result.type == 'metadata' %}
             <div class="bg-white border border-gray-200 rounded-xl p-4">
                 <h3 class="text-sm font-semibold text-gray-700 mb-3">Resource Metadata</h3>
@@ -131,6 +140,7 @@
                 <li><strong class="text-gray-700">JSON → XML</strong> — deserialize JSON, re-serialize to FHIR XML</li>
                 <li><strong class="text-gray-700">XML → JSON</strong> — deserialize XML, re-serialize to FHIR JSON</li>
                 <li><strong class="text-gray-700">Show metadata</strong> — extract resourceType, FHIR version, and class info via reflection</li>
+                <li><strong class="text-gray-700">Dump structure</strong> — deserialize to PHP object and display the full typed object tree using Symfony VarDumper</li>
             </ul>
         </div>
 

@@ -29,6 +29,7 @@ class Annotation extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -38,15 +39,17 @@ class Annotation extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'authorX' => [
+        'author' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Reference',
@@ -71,6 +74,7 @@ class Annotation extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'text' => [
@@ -80,6 +84,7 @@ class Annotation extends Element
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];
@@ -91,7 +96,7 @@ class Annotation extends Element
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
-        /** @var Reference|StringPrimitive|string|null authorX Individual responsible for the annotation */
+        /** @var Reference|StringPrimitive|string|null author Individual responsible for the annotation */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -111,7 +116,7 @@ class Annotation extends Element
                 ],
             ],
         )]
-        public Reference|StringPrimitive|string|null $authorX = null,
+        public Reference|StringPrimitive|string|null $author = null,
         /** @var DateTimePrimitive|null time When the annotation was made */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $time = null,

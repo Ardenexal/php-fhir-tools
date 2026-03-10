@@ -28,6 +28,7 @@ class MolecularSequenceReferenceSeq extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -37,6 +38,7 @@ class MolecularSequenceReferenceSeq extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -46,6 +48,7 @@ class MolecularSequenceReferenceSeq extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'chromosome' => [
@@ -55,6 +58,7 @@ class MolecularSequenceReferenceSeq extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'genomeBuild' => [
@@ -64,6 +68,7 @@ class MolecularSequenceReferenceSeq extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'orientation' => [
@@ -73,6 +78,7 @@ class MolecularSequenceReferenceSeq extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'referenceSeqId' => [
@@ -82,6 +88,7 @@ class MolecularSequenceReferenceSeq extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'referenceSeqPointer' => [
@@ -91,6 +98,7 @@ class MolecularSequenceReferenceSeq extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'referenceSeqString' => [
@@ -100,6 +108,7 @@ class MolecularSequenceReferenceSeq extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'strand' => [
@@ -109,6 +118,7 @@ class MolecularSequenceReferenceSeq extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'windowStart' => [
@@ -118,6 +128,7 @@ class MolecularSequenceReferenceSeq extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'windowEnd' => [
@@ -127,6 +138,7 @@ class MolecularSequenceReferenceSeq extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

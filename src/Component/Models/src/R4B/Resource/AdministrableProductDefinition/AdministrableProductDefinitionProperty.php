@@ -32,6 +32,7 @@ class AdministrableProductDefinitionProperty extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -41,6 +42,7 @@ class AdministrableProductDefinitionProperty extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -50,6 +52,7 @@ class AdministrableProductDefinitionProperty extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -59,15 +62,17 @@ class AdministrableProductDefinitionProperty extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'valueX' => [
+        'value' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'CodeableConcept',
@@ -113,6 +118,7 @@ class AdministrableProductDefinitionProperty extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];
@@ -130,7 +136,7 @@ class AdministrableProductDefinitionProperty extends BackboneElement
         /** @var CodeableConcept|null type A code expressing the type of characteristic */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?CodeableConcept $type = null,
-        /** @var CodeableConcept|Quantity|DatePrimitive|bool|Attachment|null valueX A value for the characteristic */
+        /** @var CodeableConcept|Quantity|DatePrimitive|bool|Attachment|null value A value for the characteristic */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -163,7 +169,7 @@ class AdministrableProductDefinitionProperty extends BackboneElement
                 ],
             ],
         )]
-        public CodeableConcept|Quantity|DatePrimitive|bool|Attachment|null $valueX = null,
+        public CodeableConcept|Quantity|DatePrimitive|bool|Attachment|null $value = null,
         /** @var CodeableConcept|null status The status of characteristic e.g. assigned or pending */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $status = null,

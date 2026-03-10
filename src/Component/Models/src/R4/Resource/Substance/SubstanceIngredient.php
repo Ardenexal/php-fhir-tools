@@ -27,6 +27,7 @@ class SubstanceIngredient extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -36,6 +37,7 @@ class SubstanceIngredient extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -45,6 +47,7 @@ class SubstanceIngredient extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'quantity' => [
@@ -54,15 +57,17 @@ class SubstanceIngredient extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'substanceX' => [
+        'substance' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => true,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'CodeableConcept',
@@ -95,7 +100,7 @@ class SubstanceIngredient extends BackboneElement
         /** @var Ratio|null quantity Optional amount (concentration) */
         #[FhirProperty(fhirType: 'Ratio', propertyKind: 'complex')]
         public ?Ratio $quantity = null,
-        /** @var CodeableConcept|Reference|null substanceX A component of the substance */
+        /** @var CodeableConcept|Reference|null substance A component of the substance */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -117,7 +122,7 @@ class SubstanceIngredient extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public CodeableConcept|Reference|null $substanceX = null,
+        public CodeableConcept|Reference|null $substance = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

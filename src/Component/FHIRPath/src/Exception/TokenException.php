@@ -117,4 +117,22 @@ class TokenException extends ParseException
 
         return new self($message, $line, $column, $context, $suggestion);
     }
+
+    /**
+     * Create a token exception for unterminated multi-line comments.
+     *
+     * @param int    $line    The line number where the comment started
+     * @param int    $column  The column number where the comment started
+     * @param string $context The expression context
+     */
+    public static function unterminatedComment(
+        int $line,
+        int $column,
+        string $context = ''
+    ): self {
+        $message    = 'Unterminated multi-line comment';
+        $suggestion = 'Add closing */ to terminate the comment.';
+
+        return new self($message, $line, $column, $context, $suggestion);
+    }
 }

@@ -33,6 +33,7 @@ class ExplanationOfBenefitSupportingInfo extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -42,6 +43,7 @@ class ExplanationOfBenefitSupportingInfo extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -51,6 +53,7 @@ class ExplanationOfBenefitSupportingInfo extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'sequence' => [
@@ -60,6 +63,7 @@ class ExplanationOfBenefitSupportingInfo extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'category' => [
@@ -69,6 +73,7 @@ class ExplanationOfBenefitSupportingInfo extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'code' => [
@@ -78,15 +83,17 @@ class ExplanationOfBenefitSupportingInfo extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'timingX' => [
+        'timing' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'date',
@@ -104,13 +111,14 @@ class ExplanationOfBenefitSupportingInfo extends BackboneElement
                 ],
             ],
         ],
-        'valueX' => [
+        'value' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'boolean',
@@ -156,6 +164,7 @@ class ExplanationOfBenefitSupportingInfo extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];
@@ -179,7 +188,7 @@ class ExplanationOfBenefitSupportingInfo extends BackboneElement
         /** @var CodeableConcept|null code Type of information */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $code = null,
-        /** @var DatePrimitive|Period|null timingX When it occurred */
+        /** @var DatePrimitive|Period|null timing When it occurred */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -199,8 +208,8 @@ class ExplanationOfBenefitSupportingInfo extends BackboneElement
                 ],
             ],
         )]
-        public DatePrimitive|Period|null $timingX = null,
-        /** @var bool|StringPrimitive|string|Quantity|Attachment|Reference|null valueX Data to be provided */
+        public DatePrimitive|Period|null $timing = null,
+        /** @var bool|StringPrimitive|string|Quantity|Attachment|Reference|null value Data to be provided */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -233,7 +242,7 @@ class ExplanationOfBenefitSupportingInfo extends BackboneElement
                 ],
             ],
         )]
-        public bool|StringPrimitive|string|Quantity|Attachment|Reference|null $valueX = null,
+        public bool|StringPrimitive|string|Quantity|Attachment|Reference|null $value = null,
         /** @var Coding|null reason Explanation for the information */
         #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
         public ?Coding $reason = null,

@@ -26,6 +26,7 @@ class NutritionOrderEnteralFormulaAdministration extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -35,6 +36,7 @@ class NutritionOrderEnteralFormulaAdministration extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -44,6 +46,7 @@ class NutritionOrderEnteralFormulaAdministration extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'schedule' => [
@@ -53,6 +56,7 @@ class NutritionOrderEnteralFormulaAdministration extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'quantity' => [
@@ -62,15 +66,17 @@ class NutritionOrderEnteralFormulaAdministration extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'rateX' => [
+        'rate' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Quantity',
@@ -106,7 +112,7 @@ class NutritionOrderEnteralFormulaAdministration extends BackboneElement
         /** @var Quantity|null quantity The volume of formula to provide */
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
         public ?Quantity $quantity = null,
-        /** @var Quantity|Ratio|null rateX Speed with which the formula is provided per period of time */
+        /** @var Quantity|Ratio|null rate Speed with which the formula is provided per period of time */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -126,7 +132,7 @@ class NutritionOrderEnteralFormulaAdministration extends BackboneElement
                 ],
             ],
         )]
-        public Quantity|Ratio|null $rateX = null,
+        public Quantity|Ratio|null $rate = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

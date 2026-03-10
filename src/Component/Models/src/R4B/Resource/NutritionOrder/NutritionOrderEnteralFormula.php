@@ -26,6 +26,7 @@ class NutritionOrderEnteralFormula extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -35,6 +36,7 @@ class NutritionOrderEnteralFormula extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -44,6 +46,7 @@ class NutritionOrderEnteralFormula extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'baseFormulaType' => [
@@ -53,6 +56,7 @@ class NutritionOrderEnteralFormula extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'baseFormulaProductName' => [
@@ -62,6 +66,7 @@ class NutritionOrderEnteralFormula extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'additiveType' => [
@@ -71,6 +76,7 @@ class NutritionOrderEnteralFormula extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'additiveProductName' => [
@@ -80,6 +86,7 @@ class NutritionOrderEnteralFormula extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'caloricDensity' => [
@@ -89,6 +96,7 @@ class NutritionOrderEnteralFormula extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'routeofAdministration' => [
@@ -98,6 +106,7 @@ class NutritionOrderEnteralFormula extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'administration' => [
@@ -107,6 +116,7 @@ class NutritionOrderEnteralFormula extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\NutritionOrder\NutritionOrderEnteralFormulaAdministration',
             'variants'     => null,
         ],
         'maxVolumeToDeliver' => [
@@ -116,6 +126,7 @@ class NutritionOrderEnteralFormula extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'administrationInstruction' => [
@@ -125,6 +136,7 @@ class NutritionOrderEnteralFormula extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

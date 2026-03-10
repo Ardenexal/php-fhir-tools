@@ -30,6 +30,7 @@ class FamilyMemberHistoryCondition extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -39,6 +40,7 @@ class FamilyMemberHistoryCondition extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -48,6 +50,7 @@ class FamilyMemberHistoryCondition extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'code' => [
@@ -57,6 +60,7 @@ class FamilyMemberHistoryCondition extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'outcome' => [
@@ -66,6 +70,7 @@ class FamilyMemberHistoryCondition extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'contributedToDeath' => [
@@ -75,15 +80,17 @@ class FamilyMemberHistoryCondition extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'onsetX' => [
+        'onset' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Age',
@@ -122,6 +129,7 @@ class FamilyMemberHistoryCondition extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation',
             'variants'     => null,
         ],
     ];
@@ -145,7 +153,7 @@ class FamilyMemberHistoryCondition extends BackboneElement
         /** @var bool|null contributedToDeath Whether the condition contributed to the cause of death */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $contributedToDeath = null,
-        /** @var Age|Range|Period|StringPrimitive|string|null onsetX When condition first manifested */
+        /** @var Age|Range|Period|StringPrimitive|string|null onset When condition first manifested */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -177,7 +185,7 @@ class FamilyMemberHistoryCondition extends BackboneElement
                 ],
             ],
         )]
-        public Age|Range|Period|StringPrimitive|string|null $onsetX = null,
+        public Age|Range|Period|StringPrimitive|string|null $onset = null,
         /** @var array<Annotation> note Extra information about condition */
         #[FhirProperty(fhirType: 'Annotation', propertyKind: 'complex', isArray: true)]
         public array $note = [],

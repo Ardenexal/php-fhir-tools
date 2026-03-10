@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
+use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
 
 /**
  * not() : Boolean
@@ -50,15 +51,16 @@ final class NotFunction extends AbstractFunction
         }
 
         if (!$input->isSingle()) {
-            // Can only negate a single value, not multiple values
-            return Collection::empty();
+            // not() requires a single boolean — multiple items is an error per FHIRPath spec
+            throw new EvaluationException('not() requires a single-item collection');
         }
 
         $value = $input->first();
 
         if (!is_bool($value)) {
-            // Can only negate boolean values (true/false)
-            return Collection::empty();
+            // Per FHIRPath spec §6.1 singleton evaluation: a non-boolean single item
+            // evaluates to true in a boolean context, so not(true) = false.
+            return Collection::single(false);
         }
 
         // Flip the boolean: true → false, false → true

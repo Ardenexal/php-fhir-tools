@@ -27,6 +27,7 @@ class ClinicalUseDefinitionIndication extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -36,6 +37,7 @@ class ClinicalUseDefinitionIndication extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -45,6 +47,7 @@ class ClinicalUseDefinitionIndication extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'diseaseSymptomProcedure' => [
@@ -54,6 +57,7 @@ class ClinicalUseDefinitionIndication extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'diseaseStatus' => [
@@ -63,6 +67,7 @@ class ClinicalUseDefinitionIndication extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'comorbidity' => [
@@ -72,6 +77,7 @@ class ClinicalUseDefinitionIndication extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableReference',
             'variants'     => null,
         ],
         'intendedEffect' => [
@@ -81,15 +87,17 @@ class ClinicalUseDefinitionIndication extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'durationX' => [
+        'duration' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Range',
@@ -114,6 +122,7 @@ class ClinicalUseDefinitionIndication extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
             'variants'     => null,
         ],
         'otherTherapy' => [
@@ -123,6 +132,7 @@ class ClinicalUseDefinitionIndication extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ClinicalUseDefinition\ClinicalUseDefinitionContraindicationOtherTherapy',
             'variants'     => null,
         ],
     ];
@@ -149,7 +159,7 @@ class ClinicalUseDefinitionIndication extends BackboneElement
         /** @var CodeableReference|null intendedEffect The intended effect, aim or strategy to be achieved */
         #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex')]
         public ?CodeableReference $intendedEffect = null,
-        /** @var Range|StringPrimitive|string|null durationX Timing or duration information */
+        /** @var Range|StringPrimitive|string|null duration Timing or duration information */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -169,7 +179,7 @@ class ClinicalUseDefinitionIndication extends BackboneElement
                 ],
             ],
         )]
-        public Range|StringPrimitive|string|null $durationX = null,
+        public Range|StringPrimitive|string|null $duration = null,
         /** @var array<Reference> undesirableEffect An unwanted side effect or negative outcome of the subject of this resource when being used for this indication */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isArray: true)]
         public array $undesirableEffect = [],

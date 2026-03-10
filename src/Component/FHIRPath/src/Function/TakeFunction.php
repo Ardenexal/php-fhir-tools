@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
+use Ardenexal\FHIRTools\Component\FHIRPath\Exception\FHIRPathSemanticException;
 
 /**
  * take(num) function - Returns the first num items from the collection
@@ -24,8 +25,17 @@ final class TakeFunction extends AbstractFunction
     {
         $this->validateParameterCount($parameters, 1);
 
-        $numCollection = $parameters[0];
-        if (!($numCollection instanceof Collection) || $numCollection->isEmpty()) {
+        if ($context->getEvaluator()?->getContext()->isStrictMode() && !$input->isOrdered()) {
+            throw new FHIRPathSemanticException("Function 'take' requires an ordered collection");
+        }
+
+        $evaluator = $context->getEvaluator();
+        if ($evaluator === null) {
+            throw new EvaluationException('Evaluator not available in context');
+        }
+
+        $numCollection = $evaluator->evaluate($parameters[0], $context);
+        if ($numCollection->isEmpty()) {
             throw EvaluationException::invalidFunctionParameter('take', 'num', 'non-empty integer collection');
         }
 

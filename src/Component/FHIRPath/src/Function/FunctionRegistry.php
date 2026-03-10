@@ -59,6 +59,7 @@ final class FunctionRegistry
         $this->registerSafe(new SkipFunction());
         $this->registerSafe(new SingleFunction());
         $this->registerSafe(new DistinctFunction());
+        $this->registerSafe(new SortFunction());
 
         // Subsetting functions
         $this->registerSafe(new UnionFunction());
@@ -81,6 +82,11 @@ final class FunctionRegistry
         $this->registerSafe(new TrimFunction());
         $this->registerSafe(new SplitFunction());
         $this->registerSafe(new ToCharsFunction());
+        $this->registerSafe(new EncodeFunction());
+        $this->registerSafe(new DecodeFunction());
+        $this->registerSafe(new JoinFunction());
+        $this->registerSafe(new EscapeFunction());
+        $this->registerSafe(new UnescapeFunction());
 
         // Math functions
         $this->registerSafe(new SumFunction());
@@ -107,6 +113,7 @@ final class FunctionRegistry
 
         // Type functions
         $this->registerSafe(new OfTypeFunction());
+        $this->registerSafe(new TypeFunction());
         $this->registerSafe(new HasValueFunction());
 
         // Tree navigation functions

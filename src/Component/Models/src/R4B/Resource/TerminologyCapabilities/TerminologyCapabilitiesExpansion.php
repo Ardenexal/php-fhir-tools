@@ -24,6 +24,7 @@ class TerminologyCapabilitiesExpansion extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -33,6 +34,7 @@ class TerminologyCapabilitiesExpansion extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -42,6 +44,7 @@ class TerminologyCapabilitiesExpansion extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'hierarchical' => [
@@ -51,6 +54,7 @@ class TerminologyCapabilitiesExpansion extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'paging' => [
@@ -60,6 +64,7 @@ class TerminologyCapabilitiesExpansion extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'incomplete' => [
@@ -69,6 +74,7 @@ class TerminologyCapabilitiesExpansion extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'parameter' => [
@@ -78,6 +84,7 @@ class TerminologyCapabilitiesExpansion extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\TerminologyCapabilities\TerminologyCapabilitiesExpansionParameter',
             'variants'     => null,
         ],
         'textFilter' => [
@@ -87,6 +94,7 @@ class TerminologyCapabilitiesExpansion extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

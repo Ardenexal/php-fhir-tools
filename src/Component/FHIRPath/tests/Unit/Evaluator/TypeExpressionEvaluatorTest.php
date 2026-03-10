@@ -119,48 +119,67 @@ final class TypeExpressionEvaluatorTest extends TestCase
 
     public function testIsOperatorWithIntegerDecimalCompatibility(): void
     {
-        // Integer is compatible with decimal — returns true (per FHIRTypeResolver).
+        // Per FHIRPath spec, `is` is strict type identity — Integer is NOT Decimal.
+        // Implicit integer→decimal promotion applies in arithmetic/comparison contexts, not `is`.
         $result = $this->evaluate('42 is decimal', null);
         self::assertSame(1, $result->count());
-        self::assertTrue($result->first());
+        self::assertFalse($result->first());
 
         $fhirInteger = new FHIRInteger(value: 100);
         $result      = $this->evaluate('$this is decimal', $fhirInteger);
         self::assertSame(1, $result->count());
-        self::assertTrue($result->first());
+        self::assertFalse($result->first());
     }
 
     public function testAsOperatorWithPrimitiveValues(): void
     {
-        // Cast integer to string
-        $result = $this->evaluate('42 as string', null);
-        self::assertSame(1, $result->count());
-        self::assertSame('42', $result->first());
+        // FHIRPath spec: 'as' is a strict type filter — returns the item only when the type matches.
 
-        // Cast string to integer
-        $result = $this->evaluate("'100' as integer", null);
+        // integer as integer → matches, returns 42
+        $result = $this->evaluate('42 as integer', null);
         self::assertSame(1, $result->count());
-        self::assertSame(100, $result->first());
+        self::assertSame(42, $result->first());
 
-        // Cast string to boolean
-        $result = $this->evaluate("'true' as boolean", null);
+        // string as string → matches, returns the string
+        $result = $this->evaluate("'hello' as string", null);
+        self::assertSame(1, $result->count());
+        self::assertSame('hello', $result->first());
+
+        // boolean as boolean → matches, returns true
+        $result = $this->evaluate('true as boolean', null);
         self::assertSame(1, $result->count());
         self::assertTrue($result->first());
+
+        // integer as string → type mismatch → empty (not a cast)
+        $result = $this->evaluate('42 as string', null);
+        self::assertTrue($result->isEmpty());
+
+        // string as integer → type mismatch → empty
+        $result = $this->evaluate("'100' as integer", null);
+        self::assertTrue($result->isEmpty());
     }
 
     public function testAsOperatorWithFHIRPrimitives(): void
     {
-        // Cast FHIRInteger to string
-        $fhirInteger = new FHIRInteger(value: 42);
-        $result      = $this->evaluate('$this as string', $fhirInteger);
-        self::assertSame(1, $result->count());
-        self::assertSame('42', $result->first());
+        // FHIRPath spec: 'as' is a strict type filter — the FHIR primitive is unwrapped
+        // to its PHP scalar by normalizeValue(), and the type check is applied to that scalar.
 
-        // Cast FHIRString to integer
-        $fhirString = new FHIRString(value: '100');
-        $result     = $this->evaluate('$this as integer', $fhirString);
+        // FHIRInteger (unwraps to int) as integer → matches → returns the integer value
+        $fhirInteger = new FHIRInteger(value: 42);
+        $result      = $this->evaluate('$this as integer', $fhirInteger);
         self::assertSame(1, $result->count());
-        self::assertSame(100, $result->first());
+        self::assertSame(42, $result->first());
+
+        // FHIRString (unwraps to string) as string → matches → returns the string value
+        $fhirString = new FHIRString(value: 'test');
+        $result     = $this->evaluate('$this as string', $fhirString);
+        self::assertSame(1, $result->count());
+        self::assertSame('test', $result->first());
+
+        // FHIRInteger as string → type mismatch → empty (not a cast)
+        $fhirInteger2 = new FHIRInteger(value: 42);
+        $result       = $this->evaluate('$this as string', $fhirInteger2);
+        self::assertTrue($result->isEmpty());
     }
 
     public function testAsOperatorSkipsInvalidCasts(): void
@@ -188,14 +207,22 @@ final class TypeExpressionEvaluatorTest extends TestCase
 
     public function testAsOperatorCaseInsensitive(): void
     {
-        // Type casting should be case-insensitive
-        $result = $this->evaluate('42 as String', null);
-        self::assertSame(1, $result->count());
-        self::assertSame('42', $result->first());
+        // Type filtering with 'as' should be case-insensitive for the type name.
 
-        $result = $this->evaluate("'100' as Integer", null);
+        // string as String (case-insensitive) → matches → returns the string
+        $result = $this->evaluate("'hello' as String", null);
         self::assertSame(1, $result->count());
-        self::assertSame(100, $result->first());
+        self::assertSame('hello', $result->first());
+
+        // integer as Integer (case-insensitive) → matches → returns the integer
+        $result = $this->evaluate('42 as Integer', null);
+        self::assertSame(1, $result->count());
+        self::assertSame(42, $result->first());
+
+        // boolean as Boolean → matches → returns true
+        $result = $this->evaluate('true as Boolean', null);
+        self::assertSame(1, $result->count());
+        self::assertTrue($result->first());
     }
 
     public function testIsOperatorWithMultiItemCollectionThrows(): void
@@ -225,15 +252,13 @@ final class TypeExpressionEvaluatorTest extends TestCase
 
     public function testAsOperatorWithCollections(): void
     {
-        // Create a collection of integers
+        // FHIRPath spec: 'as' on a multi-item collection is an execution error.
         $data = (object) [
             'values' => [1, 2, 3],
         ];
 
-        // Cast all integers to strings
-        $result = $this->evaluate('values as string', $data);
-        self::assertSame(3, $result->count());
-        self::assertSame(['1', '2', '3'], $result->toArray());
+        $this->expectException(EvaluationException::class);
+        $this->evaluate('values as string', $data);
     }
 
     public function testIsOperatorWithFHIRPrimitiveCollectionMultiItemThrows(): void
@@ -320,9 +345,13 @@ final class TypeExpressionEvaluatorTest extends TestCase
 
     public function testAsOperatorWithSystemNamespace(): void
     {
-        // 42 as System.String → '42'
+        // 42 as System.Integer → type matches → returns 42
+        $result = $this->evaluate('42 as System.Integer', null);
+        self::assertSame(42, $result->first());
+
+        // 42 as System.String → type mismatch → empty
         $result = $this->evaluate('42 as System.String', null);
-        self::assertSame('42', $result->first());
+        self::assertTrue($result->isEmpty());
     }
 
     // -------------------------------------------------------------------------
@@ -359,9 +388,13 @@ final class TypeExpressionEvaluatorTest extends TestCase
 
     public function testAsOperatorWithFHIRNamespace(): void
     {
-        // 42 as FHIR.string → '42'
+        // 42 as FHIR.integer → type matches → returns 42
+        $result = $this->evaluate('42 as FHIR.integer', null);
+        self::assertSame(42, $result->first());
+
+        // 42 as FHIR.string → type mismatch → empty
         $result = $this->evaluate('42 as FHIR.string', null);
-        self::assertSame('42', $result->first());
+        self::assertTrue($result->isEmpty());
     }
 
     // -------------------------------------------------------------------------

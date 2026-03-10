@@ -30,14 +30,21 @@ final class AbsFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        $value = $input->first();
-        if (!is_numeric($value)) {
+        $value = $context->normalizeValue($input->first());
+
+        // Handle Quantity: abs() the numeric value, preserve the unit
+        if (is_array($value) && array_key_exists('value', $value) && is_numeric($value['value'])) {
+            $result          = $value;
+            $result['value'] = abs((float) $value['value']);
+
+            return Collection::single($result);
+        }
+
+        $numeric = $this->extractNumeric($value);
+        if ($numeric === null) {
             throw EvaluationException::invalidFunctionParameter($this->getName(), 'input', 'number');
         }
 
-        // Ensure we have a numeric value for abs()
-        $numericValue = is_string($value) ? (float) $value : $value;
-
-        return Collection::single(abs($numericValue));
+        return Collection::single(abs($numeric));
     }
 }

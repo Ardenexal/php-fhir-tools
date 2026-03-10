@@ -47,7 +47,7 @@ final class ConvertsToBooleanFunction extends AbstractFunction
         }
 
         // Try the conversion and check if it succeeded (returns non-null)
-        $canConvert = ToBooleanFunction::tryConvert($input->first()) !== null;
+        $canConvert = ToBooleanFunction::tryConvert($context->normalizeValue($input->first())) !== null;
 
         return Collection::single($canConvert);
     }

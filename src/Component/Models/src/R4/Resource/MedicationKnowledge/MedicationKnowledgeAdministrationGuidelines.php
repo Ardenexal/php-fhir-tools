@@ -25,6 +25,7 @@ class MedicationKnowledgeAdministrationGuidelines extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -34,6 +35,7 @@ class MedicationKnowledgeAdministrationGuidelines extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -43,6 +45,7 @@ class MedicationKnowledgeAdministrationGuidelines extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'dosage' => [
@@ -52,15 +55,17 @@ class MedicationKnowledgeAdministrationGuidelines extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\MedicationKnowledge\MedicationKnowledgeAdministrationGuidelinesDosage',
             'variants'     => null,
         ],
-        'indicationX' => [
+        'indication' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'CodeableConcept',
@@ -85,6 +90,7 @@ class MedicationKnowledgeAdministrationGuidelines extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\MedicationKnowledge\MedicationKnowledgeAdministrationGuidelinesPatientCharacteristics',
             'variants'     => null,
         ],
     ];
@@ -102,7 +108,7 @@ class MedicationKnowledgeAdministrationGuidelines extends BackboneElement
         /** @var array<MedicationKnowledgeAdministrationGuidelinesDosage> dosage Dosage for the medication for the specific guidelines */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
         public array $dosage = [],
-        /** @var CodeableConcept|Reference|null indicationX Indication for use that apply to the specific administration guidelines */
+        /** @var CodeableConcept|Reference|null indication Indication for use that apply to the specific administration guidelines */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -122,7 +128,7 @@ class MedicationKnowledgeAdministrationGuidelines extends BackboneElement
                 ],
             ],
         )]
-        public CodeableConcept|Reference|null $indicationX = null,
+        public CodeableConcept|Reference|null $indication = null,
         /** @var array<MedicationKnowledgeAdministrationGuidelinesPatientCharacteristics> patientCharacteristics Characteristics of the patient that are relevant to the administration guidelines */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
         public array $patientCharacteristics = [],

@@ -29,6 +29,7 @@ class CitationCitedArtifactPublicationFormPeriodicReleaseDateOfPublication exten
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -38,6 +39,7 @@ class CitationCitedArtifactPublicationFormPeriodicReleaseDateOfPublication exten
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -47,6 +49,7 @@ class CitationCitedArtifactPublicationFormPeriodicReleaseDateOfPublication exten
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'date' => [
@@ -56,6 +59,7 @@ class CitationCitedArtifactPublicationFormPeriodicReleaseDateOfPublication exten
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'year' => [
@@ -65,6 +69,7 @@ class CitationCitedArtifactPublicationFormPeriodicReleaseDateOfPublication exten
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'month' => [
@@ -74,6 +79,7 @@ class CitationCitedArtifactPublicationFormPeriodicReleaseDateOfPublication exten
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'day' => [
@@ -83,6 +89,7 @@ class CitationCitedArtifactPublicationFormPeriodicReleaseDateOfPublication exten
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'season' => [
@@ -92,6 +99,7 @@ class CitationCitedArtifactPublicationFormPeriodicReleaseDateOfPublication exten
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'text' => [
@@ -101,6 +109,7 @@ class CitationCitedArtifactPublicationFormPeriodicReleaseDateOfPublication exten
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

@@ -6,11 +6,12 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathTime;
 
 /**
  * FHIRPath timeOfDay() function.
  *
- * Returns the current time of day (time only, no date).
+ * Returns the current time of day (time only, no date) as a FHIRPathTime wrapper.
  * Takes no parameters.
  *
  * @author Ardenexal <info@ardenexal.com>
@@ -26,9 +27,8 @@ class TimeOfDayFunction extends AbstractFunction
     {
         $this->validateParameterCount($parameters, 0, 0);
 
-        // Return time portion as string in format HH:mm:ss
-        $now = new \DateTime();
+        $now = new \DateTimeImmutable();
 
-        return Collection::single($now->format('H:i:s'));
+        return Collection::single(new FHIRPathTime($now->format('H:i:s')));
     }
 }

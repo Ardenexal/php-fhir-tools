@@ -44,6 +44,7 @@ class PlanDefinitionAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -53,6 +54,7 @@ class PlanDefinitionAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -62,6 +64,7 @@ class PlanDefinitionAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'prefix' => [
@@ -71,6 +74,7 @@ class PlanDefinitionAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'title' => [
@@ -80,6 +84,7 @@ class PlanDefinitionAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'description' => [
@@ -89,6 +94,7 @@ class PlanDefinitionAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'textEquivalent' => [
@@ -98,6 +104,7 @@ class PlanDefinitionAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'priority' => [
@@ -107,6 +114,7 @@ class PlanDefinitionAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'code' => [
@@ -116,6 +124,7 @@ class PlanDefinitionAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'reason' => [
@@ -125,6 +134,7 @@ class PlanDefinitionAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'documentation' => [
@@ -134,6 +144,7 @@ class PlanDefinitionAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\RelatedArtifact',
             'variants'     => null,
         ],
         'goalId' => [
@@ -143,15 +154,17 @@ class PlanDefinitionAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'subjectX' => [
+        'subject' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'CodeableConcept',
@@ -183,6 +196,7 @@ class PlanDefinitionAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\TriggerDefinition',
             'variants'     => null,
         ],
         'condition' => [
@@ -192,6 +206,7 @@ class PlanDefinitionAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\PlanDefinition\PlanDefinitionActionCondition',
             'variants'     => null,
         ],
         'input' => [
@@ -201,6 +216,7 @@ class PlanDefinitionAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\DataRequirement',
             'variants'     => null,
         ],
         'output' => [
@@ -210,6 +226,7 @@ class PlanDefinitionAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\DataRequirement',
             'variants'     => null,
         ],
         'relatedAction' => [
@@ -219,15 +236,17 @@ class PlanDefinitionAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\PlanDefinition\PlanDefinitionActionRelatedAction',
             'variants'     => null,
         ],
-        'timingX' => [
+        'timing' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'dateTime',
@@ -280,6 +299,7 @@ class PlanDefinitionAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\PlanDefinition\PlanDefinitionActionParticipant',
             'variants'     => null,
         ],
         'type' => [
@@ -289,6 +309,7 @@ class PlanDefinitionAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'groupingBehavior' => [
@@ -298,6 +319,7 @@ class PlanDefinitionAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'selectionBehavior' => [
@@ -307,6 +329,7 @@ class PlanDefinitionAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'requiredBehavior' => [
@@ -316,6 +339,7 @@ class PlanDefinitionAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'precheckBehavior' => [
@@ -325,6 +349,7 @@ class PlanDefinitionAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'cardinalityBehavior' => [
@@ -334,15 +359,17 @@ class PlanDefinitionAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'definitionX' => [
+        'definition' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'canonical',
@@ -367,6 +394,7 @@ class PlanDefinitionAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'dynamicValue' => [
@@ -376,6 +404,7 @@ class PlanDefinitionAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\PlanDefinition\PlanDefinitionActionDynamicValue',
             'variants'     => null,
         ],
         'action' => [
@@ -385,6 +414,7 @@ class PlanDefinitionAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\PlanDefinition\PlanDefinitionAction',
             'variants'     => null,
         ],
     ];
@@ -426,7 +456,7 @@ class PlanDefinitionAction extends BackboneElement
         /** @var array<IdPrimitive> goalId What goals this action supports */
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive', isArray: true)]
         public array $goalId = [],
-        /** @var CodeableConcept|Reference|CanonicalPrimitive|null subjectX Type of individual the action is focused on */
+        /** @var CodeableConcept|Reference|CanonicalPrimitive|null subject Type of individual the action is focused on */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -452,7 +482,7 @@ class PlanDefinitionAction extends BackboneElement
                 ],
             ],
         )]
-        public CodeableConcept|Reference|CanonicalPrimitive|null $subjectX = null,
+        public CodeableConcept|Reference|CanonicalPrimitive|null $subject = null,
         /** @var array<TriggerDefinition> trigger When the action should be triggered */
         #[FhirProperty(fhirType: 'TriggerDefinition', propertyKind: 'complex', isArray: true)]
         public array $trigger = [],
@@ -468,7 +498,7 @@ class PlanDefinitionAction extends BackboneElement
         /** @var array<PlanDefinitionActionRelatedAction> relatedAction Relationship to another action */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
         public array $relatedAction = [],
-        /** @var DateTimePrimitive|Age|Period|Duration|Range|Timing|null timingX When the action should take place */
+        /** @var DateTimePrimitive|Age|Period|Duration|Range|Timing|null timing When the action should take place */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -512,7 +542,7 @@ class PlanDefinitionAction extends BackboneElement
                 ],
             ],
         )]
-        public DateTimePrimitive|Age|Period|Duration|Range|Timing|null $timingX = null,
+        public DateTimePrimitive|Age|Period|Duration|Range|Timing|null $timing = null,
         /** @var array<PlanDefinitionActionParticipant> participant Who should participate in the action */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
         public array $participant = [],
@@ -534,7 +564,7 @@ class PlanDefinitionAction extends BackboneElement
         /** @var ActionCardinalityBehaviorType|null cardinalityBehavior single | multiple */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
         public ?ActionCardinalityBehaviorType $cardinalityBehavior = null,
-        /** @var CanonicalPrimitive|UriPrimitive|null definitionX Description of the activity to be performed */
+        /** @var CanonicalPrimitive|UriPrimitive|null definition Description of the activity to be performed */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -554,7 +584,7 @@ class PlanDefinitionAction extends BackboneElement
                 ],
             ],
         )]
-        public CanonicalPrimitive|UriPrimitive|null $definitionX = null,
+        public CanonicalPrimitive|UriPrimitive|null $definition = null,
         /** @var CanonicalPrimitive|null transform Transform to apply the template */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
         public ?CanonicalPrimitive $transform = null,

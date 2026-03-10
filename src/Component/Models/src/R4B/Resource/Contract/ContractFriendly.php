@@ -26,6 +26,7 @@ class ContractFriendly extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -35,6 +36,7 @@ class ContractFriendly extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -44,15 +46,17 @@ class ContractFriendly extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'contentX' => [
+        'content' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => true,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Attachment',
@@ -82,7 +86,7 @@ class ContractFriendly extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
-        /** @var Attachment|Reference|null contentX Easily comprehended representation of this Contract */
+        /** @var Attachment|Reference|null content Easily comprehended representation of this Contract */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -104,7 +108,7 @@ class ContractFriendly extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public Attachment|Reference|null $contentX = null,
+        public Attachment|Reference|null $content = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

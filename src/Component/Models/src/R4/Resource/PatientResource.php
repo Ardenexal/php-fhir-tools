@@ -42,6 +42,7 @@ class PatientResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'meta' => [
@@ -51,6 +52,7 @@ class PatientResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'implicitRules' => [
@@ -60,6 +62,7 @@ class PatientResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'language' => [
@@ -69,6 +72,7 @@ class PatientResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'text' => [
@@ -78,6 +82,7 @@ class PatientResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'contained' => [
@@ -87,6 +92,7 @@ class PatientResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -96,6 +102,7 @@ class PatientResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -105,6 +112,7 @@ class PatientResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'identifier' => [
@@ -114,6 +122,7 @@ class PatientResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
             'variants'     => null,
         ],
         'active' => [
@@ -123,6 +132,7 @@ class PatientResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'name' => [
@@ -132,6 +142,7 @@ class PatientResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\HumanName',
             'variants'     => null,
         ],
         'telecom' => [
@@ -141,6 +152,7 @@ class PatientResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactPoint',
             'variants'     => null,
         ],
         'gender' => [
@@ -150,6 +162,7 @@ class PatientResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'birthDate' => [
@@ -159,15 +172,17 @@ class PatientResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'deceasedX' => [
+        'deceased' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'boolean',
@@ -192,6 +207,7 @@ class PatientResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Address',
             'variants'     => null,
         ],
         'maritalStatus' => [
@@ -201,15 +217,17 @@ class PatientResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'multipleBirthX' => [
+        'multipleBirth' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'boolean',
@@ -234,6 +252,7 @@ class PatientResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Attachment',
             'variants'     => null,
         ],
         'contact' => [
@@ -243,6 +262,7 @@ class PatientResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Patient\PatientContact',
             'variants'     => null,
         ],
         'communication' => [
@@ -252,6 +272,7 @@ class PatientResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Patient\PatientCommunication',
             'variants'     => null,
         ],
         'generalPractitioner' => [
@@ -261,6 +282,7 @@ class PatientResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
             'variants'     => null,
         ],
         'managingOrganization' => [
@@ -270,6 +292,7 @@ class PatientResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'link' => [
@@ -279,6 +302,7 @@ class PatientResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Patient\PatientLink',
             'variants'     => null,
         ],
     ];
@@ -326,7 +350,7 @@ class PatientResource extends DomainResourceResource
         /** @var DatePrimitive|null birthDate The date of birth for the individual */
         #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
         public ?DatePrimitive $birthDate = null,
-        /** @var bool|DateTimePrimitive|null deceasedX Indicates if the individual is deceased or not */
+        /** @var bool|DateTimePrimitive|null deceased Indicates if the individual is deceased or not */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -341,14 +365,14 @@ class PatientResource extends DomainResourceResource
                 ],
             ],
         )]
-        public bool|DateTimePrimitive|null $deceasedX = null,
+        public bool|DateTimePrimitive|null $deceased = null,
         /** @var array<Address> address An address for the individual */
         #[FhirProperty(fhirType: 'Address', propertyKind: 'complex', isArray: true)]
         public array $address = [],
         /** @var CodeableConcept|null maritalStatus Marital (civil) status of a patient */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $maritalStatus = null,
-        /** @var bool|int|null multipleBirthX Whether patient is part of a multiple birth */
+        /** @var bool|int|null multipleBirth Whether patient is part of a multiple birth */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -358,7 +382,7 @@ class PatientResource extends DomainResourceResource
                 ['fhirType' => 'integer', 'propertyKind' => 'scalar', 'phpType' => 'int', 'jsonKey' => 'multipleBirthInteger'],
             ],
         )]
-        public bool|int|null $multipleBirthX = null,
+        public bool|int|null $multipleBirth = null,
         /** @var array<Attachment> photo Image of the patient */
         #[FhirProperty(fhirType: 'Attachment', propertyKind: 'complex', isArray: true)]
         public array $photo = [],

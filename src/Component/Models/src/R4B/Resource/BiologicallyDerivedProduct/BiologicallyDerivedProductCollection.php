@@ -26,6 +26,7 @@ class BiologicallyDerivedProductCollection extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -35,6 +36,7 @@ class BiologicallyDerivedProductCollection extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -44,6 +46,7 @@ class BiologicallyDerivedProductCollection extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'collector' => [
@@ -53,6 +56,7 @@ class BiologicallyDerivedProductCollection extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'source' => [
@@ -62,15 +66,17 @@ class BiologicallyDerivedProductCollection extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'collectedX' => [
+        'collected' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'dateTime',
@@ -106,7 +112,7 @@ class BiologicallyDerivedProductCollection extends BackboneElement
         /** @var Reference|null source Who is product from */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $source = null,
-        /** @var DateTimePrimitive|Period|null collectedX Time of product collection */
+        /** @var DateTimePrimitive|Period|null collected Time of product collection */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -126,7 +132,7 @@ class BiologicallyDerivedProductCollection extends BackboneElement
                 ],
             ],
         )]
-        public DateTimePrimitive|Period|null $collectedX = null,
+        public DateTimePrimitive|Period|null $collected = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

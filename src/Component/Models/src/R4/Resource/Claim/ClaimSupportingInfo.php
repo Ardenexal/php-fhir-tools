@@ -32,6 +32,7 @@ class ClaimSupportingInfo extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -41,6 +42,7 @@ class ClaimSupportingInfo extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -50,6 +52,7 @@ class ClaimSupportingInfo extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'sequence' => [
@@ -59,6 +62,7 @@ class ClaimSupportingInfo extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'category' => [
@@ -68,6 +72,7 @@ class ClaimSupportingInfo extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'code' => [
@@ -77,15 +82,17 @@ class ClaimSupportingInfo extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'timingX' => [
+        'timing' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'date',
@@ -103,13 +110,14 @@ class ClaimSupportingInfo extends BackboneElement
                 ],
             ],
         ],
-        'valueX' => [
+        'value' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'boolean',
@@ -155,6 +163,7 @@ class ClaimSupportingInfo extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];
@@ -178,7 +187,7 @@ class ClaimSupportingInfo extends BackboneElement
         /** @var CodeableConcept|null code Type of information */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $code = null,
-        /** @var DatePrimitive|Period|null timingX When it occurred */
+        /** @var DatePrimitive|Period|null timing When it occurred */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -198,8 +207,8 @@ class ClaimSupportingInfo extends BackboneElement
                 ],
             ],
         )]
-        public DatePrimitive|Period|null $timingX = null,
-        /** @var bool|StringPrimitive|string|Quantity|Attachment|Reference|null valueX Data to be provided */
+        public DatePrimitive|Period|null $timing = null,
+        /** @var bool|StringPrimitive|string|Quantity|Attachment|Reference|null value Data to be provided */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -232,7 +241,7 @@ class ClaimSupportingInfo extends BackboneElement
                 ],
             ],
         )]
-        public bool|StringPrimitive|string|Quantity|Attachment|Reference|null $valueX = null,
+        public bool|StringPrimitive|string|Quantity|Attachment|Reference|null $value = null,
         /** @var CodeableConcept|null reason Explanation for the information */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $reason = null,

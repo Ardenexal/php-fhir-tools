@@ -27,6 +27,7 @@ class InvoiceLineItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -36,6 +37,7 @@ class InvoiceLineItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -45,6 +47,7 @@ class InvoiceLineItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'sequence' => [
@@ -54,15 +57,17 @@ class InvoiceLineItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'chargeItemX' => [
+        'chargeItem' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => true,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Reference',
@@ -87,6 +92,7 @@ class InvoiceLineItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Invoice\InvoiceLineItemPriceComponent',
             'variants'     => null,
         ],
     ];
@@ -104,7 +110,7 @@ class InvoiceLineItem extends BackboneElement
         /** @var PositiveIntPrimitive|null sequence Sequence number of line item */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]
         public ?PositiveIntPrimitive $sequence = null,
-        /** @var Reference|CodeableConcept|null chargeItemX Reference to ChargeItem containing details of this line item or an inline billing code */
+        /** @var Reference|CodeableConcept|null chargeItem Reference to ChargeItem containing details of this line item or an inline billing code */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -126,7 +132,7 @@ class InvoiceLineItem extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public Reference|CodeableConcept|null $chargeItemX = null,
+        public Reference|CodeableConcept|null $chargeItem = null,
         /** @var array<InvoiceLineItemPriceComponent> priceComponent Components of total line item price */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
         public array $priceComponent = [],

@@ -27,6 +27,7 @@ class MedicationAdministrationDosage extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -36,6 +37,7 @@ class MedicationAdministrationDosage extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -45,6 +47,7 @@ class MedicationAdministrationDosage extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'text' => [
@@ -54,6 +57,7 @@ class MedicationAdministrationDosage extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'site' => [
@@ -63,6 +67,7 @@ class MedicationAdministrationDosage extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'route' => [
@@ -72,6 +77,7 @@ class MedicationAdministrationDosage extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'method' => [
@@ -81,6 +87,7 @@ class MedicationAdministrationDosage extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'dose' => [
@@ -90,15 +97,17 @@ class MedicationAdministrationDosage extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'rateX' => [
+        'rate' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Ratio',
@@ -143,7 +152,7 @@ class MedicationAdministrationDosage extends BackboneElement
         /** @var Quantity|null dose Amount of medication per dose */
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
         public ?Quantity $dose = null,
-        /** @var Ratio|Quantity|null rateX Dose quantity per unit of time */
+        /** @var Ratio|Quantity|null rate Dose quantity per unit of time */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -163,7 +172,7 @@ class MedicationAdministrationDosage extends BackboneElement
                 ],
             ],
         )]
-        public Ratio|Quantity|null $rateX = null,
+        public Ratio|Quantity|null $rate = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

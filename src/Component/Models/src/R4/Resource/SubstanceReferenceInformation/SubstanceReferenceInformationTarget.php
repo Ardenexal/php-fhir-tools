@@ -29,6 +29,7 @@ class SubstanceReferenceInformationTarget extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -38,6 +39,7 @@ class SubstanceReferenceInformationTarget extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -47,6 +49,7 @@ class SubstanceReferenceInformationTarget extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'target' => [
@@ -56,6 +59,7 @@ class SubstanceReferenceInformationTarget extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -65,6 +69,7 @@ class SubstanceReferenceInformationTarget extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'interaction' => [
@@ -74,6 +79,7 @@ class SubstanceReferenceInformationTarget extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'organism' => [
@@ -83,6 +89,7 @@ class SubstanceReferenceInformationTarget extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'organismType' => [
@@ -92,15 +99,17 @@ class SubstanceReferenceInformationTarget extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'amountX' => [
+        'amount' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Quantity',
@@ -132,6 +141,7 @@ class SubstanceReferenceInformationTarget extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'source' => [
@@ -141,6 +151,7 @@ class SubstanceReferenceInformationTarget extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
             'variants'     => null,
         ],
     ];
@@ -170,7 +181,7 @@ class SubstanceReferenceInformationTarget extends BackboneElement
         /** @var CodeableConcept|null organismType Todo */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $organismType = null,
-        /** @var Quantity|Range|StringPrimitive|string|null amountX Todo */
+        /** @var Quantity|Range|StringPrimitive|string|null amount Todo */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -196,7 +207,7 @@ class SubstanceReferenceInformationTarget extends BackboneElement
                 ],
             ],
         )]
-        public Quantity|Range|StringPrimitive|string|null $amountX = null,
+        public Quantity|Range|StringPrimitive|string|null $amount = null,
         /** @var CodeableConcept|null amountType Todo */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $amountType = null,

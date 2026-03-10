@@ -28,6 +28,7 @@ class SpecimenContainer extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -37,6 +38,7 @@ class SpecimenContainer extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -46,6 +48,7 @@ class SpecimenContainer extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'identifier' => [
@@ -55,6 +58,7 @@ class SpecimenContainer extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
             'variants'     => null,
         ],
         'description' => [
@@ -64,6 +68,7 @@ class SpecimenContainer extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -73,6 +78,7 @@ class SpecimenContainer extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'capacity' => [
@@ -82,6 +88,7 @@ class SpecimenContainer extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'specimenQuantity' => [
@@ -91,15 +98,17 @@ class SpecimenContainer extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'additiveX' => [
+        'additive' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'CodeableConcept',
@@ -144,7 +153,7 @@ class SpecimenContainer extends BackboneElement
         /** @var Quantity|null specimenQuantity Quantity of specimen within container */
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
         public ?Quantity $specimenQuantity = null,
-        /** @var CodeableConcept|Reference|null additiveX Additive associated with container */
+        /** @var CodeableConcept|Reference|null additive Additive associated with container */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -164,7 +173,7 @@ class SpecimenContainer extends BackboneElement
                 ],
             ],
         )]
-        public CodeableConcept|Reference|null $additiveX = null,
+        public CodeableConcept|Reference|null $additive = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

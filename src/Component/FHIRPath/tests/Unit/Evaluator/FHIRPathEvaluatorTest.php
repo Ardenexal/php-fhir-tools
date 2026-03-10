@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\FHIRPathEvaluator;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\FHIRPathLexer;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\FHIRPathParser;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\HumanName;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\NameUseType;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
@@ -144,7 +145,9 @@ final class FHIRPathEvaluatorTest extends TestCase
     {
         $result = $this->evaluate('15 / 3', null);
 
-        self::assertSame(5.0, $result->first());
+        // Division always returns Decimal per FHIRPath spec
+        self::assertInstanceOf(FHIRPathDecimal::class, $result->first());
+        self::assertSame('5.0', $result->first()->value);
     }
 
     public function testArithmeticIntegerDivision(): void
@@ -226,6 +229,110 @@ final class FHIRPathEvaluatorTest extends TestCase
 
         self::assertTrue($result1->first());
         self::assertTrue($result2->first());
+    }
+
+    // Collection equality tests
+    public function testCollectionEqualityOrderIndependent(): void
+    {
+        $result = $this->evaluate('(1 | 2 | 3) = (3 | 2 | 1)', null);
+
+        self::assertTrue($result->first());
+    }
+
+    public function testCollectionEqualitySimple(): void
+    {
+        $result = $this->evaluate('(1 | 2) = (1 | 2)', null);
+
+        self::assertTrue($result->first());
+    }
+
+    public function testCollectionInequalityDifferentValues(): void
+    {
+        $result = $this->evaluate('(1 | 2) = (1 | 3)', null);
+
+        self::assertFalse($result->first());
+    }
+
+    public function testCollectionNotEquals(): void
+    {
+        $result = $this->evaluate('(1 | 2) != (1 | 3)', null);
+
+        self::assertTrue($result->first());
+    }
+
+    public function testCollectionNotEqualsSameValues(): void
+    {
+        $result = $this->evaluate('(1 | 2) != (2 | 1)', null);
+
+        self::assertFalse($result->first());
+    }
+
+    public function testEquivalenceOperator(): void
+    {
+        $result = $this->evaluate('(1 | 1.0) ~ (1 | 1)', null);
+
+        self::assertTrue($result->first());
+    }
+
+    public function testEquivalenceVsEquality(): void
+    {
+        $resultEquivalent = $this->evaluate('1 ~ 1.0', null);
+        $resultEqual      = $this->evaluate('1 = 1.0', null);
+
+        // Per FHIRPath spec, Integer is implicitly promoted to Decimal for comparison,
+        // so both equality and equivalence are true for numerically equal values.
+        // (Confirmed by spec conformance test: 1 / 1 = 1 → true)
+        self::assertTrue($resultEquivalent->first());
+        self::assertTrue($resultEqual->first());
+    }
+
+    public function testNotEquivalentOperator(): void
+    {
+        $result = $this->evaluate('1 !~ 2', null);
+
+        self::assertTrue($result->first());
+    }
+
+    public function testDateTimeEqualitySamePrecision(): void
+    {
+        $result = $this->evaluate('@2018-03-01 = @2018-03-01', null);
+
+        self::assertTrue($result->first());
+    }
+
+    public function testDateTimeInequalitySamePrecision(): void
+    {
+        $result = $this->evaluate('@2018-03-01 = @2018-03-02', null);
+
+        self::assertFalse($result->first());
+    }
+
+    public function testDateTimePrecisionMismatchReturnsEmpty(): void
+    {
+        $result = $this->evaluate('@2018-03 = @2018-03-01', null);
+
+        self::assertTrue($result->isEmpty());
+    }
+
+    public function testDateTimePrecisionMismatchFull(): void
+    {
+        $result = $this->evaluate('@2012-04-15 = @2012-04-15T10:00:00', null);
+
+        self::assertTrue($result->isEmpty());
+    }
+
+    public function testOrderingDateTimePrecisionMismatch(): void
+    {
+        $result = $this->evaluate('@2018-03 < @2018-03-01', null);
+
+        self::assertTrue($result->isEmpty());
+    }
+
+    public function testEmptyCollectionEqualityReturnsEmpty(): void
+    {
+        $result = $this->evaluate('{} = {}', null);
+
+        self::assertTrue($result->isEmpty());
     }
 
     public function testStringConcatenation(): void

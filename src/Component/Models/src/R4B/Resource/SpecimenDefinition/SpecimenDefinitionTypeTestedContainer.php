@@ -26,6 +26,7 @@ class SpecimenDefinitionTypeTestedContainer extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -35,6 +36,7 @@ class SpecimenDefinitionTypeTestedContainer extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -44,6 +46,7 @@ class SpecimenDefinitionTypeTestedContainer extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'material' => [
@@ -53,6 +56,7 @@ class SpecimenDefinitionTypeTestedContainer extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -62,6 +66,7 @@ class SpecimenDefinitionTypeTestedContainer extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'cap' => [
@@ -71,6 +76,7 @@ class SpecimenDefinitionTypeTestedContainer extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'description' => [
@@ -80,6 +86,7 @@ class SpecimenDefinitionTypeTestedContainer extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'capacity' => [
@@ -89,15 +96,17 @@ class SpecimenDefinitionTypeTestedContainer extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'minimumVolumeX' => [
+        'minimumVolume' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Quantity',
@@ -122,6 +131,7 @@ class SpecimenDefinitionTypeTestedContainer extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\SpecimenDefinition\SpecimenDefinitionTypeTestedContainerAdditive',
             'variants'     => null,
         ],
         'preparation' => [
@@ -131,6 +141,7 @@ class SpecimenDefinitionTypeTestedContainer extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];
@@ -160,7 +171,7 @@ class SpecimenDefinitionTypeTestedContainer extends BackboneElement
         /** @var Quantity|null capacity Container capacity */
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
         public ?Quantity $capacity = null,
-        /** @var Quantity|StringPrimitive|string|null minimumVolumeX Minimum volume */
+        /** @var Quantity|StringPrimitive|string|null minimumVolume Minimum volume */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -180,7 +191,7 @@ class SpecimenDefinitionTypeTestedContainer extends BackboneElement
                 ],
             ],
         )]
-        public Quantity|StringPrimitive|string|null $minimumVolumeX = null,
+        public Quantity|StringPrimitive|string|null $minimumVolume = null,
         /** @var array<SpecimenDefinitionTypeTestedContainerAdditive> additive Additive associated with container */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
         public array $additive = [],

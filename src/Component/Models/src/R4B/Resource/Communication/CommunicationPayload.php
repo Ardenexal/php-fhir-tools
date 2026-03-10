@@ -27,6 +27,7 @@ class CommunicationPayload extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -36,6 +37,7 @@ class CommunicationPayload extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -45,15 +47,17 @@ class CommunicationPayload extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'contentX' => [
+        'content' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => true,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'string',
@@ -90,7 +94,7 @@ class CommunicationPayload extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
-        /** @var StringPrimitive|string|Attachment|Reference|null contentX Message part content */
+        /** @var StringPrimitive|string|Attachment|Reference|null content Message part content */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -118,7 +122,7 @@ class CommunicationPayload extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public StringPrimitive|string|Attachment|Reference|null $contentX = null,
+        public StringPrimitive|string|Attachment|Reference|null $content = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

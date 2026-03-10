@@ -30,6 +30,7 @@ class SpecimenDefinitionTypeTestedContainerAdditive extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -39,6 +40,7 @@ class SpecimenDefinitionTypeTestedContainerAdditive extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -48,15 +50,17 @@ class SpecimenDefinitionTypeTestedContainerAdditive extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'additiveX' => [
+        'additive' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => true,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'CodeableConcept',
@@ -86,7 +90,7 @@ class SpecimenDefinitionTypeTestedContainerAdditive extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
-        /** @var CodeableConcept|Reference|null additiveX Additive associated with container */
+        /** @var CodeableConcept|Reference|null additive Additive associated with container */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -108,7 +112,7 @@ class SpecimenDefinitionTypeTestedContainerAdditive extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public CodeableConcept|Reference|null $additiveX = null,
+        public CodeableConcept|Reference|null $additive = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

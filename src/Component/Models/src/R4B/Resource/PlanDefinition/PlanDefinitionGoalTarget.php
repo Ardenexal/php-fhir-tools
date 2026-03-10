@@ -27,6 +27,7 @@ class PlanDefinitionGoalTarget extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -36,6 +37,7 @@ class PlanDefinitionGoalTarget extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -45,6 +47,7 @@ class PlanDefinitionGoalTarget extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'measure' => [
@@ -54,15 +57,17 @@ class PlanDefinitionGoalTarget extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'detailX' => [
+        'detail' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Quantity',
@@ -94,6 +99,7 @@ class PlanDefinitionGoalTarget extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];
@@ -111,7 +117,7 @@ class PlanDefinitionGoalTarget extends BackboneElement
         /** @var CodeableConcept|null measure The parameter whose value is to be tracked */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $measure = null,
-        /** @var Quantity|Range|CodeableConcept|null detailX The target value to be achieved */
+        /** @var Quantity|Range|CodeableConcept|null detail The target value to be achieved */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -137,7 +143,7 @@ class PlanDefinitionGoalTarget extends BackboneElement
                 ],
             ],
         )]
-        public Quantity|Range|CodeableConcept|null $detailX = null,
+        public Quantity|Range|CodeableConcept|null $detail = null,
         /** @var Duration|null due Reach goal within */
         #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex')]
         public ?Duration $due = null,

@@ -27,6 +27,7 @@ class SubstanceDefinitionMoiety extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -36,6 +37,7 @@ class SubstanceDefinitionMoiety extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -45,6 +47,7 @@ class SubstanceDefinitionMoiety extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'role' => [
@@ -54,6 +57,7 @@ class SubstanceDefinitionMoiety extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'identifier' => [
@@ -63,6 +67,7 @@ class SubstanceDefinitionMoiety extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'name' => [
@@ -72,6 +77,7 @@ class SubstanceDefinitionMoiety extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'stereochemistry' => [
@@ -81,6 +87,7 @@ class SubstanceDefinitionMoiety extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'opticalActivity' => [
@@ -90,6 +97,7 @@ class SubstanceDefinitionMoiety extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'molecularFormula' => [
@@ -99,15 +107,17 @@ class SubstanceDefinitionMoiety extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'amountX' => [
+        'amount' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Quantity',
@@ -132,6 +142,7 @@ class SubstanceDefinitionMoiety extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];
@@ -164,7 +175,7 @@ class SubstanceDefinitionMoiety extends BackboneElement
         /** @var StringPrimitive|string|null molecularFormula Molecular formula for this moiety (e.g. with the Hill system) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $molecularFormula = null,
-        /** @var Quantity|StringPrimitive|string|null amountX Quantitative value for this moiety */
+        /** @var Quantity|StringPrimitive|string|null amount Quantitative value for this moiety */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -184,7 +195,7 @@ class SubstanceDefinitionMoiety extends BackboneElement
                 ],
             ],
         )]
-        public Quantity|StringPrimitive|string|null $amountX = null,
+        public Quantity|StringPrimitive|string|null $amount = null,
         /** @var CodeableConcept|null measurementType The measurement type of the quantitative value */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $measurementType = null,

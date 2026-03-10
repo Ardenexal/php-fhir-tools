@@ -28,6 +28,7 @@ class ImmunizationProtocolApplied extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -37,6 +38,7 @@ class ImmunizationProtocolApplied extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -46,6 +48,7 @@ class ImmunizationProtocolApplied extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'series' => [
@@ -55,6 +58,7 @@ class ImmunizationProtocolApplied extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'authority' => [
@@ -64,6 +68,7 @@ class ImmunizationProtocolApplied extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'targetDisease' => [
@@ -73,15 +78,17 @@ class ImmunizationProtocolApplied extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
             'variants'     => null,
         ],
-        'doseNumberX' => [
+        'doseNumber' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => true,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'positiveInt',
@@ -99,13 +106,14 @@ class ImmunizationProtocolApplied extends BackboneElement
                 ],
             ],
         ],
-        'seriesDosesX' => [
+        'seriesDoses' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'positiveInt',
@@ -144,7 +152,7 @@ class ImmunizationProtocolApplied extends BackboneElement
         /** @var array<CodeableConcept> targetDisease Vaccine preventatable disease being targetted */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true)]
         public array $targetDisease = [],
-        /** @var PositiveIntPrimitive|StringPrimitive|string|null doseNumberX Dose number within series */
+        /** @var PositiveIntPrimitive|StringPrimitive|string|null doseNumber Dose number within series */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -166,8 +174,8 @@ class ImmunizationProtocolApplied extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public PositiveIntPrimitive|StringPrimitive|string|null $doseNumberX = null,
-        /** @var PositiveIntPrimitive|StringPrimitive|string|null seriesDosesX Recommended number of doses for immunity */
+        public PositiveIntPrimitive|StringPrimitive|string|null $doseNumber = null,
+        /** @var PositiveIntPrimitive|StringPrimitive|string|null seriesDoses Recommended number of doses for immunity */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -187,7 +195,7 @@ class ImmunizationProtocolApplied extends BackboneElement
                 ],
             ],
         )]
-        public PositiveIntPrimitive|StringPrimitive|string|null $seriesDosesX = null,
+        public PositiveIntPrimitive|StringPrimitive|string|null $seriesDoses = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

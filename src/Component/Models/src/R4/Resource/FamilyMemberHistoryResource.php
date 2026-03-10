@@ -48,6 +48,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'meta' => [
@@ -57,6 +58,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'implicitRules' => [
@@ -66,6 +68,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'language' => [
@@ -75,6 +78,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'text' => [
@@ -84,6 +88,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'contained' => [
@@ -93,6 +98,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -102,6 +108,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -111,6 +118,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'identifier' => [
@@ -120,6 +128,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
             'variants'     => null,
         ],
         'instantiatesCanonical' => [
@@ -129,6 +138,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'instantiatesUri' => [
@@ -138,6 +148,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'status' => [
@@ -147,6 +158,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'dataAbsentReason' => [
@@ -156,6 +168,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'patient' => [
@@ -165,6 +178,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'date' => [
@@ -174,6 +188,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'name' => [
@@ -183,6 +198,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'relationship' => [
@@ -192,6 +208,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'sex' => [
@@ -201,15 +218,17 @@ class FamilyMemberHistoryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'bornX' => [
+        'born' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Period',
@@ -234,13 +253,14 @@ class FamilyMemberHistoryResource extends DomainResourceResource
                 ],
             ],
         ],
-        'ageX' => [
+        'age' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Age',
@@ -272,15 +292,17 @@ class FamilyMemberHistoryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'deceasedX' => [
+        'deceased' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'boolean',
@@ -326,6 +348,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'reasonReference' => [
@@ -335,6 +358,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
             'variants'     => null,
         ],
         'note' => [
@@ -344,6 +368,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation',
             'variants'     => null,
         ],
         'condition' => [
@@ -353,6 +378,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\FamilyMemberHistory\FamilyMemberHistoryCondition',
             'variants'     => null,
         ],
     ];
@@ -412,7 +438,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
         /** @var CodeableConcept|null sex male | female | other | unknown */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $sex = null,
-        /** @var Period|DatePrimitive|StringPrimitive|string|null bornX (approximate) date of birth */
+        /** @var Period|DatePrimitive|StringPrimitive|string|null born (approximate) date of birth */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -438,8 +464,8 @@ class FamilyMemberHistoryResource extends DomainResourceResource
                 ],
             ],
         )]
-        public Period|DatePrimitive|StringPrimitive|string|null $bornX = null,
-        /** @var Age|Range|StringPrimitive|string|null ageX (approximate) age */
+        public Period|DatePrimitive|StringPrimitive|string|null $born = null,
+        /** @var Age|Range|StringPrimitive|string|null age (approximate) age */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -465,11 +491,11 @@ class FamilyMemberHistoryResource extends DomainResourceResource
                 ],
             ],
         )]
-        public Age|Range|StringPrimitive|string|null $ageX = null,
+        public Age|Range|StringPrimitive|string|null $age = null,
         /** @var bool|null estimatedAge Age is estimated? */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $estimatedAge = null,
-        /** @var bool|Age|Range|DatePrimitive|StringPrimitive|string|null deceasedX Dead? How old/when? */
+        /** @var bool|Age|Range|DatePrimitive|StringPrimitive|string|null deceased Dead? How old/when? */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -502,7 +528,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
                 ],
             ],
         )]
-        public bool|Age|Range|DatePrimitive|StringPrimitive|string|null $deceasedX = null,
+        public bool|Age|Range|DatePrimitive|StringPrimitive|string|null $deceased = null,
         /** @var array<CodeableConcept> reasonCode Why was family member history performed? */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true)]
         public array $reasonCode = [],

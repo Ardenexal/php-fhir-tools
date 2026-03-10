@@ -29,7 +29,7 @@ class AllFalseFunction extends AbstractFunction
         }
 
         foreach ($input as $item) {
-            if ($item !== false) {
+            if ($context->normalizeValue($item) !== false) {
                 return Collection::single(false);
             }
         }

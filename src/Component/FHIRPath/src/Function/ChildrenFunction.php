@@ -57,6 +57,6 @@ final class ChildrenFunction extends AbstractFunction
             }
         }
 
-        return Collection::from($children);
+        return Collection::unordered($children);
     }
 }

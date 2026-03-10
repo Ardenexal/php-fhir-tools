@@ -29,6 +29,7 @@ class EvidenceStatisticModelCharacteristicVariable extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -38,6 +39,7 @@ class EvidenceStatisticModelCharacteristicVariable extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -47,6 +49,7 @@ class EvidenceStatisticModelCharacteristicVariable extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'variableDefinition' => [
@@ -56,6 +59,7 @@ class EvidenceStatisticModelCharacteristicVariable extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'handling' => [
@@ -65,6 +69,7 @@ class EvidenceStatisticModelCharacteristicVariable extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'valueCategory' => [
@@ -74,6 +79,7 @@ class EvidenceStatisticModelCharacteristicVariable extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'valueQuantity' => [
@@ -83,6 +89,7 @@ class EvidenceStatisticModelCharacteristicVariable extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity',
             'variants'     => null,
         ],
         'valueRange' => [
@@ -92,6 +99,7 @@ class EvidenceStatisticModelCharacteristicVariable extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Range',
             'variants'     => null,
         ],
     ];

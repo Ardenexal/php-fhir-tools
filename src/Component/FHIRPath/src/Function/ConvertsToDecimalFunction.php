@@ -47,6 +47,6 @@ final class ConvertsToDecimalFunction extends AbstractFunction
         }
 
         // Try the conversion and check if it succeeded (returns non-null)
-        return Collection::single(ToDecimalFunction::tryConvert($input->first()) !== null);
+        return Collection::single(ToDecimalFunction::tryConvert($context->normalizeValue($input->first())) !== null);
     }
 }

@@ -27,6 +27,7 @@ class SubstanceSpecificationProperty extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -36,6 +37,7 @@ class SubstanceSpecificationProperty extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -45,6 +47,7 @@ class SubstanceSpecificationProperty extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'category' => [
@@ -54,6 +57,7 @@ class SubstanceSpecificationProperty extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'code' => [
@@ -63,6 +67,7 @@ class SubstanceSpecificationProperty extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'parameters' => [
@@ -72,15 +77,17 @@ class SubstanceSpecificationProperty extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'definingSubstanceX' => [
+        'definingSubstance' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Reference',
@@ -98,13 +105,14 @@ class SubstanceSpecificationProperty extends BackboneElement
                 ],
             ],
         ],
-        'amountX' => [
+        'amount' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Quantity',
@@ -143,7 +151,7 @@ class SubstanceSpecificationProperty extends BackboneElement
         /** @var StringPrimitive|string|null parameters Parameters that were used in the measurement of a property (e.g. for viscosity: measured at 20C with a pH of 7.1) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $parameters = null,
-        /** @var Reference|CodeableConcept|null definingSubstanceX A substance upon which a defining property depends (e.g. for solubility: in water, in alcohol) */
+        /** @var Reference|CodeableConcept|null definingSubstance A substance upon which a defining property depends (e.g. for solubility: in water, in alcohol) */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -163,8 +171,8 @@ class SubstanceSpecificationProperty extends BackboneElement
                 ],
             ],
         )]
-        public Reference|CodeableConcept|null $definingSubstanceX = null,
-        /** @var Quantity|StringPrimitive|string|null amountX Quantitative value for this property */
+        public Reference|CodeableConcept|null $definingSubstance = null,
+        /** @var Quantity|StringPrimitive|string|null amount Quantitative value for this property */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -184,7 +192,7 @@ class SubstanceSpecificationProperty extends BackboneElement
                 ],
             ],
         )]
-        public Quantity|StringPrimitive|string|null $amountX = null,
+        public Quantity|StringPrimitive|string|null $amount = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -25,6 +25,7 @@ class Population extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -34,6 +35,7 @@ class Population extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -43,15 +45,17 @@ class Population extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'ageX' => [
+        'age' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Range',
@@ -76,6 +80,7 @@ class Population extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'race' => [
@@ -85,6 +90,7 @@ class Population extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'physiologicalCondition' => [
@@ -94,6 +100,7 @@ class Population extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];
@@ -108,7 +115,7 @@ class Population extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
-        /** @var Range|CodeableConcept|null ageX The age of the specific population */
+        /** @var Range|CodeableConcept|null age The age of the specific population */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -128,7 +135,7 @@ class Population extends BackboneElement
                 ],
             ],
         )]
-        public Range|CodeableConcept|null $ageX = null,
+        public Range|CodeableConcept|null $age = null,
         /** @var CodeableConcept|null gender The gender of the specific population */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $gender = null,

@@ -27,6 +27,7 @@ class EvidenceReportRelatesTo extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -36,6 +37,7 @@ class EvidenceReportRelatesTo extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -45,6 +47,7 @@ class EvidenceReportRelatesTo extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'code' => [
@@ -54,15 +57,17 @@ class EvidenceReportRelatesTo extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'targetX' => [
+        'target' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => true,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Identifier',
@@ -95,7 +100,7 @@ class EvidenceReportRelatesTo extends BackboneElement
         /** @var ReportRelationshipTypeType|null code replaces | amends | appends | transforms | replacedWith | amendedWith | appendedWith | transformedWith */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?ReportRelationshipTypeType $code = null,
-        /** @var Identifier|Reference|null targetX Target of the relationship */
+        /** @var Identifier|Reference|null target Target of the relationship */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -117,7 +122,7 @@ class EvidenceReportRelatesTo extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public Identifier|Reference|null $targetX = null,
+        public Identifier|Reference|null $target = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

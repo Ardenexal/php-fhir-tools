@@ -31,7 +31,7 @@ class DistinctFunction extends AbstractFunction
         $seen     = [];
 
         foreach ($input as $item) {
-            $key = $this->getItemKey($item);
+            $key = $this->getItemKey($item, $context);
             if (!isset($seen[$key])) {
                 $seen[$key] = true;
                 $distinct[] = $item;
@@ -41,16 +41,20 @@ class DistinctFunction extends AbstractFunction
         return Collection::from($distinct);
     }
 
-    private function getItemKey(mixed $item): string
+    private function getItemKey(mixed $item, EvaluationContext $context): string
     {
-        if (is_scalar($item) || $item === null) {
-            return serialize($item);
+        // Normalize FHIR primitive wrappers to their scalar values for key comparison
+        // so that two StringPrimitive('Peter') objects are treated as equal.
+        $normalized = $context->normalizeValue($item);
+
+        if (is_scalar($normalized) || $normalized === null) {
+            return serialize($normalized);
         }
 
-        if (is_object($item)) {
-            return spl_object_hash($item);
+        if (is_object($normalized)) {
+            return spl_object_hash($normalized);
         }
 
-        return serialize($item);
+        return serialize($normalized);
     }
 }

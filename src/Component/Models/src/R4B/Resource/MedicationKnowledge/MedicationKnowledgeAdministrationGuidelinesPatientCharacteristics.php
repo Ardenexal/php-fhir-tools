@@ -31,6 +31,7 @@ class MedicationKnowledgeAdministrationGuidelinesPatientCharacteristics extends 
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -40,6 +41,7 @@ class MedicationKnowledgeAdministrationGuidelinesPatientCharacteristics extends 
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -49,15 +51,17 @@ class MedicationKnowledgeAdministrationGuidelinesPatientCharacteristics extends 
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'characteristicX' => [
+        'characteristic' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => true,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'CodeableConcept',
@@ -82,6 +86,7 @@ class MedicationKnowledgeAdministrationGuidelinesPatientCharacteristics extends 
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];
@@ -96,7 +101,7 @@ class MedicationKnowledgeAdministrationGuidelinesPatientCharacteristics extends 
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
-        /** @var CodeableConcept|Quantity|null characteristicX Specific characteristic that is relevant to the administration guideline */
+        /** @var CodeableConcept|Quantity|null characteristic Specific characteristic that is relevant to the administration guideline */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -118,7 +123,7 @@ class MedicationKnowledgeAdministrationGuidelinesPatientCharacteristics extends 
             ],
         )]
         #[NotBlank]
-        public CodeableConcept|Quantity|null $characteristicX = null,
+        public CodeableConcept|Quantity|null $characteristic = null,
         /** @var array<StringPrimitive|string> value The specific characteristic */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
         public array $value = [],

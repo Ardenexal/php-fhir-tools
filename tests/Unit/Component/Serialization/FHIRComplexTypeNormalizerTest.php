@@ -15,6 +15,13 @@ use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRPatient;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 use Eris\Generator;
 use Eris\TestTrait;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\HumanName;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRBackboneElementNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRPrimitiveTypeNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRResourceNormalizer;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * Property-based tests for FHIRComplexTypeNormalizer
@@ -312,5 +319,98 @@ class FHIRComplexTypeNormalizerTest extends TestCase
         $supportedTypes = $this->normalizer->getSupportedTypes('json');
         self::assertArrayHasKey('object', $supportedTypes);
         self::assertTrue($supportedTypes['object']);
+    }
+
+    /**
+     * **Regression: _given (array primitive) extension data must be merged into StringPrimitive objects.**
+     *
+     * In FHIR JSON, `"given": [null, "James"]` paired with
+     * `"_given": [{"extension": [...]}, null]` means the first element is a null-value
+     * primitive that carries extension data. Both values must become `StringPrimitive`
+     * objects and the extension must appear on the first one.
+     */
+    public function testPrimitiveArrayExtensionsAreMergedDuringDenormalization(): void
+    {
+        $serializer = $this->buildFullSerializer();
+
+        $data = [
+            'use'    => 'maiden',
+            'family' => 'Windsor',
+            'given'  => [null, 'James'],
+            '_given' => [
+                [
+                    'extension' => [
+                        ['url' => 'https://example.org/syllable-count', 'valueString' => 'five'],
+                    ],
+                ],
+                null,
+            ],
+        ];
+
+        /** @var HumanName $result */
+        $result = $serializer->denormalize($data, HumanName::class, 'json');
+
+        self::assertIsArray($result->given);
+        self::assertCount(2, $result->given);
+
+        // First entry: null value with extension
+        $first = $result->given[0];
+        self::assertInstanceOf(StringPrimitive::class, $first);
+        self::assertNull($first->value);
+        self::assertNotEmpty($first->extension);
+        self::assertSame('https://example.org/syllable-count', $first->extension[0]['url']);
+
+        // Second entry: "James" with no extension
+        $second = $result->given[1];
+        self::assertInstanceOf(StringPrimitive::class, $second);
+        self::assertSame('James', $second->value);
+        self::assertEmpty($second->extension);
+    }
+
+    /**
+     * **Regression: _family (non-array primitive) extension data must be merged into the StringPrimitive.**
+     */
+    public function testNonArrayPrimitiveExtensionIsMergedDuringDenormalization(): void
+    {
+        $serializer = $this->buildFullSerializer();
+
+        $data = [
+            'family'  => 'Windsor',
+            '_family' => [
+                'extension' => [
+                    ['url' => 'https://example.org/humanname-own-name', 'valueString' => 'Windsor'],
+                ],
+            ],
+        ];
+
+        /** @var HumanName $result */
+        $result = $serializer->denormalize($data, HumanName::class, 'json');
+
+        $family = $result->family;
+        self::assertInstanceOf(StringPrimitive::class, $family);
+        self::assertSame('Windsor', $family->value);
+        self::assertNotEmpty($family->extension);
+        self::assertSame('https://example.org/humanname-own-name', $family->extension[0]['url']);
+    }
+
+    /**
+     * Build a fully-wired Symfony Serializer with all FHIR normalizers chained.
+     */
+    private function buildFullSerializer(): Serializer
+    {
+        $metadataExtractor = new FHIRMetadataExtractor();
+        $typeResolver      = new FHIRTypeResolver();
+
+        $normalizers = [
+            new FHIRResourceNormalizer($metadataExtractor, $typeResolver),
+            new FHIRComplexTypeNormalizer($metadataExtractor, $typeResolver),
+            new FHIRPrimitiveTypeNormalizer($metadataExtractor),
+            new FHIRBackboneElementNormalizer($metadataExtractor),
+        ];
+
+        return new Serializer(
+            $normalizers,
+            [new JsonEncoder()],
+        );
     }
 }

@@ -28,6 +28,7 @@ class ExplanationOfBenefitBenefitBalanceFinancial extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -37,6 +38,7 @@ class ExplanationOfBenefitBenefitBalanceFinancial extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -46,6 +48,7 @@ class ExplanationOfBenefitBenefitBalanceFinancial extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -55,15 +58,17 @@ class ExplanationOfBenefitBenefitBalanceFinancial extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'allowedX' => [
+        'allowed' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'unsignedInt',
@@ -88,13 +93,14 @@ class ExplanationOfBenefitBenefitBalanceFinancial extends BackboneElement
                 ],
             ],
         ],
-        'usedX' => [
+        'used' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'unsignedInt',
@@ -127,7 +133,7 @@ class ExplanationOfBenefitBenefitBalanceFinancial extends BackboneElement
         /** @var CodeableConcept|null type Benefit classification */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?CodeableConcept $type = null,
-        /** @var UnsignedIntPrimitive|StringPrimitive|string|Money|null allowedX Benefits allowed */
+        /** @var UnsignedIntPrimitive|StringPrimitive|string|Money|null allowed Benefits allowed */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -153,8 +159,8 @@ class ExplanationOfBenefitBenefitBalanceFinancial extends BackboneElement
                 ],
             ],
         )]
-        public UnsignedIntPrimitive|StringPrimitive|string|Money|null $allowedX = null,
-        /** @var UnsignedIntPrimitive|Money|null usedX Benefits used */
+        public UnsignedIntPrimitive|StringPrimitive|string|Money|null $allowed = null,
+        /** @var UnsignedIntPrimitive|Money|null used Benefits used */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -174,7 +180,7 @@ class ExplanationOfBenefitBenefitBalanceFinancial extends BackboneElement
                 ],
             ],
         )]
-        public UnsignedIntPrimitive|Money|null $usedX = null,
+        public UnsignedIntPrimitive|Money|null $used = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

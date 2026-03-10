@@ -24,6 +24,7 @@ class ObservationDefinitionQuantitativeDetails extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -33,6 +34,7 @@ class ObservationDefinitionQuantitativeDetails extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -42,6 +44,7 @@ class ObservationDefinitionQuantitativeDetails extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'customaryUnit' => [
@@ -51,6 +54,7 @@ class ObservationDefinitionQuantitativeDetails extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'unit' => [
@@ -60,6 +64,7 @@ class ObservationDefinitionQuantitativeDetails extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'conversionFactor' => [
@@ -69,6 +74,7 @@ class ObservationDefinitionQuantitativeDetails extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'decimalPrecision' => [
@@ -78,6 +84,7 @@ class ObservationDefinitionQuantitativeDetails extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

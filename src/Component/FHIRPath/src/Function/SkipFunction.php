@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
+use Ardenexal\FHIRTools\Component\FHIRPath\Exception\FHIRPathSemanticException;
 
 /**
  * skip(num) function - Returns all items except the first num
@@ -24,8 +25,17 @@ final class SkipFunction extends AbstractFunction
     {
         $this->validateParameterCount($parameters, 1);
 
-        $numCollection = $parameters[0];
-        if (!($numCollection instanceof Collection) || $numCollection->isEmpty()) {
+        if ($context->getEvaluator()?->getContext()->isStrictMode() && !$input->isOrdered()) {
+            throw new FHIRPathSemanticException("Function 'skip' requires an ordered collection");
+        }
+
+        $evaluator = $context->getEvaluator();
+        if ($evaluator === null) {
+            throw new EvaluationException('Evaluator not available in context');
+        }
+
+        $numCollection = $evaluator->evaluate($parameters[0], $context);
+        if ($numCollection->isEmpty()) {
             throw EvaluationException::invalidFunctionParameter('skip', 'num', 'non-empty integer collection');
         }
 

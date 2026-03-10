@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
+use Ardenexal\FHIRTools\Component\FHIRPath\Exception\FHIRPathSemanticException;
 
 /**
  * last() function - Returns the last item in the collection
@@ -22,6 +23,10 @@ final class LastFunction extends AbstractFunction
     public function execute(Collection $input, array $parameters, EvaluationContext $context): Collection
     {
         $this->validateParameterCount($parameters, 0);
+
+        if ($context->getEvaluator()?->getContext()->isStrictMode() && !$input->isOrdered()) {
+            throw new FHIRPathSemanticException("Function 'last' requires an ordered collection");
+        }
 
         if ($input->isEmpty()) {
             return Collection::empty();

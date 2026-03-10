@@ -28,6 +28,7 @@ class ValueSetExpansionParameter extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -37,6 +38,7 @@ class ValueSetExpansionParameter extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -46,6 +48,7 @@ class ValueSetExpansionParameter extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'name' => [
@@ -55,15 +58,17 @@ class ValueSetExpansionParameter extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'valueX' => [
+        'value' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'string',
@@ -131,7 +136,7 @@ class ValueSetExpansionParameter extends BackboneElement
         /** @var StringPrimitive|string|null name Name as assigned by the client or server */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $name = null,
-        /** @var StringPrimitive|string|bool|int|float|UriPrimitive|CodePrimitive|DateTimePrimitive|null valueX Value of the named parameter */
+        /** @var StringPrimitive|string|bool|int|float|UriPrimitive|CodePrimitive|DateTimePrimitive|null value Value of the named parameter */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -166,7 +171,7 @@ class ValueSetExpansionParameter extends BackboneElement
                 ],
             ],
         )]
-        public StringPrimitive|string|bool|int|float|UriPrimitive|CodePrimitive|DateTimePrimitive|null $valueX = null,
+        public StringPrimitive|string|bool|int|float|UriPrimitive|CodePrimitive|DateTimePrimitive|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

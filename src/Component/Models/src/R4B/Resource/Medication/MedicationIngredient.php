@@ -27,6 +27,7 @@ class MedicationIngredient extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -36,6 +37,7 @@ class MedicationIngredient extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -45,15 +47,17 @@ class MedicationIngredient extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'itemX' => [
+        'item' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => true,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'CodeableConcept',
@@ -78,6 +82,7 @@ class MedicationIngredient extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'strength' => [
@@ -87,6 +92,7 @@ class MedicationIngredient extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];
@@ -101,7 +107,7 @@ class MedicationIngredient extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
-        /** @var CodeableConcept|Reference|null itemX The actual ingredient or content */
+        /** @var CodeableConcept|Reference|null item The actual ingredient or content */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -123,7 +129,7 @@ class MedicationIngredient extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public CodeableConcept|Reference|null $itemX = null,
+        public CodeableConcept|Reference|null $item = null,
         /** @var bool|null isActive Active ingredient indicator */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $isActive = null,

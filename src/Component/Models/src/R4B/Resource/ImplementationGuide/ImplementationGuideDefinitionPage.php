@@ -28,6 +28,7 @@ class ImplementationGuideDefinitionPage extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -37,6 +38,7 @@ class ImplementationGuideDefinitionPage extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -46,15 +48,17 @@ class ImplementationGuideDefinitionPage extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'nameX' => [
+        'name' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => true,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'url',
@@ -79,6 +83,7 @@ class ImplementationGuideDefinitionPage extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'generation' => [
@@ -88,6 +93,7 @@ class ImplementationGuideDefinitionPage extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'page' => [
@@ -97,6 +103,7 @@ class ImplementationGuideDefinitionPage extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ImplementationGuide\ImplementationGuideDefinitionPage',
             'variants'     => null,
         ],
     ];
@@ -111,7 +118,7 @@ class ImplementationGuideDefinitionPage extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
-        /** @var UrlPrimitive|Reference|null nameX Where to find that page */
+        /** @var UrlPrimitive|Reference|null name Where to find that page */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -133,7 +140,7 @@ class ImplementationGuideDefinitionPage extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public UrlPrimitive|Reference|null $nameX = null,
+        public UrlPrimitive|Reference|null $name = null,
         /** @var StringPrimitive|string|null title Short title shown for navigational assistance */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $title = null,

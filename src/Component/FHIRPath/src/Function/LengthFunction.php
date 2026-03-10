@@ -28,7 +28,7 @@ final class LengthFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        $str = $input->first();
+        $str = $context->normalizeValue($input->first());
         if (!is_string($str)) {
             throw EvaluationException::invalidFunctionParameter('length', 'input', 'string');
         }

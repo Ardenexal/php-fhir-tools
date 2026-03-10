@@ -16,6 +16,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Expression\LiteralNode;
 use Ardenexal\FHIRTools\Component\FHIRPath\Expression\MemberAccessNode;
 use Ardenexal\FHIRTools\Component\FHIRPath\Expression\TypeExpressionNode;
 use Ardenexal\FHIRTools\Component\FHIRPath\Expression\UnaryOperatorNode;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
 
 /**
  * Recursive descent parser for FHIRPath expressions.
@@ -24,10 +25,11 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Expression\UnaryOperatorNode;
  * following the FHIRPath 2.0 grammar. Handles operator precedence, function calls,
  * member access, and all FHIRPath constructs.
  *
- * Grammar (from FHIRPath spec):
- * - expression:      term (('|') term)*
+ * Grammar (from FHIRPath spec, ordered highest to lowest precedence):
+ * - expression:      term
  * - term:            comparison (('and' | 'or' | 'xor' | 'implies') comparison)*
- * - comparison:      additive (('=' | '!=' | '~' | '!~' | '>' | '<' | '>=' | '<=' | 'in' | 'contains') additive)*
+ * - comparison:      union (('=' | '!=' | '~' | '!~' | '>' | '<' | '>=' | '<=' | 'in' | 'contains') union)*
+ * - union:           additive (('|') additive)*
  * - additive:        multiplicative (('+' | '-' | '&') multiplicative)*
  * - multiplicative:  unary (('*' | '/' | 'div' | 'mod') unary)*
  * - unary:           invocation | ('-' | '+') unary
@@ -69,25 +71,11 @@ class FHIRPathParser
 
     /**
      * Parse an expression (top-level rule).
-     * expression: term (('|') term)*
+     * expression: term
      */
     private function parseExpression(): ExpressionNode
     {
-        $left = $this->parseTerm();
-
-        while ($this->match(TokenType::PIPE)) {
-            $operator = $this->previous();
-            $right    = $this->parseTerm();
-            $left     = new BinaryOperatorNode(
-                $left,
-                $operator->type,
-                $right,
-                $operator->line,
-                $operator->column,
-            );
-        }
-
-        return $left;
+        return $this->parseTerm();
     }
 
     /**
@@ -114,12 +102,38 @@ class FHIRPathParser
     }
 
     /**
+     * Parse a union expression.
+     * union: additive (('|') additive)*
+     *
+     * Per the FHIRPath spec, the union operator has higher precedence than
+     * comparison and equality operators, so `a = b | c` means `a = (b | c)`.
+     */
+    private function parseUnion(): ExpressionNode
+    {
+        $left = $this->parseAdditive();
+
+        while ($this->match(TokenType::PIPE)) {
+            $operator = $this->previous();
+            $right    = $this->parseAdditive();
+            $left     = new BinaryOperatorNode(
+                $left,
+                $operator->type,
+                $right,
+                $operator->line,
+                $operator->column,
+            );
+        }
+
+        return $left;
+    }
+
+    /**
      * Parse a comparison expression.
-     * comparison: additive (('=' | '!=' | '~' | '!~' | '>' | '<' | '>=' | '<=' | 'in' | 'contains') additive)*
+     * comparison: union (('=' | '!=' | '~' | '!~' | '>' | '<' | '>=' | '<=' | 'in' | 'contains') union)*
      */
     private function parseComparison(): ExpressionNode
     {
-        $left = $this->parseAdditive();
+        $left = $this->parseUnion();
 
         while ($this->match(
             TokenType::EQUALS,
@@ -134,7 +148,7 @@ class FHIRPathParser
             TokenType::CONTAINS,
         )) {
             $operator = $this->previous();
-            $right    = $this->parseAdditive();
+            $right    = $this->parseUnion();
             $left     = new BinaryOperatorNode(
                 $left,
                 $operator->type,
@@ -261,6 +275,25 @@ class FHIRPathParser
                     continue;
                 }
 
+                // Handle .contains('x') — 'contains' is lexed as TokenType::CONTAINS (keyword),
+                // not IDENTIFIER, so parsePrimary() won't treat it as a function call.
+                // Parse it explicitly as a FunctionCallNode named 'contains'.
+                if ($this->check(TokenType::CONTAINS) && $this->checkNext(TokenType::LPAREN)) {
+                    $keyword = $this->advance(); // consume CONTAINS
+                    $this->advance();            // consume LPAREN
+                    $arguments = [];
+                    if (!$this->check(TokenType::RPAREN)) {
+                        $arguments[] = $this->parseExpression();
+                        while ($this->match(TokenType::COMMA)) {
+                            $arguments[] = $this->parseExpression();
+                        }
+                    }
+                    $this->consume(TokenType::RPAREN, ')');
+                    $funcNode   = new FunctionCallNode('contains', $arguments, $keyword->line, $keyword->column);
+                    $expression = new MemberAccessNode($expression, $funcNode, $keyword->line, $keyword->column);
+                    continue;
+                }
+
                 $member     = $this->parsePrimary();
                 $expression = new MemberAccessNode(
                     $expression,
@@ -350,6 +383,29 @@ class FHIRPathParser
             return new IdentifierNode($token->value, $token->line, $token->column);
         }
 
+        // Contextual keywords: 'contains' and 'in' can appear as property names in expression
+        // position (e.g. repeat(contains), expansion.contains). When followed by '(' treat as
+        // a function call; otherwise treat as an identifier (member/property name).
+        if ($this->match(TokenType::CONTAINS, TokenType::IN)) {
+            $token = $this->previous();
+
+            if ($this->match(TokenType::LPAREN)) {
+                $parameters = [];
+
+                if (!$this->check(TokenType::RPAREN)) {
+                    do {
+                        $parameters[] = $this->parseExpression();
+                    } while ($this->match(TokenType::COMMA));
+                }
+
+                $this->consume(TokenType::RPAREN, ')');
+
+                return new FunctionCallNode($token->value, $parameters, $token->line, $token->column);
+            }
+
+            return new IdentifierNode($token->value, $token->line, $token->column);
+        }
+
         // Function call or identifier
         if ($this->match(TokenType::IDENTIFIER)) {
             $identifier = $this->previous();
@@ -406,11 +462,15 @@ class FHIRPathParser
 
     /**
      * Parse a number value.
+     *
+     * Integers are returned as PHP int. Decimal numbers are wrapped in FHIRPathDecimal
+     * to preserve their exact string representation for bcmath arithmetic, avoiding
+     * IEEE 754 floating-point rounding errors in FHIRPath expressions.
      */
-    private function parseNumber(string $value): int|float
+    private function parseNumber(string $value): int|FHIRPathDecimal
     {
         if (str_contains($value, '.') || str_contains($value, 'e') || str_contains($value, 'E')) {
-            return (float) $value;
+            return new FHIRPathDecimal($value);
         }
 
         return (int) $value;
@@ -418,6 +478,8 @@ class FHIRPathParser
 
     /**
      * Check if current token matches any of the given types and advance if so.
+     *
+     * @phpstan-impure
      */
     private function match(TokenType ...$types): bool
     {
@@ -480,6 +542,8 @@ class FHIRPathParser
 
     /**
      * Get the current token without advancing.
+     *
+     * @phpstan-impure
      */
     private function peek(): Token
     {

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
 
 /**
  * FHIRPath toDecimal() function.
@@ -37,7 +38,7 @@ final class ToDecimalFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        $result = self::tryConvert($input->first());
+        $result = self::tryConvert($context->normalizeValue($input->first()));
 
         return $result !== null ? Collection::single($result) : Collection::empty();
     }
@@ -50,6 +51,10 @@ final class ToDecimalFunction extends AbstractFunction
      */
     public static function tryConvert(mixed $value): ?float
     {
+        if ($value instanceof FHIRPathDecimal) {
+            return $value->toFloat();
+        }
+
         if (is_float($value)) {
             return $value;
         }

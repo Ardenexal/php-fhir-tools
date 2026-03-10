@@ -32,6 +32,7 @@ class AdministrableProductDefinitionRouteOfAdministration extends BackboneElemen
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -41,6 +42,7 @@ class AdministrableProductDefinitionRouteOfAdministration extends BackboneElemen
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -50,6 +52,7 @@ class AdministrableProductDefinitionRouteOfAdministration extends BackboneElemen
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'code' => [
@@ -59,6 +62,7 @@ class AdministrableProductDefinitionRouteOfAdministration extends BackboneElemen
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'firstDose' => [
@@ -68,6 +72,7 @@ class AdministrableProductDefinitionRouteOfAdministration extends BackboneElemen
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'maxSingleDose' => [
@@ -77,6 +82,7 @@ class AdministrableProductDefinitionRouteOfAdministration extends BackboneElemen
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'maxDosePerDay' => [
@@ -86,6 +92,7 @@ class AdministrableProductDefinitionRouteOfAdministration extends BackboneElemen
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'maxDosePerTreatmentPeriod' => [
@@ -95,6 +102,7 @@ class AdministrableProductDefinitionRouteOfAdministration extends BackboneElemen
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'maxTreatmentPeriod' => [
@@ -104,6 +112,7 @@ class AdministrableProductDefinitionRouteOfAdministration extends BackboneElemen
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'targetSpecies' => [
@@ -113,6 +122,7 @@ class AdministrableProductDefinitionRouteOfAdministration extends BackboneElemen
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\AdministrableProductDefinition\AdministrableProductDefinitionRouteOfAdministrationTargetSpecies',
             'variants'     => null,
         ],
     ];

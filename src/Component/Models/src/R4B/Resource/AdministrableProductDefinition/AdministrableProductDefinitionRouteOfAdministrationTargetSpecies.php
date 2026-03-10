@@ -29,6 +29,7 @@ class AdministrableProductDefinitionRouteOfAdministrationTargetSpecies extends B
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -38,6 +39,7 @@ class AdministrableProductDefinitionRouteOfAdministrationTargetSpecies extends B
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -47,6 +49,7 @@ class AdministrableProductDefinitionRouteOfAdministrationTargetSpecies extends B
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'code' => [
@@ -56,6 +59,7 @@ class AdministrableProductDefinitionRouteOfAdministrationTargetSpecies extends B
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'withdrawalPeriod' => [
@@ -65,6 +69,7 @@ class AdministrableProductDefinitionRouteOfAdministrationTargetSpecies extends B
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\AdministrableProductDefinition\AdministrableProductDefinitionRouteOfAdministrationTargetSpeciesWithdrawalPeriod',
             'variants'     => null,
         ],
     ];

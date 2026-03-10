@@ -26,6 +26,7 @@ class Dosage extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -35,6 +36,7 @@ class Dosage extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -44,6 +46,7 @@ class Dosage extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'sequence' => [
@@ -53,6 +56,7 @@ class Dosage extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'text' => [
@@ -62,6 +66,7 @@ class Dosage extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'additionalInstruction' => [
@@ -71,6 +76,7 @@ class Dosage extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'patientInstruction' => [
@@ -80,6 +86,7 @@ class Dosage extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'timing' => [
@@ -89,15 +96,17 @@ class Dosage extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'asNeededX' => [
+        'asNeeded' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'boolean',
@@ -122,6 +131,7 @@ class Dosage extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'route' => [
@@ -131,6 +141,7 @@ class Dosage extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'method' => [
@@ -140,6 +151,7 @@ class Dosage extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'doseAndRate' => [
@@ -149,6 +161,7 @@ class Dosage extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\DosageDoseAndRate',
             'variants'     => null,
         ],
         'maxDosePerPeriod' => [
@@ -158,6 +171,7 @@ class Dosage extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'maxDosePerAdministration' => [
@@ -167,6 +181,7 @@ class Dosage extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'maxDosePerLifetime' => [
@@ -176,6 +191,7 @@ class Dosage extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];
@@ -205,7 +221,7 @@ class Dosage extends BackboneElement
         /** @var Timing|null timing When medication should be administered */
         #[FhirProperty(fhirType: 'Timing', propertyKind: 'complex')]
         public ?Timing $timing = null,
-        /** @var bool|CodeableConcept|null asNeededX Take "as needed" (for x) */
+        /** @var bool|CodeableConcept|null asNeeded Take "as needed" (for x) */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -220,7 +236,7 @@ class Dosage extends BackboneElement
                 ],
             ],
         )]
-        public bool|CodeableConcept|null $asNeededX = null,
+        public bool|CodeableConcept|null $asNeeded = null,
         /** @var CodeableConcept|null site Body site to administer to */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $site = null,

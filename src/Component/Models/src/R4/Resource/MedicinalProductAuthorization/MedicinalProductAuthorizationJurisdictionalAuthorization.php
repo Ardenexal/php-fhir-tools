@@ -30,6 +30,7 @@ class MedicinalProductAuthorizationJurisdictionalAuthorization extends BackboneE
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -39,6 +40,7 @@ class MedicinalProductAuthorizationJurisdictionalAuthorization extends BackboneE
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -48,6 +50,7 @@ class MedicinalProductAuthorizationJurisdictionalAuthorization extends BackboneE
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'identifier' => [
@@ -57,6 +60,7 @@ class MedicinalProductAuthorizationJurisdictionalAuthorization extends BackboneE
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
             'variants'     => null,
         ],
         'country' => [
@@ -66,6 +70,7 @@ class MedicinalProductAuthorizationJurisdictionalAuthorization extends BackboneE
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'jurisdiction' => [
@@ -75,6 +80,7 @@ class MedicinalProductAuthorizationJurisdictionalAuthorization extends BackboneE
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'legalStatusOfSupply' => [
@@ -84,6 +90,7 @@ class MedicinalProductAuthorizationJurisdictionalAuthorization extends BackboneE
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'validityPeriod' => [
@@ -93,6 +100,7 @@ class MedicinalProductAuthorizationJurisdictionalAuthorization extends BackboneE
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

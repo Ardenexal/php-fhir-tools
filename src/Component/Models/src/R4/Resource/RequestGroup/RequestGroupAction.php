@@ -39,6 +39,7 @@ class RequestGroupAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -48,6 +49,7 @@ class RequestGroupAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -57,6 +59,7 @@ class RequestGroupAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'prefix' => [
@@ -66,6 +69,7 @@ class RequestGroupAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'title' => [
@@ -75,6 +79,7 @@ class RequestGroupAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'description' => [
@@ -84,6 +89,7 @@ class RequestGroupAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'textEquivalent' => [
@@ -93,6 +99,7 @@ class RequestGroupAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'priority' => [
@@ -102,6 +109,7 @@ class RequestGroupAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'code' => [
@@ -111,6 +119,7 @@ class RequestGroupAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'documentation' => [
@@ -120,6 +129,7 @@ class RequestGroupAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\RelatedArtifact',
             'variants'     => null,
         ],
         'condition' => [
@@ -129,6 +139,7 @@ class RequestGroupAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\RequestGroup\RequestGroupActionCondition',
             'variants'     => null,
         ],
         'relatedAction' => [
@@ -138,15 +149,17 @@ class RequestGroupAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\RequestGroup\RequestGroupActionRelatedAction',
             'variants'     => null,
         ],
-        'timingX' => [
+        'timing' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'dateTime',
@@ -199,6 +212,7 @@ class RequestGroupAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
             'variants'     => null,
         ],
         'type' => [
@@ -208,6 +222,7 @@ class RequestGroupAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'groupingBehavior' => [
@@ -217,6 +232,7 @@ class RequestGroupAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'selectionBehavior' => [
@@ -226,6 +242,7 @@ class RequestGroupAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'requiredBehavior' => [
@@ -235,6 +252,7 @@ class RequestGroupAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'precheckBehavior' => [
@@ -244,6 +262,7 @@ class RequestGroupAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'cardinalityBehavior' => [
@@ -253,6 +272,7 @@ class RequestGroupAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'resource' => [
@@ -262,6 +282,7 @@ class RequestGroupAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'action' => [
@@ -271,6 +292,7 @@ class RequestGroupAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\RequestGroup\RequestGroupAction',
             'variants'     => null,
         ],
     ];
@@ -312,7 +334,7 @@ class RequestGroupAction extends BackboneElement
         /** @var array<RequestGroupActionRelatedAction> relatedAction Relationship to another action */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
         public array $relatedAction = [],
-        /** @var DateTimePrimitive|Age|Period|Duration|Range|Timing|null timingX When the action should take place */
+        /** @var DateTimePrimitive|Age|Period|Duration|Range|Timing|null timing When the action should take place */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -356,7 +378,7 @@ class RequestGroupAction extends BackboneElement
                 ],
             ],
         )]
-        public DateTimePrimitive|Age|Period|Duration|Range|Timing|null $timingX = null,
+        public DateTimePrimitive|Age|Period|Duration|Range|Timing|null $timing = null,
         /** @var array<Reference> participant Who should perform the action */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isArray: true)]
         public array $participant = [],

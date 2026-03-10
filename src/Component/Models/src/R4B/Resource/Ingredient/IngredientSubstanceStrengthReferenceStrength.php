@@ -29,6 +29,7 @@ class IngredientSubstanceStrengthReferenceStrength extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -38,6 +39,7 @@ class IngredientSubstanceStrengthReferenceStrength extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -47,6 +49,7 @@ class IngredientSubstanceStrengthReferenceStrength extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'substance' => [
@@ -56,15 +59,17 @@ class IngredientSubstanceStrengthReferenceStrength extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'strengthX' => [
+        'strength' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => true,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Ratio',
@@ -89,6 +94,7 @@ class IngredientSubstanceStrengthReferenceStrength extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'country' => [
@@ -98,6 +104,7 @@ class IngredientSubstanceStrengthReferenceStrength extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
             'variants'     => null,
         ],
     ];
@@ -115,7 +122,7 @@ class IngredientSubstanceStrengthReferenceStrength extends BackboneElement
         /** @var CodeableReference|null substance Relevant reference substance */
         #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex')]
         public ?CodeableReference $substance = null,
-        /** @var Ratio|RatioRange|null strengthX Strength expressed in terms of a reference substance */
+        /** @var Ratio|RatioRange|null strength Strength expressed in terms of a reference substance */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -137,7 +144,7 @@ class IngredientSubstanceStrengthReferenceStrength extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public Ratio|RatioRange|null $strengthX = null,
+        public Ratio|RatioRange|null $strength = null,
         /** @var StringPrimitive|string|null measurementPoint When strength is measured at a particular point or distance */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $measurementPoint = null,

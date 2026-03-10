@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathTemporalTypeInterface;
 
 /**
  * toString(): String
@@ -55,7 +57,7 @@ final class ToStringFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        $result = self::tryConvert($input->first());
+        $result = self::tryConvert($context->normalizeValue($input->first()));
 
         return $result !== null ? Collection::single($result) : Collection::empty();
     }
@@ -70,6 +72,18 @@ final class ToStringFunction extends AbstractFunction
     {
         if (is_string($value)) {
             return $value;
+        }
+
+        // Date/DateTime/Time wrapper objects → return their ISO string value
+        if ($value instanceof FHIRPathTemporalTypeInterface) {
+            return $value->getValue();
+        }
+
+        // Decimal wrapper: use exact string representation, ensuring a decimal point
+        if ($value instanceof FHIRPathDecimal) {
+            $str = $value->value;
+
+            return str_contains($str, '.') ? $str : $str . '.0';
         }
 
         if (is_bool($value)) {
@@ -97,10 +111,27 @@ final class ToStringFunction extends AbstractFunction
 
         // Quantity array representation: ['value' => numeric, 'unit' => string]
         if (is_array($value) && array_key_exists('value', $value) && array_key_exists('unit', $value) && is_numeric($value['value']) && is_string($value['unit'])) {
-            $floatVal = (float) $value['value'];
-            $strVal   = self::formatDecimal($floatVal);
+            $rawVal = $value['value'];
 
-            return "{$strVal} '{$value['unit']}'";
+            // PHP int → no decimal point; PHP float/string-numeric → always decimal notation
+            if (is_int($rawVal)) {
+                $strVal = (string) $rawVal;
+            } else {
+                $strVal = self::formatDecimal((float) $rawVal);
+            }
+
+            $unit = $value['unit'];
+            $calendarKeywords = [
+                'year', 'years', 'month', 'months', 'week', 'weeks', 'day', 'days',
+                'hour', 'hours', 'minute', 'minutes', 'second', 'seconds',
+                'millisecond', 'milliseconds',
+            ];
+
+            if (in_array($unit, $calendarKeywords, true)) {
+                return "{$strVal} {$unit}";
+            }
+
+            return "{$strVal} '{$unit}'";
         }
 
         // Other complex types (non-Quantity arrays, objects) → empty

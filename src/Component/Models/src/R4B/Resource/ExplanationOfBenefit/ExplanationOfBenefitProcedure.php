@@ -28,6 +28,7 @@ class ExplanationOfBenefitProcedure extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -37,6 +38,7 @@ class ExplanationOfBenefitProcedure extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -46,6 +48,7 @@ class ExplanationOfBenefitProcedure extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'sequence' => [
@@ -55,6 +58,7 @@ class ExplanationOfBenefitProcedure extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -64,6 +68,7 @@ class ExplanationOfBenefitProcedure extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'date' => [
@@ -73,15 +78,17 @@ class ExplanationOfBenefitProcedure extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'procedureX' => [
+        'procedure' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => true,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'CodeableConcept',
@@ -106,6 +113,7 @@ class ExplanationOfBenefitProcedure extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
             'variants'     => null,
         ],
     ];
@@ -129,7 +137,7 @@ class ExplanationOfBenefitProcedure extends BackboneElement
         /** @var DateTimePrimitive|null date When the procedure was performed */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $date = null,
-        /** @var CodeableConcept|Reference|null procedureX Specific clinical procedure */
+        /** @var CodeableConcept|Reference|null procedure Specific clinical procedure */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -151,7 +159,7 @@ class ExplanationOfBenefitProcedure extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public CodeableConcept|Reference|null $procedureX = null,
+        public CodeableConcept|Reference|null $procedure = null,
         /** @var array<Reference> udi Unique device identifier */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isArray: true)]
         public array $udi = [],

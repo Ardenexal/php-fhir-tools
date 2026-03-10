@@ -28,6 +28,7 @@ class SpecimenProcessing extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -37,6 +38,7 @@ class SpecimenProcessing extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -46,6 +48,7 @@ class SpecimenProcessing extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'description' => [
@@ -55,6 +58,7 @@ class SpecimenProcessing extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'procedure' => [
@@ -64,6 +68,7 @@ class SpecimenProcessing extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'additive' => [
@@ -73,15 +78,17 @@ class SpecimenProcessing extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
             'variants'     => null,
         ],
-        'timeX' => [
+        'time' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'dateTime',
@@ -120,7 +127,7 @@ class SpecimenProcessing extends BackboneElement
         /** @var array<Reference> additive Material used in the processing step */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isArray: true)]
         public array $additive = [],
-        /** @var DateTimePrimitive|Period|null timeX Date and time of specimen processing */
+        /** @var DateTimePrimitive|Period|null time Date and time of specimen processing */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -140,7 +147,7 @@ class SpecimenProcessing extends BackboneElement
                 ],
             ],
         )]
-        public DateTimePrimitive|Period|null $timeX = null,
+        public DateTimePrimitive|Period|null $time = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

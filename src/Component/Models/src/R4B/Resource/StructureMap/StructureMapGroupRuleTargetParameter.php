@@ -26,6 +26,7 @@ class StructureMapGroupRuleTargetParameter extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -35,6 +36,7 @@ class StructureMapGroupRuleTargetParameter extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -44,15 +46,17 @@ class StructureMapGroupRuleTargetParameter extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'valueX' => [
+        'value' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => true,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'id',
@@ -103,7 +107,7 @@ class StructureMapGroupRuleTargetParameter extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
-        /** @var IdPrimitive|StringPrimitive|string|bool|int|float|null valueX Parameter value - variable or literal */
+        /** @var IdPrimitive|StringPrimitive|string|bool|int|float|null value Parameter value - variable or literal */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -128,7 +132,7 @@ class StructureMapGroupRuleTargetParameter extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public IdPrimitive|StringPrimitive|string|bool|int|float|null $valueX = null,
+        public IdPrimitive|StringPrimitive|string|bool|int|float|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

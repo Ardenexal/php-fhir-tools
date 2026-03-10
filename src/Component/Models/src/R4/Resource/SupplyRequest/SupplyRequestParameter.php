@@ -26,6 +26,7 @@ class SupplyRequestParameter extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -35,6 +36,7 @@ class SupplyRequestParameter extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -44,6 +46,7 @@ class SupplyRequestParameter extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'code' => [
@@ -53,15 +56,17 @@ class SupplyRequestParameter extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'valueX' => [
+        'value' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'CodeableConcept',
@@ -108,7 +113,7 @@ class SupplyRequestParameter extends BackboneElement
         /** @var CodeableConcept|null code Item detail */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $code = null,
-        /** @var CodeableConcept|Quantity|Range|bool|null valueX Value of detail */
+        /** @var CodeableConcept|Quantity|Range|bool|null value Value of detail */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -135,7 +140,7 @@ class SupplyRequestParameter extends BackboneElement
                 ['fhirType' => 'boolean', 'propertyKind' => 'scalar', 'phpType' => 'bool', 'jsonKey' => 'valueBoolean'],
             ],
         )]
-        public CodeableConcept|Quantity|Range|bool|null $valueX = null,
+        public CodeableConcept|Quantity|Range|bool|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

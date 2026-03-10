@@ -97,30 +97,69 @@ class FHIRBackboneElementNormalizer extends AbstractFHIRNormalizer
                 $object = $reflection->newInstanceWithoutConstructor();
             }
 
+            // Get property metadata for choice element mapping
+            $metaMap = $this->getPropertyMetadataMap($object);
+
             // Set properties from the data while maintaining parent-child relationships
-            foreach ($data as $propertyName => $value) {
+            foreach ($data as $elementName => $value) {
                 // Skip underscore-prefixed extension properties, they're handled with their base property
-                if (str_starts_with($propertyName, '_')) {
+                if (str_starts_with($elementName, '_')) {
                     continue;
                 }
 
-                if ($reflection->hasProperty($propertyName)) {
-                    $property = $reflection->getProperty($propertyName);
+                // First, check if this is a choice element variant (e.g., 'valueQuantity' -> 'value')
+                $choiceMapping = $this->findChoicePropertyByKey($metaMap, $elementName);
+                if ($choiceMapping !== null) {
+                    [$propertyName, $phpType] = $choiceMapping;
+
+                    if ($reflection->hasProperty($propertyName)) {
+                        $property = $reflection->getProperty($propertyName);
+
+                        if ($this->denormalizer !== null && !$this->isBuiltinType($phpType)) {
+                            $denormalizedValue = $this->denormalizer->denormalize($value, $phpType, $format, $context);
+                        } else {
+                            $denormalizedValue = $format === 'xml' ? $this->unwrapXmlValue($value, $phpType) : $value;
+                        }
+
+                        $property->setValue($object, $denormalizedValue);
+                        continue;
+                    }
+                }
+
+                // Standard property mapping
+                if ($reflection->hasProperty($elementName)) {
+                    $property = $reflection->getProperty($elementName);
 
                     // Handle extensions and modifierExtensions specially
-                    if ($propertyName === 'extension' || $propertyName === 'modifierExtension') {
+                    if ($elementName === 'extension' || $elementName === 'modifierExtension') {
                         $denormalizedValue = $this->denormalizeExtensions($value, $format, $context);
                     } else {
-                        // Always use the denormalizer to create properly-typed instances.
-                        // _property extension keys are implicitly skipped at the loop level.
+                        $meta = $metaMap[$elementName] ?? null;
+
                         if ($this->denormalizer !== null) {
-                            $propertyType = $this->getPropertyType($property);
-                            if ($propertyType !== null && !$this->isBuiltinType($propertyType)) {
-                                $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, $format, $context);
+                            if ($meta !== null && $meta->propertyKind === 'primitive' && $format !== 'xml') {
+                                // Always produce Primitive objects so that _property extension data
+                                // can be attached to the instances in the second pass below.
+                                $denormalizedValue = $this->denormalizePrimitiveProperty($meta, $property, $reflection, $value, $format, $context, $metaMap);
                             } else {
-                                // For XML, Symfony XmlEncoder wraps primitive values as ['@value' => '...', '#' => ''].
-                                // Unwrap before assigning to string/union-typed properties.
-                                $denormalizedValue = $format === 'xml' ? $this->unwrapXmlValue($value, $propertyType) : $value;
+                                $propertyType = $this->getPropertyType($property);
+                                if ($propertyType !== null && !$this->isBuiltinType($propertyType)) {
+                                    $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, $format, $context);
+                                } else {
+                                    // For XML, Symfony XmlEncoder wraps primitive values as ['@value' => '...', '#' => ''].
+                                    // Unwrap before assigning to string/union-typed properties.
+                                    if ($format === 'xml') {
+                                        $denormalizedValue = $this->unwrapXmlValue($value, $propertyType);
+                                        // If unwrapping left an array (because the XML element had child elements,
+                                        // e.g. an inline extension), extract just the scalar @value so it can be
+                                        // assigned to union-typed properties like StringPrimitive|string|null.
+                                        if (is_array($denormalizedValue) && isset($denormalizedValue['@value'])) {
+                                            $denormalizedValue = $denormalizedValue['@value'];
+                                        }
+                                    } else {
+                                        $denormalizedValue = $value;
+                                    }
+                                }
                             }
                         } else {
                             // Without a denormalizer, we can only handle scalar values properly
@@ -138,6 +177,9 @@ class FHIRBackboneElementNormalizer extends AbstractFHIRNormalizer
                     $property->setValue($object, $denormalizedValue);
                 }
             }
+
+            // Apply _property extension data to already-denormalized primitive properties.
+            $this->applyPrimitiveExtensions($reflection, $object, $data, $metaMap, $format, $context);
 
             return $object;
         } catch (\ReflectionException $e) {

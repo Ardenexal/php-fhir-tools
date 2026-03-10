@@ -26,6 +26,7 @@ class BiologicallyDerivedProductManipulation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -35,6 +36,7 @@ class BiologicallyDerivedProductManipulation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -44,6 +46,7 @@ class BiologicallyDerivedProductManipulation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'description' => [
@@ -53,15 +56,17 @@ class BiologicallyDerivedProductManipulation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'timeX' => [
+        'time' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'dateTime',
@@ -94,7 +99,7 @@ class BiologicallyDerivedProductManipulation extends BackboneElement
         /** @var StringPrimitive|string|null description Description of manipulation */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $description = null,
-        /** @var DateTimePrimitive|Period|null timeX Time of manipulation */
+        /** @var DateTimePrimitive|Period|null time Time of manipulation */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -114,7 +119,7 @@ class BiologicallyDerivedProductManipulation extends BackboneElement
                 ],
             ],
         )]
-        public DateTimePrimitive|Period|null $timeX = null,
+        public DateTimePrimitive|Period|null $time = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

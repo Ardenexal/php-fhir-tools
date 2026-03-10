@@ -29,9 +29,9 @@ class ContainsStringFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        $string = $input->first();
+        $string = $context->normalizeValue($input->first());
         if (!is_string($string)) {
-            return Collection::single(false);
+            throw EvaluationException::invalidFunctionParameter($this->getName(), 'input', 'string');
         }
 
         /** @var ExpressionNode $substringExpr */
@@ -40,7 +40,7 @@ class ContainsStringFunction extends AbstractFunction
         if ($evaluator === null) {
             throw new EvaluationException('Evaluator not available in context');
         }
-        $substringResult = $evaluator->evaluate($substringExpr, $context);
+        $substringResult = $evaluator->evaluateWithContext($substringExpr, $context);
 
         if ($substringResult->isEmpty()) {
             return Collection::single(false);

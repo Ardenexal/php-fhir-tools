@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
 
 /**
  * toBoolean(): Boolean
@@ -52,7 +53,7 @@ final class ToBooleanFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        $result = self::tryConvert($input->first());
+        $result = self::tryConvert($context->normalizeValue($input->first()));
 
         return $result !== null ? Collection::single($result) : Collection::empty();
     }
@@ -78,6 +79,10 @@ final class ToBooleanFunction extends AbstractFunction
     {
         if (is_bool($value)) {
             return $value;
+        }
+
+        if ($value instanceof FHIRPathDecimal) {
+            return $value->toFloat() !== 0.0;
         }
 
         if (is_int($value)) {

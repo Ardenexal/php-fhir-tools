@@ -25,7 +25,7 @@ class AnyFalseFunction extends AbstractFunction
         $this->validateParameterCount($parameters, 0);
 
         foreach ($input as $item) {
-            if ($item === false) {
+            if ($context->normalizeValue($item) === false) {
                 return Collection::single(true);
             }
         }

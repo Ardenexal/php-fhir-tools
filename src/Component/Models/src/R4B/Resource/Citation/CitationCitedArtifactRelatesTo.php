@@ -29,6 +29,7 @@ class CitationCitedArtifactRelatesTo extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -38,6 +39,7 @@ class CitationCitedArtifactRelatesTo extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -47,6 +49,7 @@ class CitationCitedArtifactRelatesTo extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'relationshipType' => [
@@ -56,6 +59,7 @@ class CitationCitedArtifactRelatesTo extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'targetClassifier' => [
@@ -65,15 +69,17 @@ class CitationCitedArtifactRelatesTo extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
             'variants'     => null,
         ],
-        'targetX' => [
+        'target' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => true,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'uri',
@@ -123,7 +129,7 @@ class CitationCitedArtifactRelatesTo extends BackboneElement
         /** @var array<CodeableConcept> targetClassifier The clasification of the related artifact */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true)]
         public array $targetClassifier = [],
-        /** @var UriPrimitive|Identifier|Reference|Attachment|null targetX The article or artifact that the cited artifact is related to */
+        /** @var UriPrimitive|Identifier|Reference|Attachment|null target The article or artifact that the cited artifact is related to */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -157,7 +163,7 @@ class CitationCitedArtifactRelatesTo extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public UriPrimitive|Identifier|Reference|Attachment|null $targetX = null,
+        public UriPrimitive|Identifier|Reference|Attachment|null $target = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

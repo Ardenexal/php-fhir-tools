@@ -29,6 +29,7 @@ class EvidenceReportSubjectCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -38,6 +39,7 @@ class EvidenceReportSubjectCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -47,6 +49,7 @@ class EvidenceReportSubjectCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'code' => [
@@ -56,15 +59,17 @@ class EvidenceReportSubjectCharacteristic extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'valueX' => [
+        'value' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => true,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Reference',
@@ -110,6 +115,7 @@ class EvidenceReportSubjectCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'period' => [
@@ -119,6 +125,7 @@ class EvidenceReportSubjectCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];
@@ -136,7 +143,7 @@ class EvidenceReportSubjectCharacteristic extends BackboneElement
         /** @var CodeableConcept|null code Characteristic code */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?CodeableConcept $code = null,
-        /** @var Reference|CodeableConcept|bool|Quantity|Range|null valueX Characteristic value */
+        /** @var Reference|CodeableConcept|bool|Quantity|Range|null value Characteristic value */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -171,7 +178,7 @@ class EvidenceReportSubjectCharacteristic extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public Reference|CodeableConcept|bool|Quantity|Range|null $valueX = null,
+        public Reference|CodeableConcept|bool|Quantity|Range|null $value = null,
         /** @var bool|null exclude Is used to express not the characteristic */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $exclude = null,

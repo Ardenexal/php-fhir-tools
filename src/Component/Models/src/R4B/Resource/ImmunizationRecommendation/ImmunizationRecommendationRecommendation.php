@@ -32,6 +32,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -41,6 +42,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -50,6 +52,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'vaccineCode' => [
@@ -59,6 +62,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'targetDisease' => [
@@ -68,6 +72,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'contraindicatedVaccineCode' => [
@@ -77,6 +82,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'forecastStatus' => [
@@ -86,6 +92,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'forecastReason' => [
@@ -95,6 +102,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'dateCriterion' => [
@@ -104,6 +112,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ImmunizationRecommendation\ImmunizationRecommendationRecommendationDateCriterion',
             'variants'     => null,
         ],
         'description' => [
@@ -113,6 +122,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'series' => [
@@ -122,15 +132,17 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'doseNumberX' => [
+        'doseNumber' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'positiveInt',
@@ -148,13 +160,14 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
                 ],
             ],
         ],
-        'seriesDosesX' => [
+        'seriesDoses' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'positiveInt',
@@ -179,6 +192,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
             'variants'     => null,
         ],
         'supportingPatientInformation' => [
@@ -188,6 +202,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
             'variants'     => null,
         ],
     ];
@@ -226,7 +241,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
         /** @var StringPrimitive|string|null series Name of vaccination series */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $series = null,
-        /** @var PositiveIntPrimitive|StringPrimitive|string|null doseNumberX Recommended dose number within series */
+        /** @var PositiveIntPrimitive|StringPrimitive|string|null doseNumber Recommended dose number within series */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -246,8 +261,8 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
                 ],
             ],
         )]
-        public PositiveIntPrimitive|StringPrimitive|string|null $doseNumberX = null,
-        /** @var PositiveIntPrimitive|StringPrimitive|string|null seriesDosesX Recommended number of doses for immunity */
+        public PositiveIntPrimitive|StringPrimitive|string|null $doseNumber = null,
+        /** @var PositiveIntPrimitive|StringPrimitive|string|null seriesDoses Recommended number of doses for immunity */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -267,7 +282,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
                 ],
             ],
         )]
-        public PositiveIntPrimitive|StringPrimitive|string|null $seriesDosesX = null,
+        public PositiveIntPrimitive|StringPrimitive|string|null $seriesDoses = null,
         /** @var array<Reference> supportingImmunization Past immunizations supporting recommendation */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isArray: true)]
         public array $supportingImmunization = [],

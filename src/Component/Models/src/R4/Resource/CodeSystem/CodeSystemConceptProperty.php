@@ -28,6 +28,7 @@ class CodeSystemConceptProperty extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -37,6 +38,7 @@ class CodeSystemConceptProperty extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -46,6 +48,7 @@ class CodeSystemConceptProperty extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'code' => [
@@ -55,15 +58,17 @@ class CodeSystemConceptProperty extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'valueX' => [
+        'value' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => true,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'code',
@@ -131,7 +136,7 @@ class CodeSystemConceptProperty extends BackboneElement
         /** @var CodePrimitive|null code Reference to CodeSystem.property.code */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?CodePrimitive $code = null,
-        /** @var CodePrimitive|Coding|StringPrimitive|string|int|bool|DateTimePrimitive|float|null valueX Value of the property for this concept */
+        /** @var CodePrimitive|Coding|StringPrimitive|string|int|bool|DateTimePrimitive|float|null value Value of the property for this concept */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -168,7 +173,7 @@ class CodeSystemConceptProperty extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public CodePrimitive|Coding|StringPrimitive|string|int|bool|DateTimePrimitive|float|null $valueX = null,
+        public CodePrimitive|Coding|StringPrimitive|string|int|bool|DateTimePrimitive|float|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -23,6 +23,8 @@ final class PropertyMetadata
      * @param bool                               $isChoice     True for choice elements (value[x])
      * @param list<PropertyVariantMetadata>|null $variants     Non-null only when isChoice is true
      * @param string|null                        $jsonKey      Key override; null = use PHP property name
+     * @param string|null                        $phpItemClass FQCN for complex/backbone array item class (e.g. HumanName::class);
+     *                                                         null for primitives, scalars, and choice elements
      */
     public function __construct(
         public readonly string $fhirType,
@@ -32,6 +34,7 @@ final class PropertyMetadata
         public readonly bool $isChoice,
         public readonly ?array $variants,
         public readonly ?string $jsonKey,
+        public readonly ?string $phpItemClass = null,
     ) {
     }
 }

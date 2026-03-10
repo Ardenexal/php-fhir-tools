@@ -34,6 +34,7 @@ class CarePlanActivityDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -43,6 +44,7 @@ class CarePlanActivityDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -52,6 +54,7 @@ class CarePlanActivityDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'kind' => [
@@ -61,6 +64,7 @@ class CarePlanActivityDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'instantiatesCanonical' => [
@@ -70,6 +74,7 @@ class CarePlanActivityDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'instantiatesUri' => [
@@ -79,6 +84,7 @@ class CarePlanActivityDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'code' => [
@@ -88,6 +94,7 @@ class CarePlanActivityDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'reasonCode' => [
@@ -97,6 +104,7 @@ class CarePlanActivityDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'reasonReference' => [
@@ -106,6 +114,7 @@ class CarePlanActivityDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
             'variants'     => null,
         ],
         'goal' => [
@@ -115,6 +124,7 @@ class CarePlanActivityDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
             'variants'     => null,
         ],
         'status' => [
@@ -124,6 +134,7 @@ class CarePlanActivityDetail extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'statusReason' => [
@@ -133,6 +144,7 @@ class CarePlanActivityDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'doNotPerform' => [
@@ -142,15 +154,17 @@ class CarePlanActivityDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'scheduledX' => [
+        'scheduled' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Timing',
@@ -182,6 +196,7 @@ class CarePlanActivityDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'performer' => [
@@ -191,15 +206,17 @@ class CarePlanActivityDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
             'variants'     => null,
         ],
-        'productX' => [
+        'product' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'CodeableConcept',
@@ -224,6 +241,7 @@ class CarePlanActivityDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'quantity' => [
@@ -233,6 +251,7 @@ class CarePlanActivityDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'description' => [
@@ -242,6 +261,7 @@ class CarePlanActivityDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];
@@ -286,7 +306,7 @@ class CarePlanActivityDetail extends BackboneElement
         /** @var bool|null doNotPerform If true, activity is prohibiting action */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $doNotPerform = null,
-        /** @var Timing|Period|StringPrimitive|string|null scheduledX When activity is to occur */
+        /** @var Timing|Period|StringPrimitive|string|null scheduled When activity is to occur */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -312,14 +332,14 @@ class CarePlanActivityDetail extends BackboneElement
                 ],
             ],
         )]
-        public Timing|Period|StringPrimitive|string|null $scheduledX = null,
+        public Timing|Period|StringPrimitive|string|null $scheduled = null,
         /** @var Reference|null location Where it should happen */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $location = null,
         /** @var array<Reference> performer Who will be responsible? */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isArray: true)]
         public array $performer = [],
-        /** @var CodeableConcept|Reference|null productX What is to be administered/supplied */
+        /** @var CodeableConcept|Reference|null product What is to be administered/supplied */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -339,7 +359,7 @@ class CarePlanActivityDetail extends BackboneElement
                 ],
             ],
         )]
-        public CodeableConcept|Reference|null $productX = null,
+        public CodeableConcept|Reference|null $product = null,
         /** @var Quantity|null dailyAmount How to consume/day? */
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
         public ?Quantity $dailyAmount = null,

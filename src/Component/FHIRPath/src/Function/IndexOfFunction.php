@@ -31,7 +31,7 @@ final class IndexOfFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        $string = $input->first();
+        $string = $context->normalizeValue($input->first());
         if (!is_string($string)) {
             throw EvaluationException::invalidFunctionParameter($this->getName(), 'input', 'string');
         }
@@ -41,7 +41,12 @@ final class IndexOfFunction extends AbstractFunction
             throw new EvaluationException('Evaluator not available in context');
         }
 
-        $substring = $evaluator->evaluate($parameters[0], $context)->first();
+        $substringResult = $evaluator->evaluateWithContext($parameters[0], $context);
+        if ($substringResult->isEmpty()) {
+            return Collection::empty();
+        }
+
+        $substring = $substringResult->first();
         if (!is_string($substring)) {
             throw EvaluationException::invalidFunctionParameter($this->getName(), 'substring', 'string');
         }

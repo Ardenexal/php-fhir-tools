@@ -27,6 +27,7 @@ class IngredientSubstanceStrength extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -36,6 +37,7 @@ class IngredientSubstanceStrength extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -45,15 +47,17 @@ class IngredientSubstanceStrength extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'presentationX' => [
+        'presentation' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Ratio',
@@ -78,15 +82,17 @@ class IngredientSubstanceStrength extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'concentrationX' => [
+        'concentration' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Ratio',
@@ -111,6 +117,7 @@ class IngredientSubstanceStrength extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'measurementPoint' => [
@@ -120,6 +127,7 @@ class IngredientSubstanceStrength extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'country' => [
@@ -129,6 +137,7 @@ class IngredientSubstanceStrength extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'referenceStrength' => [
@@ -138,6 +147,7 @@ class IngredientSubstanceStrength extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Ingredient\IngredientSubstanceStrengthReferenceStrength',
             'variants'     => null,
         ],
     ];
@@ -152,7 +162,7 @@ class IngredientSubstanceStrength extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
-        /** @var Ratio|RatioRange|null presentationX The quantity of substance in the unit of presentation */
+        /** @var Ratio|RatioRange|null presentation The quantity of substance in the unit of presentation */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -172,11 +182,11 @@ class IngredientSubstanceStrength extends BackboneElement
                 ],
             ],
         )]
-        public Ratio|RatioRange|null $presentationX = null,
+        public Ratio|RatioRange|null $presentation = null,
         /** @var StringPrimitive|string|null textPresentation Text of either the whole presentation strength or a part of it (rest being in Strength.presentation as a ratio) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $textPresentation = null,
-        /** @var Ratio|RatioRange|null concentrationX The strength per unitary volume (or mass) */
+        /** @var Ratio|RatioRange|null concentration The strength per unitary volume (or mass) */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -196,7 +206,7 @@ class IngredientSubstanceStrength extends BackboneElement
                 ],
             ],
         )]
-        public Ratio|RatioRange|null $concentrationX = null,
+        public Ratio|RatioRange|null $concentration = null,
         /** @var StringPrimitive|string|null textConcentration Text of either the whole concentration strength or a part of it (rest being in Strength.concentration as a ratio) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $textConcentration = null,

@@ -27,6 +27,7 @@ class MedicationKnowledgeDrugCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -36,6 +37,7 @@ class MedicationKnowledgeDrugCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -45,6 +47,7 @@ class MedicationKnowledgeDrugCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -54,15 +57,17 @@ class MedicationKnowledgeDrugCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'valueX' => [
+        'value' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'CodeableConcept',
@@ -109,7 +114,7 @@ class MedicationKnowledgeDrugCharacteristic extends BackboneElement
         /** @var CodeableConcept|null type Code specifying the type of characteristic of medication */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $type = null,
-        /** @var CodeableConcept|StringPrimitive|string|Quantity|Base64BinaryPrimitive|null valueX Description of the characteristic */
+        /** @var CodeableConcept|StringPrimitive|string|Quantity|Base64BinaryPrimitive|null value Description of the characteristic */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -141,7 +146,7 @@ class MedicationKnowledgeDrugCharacteristic extends BackboneElement
                 ],
             ],
         )]
-        public CodeableConcept|StringPrimitive|string|Quantity|Base64BinaryPrimitive|null $valueX = null,
+        public CodeableConcept|StringPrimitive|string|Quantity|Base64BinaryPrimitive|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

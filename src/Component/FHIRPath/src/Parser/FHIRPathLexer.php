@@ -204,6 +204,21 @@ class FHIRPathLexer
         }
 
         if ($char === '/') {
+            // Check for single-line comment //
+            if ($this->peek() === '/') {
+                $this->advance(); // consume second /
+                $this->skipSingleLineComment();
+
+                return;
+            }
+            // Check for multi-line comment /*
+            if ($this->peek() === '*') {
+                $this->advance(); // consume *
+                $this->skipMultiLineComment($startLine, $startColumn, $start);
+
+                return;
+            }
+            // Otherwise it's a division operator
             $this->addToken(TokenType::DIVIDE, '/', $startLine, $startColumn, $start);
 
             return;
@@ -233,6 +248,13 @@ class FHIRPathLexer
         // External constants starting with %
         if ($char === '%') {
             $this->scanExternalConstant($startLine, $startColumn, $start);
+
+            return;
+        }
+
+        // Backtick-delimited escaped identifiers
+        if ($char === '`') {
+            $this->scanBacktickIdentifier($startLine, $startColumn, $start);
 
             return;
         }
@@ -273,6 +295,8 @@ class FHIRPathLexer
                     "'"     => "'",
                     '"'     => '"',
                     '\\'    => '\\',
+                    '`'     => '`',
+                    '/'     => '/',
                     't'     => "\t",
                     'n'     => "\n",
                     'r'     => "\r",
@@ -347,7 +371,7 @@ class FHIRPathLexer
             }
         }
 
-        // Check for quantity unit
+        // Check for quantity unit (quoted UCUM units like '185 'mg'')
         if ($this->peek() === ' ' && $this->peek(1) === "'") {
             $this->advance(); // consume space
             $this->advance(); // consume opening quote
@@ -368,6 +392,34 @@ class FHIRPathLexer
             return;
         }
 
+        // Check for calendar duration unit (unquoted keywords like '7 days', '1 week')
+        if ($this->peek() === ' ' && $this->isAlpha($this->peek(1))) {
+            $unitStart = $this->position; // Save position before parsing unit
+            $this->advance(); // consume space
+
+            $keyword = '';
+            while ($this->isAlpha($this->peek())) {
+                $keyword .= $this->advance();
+            }
+
+            // Valid calendar duration keywords (singular and plural)
+            $validKeywords = [
+                'year', 'years', 'month', 'months', 'week', 'weeks', 'day', 'days',
+                'hour', 'hours', 'minute', 'minutes', 'second', 'seconds',
+                'millisecond', 'milliseconds',
+            ];
+
+            if (in_array($keyword, $validKeywords, true)) {
+                // Normalize to quoted format for consistency with UCUM quantities
+                $this->addToken(TokenType::QUANTITY, $value . " '" . $keyword . "'", $startLine, $startColumn, $start);
+
+                return;
+            }
+
+            // Not a valid calendar duration keyword - reset position and treat as NUMBER
+            $this->position = $unitStart;
+        }
+
         $this->addToken(TokenType::NUMBER, $value, $startLine, $startColumn, $start);
     }
 
@@ -382,8 +434,21 @@ class FHIRPathLexer
         if ($this->peek() === 'T') {
             $value .= $this->advance();
             // Scan time part
-            while (!$this->isAtEnd() && ($this->isDigit($this->peek()) || $this->peek() === ':' || $this->peek() === '.')) {
-                $value .= $this->advance();
+            while (!$this->isAtEnd()) {
+                $char = $this->peek();
+                if ($this->isDigit($char) || $char === ':') {
+                    $value .= $this->advance();
+                } elseif ($char === '.') {
+                    $next = $this->peekNext();
+                    if ($next !== '' && $this->isDigit($next)) {
+                        // Only include '.' if followed by a digit (fractional seconds)
+                        $value .= $this->advance();
+                    } else {
+                        break;
+                    }
+                } else {
+                    break;
+                }
             }
             $this->addToken(TokenType::TIME, $value, $startLine, $startColumn, $start);
 
@@ -399,8 +464,21 @@ class FHIRPathLexer
         if ($this->peek() === 'T') {
             $value .= $this->advance();
             // Scan time and timezone
-            while (!$this->isAtEnd() && ($this->isDigit($this->peek()) || $this->peek() === ':' || $this->peek() === '.' || $this->peek() === '+' || $this->peek() === '-' || $this->peek() === 'Z')) {
-                $value .= $this->advance();
+            while (!$this->isAtEnd()) {
+                $char = $this->peek();
+                if ($this->isDigit($char) || $char === ':' || $char === '+' || $char === '-' || $char === 'Z') {
+                    $value .= $this->advance();
+                } elseif ($char === '.') {
+                    $next = $this->peekNext();
+                    if ($next !== '' && $this->isDigit($next)) {
+                        // Only include '.' if followed by a digit (fractional seconds)
+                        $value .= $this->advance();
+                    } else {
+                        break;
+                    }
+                } else {
+                    break;
+                }
             }
         }
 
@@ -454,6 +532,39 @@ class FHIRPathLexer
     }
 
     /**
+     * Scan a backtick-delimited escaped identifier (e.g., `given`, `vs-administrative-gender`).
+     *
+     * Per the FHIRPath spec, backtick identifiers allow reserved words, hyphens, and other
+     * special characters in identifiers. The backticks are stripped and the inner content is
+     * emitted as a regular IDENTIFIER token.
+     *
+     * @throws TokenException If the identifier is unterminated before EOF
+     */
+    private function scanBacktickIdentifier(int $startLine, int $startColumn, int $start): void
+    {
+        $value = '';
+
+        while (!$this->isAtEnd() && $this->peek() !== '`') {
+            if ($this->peek() === '\\' && $this->peek(1) === '`') {
+                $this->advance(); // consume backslash
+                $this->advance(); // consume backtick
+                $value .= '`';
+            } else {
+                $value .= $this->advance();
+            }
+        }
+
+        if ($this->isAtEnd()) {
+            throw TokenException::unterminatedString($startLine, $startColumn, $this->getContext($start));
+        }
+
+        // Consume closing backtick
+        $this->advance();
+
+        $this->addToken(TokenType::IDENTIFIER, $value, $startLine, $startColumn, $start);
+    }
+
+    /**
      * Add a token to the tokens list.
      */
     private function addToken(TokenType $type, string $value, int $line, int $column, int $position): void
@@ -477,7 +588,44 @@ class FHIRPathLexer
     }
 
     /**
+     * Skip a single-line comment (// to end of line).
+     */
+    private function skipSingleLineComment(): void
+    {
+        // Consume characters until newline or EOF
+        while (!$this->isAtEnd() && $this->peek() !== "\n") {
+            $this->advance();
+        }
+        // The newline (if present) will be consumed by skipWhitespace on next scanToken iteration
+    }
+
+    /**
+     * Skip a multi-line comment (slash-asterisk ... asterisk-slash).
+     *
+     * @throws TokenException If the comment is not terminated before EOF
+     */
+    private function skipMultiLineComment(int $startLine, int $startColumn, int $start): void
+    {
+        // Consume characters until we find */
+        while (!$this->isAtEnd()) {
+            if ($this->peek() === '*' && $this->peek(1) === '/') {
+                // Found closing */
+                $this->advance(); // consume *
+                $this->advance(); // consume /
+
+                return;
+            }
+            $this->advance();
+        }
+
+        // Reached EOF without finding */
+        throw TokenException::unterminatedComment($startLine, $startColumn, $this->getContext($start));
+    }
+
+    /**
      * Advance to the next character and return it.
+     *
+     * @phpstan-impure
      */
     private function advance(): string
     {
@@ -499,6 +647,8 @@ class FHIRPathLexer
 
     /**
      * Peek at the current character without advancing.
+     *
+     * @phpstan-impure
      */
     private function peek(int $offset = 0): string
     {
@@ -521,6 +671,18 @@ class FHIRPathLexer
         $this->advance();
 
         return true;
+    }
+
+    /**
+     * Peek at the next character without consuming it.
+     */
+    private function peekNext(): string
+    {
+        if ($this->position + 1 >= strlen($this->input)) {
+            return '';
+        }
+
+        return $this->input[$this->position + 1];
     }
 
     /**

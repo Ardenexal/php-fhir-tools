@@ -52,7 +52,7 @@ final class ReplaceMatchesFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        $string = $input->first();
+        $string = $context->normalizeValue($input->first());
         if (!is_string($string)) {
             throw EvaluationException::invalidFunctionParameter($this->getName(), 'input', 'string');
         }
@@ -80,6 +80,11 @@ final class ReplaceMatchesFunction extends AbstractFunction
         $substitution = $substitutionResult->first();
         if (!is_string($substitution)) {
             throw EvaluationException::invalidFunctionParameter($this->getName(), 'substitution', 'string');
+        }
+
+        // Per FHIRPath spec: empty pattern string returns the original string unchanged
+        if ($pattern === '') {
+            return Collection::single($string);
         }
 
         // Add PCRE delimiters and DOTALL flag if not already present — same logic as MatchesFunction

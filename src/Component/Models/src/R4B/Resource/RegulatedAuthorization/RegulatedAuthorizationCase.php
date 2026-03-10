@@ -27,6 +27,7 @@ class RegulatedAuthorizationCase extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -36,6 +37,7 @@ class RegulatedAuthorizationCase extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -45,6 +47,7 @@ class RegulatedAuthorizationCase extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'identifier' => [
@@ -54,6 +57,7 @@ class RegulatedAuthorizationCase extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -63,6 +67,7 @@ class RegulatedAuthorizationCase extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'status' => [
@@ -72,15 +77,17 @@ class RegulatedAuthorizationCase extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'dateX' => [
+        'date' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Period',
@@ -105,6 +112,7 @@ class RegulatedAuthorizationCase extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\RegulatedAuthorization\RegulatedAuthorizationCase',
             'variants'     => null,
         ],
     ];
@@ -128,7 +136,7 @@ class RegulatedAuthorizationCase extends BackboneElement
         /** @var CodeableConcept|null status The status associated with the case */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $status = null,
-        /** @var Period|DateTimePrimitive|null dateX Relevant date for this case */
+        /** @var Period|DateTimePrimitive|null date Relevant date for this case */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -148,7 +156,7 @@ class RegulatedAuthorizationCase extends BackboneElement
                 ],
             ],
         )]
-        public Period|DateTimePrimitive|null $dateX = null,
+        public Period|DateTimePrimitive|null $date = null,
         /** @var array<RegulatedAuthorizationCase> application Applications submitted to obtain a regulated authorization. Steps within the longer running case or procedure */
         #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex', isArray: true)]
         public array $application = [],

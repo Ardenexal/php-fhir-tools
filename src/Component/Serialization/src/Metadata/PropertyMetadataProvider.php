@@ -61,7 +61,7 @@ class PropertyMetadataProvider implements PropertyMetadataProviderInterface
     /**
      * Hydrate PropertyMetadata objects from a FHIR_PROPERTY_MAP const value.
      *
-     * @param array<string, array{fhirType: string, propertyKind: string, isArray: bool, isRequired: bool, isChoice: bool, jsonKey: string|null, variants: list<array{fhirType: string, propertyKind: string, phpType: string, jsonKey: string, isBuiltin: bool}>|null}> $map
+     * @param array<string, array{fhirType: string, propertyKind: string, isArray: bool, isRequired: bool, isChoice: bool, jsonKey: string|null, phpType?: string|null, variants: list<array{fhirType: string, propertyKind: string, phpType: string, jsonKey: string, isBuiltin: bool}>|null}> $map
      *
      * @return array<string, PropertyMetadata>
      */
@@ -84,6 +84,8 @@ class PropertyMetadataProvider implements PropertyMetadataProviderInterface
                 );
             }
 
+            $phpItemClass = $entry['phpType'] ?? null;
+
             $result[$propertyName] = new PropertyMetadata(
                 $entry['fhirType'],
                 $entry['propertyKind'],
@@ -92,6 +94,7 @@ class PropertyMetadataProvider implements PropertyMetadataProviderInterface
                 $entry['isChoice'],
                 $variants,
                 $entry['jsonKey'],
+                $phpItemClass,
             );
         }
 

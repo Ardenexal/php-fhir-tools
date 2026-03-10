@@ -29,6 +29,7 @@ class SubstanceSpecificationRelationship extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -38,6 +39,7 @@ class SubstanceSpecificationRelationship extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -47,15 +49,17 @@ class SubstanceSpecificationRelationship extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'substanceX' => [
+        'substance' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Reference',
@@ -80,6 +84,7 @@ class SubstanceSpecificationRelationship extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'isDefining' => [
@@ -89,15 +94,17 @@ class SubstanceSpecificationRelationship extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'amountX' => [
+        'amount' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Quantity',
@@ -136,6 +143,7 @@ class SubstanceSpecificationRelationship extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'amountType' => [
@@ -145,6 +153,7 @@ class SubstanceSpecificationRelationship extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'source' => [
@@ -154,6 +163,7 @@ class SubstanceSpecificationRelationship extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
             'variants'     => null,
         ],
     ];
@@ -168,7 +178,7 @@ class SubstanceSpecificationRelationship extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
-        /** @var Reference|CodeableConcept|null substanceX A pointer to another substance, as a resource or just a representational code */
+        /** @var Reference|CodeableConcept|null substance A pointer to another substance, as a resource or just a representational code */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -188,14 +198,14 @@ class SubstanceSpecificationRelationship extends BackboneElement
                 ],
             ],
         )]
-        public Reference|CodeableConcept|null $substanceX = null,
+        public Reference|CodeableConcept|null $substance = null,
         /** @var CodeableConcept|null relationship For example "salt to parent", "active moiety", "starting material" */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $relationship = null,
         /** @var bool|null isDefining For example where an enzyme strongly bonds with a particular substance, this is a defining relationship for that enzyme, out of several possible substance relationships */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $isDefining = null,
-        /** @var Quantity|Range|Ratio|StringPrimitive|string|null amountX A numeric factor for the relationship, for instance to express that the salt of a substance has some percentage of the active substance in relation to some other */
+        /** @var Quantity|Range|Ratio|StringPrimitive|string|null amount A numeric factor for the relationship, for instance to express that the salt of a substance has some percentage of the active substance in relation to some other */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -227,7 +237,7 @@ class SubstanceSpecificationRelationship extends BackboneElement
                 ],
             ],
         )]
-        public Quantity|Range|Ratio|StringPrimitive|string|null $amountX = null,
+        public Quantity|Range|Ratio|StringPrimitive|string|null $amount = null,
         /** @var Ratio|null amountRatioLowLimit For use when the numeric */
         #[FhirProperty(fhirType: 'Ratio', propertyKind: 'complex')]
         public ?Ratio $amountRatioLowLimit = null,

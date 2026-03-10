@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
+use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
+use Ardenexal\FHIRTools\Component\FHIRPath\Expression\ExpressionNode;
 
 /**
  * intersect(other) function - Returns the intersection of two collections
@@ -23,10 +25,14 @@ final class IntersectFunction extends AbstractFunction
     {
         $this->validateParameterCount($parameters, 1);
 
-        $otherCollection = $parameters[0];
-        if (!$otherCollection instanceof Collection) {
-            return Collection::empty();
+        $evaluator = $context->getEvaluator();
+        if ($evaluator === null) {
+            throw new EvaluationException('Evaluator not available in context');
         }
+
+        /** @var ExpressionNode $otherExpr */
+        $otherExpr       = $parameters[0];
+        $otherCollection = $evaluator->evaluateWithContext($otherExpr, $context);
 
         return $input->intersect($otherCollection);
     }

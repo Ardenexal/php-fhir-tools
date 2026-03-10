@@ -29,6 +29,7 @@ class VisionPrescriptionLensSpecification extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -38,6 +39,7 @@ class VisionPrescriptionLensSpecification extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -47,6 +49,7 @@ class VisionPrescriptionLensSpecification extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'product' => [
@@ -56,6 +59,7 @@ class VisionPrescriptionLensSpecification extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'eye' => [
@@ -65,6 +69,7 @@ class VisionPrescriptionLensSpecification extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'sphere' => [
@@ -74,6 +79,7 @@ class VisionPrescriptionLensSpecification extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'cylinder' => [
@@ -83,6 +89,7 @@ class VisionPrescriptionLensSpecification extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'axis' => [
@@ -92,6 +99,7 @@ class VisionPrescriptionLensSpecification extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'prism' => [
@@ -101,6 +109,7 @@ class VisionPrescriptionLensSpecification extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\VisionPrescription\VisionPrescriptionLensSpecificationPrism',
             'variants'     => null,
         ],
         'add' => [
@@ -110,6 +119,7 @@ class VisionPrescriptionLensSpecification extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'power' => [
@@ -119,6 +129,7 @@ class VisionPrescriptionLensSpecification extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'backCurve' => [
@@ -128,6 +139,7 @@ class VisionPrescriptionLensSpecification extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'diameter' => [
@@ -137,6 +149,7 @@ class VisionPrescriptionLensSpecification extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'duration' => [
@@ -146,6 +159,7 @@ class VisionPrescriptionLensSpecification extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'color' => [
@@ -155,6 +169,7 @@ class VisionPrescriptionLensSpecification extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'brand' => [
@@ -164,6 +179,7 @@ class VisionPrescriptionLensSpecification extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'note' => [
@@ -173,6 +189,7 @@ class VisionPrescriptionLensSpecification extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation',
             'variants'     => null,
         ],
     ];

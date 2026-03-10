@@ -32,6 +32,7 @@ class MedicinalProductAuthorizationProcedure extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -41,6 +42,7 @@ class MedicinalProductAuthorizationProcedure extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -50,6 +52,7 @@ class MedicinalProductAuthorizationProcedure extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'identifier' => [
@@ -59,6 +62,7 @@ class MedicinalProductAuthorizationProcedure extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -68,15 +72,17 @@ class MedicinalProductAuthorizationProcedure extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'dateX' => [
+        'date' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Period',
@@ -101,6 +107,7 @@ class MedicinalProductAuthorizationProcedure extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\MedicinalProductAuthorization\MedicinalProductAuthorizationProcedure',
             'variants'     => null,
         ],
     ];
@@ -121,7 +128,7 @@ class MedicinalProductAuthorizationProcedure extends BackboneElement
         /** @var CodeableConcept|null type Type of procedure */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?CodeableConcept $type = null,
-        /** @var Period|DateTimePrimitive|null dateX Date of procedure */
+        /** @var Period|DateTimePrimitive|null date Date of procedure */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -141,7 +148,7 @@ class MedicinalProductAuthorizationProcedure extends BackboneElement
                 ],
             ],
         )]
-        public Period|DateTimePrimitive|null $dateX = null,
+        public Period|DateTimePrimitive|null $date = null,
         /** @var array<MedicinalProductAuthorizationProcedure> application Applcations submitted to obtain a marketing authorization */
         #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex', isArray: true)]
         public array $application = [],

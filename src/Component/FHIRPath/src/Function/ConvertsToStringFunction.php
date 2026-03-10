@@ -47,6 +47,6 @@ final class ConvertsToStringFunction extends AbstractFunction
         }
 
         // Try the conversion and check if it succeeded (returns non-null)
-        return Collection::single(ToStringFunction::tryConvert($input->first()) !== null);
+        return Collection::single(ToStringFunction::tryConvert($context->normalizeValue($input->first())) !== null);
     }
 }

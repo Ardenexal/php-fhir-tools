@@ -26,6 +26,7 @@ class UnsignedIntPrimitive extends IntegerPrimitive
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -35,6 +36,7 @@ class UnsignedIntPrimitive extends IntegerPrimitive
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'value' => [
@@ -44,6 +46,7 @@ class UnsignedIntPrimitive extends IntegerPrimitive
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

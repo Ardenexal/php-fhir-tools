@@ -26,6 +26,7 @@ class AuditEventEntityDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -35,6 +36,7 @@ class AuditEventEntityDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -44,6 +46,7 @@ class AuditEventEntityDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -53,15 +56,17 @@ class AuditEventEntityDetail extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'valueX' => [
+        'value' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => true,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'string',
@@ -94,7 +99,7 @@ class AuditEventEntityDetail extends BackboneElement
         /** @var StringPrimitive|string|null type Name of the property */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $type = null,
-        /** @var StringPrimitive|string|Base64BinaryPrimitive|null valueX Property value */
+        /** @var StringPrimitive|string|Base64BinaryPrimitive|null value Property value */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -116,7 +121,7 @@ class AuditEventEntityDetail extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public StringPrimitive|string|Base64BinaryPrimitive|null $valueX = null,
+        public StringPrimitive|string|Base64BinaryPrimitive|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
 
 /**
  * Abstract base class for FHIRPath functions.
@@ -69,6 +70,25 @@ abstract class AbstractFunction implements FunctionInterface
         if ($count < $min) {
             throw new EvaluationException(sprintf('Function %s() expects at least %d parameter(s), %d given', $this->name, $min, $count), 0, 0);
         }
+    }
+
+    /**
+     * Extract a numeric value from a mixed input, handling FHIRPathDecimal wrappers.
+     *
+     * Returns int or float for plain PHP numerics, and float for FHIRPathDecimal
+     * (precision-sensitive operations should use FHIRPathDecimal directly).
+     */
+    protected function extractNumeric(mixed $value): int|float|null
+    {
+        if (is_int($value) || is_float($value)) {
+            return $value;
+        }
+
+        if ($value instanceof FHIRPathDecimal) {
+            return $value->toFloat();
+        }
+
+        return null;
     }
 
     /**

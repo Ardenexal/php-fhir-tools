@@ -101,11 +101,12 @@ class SerializationController extends AbstractController
             };
 
             $result = match ($action) {
-                'validate'      => $this->doValidate($object),
-                'json_to_xml'   => $this->doConvert($object, 'xml'),
-                'xml_to_json'   => $this->doConvert($object, 'json'),
-                'show_metadata' => $this->doMetadata($object),
-                default         => throw new \InvalidArgumentException(sprintf('Unknown action "%s"', $action)),
+                'validate'       => $this->doValidate($object),
+                'json_to_xml'    => $this->doConvert($object, 'xml'),
+                'xml_to_json'    => $this->doConvert($object, 'json'),
+                'show_metadata'  => $this->doMetadata($object),
+                'dump_structure' => $this->doDumpStructure($object),
+                default          => throw new \InvalidArgumentException(sprintf('Unknown action "%s"', $action)),
             };
         } catch (FHIRSerializationException $e) {
             $error = 'Serialization error: ' . $e->getMessage();
@@ -199,6 +200,15 @@ class SerializationController extends AbstractController
             'is_complex_type'  => $this->metadataExtractor->isComplexType($object),
             'parent_resource'  => $this->metadataExtractor->extractParentResource($object),
             'element_path'     => $this->metadataExtractor->extractElementPath($object),
+        ];
+    }
+
+    /** @return array<string, mixed> */
+    private function doDumpStructure(object $object): array
+    {
+        return [
+            'type'   => 'dump_structure',
+            'object' => $object,
         ];
     }
 

@@ -35,11 +35,13 @@ class LnFunction extends AbstractFunction
 
         $items = [];
         foreach ($input as $item) {
-            if (!is_numeric($item)) {
+            $item    = $context->normalizeValue($item);
+            $numeric = $this->extractNumeric($item);
+            if ($numeric === null) {
                 throw EvaluationException::invalidFunctionParameter('ln', 'numeric value', gettype($item));
             }
 
-            $value = (float) $item;
+            $value = (float) $numeric;
             if ($value <= 0) {
                 throw EvaluationException::invalidFunctionParameter('ln', 'positive number', 'number <= 0');
             }

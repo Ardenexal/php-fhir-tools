@@ -22,8 +22,11 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
  */
 final class ToTimeFunction extends AbstractFunction
 {
-    /** Matches Thh, Thh:mm, Thh:mm:ss, Thh:mm:ss.fff */
-    private const TIME_PATTERN = '/^T(?:[01]\d|2[0-3])(?::(?:[0-5]\d)(?::(?:[0-5]\d)(?:\.\d+)?)?)?$/';
+    /**
+     * Matches Thh, Thh:mm, Thh:mm:ss, Thh:mm:ss.fff (T prefix optional for string conversion).
+     * The FHIRPath spec accepts strings like '14', '14:34', '14:34:28' in addition to 'T14' etc.
+     */
+    private const TIME_PATTERN = '/^T?(?:[01]\d|2[0-3])(?::(?:[0-5]\d)(?::(?:[0-5]\d)(?:\.\d+)?)?)?$/';
 
     public function __construct()
     {
@@ -58,6 +61,7 @@ final class ToTimeFunction extends AbstractFunction
             return null;
         }
 
-        return $value;
+        // Normalise to canonical FHIRPath time format: ensure T prefix is present
+        return str_starts_with($value, 'T') ? $value : 'T' . $value;
     }
 }

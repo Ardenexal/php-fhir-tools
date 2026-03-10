@@ -51,7 +51,7 @@ final class IsDistinctFunction extends AbstractFunction
         $seen = []; // Track items we've already encountered
 
         foreach ($input as $item) {
-            $key = $this->itemKey($item);
+            $key = $this->itemKey($item, $context);
 
             if (isset($seen[$key])) {
                 // Found a duplicate - collection is NOT distinct
@@ -77,20 +77,24 @@ final class IsDistinctFunction extends AbstractFunction
      *
      * @return string A unique string identifier for this item
      */
-    private function itemKey(mixed $item): string
+    private function itemKey(mixed $item, EvaluationContext $context): string
     {
+        // Normalize FHIR primitive wrappers to their scalar values for key comparison
+        // so that two StringPrimitive('Peter') objects are treated as equal.
+        $normalized = $context->normalizeValue($item);
+
         // For simple values (strings, numbers, booleans, null), serialize them
-        if (is_scalar($item) || $item === null) {
-            return serialize($item);
+        if (is_scalar($normalized) || $normalized === null) {
+            return serialize($normalized);
         }
 
         // For objects, use PHP's built-in object hash (unique per object instance)
         // Two different object instances are considered different even if they have same properties
-        if (is_object($item)) {
-            return spl_object_hash($item);
+        if (is_object($normalized)) {
+            return spl_object_hash($normalized);
         }
 
         // For arrays and other types, serialize them
-        return serialize($item);
+        return serialize($normalized);
     }
 }

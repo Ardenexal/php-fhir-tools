@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
+use Ardenexal\FHIRTools\Component\FHIRPath\Expression\ExpressionNode;
 
 /**
  * FHIRPath combine() function.
@@ -33,7 +34,9 @@ class CombineFunction extends AbstractFunction
             throw new EvaluationException('Evaluator not available in context');
         }
 
-        $otherResult = $evaluator->evaluate($parameters[0], $context);
+        /** @var ExpressionNode $otherExpr */
+        $otherExpr   = $parameters[0];
+        $otherResult = $evaluator->evaluateWithContext($otherExpr, $context);
 
         // Combine keeps all items including duplicates
         $items = [];

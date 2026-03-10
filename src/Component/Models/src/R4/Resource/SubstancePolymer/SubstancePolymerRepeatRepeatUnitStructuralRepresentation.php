@@ -30,6 +30,7 @@ class SubstancePolymerRepeatRepeatUnitStructuralRepresentation extends BackboneE
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -39,6 +40,7 @@ class SubstancePolymerRepeatRepeatUnitStructuralRepresentation extends BackboneE
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -48,6 +50,7 @@ class SubstancePolymerRepeatRepeatUnitStructuralRepresentation extends BackboneE
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -57,6 +60,7 @@ class SubstancePolymerRepeatRepeatUnitStructuralRepresentation extends BackboneE
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'representation' => [
@@ -66,6 +70,7 @@ class SubstancePolymerRepeatRepeatUnitStructuralRepresentation extends BackboneE
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'attachment' => [
@@ -75,6 +80,7 @@ class SubstancePolymerRepeatRepeatUnitStructuralRepresentation extends BackboneE
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

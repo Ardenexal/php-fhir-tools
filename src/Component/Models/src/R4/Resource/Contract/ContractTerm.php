@@ -30,6 +30,7 @@ class ContractTerm extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -39,6 +40,7 @@ class ContractTerm extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -48,6 +50,7 @@ class ContractTerm extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'identifier' => [
@@ -57,6 +60,7 @@ class ContractTerm extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'issued' => [
@@ -66,6 +70,7 @@ class ContractTerm extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'applies' => [
@@ -75,15 +80,17 @@ class ContractTerm extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'topicX' => [
+        'topic' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'CodeableConcept',
@@ -108,6 +115,7 @@ class ContractTerm extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'subType' => [
@@ -117,6 +125,7 @@ class ContractTerm extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'text' => [
@@ -126,6 +135,7 @@ class ContractTerm extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'securityLabel' => [
@@ -135,6 +145,7 @@ class ContractTerm extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Contract\ContractTermSecurityLabel',
             'variants'     => null,
         ],
         'offer' => [
@@ -144,6 +155,7 @@ class ContractTerm extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'asset' => [
@@ -153,6 +165,7 @@ class ContractTerm extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Contract\ContractTermAsset',
             'variants'     => null,
         ],
         'action' => [
@@ -162,6 +175,7 @@ class ContractTerm extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Contract\ContractTermAction',
             'variants'     => null,
         ],
         'group' => [
@@ -171,6 +185,7 @@ class ContractTerm extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Contract\ContractTerm',
             'variants'     => null,
         ],
     ];
@@ -194,7 +209,7 @@ class ContractTerm extends BackboneElement
         /** @var Period|null applies Contract Term Effective Time */
         #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
         public ?Period $applies = null,
-        /** @var CodeableConcept|Reference|null topicX Term Concern */
+        /** @var CodeableConcept|Reference|null topic Term Concern */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -214,7 +229,7 @@ class ContractTerm extends BackboneElement
                 ],
             ],
         )]
-        public CodeableConcept|Reference|null $topicX = null,
+        public CodeableConcept|Reference|null $topic = null,
         /** @var CodeableConcept|null type Contract Term Type or Form */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $type = null,

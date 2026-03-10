@@ -29,6 +29,7 @@ class TriggerDefinition extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -38,6 +39,7 @@ class TriggerDefinition extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -47,6 +49,7 @@ class TriggerDefinition extends Element
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'name' => [
@@ -56,15 +59,17 @@ class TriggerDefinition extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'timingX' => [
+        'timing' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Timing',
@@ -103,6 +108,7 @@ class TriggerDefinition extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\DataRequirement',
             'variants'     => null,
         ],
         'condition' => [
@@ -112,6 +118,7 @@ class TriggerDefinition extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];
@@ -129,7 +136,7 @@ class TriggerDefinition extends Element
         /** @var StringPrimitive|string|null name Name or URI that identifies the event */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $name = null,
-        /** @var Timing|Reference|DatePrimitive|DateTimePrimitive|null timingX Timing of the event */
+        /** @var Timing|Reference|DatePrimitive|DateTimePrimitive|null timing Timing of the event */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -161,7 +168,7 @@ class TriggerDefinition extends Element
                 ],
             ],
         )]
-        public Timing|Reference|DatePrimitive|DateTimePrimitive|null $timingX = null,
+        public Timing|Reference|DatePrimitive|DateTimePrimitive|null $timing = null,
         /** @var array<DataRequirement> data Triggering data of the event (multiple = 'and') */
         #[FhirProperty(fhirType: 'DataRequirement', propertyKind: 'complex', isArray: true)]
         public array $data = [],

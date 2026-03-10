@@ -29,6 +29,7 @@ class QuestionnaireItemAnswerOption extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -38,6 +39,7 @@ class QuestionnaireItemAnswerOption extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -47,15 +49,17 @@ class QuestionnaireItemAnswerOption extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'valueX' => [
+        'value' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => true,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'integer',
@@ -108,6 +112,7 @@ class QuestionnaireItemAnswerOption extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];
@@ -122,7 +127,7 @@ class QuestionnaireItemAnswerOption extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
-        /** @var int|DatePrimitive|TimePrimitive|StringPrimitive|string|Coding|Reference|null valueX Answer value */
+        /** @var int|DatePrimitive|TimePrimitive|StringPrimitive|string|Coding|Reference|null value Answer value */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -163,7 +168,7 @@ class QuestionnaireItemAnswerOption extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public int|DatePrimitive|TimePrimitive|StringPrimitive|string|Coding|Reference|null $valueX = null,
+        public int|DatePrimitive|TimePrimitive|StringPrimitive|string|Coding|Reference|null $value = null,
         /** @var bool|null initialSelected Whether option is selected by default */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $initialSelected = null,

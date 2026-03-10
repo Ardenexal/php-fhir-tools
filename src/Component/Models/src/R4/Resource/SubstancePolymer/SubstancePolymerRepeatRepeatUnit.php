@@ -26,6 +26,7 @@ class SubstancePolymerRepeatRepeatUnit extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -35,6 +36,7 @@ class SubstancePolymerRepeatRepeatUnit extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -44,6 +46,7 @@ class SubstancePolymerRepeatRepeatUnit extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'orientationOfPolymerisation' => [
@@ -53,6 +56,7 @@ class SubstancePolymerRepeatRepeatUnit extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'repeatUnit' => [
@@ -62,6 +66,7 @@ class SubstancePolymerRepeatRepeatUnit extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'amount' => [
@@ -71,6 +76,7 @@ class SubstancePolymerRepeatRepeatUnit extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'degreeOfPolymerisation' => [
@@ -80,6 +86,7 @@ class SubstancePolymerRepeatRepeatUnit extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\SubstancePolymer\SubstancePolymerRepeatRepeatUnitDegreeOfPolymerisation',
             'variants'     => null,
         ],
         'structuralRepresentation' => [
@@ -89,6 +96,7 @@ class SubstancePolymerRepeatRepeatUnit extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\SubstancePolymer\SubstancePolymerRepeatRepeatUnitStructuralRepresentation',
             'variants'     => null,
         ],
     ];

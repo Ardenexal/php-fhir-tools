@@ -31,6 +31,7 @@ class MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength exte
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -40,6 +41,7 @@ class MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength exte
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -49,6 +51,7 @@ class MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength exte
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'substance' => [
@@ -58,6 +61,7 @@ class MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength exte
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'strength' => [
@@ -67,6 +71,7 @@ class MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength exte
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'strengthLowLimit' => [
@@ -76,6 +81,7 @@ class MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength exte
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'measurementPoint' => [
@@ -85,6 +91,7 @@ class MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength exte
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'country' => [
@@ -94,6 +101,7 @@ class MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength exte
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
             'variants'     => null,
         ],
     ];

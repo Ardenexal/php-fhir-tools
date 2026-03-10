@@ -28,6 +28,7 @@ class ClaimAccident extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -37,6 +38,7 @@ class ClaimAccident extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -46,6 +48,7 @@ class ClaimAccident extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'date' => [
@@ -55,6 +58,7 @@ class ClaimAccident extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -64,15 +68,17 @@ class ClaimAccident extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'locationX' => [
+        'location' => [
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Address',
@@ -108,7 +114,7 @@ class ClaimAccident extends BackboneElement
         /** @var CodeableConcept|null type The nature of the accident */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $type = null,
-        /** @var Address|Reference|null locationX Where the event occurred */
+        /** @var Address|Reference|null location Where the event occurred */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -128,7 +134,7 @@ class ClaimAccident extends BackboneElement
                 ],
             ],
         )]
-        public Address|Reference|null $locationX = null,
+        public Address|Reference|null $location = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

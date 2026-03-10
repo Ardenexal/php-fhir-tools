@@ -18,6 +18,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Expression\UnaryOperatorNode;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\FHIRPathLexer;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\FHIRPathParser;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\TokenType;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -64,7 +65,9 @@ class FHIRPathParserTest extends TestCase
         $ast    = $this->parser->parse($tokens);
 
         self::assertInstanceOf(LiteralNode::class, $ast);
-        self::assertEquals(3.14, $ast->getValue());
+        // Decimal literals are now wrapped in FHIRPathDecimal for bcmath precision
+        self::assertInstanceOf(FHIRPathDecimal::class, $ast->getValue());
+        self::assertSame('3.14', $ast->getValue()->value);
     }
 
     public function testParseBooleanLiteral(): void
