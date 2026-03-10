@@ -1,6 +1,6 @@
 {
     "name": "ardenexal/fhir-serialization",
-    "version": "0.0.3",
+    "version": "0.1.2",
     "description": "PHP library for FHIR JSON serialization, deserialization, and validation",
     "type": "library",
     "license": "MIT",
