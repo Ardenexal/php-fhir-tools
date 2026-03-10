@@ -87,6 +87,6 @@ final class DescendantsFunction extends AbstractFunction
             }
         }
 
-        return Collection::from($result);
+        return Collection::unordered($result);
     }
 }

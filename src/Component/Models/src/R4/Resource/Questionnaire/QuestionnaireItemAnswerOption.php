@@ -29,6 +29,7 @@ class QuestionnaireItemAnswerOption extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -38,6 +39,7 @@ class QuestionnaireItemAnswerOption extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -47,6 +49,7 @@ class QuestionnaireItemAnswerOption extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'value' => [
@@ -56,6 +59,7 @@ class QuestionnaireItemAnswerOption extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'integer',
@@ -108,6 +112,7 @@ class QuestionnaireItemAnswerOption extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

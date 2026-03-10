@@ -29,6 +29,7 @@ class Annotation extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -38,6 +39,7 @@ class Annotation extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'author' => [
@@ -47,6 +49,7 @@ class Annotation extends Element
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Reference',
@@ -71,6 +74,7 @@ class Annotation extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'text' => [
@@ -80,6 +84,7 @@ class Annotation extends Element
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

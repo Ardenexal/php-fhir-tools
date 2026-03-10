@@ -49,6 +49,7 @@ class NutritionOrderResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'meta' => [
@@ -58,6 +59,7 @@ class NutritionOrderResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'implicitRules' => [
@@ -67,6 +69,7 @@ class NutritionOrderResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'language' => [
@@ -76,6 +79,7 @@ class NutritionOrderResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'text' => [
@@ -85,6 +89,7 @@ class NutritionOrderResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'contained' => [
@@ -94,6 +99,7 @@ class NutritionOrderResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -103,6 +109,7 @@ class NutritionOrderResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -112,6 +119,7 @@ class NutritionOrderResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'identifier' => [
@@ -121,6 +129,7 @@ class NutritionOrderResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
             'variants'     => null,
         ],
         'instantiatesCanonical' => [
@@ -130,6 +139,7 @@ class NutritionOrderResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'instantiatesUri' => [
@@ -139,6 +149,7 @@ class NutritionOrderResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'instantiates' => [
@@ -148,6 +159,7 @@ class NutritionOrderResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'basedOn' => [
@@ -157,6 +169,7 @@ class NutritionOrderResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
             'variants'     => null,
         ],
         'groupIdentifier' => [
@@ -166,6 +179,7 @@ class NutritionOrderResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'status' => [
@@ -175,6 +189,7 @@ class NutritionOrderResource extends DomainResourceResource
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'intent' => [
@@ -184,6 +199,7 @@ class NutritionOrderResource extends DomainResourceResource
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'priority' => [
@@ -193,6 +209,7 @@ class NutritionOrderResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'subject' => [
@@ -202,6 +219,7 @@ class NutritionOrderResource extends DomainResourceResource
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'encounter' => [
@@ -211,6 +229,7 @@ class NutritionOrderResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'supportingInformation' => [
@@ -220,6 +239,7 @@ class NutritionOrderResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
             'variants'     => null,
         ],
         'dateTime' => [
@@ -229,6 +249,7 @@ class NutritionOrderResource extends DomainResourceResource
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'orderer' => [
@@ -238,6 +259,7 @@ class NutritionOrderResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'performer' => [
@@ -247,6 +269,7 @@ class NutritionOrderResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
             'variants'     => null,
         ],
         'allergyIntolerance' => [
@@ -256,6 +279,7 @@ class NutritionOrderResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
             'variants'     => null,
         ],
         'foodPreferenceModifier' => [
@@ -265,6 +289,7 @@ class NutritionOrderResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'excludeFoodModifier' => [
@@ -274,6 +299,7 @@ class NutritionOrderResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'outsideFoodAllowed' => [
@@ -283,6 +309,7 @@ class NutritionOrderResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'oralDiet' => [
@@ -292,6 +319,7 @@ class NutritionOrderResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'supplement' => [
@@ -301,6 +329,7 @@ class NutritionOrderResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\NutritionOrder\NutritionOrderSupplement',
             'variants'     => null,
         ],
         'enteralFormula' => [
@@ -310,6 +339,7 @@ class NutritionOrderResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'note' => [
@@ -319,6 +349,7 @@ class NutritionOrderResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation',
             'variants'     => null,
         ],
     ];

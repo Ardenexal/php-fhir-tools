@@ -25,6 +25,7 @@ class MedicinalProductPackagedBatchIdentifier extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -34,6 +35,7 @@ class MedicinalProductPackagedBatchIdentifier extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -43,6 +45,7 @@ class MedicinalProductPackagedBatchIdentifier extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'outerPackaging' => [
@@ -52,6 +55,7 @@ class MedicinalProductPackagedBatchIdentifier extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'immediatePackaging' => [
@@ -61,6 +65,7 @@ class MedicinalProductPackagedBatchIdentifier extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

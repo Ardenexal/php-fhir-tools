@@ -33,6 +33,7 @@ class AuditEventEntityDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -42,6 +43,7 @@ class AuditEventEntityDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -51,6 +53,7 @@ class AuditEventEntityDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -60,6 +63,7 @@ class AuditEventEntityDetail extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'value' => [
@@ -69,6 +73,7 @@ class AuditEventEntityDetail extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Quantity',

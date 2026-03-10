@@ -42,6 +42,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'meta' => [
@@ -51,6 +52,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'implicitRules' => [
@@ -60,6 +62,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'language' => [
@@ -69,6 +72,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'text' => [
@@ -78,6 +82,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'contained' => [
@@ -87,6 +92,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -96,6 +102,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -105,6 +112,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'identifier' => [
@@ -114,6 +122,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
             'variants'     => null,
         ],
         'title' => [
@@ -123,6 +132,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'protocol' => [
@@ -132,6 +142,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
             'variants'     => null,
         ],
         'partOf' => [
@@ -141,6 +152,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
             'variants'     => null,
         ],
         'status' => [
@@ -150,6 +162,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'primaryPurposeType' => [
@@ -159,6 +172,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'phase' => [
@@ -168,6 +182,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'category' => [
@@ -177,6 +192,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'focus' => [
@@ -186,6 +202,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'condition' => [
@@ -195,6 +212,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'contact' => [
@@ -204,6 +222,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactDetail',
             'variants'     => null,
         ],
         'relatedArtifact' => [
@@ -213,6 +232,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\RelatedArtifact',
             'variants'     => null,
         ],
         'keyword' => [
@@ -222,6 +242,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'location' => [
@@ -231,6 +252,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'description' => [
@@ -240,6 +262,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'enrollment' => [
@@ -249,6 +272,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
             'variants'     => null,
         ],
         'period' => [
@@ -258,6 +282,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'sponsor' => [
@@ -267,6 +292,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'principalInvestigator' => [
@@ -276,6 +302,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'site' => [
@@ -285,6 +312,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
             'variants'     => null,
         ],
         'reasonStopped' => [
@@ -294,6 +322,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'note' => [
@@ -303,6 +332,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation',
             'variants'     => null,
         ],
         'arm' => [
@@ -312,6 +342,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ResearchStudy\ResearchStudyArm',
             'variants'     => null,
         ],
         'objective' => [
@@ -321,6 +352,7 @@ class ResearchStudyResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ResearchStudy\ResearchStudyObjective',
             'variants'     => null,
         ],
     ];

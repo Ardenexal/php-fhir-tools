@@ -41,6 +41,7 @@ class AdministrableProductDefinitionResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'meta' => [
@@ -50,6 +51,7 @@ class AdministrableProductDefinitionResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'implicitRules' => [
@@ -59,6 +61,7 @@ class AdministrableProductDefinitionResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'language' => [
@@ -68,6 +71,7 @@ class AdministrableProductDefinitionResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'text' => [
@@ -77,6 +81,7 @@ class AdministrableProductDefinitionResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'contained' => [
@@ -86,6 +91,7 @@ class AdministrableProductDefinitionResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -95,6 +101,7 @@ class AdministrableProductDefinitionResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -104,6 +111,7 @@ class AdministrableProductDefinitionResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'identifier' => [
@@ -113,6 +121,7 @@ class AdministrableProductDefinitionResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier',
             'variants'     => null,
         ],
         'status' => [
@@ -122,6 +131,7 @@ class AdministrableProductDefinitionResource extends DomainResourceResource
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'formOf' => [
@@ -131,6 +141,7 @@ class AdministrableProductDefinitionResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
             'variants'     => null,
         ],
         'administrableDoseForm' => [
@@ -140,6 +151,7 @@ class AdministrableProductDefinitionResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'unitOfPresentation' => [
@@ -149,6 +161,7 @@ class AdministrableProductDefinitionResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'producedFrom' => [
@@ -158,6 +171,7 @@ class AdministrableProductDefinitionResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
             'variants'     => null,
         ],
         'ingredient' => [
@@ -167,6 +181,7 @@ class AdministrableProductDefinitionResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'device' => [
@@ -176,6 +191,7 @@ class AdministrableProductDefinitionResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'property' => [
@@ -185,6 +201,7 @@ class AdministrableProductDefinitionResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\AdministrableProductDefinition\AdministrableProductDefinitionProperty',
             'variants'     => null,
         ],
         'routeOfAdministration' => [
@@ -194,6 +211,7 @@ class AdministrableProductDefinitionResource extends DomainResourceResource
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\AdministrableProductDefinition\AdministrableProductDefinitionRouteOfAdministration',
             'variants'     => null,
         ],
     ];

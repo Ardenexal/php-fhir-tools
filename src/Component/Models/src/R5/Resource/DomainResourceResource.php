@@ -35,6 +35,7 @@ abstract class DomainResourceResource extends ResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'meta' => [
@@ -44,6 +45,7 @@ abstract class DomainResourceResource extends ResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'implicitRules' => [
@@ -53,6 +55,7 @@ abstract class DomainResourceResource extends ResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'language' => [
@@ -62,6 +65,7 @@ abstract class DomainResourceResource extends ResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'text' => [
@@ -71,6 +75,7 @@ abstract class DomainResourceResource extends ResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'contained' => [
@@ -80,6 +85,7 @@ abstract class DomainResourceResource extends ResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -89,6 +95,7 @@ abstract class DomainResourceResource extends ResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -98,6 +105,7 @@ abstract class DomainResourceResource extends ResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

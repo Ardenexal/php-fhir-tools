@@ -32,6 +32,7 @@ class CapabilityStatementRestResource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -41,6 +42,7 @@ class CapabilityStatementRestResource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -50,6 +52,7 @@ class CapabilityStatementRestResource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -59,6 +62,7 @@ class CapabilityStatementRestResource extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'profile' => [
@@ -68,6 +72,7 @@ class CapabilityStatementRestResource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'supportedProfile' => [
@@ -77,6 +82,7 @@ class CapabilityStatementRestResource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'documentation' => [
@@ -86,6 +92,7 @@ class CapabilityStatementRestResource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'interaction' => [
@@ -95,6 +102,7 @@ class CapabilityStatementRestResource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\CapabilityStatement\CapabilityStatementRestResourceInteraction',
             'variants'     => null,
         ],
         'versioning' => [
@@ -104,6 +112,7 @@ class CapabilityStatementRestResource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'readHistory' => [
@@ -113,6 +122,7 @@ class CapabilityStatementRestResource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'updateCreate' => [
@@ -122,6 +132,7 @@ class CapabilityStatementRestResource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'conditionalCreate' => [
@@ -131,6 +142,7 @@ class CapabilityStatementRestResource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'conditionalRead' => [
@@ -140,6 +152,7 @@ class CapabilityStatementRestResource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'conditionalUpdate' => [
@@ -149,6 +162,7 @@ class CapabilityStatementRestResource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'conditionalDelete' => [
@@ -158,6 +172,7 @@ class CapabilityStatementRestResource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'referencePolicy' => [
@@ -167,6 +182,7 @@ class CapabilityStatementRestResource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'searchInclude' => [
@@ -176,6 +192,7 @@ class CapabilityStatementRestResource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'searchRevInclude' => [
@@ -185,6 +202,7 @@ class CapabilityStatementRestResource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'searchParam' => [
@@ -194,6 +212,7 @@ class CapabilityStatementRestResource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\CapabilityStatement\CapabilityStatementRestResourceSearchParam',
             'variants'     => null,
         ],
         'operation' => [
@@ -203,6 +222,7 @@ class CapabilityStatementRestResource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\CapabilityStatement\CapabilityStatementRestResourceOperation',
             'variants'     => null,
         ],
     ];

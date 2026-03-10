@@ -47,6 +47,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'meta' => [
@@ -56,6 +57,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'implicitRules' => [
@@ -65,6 +67,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'language' => [
@@ -74,6 +77,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'text' => [
@@ -83,6 +87,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'contained' => [
@@ -92,6 +97,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -101,6 +107,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -110,6 +117,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'url' => [
@@ -119,6 +127,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'identifier' => [
@@ -128,6 +137,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
             'variants'     => null,
         ],
         'version' => [
@@ -137,6 +147,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'versionAlgorithm' => [
@@ -146,6 +157,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'string',
@@ -170,6 +182,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'title' => [
@@ -179,6 +192,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'subtitle' => [
@@ -188,6 +202,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'status' => [
@@ -197,6 +212,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'experimental' => [
@@ -206,6 +222,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -215,6 +232,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'subject' => [
@@ -224,6 +242,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'CodeableConcept',
@@ -248,6 +267,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'publisher' => [
@@ -257,6 +277,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'contact' => [
@@ -266,6 +287,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
             'variants'     => null,
         ],
         'description' => [
@@ -275,6 +297,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'useContext' => [
@@ -284,6 +307,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\UsageContext',
             'variants'     => null,
         ],
         'jurisdiction' => [
@@ -293,6 +317,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'purpose' => [
@@ -302,6 +327,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'usage' => [
@@ -311,6 +337,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'copyright' => [
@@ -320,6 +347,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'copyrightLabel' => [
@@ -329,6 +357,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'approvalDate' => [
@@ -338,6 +367,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'lastReviewDate' => [
@@ -347,6 +377,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'effectivePeriod' => [
@@ -356,6 +387,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'topic' => [
@@ -365,6 +397,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'author' => [
@@ -374,6 +407,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
             'variants'     => null,
         ],
         'editor' => [
@@ -383,6 +417,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
             'variants'     => null,
         ],
         'reviewer' => [
@@ -392,6 +427,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
             'variants'     => null,
         ],
         'endorser' => [
@@ -401,6 +437,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
             'variants'     => null,
         ],
         'relatedArtifact' => [
@@ -410,6 +447,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\RelatedArtifact',
             'variants'     => null,
         ],
         'parameter' => [
@@ -419,6 +457,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ParameterDefinition',
             'variants'     => null,
         ],
         'dataRequirement' => [
@@ -428,6 +467,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\DataRequirement',
             'variants'     => null,
         ],
         'content' => [
@@ -437,6 +477,7 @@ class LibraryResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Attachment',
             'variants'     => null,
         ],
     ];

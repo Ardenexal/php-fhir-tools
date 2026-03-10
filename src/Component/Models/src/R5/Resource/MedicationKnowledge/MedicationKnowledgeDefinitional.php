@@ -25,6 +25,7 @@ class MedicationKnowledgeDefinitional extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -34,6 +35,7 @@ class MedicationKnowledgeDefinitional extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -43,6 +45,7 @@ class MedicationKnowledgeDefinitional extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'definition' => [
@@ -52,6 +55,7 @@ class MedicationKnowledgeDefinitional extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
             'variants'     => null,
         ],
         'doseForm' => [
@@ -61,6 +65,7 @@ class MedicationKnowledgeDefinitional extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'intendedRoute' => [
@@ -70,6 +75,7 @@ class MedicationKnowledgeDefinitional extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'ingredient' => [
@@ -79,6 +85,7 @@ class MedicationKnowledgeDefinitional extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\MedicationKnowledge\MedicationKnowledgeDefinitionalIngredient',
             'variants'     => null,
         ],
         'drugCharacteristic' => [
@@ -88,6 +95,7 @@ class MedicationKnowledgeDefinitional extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\MedicationKnowledge\MedicationKnowledgeDefinitionalDrugCharacteristic',
             'variants'     => null,
         ],
     ];

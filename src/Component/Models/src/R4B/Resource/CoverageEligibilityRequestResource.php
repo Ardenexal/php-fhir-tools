@@ -46,6 +46,7 @@ class CoverageEligibilityRequestResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'meta' => [
@@ -55,6 +56,7 @@ class CoverageEligibilityRequestResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'implicitRules' => [
@@ -64,6 +66,7 @@ class CoverageEligibilityRequestResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'language' => [
@@ -73,6 +76,7 @@ class CoverageEligibilityRequestResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'text' => [
@@ -82,6 +86,7 @@ class CoverageEligibilityRequestResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'contained' => [
@@ -91,6 +96,7 @@ class CoverageEligibilityRequestResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -100,6 +106,7 @@ class CoverageEligibilityRequestResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -109,6 +116,7 @@ class CoverageEligibilityRequestResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'identifier' => [
@@ -118,6 +126,7 @@ class CoverageEligibilityRequestResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier',
             'variants'     => null,
         ],
         'status' => [
@@ -127,6 +136,7 @@ class CoverageEligibilityRequestResource extends DomainResourceResource
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'priority' => [
@@ -136,6 +146,7 @@ class CoverageEligibilityRequestResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'purpose' => [
@@ -145,6 +156,7 @@ class CoverageEligibilityRequestResource extends DomainResourceResource
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'patient' => [
@@ -154,6 +166,7 @@ class CoverageEligibilityRequestResource extends DomainResourceResource
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'serviced' => [
@@ -163,6 +176,7 @@ class CoverageEligibilityRequestResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'date',
@@ -187,6 +201,7 @@ class CoverageEligibilityRequestResource extends DomainResourceResource
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'enterer' => [
@@ -196,6 +211,7 @@ class CoverageEligibilityRequestResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'provider' => [
@@ -205,6 +221,7 @@ class CoverageEligibilityRequestResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'insurer' => [
@@ -214,6 +231,7 @@ class CoverageEligibilityRequestResource extends DomainResourceResource
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'facility' => [
@@ -223,6 +241,7 @@ class CoverageEligibilityRequestResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'supportingInfo' => [
@@ -232,6 +251,7 @@ class CoverageEligibilityRequestResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\CoverageEligibilityRequest\CoverageEligibilityRequestSupportingInfo',
             'variants'     => null,
         ],
         'insurance' => [
@@ -241,6 +261,7 @@ class CoverageEligibilityRequestResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\CoverageEligibilityRequest\CoverageEligibilityRequestInsurance',
             'variants'     => null,
         ],
         'item' => [
@@ -250,6 +271,7 @@ class CoverageEligibilityRequestResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\CoverageEligibilityRequest\CoverageEligibilityRequestItem',
             'variants'     => null,
         ],
     ];

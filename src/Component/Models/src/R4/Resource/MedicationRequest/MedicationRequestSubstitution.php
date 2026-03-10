@@ -25,6 +25,7 @@ class MedicationRequestSubstitution extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -34,6 +35,7 @@ class MedicationRequestSubstitution extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -43,6 +45,7 @@ class MedicationRequestSubstitution extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'allowed' => [
@@ -52,6 +55,7 @@ class MedicationRequestSubstitution extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'boolean',
@@ -76,6 +80,7 @@ class MedicationRequestSubstitution extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

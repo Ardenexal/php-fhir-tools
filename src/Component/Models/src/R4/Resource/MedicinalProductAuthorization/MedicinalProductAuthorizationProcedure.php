@@ -32,6 +32,7 @@ class MedicinalProductAuthorizationProcedure extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -41,6 +42,7 @@ class MedicinalProductAuthorizationProcedure extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -50,6 +52,7 @@ class MedicinalProductAuthorizationProcedure extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'identifier' => [
@@ -59,6 +62,7 @@ class MedicinalProductAuthorizationProcedure extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -68,6 +72,7 @@ class MedicinalProductAuthorizationProcedure extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'date' => [
@@ -77,6 +82,7 @@ class MedicinalProductAuthorizationProcedure extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Period',
@@ -101,6 +107,7 @@ class MedicinalProductAuthorizationProcedure extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\MedicinalProductAuthorization\MedicinalProductAuthorizationProcedure',
             'variants'     => null,
         ],
     ];

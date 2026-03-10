@@ -23,6 +23,7 @@ class ElementDefinitionSlicing extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -32,6 +33,7 @@ class ElementDefinitionSlicing extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'discriminator' => [
@@ -41,6 +43,7 @@ class ElementDefinitionSlicing extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\ElementDefinitionSlicingDiscriminator',
             'variants'     => null,
         ],
         'description' => [
@@ -50,6 +53,7 @@ class ElementDefinitionSlicing extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'ordered' => [
@@ -59,6 +63,7 @@ class ElementDefinitionSlicing extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'rules' => [
@@ -68,6 +73,7 @@ class ElementDefinitionSlicing extends Element
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

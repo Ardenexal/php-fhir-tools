@@ -27,6 +27,7 @@ class AppointmentRecurrenceTemplate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -36,6 +37,7 @@ class AppointmentRecurrenceTemplate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -45,6 +47,7 @@ class AppointmentRecurrenceTemplate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'timezone' => [
@@ -54,6 +57,7 @@ class AppointmentRecurrenceTemplate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'recurrenceType' => [
@@ -63,6 +67,7 @@ class AppointmentRecurrenceTemplate extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'lastOccurrenceDate' => [
@@ -72,6 +77,7 @@ class AppointmentRecurrenceTemplate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'occurrenceCount' => [
@@ -81,6 +87,7 @@ class AppointmentRecurrenceTemplate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'occurrenceDate' => [
@@ -90,6 +97,7 @@ class AppointmentRecurrenceTemplate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'weeklyTemplate' => [
@@ -99,6 +107,7 @@ class AppointmentRecurrenceTemplate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'monthlyTemplate' => [
@@ -108,6 +117,7 @@ class AppointmentRecurrenceTemplate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'yearlyTemplate' => [
@@ -117,6 +127,7 @@ class AppointmentRecurrenceTemplate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'excludingDate' => [
@@ -126,6 +137,7 @@ class AppointmentRecurrenceTemplate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'excludingRecurrenceId' => [
@@ -135,6 +147,7 @@ class AppointmentRecurrenceTemplate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

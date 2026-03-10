@@ -26,6 +26,7 @@ class ClinicalUseDefinitionContraindication extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -35,6 +36,7 @@ class ClinicalUseDefinitionContraindication extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -44,6 +46,7 @@ class ClinicalUseDefinitionContraindication extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'diseaseSymptomProcedure' => [
@@ -53,6 +56,7 @@ class ClinicalUseDefinitionContraindication extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'diseaseStatus' => [
@@ -62,6 +66,7 @@ class ClinicalUseDefinitionContraindication extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'comorbidity' => [
@@ -71,6 +76,7 @@ class ClinicalUseDefinitionContraindication extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
             'variants'     => null,
         ],
         'indication' => [
@@ -80,6 +86,7 @@ class ClinicalUseDefinitionContraindication extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
             'variants'     => null,
         ],
         'applicability' => [
@@ -89,6 +96,7 @@ class ClinicalUseDefinitionContraindication extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'otherTherapy' => [
@@ -98,6 +106,7 @@ class ClinicalUseDefinitionContraindication extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ClinicalUseDefinition\ClinicalUseDefinitionContraindicationOtherTherapy',
             'variants'     => null,
         ],
     ];

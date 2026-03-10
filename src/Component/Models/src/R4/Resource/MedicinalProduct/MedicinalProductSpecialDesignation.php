@@ -27,6 +27,7 @@ class MedicinalProductSpecialDesignation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -36,6 +37,7 @@ class MedicinalProductSpecialDesignation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -45,6 +47,7 @@ class MedicinalProductSpecialDesignation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'identifier' => [
@@ -54,6 +57,7 @@ class MedicinalProductSpecialDesignation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
             'variants'     => null,
         ],
         'type' => [
@@ -63,6 +67,7 @@ class MedicinalProductSpecialDesignation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'intendedUse' => [
@@ -72,6 +77,7 @@ class MedicinalProductSpecialDesignation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'indication' => [
@@ -81,6 +87,7 @@ class MedicinalProductSpecialDesignation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'CodeableConcept',
@@ -105,6 +112,7 @@ class MedicinalProductSpecialDesignation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'date' => [
@@ -114,6 +122,7 @@ class MedicinalProductSpecialDesignation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'species' => [
@@ -123,6 +132,7 @@ class MedicinalProductSpecialDesignation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

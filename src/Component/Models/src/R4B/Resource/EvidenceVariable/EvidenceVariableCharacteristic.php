@@ -30,6 +30,7 @@ class EvidenceVariableCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -39,6 +40,7 @@ class EvidenceVariableCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -48,6 +50,7 @@ class EvidenceVariableCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'description' => [
@@ -57,6 +60,7 @@ class EvidenceVariableCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'definition' => [
@@ -66,6 +70,7 @@ class EvidenceVariableCharacteristic extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Reference',
@@ -104,6 +109,7 @@ class EvidenceVariableCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'device' => [
@@ -113,6 +119,7 @@ class EvidenceVariableCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'exclude' => [
@@ -122,6 +129,7 @@ class EvidenceVariableCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'timeFromStart' => [
@@ -131,6 +139,7 @@ class EvidenceVariableCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'groupMeasure' => [
@@ -140,6 +149,7 @@ class EvidenceVariableCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

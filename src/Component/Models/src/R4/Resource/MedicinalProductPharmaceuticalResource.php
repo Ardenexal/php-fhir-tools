@@ -40,6 +40,7 @@ class MedicinalProductPharmaceuticalResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'meta' => [
@@ -49,6 +50,7 @@ class MedicinalProductPharmaceuticalResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'implicitRules' => [
@@ -58,6 +60,7 @@ class MedicinalProductPharmaceuticalResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'language' => [
@@ -67,6 +70,7 @@ class MedicinalProductPharmaceuticalResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'text' => [
@@ -76,6 +80,7 @@ class MedicinalProductPharmaceuticalResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'contained' => [
@@ -85,6 +90,7 @@ class MedicinalProductPharmaceuticalResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -94,6 +100,7 @@ class MedicinalProductPharmaceuticalResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -103,6 +110,7 @@ class MedicinalProductPharmaceuticalResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'identifier' => [
@@ -112,6 +120,7 @@ class MedicinalProductPharmaceuticalResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
             'variants'     => null,
         ],
         'administrableDoseForm' => [
@@ -121,6 +130,7 @@ class MedicinalProductPharmaceuticalResource extends DomainResourceResource
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'unitOfPresentation' => [
@@ -130,6 +140,7 @@ class MedicinalProductPharmaceuticalResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'ingredient' => [
@@ -139,6 +150,7 @@ class MedicinalProductPharmaceuticalResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
             'variants'     => null,
         ],
         'device' => [
@@ -148,6 +160,7 @@ class MedicinalProductPharmaceuticalResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
             'variants'     => null,
         ],
         'characteristics' => [
@@ -157,6 +170,7 @@ class MedicinalProductPharmaceuticalResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\MedicinalProductPharmaceutical\MedicinalProductPharmaceuticalCharacteristics',
             'variants'     => null,
         ],
         'routeOfAdministration' => [
@@ -166,6 +180,7 @@ class MedicinalProductPharmaceuticalResource extends DomainResourceResource
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\MedicinalProductPharmaceutical\MedicinalProductPharmaceuticalRouteOfAdministration',
             'variants'     => null,
         ],
     ];

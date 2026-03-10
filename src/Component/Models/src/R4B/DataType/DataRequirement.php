@@ -29,6 +29,7 @@ class DataRequirement extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -38,6 +39,7 @@ class DataRequirement extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -47,6 +49,7 @@ class DataRequirement extends Element
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'profile' => [
@@ -56,6 +59,7 @@ class DataRequirement extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'subject' => [
@@ -65,6 +69,7 @@ class DataRequirement extends Element
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'CodeableConcept',
@@ -89,6 +94,7 @@ class DataRequirement extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'codeFilter' => [
@@ -98,6 +104,7 @@ class DataRequirement extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\DataRequirementCodeFilter',
             'variants'     => null,
         ],
         'dateFilter' => [
@@ -107,6 +114,7 @@ class DataRequirement extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\DataRequirementDateFilter',
             'variants'     => null,
         ],
         'limit' => [
@@ -116,6 +124,7 @@ class DataRequirement extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'sort' => [
@@ -125,6 +134,7 @@ class DataRequirement extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\DataRequirementSort',
             'variants'     => null,
         ],
     ];

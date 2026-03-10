@@ -45,6 +45,7 @@ class MedicationStatementResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'meta' => [
@@ -54,6 +55,7 @@ class MedicationStatementResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'implicitRules' => [
@@ -63,6 +65,7 @@ class MedicationStatementResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'language' => [
@@ -72,6 +75,7 @@ class MedicationStatementResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'text' => [
@@ -81,6 +85,7 @@ class MedicationStatementResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'contained' => [
@@ -90,6 +95,7 @@ class MedicationStatementResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -99,6 +105,7 @@ class MedicationStatementResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -108,6 +115,7 @@ class MedicationStatementResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'identifier' => [
@@ -117,6 +125,7 @@ class MedicationStatementResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
             'variants'     => null,
         ],
         'basedOn' => [
@@ -126,6 +135,7 @@ class MedicationStatementResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
             'variants'     => null,
         ],
         'partOf' => [
@@ -135,6 +145,7 @@ class MedicationStatementResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
             'variants'     => null,
         ],
         'status' => [
@@ -144,6 +155,7 @@ class MedicationStatementResource extends DomainResourceResource
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'statusReason' => [
@@ -153,6 +165,7 @@ class MedicationStatementResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'category' => [
@@ -162,6 +175,7 @@ class MedicationStatementResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'medication' => [
@@ -171,6 +185,7 @@ class MedicationStatementResource extends DomainResourceResource
             'isRequired'   => true,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'CodeableConcept',
@@ -195,6 +210,7 @@ class MedicationStatementResource extends DomainResourceResource
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'context' => [
@@ -204,6 +220,7 @@ class MedicationStatementResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'effective' => [
@@ -213,6 +230,7 @@ class MedicationStatementResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'dateTime',
@@ -237,6 +255,7 @@ class MedicationStatementResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'informationSource' => [
@@ -246,6 +265,7 @@ class MedicationStatementResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'derivedFrom' => [
@@ -255,6 +275,7 @@ class MedicationStatementResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
             'variants'     => null,
         ],
         'reasonCode' => [
@@ -264,6 +285,7 @@ class MedicationStatementResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'reasonReference' => [
@@ -273,6 +295,7 @@ class MedicationStatementResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
             'variants'     => null,
         ],
         'note' => [
@@ -282,6 +305,7 @@ class MedicationStatementResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation',
             'variants'     => null,
         ],
         'dosage' => [
@@ -291,6 +315,7 @@ class MedicationStatementResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Dosage',
             'variants'     => null,
         ],
     ];

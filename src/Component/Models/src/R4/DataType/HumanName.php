@@ -9,9 +9,9 @@ use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 
 /**
- * @author HL7 FHIR Standard
+ * @author      HL7 FHIR Standard
  *
- * @see http://hl7.org/fhir/StructureDefinition/HumanName
+ * @see         http://hl7.org/fhir/StructureDefinition/HumanName
  *
  * @description A human's name with the ability to identify parts and usage.
  */
@@ -19,13 +19,14 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 class HumanName extends Element
 {
     public const FHIR_PROPERTY_MAP = [
-        'id' => [
+        'id'        => [
             'fhirType'     => 'http://hl7.org/fhirpath/System.String',
             'propertyKind' => 'scalar',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -35,69 +36,77 @@ class HumanName extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'use' => [
+        'use'       => [
             'fhirType'     => 'code',
             'propertyKind' => 'primitive',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'text' => [
+        'text'      => [
             'fhirType'     => 'string',
             'propertyKind' => 'primitive',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'family' => [
+        'family'    => [
             'fhirType'     => 'string',
             'propertyKind' => 'primitive',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'given' => [
+        'given'     => [
             'fhirType'     => 'string',
             'propertyKind' => 'primitive',
             'isArray'      => true,
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'prefix' => [
+        'prefix'    => [
             'fhirType'     => 'string',
             'propertyKind' => 'primitive',
             'isArray'      => true,
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'suffix' => [
+        'suffix'    => [
             'fhirType'     => 'string',
             'propertyKind' => 'primitive',
             'isArray'      => true,
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
-        'period' => [
+        'period'    => [
             'fhirType'     => 'Period',
             'propertyKind' => 'complex',
             'isArray'      => false,
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

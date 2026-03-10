@@ -31,6 +31,7 @@ class CitationCitedArtifactRelatesTo extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -40,6 +41,7 @@ class CitationCitedArtifactRelatesTo extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -49,6 +51,7 @@ class CitationCitedArtifactRelatesTo extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -58,6 +61,7 @@ class CitationCitedArtifactRelatesTo extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'classifier' => [
@@ -67,6 +71,7 @@ class CitationCitedArtifactRelatesTo extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'label' => [
@@ -76,6 +81,7 @@ class CitationCitedArtifactRelatesTo extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'display' => [
@@ -85,6 +91,7 @@ class CitationCitedArtifactRelatesTo extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'citation' => [
@@ -94,6 +101,7 @@ class CitationCitedArtifactRelatesTo extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'document' => [
@@ -103,6 +111,7 @@ class CitationCitedArtifactRelatesTo extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'resource' => [
@@ -112,6 +121,7 @@ class CitationCitedArtifactRelatesTo extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'resourceReference' => [
@@ -121,6 +131,7 @@ class CitationCitedArtifactRelatesTo extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

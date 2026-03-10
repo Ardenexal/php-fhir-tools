@@ -24,6 +24,7 @@ class TestPlanTestCase extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -33,6 +34,7 @@ class TestPlanTestCase extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -42,6 +44,7 @@ class TestPlanTestCase extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'sequence' => [
@@ -51,6 +54,7 @@ class TestPlanTestCase extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'scope' => [
@@ -60,6 +64,7 @@ class TestPlanTestCase extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
             'variants'     => null,
         ],
         'dependency' => [
@@ -69,6 +74,7 @@ class TestPlanTestCase extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\TestPlan\TestPlanTestCaseDependency',
             'variants'     => null,
         ],
         'testRun' => [
@@ -78,6 +84,7 @@ class TestPlanTestCase extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\TestPlan\TestPlanTestCaseTestRun',
             'variants'     => null,
         ],
         'testData' => [
@@ -87,6 +94,7 @@ class TestPlanTestCase extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\TestPlan\TestPlanTestCaseTestData',
             'variants'     => null,
         ],
         'assertion' => [
@@ -96,6 +104,7 @@ class TestPlanTestCase extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\TestPlan\TestPlanTestCaseAssertion',
             'variants'     => null,
         ],
     ];

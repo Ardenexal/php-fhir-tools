@@ -28,6 +28,7 @@ class ResearchStudyAssociatedParty extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -37,6 +38,7 @@ class ResearchStudyAssociatedParty extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -46,6 +48,7 @@ class ResearchStudyAssociatedParty extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'name' => [
@@ -55,6 +58,7 @@ class ResearchStudyAssociatedParty extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'role' => [
@@ -64,6 +68,7 @@ class ResearchStudyAssociatedParty extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'period' => [
@@ -73,6 +78,7 @@ class ResearchStudyAssociatedParty extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Period',
             'variants'     => null,
         ],
         'classifier' => [
@@ -82,6 +88,7 @@ class ResearchStudyAssociatedParty extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'party' => [
@@ -91,6 +98,7 @@ class ResearchStudyAssociatedParty extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

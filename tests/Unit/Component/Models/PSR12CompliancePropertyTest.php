@@ -14,7 +14,6 @@ use PHPUnit\Framework\TestCase;
  *
  * @author FHIR Tools Contributors
  */
-
 class PSR12CompliancePropertyTest extends TestCase
 {
     use TestTrait;

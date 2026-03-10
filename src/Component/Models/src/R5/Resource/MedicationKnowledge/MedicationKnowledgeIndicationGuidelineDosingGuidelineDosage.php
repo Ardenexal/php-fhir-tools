@@ -30,6 +30,7 @@ class MedicationKnowledgeIndicationGuidelineDosingGuidelineDosage extends Backbo
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -39,6 +40,7 @@ class MedicationKnowledgeIndicationGuidelineDosingGuidelineDosage extends Backbo
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -48,6 +50,7 @@ class MedicationKnowledgeIndicationGuidelineDosingGuidelineDosage extends Backbo
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -57,6 +60,7 @@ class MedicationKnowledgeIndicationGuidelineDosingGuidelineDosage extends Backbo
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'dosage' => [
@@ -66,6 +70,7 @@ class MedicationKnowledgeIndicationGuidelineDosingGuidelineDosage extends Backbo
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Dosage',
             'variants'     => null,
         ],
     ];

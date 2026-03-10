@@ -65,7 +65,7 @@ final class UnescapeFunction extends AbstractFunction
     {
         $result = preg_replace_callback(
             '/\\\\(?:["\\\\\\/bfnrt]|u[0-9a-fA-F]{4})/',
-            static function (array $matches): string {
+            static function(array $matches): string {
                 $seq = $matches[0];
 
                 // \uXXXX unicode escape sequence
@@ -74,17 +74,17 @@ final class UnescapeFunction extends AbstractFunction
                 }
 
                 return match ($seq) {
-                    '\\"'  => '"',
+                    '\\"'   => '"',
                     '\\\\'  => '\\',
-                    '\\/'  => '/',
-                    '\\b'  => "\x08",
-                    '\\f'  => "\x0C",
-                    '\\n'  => "\n",
-                    '\\r'  => "\r",
+                    '\\/'   => '/',
+                    '\\b'   => "\x08",
+                    '\\f'   => "\x0C",
+                    '\\n'   => "\n",
+                    '\\r'   => "\r",
                     default => "\t",
                 };
             },
-            $string
+            $string,
         );
 
         return $result ?? $string;

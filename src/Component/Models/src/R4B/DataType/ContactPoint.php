@@ -27,6 +27,7 @@ class ContactPoint extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -36,6 +37,7 @@ class ContactPoint extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'system' => [
@@ -45,6 +47,7 @@ class ContactPoint extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'value' => [
@@ -54,6 +57,7 @@ class ContactPoint extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'use' => [
@@ -63,6 +67,7 @@ class ContactPoint extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'rank' => [
@@ -72,6 +77,7 @@ class ContactPoint extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'period' => [
@@ -81,6 +87,7 @@ class ContactPoint extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

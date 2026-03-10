@@ -30,7 +30,6 @@ declare(strict_types=1);
  *   - phpstan with --error-format=json (already structured)
  *   - Everything else (non-test/non-analysis commands)
  */
-
 $stdin = stream_get_contents(STDIN);
 
 if ($stdin === false || $stdin === '') {
@@ -123,7 +122,7 @@ function shouldBlock(string $command): ?string
 
     // Block: composer quality:* (these call @test and @phpstan internally)
     if (preg_match('/\bcomposer\s+(run(-script)?\s+)?quality:/', $command)) {
-        return "Blocked verbose quality command (contains @test and @phpstan). Use phpstan-ai and test-ai variants instead.";
+        return 'Blocked verbose quality command (contains @test and @phpstan). Use phpstan-ai and test-ai variants instead.';
     }
 
     // Block: direct phpunit invocations without --no-output

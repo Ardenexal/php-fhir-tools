@@ -26,6 +26,7 @@ class ManufacturedItemDefinitionComponent extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -35,6 +36,7 @@ class ManufacturedItemDefinitionComponent extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -44,6 +46,7 @@ class ManufacturedItemDefinitionComponent extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -53,6 +56,7 @@ class ManufacturedItemDefinitionComponent extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'function' => [
@@ -62,6 +66,7 @@ class ManufacturedItemDefinitionComponent extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'amount' => [
@@ -71,6 +76,7 @@ class ManufacturedItemDefinitionComponent extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity',
             'variants'     => null,
         ],
         'constituent' => [
@@ -80,6 +86,7 @@ class ManufacturedItemDefinitionComponent extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ManufacturedItemDefinition\ManufacturedItemDefinitionComponentConstituent',
             'variants'     => null,
         ],
         'property' => [
@@ -89,6 +96,7 @@ class ManufacturedItemDefinitionComponent extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ManufacturedItemDefinition\ManufacturedItemDefinitionProperty',
             'variants'     => null,
         ],
         'component' => [
@@ -98,6 +106,7 @@ class ManufacturedItemDefinitionComponent extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ManufacturedItemDefinition\ManufacturedItemDefinitionComponent',
             'variants'     => null,
         ],
     ];

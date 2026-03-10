@@ -28,6 +28,7 @@ class ExplanationOfBenefitBenefitBalanceFinancial extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -37,6 +38,7 @@ class ExplanationOfBenefitBenefitBalanceFinancial extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -46,6 +48,7 @@ class ExplanationOfBenefitBenefitBalanceFinancial extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -55,6 +58,7 @@ class ExplanationOfBenefitBenefitBalanceFinancial extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'allowed' => [
@@ -64,6 +68,7 @@ class ExplanationOfBenefitBenefitBalanceFinancial extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'unsignedInt',
@@ -95,6 +100,7 @@ class ExplanationOfBenefitBenefitBalanceFinancial extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'unsignedInt',

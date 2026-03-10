@@ -31,6 +31,7 @@ class GenomicStudyAnalysis extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -40,6 +41,7 @@ class GenomicStudyAnalysis extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -49,6 +51,7 @@ class GenomicStudyAnalysis extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'identifier' => [
@@ -58,6 +61,7 @@ class GenomicStudyAnalysis extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
             'variants'     => null,
         ],
         'methodType' => [
@@ -67,6 +71,7 @@ class GenomicStudyAnalysis extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'changeType' => [
@@ -76,6 +81,7 @@ class GenomicStudyAnalysis extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'genomeBuild' => [
@@ -85,6 +91,7 @@ class GenomicStudyAnalysis extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'instantiatesCanonical' => [
@@ -94,6 +101,7 @@ class GenomicStudyAnalysis extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'instantiatesUri' => [
@@ -103,6 +111,7 @@ class GenomicStudyAnalysis extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'title' => [
@@ -112,6 +121,7 @@ class GenomicStudyAnalysis extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'focus' => [
@@ -121,6 +131,7 @@ class GenomicStudyAnalysis extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
             'variants'     => null,
         ],
         'specimen' => [
@@ -130,6 +141,7 @@ class GenomicStudyAnalysis extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
             'variants'     => null,
         ],
         'date' => [
@@ -139,6 +151,7 @@ class GenomicStudyAnalysis extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'note' => [
@@ -148,6 +161,7 @@ class GenomicStudyAnalysis extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation',
             'variants'     => null,
         ],
         'protocolPerformed' => [
@@ -157,6 +171,7 @@ class GenomicStudyAnalysis extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'regionsStudied' => [
@@ -166,6 +181,7 @@ class GenomicStudyAnalysis extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
             'variants'     => null,
         ],
         'regionsCalled' => [
@@ -175,6 +191,7 @@ class GenomicStudyAnalysis extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
             'variants'     => null,
         ],
         'input' => [
@@ -184,6 +201,7 @@ class GenomicStudyAnalysis extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\GenomicStudy\GenomicStudyAnalysisInput',
             'variants'     => null,
         ],
         'output' => [
@@ -193,6 +211,7 @@ class GenomicStudyAnalysis extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\GenomicStudy\GenomicStudyAnalysisOutput',
             'variants'     => null,
         ],
         'performer' => [
@@ -202,6 +221,7 @@ class GenomicStudyAnalysis extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\GenomicStudy\GenomicStudyAnalysisPerformer',
             'variants'     => null,
         ],
         'device' => [
@@ -211,6 +231,7 @@ class GenomicStudyAnalysis extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\GenomicStudy\GenomicStudyAnalysisDevice',
             'variants'     => null,
         ],
     ];

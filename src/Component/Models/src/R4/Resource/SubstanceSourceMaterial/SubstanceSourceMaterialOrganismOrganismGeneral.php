@@ -28,6 +28,7 @@ class SubstanceSourceMaterialOrganismOrganismGeneral extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -37,6 +38,7 @@ class SubstanceSourceMaterialOrganismOrganismGeneral extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -46,6 +48,7 @@ class SubstanceSourceMaterialOrganismOrganismGeneral extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'kingdom' => [
@@ -55,6 +58,7 @@ class SubstanceSourceMaterialOrganismOrganismGeneral extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'phylum' => [
@@ -64,6 +68,7 @@ class SubstanceSourceMaterialOrganismOrganismGeneral extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'class' => [
@@ -73,6 +78,7 @@ class SubstanceSourceMaterialOrganismOrganismGeneral extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'order' => [
@@ -82,6 +88,7 @@ class SubstanceSourceMaterialOrganismOrganismGeneral extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

@@ -64,6 +64,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'meta' => [
@@ -73,6 +74,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'implicitRules' => [
@@ -82,6 +84,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'language' => [
@@ -91,6 +94,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'text' => [
@@ -100,6 +104,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'contained' => [
@@ -109,6 +114,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -118,6 +124,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -127,6 +134,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'identifier' => [
@@ -136,6 +144,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
             'variants'     => null,
         ],
         'traceNumber' => [
@@ -145,6 +154,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
             'variants'     => null,
         ],
         'status' => [
@@ -154,6 +164,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -163,6 +174,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'subType' => [
@@ -172,6 +184,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'use' => [
@@ -181,6 +194,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'patient' => [
@@ -190,6 +204,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'billablePeriod' => [
@@ -199,6 +214,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'created' => [
@@ -208,6 +224,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'enterer' => [
@@ -217,6 +234,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'insurer' => [
@@ -226,6 +244,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'provider' => [
@@ -235,6 +254,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'priority' => [
@@ -244,6 +264,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'fundsReserveRequested' => [
@@ -253,6 +274,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'fundsReserve' => [
@@ -262,6 +284,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'related' => [
@@ -271,6 +294,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ExplanationOfBenefit\ExplanationOfBenefitRelated',
             'variants'     => null,
         ],
         'prescription' => [
@@ -280,6 +304,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'originalPrescription' => [
@@ -289,6 +314,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'event' => [
@@ -298,6 +324,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ExplanationOfBenefit\ExplanationOfBenefitEvent',
             'variants'     => null,
         ],
         'payee' => [
@@ -307,6 +334,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'referral' => [
@@ -316,6 +344,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'encounter' => [
@@ -325,6 +354,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
             'variants'     => null,
         ],
         'facility' => [
@@ -334,6 +364,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'claim' => [
@@ -343,6 +374,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'claimResponse' => [
@@ -352,6 +384,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'outcome' => [
@@ -361,6 +394,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'decision' => [
@@ -370,6 +404,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'disposition' => [
@@ -379,6 +414,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'preAuthRef' => [
@@ -388,6 +424,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'preAuthRefPeriod' => [
@@ -397,6 +434,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Period',
             'variants'     => null,
         ],
         'diagnosisRelatedGroup' => [
@@ -406,6 +444,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'careTeam' => [
@@ -415,6 +454,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ExplanationOfBenefit\ExplanationOfBenefitCareTeam',
             'variants'     => null,
         ],
         'supportingInfo' => [
@@ -424,6 +464,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ExplanationOfBenefit\ExplanationOfBenefitSupportingInfo',
             'variants'     => null,
         ],
         'diagnosis' => [
@@ -433,6 +474,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ExplanationOfBenefit\ExplanationOfBenefitDiagnosis',
             'variants'     => null,
         ],
         'procedure' => [
@@ -442,6 +484,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ExplanationOfBenefit\ExplanationOfBenefitProcedure',
             'variants'     => null,
         ],
         'precedence' => [
@@ -451,6 +494,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'insurance' => [
@@ -460,6 +504,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ExplanationOfBenefit\ExplanationOfBenefitInsurance',
             'variants'     => null,
         ],
         'accident' => [
@@ -469,6 +514,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'patientPaid' => [
@@ -478,6 +524,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'item' => [
@@ -487,6 +534,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ExplanationOfBenefit\ExplanationOfBenefitItem',
             'variants'     => null,
         ],
         'addItem' => [
@@ -496,6 +544,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ExplanationOfBenefit\ExplanationOfBenefitAddItem',
             'variants'     => null,
         ],
         'adjudication' => [
@@ -505,6 +554,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ExplanationOfBenefit\ExplanationOfBenefitItemAdjudication',
             'variants'     => null,
         ],
         'total' => [
@@ -514,6 +564,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ExplanationOfBenefit\ExplanationOfBenefitTotal',
             'variants'     => null,
         ],
         'payment' => [
@@ -523,6 +574,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'formCode' => [
@@ -532,6 +584,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'form' => [
@@ -541,6 +594,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'processNote' => [
@@ -550,6 +604,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ExplanationOfBenefit\ExplanationOfBenefitProcessNote',
             'variants'     => null,
         ],
         'benefitPeriod' => [
@@ -559,6 +614,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'benefitBalance' => [
@@ -568,6 +624,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ExplanationOfBenefit\ExplanationOfBenefitBenefitBalance',
             'variants'     => null,
         ],
     ];

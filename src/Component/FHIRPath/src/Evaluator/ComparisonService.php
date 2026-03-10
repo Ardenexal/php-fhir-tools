@@ -221,7 +221,7 @@ final class ComparisonService
         $rightIsDecimal = $rightValue instanceof FHIRPathDecimal;
 
         if ($leftIsDecimal || $rightIsDecimal) {
-            $leftStr  = $leftIsDecimal  ? $leftValue->value  : (is_numeric($leftValue)  ? (string) $leftValue  : null);
+            $leftStr  = $leftIsDecimal ? $leftValue->value : (is_numeric($leftValue) ? (string) $leftValue : null);
             $rightStr = $rightIsDecimal ? $rightValue->value : (is_numeric($rightValue) ? (string) $rightValue : null);
 
             if ($leftStr === null || $rightStr === null) {
@@ -233,7 +233,7 @@ final class ComparisonService
 
             $maxPrec = max(
                 ($dotPos = strpos($leftStr, '.'))  !== false ? strlen($leftStr)  - $dotPos - 1 : 0,
-                ($dotPos = strpos($rightStr, '.')) !== false ? strlen($rightStr) - $dotPos - 1 : 0
+                ($dotPos = strpos($rightStr, '.')) !== false ? strlen($rightStr) - $dotPos - 1 : 0,
             );
             $cmp = bccomp($leftStr, $rightStr, $maxPrec + 2);
 
@@ -276,8 +276,25 @@ final class ComparisonService
                 $leftHasTime  = $this->hasTimeComponent($leftNorm);
                 $rightHasTime = $this->hasTimeComponent($rightNorm);
 
-                // Both have time components (datetime vs datetime different precision) → ambiguous → empty
+                // Both have time components with different precision.
+                // If both carry timezone info we can convert to UTC and compare precisely
+                // (absolute timestamps are never ambiguous regardless of fractional precision).
+                // Without timezone the comparison is ambiguous → empty.
                 if ($leftHasTime && $rightHasTime) {
+                    $leftHasTzEarly  = $this->hasTimezone($leftNorm);
+                    $rightHasTzEarly = $this->hasTimezone($rightNorm);
+
+                    if ($leftHasTzEarly && $rightHasTzEarly) {
+                        $leftUtcEarly  = $this->toUtcTimestamp($leftNorm);
+                        $rightUtcEarly = $this->toUtcTimestamp($rightNorm);
+
+                        if ($leftUtcEarly === null || $rightUtcEarly === null) {
+                            return Collection::empty();
+                        }
+
+                        return Collection::single($operation($leftUtcEarly, $rightUtcEarly));
+                    }
+
                     return Collection::empty();
                 }
 
@@ -496,14 +513,14 @@ final class ComparisonService
                 return bccomp(
                     $this->bcRoundHalfUp($aStr, $minPrec),
                     $this->bcRoundHalfUp($bStr, $minPrec),
-                    $minPrec
+                    $minPrec,
                 ) === 0;
             }
 
             // Equality: compare at max precision
             $maxPrec = max(
                 ($dotPos = strpos($aStr, '.')) !== false ? strlen($aStr) - $dotPos - 1 : 0,
-                ($dotPos = strpos($bStr, '.')) !== false ? strlen($bStr) - $dotPos - 1 : 0
+                ($dotPos = strpos($bStr, '.')) !== false ? strlen($bStr) - $dotPos - 1 : 0,
             );
 
             return bccomp($aStr, $bStr, $maxPrec + 2) === 0;
@@ -583,7 +600,8 @@ final class ComparisonService
      * results for equivalence comparisons. This method adds half-a-ULP at the target
      * scale before truncating to get true half-up rounding.
      *
-     * @param  numeric-string $value
+     * @param numeric-string $value
+     *
      * @return numeric-string
      */
     private function bcRoundHalfUp(string $value, int $scale): string
@@ -952,14 +970,29 @@ final class ComparisonService
      */
     private function compareQuantityValues(array $left, array $right): ?float
     {
-        $leftUnit  = $left['code'];
-        $rightUnit = $right['code'];
+        $leftOriginal  = $left['code'];
+        $rightOriginal = $right['code'];
 
         // Normalize calendar duration keywords to UCUM codes
-        $leftUnit  = self::CALENDAR_TO_UCUM[$leftUnit]  ?? $leftUnit;
-        $rightUnit = self::CALENDAR_TO_UCUM[$rightUnit] ?? $rightUnit;
+        $leftUnit  = self::CALENDAR_TO_UCUM[$leftOriginal]  ?? $leftOriginal;
+        $rightUnit = self::CALENDAR_TO_UCUM[$rightOriginal] ?? $rightOriginal;
 
         if ($leftUnit === $rightUnit) {
+            // UCUM codes 'mo' (month) and 'a' (year) are context-dependent calendar
+            // approximations. A UCUM quantity with code 'mo'/'a' and a calendar duration
+            // keyword ('month'/'year') normalise to the same UCUM code but are NOT
+            // interchangeable per the FHIRPath spec — the comparison is incomparable.
+            if ($leftOriginal !== $rightOriginal) {
+                $ucumCalendarCodes = ['mo' => true, 'a' => true];
+                if (isset($ucumCalendarCodes[$leftUnit])) {
+                    $leftIsKeyword  = isset(self::CALENDAR_TO_UCUM[$leftOriginal]);
+                    $rightIsKeyword = isset(self::CALENDAR_TO_UCUM[$rightOriginal]);
+                    if ($leftIsKeyword !== $rightIsKeyword) {
+                        return null;
+                    }
+                }
+            }
+
             return $left['value'] - $right['value'];
         }
 

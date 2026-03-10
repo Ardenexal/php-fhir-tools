@@ -31,6 +31,7 @@ class MeasureReportGroup extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -40,6 +41,7 @@ class MeasureReportGroup extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -49,6 +51,7 @@ class MeasureReportGroup extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'linkId' => [
@@ -58,6 +61,7 @@ class MeasureReportGroup extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'code' => [
@@ -67,6 +71,7 @@ class MeasureReportGroup extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'subject' => [
@@ -76,6 +81,7 @@ class MeasureReportGroup extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'population' => [
@@ -85,6 +91,7 @@ class MeasureReportGroup extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\MeasureReport\MeasureReportGroupPopulation',
             'variants'     => null,
         ],
         'measureScore' => [
@@ -94,6 +101,7 @@ class MeasureReportGroup extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Quantity',
@@ -146,6 +154,7 @@ class MeasureReportGroup extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\MeasureReport\MeasureReportGroupStratifier',
             'variants'     => null,
         ],
     ];

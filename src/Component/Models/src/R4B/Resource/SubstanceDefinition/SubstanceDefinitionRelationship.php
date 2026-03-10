@@ -29,6 +29,7 @@ class SubstanceDefinitionRelationship extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -38,6 +39,7 @@ class SubstanceDefinitionRelationship extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -47,6 +49,7 @@ class SubstanceDefinitionRelationship extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'substanceDefinition' => [
@@ -56,6 +59,7 @@ class SubstanceDefinitionRelationship extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Reference',
@@ -80,6 +84,7 @@ class SubstanceDefinitionRelationship extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'isDefining' => [
@@ -89,6 +94,7 @@ class SubstanceDefinitionRelationship extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'amount' => [
@@ -98,6 +104,7 @@ class SubstanceDefinitionRelationship extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Quantity',
@@ -129,6 +136,7 @@ class SubstanceDefinitionRelationship extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'comparator' => [
@@ -138,6 +146,7 @@ class SubstanceDefinitionRelationship extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'source' => [
@@ -147,6 +156,7 @@ class SubstanceDefinitionRelationship extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
             'variants'     => null,
         ],
     ];

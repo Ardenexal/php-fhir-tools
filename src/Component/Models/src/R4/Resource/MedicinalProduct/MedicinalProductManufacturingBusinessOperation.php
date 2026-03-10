@@ -27,6 +27,7 @@ class MedicinalProductManufacturingBusinessOperation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -36,6 +37,7 @@ class MedicinalProductManufacturingBusinessOperation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -45,6 +47,7 @@ class MedicinalProductManufacturingBusinessOperation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'operationType' => [
@@ -54,6 +57,7 @@ class MedicinalProductManufacturingBusinessOperation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'authorisationReferenceNumber' => [
@@ -63,6 +67,7 @@ class MedicinalProductManufacturingBusinessOperation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'effectiveDate' => [
@@ -72,6 +77,7 @@ class MedicinalProductManufacturingBusinessOperation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'confidentialityIndicator' => [
@@ -81,6 +87,7 @@ class MedicinalProductManufacturingBusinessOperation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'manufacturer' => [
@@ -90,6 +97,7 @@ class MedicinalProductManufacturingBusinessOperation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
             'variants'     => null,
         ],
         'regulator' => [
@@ -99,6 +107,7 @@ class MedicinalProductManufacturingBusinessOperation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

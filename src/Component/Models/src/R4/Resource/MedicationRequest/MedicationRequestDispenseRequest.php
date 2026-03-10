@@ -28,6 +28,7 @@ class MedicationRequestDispenseRequest extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -37,6 +38,7 @@ class MedicationRequestDispenseRequest extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -46,6 +48,7 @@ class MedicationRequestDispenseRequest extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'initialFill' => [
@@ -55,6 +58,7 @@ class MedicationRequestDispenseRequest extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'dispenseInterval' => [
@@ -64,6 +68,7 @@ class MedicationRequestDispenseRequest extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'validityPeriod' => [
@@ -73,6 +78,7 @@ class MedicationRequestDispenseRequest extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'numberOfRepeatsAllowed' => [
@@ -82,6 +88,7 @@ class MedicationRequestDispenseRequest extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'quantity' => [
@@ -91,6 +98,7 @@ class MedicationRequestDispenseRequest extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'expectedSupplyDuration' => [
@@ -100,6 +108,7 @@ class MedicationRequestDispenseRequest extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'performer' => [
@@ -109,6 +118,7 @@ class MedicationRequestDispenseRequest extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

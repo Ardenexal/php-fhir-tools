@@ -27,6 +27,7 @@ class ConsentProvision extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -36,6 +37,7 @@ class ConsentProvision extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -45,6 +47,7 @@ class ConsentProvision extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'period' => [
@@ -54,6 +57,7 @@ class ConsentProvision extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'actor' => [
@@ -63,6 +67,7 @@ class ConsentProvision extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Consent\ConsentProvisionActor',
             'variants'     => null,
         ],
         'action' => [
@@ -72,6 +77,7 @@ class ConsentProvision extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'securityLabel' => [
@@ -81,6 +87,7 @@ class ConsentProvision extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding',
             'variants'     => null,
         ],
         'purpose' => [
@@ -90,6 +97,7 @@ class ConsentProvision extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding',
             'variants'     => null,
         ],
         'documentType' => [
@@ -99,6 +107,7 @@ class ConsentProvision extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding',
             'variants'     => null,
         ],
         'resourceType' => [
@@ -108,6 +117,7 @@ class ConsentProvision extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding',
             'variants'     => null,
         ],
         'code' => [
@@ -117,6 +127,7 @@ class ConsentProvision extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'dataPeriod' => [
@@ -126,6 +137,7 @@ class ConsentProvision extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'data' => [
@@ -135,6 +147,7 @@ class ConsentProvision extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Consent\ConsentProvisionData',
             'variants'     => null,
         ],
         'expression' => [
@@ -144,6 +157,7 @@ class ConsentProvision extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'provision' => [
@@ -153,6 +167,7 @@ class ConsentProvision extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Consent\ConsentProvision',
             'variants'     => null,
         ],
     ];

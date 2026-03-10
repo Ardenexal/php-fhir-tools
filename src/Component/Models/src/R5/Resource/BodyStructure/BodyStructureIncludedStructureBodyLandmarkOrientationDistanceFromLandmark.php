@@ -29,6 +29,7 @@ class BodyStructureIncludedStructureBodyLandmarkOrientationDistanceFromLandmark 
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -38,6 +39,7 @@ class BodyStructureIncludedStructureBodyLandmarkOrientationDistanceFromLandmark 
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -47,6 +49,7 @@ class BodyStructureIncludedStructureBodyLandmarkOrientationDistanceFromLandmark 
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'device' => [
@@ -56,6 +59,7 @@ class BodyStructureIncludedStructureBodyLandmarkOrientationDistanceFromLandmark 
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
             'variants'     => null,
         ],
         'value' => [
@@ -65,6 +69,7 @@ class BodyStructureIncludedStructureBodyLandmarkOrientationDistanceFromLandmark 
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity',
             'variants'     => null,
         ],
     ];

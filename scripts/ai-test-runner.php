@@ -144,14 +144,14 @@ function formatResults(string $junitFile, int $exitCode, int $aiLimit = 50, int 
         foreach ($tc->failure as $failure) {
             ++$failures;
             // Use element text content (actual assertion message), not 'message' attr (which is the test name)
-            $msg = trim((string) $failure);
+            $msg      = trim((string) $failure);
             $issues[] = buildIssue('FAIL', $tc, $msg !== '' ? $msg : (string) ($failure['message'] ?? ''));
         }
 
         // Count and collect errors
         foreach ($tc->error as $error) {
             ++$errors;
-            $msg = trim((string) $error);
+            $msg      = trim((string) $error);
             $issues[] = buildIssue('ERR', $tc, $msg !== '' ? $msg : (string) ($error['message'] ?? ''));
         }
 
@@ -161,8 +161,8 @@ function formatResults(string $junitFile, int $exitCode, int $aiLimit = 50, int 
         }
     }
 
-    $timeStr  = number_format($time, 2) . 's';
-    $passed   = $total - $failures - $errors - $skipped;
+    $timeStr    = number_format($time, 2) . 's';
+    $passed     = $total - $failures - $errors - $skipped;
     $issueCount = $failures + $errors;
 
     // --- All green ---
@@ -184,10 +184,10 @@ function formatResults(string $junitFile, int $exitCode, int $aiLimit = 50, int 
 
     // Pagination header when offset > 0
     $paginationNote = $aiOffset > 0 ? " [offset={$aiOffset}]" : '';
-    $lines = ["FAIL {$passed}/{$total} tests {$timeStr} {$breakdown}{$paginationNote}", '---'];
+    $lines          = ["FAIL {$passed}/{$total} tests {$timeStr} {$breakdown}{$paginationNote}", '---'];
 
-    $shown   = 0;
-    $skipped = 0;
+    $shown          = 0;
+    $skipped        = 0;
     $effectiveLimit = $aiLimit === 0 ? PHP_INT_MAX : $aiLimit;
 
     foreach ($issues as $issue) {
@@ -217,7 +217,7 @@ function formatResults(string $junitFile, int $exitCode, int $aiLimit = 50, int 
 
     $remaining = count($issues) - $aiOffset - $shown;
     if ($remaining > 0) {
-        $lines[] = "... and {$remaining} more failures (use --ai-offset=" . ($aiOffset + $shown) . " to continue)";
+        $lines[] = "... and {$remaining} more failures (use --ai-offset=" . ($aiOffset + $shown) . ' to continue)';
     }
 
     return implode("\n", $lines);
@@ -226,7 +226,7 @@ function formatResults(string $junitFile, int $exitCode, int $aiLimit = 50, int 
 /**
  * @return array{type: string, class: string, method: string, message: string}
  */
-function buildIssue(string $type, \SimpleXMLElement $tc, string $rawMessage): array
+function buildIssue(string $type, SimpleXMLElement $tc, string $rawMessage): array
 {
     $fullClass = (string) ($tc['classname'] ?? $tc['class'] ?? '');
     $method    = (string) ($tc['name'] ?? '');

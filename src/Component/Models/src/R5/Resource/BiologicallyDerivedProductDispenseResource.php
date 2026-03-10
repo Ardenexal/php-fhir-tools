@@ -45,6 +45,7 @@ class BiologicallyDerivedProductDispenseResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'meta' => [
@@ -54,6 +55,7 @@ class BiologicallyDerivedProductDispenseResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'implicitRules' => [
@@ -63,6 +65,7 @@ class BiologicallyDerivedProductDispenseResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'language' => [
@@ -72,6 +75,7 @@ class BiologicallyDerivedProductDispenseResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'text' => [
@@ -81,6 +85,7 @@ class BiologicallyDerivedProductDispenseResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'contained' => [
@@ -90,6 +95,7 @@ class BiologicallyDerivedProductDispenseResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -99,6 +105,7 @@ class BiologicallyDerivedProductDispenseResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -108,6 +115,7 @@ class BiologicallyDerivedProductDispenseResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'identifier' => [
@@ -117,6 +125,7 @@ class BiologicallyDerivedProductDispenseResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
             'variants'     => null,
         ],
         'basedOn' => [
@@ -126,6 +135,7 @@ class BiologicallyDerivedProductDispenseResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
             'variants'     => null,
         ],
         'partOf' => [
@@ -135,6 +145,7 @@ class BiologicallyDerivedProductDispenseResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
             'variants'     => null,
         ],
         'status' => [
@@ -144,6 +155,7 @@ class BiologicallyDerivedProductDispenseResource extends DomainResourceResource
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'originRelationshipType' => [
@@ -153,6 +165,7 @@ class BiologicallyDerivedProductDispenseResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'product' => [
@@ -162,6 +175,7 @@ class BiologicallyDerivedProductDispenseResource extends DomainResourceResource
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'patient' => [
@@ -171,6 +185,7 @@ class BiologicallyDerivedProductDispenseResource extends DomainResourceResource
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'matchStatus' => [
@@ -180,6 +195,7 @@ class BiologicallyDerivedProductDispenseResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'performer' => [
@@ -189,6 +205,7 @@ class BiologicallyDerivedProductDispenseResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\BiologicallyDerivedProductDispense\BiologicallyDerivedProductDispensePerformer',
             'variants'     => null,
         ],
         'location' => [
@@ -198,6 +215,7 @@ class BiologicallyDerivedProductDispenseResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'quantity' => [
@@ -207,6 +225,7 @@ class BiologicallyDerivedProductDispenseResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'preparedDate' => [
@@ -216,6 +235,7 @@ class BiologicallyDerivedProductDispenseResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'whenHandedOver' => [
@@ -225,6 +245,7 @@ class BiologicallyDerivedProductDispenseResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'destination' => [
@@ -234,6 +255,7 @@ class BiologicallyDerivedProductDispenseResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'note' => [
@@ -243,6 +265,7 @@ class BiologicallyDerivedProductDispenseResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation',
             'variants'     => null,
         ],
         'usageInstruction' => [
@@ -252,6 +275,7 @@ class BiologicallyDerivedProductDispenseResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

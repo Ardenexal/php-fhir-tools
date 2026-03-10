@@ -28,6 +28,7 @@ class MedicationKnowledgeIndicationGuidelineDosingGuideline extends BackboneElem
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -37,6 +38,7 @@ class MedicationKnowledgeIndicationGuidelineDosingGuideline extends BackboneElem
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -46,6 +48,7 @@ class MedicationKnowledgeIndicationGuidelineDosingGuideline extends BackboneElem
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'treatmentIntent' => [
@@ -55,6 +58,7 @@ class MedicationKnowledgeIndicationGuidelineDosingGuideline extends BackboneElem
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'dosage' => [
@@ -64,6 +68,7 @@ class MedicationKnowledgeIndicationGuidelineDosingGuideline extends BackboneElem
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\MedicationKnowledge\MedicationKnowledgeIndicationGuidelineDosingGuidelineDosage',
             'variants'     => null,
         ],
         'administrationTreatment' => [
@@ -73,6 +78,7 @@ class MedicationKnowledgeIndicationGuidelineDosingGuideline extends BackboneElem
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'patientCharacteristic' => [
@@ -82,6 +88,7 @@ class MedicationKnowledgeIndicationGuidelineDosingGuideline extends BackboneElem
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\MedicationKnowledge\MedicationKnowledgeIndicationGuidelineDosingGuidelinePatientCharacteristic',
             'variants'     => null,
         ],
     ];

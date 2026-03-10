@@ -72,6 +72,7 @@ class StructureMapGroupRuleSource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -81,6 +82,7 @@ class StructureMapGroupRuleSource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -90,6 +92,7 @@ class StructureMapGroupRuleSource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'context' => [
@@ -99,6 +102,7 @@ class StructureMapGroupRuleSource extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'min' => [
@@ -108,6 +112,7 @@ class StructureMapGroupRuleSource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'max' => [
@@ -117,6 +122,7 @@ class StructureMapGroupRuleSource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -126,6 +132,7 @@ class StructureMapGroupRuleSource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'defaultValue' => [
@@ -135,6 +142,7 @@ class StructureMapGroupRuleSource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'base64Binary',
@@ -495,6 +503,7 @@ class StructureMapGroupRuleSource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'listMode' => [
@@ -504,6 +513,7 @@ class StructureMapGroupRuleSource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'variable' => [
@@ -513,6 +523,7 @@ class StructureMapGroupRuleSource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'condition' => [
@@ -522,6 +533,7 @@ class StructureMapGroupRuleSource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'check' => [
@@ -531,6 +543,7 @@ class StructureMapGroupRuleSource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'logMessage' => [
@@ -540,6 +553,7 @@ class StructureMapGroupRuleSource extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

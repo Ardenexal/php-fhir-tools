@@ -29,6 +29,7 @@ class ObservationDefinitionQualifiedValue extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -38,6 +39,7 @@ class ObservationDefinitionQualifiedValue extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -47,6 +49,7 @@ class ObservationDefinitionQualifiedValue extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'context' => [
@@ -56,6 +59,7 @@ class ObservationDefinitionQualifiedValue extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'appliesTo' => [
@@ -65,6 +69,7 @@ class ObservationDefinitionQualifiedValue extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'gender' => [
@@ -74,6 +79,7 @@ class ObservationDefinitionQualifiedValue extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'age' => [
@@ -83,6 +89,7 @@ class ObservationDefinitionQualifiedValue extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'gestationalAge' => [
@@ -92,6 +99,7 @@ class ObservationDefinitionQualifiedValue extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'condition' => [
@@ -101,6 +109,7 @@ class ObservationDefinitionQualifiedValue extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'rangeCategory' => [
@@ -110,6 +119,7 @@ class ObservationDefinitionQualifiedValue extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'range' => [
@@ -119,6 +129,7 @@ class ObservationDefinitionQualifiedValue extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'validCodedValueSet' => [
@@ -128,6 +139,7 @@ class ObservationDefinitionQualifiedValue extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'normalCodedValueSet' => [
@@ -137,6 +149,7 @@ class ObservationDefinitionQualifiedValue extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'abnormalCodedValueSet' => [
@@ -146,6 +159,7 @@ class ObservationDefinitionQualifiedValue extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'criticalCodedValueSet' => [
@@ -155,6 +169,7 @@ class ObservationDefinitionQualifiedValue extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

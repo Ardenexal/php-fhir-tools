@@ -24,6 +24,7 @@ class ElementDefinitionBase extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -33,6 +34,7 @@ class ElementDefinitionBase extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'path' => [
@@ -42,6 +44,7 @@ class ElementDefinitionBase extends Element
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'min' => [
@@ -51,6 +54,7 @@ class ElementDefinitionBase extends Element
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'max' => [
@@ -60,6 +64,7 @@ class ElementDefinitionBase extends Element
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

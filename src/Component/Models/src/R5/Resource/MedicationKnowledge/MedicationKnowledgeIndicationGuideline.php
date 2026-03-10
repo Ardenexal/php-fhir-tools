@@ -24,6 +24,7 @@ class MedicationKnowledgeIndicationGuideline extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -33,6 +34,7 @@ class MedicationKnowledgeIndicationGuideline extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -42,6 +44,7 @@ class MedicationKnowledgeIndicationGuideline extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'indication' => [
@@ -51,6 +54,7 @@ class MedicationKnowledgeIndicationGuideline extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
             'variants'     => null,
         ],
         'dosingGuideline' => [
@@ -60,6 +64,7 @@ class MedicationKnowledgeIndicationGuideline extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\MedicationKnowledge\MedicationKnowledgeIndicationGuidelineDosingGuideline',
             'variants'     => null,
         ],
     ];

@@ -30,6 +30,7 @@ class MeasureReportGroupStratifierStratum extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -39,6 +40,7 @@ class MeasureReportGroupStratifierStratum extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -48,6 +50,7 @@ class MeasureReportGroupStratifierStratum extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'value' => [
@@ -57,6 +60,7 @@ class MeasureReportGroupStratifierStratum extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'CodeableConcept',
@@ -102,6 +106,7 @@ class MeasureReportGroupStratifierStratum extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\MeasureReport\MeasureReportGroupStratifierStratumComponent',
             'variants'     => null,
         ],
         'population' => [
@@ -111,6 +116,7 @@ class MeasureReportGroupStratifierStratum extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\MeasureReport\MeasureReportGroupStratifierStratumPopulation',
             'variants'     => null,
         ],
         'measureScore' => [
@@ -120,6 +126,7 @@ class MeasureReportGroupStratifierStratum extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Quantity',

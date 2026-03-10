@@ -32,6 +32,7 @@ class QuestionnaireItemEnableWhen extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -41,6 +42,7 @@ class QuestionnaireItemEnableWhen extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -50,6 +52,7 @@ class QuestionnaireItemEnableWhen extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'question' => [
@@ -59,6 +62,7 @@ class QuestionnaireItemEnableWhen extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'operator' => [
@@ -68,6 +72,7 @@ class QuestionnaireItemEnableWhen extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'answer' => [
@@ -77,6 +82,7 @@ class QuestionnaireItemEnableWhen extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'boolean',

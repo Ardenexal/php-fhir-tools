@@ -23,6 +23,7 @@ class MolecularSequenceQualityRoc extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -32,6 +33,7 @@ class MolecularSequenceQualityRoc extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -41,6 +43,7 @@ class MolecularSequenceQualityRoc extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'score' => [
@@ -50,6 +53,7 @@ class MolecularSequenceQualityRoc extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'numTP' => [
@@ -59,6 +63,7 @@ class MolecularSequenceQualityRoc extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'numFP' => [
@@ -68,6 +73,7 @@ class MolecularSequenceQualityRoc extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'numFN' => [
@@ -77,6 +83,7 @@ class MolecularSequenceQualityRoc extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'precision' => [
@@ -86,6 +93,7 @@ class MolecularSequenceQualityRoc extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'sensitivity' => [
@@ -95,6 +103,7 @@ class MolecularSequenceQualityRoc extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'fMeasure' => [
@@ -104,6 +113,7 @@ class MolecularSequenceQualityRoc extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

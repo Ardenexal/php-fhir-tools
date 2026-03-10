@@ -29,6 +29,7 @@ class MedicinalProductIngredientSpecifiedSubstance extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -38,6 +39,7 @@ class MedicinalProductIngredientSpecifiedSubstance extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -47,6 +49,7 @@ class MedicinalProductIngredientSpecifiedSubstance extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'code' => [
@@ -56,6 +59,7 @@ class MedicinalProductIngredientSpecifiedSubstance extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'group' => [
@@ -65,6 +69,7 @@ class MedicinalProductIngredientSpecifiedSubstance extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'confidentiality' => [
@@ -74,6 +79,7 @@ class MedicinalProductIngredientSpecifiedSubstance extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'strength' => [
@@ -83,6 +89,7 @@ class MedicinalProductIngredientSpecifiedSubstance extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\MedicinalProductIngredient\MedicinalProductIngredientSpecifiedSubstanceStrength',
             'variants'     => null,
         ],
     ];

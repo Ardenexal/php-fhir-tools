@@ -30,6 +30,7 @@ class QuestionnaireItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -39,6 +40,7 @@ class QuestionnaireItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -48,6 +50,7 @@ class QuestionnaireItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'linkId' => [
@@ -57,6 +60,7 @@ class QuestionnaireItem extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'definition' => [
@@ -66,6 +70,7 @@ class QuestionnaireItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'code' => [
@@ -75,6 +80,7 @@ class QuestionnaireItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding',
             'variants'     => null,
         ],
         'prefix' => [
@@ -84,6 +90,7 @@ class QuestionnaireItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'text' => [
@@ -93,6 +100,7 @@ class QuestionnaireItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -102,6 +110,7 @@ class QuestionnaireItem extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'enableWhen' => [
@@ -111,6 +120,7 @@ class QuestionnaireItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Questionnaire\QuestionnaireItemEnableWhen',
             'variants'     => null,
         ],
         'enableBehavior' => [
@@ -120,6 +130,7 @@ class QuestionnaireItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'required' => [
@@ -129,6 +140,7 @@ class QuestionnaireItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'repeats' => [
@@ -138,6 +150,7 @@ class QuestionnaireItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'readOnly' => [
@@ -147,6 +160,7 @@ class QuestionnaireItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'maxLength' => [
@@ -156,6 +170,7 @@ class QuestionnaireItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'answerValueSet' => [
@@ -165,6 +180,7 @@ class QuestionnaireItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'answerOption' => [
@@ -174,6 +190,7 @@ class QuestionnaireItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Questionnaire\QuestionnaireItemAnswerOption',
             'variants'     => null,
         ],
         'initial' => [
@@ -183,6 +200,7 @@ class QuestionnaireItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Questionnaire\QuestionnaireItemInitial',
             'variants'     => null,
         ],
         'item' => [
@@ -192,6 +210,7 @@ class QuestionnaireItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Questionnaire\QuestionnaireItem',
             'variants'     => null,
         ],
     ];

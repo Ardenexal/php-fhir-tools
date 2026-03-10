@@ -27,6 +27,7 @@ class SpecimenDefinitionTypeTestedContainer extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -36,6 +37,7 @@ class SpecimenDefinitionTypeTestedContainer extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -45,6 +47,7 @@ class SpecimenDefinitionTypeTestedContainer extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'material' => [
@@ -54,6 +57,7 @@ class SpecimenDefinitionTypeTestedContainer extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -63,6 +67,7 @@ class SpecimenDefinitionTypeTestedContainer extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'cap' => [
@@ -72,6 +77,7 @@ class SpecimenDefinitionTypeTestedContainer extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'description' => [
@@ -81,6 +87,7 @@ class SpecimenDefinitionTypeTestedContainer extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'capacity' => [
@@ -90,6 +97,7 @@ class SpecimenDefinitionTypeTestedContainer extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'minimumVolume' => [
@@ -99,6 +107,7 @@ class SpecimenDefinitionTypeTestedContainer extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'Quantity',
@@ -123,6 +132,7 @@ class SpecimenDefinitionTypeTestedContainer extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\SpecimenDefinition\SpecimenDefinitionTypeTestedContainerAdditive',
             'variants'     => null,
         ],
         'preparation' => [
@@ -132,6 +142,7 @@ class SpecimenDefinitionTypeTestedContainer extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

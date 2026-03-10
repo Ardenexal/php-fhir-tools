@@ -33,6 +33,7 @@ class EvidenceVariableCharacteristicDefinitionByTypeAndValue extends BackboneEle
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -42,6 +43,7 @@ class EvidenceVariableCharacteristicDefinitionByTypeAndValue extends BackboneEle
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -51,6 +53,7 @@ class EvidenceVariableCharacteristicDefinitionByTypeAndValue extends BackboneEle
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -60,6 +63,7 @@ class EvidenceVariableCharacteristicDefinitionByTypeAndValue extends BackboneEle
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'method' => [
@@ -69,6 +73,7 @@ class EvidenceVariableCharacteristicDefinitionByTypeAndValue extends BackboneEle
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'device' => [
@@ -78,6 +83,7 @@ class EvidenceVariableCharacteristicDefinitionByTypeAndValue extends BackboneEle
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'value' => [
@@ -87,6 +93,7 @@ class EvidenceVariableCharacteristicDefinitionByTypeAndValue extends BackboneEle
             'isRequired'   => true,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'CodeableConcept',
@@ -139,6 +146,7 @@ class EvidenceVariableCharacteristicDefinitionByTypeAndValue extends BackboneEle
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

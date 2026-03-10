@@ -24,6 +24,7 @@ class MolecularSequenceRelativeEdit extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -33,6 +34,7 @@ class MolecularSequenceRelativeEdit extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -42,6 +44,7 @@ class MolecularSequenceRelativeEdit extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'start' => [
@@ -51,6 +54,7 @@ class MolecularSequenceRelativeEdit extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'end' => [
@@ -60,6 +64,7 @@ class MolecularSequenceRelativeEdit extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'replacementSequence' => [
@@ -69,6 +74,7 @@ class MolecularSequenceRelativeEdit extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'replacedSequence' => [
@@ -78,6 +84,7 @@ class MolecularSequenceRelativeEdit extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

@@ -28,6 +28,7 @@ class ClaimResponseAddItemDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -37,6 +38,7 @@ class ClaimResponseAddItemDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -46,6 +48,7 @@ class ClaimResponseAddItemDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'productOrService' => [
@@ -55,6 +58,7 @@ class ClaimResponseAddItemDetail extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifier' => [
@@ -64,6 +68,7 @@ class ClaimResponseAddItemDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'quantity' => [
@@ -73,6 +78,7 @@ class ClaimResponseAddItemDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'unitPrice' => [
@@ -82,6 +88,7 @@ class ClaimResponseAddItemDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'factor' => [
@@ -91,6 +98,7 @@ class ClaimResponseAddItemDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'net' => [
@@ -100,6 +108,7 @@ class ClaimResponseAddItemDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'noteNumber' => [
@@ -109,6 +118,7 @@ class ClaimResponseAddItemDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'adjudication' => [
@@ -118,6 +128,7 @@ class ClaimResponseAddItemDetail extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ClaimResponse\ClaimResponseItemAdjudication',
             'variants'     => null,
         ],
         'subDetail' => [
@@ -127,6 +138,7 @@ class ClaimResponseAddItemDetail extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ClaimResponse\ClaimResponseAddItemDetailSubDetail',
             'variants'     => null,
         ],
     ];

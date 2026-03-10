@@ -32,6 +32,7 @@ class CoverageEligibilityResponseInsuranceItemBenefit extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -41,6 +42,7 @@ class CoverageEligibilityResponseInsuranceItemBenefit extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -50,6 +52,7 @@ class CoverageEligibilityResponseInsuranceItemBenefit extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -59,6 +62,7 @@ class CoverageEligibilityResponseInsuranceItemBenefit extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'allowed' => [
@@ -68,6 +72,7 @@ class CoverageEligibilityResponseInsuranceItemBenefit extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'unsignedInt',
@@ -99,6 +104,7 @@ class CoverageEligibilityResponseInsuranceItemBenefit extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'unsignedInt',

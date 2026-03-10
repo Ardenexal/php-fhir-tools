@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRInteger;
 use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRBoolean;
 use Ardenexal\FHIRTools\Tests\Fixtures\FHIR\FHIRDecimal;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
 
 /**
  * Test cases for FHIRPrimitiveTypeNormalizer
@@ -217,9 +218,9 @@ class FHIRPrimitiveTypeNormalizerTest extends TestCase
      */
     public function testPartialDateYearOnlyParsedCorrectly(): void
     {
-        $result = $this->normalizer->denormalize('2002', \Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive::class, 'json');
+        $result = $this->normalizer->denormalize('2002', DateTimePrimitive::class, 'json');
 
-        self::assertInstanceOf(\Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive::class, $result);
+        self::assertInstanceOf(DateTimePrimitive::class, $result);
         self::assertInstanceOf(\DateTimeImmutable::class, $result->value);
         self::assertSame('2002', $result->value->format('Y'));
         self::assertSame('01', $result->value->format('m'));
@@ -233,9 +234,9 @@ class FHIRPrimitiveTypeNormalizerTest extends TestCase
      */
     public function testPartialDateYearMonthParsedCorrectly(): void
     {
-        $result = $this->normalizer->denormalize('2015-02', \Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive::class, 'json');
+        $result = $this->normalizer->denormalize('2015-02', DateTimePrimitive::class, 'json');
 
-        self::assertInstanceOf(\Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive::class, $result);
+        self::assertInstanceOf(DateTimePrimitive::class, $result);
         self::assertInstanceOf(\DateTimeImmutable::class, $result->value);
         self::assertSame('2015', $result->value->format('Y'));
         self::assertSame('02', $result->value->format('m'));
@@ -247,9 +248,9 @@ class FHIRPrimitiveTypeNormalizerTest extends TestCase
      */
     public function testPartialDateFullDateParsedCorrectly(): void
     {
-        $result = $this->normalizer->denormalize('2015-02-15', \Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive::class, 'json');
+        $result = $this->normalizer->denormalize('2015-02-15', DateTimePrimitive::class, 'json');
 
-        self::assertInstanceOf(\Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive::class, $result);
+        self::assertInstanceOf(DateTimePrimitive::class, $result);
         self::assertInstanceOf(\DateTimeImmutable::class, $result->value);
         self::assertSame('2015', $result->value->format('Y'));
         self::assertSame('02', $result->value->format('m'));

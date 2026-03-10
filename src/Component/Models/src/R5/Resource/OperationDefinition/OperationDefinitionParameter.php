@@ -32,6 +32,7 @@ class OperationDefinitionParameter extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -41,6 +42,7 @@ class OperationDefinitionParameter extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -50,6 +52,7 @@ class OperationDefinitionParameter extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'name' => [
@@ -59,6 +62,7 @@ class OperationDefinitionParameter extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'use' => [
@@ -68,6 +72,7 @@ class OperationDefinitionParameter extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'scope' => [
@@ -77,6 +82,7 @@ class OperationDefinitionParameter extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'min' => [
@@ -86,6 +92,7 @@ class OperationDefinitionParameter extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'max' => [
@@ -95,6 +102,7 @@ class OperationDefinitionParameter extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'documentation' => [
@@ -104,6 +112,7 @@ class OperationDefinitionParameter extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -113,6 +122,7 @@ class OperationDefinitionParameter extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'allowedType' => [
@@ -122,6 +132,7 @@ class OperationDefinitionParameter extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'targetProfile' => [
@@ -131,6 +142,7 @@ class OperationDefinitionParameter extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'searchType' => [
@@ -140,6 +152,7 @@ class OperationDefinitionParameter extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'binding' => [
@@ -149,6 +162,7 @@ class OperationDefinitionParameter extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'referencedFrom' => [
@@ -158,6 +172,7 @@ class OperationDefinitionParameter extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\OperationDefinition\OperationDefinitionParameterReferencedFrom',
             'variants'     => null,
         ],
         'part' => [
@@ -167,6 +182,7 @@ class OperationDefinitionParameter extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\OperationDefinition\OperationDefinitionParameter',
             'variants'     => null,
         ],
     ];

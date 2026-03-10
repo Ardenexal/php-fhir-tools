@@ -86,8 +86,6 @@ final class TraceFunction extends AbstractFunction
         $logger = $evaluator->getLogger();
         if ($logger !== null) {
             $logger->debug($message);
-        } else {
-            error_log($message);
         }
 
         // Always return the original input unchanged

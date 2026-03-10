@@ -25,6 +25,7 @@ class CitationCitedArtifactPublicationFormPeriodicRelease extends BackboneElemen
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -34,6 +35,7 @@ class CitationCitedArtifactPublicationFormPeriodicRelease extends BackboneElemen
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -43,6 +45,7 @@ class CitationCitedArtifactPublicationFormPeriodicRelease extends BackboneElemen
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'citedMedium' => [
@@ -52,6 +55,7 @@ class CitationCitedArtifactPublicationFormPeriodicRelease extends BackboneElemen
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'volume' => [
@@ -61,6 +65,7 @@ class CitationCitedArtifactPublicationFormPeriodicRelease extends BackboneElemen
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'issue' => [
@@ -70,6 +75,7 @@ class CitationCitedArtifactPublicationFormPeriodicRelease extends BackboneElemen
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'dateOfPublication' => [
@@ -79,6 +85,7 @@ class CitationCitedArtifactPublicationFormPeriodicRelease extends BackboneElemen
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

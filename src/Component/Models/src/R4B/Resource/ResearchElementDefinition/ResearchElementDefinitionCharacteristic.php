@@ -35,6 +35,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -44,6 +45,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -53,6 +55,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'definition' => [
@@ -62,6 +65,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'CodeableConcept',
@@ -100,6 +104,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\UsageContext',
             'variants'     => null,
         ],
         'exclude' => [
@@ -109,6 +114,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'unitOfMeasure' => [
@@ -118,6 +124,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'studyEffectiveDescription' => [
@@ -127,6 +134,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'studyEffective' => [
@@ -136,6 +144,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'dateTime',
@@ -174,6 +183,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'studyEffectiveGroupMeasure' => [
@@ -183,6 +193,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'participantEffectiveDescription' => [
@@ -192,6 +203,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'participantEffective' => [
@@ -201,6 +213,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'dateTime',
@@ -239,6 +252,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'participantEffectiveGroupMeasure' => [
@@ -248,6 +262,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

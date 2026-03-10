@@ -23,6 +23,7 @@ class MolecularSequenceStructureVariantOuter extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -32,6 +33,7 @@ class MolecularSequenceStructureVariantOuter extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -41,6 +43,7 @@ class MolecularSequenceStructureVariantOuter extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'start' => [
@@ -50,6 +53,7 @@ class MolecularSequenceStructureVariantOuter extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'end' => [
@@ -59,6 +63,7 @@ class MolecularSequenceStructureVariantOuter extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

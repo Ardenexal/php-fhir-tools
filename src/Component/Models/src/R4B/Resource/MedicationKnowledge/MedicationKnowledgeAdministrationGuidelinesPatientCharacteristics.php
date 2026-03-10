@@ -31,6 +31,7 @@ class MedicationKnowledgeAdministrationGuidelinesPatientCharacteristics extends 
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -40,6 +41,7 @@ class MedicationKnowledgeAdministrationGuidelinesPatientCharacteristics extends 
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -49,6 +51,7 @@ class MedicationKnowledgeAdministrationGuidelinesPatientCharacteristics extends 
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'characteristic' => [
@@ -58,6 +61,7 @@ class MedicationKnowledgeAdministrationGuidelinesPatientCharacteristics extends 
             'isRequired'   => true,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'CodeableConcept',
@@ -82,6 +86,7 @@ class MedicationKnowledgeAdministrationGuidelinesPatientCharacteristics extends 
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

@@ -51,6 +51,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'meta' => [
@@ -60,6 +61,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'implicitRules' => [
@@ -69,6 +71,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'language' => [
@@ -78,6 +81,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'text' => [
@@ -87,6 +91,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'contained' => [
@@ -96,6 +101,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -105,6 +111,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -114,6 +121,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'code' => [
@@ -123,6 +131,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'status' => [
@@ -132,6 +141,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'manufacturer' => [
@@ -141,6 +151,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'doseForm' => [
@@ -150,6 +161,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'amount' => [
@@ -159,6 +171,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'synonym' => [
@@ -168,6 +181,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'relatedMedicationKnowledge' => [
@@ -177,6 +191,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationKnowledge\MedicationKnowledgeRelatedMedicationKnowledge',
             'variants'     => null,
         ],
         'associatedMedication' => [
@@ -186,6 +201,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
             'variants'     => null,
         ],
         'productType' => [
@@ -195,6 +211,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'monograph' => [
@@ -204,6 +221,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationKnowledge\MedicationKnowledgeMonograph',
             'variants'     => null,
         ],
         'ingredient' => [
@@ -213,6 +231,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationKnowledge\MedicationKnowledgeIngredient',
             'variants'     => null,
         ],
         'preparationInstruction' => [
@@ -222,6 +241,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'intendedRoute' => [
@@ -231,6 +251,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'cost' => [
@@ -240,6 +261,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationKnowledge\MedicationKnowledgeCost',
             'variants'     => null,
         ],
         'monitoringProgram' => [
@@ -249,6 +271,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationKnowledge\MedicationKnowledgeMonitoringProgram',
             'variants'     => null,
         ],
         'administrationGuidelines' => [
@@ -258,6 +281,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationKnowledge\MedicationKnowledgeAdministrationGuidelines',
             'variants'     => null,
         ],
         'medicineClassification' => [
@@ -267,6 +291,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationKnowledge\MedicationKnowledgeMedicineClassification',
             'variants'     => null,
         ],
         'packaging' => [
@@ -276,6 +301,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'drugCharacteristic' => [
@@ -285,6 +311,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationKnowledge\MedicationKnowledgeDrugCharacteristic',
             'variants'     => null,
         ],
         'contraindication' => [
@@ -294,6 +321,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
             'variants'     => null,
         ],
         'regulatory' => [
@@ -303,6 +331,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationKnowledge\MedicationKnowledgeRegulatory',
             'variants'     => null,
         ],
         'kinetics' => [
@@ -312,6 +341,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationKnowledge\MedicationKnowledgeKinetics',
             'variants'     => null,
         ],
     ];

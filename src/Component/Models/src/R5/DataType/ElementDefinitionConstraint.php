@@ -26,6 +26,7 @@ class ElementDefinitionConstraint extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -35,6 +36,7 @@ class ElementDefinitionConstraint extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'key' => [
@@ -44,6 +46,7 @@ class ElementDefinitionConstraint extends Element
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'requirements' => [
@@ -53,6 +56,7 @@ class ElementDefinitionConstraint extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'severity' => [
@@ -62,6 +66,7 @@ class ElementDefinitionConstraint extends Element
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'suppress' => [
@@ -71,6 +76,7 @@ class ElementDefinitionConstraint extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'human' => [
@@ -80,6 +86,7 @@ class ElementDefinitionConstraint extends Element
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'expression' => [
@@ -89,6 +96,7 @@ class ElementDefinitionConstraint extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'source' => [
@@ -98,6 +106,7 @@ class ElementDefinitionConstraint extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

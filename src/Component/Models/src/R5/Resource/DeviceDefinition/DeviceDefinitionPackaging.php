@@ -25,6 +25,7 @@ class DeviceDefinitionPackaging extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -34,6 +35,7 @@ class DeviceDefinitionPackaging extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -43,6 +45,7 @@ class DeviceDefinitionPackaging extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'identifier' => [
@@ -52,6 +55,7 @@ class DeviceDefinitionPackaging extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -61,6 +65,7 @@ class DeviceDefinitionPackaging extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'count' => [
@@ -70,6 +75,7 @@ class DeviceDefinitionPackaging extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'distributor' => [
@@ -79,6 +85,7 @@ class DeviceDefinitionPackaging extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\DeviceDefinition\DeviceDefinitionPackagingDistributor',
             'variants'     => null,
         ],
         'udiDeviceIdentifier' => [
@@ -88,6 +95,7 @@ class DeviceDefinitionPackaging extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\DeviceDefinition\DeviceDefinitionUdiDeviceIdentifier',
             'variants'     => null,
         ],
         'packaging' => [
@@ -97,6 +105,7 @@ class DeviceDefinitionPackaging extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\DeviceDefinition\DeviceDefinitionPackaging',
             'variants'     => null,
         ],
     ];

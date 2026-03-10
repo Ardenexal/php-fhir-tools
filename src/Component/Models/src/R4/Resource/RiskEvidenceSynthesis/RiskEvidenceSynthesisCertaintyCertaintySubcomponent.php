@@ -29,6 +29,7 @@ class RiskEvidenceSynthesisCertaintyCertaintySubcomponent extends BackboneElemen
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -38,6 +39,7 @@ class RiskEvidenceSynthesisCertaintyCertaintySubcomponent extends BackboneElemen
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -47,6 +49,7 @@ class RiskEvidenceSynthesisCertaintyCertaintySubcomponent extends BackboneElemen
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -56,6 +59,7 @@ class RiskEvidenceSynthesisCertaintyCertaintySubcomponent extends BackboneElemen
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'rating' => [
@@ -65,6 +69,7 @@ class RiskEvidenceSynthesisCertaintyCertaintySubcomponent extends BackboneElemen
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'note' => [
@@ -74,6 +79,7 @@ class RiskEvidenceSynthesisCertaintyCertaintySubcomponent extends BackboneElemen
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation',
             'variants'     => null,
         ],
     ];

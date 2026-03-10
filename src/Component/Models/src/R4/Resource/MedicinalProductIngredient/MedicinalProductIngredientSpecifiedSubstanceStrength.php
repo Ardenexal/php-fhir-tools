@@ -31,6 +31,7 @@ class MedicinalProductIngredientSpecifiedSubstanceStrength extends BackboneEleme
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -40,6 +41,7 @@ class MedicinalProductIngredientSpecifiedSubstanceStrength extends BackboneEleme
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -49,6 +51,7 @@ class MedicinalProductIngredientSpecifiedSubstanceStrength extends BackboneEleme
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'presentation' => [
@@ -58,6 +61,7 @@ class MedicinalProductIngredientSpecifiedSubstanceStrength extends BackboneEleme
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'presentationLowLimit' => [
@@ -67,6 +71,7 @@ class MedicinalProductIngredientSpecifiedSubstanceStrength extends BackboneEleme
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'concentration' => [
@@ -76,6 +81,7 @@ class MedicinalProductIngredientSpecifiedSubstanceStrength extends BackboneEleme
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'concentrationLowLimit' => [
@@ -85,6 +91,7 @@ class MedicinalProductIngredientSpecifiedSubstanceStrength extends BackboneEleme
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'measurementPoint' => [
@@ -94,6 +101,7 @@ class MedicinalProductIngredientSpecifiedSubstanceStrength extends BackboneEleme
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'country' => [
@@ -103,6 +111,7 @@ class MedicinalProductIngredientSpecifiedSubstanceStrength extends BackboneEleme
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'referenceStrength' => [
@@ -112,6 +121,7 @@ class MedicinalProductIngredientSpecifiedSubstanceStrength extends BackboneEleme
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\MedicinalProductIngredient\MedicinalProductIngredientSpecifiedSubstanceStrengthReferenceStrength',
             'variants'     => null,
         ],
     ];

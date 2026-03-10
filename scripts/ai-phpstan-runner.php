@@ -114,7 +114,6 @@ function formatResults(string $jsonOutput, int $exitCode, string $projectRoot, i
     }
 
     /** @var array{totals?: array{errors?: int, file_errors?: int}, files?: array<string, array{errors?: int, messages?: list<array{message: string, line: int, identifier?: string}>}>, errors?: list<string>} $data */
-
     $globalErrors = (array) ($data['errors'] ?? []);
     $files        = (array) ($data['files'] ?? []);
     // totals.errors = global (non-file) errors; totals.file_errors = per-file errors
@@ -186,7 +185,7 @@ function formatResults(string $jsonOutput, int $exitCode, string $projectRoot, i
 
     $remaining = $totalErrors - $aiOffset - $shown;
     if ($remaining > 0) {
-        $lines[] = "... and {$remaining} more errors (use --ai-offset=" . ($aiOffset + $shown) . " to continue)";
+        $lines[] = "... and {$remaining} more errors (use --ai-offset=" . ($aiOffset + $shown) . ' to continue)';
     }
 
     return implode("\n", $lines);

@@ -267,7 +267,7 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
      * the same fhirType and are non-array, then extracting the non-builtin type from
      * their union declaration (e.g. `StringPrimitive|string|null` → `StringPrimitive`).
      *
-     * @param \ReflectionClass<object>  $class
+     * @param \ReflectionClass<object>        $class
      * @param array<string, PropertyMetadata> $metaMap
      */
     protected function resolvePrimitiveArrayItemClass(\ReflectionClass $class, string $fhirType, array $metaMap): ?string
@@ -304,10 +304,10 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
      * If the corresponding primitive object does not yet exist (base key absent from JSON),
      * a new primitive instance is created with `value = null`.
      *
-     * @param \ReflectionClass<object>         $reflection
-     * @param array<string, mixed>             $data
-     * @param array<string, PropertyMetadata>  $metaMap
-     * @param array<string, mixed>             $context
+     * @param \ReflectionClass<object>        $reflection
+     * @param array<string, mixed>            $data
+     * @param array<string, PropertyMetadata> $metaMap
+     * @param array<string, mixed>            $context
      */
     protected function applyPrimitiveExtensions(
         \ReflectionClass $reflection,
@@ -368,8 +368,8 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
 
                 $maxLen = max(count($currentArray), count($extData));
 
-                for ($i = 0; $i < $maxLen; $i++) {
-                    $extEntry = $extData[$i] ?? null;
+                for ($i = 0; $i < $maxLen; ++$i) {
+                    $extEntry         = $extData[$i] ?? null;
                     $hasExtensionData = is_array($extEntry) && isset($extEntry['extension']) && is_array($extEntry['extension']);
 
                     if (!isset($currentArray[$i]) || !is_object($currentArray[$i])) {

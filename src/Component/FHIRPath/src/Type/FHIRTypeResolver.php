@@ -56,6 +56,12 @@ class FHIRTypeResolver
         'positiveInt'  => 'integer',
         'unsignedInt'  => 'integer',
         'instant'      => 'dateTime',
+        // FHIR profile types that extend Quantity (per FHIR spec §4.2 data type hierarchy)
+        'Age'          => 'Quantity',
+        'Count'        => 'Quantity',
+        'Distance'     => 'Quantity',
+        'Duration'     => 'Quantity',
+        'Money'        => 'Quantity',
     ];
 
     /**
@@ -139,6 +145,12 @@ class FHIRTypeResolver
             return $value->fhirType;
         }
 
+        // FHIRTypedCollection wraps a raw data array with its FHIR type name to preserve
+        // FHIR type context for complex types deserialized as PHP arrays (e.g. HumanName, Age).
+        if ($value instanceof FHIRTypedCollection) {
+            return $value->fhirType;
+        }
+
         if (is_bool($value)) {
             return 'boolean';
         }
@@ -195,6 +207,14 @@ class FHIRTypeResolver
             $resourceType = $this->findResourceTypeFromAttribute($ref);
             if ($resourceType !== null) {
                 return $resourceType;
+            }
+
+            // FHIR complex data types (HumanName, Quantity, Age, etc.) carry a canonical type
+            // name in their #[FHIRComplexType(typeName: '...')] attribute. Walk the class
+            // hierarchy so that subclasses (Age extends Quantity) are also matched.
+            $complexType = $this->findComplexTypeFromAttribute($ref);
+            if ($complexType !== null) {
+                return $complexType;
             }
 
             // Get the class name and extract the FHIR type
@@ -282,11 +302,38 @@ class FHIRTypeResolver
             }
         }
 
-        // Check if value is an instance of the FHIR resource type
+        // Check if value is an instance of the FHIR resource type (PHP class name ends with type)
         if (is_object($value)) {
             $class = get_class($value);
             if (str_ends_with($class, '\\' . $typeName)) {
                 return true;
+            }
+        }
+
+        // For the `is` operator (non-strict), walk the PHP class inheritance chain.
+        // FHIR profiles like Age (extends Quantity), Duration (extends Quantity) are
+        // represented in the generated models as PHP subclasses. Walking the hierarchy
+        // allows `Age is Quantity` to return true without needing explicit TYPE_PARENTS
+        // entries for every profile.
+        if (!$strict && is_object($value)) {
+            $parentRef = (new \ReflectionClass($value))->getParentClass();
+            while ($parentRef !== false) {
+                $parentTypeName = $this->findComplexTypeFromAttribute($parentRef)
+                    ?? $this->findResourceTypeFromAttribute($parentRef);
+                if ($parentTypeName !== null && (
+                    $parentTypeName === $typeName || strcasecmp($parentTypeName, $typeName) === 0
+                )) {
+                    return true;
+                }
+
+                // Also check the bare PHP class short name (for models without attributes)
+                $parts     = explode('\\', $parentRef->getName());
+                $shortName = (string) end($parts);
+                if ($shortName === $typeName || strcasecmp($shortName, $typeName) === 0) {
+                    return true;
+                }
+
+                $parentRef = $parentRef->getParentClass();
             }
         }
 
@@ -402,6 +449,30 @@ class FHIRTypeResolver
     public function getPhpType(string $fhirType): ?string
     {
         return self::PRIMITIVE_TYPES[$fhirType] ?? null;
+    }
+
+    /**
+     * Walk the class hierarchy of $ref looking for a #[FHIRComplexType(typeName: '...')] attribute.
+     *
+     * Returns the canonical FHIR type string (e.g. 'HumanName', 'Quantity', 'Age') from the
+     * FIRST class in the hierarchy that carries the attribute — i.e., the most-derived type.
+     *
+     * @param \ReflectionClass<object> $ref
+     */
+    private function findComplexTypeFromAttribute(\ReflectionClass $ref): ?string
+    {
+        // Only check the given class (not parents) — we want the most-specific type.
+        // Callers walk parents themselves when they need hierarchy traversal.
+        foreach ($ref->getAttributes() as $attr) {
+            if (str_ends_with($attr->getName(), 'FHIRComplexType')) {
+                $args     = $attr->getArguments();
+                $typeName = $args['typeName'] ?? $args[0] ?? null;
+
+                return is_string($typeName) ? $typeName : null;
+            }
+        }
+
+        return null;
     }
 
     /**

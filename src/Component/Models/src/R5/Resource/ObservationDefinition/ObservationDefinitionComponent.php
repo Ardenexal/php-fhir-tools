@@ -27,6 +27,7 @@ class ObservationDefinitionComponent extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -36,6 +37,7 @@ class ObservationDefinitionComponent extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -45,6 +47,7 @@ class ObservationDefinitionComponent extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'code' => [
@@ -54,6 +57,7 @@ class ObservationDefinitionComponent extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'permittedDataType' => [
@@ -63,6 +67,7 @@ class ObservationDefinitionComponent extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'permittedUnit' => [
@@ -72,6 +77,7 @@ class ObservationDefinitionComponent extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding',
             'variants'     => null,
         ],
         'qualifiedValue' => [
@@ -81,6 +87,7 @@ class ObservationDefinitionComponent extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ObservationDefinition\ObservationDefinitionQualifiedValue',
             'variants'     => null,
         ],
     ];

@@ -219,11 +219,11 @@ final class SortFunctionTest extends TestCase
         $expr   = $this->parse('name');
         $result = $this->function->execute($input, [$expr], $this->context);
 
-        // Null should sort first
-        self::assertNull($result->toArray()[0]['name']);
-        self::assertSame('Alice', $result->toArray()[1]['name']);
-        self::assertSame('Bob', $result->toArray()[2]['name']);
-        self::assertSame('Charlie', $result->toArray()[3]['name']);
+        // Per FHIRPath spec: items with empty/null sort keys are placed at the END.
+        self::assertSame('Alice', $result->toArray()[0]['name']);
+        self::assertSame('Bob', $result->toArray()[1]['name']);
+        self::assertSame('Charlie', $result->toArray()[2]['name']);
+        self::assertNull($result->toArray()[3]['name']);
     }
 
     public function testSortWithEmptyResultFromExpression(): void
@@ -238,11 +238,11 @@ final class SortFunctionTest extends TestCase
         $expr   = $this->parse('values.first()');
         $result = $this->function->execute($input, [$expr], $this->context);
 
-        // Empty result should be treated as null and sort first
-        self::assertSame([], $result->toArray()[0]['values']);
-        self::assertSame([1], $result->toArray()[1]['values']);
-        self::assertSame([2], $result->toArray()[2]['values']);
-        self::assertSame([3], $result->toArray()[3]['values']);
+        // Per FHIRPath spec: items with empty sort key expressions are placed at the END.
+        self::assertSame([1], $result->toArray()[0]['values']);
+        self::assertSame([2], $result->toArray()[1]['values']);
+        self::assertSame([3], $result->toArray()[2]['values']);
+        self::assertSame([], $result->toArray()[3]['values']);
     }
 
     public function testSortThrowsOnMultipleValuesFromExpression(): void

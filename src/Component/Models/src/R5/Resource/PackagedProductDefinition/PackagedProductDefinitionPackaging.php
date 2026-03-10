@@ -27,6 +27,7 @@ class PackagedProductDefinitionPackaging extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -36,6 +37,7 @@ class PackagedProductDefinitionPackaging extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -45,6 +47,7 @@ class PackagedProductDefinitionPackaging extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'identifier' => [
@@ -54,6 +57,7 @@ class PackagedProductDefinitionPackaging extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
             'variants'     => null,
         ],
         'type' => [
@@ -63,6 +67,7 @@ class PackagedProductDefinitionPackaging extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'componentPart' => [
@@ -72,6 +77,7 @@ class PackagedProductDefinitionPackaging extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'quantity' => [
@@ -81,6 +87,7 @@ class PackagedProductDefinitionPackaging extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'material' => [
@@ -90,6 +97,7 @@ class PackagedProductDefinitionPackaging extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'alternateMaterial' => [
@@ -99,6 +107,7 @@ class PackagedProductDefinitionPackaging extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'shelfLifeStorage' => [
@@ -108,6 +117,7 @@ class PackagedProductDefinitionPackaging extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ProductShelfLife',
             'variants'     => null,
         ],
         'manufacturer' => [
@@ -117,6 +127,7 @@ class PackagedProductDefinitionPackaging extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
             'variants'     => null,
         ],
         'property' => [
@@ -126,6 +137,7 @@ class PackagedProductDefinitionPackaging extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\PackagedProductDefinition\PackagedProductDefinitionPackagingProperty',
             'variants'     => null,
         ],
         'containedItem' => [
@@ -135,6 +147,7 @@ class PackagedProductDefinitionPackaging extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\PackagedProductDefinition\PackagedProductDefinitionPackagingContainedItem',
             'variants'     => null,
         ],
         'packaging' => [
@@ -144,6 +157,7 @@ class PackagedProductDefinitionPackaging extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\PackagedProductDefinition\PackagedProductDefinitionPackaging',
             'variants'     => null,
         ],
     ];

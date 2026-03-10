@@ -31,6 +31,7 @@ class CoverageEligibilityResponseInsuranceItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -40,6 +41,7 @@ class CoverageEligibilityResponseInsuranceItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -49,6 +51,7 @@ class CoverageEligibilityResponseInsuranceItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'category' => [
@@ -58,6 +61,7 @@ class CoverageEligibilityResponseInsuranceItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'productOrService' => [
@@ -67,6 +71,7 @@ class CoverageEligibilityResponseInsuranceItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifier' => [
@@ -76,6 +81,7 @@ class CoverageEligibilityResponseInsuranceItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'provider' => [
@@ -85,6 +91,7 @@ class CoverageEligibilityResponseInsuranceItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'excluded' => [
@@ -94,6 +101,7 @@ class CoverageEligibilityResponseInsuranceItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'name' => [
@@ -103,6 +111,7 @@ class CoverageEligibilityResponseInsuranceItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'description' => [
@@ -112,6 +121,7 @@ class CoverageEligibilityResponseInsuranceItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'network' => [
@@ -121,6 +131,7 @@ class CoverageEligibilityResponseInsuranceItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'unit' => [
@@ -130,6 +141,7 @@ class CoverageEligibilityResponseInsuranceItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'term' => [
@@ -139,6 +151,7 @@ class CoverageEligibilityResponseInsuranceItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'benefit' => [
@@ -148,6 +161,7 @@ class CoverageEligibilityResponseInsuranceItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\CoverageEligibilityResponse\CoverageEligibilityResponseInsuranceItemBenefit',
             'variants'     => null,
         ],
         'authorizationRequired' => [
@@ -157,6 +171,7 @@ class CoverageEligibilityResponseInsuranceItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'authorizationSupporting' => [
@@ -166,6 +181,7 @@ class CoverageEligibilityResponseInsuranceItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'authorizationUrl' => [
@@ -175,6 +191,7 @@ class CoverageEligibilityResponseInsuranceItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

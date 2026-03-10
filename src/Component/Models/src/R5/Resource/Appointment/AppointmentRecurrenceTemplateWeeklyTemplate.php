@@ -24,6 +24,7 @@ class AppointmentRecurrenceTemplateWeeklyTemplate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -33,6 +34,7 @@ class AppointmentRecurrenceTemplateWeeklyTemplate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -42,6 +44,7 @@ class AppointmentRecurrenceTemplateWeeklyTemplate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'monday' => [
@@ -51,6 +54,7 @@ class AppointmentRecurrenceTemplateWeeklyTemplate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'tuesday' => [
@@ -60,6 +64,7 @@ class AppointmentRecurrenceTemplateWeeklyTemplate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'wednesday' => [
@@ -69,6 +74,7 @@ class AppointmentRecurrenceTemplateWeeklyTemplate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'thursday' => [
@@ -78,6 +84,7 @@ class AppointmentRecurrenceTemplateWeeklyTemplate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'friday' => [
@@ -87,6 +94,7 @@ class AppointmentRecurrenceTemplateWeeklyTemplate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'saturday' => [
@@ -96,6 +104,7 @@ class AppointmentRecurrenceTemplateWeeklyTemplate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'sunday' => [
@@ -105,6 +114,7 @@ class AppointmentRecurrenceTemplateWeeklyTemplate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'weekInterval' => [
@@ -114,6 +124,7 @@ class AppointmentRecurrenceTemplateWeeklyTemplate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

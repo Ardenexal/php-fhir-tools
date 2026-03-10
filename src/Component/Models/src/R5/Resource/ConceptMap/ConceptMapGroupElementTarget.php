@@ -28,6 +28,7 @@ class ConceptMapGroupElementTarget extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -37,6 +38,7 @@ class ConceptMapGroupElementTarget extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -46,6 +48,7 @@ class ConceptMapGroupElementTarget extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'code' => [
@@ -55,6 +58,7 @@ class ConceptMapGroupElementTarget extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'display' => [
@@ -64,6 +68,7 @@ class ConceptMapGroupElementTarget extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'valueSet' => [
@@ -73,6 +78,7 @@ class ConceptMapGroupElementTarget extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'relationship' => [
@@ -82,6 +88,7 @@ class ConceptMapGroupElementTarget extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'comment' => [
@@ -91,6 +98,7 @@ class ConceptMapGroupElementTarget extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'property' => [
@@ -100,6 +108,7 @@ class ConceptMapGroupElementTarget extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ConceptMap\ConceptMapGroupElementTargetProperty',
             'variants'     => null,
         ],
         'dependsOn' => [
@@ -109,6 +118,7 @@ class ConceptMapGroupElementTarget extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ConceptMap\ConceptMapGroupElementTargetDependsOn',
             'variants'     => null,
         ],
         'product' => [
@@ -118,6 +128,7 @@ class ConceptMapGroupElementTarget extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ConceptMap\ConceptMapGroupElementTargetDependsOn',
             'variants'     => null,
         ],
     ];

@@ -26,6 +26,7 @@ class NutritionOrderOralDiet extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -35,6 +36,7 @@ class NutritionOrderOralDiet extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -44,6 +46,7 @@ class NutritionOrderOralDiet extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -53,6 +56,7 @@ class NutritionOrderOralDiet extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'schedule' => [
@@ -62,6 +66,7 @@ class NutritionOrderOralDiet extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing',
             'variants'     => null,
         ],
         'nutrient' => [
@@ -71,6 +76,7 @@ class NutritionOrderOralDiet extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\NutritionOrder\NutritionOrderOralDietNutrient',
             'variants'     => null,
         ],
         'texture' => [
@@ -80,6 +86,7 @@ class NutritionOrderOralDiet extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\NutritionOrder\NutritionOrderOralDietTexture',
             'variants'     => null,
         ],
         'fluidConsistencyType' => [
@@ -89,6 +96,7 @@ class NutritionOrderOralDiet extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'instruction' => [
@@ -98,6 +106,7 @@ class NutritionOrderOralDiet extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

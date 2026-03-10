@@ -31,6 +31,7 @@ class MedicationKnowledgeIndicationGuidelineDosingGuidelinePatientCharacteristic
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -40,6 +41,7 @@ class MedicationKnowledgeIndicationGuidelineDosingGuidelinePatientCharacteristic
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -49,6 +51,7 @@ class MedicationKnowledgeIndicationGuidelineDosingGuidelinePatientCharacteristic
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -58,6 +61,7 @@ class MedicationKnowledgeIndicationGuidelineDosingGuidelinePatientCharacteristic
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'value' => [
@@ -67,6 +71,7 @@ class MedicationKnowledgeIndicationGuidelineDosingGuidelinePatientCharacteristic
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'CodeableConcept',

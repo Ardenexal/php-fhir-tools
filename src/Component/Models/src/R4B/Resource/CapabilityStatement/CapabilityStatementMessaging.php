@@ -25,6 +25,7 @@ class CapabilityStatementMessaging extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -34,6 +35,7 @@ class CapabilityStatementMessaging extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -43,6 +45,7 @@ class CapabilityStatementMessaging extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'endpoint' => [
@@ -52,6 +55,7 @@ class CapabilityStatementMessaging extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\CapabilityStatement\CapabilityStatementMessagingEndpoint',
             'variants'     => null,
         ],
         'reliableCache' => [
@@ -61,6 +65,7 @@ class CapabilityStatementMessaging extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'documentation' => [
@@ -70,6 +75,7 @@ class CapabilityStatementMessaging extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'supportedMessage' => [
@@ -79,6 +85,7 @@ class CapabilityStatementMessaging extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\CapabilityStatement\CapabilityStatementMessagingSupportedMessage',
             'variants'     => null,
         ],
     ];

@@ -25,5 +25,6 @@ final class FHIRTypedScalar
     public function __construct(
         public readonly bool|int|float|string $value,
         public readonly string $fhirType,
-    ) {}
+    ) {
+    }
 }

@@ -6,7 +6,6 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
-use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
 
 /**
  * Returns true if all items in the collection are true.
@@ -31,11 +30,9 @@ class AllTrueFunction extends AbstractFunction
 
         foreach ($input as $item) {
             $item = $context->normalizeValue($item);
-            if (!is_bool($item)) {
-                throw new EvaluationException('allTrue() requires all items to be boolean');
-            }
-
-            if ($item !== true) {
+            // Non-boolean items are not true — return false per lenient semantics.
+            // (A strict evaluator would throw; lenient mode treats non-booleans as false.)
+            if (!is_bool($item) || $item !== true) {
                 return Collection::single(false);
             }
         }

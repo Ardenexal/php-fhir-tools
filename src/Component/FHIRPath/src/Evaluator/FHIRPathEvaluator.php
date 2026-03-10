@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Expression\MemberAccessNode;
 use Ardenexal\FHIRTools\Component\FHIRPath\Expression\TypeExpressionNode;
 use Ardenexal\FHIRTools\Component\FHIRPath\Expression\UnaryOperatorNode;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
+use Ardenexal\FHIRTools\Component\FHIRPath\Exception\FHIRPathSemanticException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Function\ToQuantityFunction;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\TokenType;
 use Ardenexal\FHIRTools\Component\FHIRPath\Function\FunctionRegistry;
@@ -26,6 +27,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathTemporalTypeInterface;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathTime;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRTypeResolver;
+use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRTypedCollection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRTypedScalar;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
@@ -63,6 +65,15 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      * @var array<string, bool>
      */
     private array $primitiveCache = [];
+
+    /**
+     * Cache of FHIR type name → FHIR_PROPERTY_MAP keys from the matching PHP class.
+     * Used by strict-mode property validation on typed-empty collections.
+     * null = type not found (no loaded PHP class for it); array = known property names.
+     *
+     * @var array<string, list<string>|null>
+     */
+    private array $fhirTypePropertyCache = [];
 
     private ?LoggerInterface $logger = null;
 
@@ -240,6 +251,15 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     }
 
     /**
+     * Return the current evaluation context.
+     * Exposed so that function implementations can inspect strict mode and other context state.
+     */
+    public function getContext(): EvaluationContext
+    {
+        return $this->context;
+    }
+
+    /**
      * Evaluate an expression against a resource
      *
      * @param ExpressionNode         $expression The parsed expression (AST)
@@ -345,7 +365,10 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             if ($this->context->hasVariable($variableName)) {
                 $value = $this->context->getVariable($variableName);
 
-                return $value !== null ? Collection::single($value) : Collection::empty();
+                // Return the value as-is, including null: a variable explicitly set to null
+                // (e.g. $this for a null FHIR primitive element in select()) is still a valid
+                // node that hasValue() should evaluate to false for.
+                return Collection::single($value);
             }
 
             return Collection::empty();
@@ -364,6 +387,17 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         // look for a property key named "Patient".
         if ($this->matchesResourceType($currentNode, $name)) {
             return Collection::single($currentNode);
+        }
+
+        // Strict mode: if the identifier starts with an uppercase letter (indicating a
+        // type-filter usage like `Encounter.name`), and the current node is a typed FHIR
+        // resource, this is a wrong-context error — the type filter did not match.
+        if ($this->context->isStrictMode()
+            && isset($name[0]) && ctype_upper($name[0])
+            && is_object($currentNode)
+            && $this->resolveResourceTypeFromAttribute(get_class($currentNode)) !== null
+        ) {
+            throw new FHIRPathSemanticException("Type filter '{$name}' does not match the context resource type");
         }
 
         return $this->navigateProperty($currentNode, $name);
@@ -396,6 +430,18 @@ final class FHIRPathEvaluator implements ExpressionVisitor
 
         // Property navigation: empty input propagates as empty (cannot navigate a property of nothing)
         if ($objectResult->isEmpty()) {
+            // Strict mode: if the empty collection carries a declared FHIR type (from an `as` cast),
+            // validate that the accessed property actually exists on that type.
+            if ($this->context->isStrictMode()
+                && $objectResult->getDeclaredType() !== null
+                && $node->getMember() instanceof IdentifierNode
+            ) {
+                $this->assertPropertyExistsOnFhirType(
+                    $objectResult->getDeclaredType(),
+                    $node->getMember()->getName(),
+                );
+            }
+
             return Collection::empty();
         }
 
@@ -461,23 +507,8 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         // Per FHIRPath spec, expressions like "1 > 2 is Boolean" are invalid because
         // it's unclear whether it means "(1 > 2) is Boolean" or "1 > (2 is Boolean)"
         $operator = $node->getOperator();
-        if (in_array($operator, [
-            TokenType::EQUALS,
-            TokenType::NOT_EQUALS,
-            TokenType::LESS_THAN,
-            TokenType::GREATER_THAN,
-            TokenType::LESS_EQUAL,
-            TokenType::GREATER_EQUAL,
-            TokenType::EQUIVALENT,
-            TokenType::NOT_EQUIVALENT,
-        ], true)) {
-            if ($node->getLeft() instanceof TypeExpressionNode || $node->getRight() instanceof TypeExpressionNode) {
-                throw new EvaluationException("Ambiguous expression: 'is'/'as' operator cannot be used within comparison without parentheses", $node->getLine(), $node->getColumn());
-            }
-        }
-
-        $left  = $node->getLeft()->accept($this);
-        $right = $node->getRight()->accept($this);
+        $left     = $node->getLeft()->accept($this);
+        $right    = $node->getRight()->accept($this);
 
         return match ($operator) {
             // Union operator
@@ -600,29 +631,6 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      */
     public function visitTypeExpression(TypeExpressionNode $node): Collection
     {
-        // Semantic validation: detect ambiguous 'is' operator usage with comparison operators
-        // Per FHIRPath spec, expressions like "1 > 2 is Boolean" are invalid because they're
-        // ambiguous about precedence. Valid: "(1 > 2) is Boolean". Invalid: "1 > 2 is Boolean".
-        if ($node->getOperator() === TokenType::IS) {
-            $expression = $node->getExpression();
-            if ($expression instanceof BinaryOperatorNode) {
-                $operator = $expression->getOperator();
-                // Check if it's a comparison operator
-                if (in_array($operator, [
-                    TokenType::EQUALS,
-                    TokenType::NOT_EQUALS,
-                    TokenType::LESS_THAN,
-                    TokenType::GREATER_THAN,
-                    TokenType::LESS_EQUAL,
-                    TokenType::GREATER_EQUAL,
-                    TokenType::EQUIVALENT,
-                    TokenType::NOT_EQUIVALENT,
-                ], true)) {
-                    throw new EvaluationException("Ambiguous expression: 'is' operator cannot be applied to comparison result without parentheses", $node->getLine(), $node->getColumn());
-                }
-            }
-        }
-
         // Evaluate the expression to get the collection to check/cast
         $collection = $node->getExpression()->accept($this);
         $operator   = $node->getOperator();
@@ -648,7 +656,13 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         // Normalise namespace-qualified type names: System.Boolean → boolean, FHIR.Patient → Patient
         $typeName = $this->typeResolver->normalizeTypeName($node->getTypeName());
 
-        // Handle 'as' operator - type casting
+        // Handle 'as' operator — strict type filter per FHIRPath spec §5.22
+        // Rules:
+        //   - Empty input  → empty
+        //   - Unknown type → execution error
+        //   - Multi-item   → execution error (both operator and function form)
+        //   - Single item that matches the type (strict identity, no hierarchy) → return it
+        //   - Single item that does not match → return empty
         if ($operator === TokenType::AS) {
             if ($collection->isEmpty()) {
                 return Collection::empty();
@@ -659,19 +673,20 @@ final class FHIRPathEvaluator implements ExpressionVisitor
                 throw new EvaluationException("'as' operator used with unknown type: '{$node->getTypeName()}'");
             }
 
-            // For each item in the collection, attempt the cast; skip items that cannot be cast
-            // (FHIRPath 'as' is a filter/cast: items of the wrong type are excluded, not an error)
-            $casted = [];
-            foreach ($collection->toArray() as $item) {
-                try {
-                    $casted[] = $this->typeResolver->castToType($item, $typeName);
-                } catch (\InvalidArgumentException) {
-                    // Value is not compatible with the target type — skip it
-                    continue;
-                }
+            // Multi-item input is an execution error for both operator and function forms
+            if (!$collection->isSingle()) {
+                throw new EvaluationException(sprintf("'as' operator requires a single-item collection, got %d items", $collection->count()), $node->getLine(), $node->getColumn());
             }
 
-            return Collection::from($casted);
+            $item = $collection->first();
+
+            if ($this->typeResolver->isOfType($item, $typeName, strict: true)) {
+                return Collection::single($item);
+            }
+
+            return $this->context->isStrictMode()
+                ? Collection::typedEmpty($typeName)
+                : Collection::empty();
         }
 
         throw new EvaluationException(sprintf('Unsupported type operator: %s', $operator->name), $node->getLine(), $node->getColumn());
@@ -869,7 +884,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
 
             foreach ($propMeta['variants'] as $variant) {
                 $jsonKey = $variant['jsonKey'] ?? null;
-                if ($jsonKey === $propertyName
+                if ($jsonKey                            === $propertyName
                     && ($variant['propertyKind'] ?? '') === 'scalar'
                     && isset($variant['fhirType'])
                     && !str_starts_with($variant['fhirType'], 'http://')
@@ -883,10 +898,179 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     }
 
     /**
+     * Return the FHIR type name for a 'complex' or 'extension' kind property on an object.
+     *
+     * Complements resolveFhirPropertyType() which only handles 'scalar' properties.
+     * Used to wrap array items in FHIRTypedCollection so that ofType() and is() can
+     * identify raw arrays as their FHIR type (e.g. Patient.name items as HumanName).
+     *
+     * Returns null when the object has no FHIR_PROPERTY_MAP, the property is absent,
+     * or the property kind is not 'complex' or 'extension'.
+     */
+    private function resolveComplexPropertyFhirType(object $node, string $propertyName): ?string
+    {
+        $class = get_class($node);
+        if (!defined("{$class}::FHIR_PROPERTY_MAP")) {
+            return null;
+        }
+
+        /** @var array<string, array{fhirType?: string, propertyKind?: string}> $map */
+        $map = constant("{$class}::FHIR_PROPERTY_MAP");
+
+        if (!isset($map[$propertyName])) {
+            return null;
+        }
+
+        $meta = $map[$propertyName];
+        $kind = $meta['propertyKind'] ?? '';
+
+        if (!in_array($kind, ['complex', 'extension'], true)) {
+            return null;
+        }
+
+        $fhirType = $meta['fhirType'] ?? null;
+
+        if (
+            !is_string($fhirType)
+            || str_starts_with($fhirType, 'http://')
+            || str_starts_with($fhirType, 'https://')
+        ) {
+            return null;
+        }
+
+        return $fhirType;
+    }
+
+    /**
+     * Return true when $propertyName is a choice-type variant key in the class's FHIR_PROPERTY_MAP
+     * (e.g. 'valueQuantity' is a variant of the 'value[x]' choice property on Observation),
+     * rather than a first-class property.
+     *
+     * Used by strict-mode guards to reject direct variant access like `Observation.valueQuantity`.
+     *
+     * @param class-string $class
+     */
+    private function isChoiceVariantAccess(string $class, string $propertyName): bool
+    {
+        /** @var array<string, array{variants?: array<int, array{jsonKey?: string}>|null}> $map */
+        $map = constant("{$class}::FHIR_PROPERTY_MAP");
+
+        if (array_key_exists($propertyName, $map)) {
+            return false; // It's a first-class property
+        }
+
+        foreach ($map as $meta) {
+            foreach ($meta['variants'] ?? [] as $variant) {
+                if (($variant['jsonKey'] ?? null) === $propertyName) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Assert that $propertyName is a valid property of the given FHIR type name in strict mode.
+     *
+     * Searches loaded PHP classes for one whose FHIR_PROPERTY_MAP matches $fhirType via a
+     * #[FHIRComplexType] or #[FHIRPrimitive] attribute. If the class is found and the property
+     * is not in the map, throws FHIRPathSemanticException. If no class is found (type not loaded),
+     * silently returns to avoid false positives.
+     *
+     * Results are cached per type name.
+     *
+     * @throws FHIRPathSemanticException when the property is known to not exist on the type
+     */
+    private function assertPropertyExistsOnFhirType(string $fhirType, string $propertyName): void
+    {
+        if (!array_key_exists($fhirType, $this->fhirTypePropertyCache)) {
+            $this->fhirTypePropertyCache[$fhirType] = null;
+
+            foreach (get_declared_classes() as $class) {
+                if (!defined("{$class}::FHIR_PROPERTY_MAP")) {
+                    continue;
+                }
+
+                // Check for #[FHIRComplexType(typeName: '...')] or similar attribute
+                if (!class_exists($class)) {
+                    continue;
+                }
+
+                $reflection = new \ReflectionClass($class);
+
+                $matched = false;
+                foreach ($reflection->getAttributes() as $attribute) {
+                    $attrName = $attribute->getName();
+                    if (!str_ends_with($attrName, 'FHIRComplexType')
+                        && !str_ends_with($attrName, 'FHIRPrimitive')
+                        && !str_ends_with($attrName, 'FhirComplexType')
+                        && !str_ends_with($attrName, 'FhirPrimitive')
+                    ) {
+                        continue;
+                    }
+
+                    $args = $attribute->getArguments();
+                    $type = $args['typeName'] ?? $args['type'] ?? $args[0] ?? null;
+                    if (is_string($type) && $type === $fhirType) {
+                        $matched = true;
+                        break;
+                    }
+                }
+
+                if ($matched) {
+                    /** @var array<string, mixed> $map */
+                    $map                                    = constant("{$class}::FHIR_PROPERTY_MAP");
+                    $this->fhirTypePropertyCache[$fhirType] = array_keys($map);
+                    break;
+                }
+            }
+
+            // If still not found, derive candidate namespaces from already-loaded FHIR classes
+            // and attempt autoloading. This handles FHIR DataTypes that were never instantiated
+            // (e.g. Period when the test data only contains a Quantity).
+            if ($this->fhirTypePropertyCache[$fhirType] === null) {
+                $namespacesToTry = [];
+                foreach (get_declared_classes() as $declared) {
+                    if (defined("{$declared}::FHIR_PROPERTY_MAP")) {
+                        $lastSlash = strrpos($declared, '\\');
+                        if ($lastSlash !== false) {
+                            $namespacesToTry[substr($declared, 0, $lastSlash)] = true;
+                        }
+                    }
+                }
+
+                foreach (array_keys($namespacesToTry) as $ns) {
+                    $candidate = $ns . '\\' . $fhirType;
+                    if (!class_exists($candidate, true) || !defined("{$candidate}::FHIR_PROPERTY_MAP")) {
+                        continue;
+                    }
+                    /** @var array<string, mixed> $candidateMap */
+                    $candidateMap                           = constant("{$candidate}::FHIR_PROPERTY_MAP");
+                    $this->fhirTypePropertyCache[$fhirType] = array_keys($candidateMap);
+                    break;
+                }
+            }
+        }
+
+        $knownProperties = $this->fhirTypePropertyCache[$fhirType];
+        if ($knownProperties !== null && !in_array($propertyName, $knownProperties, true)) {
+            throw new FHIRPathSemanticException("Property '{$propertyName}' does not exist on FHIR type '{$fhirType}'");
+        }
+    }
+
+    /**
      * Navigate a property on a node
      */
     private function navigateProperty(mixed $node, string $propertyName): Collection
     {
+        // FHIRTypedCollection wraps a raw data array with FHIR type context.
+        // Delegate navigation to the underlying array — type context is preserved by the
+        // caller and does not need to be threaded through sub-property navigation.
+        if ($node instanceof FHIRTypedCollection) {
+            return $this->navigateProperty($node->value, $propertyName);
+        }
+
         // Handle arrays
         if (is_array($node)) {
             if (array_key_exists($propertyName, $node)) {
@@ -911,8 +1095,14 @@ final class FHIRPathEvaluator implements ExpressionVisitor
                     $otherKeys = array_diff(array_keys($rawValue), ['@value', '#']);
                     if (empty($otherKeys) && array_key_exists('@value', $rawValue)) {
                         $scalar = $rawValue['@value'];
+
                         return Collection::single(new FHIRTypedScalar($scalar, $fhirType));
                     }
+
+                    // Complex type array (not a simple @value primitive): preserve FHIR type
+                    // using the original capitalised suffix (e.g. 'Age', 'Quantity', 'HumanName')
+                    // so that is() and ofType() can correctly resolve the FHIR type.
+                    return Collection::single(new FHIRTypedCollection($rawValue, $suffix));
                 }
 
                 return $this->wrapValue($rawValue);
@@ -923,6 +1113,18 @@ final class FHIRPathEvaluator implements ExpressionVisitor
 
         // Handle objects
         if (is_object($node)) {
+            // Strict mode: guard against direct access to a choice-type variant
+            // (e.g. Observation.valueQuantity when 'value' is the choice property).
+            // Only fires when the class has FHIR_PROPERTY_MAP (typed model).
+            if ($this->context->isStrictMode()) {
+                $class = get_class($node);
+                if (defined("{$class}::FHIR_PROPERTY_MAP")
+                    && $this->isChoiceVariantAccess($class, $propertyName)
+                ) {
+                    throw new FHIRPathSemanticException("Direct access to choice type variant '{$propertyName}' is not allowed in strict mode. Use 'value.ofType(Type)' or '(value as Type)' instead.");
+                }
+            }
+
             // Try direct property access
             if (property_exists($node, $propertyName)) {
                 try {
@@ -933,6 +1135,26 @@ final class FHIRPathEvaluator implements ExpressionVisitor
                     $fhirType = $this->resolveFhirPropertyType($node, $propertyName);
                     if ($fhirType !== null && is_scalar($value)) {
                         return Collection::single(new FHIRTypedScalar($value, $fhirType));
+                    }
+
+                    // Wrap complex-type array items with FHIR type context from the property map
+                    // so that ofType() and is() can identify raw arrays as their FHIR type
+                    // (e.g. Patient.name items as HumanName, Observation.extension as Extension).
+                    $complexFhirType = $this->resolveComplexPropertyFhirType($node, $propertyName);
+                    if ($complexFhirType !== null && is_array($value)) {
+                        if (array_is_list($value)) {
+                            $typedItems = array_map(
+                                static fn (mixed $item) => is_array($item)
+                                    ? new FHIRTypedCollection($item, $complexFhirType)
+                                    : $item,
+                                $value,
+                            );
+
+                            return Collection::from($typedItems);
+                        }
+
+                        // Single associative array stored non-list (e.g. one extension element)
+                        return Collection::single(new FHIRTypedCollection($value, $complexFhirType));
                     }
 
                     return $this->wrapValue($value);
@@ -961,6 +1183,15 @@ final class FHIRPathEvaluator implements ExpressionVisitor
                     }
 
                     return $this->wrapValue($value);
+                }
+            }
+
+            // Strict mode: if the class has a FHIR_PROPERTY_MAP and nothing was found,
+            // the property is semantically invalid for this FHIR type.
+            if ($this->context->isStrictMode()) {
+                $class = get_class($node);
+                if (defined("{$class}::FHIR_PROPERTY_MAP")) {
+                    throw new FHIRPathSemanticException("Property '{$propertyName}' does not exist on FHIR type");
                 }
             }
 
@@ -1040,6 +1271,11 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     {
         // FHIRTypedScalar → unwrap to PHP scalar (type context no longer needed in final output)
         if ($value instanceof FHIRTypedScalar) {
+            return $value->value;
+        }
+
+        // FHIRTypedCollection → unwrap to raw array (type context used only by type checks)
+        if ($value instanceof FHIRTypedCollection) {
             return $value->value;
         }
 
@@ -1183,7 +1419,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         $rightIsDecimal = $rightValue instanceof FHIRPathDecimal;
 
         if ($leftIsDecimal || $rightIsDecimal || $operator === TokenType::DIVIDE) {
-            $leftStr  = $leftIsDecimal  ? $leftValue->value  : $this->numericToBcString($leftValue);
+            $leftStr  = $leftIsDecimal ? $leftValue->value : $this->numericToBcString($leftValue);
             $rightStr = $rightIsDecimal ? $rightValue->value : $this->numericToBcString($rightValue);
 
             if ($leftStr === null || $rightStr === null) {
@@ -1212,7 +1448,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         // Both strings are guaranteed numeric at this point (from FHIRPathDecimal->value or numericToBcString)
         assert(is_numeric($left) && is_numeric($right));
 
-        $leftPrec  = ($dotPos = strpos($left, '.')) !== false ? strlen($left) - $dotPos - 1 : 0;
+        $leftPrec  = ($dotPos = strpos($left, '.'))  !== false ? strlen($left)  - $dotPos - 1 : 0;
         $rightPrec = ($dotPos = strpos($right, '.')) !== false ? strlen($right) - $dotPos - 1 : 0;
         $maxPrec   = max($leftPrec, $rightPrec);
 
@@ -1387,21 +1623,21 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      */
     private const DATE_UNIT_MAP = [
         // Calendar keywords (singular)
-        'year'        => 'year',
-        'years'       => 'year',
-        'month'       => 'month',
-        'months'      => 'month',
-        'week'        => 'week',
-        'weeks'       => 'week',
-        'day'         => 'day',
-        'days'        => 'day',
-        'hour'        => 'hour',
-        'hours'       => 'hour',
-        'minute'      => 'minute',
-        'minutes'     => 'minute',
-        'second'      => 'second',
-        'seconds'     => 'second',
-        'millisecond' => 'millisecond',
+        'year'         => 'year',
+        'years'        => 'year',
+        'month'        => 'month',
+        'months'       => 'month',
+        'week'         => 'week',
+        'weeks'        => 'week',
+        'day'          => 'day',
+        'days'         => 'day',
+        'hour'         => 'hour',
+        'hours'        => 'hour',
+        'minute'       => 'minute',
+        'minutes'      => 'minute',
+        'second'       => 'second',
+        'seconds'      => 'second',
+        'millisecond'  => 'millisecond',
         'milliseconds' => 'millisecond',
         // UCUM codes (year 'a' and month 'mo' are intentionally absent)
         'wk'  => 'week',
@@ -1422,16 +1658,12 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      */
     private function performDateArithmetic(string $dateStr, array $quantity, TokenType $operator): Collection
     {
-        $unitCode     = $quantity['code'];
+        $unitCode      = $quantity['code'];
         $canonicalUnit = self::DATE_UNIT_MAP[$unitCode] ?? null;
 
         if ($canonicalUnit === null) {
             // Unknown or unsupported unit (e.g. UCUM 'a', 'mo', or 'cm')
-            throw new EvaluationException(
-                "Date arithmetic with unit '{$unitCode}' is not supported",
-                0,
-                0
-            );
+            throw new EvaluationException("Date arithmetic with unit '{$unitCode}' is not supported", 0, 0);
         }
 
         // Truncate to integer per FHIRPath spec (7.7 days = 7 days, 0.1 s = 0 s)
@@ -1673,7 +1905,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         }
 
         // Empty collection treated as empty string (per spec)
-        $leftValue  = $left->isEmpty()  ? '' : (string) $this->normalizeValue($left->first());
+        $leftValue  = $left->isEmpty() ? '' : (string) $this->normalizeValue($left->first());
         $rightValue = $right->isEmpty() ? '' : (string) $this->normalizeValue($right->first());
 
         return Collection::single($leftValue . $rightValue);
@@ -1748,9 +1980,14 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         $leftBool  = $this->toBoolean($left);
         $rightBool = $this->toBoolean($right);
 
-        // Three-valued logic for implies
-        // false implies anything = true
+        // Three-valued logic for implies per FHIRPath spec:
+        // false implies * = true
         if ($leftBool === false) {
+            return Collection::single(true);
+        }
+
+        // empty implies true = true
+        if ($leftBool === null && $rightBool === true) {
             return Collection::single(true);
         }
 
@@ -1764,7 +2001,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             return Collection::single(false);
         }
 
-        // Otherwise empty (unknown)
+        // Otherwise empty (unknown): true implies empty, empty implies false, empty implies empty
         return Collection::empty();
     }
 

@@ -32,6 +32,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -41,6 +42,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -50,6 +52,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'vaccineCode' => [
@@ -59,6 +62,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'targetDisease' => [
@@ -68,6 +72,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'contraindicatedVaccineCode' => [
@@ -77,6 +82,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'forecastStatus' => [
@@ -86,6 +92,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'forecastReason' => [
@@ -95,6 +102,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'dateCriterion' => [
@@ -104,6 +112,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ImmunizationRecommendation\ImmunizationRecommendationRecommendationDateCriterion',
             'variants'     => null,
         ],
         'description' => [
@@ -113,6 +122,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'series' => [
@@ -122,6 +132,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'doseNumber' => [
@@ -131,6 +142,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'seriesDoses' => [
@@ -140,6 +152,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'supportingImmunization' => [
@@ -149,6 +162,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
             'variants'     => null,
         ],
         'supportingPatientInformation' => [
@@ -158,6 +172,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
             'variants'     => null,
         ],
     ];

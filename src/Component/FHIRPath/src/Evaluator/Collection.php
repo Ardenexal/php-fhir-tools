@@ -18,9 +18,14 @@ final readonly class Collection implements \IteratorAggregate, \Countable
 {
     /**
      * @param array<int, mixed> $items
+     * @param bool              $ordered      Whether items have a defined order (false for children(), descendants(), etc.)
+     * @param string|null       $declaredType FHIR type name declared by an `as` cast (e.g. 'Period'),
+     *                                        carried on empty collections so strict-mode property checks work.
      */
     private function __construct(
-        private array $items
+        private array $items,
+        private bool $ordered = true,
+        private ?string $declaredType = null,
     ) {
     }
 
@@ -48,6 +53,50 @@ final readonly class Collection implements \IteratorAggregate, \Countable
     public static function from(array $items): self
     {
         return new self(array_values($items));
+    }
+
+    /**
+     * Create an unordered collection from an array of items.
+     *
+     * Used by functions such as children() and descendants() whose results are
+     * not guaranteed to have a meaningful order per the FHIRPath specification.
+     * Strict-mode guards on skip(), tail(), take(), and last() will reject these.
+     *
+     * @param array<int, mixed> $items
+     */
+    public static function unordered(array $items): self
+    {
+        return new self(array_values($items), false);
+    }
+
+    /**
+     * Create a typed-empty collection carrying a FHIR declared type.
+     *
+     * Used by the strict-mode `as` operator when the cast returns empty — the type
+     * annotation allows visitMemberAccess to validate property names against the
+     * declared type even when the collection is empty.
+     */
+    public static function typedEmpty(string $type): self
+    {
+        return new self([], true, $type);
+    }
+
+    /**
+     * Return whether this collection has a defined ordering.
+     * Unordered collections are produced by children(), descendants(), etc.
+     */
+    public function isOrdered(): bool
+    {
+        return $this->ordered;
+    }
+
+    /**
+     * Return the FHIR type declared by an `as` cast, or null if none.
+     * Only set on empty collections produced by a failed strict-mode cast.
+     */
+    public function getDeclaredType(): ?string
+    {
+        return $this->declaredType;
     }
 
     /**
@@ -139,9 +188,12 @@ final readonly class Collection implements \IteratorAggregate, \Countable
      */
     public function union(self $other): self
     {
-        $result = $this->items;
+        // Per FHIRPath spec: union returns the combined collection with ALL duplicates removed
+        // (not just cross-collection duplicates). Start with an empty result and add items
+        // from both sides, skipping any that are already present.
+        $result = [];
 
-        foreach ($other->items as $item) {
+        foreach (array_merge($this->items, $other->items) as $item) {
             $isDuplicate = false;
             foreach ($result as $existing) {
                 if ($existing === $item) {

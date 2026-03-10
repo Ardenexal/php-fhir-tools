@@ -25,6 +25,7 @@ class SubstanceSourceMaterialOrganism extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -34,6 +35,7 @@ class SubstanceSourceMaterialOrganism extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -43,6 +45,7 @@ class SubstanceSourceMaterialOrganism extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'family' => [
@@ -52,6 +55,7 @@ class SubstanceSourceMaterialOrganism extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'genus' => [
@@ -61,6 +65,7 @@ class SubstanceSourceMaterialOrganism extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'species' => [
@@ -70,6 +75,7 @@ class SubstanceSourceMaterialOrganism extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'intraspecificType' => [
@@ -79,6 +85,7 @@ class SubstanceSourceMaterialOrganism extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'intraspecificDescription' => [
@@ -88,6 +95,7 @@ class SubstanceSourceMaterialOrganism extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'author' => [
@@ -97,6 +105,7 @@ class SubstanceSourceMaterialOrganism extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\SubstanceSourceMaterial\SubstanceSourceMaterialOrganismAuthor',
             'variants'     => null,
         ],
         'hybrid' => [
@@ -106,6 +115,7 @@ class SubstanceSourceMaterialOrganism extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'organismGeneral' => [
@@ -115,6 +125,7 @@ class SubstanceSourceMaterialOrganism extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

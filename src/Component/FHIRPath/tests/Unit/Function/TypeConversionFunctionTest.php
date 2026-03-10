@@ -259,10 +259,12 @@ final class TypeConversionFunctionTest extends TestCase
         self::assertSame('T14:30:00.123', $this->evaluate('t.toTime()', $resource)->first());
     }
 
-    public function testToTimeReturnsEmptyForMissingTPrefix(): void
+    public function testToTimeWithoutTPrefixAddsPrefix(): void
     {
-        // Time strings must start with 'T'
-        self::assertTrue($this->evaluate("'14:30:00'.toTime()", null)->isEmpty());
+        // Strings without T prefix are accepted and the T is prepended per FHIRPath spec.
+        // '14' → 'T14', '14:30' → 'T14:30', '14:30:00' → 'T14:30:00'
+        self::assertSame('T14:30:00', $this->evaluate("'14:30:00'.toTime()", null)->first());
+        self::assertSame('T14', $this->evaluate("'14'.toTime()", null)->first());
     }
 
     public function testToTimeReturnsEmptyForInvalid(): void
@@ -285,9 +287,17 @@ final class TypeConversionFunctionTest extends TestCase
         self::assertTrue($this->evaluate('t.convertsToTime()', $resource)->first());
     }
 
+    public function testConvertsToTimeTrueForStringWithoutTPrefix(): void
+    {
+        // FHIRPath spec: strings without T prefix are valid time representations.
+        self::assertTrue($this->evaluate("'10:00:00'.convertsToTime()", null)->first());
+        self::assertTrue($this->evaluate("'10'.convertsToTime()", null)->first());
+    }
+
     public function testConvertsToTimeFalseForNonTimeString(): void
     {
-        self::assertFalse($this->evaluate("'10:00:00'.convertsToTime()", null)->first());
+        self::assertFalse($this->evaluate("'not-a-time'.convertsToTime()", null)->first());
+        self::assertFalse($this->evaluate("'25:00'.convertsToTime()", null)->first());
     }
 
     public function testConvertsToTimeEmptyForEmptyInput(): void

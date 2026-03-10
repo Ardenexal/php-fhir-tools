@@ -27,6 +27,7 @@ class CitationCitedArtifactPublicationForm extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -36,6 +37,7 @@ class CitationCitedArtifactPublicationForm extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -45,6 +47,7 @@ class CitationCitedArtifactPublicationForm extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'publishedIn' => [
@@ -54,6 +57,7 @@ class CitationCitedArtifactPublicationForm extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'periodicRelease' => [
@@ -63,6 +67,7 @@ class CitationCitedArtifactPublicationForm extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'articleDate' => [
@@ -72,6 +77,7 @@ class CitationCitedArtifactPublicationForm extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'lastRevisionDate' => [
@@ -81,6 +87,7 @@ class CitationCitedArtifactPublicationForm extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'language' => [
@@ -90,6 +97,7 @@ class CitationCitedArtifactPublicationForm extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'accessionNumber' => [
@@ -99,6 +107,7 @@ class CitationCitedArtifactPublicationForm extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'pageString' => [
@@ -108,6 +117,7 @@ class CitationCitedArtifactPublicationForm extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'firstPage' => [
@@ -117,6 +127,7 @@ class CitationCitedArtifactPublicationForm extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'lastPage' => [
@@ -126,6 +137,7 @@ class CitationCitedArtifactPublicationForm extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'pageCount' => [
@@ -135,6 +147,7 @@ class CitationCitedArtifactPublicationForm extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'copyright' => [
@@ -144,6 +157,7 @@ class CitationCitedArtifactPublicationForm extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

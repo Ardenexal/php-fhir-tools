@@ -30,6 +30,7 @@ class ExampleScenarioInstance extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -39,6 +40,7 @@ class ExampleScenarioInstance extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -48,6 +50,7 @@ class ExampleScenarioInstance extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'key' => [
@@ -57,6 +60,7 @@ class ExampleScenarioInstance extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'structureType' => [
@@ -66,6 +70,7 @@ class ExampleScenarioInstance extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'structureVersion' => [
@@ -75,6 +80,7 @@ class ExampleScenarioInstance extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'structureProfile' => [
@@ -84,6 +90,7 @@ class ExampleScenarioInstance extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'canonical',
@@ -108,6 +115,7 @@ class ExampleScenarioInstance extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'description' => [
@@ -117,6 +125,7 @@ class ExampleScenarioInstance extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'content' => [
@@ -126,6 +135,7 @@ class ExampleScenarioInstance extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'version' => [
@@ -135,6 +145,7 @@ class ExampleScenarioInstance extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ExampleScenario\ExampleScenarioInstanceVersion',
             'variants'     => null,
         ],
         'containedInstance' => [
@@ -144,6 +155,7 @@ class ExampleScenarioInstance extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ExampleScenario\ExampleScenarioInstanceContainedInstance',
             'variants'     => null,
         ],
     ];

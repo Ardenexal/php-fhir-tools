@@ -28,6 +28,7 @@ class BodyStructureIncludedStructureBodyLandmarkOrientation extends BackboneElem
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -37,6 +38,7 @@ class BodyStructureIncludedStructureBodyLandmarkOrientation extends BackboneElem
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -46,6 +48,7 @@ class BodyStructureIncludedStructureBodyLandmarkOrientation extends BackboneElem
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'landmarkDescription' => [
@@ -55,6 +58,7 @@ class BodyStructureIncludedStructureBodyLandmarkOrientation extends BackboneElem
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'clockFacePosition' => [
@@ -64,6 +68,7 @@ class BodyStructureIncludedStructureBodyLandmarkOrientation extends BackboneElem
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'distanceFromLandmark' => [
@@ -73,6 +78,7 @@ class BodyStructureIncludedStructureBodyLandmarkOrientation extends BackboneElem
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\BodyStructure\BodyStructureIncludedStructureBodyLandmarkOrientationDistanceFromLandmark',
             'variants'     => null,
         ],
         'surfaceOrientation' => [
@@ -82,6 +88,7 @@ class BodyStructureIncludedStructureBodyLandmarkOrientation extends BackboneElem
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
             'variants'     => null,
         ],
     ];

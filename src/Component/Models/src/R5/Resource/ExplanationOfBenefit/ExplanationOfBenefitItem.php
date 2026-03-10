@@ -33,6 +33,7 @@ class ExplanationOfBenefitItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -42,6 +43,7 @@ class ExplanationOfBenefitItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -51,6 +53,7 @@ class ExplanationOfBenefitItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'sequence' => [
@@ -60,6 +63,7 @@ class ExplanationOfBenefitItem extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'careTeamSequence' => [
@@ -69,6 +73,7 @@ class ExplanationOfBenefitItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'diagnosisSequence' => [
@@ -78,6 +83,7 @@ class ExplanationOfBenefitItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'procedureSequence' => [
@@ -87,6 +93,7 @@ class ExplanationOfBenefitItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'informationSequence' => [
@@ -96,6 +103,7 @@ class ExplanationOfBenefitItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'traceNumber' => [
@@ -105,6 +113,7 @@ class ExplanationOfBenefitItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
             'variants'     => null,
         ],
         'revenue' => [
@@ -114,6 +123,7 @@ class ExplanationOfBenefitItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'category' => [
@@ -123,6 +133,7 @@ class ExplanationOfBenefitItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'productOrService' => [
@@ -132,6 +143,7 @@ class ExplanationOfBenefitItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'productOrServiceEnd' => [
@@ -141,6 +153,7 @@ class ExplanationOfBenefitItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'request' => [
@@ -150,6 +163,7 @@ class ExplanationOfBenefitItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
             'variants'     => null,
         ],
         'modifier' => [
@@ -159,6 +173,7 @@ class ExplanationOfBenefitItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'programCode' => [
@@ -168,6 +183,7 @@ class ExplanationOfBenefitItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'serviced' => [
@@ -177,6 +193,7 @@ class ExplanationOfBenefitItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'date',
@@ -201,6 +218,7 @@ class ExplanationOfBenefitItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'CodeableConcept',
@@ -232,6 +250,7 @@ class ExplanationOfBenefitItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'quantity' => [
@@ -241,6 +260,7 @@ class ExplanationOfBenefitItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'unitPrice' => [
@@ -250,6 +270,7 @@ class ExplanationOfBenefitItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'factor' => [
@@ -259,6 +280,7 @@ class ExplanationOfBenefitItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'tax' => [
@@ -268,6 +290,7 @@ class ExplanationOfBenefitItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'net' => [
@@ -277,6 +300,7 @@ class ExplanationOfBenefitItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'udi' => [
@@ -286,6 +310,7 @@ class ExplanationOfBenefitItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
             'variants'     => null,
         ],
         'bodySite' => [
@@ -295,6 +320,7 @@ class ExplanationOfBenefitItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ExplanationOfBenefit\ExplanationOfBenefitItemBodySite',
             'variants'     => null,
         ],
         'encounter' => [
@@ -304,6 +330,7 @@ class ExplanationOfBenefitItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
             'variants'     => null,
         ],
         'noteNumber' => [
@@ -313,6 +340,7 @@ class ExplanationOfBenefitItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'reviewOutcome' => [
@@ -322,6 +350,7 @@ class ExplanationOfBenefitItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'adjudication' => [
@@ -331,6 +360,7 @@ class ExplanationOfBenefitItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ExplanationOfBenefit\ExplanationOfBenefitItemAdjudication',
             'variants'     => null,
         ],
         'detail' => [
@@ -340,6 +370,7 @@ class ExplanationOfBenefitItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ExplanationOfBenefit\ExplanationOfBenefitItemDetail',
             'variants'     => null,
         ],
     ];

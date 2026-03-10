@@ -30,6 +30,7 @@ class EvidenceVariableCharacteristicDefinitionByCombination extends BackboneElem
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -39,6 +40,7 @@ class EvidenceVariableCharacteristicDefinitionByCombination extends BackboneElem
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -48,6 +50,7 @@ class EvidenceVariableCharacteristicDefinitionByCombination extends BackboneElem
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'code' => [
@@ -57,6 +60,7 @@ class EvidenceVariableCharacteristicDefinitionByCombination extends BackboneElem
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'threshold' => [
@@ -66,6 +70,7 @@ class EvidenceVariableCharacteristicDefinitionByCombination extends BackboneElem
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'characteristic' => [
@@ -75,6 +80,7 @@ class EvidenceVariableCharacteristicDefinitionByCombination extends BackboneElem
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\EvidenceVariable\EvidenceVariableCharacteristic',
             'variants'     => null,
         ],
     ];

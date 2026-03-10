@@ -32,6 +32,7 @@ class ExplanationOfBenefitAddItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -41,6 +42,7 @@ class ExplanationOfBenefitAddItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -50,6 +52,7 @@ class ExplanationOfBenefitAddItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'itemSequence' => [
@@ -59,6 +62,7 @@ class ExplanationOfBenefitAddItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'detailSequence' => [
@@ -68,6 +72,7 @@ class ExplanationOfBenefitAddItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'subDetailSequence' => [
@@ -77,6 +82,7 @@ class ExplanationOfBenefitAddItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'provider' => [
@@ -86,6 +92,7 @@ class ExplanationOfBenefitAddItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
             'variants'     => null,
         ],
         'productOrService' => [
@@ -95,6 +102,7 @@ class ExplanationOfBenefitAddItem extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifier' => [
@@ -104,6 +112,7 @@ class ExplanationOfBenefitAddItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'programCode' => [
@@ -113,6 +122,7 @@ class ExplanationOfBenefitAddItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'serviced' => [
@@ -122,6 +132,7 @@ class ExplanationOfBenefitAddItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'date',
@@ -146,6 +157,7 @@ class ExplanationOfBenefitAddItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'CodeableConcept',
@@ -177,6 +189,7 @@ class ExplanationOfBenefitAddItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'unitPrice' => [
@@ -186,6 +199,7 @@ class ExplanationOfBenefitAddItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'factor' => [
@@ -195,6 +209,7 @@ class ExplanationOfBenefitAddItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'net' => [
@@ -204,6 +219,7 @@ class ExplanationOfBenefitAddItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'bodySite' => [
@@ -213,6 +229,7 @@ class ExplanationOfBenefitAddItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'subSite' => [
@@ -222,6 +239,7 @@ class ExplanationOfBenefitAddItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'noteNumber' => [
@@ -231,6 +249,7 @@ class ExplanationOfBenefitAddItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'adjudication' => [
@@ -240,6 +259,7 @@ class ExplanationOfBenefitAddItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ExplanationOfBenefit\ExplanationOfBenefitItemAdjudication',
             'variants'     => null,
         ],
         'detail' => [
@@ -249,6 +269,7 @@ class ExplanationOfBenefitAddItem extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ExplanationOfBenefit\ExplanationOfBenefitAddItemDetail',
             'variants'     => null,
         ],
     ];

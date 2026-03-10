@@ -26,6 +26,7 @@ class SubstanceDefinitionStructure extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -35,6 +36,7 @@ class SubstanceDefinitionStructure extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -44,6 +46,7 @@ class SubstanceDefinitionStructure extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'stereochemistry' => [
@@ -53,6 +56,7 @@ class SubstanceDefinitionStructure extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'opticalActivity' => [
@@ -62,6 +66,7 @@ class SubstanceDefinitionStructure extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'molecularFormula' => [
@@ -71,6 +76,7 @@ class SubstanceDefinitionStructure extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'molecularFormulaByMoiety' => [
@@ -80,6 +86,7 @@ class SubstanceDefinitionStructure extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'molecularWeight' => [
@@ -89,6 +96,7 @@ class SubstanceDefinitionStructure extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'technique' => [
@@ -98,6 +106,7 @@ class SubstanceDefinitionStructure extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'sourceDocument' => [
@@ -107,6 +116,7 @@ class SubstanceDefinitionStructure extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
             'variants'     => null,
         ],
         'representation' => [
@@ -116,6 +126,7 @@ class SubstanceDefinitionStructure extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionStructureRepresentation',
             'variants'     => null,
         ],
     ];

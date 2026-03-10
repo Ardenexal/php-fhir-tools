@@ -25,6 +25,7 @@ class TerminologyCapabilitiesCodeSystemVersion extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -34,6 +35,7 @@ class TerminologyCapabilitiesCodeSystemVersion extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -43,6 +45,7 @@ class TerminologyCapabilitiesCodeSystemVersion extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'code' => [
@@ -52,6 +55,7 @@ class TerminologyCapabilitiesCodeSystemVersion extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'isDefault' => [
@@ -61,6 +65,7 @@ class TerminologyCapabilitiesCodeSystemVersion extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'compositional' => [
@@ -70,6 +75,7 @@ class TerminologyCapabilitiesCodeSystemVersion extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'language' => [
@@ -79,6 +85,7 @@ class TerminologyCapabilitiesCodeSystemVersion extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'filter' => [
@@ -88,6 +95,7 @@ class TerminologyCapabilitiesCodeSystemVersion extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\TerminologyCapabilities\TerminologyCapabilitiesCodeSystemVersionFilter',
             'variants'     => null,
         ],
         'property' => [
@@ -97,6 +105,7 @@ class TerminologyCapabilitiesCodeSystemVersion extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

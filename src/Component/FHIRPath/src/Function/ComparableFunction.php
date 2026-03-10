@@ -49,8 +49,7 @@ final class ComparableFunction extends AbstractFunction
 
         // Detect Quantity arrays (produced by FHIRPath Quantity literals like `1 'cm'`).
         // Plain scalars (int/float) are excluded — they lack the 'unit'/'code' keys.
-        $isQty = static fn(mixed $v): bool =>
-            is_array($v)
+        $isQty = static fn (mixed $v): bool => is_array($v)
             && array_key_exists('value', $v)
             && array_key_exists('unit', $v)
             && array_key_exists('code', $v);

@@ -21,6 +21,7 @@ final class EvaluationContext
      * @param Collection|null      $collectionInput   set by visitMemberAccess when calling a function so that
      *                                                visitFunctionCall receives the full collection as input
      *                                                instead of a per-item single-item collection
+     * @param bool                 $strictMode        When true, runtime semantic validation is enabled
      */
     public function __construct(
         private mixed $rootResource = null,
@@ -30,6 +31,7 @@ final class EvaluationContext
         private ?FHIRPathEvaluator $evaluator = null,
         private ?string $fhirVersion = null,
         private ?Collection $collectionInput = null,
+        private bool $strictMode = false,
     ) {
     }
 
@@ -109,6 +111,7 @@ final class EvaluationContext
             $this->evaluator,
             $this->fhirVersion,
             $input,
+            $this->strictMode,
         );
     }
 
@@ -119,6 +122,25 @@ final class EvaluationContext
     {
         $clone              = clone $this;
         $clone->fhirVersion = $version;
+
+        return $clone;
+    }
+
+    /**
+     * Return whether strict-mode semantic validation is enabled.
+     */
+    public function isStrictMode(): bool
+    {
+        return $this->strictMode;
+    }
+
+    /**
+     * Return an immutable copy of this context with strict mode set.
+     */
+    public function withStrictMode(bool $strict): self
+    {
+        $clone             = clone $this;
+        $clone->strictMode = $strict;
 
         return $clone;
     }
@@ -143,6 +165,8 @@ final class EvaluationContext
             $this->externalConstants,
             $this->evaluator,
             $this->fhirVersion,
+            null,
+            $this->strictMode,
         );
     }
 
@@ -193,6 +217,8 @@ final class EvaluationContext
             $this->externalConstants,
             $this->evaluator,
             $this->fhirVersion,
+            null,
+            $this->strictMode,
         );
     }
 
@@ -235,6 +261,8 @@ final class EvaluationContext
             $externalConstants,
             $this->evaluator,
             $this->fhirVersion,
+            null,
+            $this->strictMode,
         );
     }
 
@@ -255,6 +283,8 @@ final class EvaluationContext
             $this->externalConstants,
             $this->evaluator,
             $this->fhirVersion,
+            null,
+            $this->strictMode,
         );
     }
 }

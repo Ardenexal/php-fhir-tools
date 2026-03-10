@@ -25,6 +25,7 @@ class RiskEvidenceSynthesisRiskEstimate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -34,6 +35,7 @@ class RiskEvidenceSynthesisRiskEstimate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -43,6 +45,7 @@ class RiskEvidenceSynthesisRiskEstimate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'description' => [
@@ -52,6 +55,7 @@ class RiskEvidenceSynthesisRiskEstimate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -61,6 +65,7 @@ class RiskEvidenceSynthesisRiskEstimate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'value' => [
@@ -70,6 +75,7 @@ class RiskEvidenceSynthesisRiskEstimate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'unitOfMeasure' => [
@@ -79,6 +85,7 @@ class RiskEvidenceSynthesisRiskEstimate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'denominatorCount' => [
@@ -88,6 +95,7 @@ class RiskEvidenceSynthesisRiskEstimate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'numeratorCount' => [
@@ -97,6 +105,7 @@ class RiskEvidenceSynthesisRiskEstimate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'precisionEstimate' => [
@@ -106,6 +115,7 @@ class RiskEvidenceSynthesisRiskEstimate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\RiskEvidenceSynthesis\RiskEvidenceSynthesisRiskEstimatePrecisionEstimate',
             'variants'     => null,
         ],
     ];

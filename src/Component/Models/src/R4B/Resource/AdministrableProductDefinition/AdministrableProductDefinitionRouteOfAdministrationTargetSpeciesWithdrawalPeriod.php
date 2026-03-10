@@ -31,6 +31,7 @@ class AdministrableProductDefinitionRouteOfAdministrationTargetSpeciesWithdrawal
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -40,6 +41,7 @@ class AdministrableProductDefinitionRouteOfAdministrationTargetSpeciesWithdrawal
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -49,6 +51,7 @@ class AdministrableProductDefinitionRouteOfAdministrationTargetSpeciesWithdrawal
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'tissue' => [
@@ -58,6 +61,7 @@ class AdministrableProductDefinitionRouteOfAdministrationTargetSpeciesWithdrawal
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'value' => [
@@ -67,6 +71,7 @@ class AdministrableProductDefinitionRouteOfAdministrationTargetSpeciesWithdrawal
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'supportingInformation' => [
@@ -76,6 +81,7 @@ class AdministrableProductDefinitionRouteOfAdministrationTargetSpeciesWithdrawal
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

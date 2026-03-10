@@ -28,6 +28,7 @@ class RiskEvidenceSynthesisRiskEstimatePrecisionEstimate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -37,6 +38,7 @@ class RiskEvidenceSynthesisRiskEstimatePrecisionEstimate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -46,6 +48,7 @@ class RiskEvidenceSynthesisRiskEstimatePrecisionEstimate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -55,6 +58,7 @@ class RiskEvidenceSynthesisRiskEstimatePrecisionEstimate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'level' => [
@@ -64,6 +68,7 @@ class RiskEvidenceSynthesisRiskEstimatePrecisionEstimate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'from' => [
@@ -73,6 +78,7 @@ class RiskEvidenceSynthesisRiskEstimatePrecisionEstimate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'to' => [
@@ -82,6 +88,7 @@ class RiskEvidenceSynthesisRiskEstimatePrecisionEstimate extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

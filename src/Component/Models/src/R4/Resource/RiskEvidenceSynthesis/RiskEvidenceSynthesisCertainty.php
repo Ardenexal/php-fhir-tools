@@ -25,6 +25,7 @@ class RiskEvidenceSynthesisCertainty extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -34,6 +35,7 @@ class RiskEvidenceSynthesisCertainty extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -43,6 +45,7 @@ class RiskEvidenceSynthesisCertainty extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'rating' => [
@@ -52,6 +55,7 @@ class RiskEvidenceSynthesisCertainty extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'note' => [
@@ -61,6 +65,7 @@ class RiskEvidenceSynthesisCertainty extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation',
             'variants'     => null,
         ],
         'certaintySubcomponent' => [
@@ -70,6 +75,7 @@ class RiskEvidenceSynthesisCertainty extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\RiskEvidenceSynthesis\RiskEvidenceSynthesisCertaintyCertaintySubcomponent',
             'variants'     => null,
         ],
     ];

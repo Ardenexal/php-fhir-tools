@@ -28,6 +28,7 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -37,6 +38,7 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -46,6 +48,7 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'contributor' => [
@@ -55,6 +58,7 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'forenameInitials' => [
@@ -64,6 +68,7 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'affiliation' => [
@@ -73,6 +78,7 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
             'variants'     => null,
         ],
         'contributionType' => [
@@ -82,6 +88,7 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'role' => [
@@ -91,6 +98,7 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'contributionInstance' => [
@@ -100,6 +108,7 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Citation\CitationCitedArtifactContributorshipEntryContributionInstance',
             'variants'     => null,
         ],
         'correspondingContact' => [
@@ -109,6 +118,7 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'rankingOrder' => [
@@ -118,6 +128,7 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

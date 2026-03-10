@@ -23,6 +23,7 @@ class ImplementationGuideDefinition extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -32,6 +33,7 @@ class ImplementationGuideDefinition extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -41,6 +43,7 @@ class ImplementationGuideDefinition extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'grouping' => [
@@ -50,6 +53,7 @@ class ImplementationGuideDefinition extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ImplementationGuide\ImplementationGuideDefinitionGrouping',
             'variants'     => null,
         ],
         'resource' => [
@@ -59,6 +63,7 @@ class ImplementationGuideDefinition extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ImplementationGuide\ImplementationGuideDefinitionResource',
             'variants'     => null,
         ],
         'page' => [
@@ -68,6 +73,7 @@ class ImplementationGuideDefinition extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'parameter' => [
@@ -77,6 +83,7 @@ class ImplementationGuideDefinition extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ImplementationGuide\ImplementationGuideDefinitionParameter',
             'variants'     => null,
         ],
         'template' => [
@@ -86,6 +93,7 @@ class ImplementationGuideDefinition extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ImplementationGuide\ImplementationGuideDefinitionTemplate',
             'variants'     => null,
         ],
     ];

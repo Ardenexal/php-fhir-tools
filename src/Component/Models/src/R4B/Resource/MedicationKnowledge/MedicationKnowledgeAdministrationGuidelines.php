@@ -25,6 +25,7 @@ class MedicationKnowledgeAdministrationGuidelines extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -34,6 +35,7 @@ class MedicationKnowledgeAdministrationGuidelines extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -43,6 +45,7 @@ class MedicationKnowledgeAdministrationGuidelines extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'dosage' => [
@@ -52,6 +55,7 @@ class MedicationKnowledgeAdministrationGuidelines extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationKnowledge\MedicationKnowledgeAdministrationGuidelinesDosage',
             'variants'     => null,
         ],
         'indication' => [
@@ -61,6 +65,7 @@ class MedicationKnowledgeAdministrationGuidelines extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'CodeableConcept',
@@ -85,6 +90,7 @@ class MedicationKnowledgeAdministrationGuidelines extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationKnowledge\MedicationKnowledgeAdministrationGuidelinesPatientCharacteristics',
             'variants'     => null,
         ],
     ];

@@ -77,8 +77,8 @@ final class LowBoundaryFunction extends AbstractFunction
                     return Collection::empty();
                 }
 
-                $bounded        = $this->decimalLowBoundary($numericValue, $precision);
-                $result         = $value;
+                $bounded         = $this->decimalLowBoundary($numericValue, $precision);
+                $result          = $value;
                 $result['value'] = $bounded->toFloat();
 
                 return Collection::single($result);
@@ -132,7 +132,7 @@ final class LowBoundaryFunction extends AbstractFunction
         ?int $outputPrecision,
     ): FHIRPathDecimal {
         [$valueStr, $sourcePrecision] = $this->extractDecimalParts($value);
-        $outPrec = $outputPrecision ?? self::DEFAULT_DECIMAL_PRECISION;
+        $outPrec                      = $outputPrecision ?? self::DEFAULT_DECIMAL_PRECISION;
 
         // half = 0.5 × 10^(-sourcePrecision) as an exact decimal string
         $half = '0.' . str_repeat('0', $sourcePrecision) . '5';

@@ -103,6 +103,7 @@
         "phpstan-ai:fhir-path": "php scripts/ai-phpstan-runner.php src/Component/FHIRPath/",
         "lint": "php ./vendor/bin/pint -v --parallel --max-processes=4",
         "lint:bundle": "php ./vendor/bin/pint src/Bundle/ -v --parallel --max-processes=4",
+        "lint:models": "php ./vendor/bin/pint src/Component/Model -v --parallel --max-processes=4",
         "lint:codegen": "php ./vendor/bin/pint src/Component/CodeGeneration/ -v --parallel --max-processes=4",
         "lint:serialization": "php ./vendor/bin/pint src/Component/Serialization/ -v --parallel --max-processes=4",
         "lint:fhir-path": "php ./vendor/bin/pint src/Component/FHIRPath/ -v --parallel --max-processes=4",
@@ -163,9 +164,18 @@
             "php ./demo/bin/console fhir:generate --package=hl7.fhir.r4.core --package=hl7.fhir.r4b.core --package=hl7.fhir.r5.core -vvv",
             "echo 'All FHIR models generated successfully!'"
         ],
-        "generate-models-r4": "php ./demo/bin/console fhir:generate --package=hl7.fhir.r4.core -vvv",
-        "generate-models-r4b": "php ./demo/bin/console fhir:generate --package=hl7.fhir.r4b.core -vvv",
-        "generate-models-r5": "php ./demo/bin/console fhir:generate --package=hl7.fhir.r5.core -vvv",
+        "generate-models-r4": [
+            "php ./demo/bin/console fhir:generate --package=hl7.fhir.r4.core -vvv",
+            "@lint:models"
+        ],
+        "generate-models-r4b": [
+            "php ./demo/bin/console fhir:generate --package=hl7.fhir.r4b.core -vvv",
+            "@lint:models"
+        ],
+        "generate-models-r5": [
+            "php ./demo/bin/console fhir:generate --package=hl7.fhir.r5.core -vvv",
+            "@lint:models"
+        ],
         "fix-newlines": "powershell -ExecutionPolicy Bypass -File scripts/fix-newlines.ps1",
         "validate-recipe": "php scripts/validate-recipe.php",
         "test-recipe": "php ./vendor/phpunit/phpunit/phpunit tests/Integration/FlexRecipeTest.php",

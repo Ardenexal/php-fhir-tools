@@ -47,8 +47,13 @@ class IifFunction extends AbstractFunction
         // Evaluate condition
         $conditionResult = $evaluator->evaluateWithContext($parameters[0], $evalContext);
 
-        // Condition must evaluate to a single boolean per FHIRPath spec
+        // Per FHIRPath spec: if criterion is true, return true-result,
+        // otherwise (false or empty) return otherwise-result (or empty if omitted).
         if ($conditionResult->isEmpty()) {
+            if (count($parameters) >= 3) {
+                return $evaluator->evaluateWithContext($parameters[2], $evalContext);
+            }
+
             return Collection::empty();
         }
 

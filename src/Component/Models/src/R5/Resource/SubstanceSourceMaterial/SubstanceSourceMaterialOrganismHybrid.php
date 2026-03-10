@@ -25,6 +25,7 @@ class SubstanceSourceMaterialOrganismHybrid extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -34,6 +35,7 @@ class SubstanceSourceMaterialOrganismHybrid extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -43,6 +45,7 @@ class SubstanceSourceMaterialOrganismHybrid extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'maternalOrganismId' => [
@@ -52,6 +55,7 @@ class SubstanceSourceMaterialOrganismHybrid extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'maternalOrganismName' => [
@@ -61,6 +65,7 @@ class SubstanceSourceMaterialOrganismHybrid extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'paternalOrganismId' => [
@@ -70,6 +75,7 @@ class SubstanceSourceMaterialOrganismHybrid extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'paternalOrganismName' => [
@@ -79,6 +85,7 @@ class SubstanceSourceMaterialOrganismHybrid extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'hybridType' => [
@@ -88,6 +95,7 @@ class SubstanceSourceMaterialOrganismHybrid extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

@@ -23,6 +23,7 @@ class ChargeItemDefinitionPropertyGroup extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -32,6 +33,7 @@ class ChargeItemDefinitionPropertyGroup extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -41,6 +43,7 @@ class ChargeItemDefinitionPropertyGroup extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'applicability' => [
@@ -50,6 +53,7 @@ class ChargeItemDefinitionPropertyGroup extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ChargeItemDefinition\ChargeItemDefinitionApplicability',
             'variants'     => null,
         ],
         'priceComponent' => [
@@ -59,6 +63,7 @@ class ChargeItemDefinitionPropertyGroup extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ChargeItemDefinition\ChargeItemDefinitionPropertyGroupPriceComponent',
             'variants'     => null,
         ],
     ];

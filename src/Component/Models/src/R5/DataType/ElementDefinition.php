@@ -43,6 +43,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -52,6 +53,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -61,6 +63,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'path' => [
@@ -70,6 +73,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'representation' => [
@@ -79,6 +83,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'sliceName' => [
@@ -88,6 +93,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'sliceIsConstraining' => [
@@ -97,6 +103,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'label' => [
@@ -106,6 +113,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'code' => [
@@ -115,6 +123,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding',
             'variants'     => null,
         ],
         'slicing' => [
@@ -124,6 +133,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'short' => [
@@ -133,6 +143,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'definition' => [
@@ -142,6 +153,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'comment' => [
@@ -151,6 +163,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'requirements' => [
@@ -160,6 +173,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'alias' => [
@@ -169,6 +183,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'min' => [
@@ -178,6 +193,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'max' => [
@@ -187,6 +203,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'base' => [
@@ -196,6 +213,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'contentReference' => [
@@ -205,6 +223,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'type' => [
@@ -214,6 +233,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ElementDefinitionType',
             'variants'     => null,
         ],
         'defaultValue' => [
@@ -223,6 +243,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'base64Binary',
@@ -611,6 +632,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'orderMeaning' => [
@@ -620,6 +642,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'fixed' => [
@@ -629,6 +652,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'base64Binary',
@@ -1017,6 +1041,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'base64Binary',
@@ -1405,6 +1430,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ElementDefinitionExample',
             'variants'     => null,
         ],
         'minValue' => [
@@ -1414,6 +1440,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'date',
@@ -1494,6 +1521,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'date',
@@ -1574,6 +1602,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'condition' => [
@@ -1583,6 +1612,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'constraint' => [
@@ -1592,6 +1622,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ElementDefinitionConstraint',
             'variants'     => null,
         ],
         'mustHaveValue' => [
@@ -1601,6 +1632,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'valueAlternatives' => [
@@ -1610,6 +1642,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'mustSupport' => [
@@ -1619,6 +1652,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'isModifier' => [
@@ -1628,6 +1662,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'isModifierReason' => [
@@ -1637,6 +1672,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'isSummary' => [
@@ -1646,6 +1682,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'binding' => [
@@ -1655,6 +1692,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'mapping' => [
@@ -1664,6 +1702,7 @@ class ElementDefinition extends BackboneType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ElementDefinitionMapping',
             'variants'     => null,
         ],
     ];

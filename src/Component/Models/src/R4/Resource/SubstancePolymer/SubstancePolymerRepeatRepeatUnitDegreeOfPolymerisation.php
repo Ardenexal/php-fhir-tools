@@ -29,6 +29,7 @@ class SubstancePolymerRepeatRepeatUnitDegreeOfPolymerisation extends BackboneEle
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -38,6 +39,7 @@ class SubstancePolymerRepeatRepeatUnitDegreeOfPolymerisation extends BackboneEle
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -47,6 +49,7 @@ class SubstancePolymerRepeatRepeatUnitDegreeOfPolymerisation extends BackboneEle
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'degree' => [
@@ -56,6 +59,7 @@ class SubstancePolymerRepeatRepeatUnitDegreeOfPolymerisation extends BackboneEle
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'amount' => [
@@ -65,6 +69,7 @@ class SubstancePolymerRepeatRepeatUnitDegreeOfPolymerisation extends BackboneEle
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

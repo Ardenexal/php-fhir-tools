@@ -30,6 +30,7 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -39,6 +40,7 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -48,6 +50,7 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'name' => [
@@ -57,6 +60,7 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'initials' => [
@@ -66,6 +70,7 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'collectiveName' => [
@@ -75,6 +80,7 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'identifier' => [
@@ -84,6 +90,7 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier',
             'variants'     => null,
         ],
         'affiliationInfo' => [
@@ -93,6 +100,7 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Citation\CitationCitedArtifactContributorshipEntryAffiliationInfo',
             'variants'     => null,
         ],
         'address' => [
@@ -102,6 +110,7 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Address',
             'variants'     => null,
         ],
         'telecom' => [
@@ -111,6 +120,7 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\ContactPoint',
             'variants'     => null,
         ],
         'contributionType' => [
@@ -120,6 +130,7 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'role' => [
@@ -129,6 +140,7 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'contributionInstance' => [
@@ -138,6 +150,7 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Citation\CitationCitedArtifactContributorshipEntryContributionInstance',
             'variants'     => null,
         ],
         'correspondingContact' => [
@@ -147,6 +160,7 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'listOrder' => [
@@ -156,6 +170,7 @@ class CitationCitedArtifactContributorshipEntry extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

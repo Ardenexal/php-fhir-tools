@@ -72,12 +72,18 @@ final class AggregateFunction extends AbstractFunction
         }
 
         foreach ($input as $index => $item) {
-            // Each iteration gets $this, $index, and $total in its context
+            // Each iteration gets $this, $index, and $total in its context.
+            // $total is only added when there is an accumulated value: when null
+            // (no init, first iteration not yet complete), $total must be absent
+            // so that $total.empty() evaluates to true per the FHIRPath spec.
             $iterContext = $context
                 ->withCurrentNode($item)
                 ->withVariable('this', $item)
-                ->withVariable('index', $index)
-                ->withVariable('total', $accumulator);
+                ->withVariable('index', $index);
+
+            if ($accumulator !== null) {
+                $iterContext = $iterContext->withVariable('total', $accumulator);
+            }
 
             $result      = $evaluator->evaluateWithContext($aggregator, $iterContext);
             $accumulator = $result->isEmpty() ? null : $result->first();

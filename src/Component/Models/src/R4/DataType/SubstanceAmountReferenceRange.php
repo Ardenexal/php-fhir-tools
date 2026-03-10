@@ -21,6 +21,7 @@ class SubstanceAmountReferenceRange extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -30,6 +31,7 @@ class SubstanceAmountReferenceRange extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'lowLimit' => [
@@ -39,6 +41,7 @@ class SubstanceAmountReferenceRange extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'highLimit' => [
@@ -48,6 +51,7 @@ class SubstanceAmountReferenceRange extends Element
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

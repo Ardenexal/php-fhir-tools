@@ -28,6 +28,7 @@ class VirtualServiceDetail extends DataType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -37,6 +38,7 @@ class VirtualServiceDetail extends DataType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'channelType' => [
@@ -46,6 +48,7 @@ class VirtualServiceDetail extends DataType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'address' => [
@@ -55,6 +58,7 @@ class VirtualServiceDetail extends DataType
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'url',
@@ -93,6 +97,7 @@ class VirtualServiceDetail extends DataType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'maxParticipants' => [
@@ -102,6 +107,7 @@ class VirtualServiceDetail extends DataType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'sessionKey' => [
@@ -111,6 +117,7 @@ class VirtualServiceDetail extends DataType
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

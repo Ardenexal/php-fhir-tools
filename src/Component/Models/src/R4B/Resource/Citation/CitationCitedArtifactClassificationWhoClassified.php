@@ -25,6 +25,7 @@ class CitationCitedArtifactClassificationWhoClassified extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -34,6 +35,7 @@ class CitationCitedArtifactClassificationWhoClassified extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -43,6 +45,7 @@ class CitationCitedArtifactClassificationWhoClassified extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'person' => [
@@ -52,6 +55,7 @@ class CitationCitedArtifactClassificationWhoClassified extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'organization' => [
@@ -61,6 +65,7 @@ class CitationCitedArtifactClassificationWhoClassified extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'publisher' => [
@@ -70,6 +75,7 @@ class CitationCitedArtifactClassificationWhoClassified extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'classifierCopyright' => [
@@ -79,6 +85,7 @@ class CitationCitedArtifactClassificationWhoClassified extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'freeToShare' => [
@@ -88,6 +95,7 @@ class CitationCitedArtifactClassificationWhoClassified extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

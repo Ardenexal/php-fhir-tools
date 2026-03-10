@@ -57,17 +57,24 @@ class FHIRPathService
      * @param string|null            $fhirVersion Optional FHIR version hint ('R4', 'R4B', 'R5').
      *                                            Stored in the evaluation context for use by FHIRPath
      *                                            functions that need to create typed objects.
+     * @param bool                   $strictMode  when true, runtime semantic validation is enabled
      *
      * @return Collection The result collection
      *
      * @throws FHIRPathException If the expression is invalid or evaluation fails
      */
-    public function evaluate(string $expression, mixed $resource, ?EvaluationContext $context = null, ?string $fhirVersion = null): Collection
+    public function evaluate(string $expression, mixed $resource, ?EvaluationContext $context = null, ?string $fhirVersion = null, bool $strictMode = false): Collection
     {
         $compiled = $this->getOrCompile($expression);
 
+        $context = $context ?? new EvaluationContext();
+
         if ($fhirVersion !== null) {
-            $context = ($context ?? new EvaluationContext())->withFhirVersion($fhirVersion);
+            $context = $context->withFhirVersion($fhirVersion);
+        }
+
+        if ($strictMode) {
+            $context = $context->withStrictMode(true);
         }
 
         return $compiled->evaluate($resource, $context);

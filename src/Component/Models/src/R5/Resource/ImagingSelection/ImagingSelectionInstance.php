@@ -28,6 +28,7 @@ class ImagingSelectionInstance extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -37,6 +38,7 @@ class ImagingSelectionInstance extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -46,6 +48,7 @@ class ImagingSelectionInstance extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'uid' => [
@@ -55,6 +58,7 @@ class ImagingSelectionInstance extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'number' => [
@@ -64,6 +68,7 @@ class ImagingSelectionInstance extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'sopClass' => [
@@ -73,6 +78,7 @@ class ImagingSelectionInstance extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'subset' => [
@@ -82,6 +88,7 @@ class ImagingSelectionInstance extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'imageRegion2D' => [
@@ -91,6 +98,7 @@ class ImagingSelectionInstance extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ImagingSelection\ImagingSelectionInstanceImageRegion2D',
             'variants'     => null,
         ],
         'imageRegion3D' => [
@@ -100,6 +108,7 @@ class ImagingSelectionInstance extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ImagingSelection\ImagingSelectionInstanceImageRegion3D',
             'variants'     => null,
         ],
     ];

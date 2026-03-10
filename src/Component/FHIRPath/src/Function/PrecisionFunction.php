@@ -104,8 +104,8 @@ final class PrecisionFunction extends AbstractFunction
     /**
      * Compute the positional precision of a temporal value string.
      *
-     * @param string $value     Bare ISO string (@ prefix already stripped by the value object)
-     * @param bool   $timeOnly  True for FHIRPathTime (T-prefixed time-only strings)
+     * @param string $value    Bare ISO string (@ prefix already stripped by the value object)
+     * @param bool   $timeOnly True for FHIRPathTime (T-prefixed time-only strings)
      */
     private function temporalPrecision(string $value, bool $timeOnly): ?int
     {
@@ -127,9 +127,9 @@ final class PrecisionFunction extends AbstractFunction
     private function datePrecision(string $value): ?int
     {
         return match (true) {
-            (bool) preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) => 8,
-            (bool) preg_match('/^\d{4}-\d{2}$/', $value)        => 6,
-            (bool) preg_match('/^\d{4}$/', $value)              => 4,
+            (bool) preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)   => 8,
+            (bool) preg_match('/^\d{4}-\d{2}$/', $value)         => 6,
+            (bool) preg_match('/^\d{4}$/', $value)               => 4,
             default                                              => null,
         };
     }
@@ -144,10 +144,10 @@ final class PrecisionFunction extends AbstractFunction
         $stripped = (string) preg_replace('/([+-]\d{2}:\d{2}|Z)$/', '', $value);
 
         return match (true) {
-            (bool) preg_match('/T\d{2}:\d{2}:\d{2}\.\d+$/', $stripped) => 17,
-            (bool) preg_match('/T\d{2}:\d{2}:\d{2}$/', $stripped)       => 14,
-            (bool) preg_match('/T\d{2}:\d{2}$/', $stripped)             => 12,
-            (bool) preg_match('/T\d{2}$/', $stripped)                   => 10,
+            (bool) preg_match('/T\d{2}:\d{2}:\d{2}\.\d+$/', $stripped)   => 17,
+            (bool) preg_match('/T\d{2}:\d{2}:\d{2}$/', $stripped)        => 14,
+            (bool) preg_match('/T\d{2}:\d{2}$/', $stripped)              => 12,
+            (bool) preg_match('/T\d{2}$/', $stripped)                    => 10,
             default                                                      => null,
         };
     }
@@ -161,10 +161,10 @@ final class PrecisionFunction extends AbstractFunction
         $t = str_starts_with($value, 'T') ? substr($value, 1) : $value;
 
         return match (true) {
-            (bool) preg_match('/^\d{2}:\d{2}:\d{2}\.\d+$/', $t) => 9,
-            (bool) preg_match('/^\d{2}:\d{2}:\d{2}$/', $t)       => 6,
-            (bool) preg_match('/^\d{2}:\d{2}$/', $t)             => 4,
-            (bool) preg_match('/^\d{2}$/', $t)                   => 2,
+            (bool) preg_match('/^\d{2}:\d{2}:\d{2}\.\d+$/', $t)   => 9,
+            (bool) preg_match('/^\d{2}:\d{2}:\d{2}$/', $t)        => 6,
+            (bool) preg_match('/^\d{2}:\d{2}$/', $t)              => 4,
+            (bool) preg_match('/^\d{2}$/', $t)                    => 2,
             default                                               => null,
         };
     }

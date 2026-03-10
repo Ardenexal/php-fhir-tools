@@ -25,6 +25,7 @@ class StructureMapGroupRule extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -34,6 +35,7 @@ class StructureMapGroupRule extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -43,6 +45,7 @@ class StructureMapGroupRule extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'name' => [
@@ -52,6 +55,7 @@ class StructureMapGroupRule extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'source' => [
@@ -61,6 +65,7 @@ class StructureMapGroupRule extends BackboneElement
             'isRequired'   => true,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\StructureMap\StructureMapGroupRuleSource',
             'variants'     => null,
         ],
         'target' => [
@@ -70,6 +75,7 @@ class StructureMapGroupRule extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\StructureMap\StructureMapGroupRuleTarget',
             'variants'     => null,
         ],
         'rule' => [
@@ -79,6 +85,7 @@ class StructureMapGroupRule extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\StructureMap\StructureMapGroupRule',
             'variants'     => null,
         ],
         'dependent' => [
@@ -88,6 +95,7 @@ class StructureMapGroupRule extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\StructureMap\StructureMapGroupRuleDependent',
             'variants'     => null,
         ],
         'documentation' => [
@@ -97,6 +105,7 @@ class StructureMapGroupRule extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

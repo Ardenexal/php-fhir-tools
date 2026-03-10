@@ -29,6 +29,7 @@ class NutritionOrderEnteralFormulaAdministrationSchedule extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -38,6 +39,7 @@ class NutritionOrderEnteralFormulaAdministrationSchedule extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -47,6 +49,7 @@ class NutritionOrderEnteralFormulaAdministrationSchedule extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'timing' => [
@@ -56,6 +59,7 @@ class NutritionOrderEnteralFormulaAdministrationSchedule extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Timing',
             'variants'     => null,
         ],
         'asNeeded' => [
@@ -65,6 +69,7 @@ class NutritionOrderEnteralFormulaAdministrationSchedule extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'asNeededFor' => [
@@ -74,6 +79,7 @@ class NutritionOrderEnteralFormulaAdministrationSchedule extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
     ];

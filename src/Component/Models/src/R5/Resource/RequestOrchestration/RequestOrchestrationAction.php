@@ -43,6 +43,7 @@ class RequestOrchestrationAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'extension' => [
@@ -52,6 +53,7 @@ class RequestOrchestrationAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'modifierExtension' => [
@@ -61,6 +63,7 @@ class RequestOrchestrationAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'linkId' => [
@@ -70,6 +73,7 @@ class RequestOrchestrationAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'prefix' => [
@@ -79,6 +83,7 @@ class RequestOrchestrationAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'title' => [
@@ -88,6 +93,7 @@ class RequestOrchestrationAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'description' => [
@@ -97,6 +103,7 @@ class RequestOrchestrationAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'textEquivalent' => [
@@ -106,6 +113,7 @@ class RequestOrchestrationAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'priority' => [
@@ -115,6 +123,7 @@ class RequestOrchestrationAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'code' => [
@@ -124,6 +133,7 @@ class RequestOrchestrationAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
             'variants'     => null,
         ],
         'documentation' => [
@@ -133,6 +143,7 @@ class RequestOrchestrationAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\RelatedArtifact',
             'variants'     => null,
         ],
         'goal' => [
@@ -142,6 +153,7 @@ class RequestOrchestrationAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
             'variants'     => null,
         ],
         'condition' => [
@@ -151,6 +163,7 @@ class RequestOrchestrationAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\RequestOrchestration\RequestOrchestrationActionCondition',
             'variants'     => null,
         ],
         'input' => [
@@ -160,6 +173,7 @@ class RequestOrchestrationAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\RequestOrchestration\RequestOrchestrationActionInput',
             'variants'     => null,
         ],
         'output' => [
@@ -169,6 +183,7 @@ class RequestOrchestrationAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\RequestOrchestration\RequestOrchestrationActionOutput',
             'variants'     => null,
         ],
         'relatedAction' => [
@@ -178,6 +193,7 @@ class RequestOrchestrationAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\RequestOrchestration\RequestOrchestrationActionRelatedAction',
             'variants'     => null,
         ],
         'timing' => [
@@ -187,6 +203,7 @@ class RequestOrchestrationAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'dateTime',
@@ -239,6 +256,7 @@ class RequestOrchestrationAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'participant' => [
@@ -248,6 +266,7 @@ class RequestOrchestrationAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\RequestOrchestration\RequestOrchestrationActionParticipant',
             'variants'     => null,
         ],
         'type' => [
@@ -257,6 +276,7 @@ class RequestOrchestrationAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'groupingBehavior' => [
@@ -266,6 +286,7 @@ class RequestOrchestrationAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'selectionBehavior' => [
@@ -275,6 +296,7 @@ class RequestOrchestrationAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'requiredBehavior' => [
@@ -284,6 +306,7 @@ class RequestOrchestrationAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'precheckBehavior' => [
@@ -293,6 +316,7 @@ class RequestOrchestrationAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'cardinalityBehavior' => [
@@ -302,6 +326,7 @@ class RequestOrchestrationAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'resource' => [
@@ -311,6 +336,7 @@ class RequestOrchestrationAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'definition' => [
@@ -320,6 +346,7 @@ class RequestOrchestrationAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => true,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => [
                 [
                     'fhirType'     => 'canonical',
@@ -344,6 +371,7 @@ class RequestOrchestrationAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => null,
             'variants'     => null,
         ],
         'dynamicValue' => [
@@ -353,6 +381,7 @@ class RequestOrchestrationAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\RequestOrchestration\RequestOrchestrationActionDynamicValue',
             'variants'     => null,
         ],
         'action' => [
@@ -362,6 +391,7 @@ class RequestOrchestrationAction extends BackboneElement
             'isRequired'   => false,
             'isChoice'     => false,
             'jsonKey'      => null,
+            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Resource\RequestOrchestration\RequestOrchestrationAction',
             'variants'     => null,
         ],
     ];
