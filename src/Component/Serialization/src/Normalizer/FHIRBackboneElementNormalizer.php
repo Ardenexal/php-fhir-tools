@@ -467,6 +467,9 @@ class FHIRBackboneElementNormalizer extends AbstractFHIRNormalizer
                 if ($normalizedValue !== null) {
                     $data[$xmlKey] = $normalizedValue;
                 }
+            } elseif (is_scalar($value)) {
+                // FHIR XML: scalar values emit as child elements with @value attribute.
+                $data[$xmlKey] = ['@value' => is_bool($value) ? ($value ? 'true' : 'false') : (string) $value];
             } else {
                 // Handle nested backbone elements and other complex types
                 if ($this->normalizer !== null) {

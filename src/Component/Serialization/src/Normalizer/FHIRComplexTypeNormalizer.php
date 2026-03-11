@@ -463,8 +463,9 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
                     $data[$xmlKey] = $normalizedValue;
                 }
             } elseif (is_scalar($value)) {
-                // Scalar values become XML attributes
-                $data['@' . $xmlKey] = $value;
+                // FHIR XML: scalar values are child elements with a @value attribute,
+                // e.g. <period value="21"/>, not XML attributes on the parent element.
+                $data[$xmlKey] = ['@value' => is_bool($value) ? ($value ? 'true' : 'false') : (string) $value];
             } else {
                 // Use the injected normalizer if available, otherwise handle basic types
                 if ($this->normalizer !== null) {

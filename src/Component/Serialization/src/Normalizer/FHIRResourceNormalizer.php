@@ -491,6 +491,44 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
                 }
             }
 
+            // Handle polymorphic resource properties in XML: each resource must be wrapped
+            // with its resource type as the element name, e.g.
+            //   <contained><Medication>...</Medication></contained>
+            if ($meta !== null && $meta->propertyKind === 'resource') {
+                if ($meta->isArray && is_array($value)) {
+                    $wrappedItems = [];
+                    foreach ($value as $item) {
+                        if (!is_object($item)) {
+                            continue;
+                        }
+                        $itemResourceType = $this->metadataExtractor->extractResourceType($item);
+                        if ($itemResourceType === null) {
+                            continue;
+                        }
+                        $normalizedItem = $this->normalizer !== null
+                            ? $this->normalizer->normalize($item, $fhirContext->format, $context)
+                            : $this->normalizeBasicValue($item, $fhirContext->format, $context);
+                        if ($normalizedItem !== null) {
+                            $wrappedItems[] = [$itemResourceType => $normalizedItem];
+                        }
+                    }
+                    if (!empty($wrappedItems)) {
+                        $data[$xmlKey] = $wrappedItems;
+                    }
+                } elseif (!$meta->isArray && is_object($value)) {
+                    $itemResourceType = $this->metadataExtractor->extractResourceType($value);
+                    if ($itemResourceType !== null) {
+                        $normalizedValue = $this->normalizer !== null
+                            ? $this->normalizer->normalize($value, $fhirContext->format, $context)
+                            : $this->normalizeBasicValue($value, $fhirContext->format, $context);
+                        if ($normalizedValue !== null && !$this->shouldOmitValue($normalizedValue, $fhirContext)) {
+                            $data[$xmlKey] = [$itemResourceType => $normalizedValue];
+                        }
+                    }
+                }
+                continue;
+            }
+
             // Handle arrays
             if (is_array($value)) {
                 $normalizedArray = $this->normalizeArrayForXML($value, $xmlKey, $fhirContext, $context);
@@ -504,10 +542,10 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
                     $data[$xmlKey] = $normalizedValue;
                 }
             } else {
-                // FHIR XML: boolean scalars must emit as <active value="true"/> not <active>1</active>.
-                // PHP true/false would be cast to "1"/"" by XmlEncoder text-content serialization.
-                if (is_bool($value)) {
-                    $normalizedValue = ['@value' => $value ? 'true' : 'false'];
+                // FHIR XML: scalar values emit as child elements with @value attribute.
+                // Booleans: 'true'/'false'; other scalars: cast to string.
+                if (is_scalar($value)) {
+                    $normalizedValue = ['@value' => is_bool($value) ? ($value ? 'true' : 'false') : (string) $value];
                 } elseif ($this->normalizer !== null) {
                     $normalizedValue = $this->normalizer->normalize($value, $fhirContext->format, $context);
                 } else {
@@ -743,9 +781,42 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
                     $propertyMetadata = $metaMap[$elementName] ?? null;
                     $phpItemClass     = $propertyMetadata?->phpItemClass;
 
-                    // Special handling for polymorphic resource properties (e.g., Bundle.entry.resource)
-                    // In XML, the actual resource type is determined by the nested element name
+                    // Special handling for polymorphic resource properties (e.g., Bundle.entry.resource,
+                    // DomainResource::$contained). In XML the actual resource type is determined by
+                    // the nested element name, e.g. <contained><Medication>...</Medication></contained>.
                     if ($propertyMetadata !== null && $propertyMetadata->propertyKind === 'resource') {
+                        if ($propertyMetadata->isArray) {
+                            // Array of polymorphic resources (e.g. DomainResource::$contained).
+                            // XmlEncoder decodes a single <contained> element as a non-list assoc
+                            // array; multiple elements arrive as a list — normalise to a list first.
+                            $items            = is_array($value) && !array_is_list($value) ? [$value] : (array) $value;
+                            $denormalizedValue = [];
+
+                            foreach ($items as $item) {
+                                $resourceElementName = $this->extractResourceElementName($item);
+                                if ($resourceElementName === null) {
+                                    continue;
+                                }
+
+                                $resolvedClass = $this->typeResolver->resolveResourceType([
+                                    'resourceType' => $resourceElementName,
+                                ]);
+
+                                if ($resolvedClass !== null && $this->denormalizer !== null && is_array($item)) {
+                                    $denormalizedValue[] = $this->denormalizer->denormalize(
+                                        $item[$resourceElementName],
+                                        $resolvedClass,
+                                        'xml',
+                                        $context,
+                                    );
+                                }
+                            }
+
+                            $property->setValue($object, $denormalizedValue);
+                            continue;
+                        }
+
+                        // Single polymorphic resource (non-array), e.g. Bundle.entry.resource.
                         $resourceElementName = $this->extractResourceElementName($value);
                         if ($resourceElementName !== null) {
                             $resolvedClass = $this->typeResolver->resolveResourceType([
