@@ -25,10 +25,10 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
 {
     public function __construct(
-        FHIRMetadataExtractorInterface $metadataExtractor,
+        FHIRMetadataExtractorInterface             $metadataExtractor,
         private readonly FHIRTypeResolverInterface $typeResolver,
-        ?NormalizerInterface $normalizer = null,
-        ?DenormalizerInterface $denormalizer = null
+        ?NormalizerInterface                       $normalizer = null,
+        ?DenormalizerInterface                     $denormalizer = null
     ) {
         parent::__construct($metadataExtractor, $normalizer, $denormalizer);
     }
@@ -109,6 +109,17 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
                     continue;
                 }
 
+                // For XML: strip @ prefix from attribute keys (e.g. '@url' → 'url' for Extension.url).
+                // XmlEncoder encodes XML attributes with @ prefix; FHIR models store them as plain properties.
+                // Skip @value (primitive value attribute) and # (text node) — those are handled differently.
+                if ($format === 'xml' && str_starts_with($elementName, '@') && $elementName !== '@value') {
+                    $attrPropertyName = substr($elementName, 1);
+                    if ($reflection->hasProperty($attrPropertyName)) {
+                        $reflection->getProperty($attrPropertyName)->setValue($object, (string) $value);
+                    }
+                    continue;
+                }
+
                 // First, check if this is a choice element variant (e.g., 'valueQuantity' -> 'value')
                 $choiceMapping = $this->findChoicePropertyByKey($metaMap, $elementName);
                 if ($choiceMapping !== null) {
@@ -134,7 +145,24 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
                     $meta     = $metaMap[$elementName] ?? null;
 
                     if ($this->denormalizer !== null) {
-                        if ($meta !== null && $meta->propertyKind === 'primitive' && $format !== 'xml') {
+                        if ($format === 'xml' && $meta !== null && $meta->fhirType === 'xhtml' && is_array($value)) {
+                            // Xhtml special case: XmlEncoder decoded the <div> subtree as a nested array.
+                            // Convert the array back to an XML string using DOMDocument (which correctly
+                            // handles repeated sibling elements), then store the string in XhtmlPrimitive.value.
+                            $xhtmlClass = $this->getFirstNonBuiltinTypeFromProperty($property);
+                            if ($xhtmlClass !== null) {
+                                /** @var class-string $xhtmlClass */
+                                $xhtmlRefl     = new \ReflectionClass($xhtmlClass);
+                                $xhtmlInstance = $xhtmlRefl->newInstanceWithoutConstructor();
+                                if ($xhtmlRefl->hasProperty('value')) {
+                                    $xmlString = $this->encodeXhtmlToString($value, 'div');
+                                    $xhtmlRefl->getProperty('value')->setValue($xhtmlInstance, $xmlString);
+                                }
+                                $denormalizedValue = $xhtmlInstance;
+                            } else {
+                                $denormalizedValue = null;
+                            }
+                        } elseif ($meta !== null && $meta->propertyKind === 'primitive') {
                             // Always produce Primitive objects so that _property extension data
                             // can be attached to the instances in the second pass below.
                             $denormalizedValue = $this->denormalizePrimitiveProperty($meta, $property, $reflection, $value, $format, $context, $metaMap);
@@ -170,7 +198,8 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
             $this->applyPrimitiveExtensions($reflection, $object, $data, $metaMap, $format, $context);
 
             return $object;
-        } catch (\ReflectionException $e) {
+        } catch
+        (\ReflectionException $e) {
             throw new NotNormalizableValueException(sprintf('Cannot create instance of class "%s": %s', $resolvedType, $e->getMessage()), 0, $e);
         }
     }
@@ -272,7 +301,7 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
 
             // Handle choice elements: metadata-driven (generated classes) or legacy heuristic
             $isChoice = ($meta !== null && $meta->isChoice && !empty($meta->variants))
-                || ($meta === null && $this->isChoiceElement($propertyName));
+                        || ($meta === null && $this->isChoiceElement($propertyName));
 
             if ($isChoice && $meta !== null && !empty($meta->variants)) {
                 // Metadata-driven: resolve concrete JSON key and kind from variant map
@@ -373,7 +402,7 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
 
             // Handle choice elements: metadata-driven (generated classes) or legacy heuristic
             $isChoice = ($meta !== null && $meta->isChoice && !empty($meta->variants))
-                || ($meta === null && $this->isChoiceElement($propertyName));
+                        || ($meta === null && $this->isChoiceElement($propertyName));
 
             if ($isChoice && $meta !== null && !empty($meta->variants)) {
                 // Metadata-driven: resolve concrete XML key and kind from variant map
@@ -402,6 +431,29 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
                     $data[$xmlKey] = $normalizedValue;
                 }
                 continue;
+            }
+
+            // Xhtml special case: XhtmlPrimitive.value holds either:
+            //   - a raw XmlEncoder array (stored during XML deserialization) — pass through as-is, or
+            //   - an XML string (stored during JSON deserialization) — decode back to array first.
+            // Either way, XmlEncoder receives the nested array and emits proper XHTML child elements.
+            if ($meta !== null && $meta->fhirType === 'xhtml' && is_object($value)) {
+                $xhtmlReflection = new \ReflectionClass($value);
+                if ($xhtmlReflection->hasProperty('value')) {
+                    $rawXhtml = $xhtmlReflection->getProperty('value')->getValue($value);
+                    if (is_array($rawXhtml)) {
+                        $data[$xmlKey] = $rawXhtml;
+                        continue;
+                    } elseif (is_string($rawXhtml)) {
+                        // If the string is XML (starts with '<'), decode back to XmlEncoder array.
+                        // Otherwise it's plain text — emit as XmlEncoder text-node content.
+                        $trimmed       = ltrim($rawXhtml);
+                        $data[$xmlKey] = str_starts_with($trimmed, '<')
+                            ? $this->decodeXhtmlToArray($rawXhtml)
+                            : ['#' => $rawXhtml];
+                        continue;
+                    }
+                }
             }
 
             // Handle primitive extensions for XML (no underscore notation)

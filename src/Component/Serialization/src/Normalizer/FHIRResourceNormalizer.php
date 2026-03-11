@@ -504,8 +504,11 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
                     $data[$xmlKey] = $normalizedValue;
                 }
             } else {
-                // Use the injected normalizer if available, otherwise handle basic types
-                if ($this->normalizer !== null) {
+                // FHIR XML: boolean scalars must emit as <active value="true"/> not <active>1</active>.
+                // PHP true/false would be cast to "1"/"" by XmlEncoder text-content serialization.
+                if (is_bool($value)) {
+                    $normalizedValue = ['@value' => $value ? 'true' : 'false'];
+                } elseif ($this->normalizer !== null) {
                     $normalizedValue = $this->normalizer->normalize($value, $fhirContext->format, $context);
                 } else {
                     $normalizedValue = $this->normalizeBasicValue($value, $fhirContext->format, $context);
@@ -763,7 +766,19 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
                         // If we couldn't resolve, fall through to default handling
                     }
 
-                    if ($phpItemClass !== null && $this->denormalizer !== null) {
+                    if ($propertyMetadata !== null
+                        && ($propertyMetadata->propertyKind === 'extension' || $propertyMetadata->propertyKind === 'modifierExtension')
+                        && $this->denormalizer !== null
+                    ) {
+                        // Extension/modifierExtension: phpItemClass is null in FHIR_PROPERTY_MAP for these.
+                        // Unwrap XmlEncoder output (single non-list assoc array → wrap in list),
+                        // then denormalize each item to a typed Extension object.
+                        $items = $this->unwrapXmlValue($value, 'array');
+                        if (is_array($items) && !array_is_list($items)) {
+                            $items = [$items];
+                        }
+                        $denormalizedValue = $this->denormalizeExtensionArray((array) $items, 'xml', $context);
+                    } elseif ($phpItemClass !== null && $this->denormalizer !== null) {
                         // Complex/backbone array property: denormalize each item to a typed object.
                         // unwrapXmlValue strips XmlEncoder meta-keys; the single-element case produces
                         // an associative array (not a list) — wrap it so we always iterate a list.
