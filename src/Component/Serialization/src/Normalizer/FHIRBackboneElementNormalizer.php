@@ -156,8 +156,28 @@ class FHIRBackboneElementNormalizer extends AbstractFHIRNormalizer
                             // If we couldn't resolve, fall through to default handling
                         }
 
+                        $phpItemClass = $meta?->phpItemClass;
                         if ($this->denormalizer !== null) {
-                            if ($meta !== null && $meta->propertyKind === 'primitive' && $format !== 'xml') {
+                            if ($phpItemClass !== null && is_array($value)) {
+                                // Array of typed complex/backbone items: denormalize each element to the typed class.
+                                if ($format === 'xml') {
+                                    $items = $this->unwrapXmlValue($value, 'array');
+                                    if (is_array($items) && !array_is_list($items)) {
+                                        $items = [$items];
+                                    }
+                                    $denormalizedValue = [];
+                                    foreach ((array) $items as $item) {
+                                        /** @var class-string $phpItemClass */
+                                        $denormalizedValue[] = $this->denormalizer->denormalize($item, $phpItemClass, 'xml', $context);
+                                    }
+                                } else {
+                                    $denormalizedValue = [];
+                                    foreach ($value as $item) {
+                                        /** @var class-string $phpItemClass */
+                                        $denormalizedValue[] = $this->denormalizer->denormalize($item, $phpItemClass, $format, $context);
+                                    }
+                                }
+                            } elseif ($meta !== null && $meta->propertyKind === 'primitive' && $format !== 'xml') {
                                 // Always produce Primitive objects so that _property extension data
                                 // can be attached to the instances in the second pass below.
                                 $denormalizedValue = $this->denormalizePrimitiveProperty($meta, $property, $reflection, $value, $format, $context, $metaMap);

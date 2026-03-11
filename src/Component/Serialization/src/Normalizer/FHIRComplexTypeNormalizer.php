@@ -167,22 +167,44 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
                             // can be attached to the instances in the second pass below.
                             $denormalizedValue = $this->denormalizePrimitiveProperty($meta, $property, $reflection, $value, $format, $context, $metaMap);
                         } else {
-                            $propertyType = $this->getPropertyType($property);
-                            if ($propertyType !== null && !$this->isBuiltinType($propertyType)) {
-                                $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, $format, $context);
-                            } else {
-                                // For XML, Symfony XmlEncoder wraps primitive values as ['@value' => '...', '#' => ''].
-                                // Unwrap before assigning to string/union-typed properties.
+                            $phpItemClass = $meta?->phpItemClass;
+                            if ($phpItemClass !== null && is_array($value)) {
+                                // Array of typed complex/backbone items: denormalize each element to the typed class.
                                 if ($format === 'xml') {
-                                    $denormalizedValue = $this->unwrapXmlValue($value, $propertyType);
-                                    // If unwrapping left an array (because the XML element had child elements,
-                                    // e.g. an inline extension), extract just the scalar @value so it can be
-                                    // assigned to union-typed properties like StringPrimitive|string|null.
-                                    if (is_array($denormalizedValue) && isset($denormalizedValue['@value'])) {
-                                        $denormalizedValue = $denormalizedValue['@value'];
+                                    $items = $this->unwrapXmlValue($value, 'array');
+                                    if (is_array($items) && !array_is_list($items)) {
+                                        $items = [$items];
+                                    }
+                                    $denormalizedValue = [];
+                                    foreach ((array) $items as $item) {
+                                        /** @var class-string $phpItemClass */
+                                        $denormalizedValue[] = $this->denormalizer->denormalize($item, $phpItemClass, $format, $context);
                                     }
                                 } else {
-                                    $denormalizedValue = $value;
+                                    $denormalizedValue = [];
+                                    foreach ($value as $item) {
+                                        /** @var class-string $phpItemClass */
+                                        $denormalizedValue[] = $this->denormalizer->denormalize($item, $phpItemClass, $format, $context);
+                                    }
+                                }
+                            } else {
+                                $propertyType = $this->getPropertyType($property);
+                                if ($propertyType !== null && !$this->isBuiltinType($propertyType)) {
+                                    $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, $format, $context);
+                                } else {
+                                    // For XML, Symfony XmlEncoder wraps primitive values as ['@value' => '...', '#' => ''].
+                                    // Unwrap before assigning to string/union-typed properties.
+                                    if ($format === 'xml') {
+                                        $denormalizedValue = $this->unwrapXmlValue($value, $propertyType);
+                                        // If unwrapping left an array (because the XML element had child elements,
+                                        // e.g. an inline extension), extract just the scalar @value so it can be
+                                        // assigned to union-typed properties like StringPrimitive|string|null.
+                                        if (is_array($denormalizedValue) && isset($denormalizedValue['@value'])) {
+                                            $denormalizedValue = $denormalizedValue['@value'];
+                                        }
+                                    } else {
+                                        $denormalizedValue = $value;
+                                    }
                                 }
                             }
                         }
