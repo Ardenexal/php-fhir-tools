@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Tests\Unit\Attributes;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRPrimitive;
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty;
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Tests\Utilities\FHIRTestDataGenerator;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 use Eris\TestTrait;

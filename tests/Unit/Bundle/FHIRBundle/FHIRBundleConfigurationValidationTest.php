@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Tests\Unit\Bundle\FHIRBundle;
 
-use Ardenexal\FHIRTools\Bundle\FHIRBundle\DependencyInjection\Configuration;
-use Ardenexal\FHIRTools\Bundle\FHIRBundle\DependencyInjection\FHIRExtension;
+use Ardenexal\FHIRTools\Bundle\FHIRBundle\src\DependencyInjection\Configuration;
+use Ardenexal\FHIRTools\Bundle\FHIRBundle\src\DependencyInjection\FHIRExtension;
 use Eris\Generator;
 use Eris\TestTrait;
 use PHPUnit\Framework\TestCase;

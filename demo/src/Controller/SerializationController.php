@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\StructureDefinitionResource;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
@@ -36,19 +37,20 @@ class SerializationController extends AbstractController
      * @var array<string, string>
      */
     private const RESOURCE_TYPES = [
-        'Patient'              => PatientResource::class,
-        'Observation'          => ObservationResource::class,
-        'Condition'            => ConditionResource::class,
-        'Encounter'            => EncounterResource::class,
-        'MedicationRequest'    => MedicationRequestResource::class,
-        'Organization'         => OrganizationResource::class,
-        'Practitioner'         => PractitionerResource::class,
-        'Bundle'               => BundleResource::class,
+        'Patient'             => PatientResource::class,
+        'StructureDefinition' => StructureDefinitionResource::class,
+        'Observation'         => ObservationResource::class,
+        'Condition'           => ConditionResource::class,
+        'Encounter'           => EncounterResource::class,
+        'MedicationRequest'   => MedicationRequestResource::class,
+        'Organization'        => OrganizationResource::class,
+        'Practitioner'        => PractitionerResource::class,
+        'Bundle'              => BundleResource::class,
     ];
 
     public function __construct(
-        private readonly FHIRSerializationService $serializationService,
-        private readonly FHIRValidator $validator,
+        private readonly FHIRSerializationService       $serializationService,
+        private readonly FHIRValidator                  $validator,
         private readonly FHIRMetadataExtractorInterface $metadataExtractor,
     ) {
     }
@@ -71,9 +73,9 @@ class SerializationController extends AbstractController
     #[Route('/process', name: '_process', methods: ['POST'])]
     public function process(Request $request): Response
     {
-        $input        = trim((string) $request->request->get('input', ''));
-        $resourceType = (string) $request->request->get('resource_type', 'Patient');
-        $action       = (string) $request->request->get('action', 'validate');
+        $input        = trim((string)$request->request->get('input', ''));
+        $resourceType = (string)$request->request->get('resource_type', 'Patient');
+        $action       = (string)$request->request->get('action', 'validate');
 
         $result = null;
         $error  = null;
@@ -95,18 +97,18 @@ class SerializationController extends AbstractController
         try {
             $format = $this->detectFormat($input);
             $object = match ($format) {
-                'json'  => $this->serializationService->deserializeFromJson($input, $targetClass),
-                'xml'   => $this->serializationService->deserializeFromXml($input, $targetClass),
+                'json' => $this->serializationService->deserializeFromJson($input, $targetClass),
+                'xml' => $this->serializationService->deserializeFromXml($input, $targetClass),
                 default => throw new FHIRSerializationException('Unable to detect format (expected JSON or XML)'),
             };
 
             $result = match ($action) {
-                'validate'       => $this->doValidate($object),
-                'json_to_xml'    => $this->doConvert($object, 'xml'),
-                'xml_to_json'    => $this->doConvert($object, 'json'),
-                'show_metadata'  => $this->doMetadata($object),
+                'validate' => $this->doValidate($object),
+                'json_to_xml' => $this->doConvert($object, 'xml'),
+                'xml_to_json' => $this->doConvert($object, 'json'),
+                'show_metadata' => $this->doMetadata($object),
                 'dump_structure' => $this->doDumpStructure($object),
-                default          => throw new \InvalidArgumentException(sprintf('Unknown action "%s"', $action)),
+                default => throw new \InvalidArgumentException(sprintf('Unknown action "%s"', $action)),
             };
         } catch (FHIRSerializationException $e) {
             $error = 'Serialization error: ' . $e->getMessage();
@@ -137,8 +139,8 @@ class SerializationController extends AbstractController
     private function doConvert(object $object, string $targetFormat): array
     {
         $output = match ($targetFormat) {
-            'xml'   => $this->serializationService->serializeToXml($object),
-            'json'  => $this->serializationService->serializeToJson($object),
+            'xml' => $this->serializationService->serializeToXml($object),
+            'json' => $this->serializationService->serializeToJson($object),
             default => throw new \InvalidArgumentException("Unsupported target format: {$targetFormat}"),
         };
 
@@ -191,15 +193,15 @@ class SerializationController extends AbstractController
     private function doMetadata(object $object): array
     {
         return [
-            'type'             => 'metadata',
-            'class'            => get_class($object),
-            'resource_type'    => $this->metadataExtractor->extractResourceType($object),
-            'fhir_type'        => $this->metadataExtractor->extractFHIRType($object),
-            'fhir_version'     => $this->metadataExtractor->extractFHIRVersion($object),
-            'is_resource'      => $this->metadataExtractor->isResource($object),
-            'is_complex_type'  => $this->metadataExtractor->isComplexType($object),
-            'parent_resource'  => $this->metadataExtractor->extractParentResource($object),
-            'element_path'     => $this->metadataExtractor->extractElementPath($object),
+            'type'            => 'metadata',
+            'class'           => get_class($object),
+            'resource_type'   => $this->metadataExtractor->extractResourceType($object),
+            'fhir_type'       => $this->metadataExtractor->extractFHIRType($object),
+            'fhir_version'    => $this->metadataExtractor->extractFHIRVersion($object),
+            'is_resource'     => $this->metadataExtractor->isResource($object),
+            'is_complex_type' => $this->metadataExtractor->isComplexType($object),
+            'parent_resource' => $this->metadataExtractor->extractParentResource($object),
+            'element_path'    => $this->metadataExtractor->extractElementPath($object),
         ];
     }
 
@@ -228,10 +230,10 @@ class SerializationController extends AbstractController
     }
 
     private function renderForm(
-        string $input,
-        string $resourceType,
-        string $action,
-        ?array $result,
+        string  $input,
+        string  $resourceType,
+        string  $action,
+        ?array  $result,
         ?string $error,
     ): Response {
         return $this->render('serialization/index.html.twig', [

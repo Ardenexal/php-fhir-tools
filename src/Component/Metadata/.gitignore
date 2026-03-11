@@ -1,0 +1,27 @@
+# Generated FHIR model files are now committed for reuse
+# src/R4/
+# src/R4B/
+# src/R5/
+
+# Keep utility classes
+!src/Utility/
+
+# PHPUnit
+/coverage/
+/.phpunit.cache/
+
+# Composer
+/vendor/
+
+# IDE
+/.idea/
+/.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

@@ -767,10 +767,6 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         $result = [];
 
         foreach ($data as $key => $value) {
-            if (is_int($key)) {
-                continue;
-            }
-
             // #text is XmlEncoder's key for multiple text nodes in mixed content. Map to '#'.
             if ($key === '#text') {
                 $combined        = is_array($value) ? implode('', $value) : (string) $value;

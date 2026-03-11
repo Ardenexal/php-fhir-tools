@@ -77,7 +77,7 @@ class RecipeValidator
 
         // Validate bundle registration
         if (isset($manifest['bundles'])) {
-            $expectedBundle = 'Ardenexal\\FHIRTools\\Bundle\\FHIRBundle\\FHIRBundle';
+            $expectedBundle = 'Ardenexal\\FHIRTools\\Bundle\\FHIRBundle\\src\\FHIRBundle';
             if (!isset($manifest['bundles'][$expectedBundle])) {
                 $this->errors[] = 'Bundle registration is missing or incorrect';
             }

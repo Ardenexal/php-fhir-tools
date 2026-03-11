@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use Ardenexal\FHIRTools\Bundle\FHIRBundle\FHIRBundle;
+use Ardenexal\FHIRTools\Bundle\FHIRBundle\src\FHIRBundle;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 
@@ -56,7 +56,7 @@ try {
 // Test 4: Check autoloading works for all components
 echo "\n4. Testing component autoloading...\n";
 $testClasses = [
-    'Ardenexal\\FHIRTools\\Bundle\\FHIRBundle\\FHIRBundle',
+    'Ardenexal\\FHIRTools\\Bundle\\FHIRBundle\\src\\FHIRBundle',
     'Ardenexal\\FHIRTools\\Component\\CodeGeneration\\Context\\BuilderContext',
     'Ardenexal\\FHIRTools\\Component\\Serialization\\FHIRSerializationService',
 ];

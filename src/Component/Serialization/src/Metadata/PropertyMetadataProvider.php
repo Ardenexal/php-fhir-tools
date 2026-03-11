@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Metadata;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 
 /**
  * Resolves and caches PropertyMetadata for FHIR model classes.
@@ -48,7 +48,7 @@ class PropertyMetadataProvider implements PropertyMetadataProviderInterface
     {
         // Fast path: read compiled FHIR_PROPERTY_MAP const (no reflection)
         if (defined($className . '::FHIR_PROPERTY_MAP')) {
-            /** @var array<string, array{fhirType: string, propertyKind: string, isArray: bool, isRequired: bool, isChoice: bool, jsonKey: string|null, variants: list<array{fhirType: string, propertyKind: string, phpType: string, jsonKey: string, isBuiltin: bool}>|null}> $map */
+            /** @var array<string, array{fhirType: string, propertyKind: string, isArray: bool, isRequired: bool, isChoice: bool, jsonKey: string|null, phpType?: string|null, xmlSerializedName?: string|null, variants: list<array{fhirType: string, propertyKind: string, phpType: string, jsonKey: string, isBuiltin: bool}>|null}> $map */
             $map = constant($className . '::FHIR_PROPERTY_MAP');
 
             return $this->hydrateFromMap($map);
@@ -61,7 +61,7 @@ class PropertyMetadataProvider implements PropertyMetadataProviderInterface
     /**
      * Hydrate PropertyMetadata objects from a FHIR_PROPERTY_MAP const value.
      *
-     * @param array<string, array{fhirType: string, propertyKind: string, isArray: bool, isRequired: bool, isChoice: bool, jsonKey: string|null, phpType?: string|null, variants: list<array{fhirType: string, propertyKind: string, phpType: string, jsonKey: string, isBuiltin: bool}>|null}> $map
+     * @param array<string, array{fhirType: string, propertyKind: string, isArray: bool, isRequired: bool, isChoice: bool, jsonKey: string|null, phpType?: string|null, xmlSerializedName?: string|null, variants: list<array{fhirType: string, propertyKind: string, phpType: string, jsonKey: string, isBuiltin: bool}>|null}> $map
      *
      * @return array<string, PropertyMetadata>
      */
@@ -84,7 +84,8 @@ class PropertyMetadataProvider implements PropertyMetadataProviderInterface
                 );
             }
 
-            $phpItemClass = $entry['phpType'] ?? null;
+            $phpItemClass      = $entry['phpType'] ?? null;
+            $xmlSerializedName = $entry['xmlSerializedName'] ?? null;
 
             $result[$propertyName] = new PropertyMetadata(
                 $entry['fhirType'],
@@ -95,6 +96,7 @@ class PropertyMetadataProvider implements PropertyMetadataProviderInterface
                 $variants,
                 $entry['jsonKey'],
                 $phpItemClass,
+                $xmlSerializedName,
             );
         }
 
@@ -152,6 +154,8 @@ class PropertyMetadataProvider implements PropertyMetadataProviderInterface
                     $attr->isChoice,
                     $variants,
                     $attr->jsonKey,
+                    null,
+                    $attr->xmlSerializedName,
                 );
             }
 

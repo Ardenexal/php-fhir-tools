@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Type;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRPrimitive;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 
 /**
  * Resolves and validates FHIR types using the generated FHIR models.

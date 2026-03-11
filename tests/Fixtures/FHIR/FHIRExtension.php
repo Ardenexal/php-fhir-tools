@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Tests\Fixtures\FHIR;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 
 /**
  * Test FHIR Extension complex type with choice elements (value[x] pattern)

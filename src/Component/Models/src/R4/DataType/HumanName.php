@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 
 /**
- * @author      HL7 FHIR Standard
+ * @author HL7 FHIR Standard
  *
- * @see         http://hl7.org/fhir/StructureDefinition/HumanName
+ * @see http://hl7.org/fhir/StructureDefinition/HumanName
  *
  * @description A human's name with the ability to identify parts and usage.
  */
@@ -19,15 +19,16 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 class HumanName extends Element
 {
     public const FHIR_PROPERTY_MAP = [
-        'id'        => [
-            'fhirType'     => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind' => 'scalar',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
+        'id' => [
+            'fhirType'          => 'http://hl7.org/fhirpath/System.String',
+            'propertyKind'      => 'scalar',
+            'isArray'           => false,
+            'isRequired'        => false,
+            'isChoice'          => false,
+            'jsonKey'           => null,
+            'phpType'           => null,
+            'variants'          => null,
+            'xmlSerializedName' => '@id',
         ],
         'extension' => [
             'fhirType'     => 'Extension',
@@ -39,7 +40,7 @@ class HumanName extends Element
             'phpType'      => null,
             'variants'     => null,
         ],
-        'use'       => [
+        'use' => [
             'fhirType'     => 'code',
             'propertyKind' => 'primitive',
             'isArray'      => false,
@@ -49,7 +50,7 @@ class HumanName extends Element
             'phpType'      => null,
             'variants'     => null,
         ],
-        'text'      => [
+        'text' => [
             'fhirType'     => 'string',
             'propertyKind' => 'primitive',
             'isArray'      => false,
@@ -59,7 +60,7 @@ class HumanName extends Element
             'phpType'      => null,
             'variants'     => null,
         ],
-        'family'    => [
+        'family' => [
             'fhirType'     => 'string',
             'propertyKind' => 'primitive',
             'isArray'      => false,
@@ -69,7 +70,7 @@ class HumanName extends Element
             'phpType'      => null,
             'variants'     => null,
         ],
-        'given'     => [
+        'given' => [
             'fhirType'     => 'string',
             'propertyKind' => 'primitive',
             'isArray'      => true,
@@ -79,7 +80,7 @@ class HumanName extends Element
             'phpType'      => null,
             'variants'     => null,
         ],
-        'prefix'    => [
+        'prefix' => [
             'fhirType'     => 'string',
             'propertyKind' => 'primitive',
             'isArray'      => true,
@@ -89,7 +90,7 @@ class HumanName extends Element
             'phpType'      => null,
             'variants'     => null,
         ],
-        'suffix'    => [
+        'suffix' => [
             'fhirType'     => 'string',
             'propertyKind' => 'primitive',
             'isArray'      => true,
@@ -99,7 +100,7 @@ class HumanName extends Element
             'phpType'      => null,
             'variants'     => null,
         ],
-        'period'    => [
+        'period' => [
             'fhirType'     => 'Period',
             'propertyKind' => 'complex',
             'isArray'      => false,
@@ -113,7 +114,7 @@ class HumanName extends Element
 
     public function __construct(
         /** @var string|null id Unique id for inter-element referencing */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
         public ?string $id = null,
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]

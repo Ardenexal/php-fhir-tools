@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Tests\Unit\Component\CodeGeneration;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Command\FHIRModelGeneratorCommand;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\EnumType;
 use Nette\PhpGenerator\PhpNamespace;
@@ -91,7 +92,7 @@ class OutputPathGenerationTest extends TestCase
         string $version = 'R4B'
     ): ClassType {
         $class = new ClassType($className);
-        $class->addAttribute('Ardenexal\\FHIRTools\\Component\\CodeGeneration\\Attributes\\FHIRBackboneElement', [
+        $class->addAttribute(FHIRBackboneElement::class, [
             'parentResource' => $parentResource,
             'elementPath'    => $elementPath,
             'fhirVersion'    => $version,

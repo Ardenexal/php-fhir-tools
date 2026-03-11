@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\PlanDefinition;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\ActionCardinalityBehaviorType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\ActionGroupingBehaviorType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\ActionPrecheckBehaviorType;

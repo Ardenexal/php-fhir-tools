@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Tests\Unit\Bundle\FHIRBundle;
 
-use Ardenexal\FHIRTools\Bundle\FHIRBundle\FHIRBundle;
+use Ardenexal\FHIRTools\Bundle\FHIRBundle\src\FHIRBundle;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;

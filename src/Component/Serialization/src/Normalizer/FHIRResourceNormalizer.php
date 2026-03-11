@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Normalizer;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationDebugInfo;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
@@ -535,6 +535,11 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
                 if ($normalizedArray !== null) {
                     $data[$xmlKey] = $normalizedArray;
                 }
+            } elseif ($meta !== null && $meta->xmlSerializedName !== null && is_scalar($value)) {
+                // xmlAttr properties: emit as XML attribute on the parent element
+                $data[$meta->xmlSerializedName] = is_bool($value)
+                    ? ($value ? 'true' : 'false')
+                    : (string) $value;
             } elseif ($this->isPrimitiveWithExtensions($value)) {
                 // Handle primitive extensions for XML (as attributes and child elements)
                 $normalizedValue = $this->normalizePrimitiveWithExtensions($value, $fhirContext->format, $context, $fhirContext->includeExtensions);

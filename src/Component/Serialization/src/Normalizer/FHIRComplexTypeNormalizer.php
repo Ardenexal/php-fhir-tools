@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Normalizer;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
@@ -454,6 +454,14 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
                         continue;
                     }
                 }
+            }
+
+            // xmlAttr properties: emit as XML attribute on the parent element
+            if ($meta !== null && $meta->xmlSerializedName !== null && is_scalar($value)) {
+                $data[$meta->xmlSerializedName] = is_bool($value)
+                    ? ($value ? 'true' : 'false')
+                    : (string) $value;
+                continue;
             }
 
             // Handle primitive extensions for XML (no underscore notation)

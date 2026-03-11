@@ -113,25 +113,7 @@ final class SerializationSpecificationTest extends TestCase
             $this->markTestSkipped('fhir/fhir-test-cases not installed — run: composer update fhir/fhir-test-cases');
         }
 
-//        // Known serialization bugs (tracked separately)
-//        $knownBugs = [
-//            // _birthDate.extension test removed - appears to be fixed!
-//            // XML @value attribute serialization issues:
-//            'condition-example.xml',
-//            'list-example-long.xml',
-//            'medicationdispenseexample8.xml',
-//            'observation-decimal.xml',
-//            'observation-example-20minute-apgar-score.xml',
-//            'observation-example.xml',
-//            'organization-1.xml',
-//            'patient-example-xds.xml',
-//            'patient-example.xml',
-//            'patient-glossy-example.xml',
-//        ];
-//
-//        if (in_array($filename, $knownBugs, true)) {
-//            $this->markTestSkipped("Known serialization bug: {$filename} — see KNOWN_ISSUES.md");
-//        }
+
 
         // Step 1: Deserialize original file → typed model object.
         // Skip (not fail) if the resource type is not yet supported.
@@ -155,7 +137,7 @@ final class SerializationSpecificationTest extends TestCase
         try {
             $roundTripped = $this->service->deserialize($reserialized);
         } catch (\Throwable $e) {
-            $this->fail(sprintf('[%s] Re-deserialization of serialized output failed: %s', $filename, $e->getMessage()));
+            $this->fail(sprintf('[%s] Re-deserialization of serialized output failed: %s', $filename, $e->getMessage(). $e->getTraceAsString()));
         }
 
         // Step 4: Verify full structural fidelity survived the round-trip.

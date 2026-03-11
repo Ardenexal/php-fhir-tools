@@ -112,7 +112,7 @@ class RecipeInstallationTest extends TestCase
 
         $bundlesContent = file_get_contents($bundlesFile);
         self::assertNotFalse($bundlesContent, 'Should be able to read bundles.php');
-        self::assertStringContainsString('Ardenexal\\FHIRTools\\Bundle\\FHIRBundle\\FHIRBundle', $bundlesContent);
+        self::assertStringContainsString('Ardenexal\\FHIRTools\\Bundle\\FHIRBundle\\src\\FHIRBundle', $bundlesContent);
 
         // Try to evaluate the PHP file safely
         $bundles = [];
@@ -126,7 +126,7 @@ class RecipeInstallationTest extends TestCase
         }
 
         if (is_array($bundles)) {
-            $expectedBundle = 'Ardenexal\\FHIRTools\\Bundle\\FHIRBundle\\FHIRBundle';
+            $expectedBundle = 'Ardenexal\\FHIRTools\\Bundle\\FHIRBundle\\src\\FHIRBundle';
             self::assertArrayHasKey($expectedBundle, $bundles);
             self::assertEquals(['all'], $bundles[$expectedBundle]);
         }

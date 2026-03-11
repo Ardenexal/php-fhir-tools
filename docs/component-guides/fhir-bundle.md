@@ -23,7 +23,7 @@ If you have Symfony Flex installed, the bundle will be automatically configured.
 
 return [
     // ... other bundles
-    Ardenexal\FHIRTools\Bundle\FHIRBundle\FHIRBundle::class => ['all' => true],
+    \Ardenexal\FHIRTools\Bundle\FHIRBundle\src\FHIRBundle::class => ['all' => true],
 ];
 ```
 
