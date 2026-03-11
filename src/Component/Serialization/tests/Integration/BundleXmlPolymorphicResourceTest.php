@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Tests\Integration\Serialization;
+namespace Ardenexal\FHIRTools\Component\Serialization\Tests\Integration;
 
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\BundleResource;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;

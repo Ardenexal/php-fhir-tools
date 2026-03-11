@@ -41,7 +41,7 @@ jobs:
       run: composer validate --strict
 
     - name: Check code style (Pint) - All Components
-      run: composer run lint
+      run: composer run lint -- --test
 
     - name: Run PHPStan static analysis - All Components
       run: composer run phpstan
