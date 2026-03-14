@@ -105,9 +105,9 @@ class BiologicallyDerivedProductStorage extends BackboneElement
         /** @var StringPrimitive|string|null description Description of storage */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $description = null,
-        /** @var float|null temperature Storage temperature */
+        /** @var numeric-string|null temperature Storage temperature */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $temperature = null,
+        public ?string $temperature = null,
         /** @var BiologicallyDerivedProductStorageScaleType|null scale farenheit | celsius | kelvin */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
         public ?BiologicallyDerivedProductStorageScaleType $scale = null,

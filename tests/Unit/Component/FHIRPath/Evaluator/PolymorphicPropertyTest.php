@@ -28,7 +28,7 @@ final class PolymorphicPropertyTest extends TestCase
             public function __construct()
             {
                 $this->valueQuantity = new Quantity(
-                    value: 185.0,
+                    value: '185.0',
                     code: new CodePrimitive(value: '[lb_av]'),
                     unit: 'lbs',
                     system: new UriPrimitive(value: 'http://unitsofmeasure.org'),
@@ -66,7 +66,7 @@ final class PolymorphicPropertyTest extends TestCase
             public function __construct()
             {
                 $this->valueQuantity = new Quantity(
-                    value: 185.0,
+                    value: '185.0',
                     code: new CodePrimitive(value: '[lb_av]'),
                     unit: 'lbs',
                     system: new UriPrimitive(value: 'http://unitsofmeasure.org'),
@@ -85,13 +85,13 @@ final class PolymorphicPropertyTest extends TestCase
     {
         // Test that accessing a regular (non-polymorphic) property works
         $quantity = new Quantity(
-            value: 185.0,
+            value: '185.0',
             code: new CodePrimitive(value: '[lb_av]'),
         );
 
         $result = $this->service->evaluate('value', $quantity, fhirVersion: 'R4');
 
         self::assertTrue($result->isSingle(), 'Expected single result');
-        self::assertSame(185.0, $result->first());
+        self::assertSame('185.0', $result->first());
     }
 }

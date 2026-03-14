@@ -166,9 +166,9 @@ class ExplanationOfBenefitAddItemDetail extends BackboneElement
         /** @var Money|null unitPrice Fee, charge or cost per item */
         #[FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
         public ?Money $unitPrice = null,
-        /** @var float|null factor Price scaling factor */
+        /** @var numeric-string|null factor Price scaling factor */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $factor = null,
+        public ?string $factor = null,
         /** @var Money|null net Total item cost */
         #[FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
         public ?Money $net = null,

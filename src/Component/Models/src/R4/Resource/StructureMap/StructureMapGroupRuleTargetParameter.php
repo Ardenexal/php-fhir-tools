@@ -90,7 +90,7 @@ class StructureMapGroupRuleTargetParameter extends BackboneElement
                 [
                     'fhirType'     => 'decimal',
                     'propertyKind' => 'scalar',
-                    'phpType'      => 'float',
+                    'phpType'      => 'string',
                     'jsonKey'      => 'valueDecimal',
                     'isBuiltin'    => true,
                 ],
@@ -108,7 +108,7 @@ class StructureMapGroupRuleTargetParameter extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
-        /** @var IdPrimitive|StringPrimitive|string|bool|int|float|null value Parameter value - variable or literal */
+        /** @var IdPrimitive|StringPrimitive|string|bool|int|null value Parameter value - variable or literal */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -129,11 +129,11 @@ class StructureMapGroupRuleTargetParameter extends BackboneElement
                 ],
                 ['fhirType' => 'boolean', 'propertyKind' => 'scalar', 'phpType' => 'bool', 'jsonKey' => 'valueBoolean'],
                 ['fhirType' => 'integer', 'propertyKind' => 'scalar', 'phpType' => 'int', 'jsonKey' => 'valueInteger'],
-                ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'float', 'jsonKey' => 'valueDecimal'],
+                ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'string', 'jsonKey' => 'valueDecimal'],
             ],
         )]
         #[NotBlank]
-        public IdPrimitive|StringPrimitive|string|bool|int|float|null $value = null,
+        public IdPrimitive|StringPrimitive|string|bool|int|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

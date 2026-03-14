@@ -275,9 +275,9 @@ class TestReportResource extends DomainResourceResource
         /** @var TestReportResultType|null result pass | fail | pending */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?TestReportResultType $result = null,
-        /** @var float|null score The final score (percentage of tests passed) resulting from the execution of the TestScript */
+        /** @var numeric-string|null score The final score (percentage of tests passed) resulting from the execution of the TestScript */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $score = null,
+        public ?string $score = null,
         /** @var StringPrimitive|string|null tester Name of the tester producing this report (Organization or individual) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $tester = null,

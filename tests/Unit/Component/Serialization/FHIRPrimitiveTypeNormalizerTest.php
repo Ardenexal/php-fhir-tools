@@ -87,7 +87,7 @@ class FHIRPrimitiveTypeNormalizerTest extends TestCase
             new FHIRString('test'),
             new FHIRInteger(42),
             new FHIRBoolean(true),
-            new FHIRDecimal(3.14),
+            new FHIRDecimal('3.14'),
         ];
 
         foreach ($primitives as $primitive) {
@@ -171,7 +171,7 @@ class FHIRPrimitiveTypeNormalizerTest extends TestCase
             new FHIRString('test value', $extensions),
             new FHIRInteger(42, $extensions),
             new FHIRBoolean(true, $extensions),
-            new FHIRDecimal(3.14, $extensions),
+            new FHIRDecimal('3.14', $extensions),
         ];
 
         foreach ($primitives as $original) {

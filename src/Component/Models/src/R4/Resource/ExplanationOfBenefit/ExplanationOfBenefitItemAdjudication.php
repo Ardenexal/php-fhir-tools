@@ -111,9 +111,9 @@ class ExplanationOfBenefitItemAdjudication extends BackboneElement
         /** @var Money|null amount Monetary amount */
         #[FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
         public ?Money $amount = null,
-        /** @var float|null value Non-monitary value */
+        /** @var numeric-string|null value Non-monitary value */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $value = null,
+        public ?string $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

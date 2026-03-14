@@ -107,15 +107,15 @@ class EffectEvidenceSynthesisEffectEstimatePrecisionEstimate extends BackboneEle
         /** @var CodeableConcept|null type Type of precision estimate */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $type = null,
-        /** @var float|null level Level of confidence interval */
+        /** @var numeric-string|null level Level of confidence interval */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $level = null,
-        /** @var float|null from Lower bound */
+        public ?string $level = null,
+        /** @var numeric-string|null from Lower bound */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $from = null,
-        /** @var float|null to Upper bound */
+        public ?string $from = null,
+        /** @var numeric-string|null to Upper bound */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $to = null,
+        public ?string $to = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

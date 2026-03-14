@@ -113,9 +113,9 @@ class ChargeItemDefinitionPropertyGroupPriceComponent extends BackboneElement
         /** @var CodeableConcept|null code Code identifying the specific component */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $code = null,
-        /** @var float|null factor Factor used for calculating this component */
+        /** @var numeric-string|null factor Factor used for calculating this component */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $factor = null,
+        public ?string $factor = null,
         /** @var Money|null amount Monetary amount associated with this component */
         #[FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
         public ?Money $amount = null,

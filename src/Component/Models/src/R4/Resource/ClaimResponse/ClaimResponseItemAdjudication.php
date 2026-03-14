@@ -111,9 +111,9 @@ class ClaimResponseItemAdjudication extends BackboneElement
         /** @var Money|null amount Monetary amount */
         #[FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
         public ?Money $amount = null,
-        /** @var float|null value Non-monetary value */
+        /** @var numeric-string|null value Non-monetary value */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $value = null,
+        public ?string $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

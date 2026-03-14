@@ -75,7 +75,7 @@ class QuestionnaireResponseItemAnswer extends BackboneElement
                 [
                     'fhirType'     => 'decimal',
                     'propertyKind' => 'scalar',
-                    'phpType'      => 'float',
+                    'phpType'      => 'string',
                     'jsonKey'      => 'valueDecimal',
                     'isBuiltin'    => true,
                 ],
@@ -173,14 +173,14 @@ class QuestionnaireResponseItemAnswer extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
-        /** @var bool|float|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|string|UriPrimitive|Attachment|Coding|Quantity|Reference|null value Single-valued answer to the question */
+        /** @var bool|string|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|UriPrimitive|Attachment|Coding|Quantity|Reference|null value Single-valued answer to the question */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
             isChoice: true,
             variants: [
                 ['fhirType' => 'boolean', 'propertyKind' => 'scalar', 'phpType' => 'bool', 'jsonKey' => 'valueBoolean'],
-                ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'float', 'jsonKey' => 'valueDecimal'],
+                ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'string', 'jsonKey' => 'valueDecimal'],
                 ['fhirType' => 'integer', 'propertyKind' => 'scalar', 'phpType' => 'int', 'jsonKey' => 'valueInteger'],
                 [
                     'fhirType'     => 'date',
@@ -238,7 +238,7 @@ class QuestionnaireResponseItemAnswer extends BackboneElement
                 ],
             ],
         )]
-        public bool|float|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|string|UriPrimitive|Attachment|Coding|Quantity|Reference|null $value = null,
+        public bool|string|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|UriPrimitive|Attachment|Coding|Quantity|Reference|null $value = null,
         /** @var array<QuestionnaireResponseItem> item Nested groups and questions */
         #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex', isArray: true)]
         public array $item = [],

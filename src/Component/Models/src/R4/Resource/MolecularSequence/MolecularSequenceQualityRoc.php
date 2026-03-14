@@ -141,13 +141,13 @@ class MolecularSequenceQualityRoc extends BackboneElement
         /** @var array<int> numFN Roc score false negative numbers */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar', isArray: true)]
         public array $numFN = [],
-        /** @var array<float> precision Precision of the GQ score */
+        /** @var array<numeric-string> precision Precision of the GQ score */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar', isArray: true)]
         public array $precision = [],
-        /** @var array<float> sensitivity Sensitivity of the GQ score */
+        /** @var array<numeric-string> sensitivity Sensitivity of the GQ score */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar', isArray: true)]
         public array $sensitivity = [],
-        /** @var array<float> fMeasure FScore of the GQ score */
+        /** @var array<numeric-string> fMeasure FScore of the GQ score */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar', isArray: true)]
         public array $fMeasure = [],
     ) {

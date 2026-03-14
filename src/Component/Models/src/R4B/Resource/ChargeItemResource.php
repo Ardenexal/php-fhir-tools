@@ -509,9 +509,9 @@ class ChargeItemResource extends DomainResourceResource
         /** @var array<CodeableConcept> bodysite Anatomical location, if relevant */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true)]
         public array $bodysite = [],
-        /** @var float|null factorOverride Factor overriding the associated rules */
+        /** @var numeric-string|null factorOverride Factor overriding the associated rules */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $factorOverride = null,
+        public ?string $factorOverride = null,
         /** @var Money|null priceOverride Price overriding the associated rules */
         #[FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
         public ?Money $priceOverride = null,

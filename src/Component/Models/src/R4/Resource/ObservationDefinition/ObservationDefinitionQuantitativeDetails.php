@@ -106,9 +106,9 @@ class ObservationDefinitionQuantitativeDetails extends BackboneElement
         /** @var CodeableConcept|null unit SI unit for quantitative results */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $unit = null,
-        /** @var float|null conversionFactor SI to Customary unit conversion factor */
+        /** @var numeric-string|null conversionFactor SI to Customary unit conversion factor */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $conversionFactor = null,
+        public ?string $conversionFactor = null,
         /** @var int|null decimalPrecision Decimal precision of observation quantitative results */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
         public ?int $decimalPrecision = null,

@@ -61,9 +61,9 @@ class DecimalPrimitive extends Element
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
-        /** @var float|null value Primitive value for decimal */
+        /** @var numeric-string|null value Primitive value for decimal */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.Decimal', propertyKind: 'scalar', xmlSerializedName: '@value')]
-        public ?float $value = null,
+        public ?string $value = null,
     ) {
         parent::__construct($id, $extension);
     }

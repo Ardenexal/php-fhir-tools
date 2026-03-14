@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 class FHIRDecimal
 {
     public function __construct(
-        public ?float $value = null,
+        public ?string $value = null,
         public ?array $extension = null
     ) {
     }

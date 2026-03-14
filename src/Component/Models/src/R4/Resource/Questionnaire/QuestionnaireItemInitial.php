@@ -76,7 +76,7 @@ class QuestionnaireItemInitial extends BackboneElement
                 [
                     'fhirType'     => 'decimal',
                     'propertyKind' => 'scalar',
-                    'phpType'      => 'float',
+                    'phpType'      => 'string',
                     'jsonKey'      => 'valueDecimal',
                     'isBuiltin'    => true,
                 ],
@@ -164,7 +164,7 @@ class QuestionnaireItemInitial extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
-        /** @var bool|float|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|string|UriPrimitive|Attachment|Coding|Quantity|Reference|null value Actual value for initializing the question */
+        /** @var bool|string|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|UriPrimitive|Attachment|Coding|Quantity|Reference|null value Actual value for initializing the question */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -172,7 +172,7 @@ class QuestionnaireItemInitial extends BackboneElement
             isChoice: true,
             variants: [
                 ['fhirType' => 'boolean', 'propertyKind' => 'scalar', 'phpType' => 'bool', 'jsonKey' => 'valueBoolean'],
-                ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'float', 'jsonKey' => 'valueDecimal'],
+                ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'string', 'jsonKey' => 'valueDecimal'],
                 ['fhirType' => 'integer', 'propertyKind' => 'scalar', 'phpType' => 'int', 'jsonKey' => 'valueInteger'],
                 [
                     'fhirType'     => 'date',
@@ -231,7 +231,7 @@ class QuestionnaireItemInitial extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public bool|float|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|string|UriPrimitive|Attachment|Coding|Quantity|Reference|null $value = null,
+        public bool|string|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|UriPrimitive|Attachment|Coding|Quantity|Reference|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

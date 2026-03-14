@@ -451,9 +451,9 @@ class MediaResource extends DomainResourceResource
         /** @var PositiveIntPrimitive|null frames Number of frames if > 1 (photo) */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]
         public ?PositiveIntPrimitive $frames = null,
-        /** @var float|null duration Length in seconds (audio / video) */
+        /** @var numeric-string|null duration Length in seconds (audio / video) */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $duration = null,
+        public ?string $duration = null,
         /** @var Attachment|null content Actual Media - reference or data */
         #[FhirProperty(fhirType: 'Attachment', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?Attachment $content = null,

@@ -101,9 +101,9 @@ class Distance extends Quantity
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
-        /** @var float|null value Numerical value (with implicit precision) */
+        /** @var numeric-string|null value Numerical value (with implicit precision) */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $value = null,
+        public ?string $value = null,
         /** @var QuantityComparatorType|null comparator < | <= | >= | > - how to understand the value */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
         public ?QuantityComparatorType $comparator = null,

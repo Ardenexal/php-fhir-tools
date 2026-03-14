@@ -22,14 +22,15 @@ class EvidenceStatisticAttributeEstimate extends BackboneElement
 {
     public const FHIR_PROPERTY_MAP = [
         'id' => [
-            'fhirType'     => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind' => 'scalar',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
+            'fhirType'          => 'http://hl7.org/fhirpath/System.String',
+            'propertyKind'      => 'scalar',
+            'isArray'           => false,
+            'isRequired'        => false,
+            'isChoice'          => false,
+            'jsonKey'           => null,
+            'phpType'           => null,
+            'variants'          => null,
+            'xmlSerializedName' => '@id',
         ],
         'extension' => [
             'fhirType'     => 'Extension',
@@ -125,7 +126,7 @@ class EvidenceStatisticAttributeEstimate extends BackboneElement
 
     public function __construct(
         /** @var string|null id Unique id for inter-element referencing */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
         public ?string $id = null,
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -145,9 +146,9 @@ class EvidenceStatisticAttributeEstimate extends BackboneElement
         /** @var Quantity|null quantity The singular quantity of the attribute estimate, for attribute estimates represented as single values; also used to report unit of measure */
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
         public ?Quantity $quantity = null,
-        /** @var float|null level Level of confidence interval, eg 0.95 for 95% confidence interval */
+        /** @var numeric-string|null level Level of confidence interval, eg 0.95 for 95% confidence interval */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $level = null,
+        public ?string $level = null,
         /** @var Range|null range Lower and upper bound values of the attribute estimate */
         #[FhirProperty(fhirType: 'Range', propertyKind: 'complex')]
         public ?Range $range = null,

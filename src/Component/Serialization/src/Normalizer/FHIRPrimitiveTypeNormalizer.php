@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Serialization\Normalizer;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRDateTimeValue;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -174,6 +175,17 @@ class FHIRPrimitiveTypeNormalizer extends AbstractFHIRNormalizer
             $value         = $this->formatDateTimeValue($value, $primitiveAttr !== null ? $primitiveAttr->primitiveType : 'dateTime');
         }
 
+        // String decimals: convert to float for JSON number output (FHIR JSON spec requires numbers).
+        // String representation is only preserved for XML attribute output.
+        // IMPORTANT: only convert for DecimalPrimitive — other string-typed primitives (e.g.
+        // StringPrimitive, UriPrimitive) may hold numeric-looking values that must remain strings.
+        if (is_string($value) && is_numeric($value)) {
+            $decimalAttr = $this->findFHIRPrimitiveAttribute(get_class($object));
+            if ($decimalAttr !== null && $decimalAttr->primitiveType === 'decimal') {
+                $value = (float) $value;
+            }
+        }
+
         // Extract extensions
         if ($reflection->hasProperty('extension')) {
             $extensionProperty = $reflection->getProperty('extension');
@@ -224,6 +236,12 @@ class FHIRPrimitiveTypeNormalizer extends AbstractFHIRNormalizer
             if ($value instanceof \DateTimeInterface) {
                 $primitiveAttr = $this->findFHIRPrimitiveAttribute(get_class($object));
                 $value         = $this->formatDateTimeValue($value, $primitiveAttr !== null ? $primitiveAttr->primitiveType : 'dateTime');
+            }
+
+            // XmlEncoder casts PHP booleans to int (true→1, false→0). FHIR XML requires
+            // "true"/"false" string literals for boolean attributes.
+            if (is_bool($value)) {
+                $value = $value ? 'true' : 'false';
             }
 
             if ($value !== null) {
@@ -429,23 +447,36 @@ class FHIRPrimitiveTypeNormalizer extends AbstractFHIRNormalizer
 
     /**
      * Validate decimal value.
+     *
+     * All inputs are converted to numeric-string to preserve exact FHIR decimal precision
+     * (e.g. "1.0" vs "1.00") for XML round-trips. Float inputs are unavoidably lossy
+     * (precision already lost by PHP), but string and int inputs are exact.
+     *
+     * @return numeric-string|null
      */
-    private function validateDecimal(mixed $value): ?float
+    private function validateDecimal(mixed $value): ?string
     {
         if ($value === null) {
             return null;
         }
 
         if (is_float($value)) {
-            return $value;
+            // XmlEncoder type-casts "1.0" → float 1.0. Preserve at least one decimal place
+            // so "1.0" round-trips correctly rather than becoming "1".
+            $str = rtrim(sprintf('%.14F', $value), '0');
+            $str = str_ends_with($str, '.') ? $str . '0' : $str;
+            assert(is_numeric($str));
+
+            return $str;
         }
 
         if (is_int($value)) {
-            return (float) $value;
+            return (string) $value;
         }
 
         if (is_string($value) && is_numeric($value)) {
-            return (float) $value;
+            // Preserve the original string representation for precision-sensitive XML output.
+            return $value;
         }
 
         throw new NotNormalizableValueException(sprintf('Expected decimal value, got %s', gettype($value)));
@@ -501,18 +532,37 @@ class FHIRPrimitiveTypeNormalizer extends AbstractFHIRNormalizer
             return \DateTimeImmutable::createFromInterface($value);
         }
 
+        // XmlEncoder may parse numeric-looking attribute values (e.g. value="2012") as integers
+        // when TYPE_CAST_ATTRIBUTES is enabled. Coerce to string so the partial-date regex
+        // below handles YYYY correctly. With TYPE_CAST_ATTRIBUTES=false this path is unused
+        // for XML, but kept as a safety net.
+        if (is_int($value) || is_float($value)) {
+            return $this->validateDateTime((string) $value);
+        }
+
         if (is_string($value)) {
             try {
                 // FHIR allows partial dates: YYYY, YYYY-MM, YYYY-MM-DD.
                 // PHP's constructor misinterprets bare 4-digit strings, e.g. "2002" is
                 // parsed as time "20:02" on today's date rather than the year 2002.
                 // Use format-based parsing with '!' (resets unspecified fields to epoch).
+                // FHIRDateTimeValue carries the original format so serialization can
+                // round-trip partial dates without expanding to full ISO 8601.
                 if (preg_match('/^\d{4}$/', $value) === 1) {
-                    $result = \DateTimeImmutable::createFromFormat('!Y', $value, new \DateTimeZone('UTC'));
+                    $result = FHIRDateTimeValue::createFromFormat('!Y', $value, new \DateTimeZone('UTC'));
+                    if ($result !== false) {
+                        $result->originalFormat = 'Y';
+                    }
                 } elseif (preg_match('/^\d{4}-\d{2}$/', $value) === 1) {
-                    $result = \DateTimeImmutable::createFromFormat('!Y-m', $value, new \DateTimeZone('UTC'));
+                    $result = FHIRDateTimeValue::createFromFormat('!Y-m', $value, new \DateTimeZone('UTC'));
+                    if ($result !== false) {
+                        $result->originalFormat = 'Y-m';
+                    }
                 } elseif (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) === 1) {
-                    $result = \DateTimeImmutable::createFromFormat('!Y-m-d', $value, new \DateTimeZone('UTC'));
+                    $result = FHIRDateTimeValue::createFromFormat('!Y-m-d', $value, new \DateTimeZone('UTC'));
+                    if ($result !== false) {
+                        $result->originalFormat = 'Y-m-d';
+                    }
                 } else {
                     $result = new \DateTimeImmutable($value);
                 }
@@ -529,16 +579,6 @@ class FHIRPrimitiveTypeNormalizer extends AbstractFHIRNormalizer
             }
         }
 
-        // XmlEncoder parses numeric-looking attribute values (e.g. value="2012") as integers.
-        // FHIR allows partial dates such as year-only, so coerce to string and re-try.
-        if (is_int($value) || is_float($value)) {
-            try {
-                return new \DateTimeImmutable((string) $value);
-            } catch (\Exception) {
-                // Fall through to the error below
-            }
-        }
-
         throw new NotNormalizableValueException(sprintf('Expected dateTime string or DateTimeInterface, got %s', gettype($value)));
     }
 
@@ -547,6 +587,11 @@ class FHIRPrimitiveTypeNormalizer extends AbstractFHIRNormalizer
      */
     private function formatDateTimeValue(\DateTimeInterface $value, string $primitiveType): string
     {
+        // Partial-date values carry the original FHIR precision — emit as-is.
+        if ($value instanceof FHIRDateTimeValue) {
+            return $value->format($value->originalFormat);
+        }
+
         return match ($primitiveType) {
             'instant' => $value->format(\DateTimeInterface::RFC3339_EXTENDED),
             default   => $value->format(\DateTimeInterface::ATOM),

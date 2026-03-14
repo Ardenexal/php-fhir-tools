@@ -124,18 +124,18 @@ class SampledData extends Element
         /** @var Quantity|null origin Zero value and units */
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?Quantity $origin = null,
-        /** @var float|null period Number of milliseconds between samples */
+        /** @var numeric-string|null period Number of milliseconds between samples */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar', isRequired: true), NotBlank]
-        public ?float $period = null,
-        /** @var float|null factor Multiply data by this before adding to origin */
+        public ?string $period = null,
+        /** @var numeric-string|null factor Multiply data by this before adding to origin */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $factor = null,
-        /** @var float|null lowerLimit Lower limit of detection */
+        public ?string $factor = null,
+        /** @var numeric-string|null lowerLimit Lower limit of detection */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $lowerLimit = null,
-        /** @var float|null upperLimit Upper limit of detection */
+        public ?string $lowerLimit = null,
+        /** @var numeric-string|null upperLimit Upper limit of detection */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $upperLimit = null,
+        public ?string $upperLimit = null,
         /** @var PositiveIntPrimitive|null dimensions Number of sample points at each time point */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?PositiveIntPrimitive $dimensions = null,

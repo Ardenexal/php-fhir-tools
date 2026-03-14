@@ -687,6 +687,12 @@ class FHIRModelGenerator implements GeneratorInterface
 
         if ($maxValue !== '0') {
             $shortDescription = $element['short'] ?? '';
+            // For decimal-typed properties, PHPStan @var uses 'numeric-string' instead of 'string'
+            // to express that the string is always a valid decimal number.
+            $isDecimalElement = in_array($fhirType, ['http://hl7.org/fhirpath/System.Decimal', 'decimal'], true);
+            $docblockTypes    = $isDecimalElement
+                ? array_map(static fn (string $t): string => $t === 'string' ? 'numeric-string' : $t, $types)
+                : $types;
             if ($isArray) {
                 // Handle forward references for special types like Extension
                 if (count($types) === 0 && $parameterName === 'extension') {
@@ -694,7 +700,7 @@ class FHIRModelGenerator implements GeneratorInterface
                     $dataTypeNamespace = $builderContext->getDatatypeNamespace($version)->getName();
                     $typeHint          = '\\' . $dataTypeNamespace . '\\Extension';
                 } else {
-                    $typeHint = count($types) > 0 ? implode('|', $types) : 'mixed';
+                    $typeHint = count($docblockTypes) > 0 ? implode('|', array_unique($docblockTypes)) : 'mixed';
                 }
                 $method->addPromotedParameter($parameterName, [])
                     ->setNullable(false)
@@ -704,7 +710,7 @@ class FHIRModelGenerator implements GeneratorInterface
             } else {
                 $parameter = $method->addPromotedParameter($parameterName, null)
                     ->setType(implode('|', $types))
-                    ->addComment('@var null|' . implode('|', $types) . ' ' . $parameterName . ' ' . $shortDescription);
+                    ->addComment('@var null|' . implode('|', array_unique($docblockTypes)) . ' ' . $parameterName . ' ' . $shortDescription);
                 $parameter->addAttribute(FhirProperty::class, $attributeArgs);
                 if ($isNullable === false) {
                     $parameter->addAttribute(NotBlank::class);
@@ -831,7 +837,7 @@ class FHIRModelGenerator implements GeneratorInterface
                 return 'int';
             case 'http://hl7.org/fhirpath/System.Decimal':
             case 'decimal':
-                return 'float';
+                return 'string';
             case 'http://hl7.org/fhirpath/System.String':
             case 'http://hl7.org/fhirpath/System.Date':
             case 'http://hl7.org/fhirpath/System.Time':
@@ -1358,7 +1364,7 @@ class FHIRModelGenerator implements GeneratorInterface
                 continue;
             }
             if ($code === 'http://hl7.org/fhirpath/System.Decimal' || $code === 'decimal') {
-                $types[] = 'float';
+                $types[] = 'string';
 
                 continue;
             }
@@ -1453,6 +1459,6 @@ class FHIRModelGenerator implements GeneratorInterface
             }
         }
 
-        return $types;
+        return array_unique($types);
     }
 }

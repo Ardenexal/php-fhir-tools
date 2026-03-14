@@ -137,9 +137,9 @@ class RiskEvidenceSynthesisRiskEstimate extends BackboneElement
         /** @var CodeableConcept|null type Type of risk estimate */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $type = null,
-        /** @var float|null value Point estimate */
+        /** @var numeric-string|null value Point estimate */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $value = null,
+        public ?string $value = null,
         /** @var CodeableConcept|null unitOfMeasure What unit is the outcome described in? */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $unitOfMeasure = null,

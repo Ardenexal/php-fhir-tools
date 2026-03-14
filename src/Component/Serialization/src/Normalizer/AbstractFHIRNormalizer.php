@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Normalizer;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRDateTimeValue;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadata;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyVariantMetadata;
@@ -89,10 +91,29 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             $valueProperty = $reflection->getProperty('value');
             if ($valueProperty->isInitialized($value)) {
                 $raw = $valueProperty->getValue($value);
-                // Format DateTimeInterface to string for serialization (dateTime / instant primitives)
+                // Format DateTimeInterface to string for serialization (dateTime / instant primitives).
+                // FHIRDateTimeValue carries the original FHIR partial-date precision.
                 if ($raw instanceof \DateTimeInterface) {
-                    $raw = $raw->format(\DateTimeInterface::ATOM);
+                    $raw = $raw instanceof FHIRDateTimeValue
+                        ? $raw->format($raw->originalFormat)
+                        : $raw->format(\DateTimeInterface::ATOM);
                 }
+
+                // XmlEncoder casts PHP booleans to int (true→1, false→0). FHIR XML requires
+                // "true"/"false" string literals for boolean attributes.
+                if (is_bool($raw) && $format === 'xml') {
+                    $raw = $raw ? 'true' : 'false';
+                }
+
+                // String decimals: convert back to float for JSON number output.
+                // The original string is preserved in the model for XML precision round-trips.
+                // Only applies to DecimalPrimitive, identified via the FHIRPrimitive attribute.
+                if (is_string($raw) && is_numeric($raw) && $format !== 'xml') {
+                    if ($this->isDecimalPrimitive($value)) {
+                        $raw = (float) $raw;
+                    }
+                }
+
                 // For XML, use @ prefix to create attribute; for JSON use plain key
                 $valueKey          = ($format === 'xml') ? '@value' : 'value';
                 $result[$valueKey] = $raw;
@@ -451,6 +472,46 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     }
 
     /**
+     * Return true when $obj carries a FHIRPrimitive attribute with primitiveType === 'decimal'.
+     *
+     * Walks the parent class hierarchy so subclasses of DecimalPrimitive are also matched.
+     */
+    protected function isDecimalPrimitive(object $obj): bool
+    {
+        $reflection = new \ReflectionClass($obj);
+        do {
+            $attributes = $reflection->getAttributes(FHIRPrimitive::class);
+            if (!empty($attributes)) {
+                return $attributes[0]->newInstance()->primitiveType === 'decimal';
+            }
+            $reflection = $reflection->getParentClass();
+        } while ($reflection !== false);
+
+        return false;
+    }
+
+    /**
+     * Cast a numeric-string scalar to the appropriate PHP numeric type for JSON output.
+     *
+     * FHIR decimal properties are stored as ?string to preserve precision (e.g. "1.0" vs "1.00"),
+     * but FHIR JSON requires numeric values (not strings). This method converts them back.
+     * Integer FHIR types stored as ?int pass through unchanged (already correct PHP type).
+     */
+    protected function castNumericScalarForJson(mixed $value, ?PropertyMetadata $meta): mixed
+    {
+        if ($meta === null || $meta->propertyKind !== 'scalar' || !is_string($value) || !is_numeric($value)) {
+            return $value;
+        }
+
+        return match ($meta->fhirType) {
+            'decimal', 'http://hl7.org/fhirpath/System.Decimal' => (float) $value,
+            'integer', 'http://hl7.org/fhirpath/System.Integer',
+            'unsignedInt', 'positiveInt'                        => (int) $value,
+            default                                             => $value,
+        };
+    }
+
+    /**
      * Unwrap a FHIR XML value encoded as ['@value' => '...', '#' => ''] by Symfony's XmlEncoder.
      *
      * XmlEncoder always adds a '#' key for empty text content alongside XML attributes.
@@ -466,6 +527,13 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             if (empty($otherKeys)) {
                 $value = $value['@value'];
             }
+        }
+
+        // FHIR XML uses "true"/"false" string literals for boolean attributes.
+        // PHP's generic string-to-bool coercion is wrong: (bool)"false" = true (non-empty string).
+        // Correctly map "true" → true and "false" → false for bool-typed properties.
+        if ($propertyType === 'bool' && is_string($value)) {
+            return $value === 'true';
         }
 
         // XmlEncoder collapses single XML elements into scalars instead of arrays.
@@ -561,14 +629,14 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     }
 
     /**
-     * Resolve the concrete propertyKind and JSON/XML key for a choice element value.
+     * Resolve the concrete propertyKind, JSON/XML key, and FHIR type for a choice element value.
      *
      * Iterates over the compiled variant list and matches the runtime value by PHP type.
-     * Returns ['', ''] when no variant matches (caller should fall back to legacy handling).
+     * Returns ['', '', ''] when no variant matches (caller should fall back to legacy handling).
      *
      * @param list<PropertyVariantMetadata> $variants
      *
-     * @return array{0: string, 1: string} [propertyKind, jsonKey]
+     * @return array{0: string, 1: string, 2: string} [propertyKind, jsonKey, fhirType]
      */
     protected function resolveChoiceVariant(mixed $value, array $variants): array
     {
@@ -578,26 +646,26 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         foreach ($variants as $variant) {
             if ($variant->isBuiltin) {
                 if (gettype($value) === ($phpToGettype[$variant->phpType] ?? '')) {
-                    return [$variant->propertyKind, $variant->jsonKey];
+                    return [$variant->propertyKind, $variant->jsonKey, $variant->fhirType];
                 }
             } elseif (is_object($value) && $value instanceof $variant->phpType) {
-                return [$variant->propertyKind, $variant->jsonKey];
+                return [$variant->propertyKind, $variant->jsonKey, $variant->fhirType];
             }
         }
 
-        return ['', ''];
+        return ['', '', ''];
     }
 
     /**
-     * Find the property name and PHP type for a choice element by its JSON/XML key.
+     * Find the property name, PHP type, and FHIR type for a choice element by its JSON/XML key.
      *
      * Reverse lookup: given an element name like 'valueQuantity', find the base property
-     * name ('value') and the concrete PHP type for that variant.
+     * name ('value'), the concrete PHP type, and the FHIR type for that variant.
      *
      * @param array<string, PropertyMetadata> $metaMap    The property metadata map
      * @param string                          $elementKey The JSON/XML element name (e.g., 'valueQuantity')
      *
-     * @return array{0: string, 1: string}|null [propertyName, phpType] or null if not found
+     * @return array{0: string, 1: string, 2: string}|null [propertyName, phpType, fhirType] or null if not found
      */
     protected function findChoicePropertyByKey(array $metaMap, string $elementKey): ?array
     {
@@ -605,7 +673,7 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             if ($meta->isChoice && !empty($meta->variants)) {
                 foreach ($meta->variants as $variant) {
                     if ($variant->jsonKey === $elementKey) {
-                        return [$propertyName, $variant->phpType];
+                        return [$propertyName, $variant->phpType, $variant->fhirType];
                     }
                 }
             }

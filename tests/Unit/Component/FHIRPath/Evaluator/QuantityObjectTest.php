@@ -28,7 +28,7 @@ final class QuantityObjectTest extends TestCase
     {
         // This is what a deserialized Quantity looks like from FHIR JSON
         $quantity = new Quantity(
-            value: 185.0,
+            value: '185.0',
             code: new CodePrimitive(value: '[lb_av]'),
             unit: 'lbs',
             system: new UriPrimitive(value: 'http://unitsofmeasure.org'),
@@ -46,7 +46,7 @@ final class QuantityObjectTest extends TestCase
     {
         // Observation.value from deserialized resource
         $quantity = new Quantity(
-            value: 185.0,
+            value: '185.0',
             code: new CodePrimitive(value: '[lb_av]'),
             unit: 'lbs',
             system: new UriPrimitive(value: 'http://unitsofmeasure.org'),
@@ -73,7 +73,7 @@ final class QuantityObjectTest extends TestCase
     {
         // Observation.value = 185 '[lb_av]'
         $quantity = new Quantity(
-            value: 185.0,
+            value: '185.0',
             code: new CodePrimitive(value: '[lb_av]'),
             unit: 'lbs',
             system: new UriPrimitive(value: 'http://unitsofmeasure.org'),
@@ -100,7 +100,7 @@ final class QuantityObjectTest extends TestCase
     {
         // Test quantity without explicit system (should default to UCUM)
         $quantity = new Quantity(
-            value: 185.0,
+            value: '185.0',
             code: new CodePrimitive(value: '[lb_av]'),
             unit: 'lbs',
         );

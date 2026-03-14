@@ -110,7 +110,7 @@ class FHIRBackboneElementNormalizer extends AbstractFHIRNormalizer
                 // First, check if this is a choice element variant (e.g., 'valueQuantity' -> 'value')
                 $choiceMapping = $this->findChoicePropertyByKey($metaMap, $elementName);
                 if ($choiceMapping !== null) {
-                    [$propertyName, $phpType] = $choiceMapping;
+                    [$propertyName, $phpType, $fhirType] = $choiceMapping;
 
                     if ($reflection->hasProperty($propertyName)) {
                         $property = $reflection->getProperty($propertyName);
@@ -118,7 +118,10 @@ class FHIRBackboneElementNormalizer extends AbstractFHIRNormalizer
                         if ($this->denormalizer !== null && !$this->isBuiltinType($phpType)) {
                             $denormalizedValue = $this->denormalizer->denormalize($value, $phpType, $format, $context);
                         } else {
-                            $denormalizedValue = $format === 'xml' ? $this->unwrapXmlValue($value, $phpType) : $value;
+                            $rawValue          = $format === 'xml' ? $this->unwrapXmlValue($value, $phpType) : $value;
+                            $denormalizedValue = ($fhirType === 'decimal' || $fhirType === 'http://hl7.org/fhirpath/System.Decimal') && is_numeric($rawValue)
+                                ? (string) $rawValue
+                                : $rawValue;
                         }
 
                         $property->setValue($object, $denormalizedValue);
@@ -362,7 +365,7 @@ class FHIRBackboneElementNormalizer extends AbstractFHIRNormalizer
 
             // Handle choice elements via metadata
             if ($meta !== null && $meta->isChoice && !empty($meta->variants)) {
-                [$resolvedKind, $resolvedKey] = $this->resolveChoiceVariant($value, $meta->variants);
+                [$resolvedKind, $resolvedKey, $resolvedFhirType] = $this->resolveChoiceVariant($value, $meta->variants);
                 if ($resolvedKey !== '') {
                     $jsonKey = $resolvedKey;
                     if ($resolvedKind === 'primitive' && $this->isPrimitiveWithExtensions($value)) {
@@ -377,6 +380,9 @@ class FHIRBackboneElementNormalizer extends AbstractFHIRNormalizer
                         $normalizedValue = $this->normalizer !== null
                             ? $this->normalizer->normalize($value, 'json', $context)
                             : $this->normalizeBasicValue($value, 'json', $context);
+                        if (($resolvedFhirType === 'decimal' || $resolvedFhirType === 'http://hl7.org/fhirpath/System.Decimal') && is_string($normalizedValue) && is_numeric($normalizedValue)) {
+                            $normalizedValue = (float) $normalizedValue;
+                        }
                         if ($normalizedValue !== null) {
                             $data[$jsonKey] = $normalizedValue;
                         }
@@ -401,6 +407,8 @@ class FHIRBackboneElementNormalizer extends AbstractFHIRNormalizer
                 } else {
                     $normalizedValue = $this->normalizeBasicValue($value, 'json', $context);
                 }
+
+                $normalizedValue = $this->castNumericScalarForJson($normalizedValue, $meta);
 
                 if ($normalizedValue !== null) {
                     $data[$jsonKey] = $normalizedValue;

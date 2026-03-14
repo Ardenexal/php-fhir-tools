@@ -95,7 +95,7 @@ class QuestionnaireItemEnableWhen extends BackboneElement
                 [
                     'fhirType'     => 'decimal',
                     'propertyKind' => 'scalar',
-                    'phpType'      => 'float',
+                    'phpType'      => 'string',
                     'jsonKey'      => 'answerDecimal',
                     'isBuiltin'    => true,
                 ],
@@ -175,7 +175,7 @@ class QuestionnaireItemEnableWhen extends BackboneElement
         /** @var QuestionnaireItemOperatorType|null operator exists | = | != | > | < | >= | <= */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?QuestionnaireItemOperatorType $operator = null,
-        /** @var bool|float|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|string|Coding|Quantity|Reference|null answer Value for question comparison based on operator */
+        /** @var bool|string|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|Coding|Quantity|Reference|null answer Value for question comparison based on operator */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -183,7 +183,7 @@ class QuestionnaireItemEnableWhen extends BackboneElement
             isChoice: true,
             variants: [
                 ['fhirType' => 'boolean', 'propertyKind' => 'scalar', 'phpType' => 'bool', 'jsonKey' => 'answerBoolean'],
-                ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'float', 'jsonKey' => 'answerDecimal'],
+                ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'string', 'jsonKey' => 'answerDecimal'],
                 ['fhirType' => 'integer', 'propertyKind' => 'scalar', 'phpType' => 'int', 'jsonKey' => 'answerInteger'],
                 [
                     'fhirType'     => 'date',
@@ -230,7 +230,7 @@ class QuestionnaireItemEnableWhen extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public bool|float|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|string|Coding|Quantity|Reference|null $answer = null,
+        public bool|string|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|Coding|Quantity|Reference|null $answer = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

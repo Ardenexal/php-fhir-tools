@@ -90,15 +90,15 @@ class LocationPosition extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
-        /** @var float|null longitude Longitude with WGS84 datum */
+        /** @var numeric-string|null longitude Longitude with WGS84 datum */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar', isRequired: true), NotBlank]
-        public ?float $longitude = null,
-        /** @var float|null latitude Latitude with WGS84 datum */
+        public ?string $longitude = null,
+        /** @var numeric-string|null latitude Latitude with WGS84 datum */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar', isRequired: true), NotBlank]
-        public ?float $latitude = null,
-        /** @var float|null altitude Altitude with WGS84 datum */
+        public ?string $latitude = null,
+        /** @var numeric-string|null altitude Altitude with WGS84 datum */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $altitude = null,
+        public ?string $altitude = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

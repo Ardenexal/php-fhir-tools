@@ -211,30 +211,30 @@ class VisionPrescriptionLensSpecification extends BackboneElement
         /** @var VisionEyesType|null eye right | left */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?VisionEyesType $eye = null,
-        /** @var float|null sphere Power of the lens */
+        /** @var numeric-string|null sphere Power of the lens */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $sphere = null,
-        /** @var float|null cylinder Lens power for astigmatism */
+        public ?string $sphere = null,
+        /** @var numeric-string|null cylinder Lens power for astigmatism */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $cylinder = null,
+        public ?string $cylinder = null,
         /** @var int|null axis Lens meridian which contain no power for astigmatism */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
         public ?int $axis = null,
         /** @var array<VisionPrescriptionLensSpecificationPrism> prism Eye alignment compensation */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
         public array $prism = [],
-        /** @var float|null add Added power for multifocal levels */
+        /** @var numeric-string|null add Added power for multifocal levels */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $add = null,
-        /** @var float|null power Contact lens power */
+        public ?string $add = null,
+        /** @var numeric-string|null power Contact lens power */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $power = null,
-        /** @var float|null backCurve Contact lens back curvature */
+        public ?string $power = null,
+        /** @var numeric-string|null backCurve Contact lens back curvature */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $backCurve = null,
-        /** @var float|null diameter Contact lens diameter */
+        public ?string $backCurve = null,
+        /** @var numeric-string|null diameter Contact lens diameter */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $diameter = null,
+        public ?string $diameter = null,
         /** @var Quantity|null duration Lens wear duration */
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
         public ?Quantity $duration = null,

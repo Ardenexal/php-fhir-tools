@@ -73,7 +73,7 @@ class RiskAssessmentPrediction extends BackboneElement
                 [
                     'fhirType'     => 'decimal',
                     'propertyKind' => 'scalar',
-                    'phpType'      => 'float',
+                    'phpType'      => 'string',
                     'jsonKey'      => 'probabilityDecimal',
                     'isBuiltin'    => true,
                 ],
@@ -156,13 +156,13 @@ class RiskAssessmentPrediction extends BackboneElement
         /** @var CodeableConcept|null outcome Possible outcome for the subject */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $outcome = null,
-        /** @var float|Range|null probability Likelihood of specified outcome */
+        /** @var string|Range|null probability Likelihood of specified outcome */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
             isChoice: true,
             variants: [
-                ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'float', 'jsonKey' => 'probabilityDecimal'],
+                ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'string', 'jsonKey' => 'probabilityDecimal'],
                 [
                     'fhirType'     => 'Range',
                     'propertyKind' => 'complex',
@@ -171,13 +171,13 @@ class RiskAssessmentPrediction extends BackboneElement
                 ],
             ],
         )]
-        public float|Range|null $probability = null,
+        public string|Range|null $probability = null,
         /** @var CodeableConcept|null qualitativeRisk Likelihood of specified outcome as a qualitative value */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $qualitativeRisk = null,
-        /** @var float|null relativeRisk Relative likelihood */
+        /** @var numeric-string|null relativeRisk Relative likelihood */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $relativeRisk = null,
+        public ?string $relativeRisk = null,
         /** @var Period|Range|null when Timeframe or age range */
         #[FhirProperty(
             fhirType: 'choice',

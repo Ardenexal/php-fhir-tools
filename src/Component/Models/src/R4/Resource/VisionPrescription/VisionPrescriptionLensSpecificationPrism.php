@@ -81,9 +81,9 @@ class VisionPrescriptionLensSpecificationPrism extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
-        /** @var float|null amount Amount of adjustment */
+        /** @var numeric-string|null amount Amount of adjustment */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar', isRequired: true), NotBlank]
-        public ?float $amount = null,
+        public ?string $amount = null,
         /** @var VisionBaseType|null base up | down | in | out */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?VisionBaseType $base = null,

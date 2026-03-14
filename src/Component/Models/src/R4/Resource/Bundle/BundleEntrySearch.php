@@ -83,9 +83,9 @@ class BundleEntrySearch extends BackboneElement
         /** @var SearchEntryModeType|null mode match | include | outcome - why this is in the result set */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
         public ?SearchEntryModeType $mode = null,
-        /** @var float|null score Search ranking (between 0 and 1) */
+        /** @var numeric-string|null score Search ranking (between 0 and 1) */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $score = null,
+        public ?string $score = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

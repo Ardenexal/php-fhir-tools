@@ -123,7 +123,7 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
                 // First, check if this is a choice element variant (e.g., 'valueQuantity' -> 'value')
                 $choiceMapping = $this->findChoicePropertyByKey($metaMap, $elementName);
                 if ($choiceMapping !== null) {
-                    [$propertyName, $phpType] = $choiceMapping;
+                    [$propertyName, $phpType, $fhirType] = $choiceMapping;
 
                     if ($reflection->hasProperty($propertyName)) {
                         $property = $reflection->getProperty($propertyName);
@@ -131,7 +131,10 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
                         if ($this->denormalizer !== null && !$this->isBuiltinType($phpType)) {
                             $denormalizedValue = $this->denormalizer->denormalize($value, $phpType, $format, $context);
                         } else {
-                            $denormalizedValue = $format === 'xml' ? $this->unwrapXmlValue($value, $phpType) : $value;
+                            $rawValue          = $format === 'xml' ? $this->unwrapXmlValue($value, $phpType) : $value;
+                            $denormalizedValue = ($fhirType === 'decimal' || $fhirType === 'http://hl7.org/fhirpath/System.Decimal') && is_numeric($rawValue)
+                                ? (string) $rawValue
+                                : $rawValue;
                         }
 
                         $property->setValue($object, $denormalizedValue);
@@ -327,7 +330,7 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
 
             if ($isChoice && $meta !== null && !empty($meta->variants)) {
                 // Metadata-driven: resolve concrete JSON key and kind from variant map
-                [$resolvedKind, $resolvedKey] = $this->resolveChoiceVariant($value, $meta->variants);
+                [$resolvedKind, $resolvedKey, $resolvedFhirType] = $this->resolveChoiceVariant($value, $meta->variants);
                 if ($resolvedKey !== '') {
                     $jsonKey = $resolvedKey;
                     if ($resolvedKind === 'primitive' && $this->isPrimitiveWithExtensions($value)) {
@@ -342,6 +345,9 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
                         $normalizedValue = $this->normalizer !== null
                             ? $this->normalizer->normalize($value, 'json', $context)
                             : $this->normalizeBasicValue($value, 'json', $context);
+                        if (($resolvedFhirType === 'decimal' || $resolvedFhirType === 'http://hl7.org/fhirpath/System.Decimal') && is_string($normalizedValue) && is_numeric($normalizedValue)) {
+                            $normalizedValue = (float) $normalizedValue;
+                        }
                         if ($normalizedValue !== null) {
                             $data[$jsonKey] = $normalizedValue;
                         }
@@ -373,6 +379,8 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
                 } else {
                     $normalizedValue = $this->normalizeBasicValue($value, 'json', $context);
                 }
+
+                $normalizedValue = $this->castNumericScalarForJson($normalizedValue, $meta);
 
                 if ($normalizedValue !== null) {
                     $data[$jsonKey] = $normalizedValue;
@@ -436,6 +444,16 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
                         if ($normalizedValue !== null) {
                             $data[$xmlKey] = $normalizedValue;
                         }
+                    } elseif (is_scalar($value)) {
+                        // Scalar choice elements (bool, int, float, string) must emit as
+                        // <element value="..."/> in FHIR XML. Build the @value array directly
+                        // rather than delegating to the Symfony normalizer, which would let
+                        // XmlEncoder apply its own bool→int or float→string casts.
+                        $data[$xmlKey] = [
+                            '@value' => is_bool($value)
+                                ? ($value ? 'true' : 'false')
+                                : (string) $value,
+                        ];
                     } else {
                         $normalizedValue = $this->normalizer !== null
                             ? $this->normalizer->normalize($value, 'xml', $context)

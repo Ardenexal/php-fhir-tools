@@ -68,9 +68,9 @@ class Money extends Element
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
-        /** @var float|null value Numerical value (with implicit precision) */
+        /** @var numeric-string|null value Numerical value (with implicit precision) */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $value = null,
+        public ?string $value = null,
         /** @var CurrenciesType|null currency ISO 4217 Currency Code */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
         public ?CurrenciesType $currency = null,
