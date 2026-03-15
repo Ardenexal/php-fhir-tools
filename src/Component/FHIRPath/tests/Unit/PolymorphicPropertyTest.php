@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Component\FHIRPath\tests\Unit;
 
-use;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
