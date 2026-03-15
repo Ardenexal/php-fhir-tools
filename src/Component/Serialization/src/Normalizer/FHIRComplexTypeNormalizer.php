@@ -482,15 +482,19 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
                 if ($xhtmlReflection->hasProperty('value')) {
                     $rawXhtml = $xhtmlReflection->getProperty('value')->getValue($value);
                     if (is_array($rawXhtml)) {
-                        $data[$xmlKey] = $rawXhtml;
+                        $xhtmlArray           = $rawXhtml;
+                        $xhtmlArray['@xmlns'] = 'http://www.w3.org/1999/xhtml';
+                        $data[$xmlKey]        = $xhtmlArray;
                         continue;
                     } elseif (is_string($rawXhtml)) {
                         // If the string is XML (starts with '<'), decode back to XmlEncoder array.
                         // Otherwise it's plain text — emit as XmlEncoder text-node content.
-                        $trimmed       = ltrim($rawXhtml);
-                        $data[$xmlKey] = str_starts_with($trimmed, '<')
+                        $trimmed    = ltrim($rawXhtml);
+                        $xhtmlArray = str_starts_with($trimmed, '<')
                             ? $this->decodeXhtmlToArray($rawXhtml)
                             : ['#' => $rawXhtml];
+                        $xhtmlArray['@xmlns'] = 'http://www.w3.org/1999/xhtml';
+                        $data[$xmlKey]        = $xhtmlArray;
                         continue;
                     }
                 }

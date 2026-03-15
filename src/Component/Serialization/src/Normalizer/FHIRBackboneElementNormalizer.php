@@ -489,6 +489,43 @@ class FHIRBackboneElementNormalizer extends AbstractFHIRNormalizer
                 }
             }
 
+            // Handle polymorphic resource properties in XML: wrap with resource type element name,
+            // e.g. <resource><Patient>...</Patient></resource>
+            if ($meta !== null && $meta->propertyKind === 'resource') {
+                if ($meta->isArray && is_array($value)) {
+                    $wrappedItems = [];
+                    foreach ($value as $item) {
+                        if (!is_object($item)) {
+                            continue;
+                        }
+                        $itemResourceType = $this->metadataExtractor->extractResourceType($item);
+                        if ($itemResourceType === null) {
+                            continue;
+                        }
+                        $normalizedItem = $this->normalizer !== null
+                            ? $this->normalizer->normalize($item, 'xml', $context)
+                            : $this->normalizeBasicValue($item, 'xml', $context);
+                        if ($normalizedItem !== null) {
+                            $wrappedItems[] = [$itemResourceType => $normalizedItem];
+                        }
+                    }
+                    if (!empty($wrappedItems)) {
+                        $data[$xmlKey] = $wrappedItems;
+                    }
+                } elseif (!$meta->isArray && is_object($value)) {
+                    $itemResourceType = $this->metadataExtractor->extractResourceType($value);
+                    if ($itemResourceType !== null) {
+                        $normalizedValue = $this->normalizer !== null
+                            ? $this->normalizer->normalize($value, 'xml', $context)
+                            : $this->normalizeBasicValue($value, 'xml', $context);
+                        if ($normalizedValue !== null) {
+                            $data[$xmlKey] = [$itemResourceType => $normalizedValue];
+                        }
+                    }
+                }
+                continue;
+            }
+
             // xmlAttr properties: emit as XML attribute on the parent element
             if ($meta !== null && $meta->xmlSerializedName !== null && is_scalar($value)) {
                 $data[$meta->xmlSerializedName] = is_bool($value)

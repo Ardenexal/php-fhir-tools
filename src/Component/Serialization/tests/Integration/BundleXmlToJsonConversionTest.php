@@ -170,32 +170,33 @@ class BundleXmlToJsonConversionTest extends TestCase
         $entries = $xml->entry;
         self::assertCount(5, $entries, 'Bundle should have 5 entries');
 
-        // Validate first entry contains Patient resource data - THE MAIN FIX WE'RE TESTING
-        // Note: The serializer doesn't wrap with <Patient> - it serializes fields directly
+        // Validate first entry contains Patient resource data wrapped with <Patient> element
         $firstEntry = $entries[0];
         self::assertNotNull($firstEntry->resource, 'First entry should have a resource element');
 
-        // Validate Patient fields are present (proving polymorphic deserialization worked)
-        $resource = $firstEntry->resource;
-        self::assertNotNull($resource->id, 'Patient should have id');
-        self::assertSame('example', (string) $resource->id, 'Patient ID should match');
-        self::assertNotNull($resource->meta, 'Patient should have meta');
-        self::assertNotNull($resource->active, 'Patient should have active field');
-        self::assertNotNull($resource->gender, 'Patient should have gender');
-        self::assertNotNull($resource->birthDate, 'Patient should have birthDate');
-        self::assertNotNull($resource->name, 'Patient should have name');
-        self::assertNotNull($resource->identifier, 'Patient should have identifier');
+        // With the fix, Patient fields are wrapped: <resource><Patient>...</Patient></resource>
+        $patient = $firstEntry->resource->Patient;
+        self::assertNotNull($patient, 'First entry resource should have a Patient wrapper element');
+        self::assertNotNull($patient->id, 'Patient should have id');
+        self::assertSame('example', (string) $patient->id['value'], 'Patient ID should match');
+        self::assertNotNull($patient->meta, 'Patient should have meta');
+        self::assertNotNull($patient->active, 'Patient should have active field');
+        self::assertNotNull($patient->gender, 'Patient should have gender');
+        self::assertNotNull($patient->birthDate, 'Patient should have birthDate');
+        self::assertNotNull($patient->name, 'Patient should have name');
+        self::assertNotNull($patient->identifier, 'Patient should have identifier');
 
         // Validate first entry response
         self::assertNotNull($firstEntry->response, 'First entry should have response');
 
-        // Validate remaining entries contain nested Bundle resource data - ALSO TESTING POLYMORPHIC RESOURCES
+        // Validate remaining entries contain nested Bundle resource data wrapped with <Bundle> element
         for ($i = 1; $i < 5; ++$i) {
             $entry = $entries[$i];
             self::assertNotNull($entry->resource, "Entry {$i} should have a resource element");
 
-            // Validate Bundle fields are present (proving polymorphic deserialization worked)
-            $bundleResource = $entry->resource;
+            // With the fix, Bundle fields are wrapped: <resource><Bundle>...</Bundle></resource>
+            $bundleResource = $entry->resource->Bundle;
+            self::assertNotNull($bundleResource, "Entry {$i} resource should have a Bundle wrapper element");
             self::assertNotNull($bundleResource->id, "Bundle {$i} should have id");
             self::assertNotNull($bundleResource->meta, "Bundle {$i} should have meta");
             self::assertNotNull($bundleResource->type, "Bundle {$i} should have type");
@@ -211,8 +212,42 @@ class BundleXmlToJsonConversionTest extends TestCase
         //    - JSON has "resourceType": "Patient" → deserializes to PatientResource object
         //    - JSON has "resourceType": "Bundle" → deserializes to BundleResource object
         // 2. The deserialized polymorphic objects can be serialized back to valid FHIR XML
-        // 3. The XML contains all expected resource data
+        // 3. The XML wraps each resource with its type element: <resource><Patient>...</Patient></resource>
         // 4. Round-trip conversion works (JSON→Object→XML)
+    }
+
+    public function testNarrativeDivHasXhtmlNamespace(): void
+    {
+        $json = $this->getExpectedJson();
+
+        $bundle = $this->serializer->deserializeFromJson($json, BundleResource::class);
+        self::assertInstanceOf(BundleResource::class, $bundle);
+
+        $actualXml = $this->serializer->serializeToXml($bundle);
+        self::assertIsString($actualXml);
+
+        // Parse with namespace awareness — registerXPathNamespace is needed for namespace-aware queries
+        $xml = simplexml_load_string($actualXml, 'SimpleXMLElement', LIBXML_NONET | LIBXML_NSCLEAN);
+        self::assertNotFalse($xml, 'Failed to parse generated XML');
+
+        // Navigate to Patient.text.div
+        $patient = $xml->entry[0]->resource->Patient;
+        self::assertNotNull($patient, 'First entry should have a Patient element');
+
+        $textElement = $patient->text;
+        self::assertNotNull($textElement, 'Patient should have a text element');
+
+        $divElement = $textElement->div;
+        self::assertNotNull($divElement, 'Narrative text should have a div element');
+
+        // Verify the div carries xmlns="http://www.w3.org/1999/xhtml"
+        $namespaces = $divElement->getNamespaces(false);
+        self::assertArrayHasKey('', $namespaces, 'div should declare a default namespace');
+        self::assertSame(
+            'http://www.w3.org/1999/xhtml',
+            $namespaces[''],
+            'div default namespace must be XHTML, not FHIR',
+        );
     }
 
     /**
