@@ -717,5 +717,4 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
 
         return false;
     }
-
 }

@@ -494,7 +494,7 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
                 $choiceMatch = $this->resolveChoiceVariant($value, $meta->variants);
                 if ($choiceMatch !== null) {
                     [$resolvedKind, $resolvedKey, $resolvedFhirType] = $choiceMatch;
-                    $jsonKey = $resolvedKey;
+                    $jsonKey                                         = $resolvedKey;
                     if ($resolvedKind === 'primitive' && $this->isPrimitiveWithExtensions($value)) {
                         $normalizedValue = $this->normalizePrimitiveWithExtensions($value, 'json', $context);
                         if ($normalizedValue !== null) {
@@ -601,7 +601,7 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
                 $choiceMatch = $this->resolveChoiceVariant($value, $meta->variants);
                 if ($choiceMatch !== null) {
                     [$resolvedKind, $resolvedKey] = $choiceMatch;
-                    $xmlKey = $resolvedKey;
+                    $xmlKey                       = $resolvedKey;
                     if ($resolvedKind === 'primitive' && $this->isPrimitiveWithExtensions($value)) {
                         $normalizedValue = $this->normalizePrimitiveWithExtensions($value, 'xml', $context);
                         if ($normalizedValue !== null) {
