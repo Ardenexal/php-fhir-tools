@@ -14,23 +14,10 @@
     "require": {
         "php": ">=8.2"
     },
-    "require-dev": {
-        "phpunit/phpunit": "^12.5",
-        "giorgiosironi/eris": "^1.0"
-    },
     "autoload": {
         "psr-4": {
             "Ardenexal\\FHIRTools\\Component\\Metadata\\": "src/"
         }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Ardenexal\\FHIRTools\\Component\\Metadata\\Tests\\": "tests/"
-        }
-    },
-    "scripts": {
-        "test": "phpunit",
-        "test-coverage": "phpunit --coverage-html coverage"
     },
     "keywords": [
         "fhir",

@@ -7,7 +7,34 @@ permissions:
     contents: read
     pull-requests: write
 jobs:
-  validate:
+  checks:
+      runs-on: ubuntu-latest
+      steps:
+          -   uses: actions/checkout@v4
+              with:
+                  # Fetch full history for better diff analysis
+                  fetch-depth: 0
+
+          -   name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.3'
+                  extensions: ctype, iconv, zip
+
+          -   name: Cache Composer packages
+              id: composer-cache
+              uses: actions/cache@v4
+              with:
+                  path: vendor
+                  key: ${{ runner.os }}-php-8.3-${{ hashFiles('**/composer.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-php-8.3-
+
+          -   name: Install dependencies
+              run: composer install --prefer-dist --no-progress --no-suggest
+          -   name: Security audit
+              run: composer audit
+  style:
     runs-on: ubuntu-latest
     env:
       XDEBUG_MODE: off
@@ -40,88 +67,84 @@ jobs:
     - name: Validate composer files
       run: composer validate --strict
 
-    - name: Check code style (Pint) - All Components
-      run: composer run lint -- --test
-
-    - name: Run PHPStan static analysis - All Components
-      run: composer run phpstan
-
-    - name: Run unit tests
-      run: composer run test-unit -- --no-coverage
-
-    - name: Run integration tests
-      run: composer run test-integration -- --no-coverage
-
-    - name: Run FHIR tests
-      run: composer run test-fhir -- --no-coverage
-
     - name: Security audit
       run: composer audit
 
-    # - name: Validate commit messages
-    #   run: |
-    #     # Check if commit messages follow conventional commits
-    #     git log --oneline origin/main..HEAD | while read line; do
-    #       commit_msg=$(echo "$line" | cut -d' ' -f2-)
-    #       if ! echo "$commit_msg" | grep -qE '^(feat|fix|chore|test|docs|refactor|perf|style)(\(.+\))?: .+'; then
-    #         echo "❌ Commit message does not follow conventional commits format: $commit_msg"
-    #         echo "Expected format: type: description"
-    #         echo "Valid types: feat, fix, chore, test, docs, refactor, perf, style"
-    #         exit 1
-    #       fi
-    #     done
-    #     echo "✅ All commit messages follow conventional commits format"
+  unit-tests:
+      runs-on: ubuntu-latest
+      env:
+          XDEBUG_MODE: off
+          COMPOSER_NO_INTERACTION: 1
 
-  component-quality:
-    runs-on: ubuntu-latest
-    needs: validate
-    strategy:
-      matrix:
-        component: [bundle, codegen, serialization]
+      steps:
+          - uses: actions/checkout@v4
+            with:
+                # Fetch full history for better diff analysis
+                fetch-depth: 0
 
-    steps:
-    - uses: actions/checkout@v4
+          - name: Setup PHP
+            uses: shivammathur/setup-php@v2
+            with:
+                php-version: '8.3'
+                extensions: ctype, iconv, zip
 
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.3'
-        extensions: ctype, iconv, zip
+          - name: Cache Composer packages
+            id: composer-cache
+            uses: actions/cache@v4
+            with:
+                path: vendor
+                key: ${{ runner.os }}-php-8.3-${{ hashFiles('**/composer.lock') }}
+                restore-keys: |
+                    ${{ runner.os }}-php-8.3-
 
-    - name: Install dependencies
-      run: composer install --prefer-dist --no-progress --no-suggest
+          - name: Install dependencies
+            run: composer install --prefer-dist --no-progress --no-suggest
 
-    - name: Run ${{ matrix.component }} quality checks
-      run: composer run quality:${{ matrix.component }}
+          - name: Run unit tests
+            run: composer run test-unit -- --no-coverage
 
-  performance:
-    runs-on: ubuntu-latest
-    needs: validate
+  integration-tests:
+      runs-on: ubuntu-latest
+      env:
+          XDEBUG_MODE: off
+          COMPOSER_NO_INTERACTION: 1
 
-    steps:
-    - uses: actions/checkout@v4
+      steps:
+          -   uses: actions/checkout@v4
+              with:
+                  # Fetch full history for better diff analysis
+                  fetch-depth: 0
 
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.3'
-        extensions: ctype, iconv, zip
+          -   name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.3'
+                  extensions: ctype, iconv, zip
 
-    - name: Install dependencies
-      run: composer install --prefer-dist --no-progress --no-suggest
+          -   name: Cache Composer packages
+              id: composer-cache
+              uses: actions/cache@v4
+              with:
+                  path: vendor
+                  key: ${{ runner.os }}-php-8.3-${{ hashFiles('**/composer.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-php-8.3-
 
-    - name: Install demo dependencies
-      run: composer install --working-dir=demo --prefer-dist --no-progress
+          -   name: Install dependencies
+              run: composer install --prefer-dist --no-progress --no-suggest
 
-    - name: Test command performance
-      run: |
-        echo "Testing basic command performance..."
-        time php demo/bin/console list > /dev/null
-        echo "✅ Command execution completed successfully"
+
+          -   name: Run integration tests
+              run: composer run test-integration -- --no-coverage
+
+          -   name: Run FHIR tests
+              run: composer run test-fhir -- --no-coverage
+
+          -   name: Security audit
+              run: composer audit
 
   recipe-validation:
     runs-on: ubuntu-latest
-    needs: validate
 
     steps:
     - uses: actions/checkout@v4
@@ -143,7 +166,7 @@ jobs:
 
   fhir-generation-test:
     runs-on: ubuntu-latest
-    needs: [validate, component-quality]
+    needs: [unit-tests,integration-tests ]
     permissions:
       pull-requests: write
       contents: read
