@@ -42,7 +42,6 @@ composer test
 # Run specific test suites
 composer test-unit
 composer test-integration
-composer test-fhir
 composer test-fhirpath-spec     # FHIRPath specification conformance tests
 
 # Component-specific tests
@@ -127,8 +126,7 @@ composer phpstan-ai -- --ai-limit=100 --ai-offset=100        # page 2
 
 ## Testing Guidelines
 
-- Tests located in `tests/` directory
-- Use `Ardenexal\FHIRTools\Tests\` namespace
+- Tests located in `src/Component/[Package]/tests/` directory
 - Test fixtures in `tests/Fixtures/`
 - Integration tests verify FHIR conformance and serialization round-trips
 

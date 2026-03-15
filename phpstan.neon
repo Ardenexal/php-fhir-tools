@@ -12,6 +12,7 @@ parameters:
         - src/Component/FHIRPath/src/
     excludePaths:
         - */vendor/*
+        - src/Bundle/*/tests/*
         - src/Component/*/tests/*
         - src/Component/*/output/*
     tmpDir: var/cache/phpstan

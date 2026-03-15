@@ -21,15 +21,16 @@
 
     <testsuites>
         <testsuite name="unit">
-            <directory>tests/Unit</directory>
+            <directory>src/Bundle/FHIRBundle/tests</directory>
+            <directory>src/Component/CodeGeneration/tests/Unit</directory>
+            <directory>src/Component/Serialization/tests/Unit</directory>
             <directory>src/Component/FHIRPath/tests/Unit</directory>
         </testsuite>
         <testsuite name="integration">
             <directory>tests/Integration</directory>
             <directory>src/Component/Serialization/tests/Integration</directory>
-        </testsuite>
-        <testsuite name="fhir">
-            <directory>tests/FHIR</directory>
+            <directory>src/Component/CodeGeneration/tests/Integration</directory>
+            <directory>src/Component/FHIRPath/tests/Integration</directory>
         </testsuite>
         <testsuite name="fhirpath-spec">
             <directory>src/Component/FHIRPath/tests/Integration</directory>
