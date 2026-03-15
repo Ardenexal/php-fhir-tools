@@ -84,7 +84,7 @@ class PropertyMetadataProvider implements PropertyMetadataProviderInterface
                 );
             }
 
-            $phpItemClass      = $entry['phpType'] ?? null;
+            $phpItemClass      = $entry['phpType']           ?? null;
             $xmlSerializedName = $entry['xmlSerializedName'] ?? null;
 
             $result[$propertyName] = new PropertyMetadata(

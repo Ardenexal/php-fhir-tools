@@ -10,7 +10,6 @@ use Ardenexal\FHIRTools\Component\Serialization\FHIRDateTimeValue;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadata;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyVariantMetadata;
-use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
@@ -30,6 +29,9 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     protected ?NormalizerInterface $normalizer = null;
 
     protected ?DenormalizerInterface $denormalizer = null;
+
+    /** @var array<class-string, bool> */
+    private array $decimalPrimitiveCache = [];
 
     public function __construct(
         protected readonly FHIRMetadataExtractorInterface $metadataExtractor,
@@ -105,6 +107,9 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
                     $raw = $raw ? 'true' : 'false';
                 }
 
+                // NOTE: this handles the ->value property of standalone DecimalPrimitive objects.
+                // For decimal-typed scalar properties inside resource/complex/backbone normalizers,
+                // castNumericScalarForJson() handles the conversion using PropertyMetadata.fhirType.
                 // String decimals: convert back to float for JSON number output.
                 // The original string is preserved in the model for XML precision round-trips.
                 // Only applies to DecimalPrimitive, identified via the FHIRPrimitive attribute.
@@ -478,20 +483,28 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
      */
     protected function isDecimalPrimitive(object $obj): bool
     {
+        $class = get_class($obj);
+        if (array_key_exists($class, $this->decimalPrimitiveCache)) {
+            return $this->decimalPrimitiveCache[$class];
+        }
+
         $reflection = new \ReflectionClass($obj);
         do {
             $attributes = $reflection->getAttributes(FHIRPrimitive::class);
             if (!empty($attributes)) {
-                return $attributes[0]->newInstance()->primitiveType === 'decimal';
+                return $this->decimalPrimitiveCache[$class] = $attributes[0]->newInstance()->primitiveType === 'decimal';
             }
             $reflection = $reflection->getParentClass();
         } while ($reflection !== false);
 
-        return false;
+        return $this->decimalPrimitiveCache[$class] = false;
     }
 
     /**
      * Cast a numeric-string scalar to the appropriate PHP numeric type for JSON output.
+     *
+     * NOTE: this handles inline scalar properties in resource/complex/backbone normalizers.
+     * For standalone DecimalPrimitive objects, see normalizePrimitiveWithExtensions().
      *
      * FHIR decimal properties are stored as ?string to preserve precision (e.g. "1.0" vs "1.00"),
      * but FHIR JSON requires numeric values (not strings). This method converts them back.
@@ -632,13 +645,13 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
      * Resolve the concrete propertyKind, JSON/XML key, and FHIR type for a choice element value.
      *
      * Iterates over the compiled variant list and matches the runtime value by PHP type.
-     * Returns ['', '', ''] when no variant matches (caller should fall back to legacy handling).
+     * Returns null when no variant matches (caller should fall back to legacy handling).
      *
      * @param list<PropertyVariantMetadata> $variants
      *
-     * @return array{0: string, 1: string, 2: string} [propertyKind, jsonKey, fhirType]
+     * @return array{0: string, 1: string, 2: string}|null [propertyKind, jsonKey, fhirType] or null
      */
-    protected function resolveChoiceVariant(mixed $value, array $variants): array
+    protected function resolveChoiceVariant(mixed $value, array $variants): ?array
     {
         /** @var array<string, string> */
         static $phpToGettype = ['bool' => 'boolean', 'int' => 'integer', 'float' => 'double', 'string' => 'string'];
@@ -653,7 +666,7 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             }
         }
 
-        return ['', '', ''];
+        return null;
     }
 
     /**
@@ -705,164 +718,4 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         return false;
     }
 
-    /**
-     * Encode an XmlEncoder-decoded XHTML array back to an XML string using DOMDocument.
-     *
-     * XmlEncoder::encode cannot reliably round-trip repeated sibling elements
-     * (e.g. two <p> tags) — it wraps them in <item> elements. DOMDocument handles
-     * this correctly and is used here instead.
-     *
-     * The $elementName parameter names the root element (typically 'div' for FHIR xhtml).
-     * The $data array uses XmlEncoder conventions: '@key' for attributes, '#' for text nodes,
-     * and list arrays for repeated sibling elements.
-     *
-     * @param array<string, mixed> $data
-     */
-    protected function encodeXhtmlToString(array $data, string $elementName): string
-    {
-        $dom  = new \DOMDocument('1.0', 'UTF-8');
-        $root = $dom->createElement($elementName);
-        $dom->appendChild($root);
-        $this->buildDomFromArray($dom, $root, $data);
-
-        return $dom->saveXML($root) ?: '';
-    }
-
-    /**
-     * Recursively populate a DOMElement from an XmlEncoder-style data array.
-     *
-     * @param array<array-key, mixed> $data
-     */
-    private function buildDomFromArray(\DOMDocument $dom, \DOMElement $parent, array $data): void
-    {
-        foreach ($data as $key => $value) {
-            if (is_int($key)) {
-                continue; // skip numeric keys (handled by list branch in parent call)
-            }
-
-            // Skip XmlEncoder meta-keys that are not mappable to DOM nodes
-            if (str_starts_with($key, '#') && $key !== '#' && $key !== '#text') {
-                // '#comment', '#document', etc. — skip
-                continue;
-            }
-
-            if (str_starts_with($key, '@')) {
-                // XML attribute (e.g. @xmlns, @href)
-                $parent->setAttribute(substr($key, 1), (string) $value);
-            } elseif ($key === '#' || $key === '#text') {
-                // Text node content.
-                // '#' = single text node; '#text' = multiple text nodes in mixed content
-                // (XmlEncoder uses #text when text and element nodes coexist as siblings).
-                if (is_array($value)) {
-                    foreach ($value as $textItem) {
-                        if ($textItem !== '' && $textItem !== null) {
-                            $parent->appendChild($dom->createTextNode((string) $textItem));
-                        }
-                    }
-                } elseif ($value !== '' && $value !== null) {
-                    $parent->appendChild($dom->createTextNode((string) $value));
-                }
-            } elseif (is_array($value) && array_is_list($value)) {
-                // Multiple sibling elements with the same tag name (e.g. two <p> elements)
-                foreach ($value as $item) {
-                    $child = $dom->createElement($key);
-                    $parent->appendChild($child);
-                    if (is_array($item)) {
-                        $this->buildDomFromArray($dom, $child, $item);
-                    } elseif ($item !== '' && $item !== null) {
-                        $child->appendChild($dom->createTextNode((string) $item));
-                    }
-                }
-            } elseif (is_array($value)) {
-                // Single child element with sub-structure
-                $child = $dom->createElement($key);
-                $parent->appendChild($child);
-                $this->buildDomFromArray($dom, $child, $value);
-            } else {
-                // Single child element with text content (or self-closing like <br/>)
-                $child = $dom->createElement($key);
-                $parent->appendChild($child);
-                if ($value !== '' && $value !== null) {
-                    $child->appendChild($dom->createTextNode((string) $value));
-                }
-            }
-        }
-    }
-
-    /**
-     * Decode an XHTML XML element string back to the array format XmlEncoder expects.
-     *
-     * Used when XhtmlPrimitive.value holds a raw XML string (e.g. from JSON deserialization
-     * where FHIR stores xhtml as a string). Parses the string and returns the content of the
-     * root element as an associative array (attributes keyed with @ prefix, child elements
-     * keyed by tag name) so that XmlEncoder can re-emit it as proper nested XML elements.
-     *
-     * The decoded array is post-processed so that lists of scalar values are converted to
-     * lists of text-node objects (e.g. `'p' => ['First', 'Second']` becomes
-     * `'p' => [['#' => 'First'], ['#' => 'Second']]`). This prevents XmlEncoder from
-     * wrapping repeated sibling elements in `<item>` tags when re-encoding.
-     *
-     * @return array<string, mixed>
-     */
-    protected function decodeXhtmlToArray(string $xmlString): array
-    {
-        $xmlEncoder = new XmlEncoder();
-        $decoded    = $xmlEncoder->decode($xmlString, 'xml');
-
-        if (!is_array($decoded)) {
-            return [];
-        }
-
-        return $this->transformXhtmlArrayForReencoding($decoded);
-    }
-
-    /**
-     * Recursively transform an XmlEncoder-decoded XHTML array so it can be re-encoded correctly.
-     *
-     * XmlEncoder incorrectly wraps repeated sibling elements in <item> tags when the value is
-     * a list of scalars (e.g. `'p' => ['First', 'Second']`). Converting each scalar to an
-     * associative array with a '#' text-node key fixes this: XmlEncoder then emits repeated
-     * `<p>` elements correctly.
-     *
-     * Also maps `#text` (XmlEncoder's mixed-content key) to `#` (standard text-node key).
-     *
-     * @param array<string, mixed> $data
-     *
-     * @return array<array-key, mixed>
-     */
-    private function transformXhtmlArrayForReencoding(array $data): array
-    {
-        $result = [];
-
-        foreach ($data as $key => $value) {
-            // #text is XmlEncoder's key for multiple text nodes in mixed content. Map to '#'.
-            if ($key === '#text') {
-                $combined        = is_array($value) ? implode('', $value) : (string) $value;
-                $result['#']     = ($result['#'] ?? '') . $combined;
-                continue;
-            }
-
-            if (is_array($value) && array_is_list($value)) {
-                // List of items: wrap plain scalars in ['#' => scalar] so XmlEncoder
-                // produces repeated <tag>text</tag> elements instead of <tag><item>...</item></tag>.
-                $transformed = [];
-                foreach ($value as $item) {
-                    if (is_scalar($item)) {
-                        $transformed[] = ['#' => (string) $item];
-                    } elseif (is_array($item)) {
-                        $transformed[] = $this->transformXhtmlArrayForReencoding($item);
-                    } else {
-                        $transformed[] = $item;
-                    }
-                }
-                $result[$key] = $transformed;
-            } elseif (is_array($value)) {
-                $result[$key] = $this->transformXhtmlArrayForReencoding($value);
-            } else {
-                $result[$key] = $value;
-            }
-        }
-
-        return $result;
-    }
 }

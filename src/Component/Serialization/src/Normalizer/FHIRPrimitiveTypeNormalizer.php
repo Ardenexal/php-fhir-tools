@@ -549,20 +549,11 @@ class FHIRPrimitiveTypeNormalizer extends AbstractFHIRNormalizer
                 // FHIRDateTimeValue carries the original format so serialization can
                 // round-trip partial dates without expanding to full ISO 8601.
                 if (preg_match('/^\d{4}$/', $value) === 1) {
-                    $result = FHIRDateTimeValue::createFromFormat('!Y', $value, new \DateTimeZone('UTC'));
-                    if ($result !== false) {
-                        $result->originalFormat = 'Y';
-                    }
+                    $result = FHIRDateTimeValue::fromPartialDate($value, 'Y', new \DateTimeZone('UTC'));
                 } elseif (preg_match('/^\d{4}-\d{2}$/', $value) === 1) {
-                    $result = FHIRDateTimeValue::createFromFormat('!Y-m', $value, new \DateTimeZone('UTC'));
-                    if ($result !== false) {
-                        $result->originalFormat = 'Y-m';
-                    }
+                    $result = FHIRDateTimeValue::fromPartialDate($value, 'Y-m', new \DateTimeZone('UTC'));
                 } elseif (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) === 1) {
-                    $result = FHIRDateTimeValue::createFromFormat('!Y-m-d', $value, new \DateTimeZone('UTC'));
-                    if ($result !== false) {
-                        $result->originalFormat = 'Y-m-d';
-                    }
+                    $result = FHIRDateTimeValue::fromPartialDate($value, 'Y-m-d', new \DateTimeZone('UTC'));
                 } else {
                     $result = new \DateTimeImmutable($value);
                 }

@@ -360,8 +360,9 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
 
             // Resolve choice element to correct concrete JSON key
             if ($meta !== null && $meta->isChoice && !empty($meta->variants)) {
-                [$resolvedKind, $resolvedKey, $resolvedFhirType] = $this->resolveChoiceVariant($value, $meta->variants);
-                if ($resolvedKey !== '') {
+                $choiceMatch = $this->resolveChoiceVariant($value, $meta->variants);
+                if ($choiceMatch !== null) {
+                    [$resolvedKind, $resolvedKey, $resolvedFhirType] = $choiceMatch;
                     $jsonKey = $resolvedKey;
                     if ($resolvedKind === 'primitive' && $this->isPrimitiveWithExtensions($value)) {
                         $normalizedValue = $this->normalizePrimitiveWithExtensions($value, $fhirContext->format, $context, $fhirContext->includeExtensions);
@@ -474,8 +475,9 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
 
             // Resolve choice element to correct concrete XML element name
             if ($meta !== null && $meta->isChoice && !empty($meta->variants)) {
-                [$resolvedKind, $resolvedKey] = $this->resolveChoiceVariant($value, $meta->variants);
-                if ($resolvedKey !== '') {
+                $choiceMatch = $this->resolveChoiceVariant($value, $meta->variants);
+                if ($choiceMatch !== null) {
+                    [$resolvedKind, $resolvedKey] = $choiceMatch;
                     $xmlKey = $resolvedKey;
                     if ($resolvedKind === 'primitive' && $this->isPrimitiveWithExtensions($value)) {
                         $normalizedValue = $this->normalizePrimitiveWithExtensions($value, $fhirContext->format, $context, $fhirContext->includeExtensions);
@@ -814,7 +816,7 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
                             // Array of polymorphic resources (e.g. DomainResource::$contained).
                             // XmlEncoder decodes a single <contained> element as a non-list assoc
                             // array; multiple elements arrive as a list — normalise to a list first.
-                            $items            = is_array($value) && !array_is_list($value) ? [$value] : (array) $value;
+                            $items             = is_array($value) && !array_is_list($value) ? [$value] : (array) $value;
                             $denormalizedValue = [];
 
                             foreach ($items as $item) {

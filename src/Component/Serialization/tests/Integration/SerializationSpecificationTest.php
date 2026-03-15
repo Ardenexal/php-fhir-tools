@@ -137,7 +137,7 @@ final class SerializationSpecificationTest extends TestCase
         try {
             $roundTripped = $this->service->deserialize($reserialized);
         } catch (\Throwable $e) {
-            $this->fail(sprintf('[%s] Re-deserialization of serialized output failed: %s', $filename, $e->getMessage(). $e->getTraceAsString()));
+            $this->fail(sprintf('[%s] Re-deserialization of serialized output failed: %s', $filename, $e->getMessage()));
         }
 
         // Step 4: Verify full structural fidelity survived the round-trip.

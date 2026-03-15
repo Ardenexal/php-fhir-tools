@@ -365,8 +365,9 @@ class FHIRBackboneElementNormalizer extends AbstractFHIRNormalizer
 
             // Handle choice elements via metadata
             if ($meta !== null && $meta->isChoice && !empty($meta->variants)) {
-                [$resolvedKind, $resolvedKey, $resolvedFhirType] = $this->resolveChoiceVariant($value, $meta->variants);
-                if ($resolvedKey !== '') {
+                $choiceMatch = $this->resolveChoiceVariant($value, $meta->variants);
+                if ($choiceMatch !== null) {
+                    [$resolvedKind, $resolvedKey, $resolvedFhirType] = $choiceMatch;
                     $jsonKey = $resolvedKey;
                     if ($resolvedKind === 'primitive' && $this->isPrimitiveWithExtensions($value)) {
                         $normalizedValue = $this->normalizePrimitiveWithExtensions($value, 'json', $context);
@@ -469,8 +470,9 @@ class FHIRBackboneElementNormalizer extends AbstractFHIRNormalizer
 
             // Handle choice elements via metadata
             if ($meta !== null && $meta->isChoice && !empty($meta->variants)) {
-                [$resolvedKind, $resolvedKey] = $this->resolveChoiceVariant($value, $meta->variants);
-                if ($resolvedKey !== '') {
+                $choiceMatch = $this->resolveChoiceVariant($value, $meta->variants);
+                if ($choiceMatch !== null) {
+                    [$resolvedKind, $resolvedKey] = $choiceMatch;
                     $xmlKey = $resolvedKey;
                     if ($resolvedKind === 'primitive' && $this->isPrimitiveWithExtensions($value)) {
                         $normalizedValue = $this->normalizePrimitiveWithExtensions($value, 'xml', $context);

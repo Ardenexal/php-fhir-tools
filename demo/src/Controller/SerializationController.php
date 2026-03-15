@@ -49,8 +49,8 @@ class SerializationController extends AbstractController
     ];
 
     public function __construct(
-        private readonly FHIRSerializationService       $serializationService,
-        private readonly FHIRValidator                  $validator,
+        private readonly FHIRSerializationService $serializationService,
+        private readonly FHIRValidator $validator,
         private readonly FHIRMetadataExtractorInterface $metadataExtractor,
     ) {
     }
@@ -73,9 +73,9 @@ class SerializationController extends AbstractController
     #[Route('/process', name: '_process', methods: ['POST'])]
     public function process(Request $request): Response
     {
-        $input        = trim((string)$request->request->get('input', ''));
-        $resourceType = (string)$request->request->get('resource_type', 'Patient');
-        $action       = (string)$request->request->get('action', 'validate');
+        $input        = trim((string) $request->request->get('input', ''));
+        $resourceType = (string) $request->request->get('resource_type', 'Patient');
+        $action       = (string) $request->request->get('action', 'validate');
 
         $result = null;
         $error  = null;
@@ -97,18 +97,18 @@ class SerializationController extends AbstractController
         try {
             $format = $this->detectFormat($input);
             $object = match ($format) {
-                'json' => $this->serializationService->deserializeFromJson($input, $targetClass),
-                'xml' => $this->serializationService->deserializeFromXml($input, $targetClass),
+                'json'  => $this->serializationService->deserializeFromJson($input, $targetClass),
+                'xml'   => $this->serializationService->deserializeFromXml($input, $targetClass),
                 default => throw new FHIRSerializationException('Unable to detect format (expected JSON or XML)'),
             };
 
             $result = match ($action) {
-                'validate' => $this->doValidate($object),
-                'json_to_xml' => $this->doConvert($object, 'xml'),
-                'xml_to_json' => $this->doConvert($object, 'json'),
-                'show_metadata' => $this->doMetadata($object),
+                'validate'       => $this->doValidate($object),
+                'json_to_xml'    => $this->doConvert($object, 'xml'),
+                'xml_to_json'    => $this->doConvert($object, 'json'),
+                'show_metadata'  => $this->doMetadata($object),
                 'dump_structure' => $this->doDumpStructure($object),
-                default => throw new \InvalidArgumentException(sprintf('Unknown action "%s"', $action)),
+                default          => throw new \InvalidArgumentException(sprintf('Unknown action "%s"', $action)),
             };
         } catch (FHIRSerializationException $e) {
             $error = 'Serialization error: ' . $e->getMessage();
@@ -139,8 +139,8 @@ class SerializationController extends AbstractController
     private function doConvert(object $object, string $targetFormat): array
     {
         $output = match ($targetFormat) {
-            'xml' => $this->serializationService->serializeToXml($object),
-            'json' => $this->serializationService->serializeToJson($object),
+            'xml'   => $this->serializationService->serializeToXml($object),
+            'json'  => $this->serializationService->serializeToJson($object),
             default => throw new \InvalidArgumentException("Unsupported target format: {$targetFormat}"),
         };
 
@@ -230,10 +230,10 @@ class SerializationController extends AbstractController
     }
 
     private function renderForm(
-        string  $input,
-        string  $resourceType,
-        string  $action,
-        ?array  $result,
+        string $input,
+        string $resourceType,
+        string $action,
+        ?array $result,
         ?string $error,
     ): Response {
         return $this->render('serialization/index.html.twig', [

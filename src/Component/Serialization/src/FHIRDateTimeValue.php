@@ -15,4 +15,22 @@ final class FHIRDateTimeValue extends \DateTimeImmutable
 {
     /** The PHP date() format string reflecting the original FHIR partial-date precision. */
     public string $originalFormat = \DateTimeInterface::ATOM;
+
+    /**
+     * Create a FHIRDateTimeValue from a partial FHIR date string, setting $originalFormat atomically.
+     *
+     * @param \DateTimeZone|null $timezone
+     *
+     * @return self|false Returns false if the value does not match $phpFormat
+     */
+    public static function fromPartialDate(string $datetime, string $phpFormat, ?\DateTimeZone $timezone = null): self|false
+    {
+        $instance = self::createFromFormat('!' . $phpFormat, $datetime, $timezone);
+        if ($instance === false) {
+            return false;
+        }
+        $instance->originalFormat = $phpFormat;
+
+        return $instance;
+    }
 }
