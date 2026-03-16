@@ -118,10 +118,26 @@ class FHIRBackboneElementNormalizer extends AbstractFHIRNormalizer
                         if ($this->denormalizer !== null && !$this->isBuiltinType($phpType)) {
                             $denormalizedValue = $this->denormalizer->denormalize($value, $phpType, $format, $context);
                         } else {
-                            $rawValue          = $format === 'xml' ? $this->unwrapXmlValue($value, $phpType) : $value;
-                            $denormalizedValue = ($fhirType === 'decimal' || $fhirType === 'http://hl7.org/fhirpath/System.Decimal') && is_numeric($rawValue)
-                                ? (string) $rawValue
-                                : $rawValue;
+                            $rawValue = $format === 'xml' ? $this->unwrapXmlValue($value, $phpType) : $value;
+
+                            if ($format === 'xml') {
+                                // XML: cast to correct PHP scalar type so FHIRPath inferType() returns
+                                // the right type ('decimal' for float, 'integer' for int, etc.)
+                                if ($phpType === 'int') {
+                                    $denormalizedValue = (int) $rawValue;
+                                } elseif ($phpType === 'float') {
+                                    $denormalizedValue = (float) $rawValue;
+                                } elseif ($phpType === 'bool') {
+                                    $denormalizedValue = filter_var($rawValue, FILTER_VALIDATE_BOOLEAN);
+                                } else {
+                                    $denormalizedValue = $rawValue;
+                                }
+                            } elseif ($fhirType === 'decimal' || $fhirType === 'http://hl7.org/fhirpath/System.Decimal') {
+                                // JSON: preserve as string to avoid floating-point precision loss
+                                $denormalizedValue = is_numeric($rawValue) ? (string) $rawValue : $rawValue;
+                            } else {
+                                $denormalizedValue = $rawValue;
+                            }
                         }
 
                         $property->setValue($object, $denormalizedValue);
@@ -198,6 +214,16 @@ class FHIRBackboneElementNormalizer extends AbstractFHIRNormalizer
                                         // assigned to union-typed properties like StringPrimitive|string|null.
                                         if (is_array($denormalizedValue) && isset($denormalizedValue['@value'])) {
                                             $denormalizedValue = $denormalizedValue['@value'];
+                                        }
+
+                                        // Cast to correct PHP scalar type based on FhirProperty metadata
+                                        $scalarPhpType = $meta?->phpType;
+                                        if ($scalarPhpType === 'int') {
+                                            $denormalizedValue = (int) $denormalizedValue;
+                                        } elseif ($scalarPhpType === 'float') {
+                                            $denormalizedValue = (float) $denormalizedValue;
+                                        } elseif ($scalarPhpType === 'bool') {
+                                            $denormalizedValue = filter_var($denormalizedValue, FILTER_VALIDATE_BOOLEAN);
                                         }
                                     } else {
                                         $denormalizedValue = $value;

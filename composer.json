@@ -66,7 +66,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Ardenexal\\FHIRTools\\Bundle\\FHIRBundle\\": "src/",
+            "Ardenexal\\FHIRTools\\Bundle\\FHIRBundle\\": "src/Bundle/FHIRBundle/src/",
             "Ardenexal\\FHIRTools\\Component\\CodeGeneration\\": "src/Component/CodeGeneration/src/",
             "Ardenexal\\FHIRTools\\Component\\Serialization\\": "src/Component/Serialization/src/",
             "Ardenexal\\FHIRTools\\Component\\Models\\": "src/Component/Models/src/",
@@ -77,6 +77,7 @@
     "autoload-dev": {
         "psr-4": {
             "Ardenexal\\FHIRTools\\Tests\\": "tests/",
+            "Ardenexal\\FHIRTools\\Bundle\\FHIRBundle\\Tests\\": "src/Bundle/FHIRBundle/tests/",
             "Ardenexal\\FHIRTools\\Component\\FHIRPath\\Tests\\": "src/Component/FHIRPath/tests/",
             "Ardenexal\\FHIRTools\\Component\\Serialization\\Tests\\": "src/Component/Serialization/tests/"
         }
@@ -115,14 +116,12 @@
         "test-ai-fhirpath-spec": "php scripts/ai-test-runner.php --testsuite=fhirpath-spec",
         "test": "php ./vendor/phpunit/phpunit/phpunit --testdox --testdox-summary",
         "test-coverage": "php ./vendor/phpunit/phpunit/phpunit --coverage-html coverage",
-        "test-unit": "php ./vendor/phpunit/phpunit/phpunit --testsuite=unit",
         "test-integration": "php ./vendor/phpunit/phpunit/phpunit --testsuite=integration",
-        "test-fhir": "php ./vendor/phpunit/phpunit/phpunit --testsuite=fhir",
         "test-fhirpath-spec": "php ./vendor/phpunit/phpunit/phpunit --testsuite=fhirpath-spec",
-        "test:bundle": "php ./vendor/phpunit/phpunit/phpunit tests/Unit/Bundle/ --no-coverage",
-        "test:codegen": "php ./vendor/phpunit/phpunit/phpunit tests/Unit/Component/CodeGeneration/ --no-coverage",
-        "test:serialization": "php ./vendor/phpunit/phpunit/phpunit tests/Unit/Component/Serialization/ --no-coverage",
-        "test:fhir-path": "php ./vendor/phpunit/phpunit/phpunit tests/Unit/Component/FHIRPath/ --no-coverage",
+        "test:bundle": "php ./vendor/phpunit/phpunit/phpunit src/Bundle/FHIRBundle/tests/ --no-coverage",
+        "test:codegen": "php ./vendor/phpunit/phpunit/phpunit src/Component/CodeGeneration/tests/ --no-coverage",
+        "test:serialization": "php ./vendor/phpunit/phpunit/phpunit src/Component/Serialization/tests/ --no-coverage",
+        "test:fhir-path": "php ./vendor/phpunit/phpunit/phpunit src/Component/FHIRPath/tests/ --no-coverage",
         "test:components": [
             "@test:bundle",
             "@test:codegen",

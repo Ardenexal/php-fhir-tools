@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Bundle\FHIRBundle\tests\Unit;
+namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Tests\Unit;
 
 use Composer\Semver\Semver;
 use Eris\Generator;

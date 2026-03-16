@@ -48,7 +48,7 @@ class FlexRecipeTest extends TestCase
         $manifestPath = $this->recipeDir . '/manifest.json';
         $manifest     = json_decode(file_get_contents($manifestPath), true);
 
-        $expectedBundle = 'Ardenexal\\FHIRTools\\Bundle\\FHIRBundle\\src\\FHIRBundle';
+        $expectedBundle = 'Ardenexal\\FHIRTools\\Bundle\\FHIRBundle\\FHIRBundle';
         self::assertArrayHasKey($expectedBundle, $manifest['bundles']);
         self::assertEquals(['all'], $manifest['bundles'][$expectedBundle]);
     }

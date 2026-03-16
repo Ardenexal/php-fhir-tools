@@ -86,41 +86,6 @@ class EnhancedPackageLoaderIntegrationTest extends TestCase
         }
     }
 
-    public function testInstallPackageWithVersionConstraint(): void
-    {
-        self::markTestSkipped('Integration test requires proper HTTP mocking setup');
-    }
-
-    public function testInstallPackageWithLatestVersion(): void
-    {
-        self::markTestSkipped('Integration test requires proper HTTP mocking setup');
-    }
-
-    public function testGetCacheStatistics(): void
-    {
-        self::markTestSkipped('Integration test requires proper HTTP mocking setup');
-    }
-
-    public function testListCachedPackages(): void
-    {
-        self::markTestSkipped('Integration test requires proper HTTP mocking setup');
-    }
-
-    public function testCleanVersionCache(): void
-    {
-        self::markTestSkipped('Integration test requires proper HTTP mocking setup');
-    }
-
-    public function testInstallPackageThrowsExceptionForUnsupportedFhirVersion(): void
-    {
-        self::markTestSkipped('Integration test requires proper HTTP mocking setup');
-    }
-
-    public function testPackageCacheIntegrityValidation(): void
-    {
-        self::markTestSkipped('Integration test requires proper HTTP mocking setup');
-    }
-
     /**
      * Create mock package content (simplified tar.gz simulation)
      */

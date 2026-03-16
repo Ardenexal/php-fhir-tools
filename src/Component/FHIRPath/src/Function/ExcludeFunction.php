@@ -41,14 +41,15 @@ class ExcludeFunction extends AbstractFunction
             return $input;
         }
 
-        $otherItems = [];
-        foreach ($otherResult as $item) {
-            $otherItems[] = $item;
-        }
+        // Normalize exclusion items so FHIR primitive wrappers compare equal to plain scalars
+        $normalizedOtherItems = array_map(
+            fn($o) => $context->normalizeValue($o),
+            $otherResult->toArray(),
+        );
 
         $result = [];
         foreach ($input as $item) {
-            if (!in_array($item, $otherItems, true)) {
+            if (!in_array($context->normalizeValue($item), $normalizedOtherItems, true)) {
                 $result[] = $item;
             }
         }

@@ -790,10 +790,19 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
                         if ($this->denormalizer !== null && !$this->isBuiltinType($phpType)) {
                             $denormalizedValue = $this->denormalizer->denormalize($value, $phpType, 'xml', $context);
                         } else {
-                            $rawValue          = $this->unwrapXmlValue($value, $phpType);
-                            $denormalizedValue = ($fhirType === 'decimal' || $fhirType === 'http://hl7.org/fhirpath/System.Decimal') && is_numeric($rawValue)
-                                ? (string) $rawValue
-                                : $rawValue;
+                            $rawValue = $this->unwrapXmlValue($value, $phpType);
+
+                            // XML: cast to correct PHP scalar type so FHIRPath inferType() returns
+                            // the right type ('decimal' for float, 'integer' for int, etc.)
+                            if ($phpType === 'int') {
+                                $denormalizedValue = (int) $rawValue;
+                            } elseif ($phpType === 'float') {
+                                $denormalizedValue = (float) $rawValue;
+                            } elseif ($phpType === 'bool') {
+                                $denormalizedValue = filter_var($rawValue, FILTER_VALIDATE_BOOLEAN);
+                            } else {
+                                $denormalizedValue = $rawValue;
+                            }
                         }
 
                         $property->setValue($object, $denormalizedValue);
@@ -894,6 +903,16 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
                         // For built-in PHP types, unwrap the FHIR XML @value wrapper if present.
                         // Symfony XmlEncoder decodes <id value="example"/> as ['@value' => 'example'].
                         $denormalizedValue = $this->unwrapXmlValue($value, $propertyType);
+
+                        // Cast to correct PHP scalar type based on FhirProperty metadata
+                        $scalarPhpType = $propertyMetadata?->phpType;
+                        if ($scalarPhpType === 'int') {
+                            $denormalizedValue = (int) $denormalizedValue;
+                        } elseif ($scalarPhpType === 'float') {
+                            $denormalizedValue = (float) $denormalizedValue;
+                        } elseif ($scalarPhpType === 'bool') {
+                            $denormalizedValue = filter_var($denormalizedValue, FILTER_VALIDATE_BOOLEAN);
+                        }
                     }
 
                     $property->setValue($object, $denormalizedValue);

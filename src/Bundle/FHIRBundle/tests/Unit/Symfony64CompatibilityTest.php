@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Bundle\FHIRBundle\tests\Unit;
+namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Tests\Unit;
 
 use Ardenexal\FHIRTools\Bundle\FHIRBundle\Compatibility\SymfonyVersionHelper;
 use Ardenexal\FHIRTools\Bundle\FHIRBundle\FHIRBundle;
