@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Component\Serialization\tests\Unit;
+namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Bundle\FHIRBundle\tests\Integration;
 
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContextFactory;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationDebugInfo;
@@ -85,7 +85,7 @@ class FHIRServiceConfigurationTest extends TestCase
     public function testBundleServiceConfigurationFileExists(): void
     {
         // Verify the bundle's service configuration exists
-        $bundleServicesPath = __DIR__ . '/../../../../src/Bundle/FHIRBundle/Resources/config/services.yaml';
+        $bundleServicesPath = __DIR__ . '/../../src/Resources/config/services.yaml';
         self::assertFileExists($bundleServicesPath);
 
         $servicesContent = file_get_contents($bundleServicesPath);

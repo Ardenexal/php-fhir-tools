@@ -92,7 +92,7 @@ class VersionRangeValidityTest extends TestCase
      */
     public function testComposerJsonVersionRanges(): void
     {
-        $composerPath = __DIR__ . '/../../../../composer.json';
+        $composerPath = __DIR__ . '/../../composer.json';
         self::assertFileExists($composerPath, 'composer.json should exist');
 
         $composerContent = file_get_contents($composerPath);

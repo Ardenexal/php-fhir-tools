@@ -118,8 +118,8 @@ class OutputPathGenerationTest extends TestCase
      */
     public function testBackboneElementOutputPaths(): void
     {
-        $backboneClass = $this->createBackboneElement('FHIRPatientContact', 'Patient', 'Patient.contact');
-        $this->verifyOutputPath('R4B', 'Resource', 'FHIRPatientContact', 'R4B/Resource/Patient/FHIRPatientContact.php', $backboneClass);
+        $backboneClass = $this->createBackboneElement('PatientContact', 'Patient', 'Patient.contact');
+        $this->verifyOutputPath('R4B', 'Resource', 'PatientContact', 'R4B/Resource/Patient/PatientContact.php', $backboneClass);
     }
 
     /**
@@ -181,7 +181,7 @@ class OutputPathGenerationTest extends TestCase
     public function testBackboneElementDetection(): void
     {
         // Test with proper backbone element attribute
-        $backboneClass = $this->createBackboneElement('FHIRPatientContact', 'Patient', 'Patient.contact');
+        $backboneClass = $this->createBackboneElement('PatientContact', 'Patient', 'Patient.contact');
 
         $parentResource = $this->getBackboneParentResourceMethod->invoke(
             $this->command,
@@ -209,7 +209,7 @@ class OutputPathGenerationTest extends TestCase
     public function testResourceNameExtraction(): void
     {
         // Test with proper backbone element attribute
-        $backboneClass = $this->createBackboneElement('FHIRPatientContact', 'Patient', 'Patient.contact');
+        $backboneClass = $this->createBackboneElement('PatientContact', 'Patient', 'Patient.contact');
 
         $resourceName = $this->getBackboneParentResourceMethod->invoke(
             $this->command,
@@ -266,7 +266,7 @@ class OutputPathGenerationTest extends TestCase
 
         // Test with very long backbone element name
         $longBackboneClass = $this->createBackboneElement(
-            'FHIRPatientContactRelationshipVeryLongElementName',
+            'PatientContactRelationshipVeryLongElementName',
             'Patient',
             'Patient.contact.relationship',
         );

@@ -719,8 +719,8 @@ class FHIRModelGeneratorCommand extends Command
      * Backbone elements that belong to a resource get a subdirectory:
      *   Models/src/{version}/Resource/{ResourceName}/{BackboneElementName}.php
      *
-     * For example, FHIRPatientContact (a backbone element of Patient) goes to:
-     *   Models/src/R4/Resource/Patient/FHIRPatientContact.php
+     * For example, PatientContact (a backbone element of Patient) goes to:
+     *   Models/src/R4/Resource/Patient/PatientContact.php
      *
      * This keeps resource directories organised when a resource has many backbone elements.
      */
