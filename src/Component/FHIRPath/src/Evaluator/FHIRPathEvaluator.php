@@ -19,6 +19,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Expression\UnaryOperatorNode;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\FHIRPathSemanticException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Function\ToQuantityFunction;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTemporalValue;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\TokenType;
 use Ardenexal\FHIRTools\Component\FHIRPath\Function\FunctionRegistry;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDate;
@@ -1363,8 +1364,13 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         if ($this->primitiveCache[$class] && property_exists($value, 'value')) {
             $extracted = $value->value; // e.g. StringPrimitive->value = 'Peter'
 
-            // DateTimePrimitive->value is ?DateTimeInterface — convert to ISO 8601 string
+            // FHIRTemporalValue (FHIRDate, FHIRDateTime, FHIRTime, FHIRInstant) → string
             // so date comparisons and precision logic work correctly
+            if ($extracted instanceof FHIRTemporalValue) {
+                return (string) $extracted;
+            }
+
+            // DateTimeInterface fallback (fixture models still use ?DateTimeInterface in tests)
             if ($extracted instanceof \DateTimeInterface) {
                 return $extracted->format(\DateTimeInterface::ATOM);
             }

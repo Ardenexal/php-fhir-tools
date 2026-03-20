@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Serialization\Normalizer;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTemporalValue;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
-use Ardenexal\FHIRTools\Component\Serialization\FHIRDateTimeValue;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadata;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyVariantMetadata;
@@ -93,12 +93,9 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             $valueProperty = $reflection->getProperty('value');
             if ($valueProperty->isInitialized($value)) {
                 $raw = $valueProperty->getValue($value);
-                // Format DateTimeInterface to string for serialization (dateTime / instant primitives).
-                // FHIRDateTimeValue carries the original FHIR partial-date precision.
-                if ($raw instanceof \DateTimeInterface) {
-                    $raw = $raw instanceof FHIRDateTimeValue
-                        ? $raw->format($raw->originalFormat)
-                        : $raw->format(\DateTimeInterface::ATOM);
+                // Format temporal value objects to string for serialization.
+                if ($raw instanceof FHIRTemporalValue) {
+                    $raw = (string) $raw;
                 }
 
                 // XmlEncoder casts PHP booleans to int (true→1, false→0). FHIR XML requires

@@ -14,6 +14,9 @@ src/
 ├── Component/
 │   ├── CodeGeneration/src/         # FHIR class generation
 │   ├── Serialization/src/          # FHIR JSON/XML serialization
+│   ├── Metadata/src/               # Shared attributes and contracts
+│   │   ├── Attribute/              # PHP 8 attributes (FHIRPrimitive, FhirProperty, etc.)
+│   │   └── Contract/               # Shared interfaces (e.g. FHIRTemporalValue)
 │   ├── Models/src/                 # Generated FHIR models
 │   └── FHIRPath/src/               # FHIRPath expression evaluator
 ├── Exception/                      # Project-wide exceptions
@@ -21,6 +24,8 @@ src/
 ```
 
 **Namespace pattern:** `Ardenexal\FHIRTools\Component\{ComponentName}\`
+
+**Metadata component conventions:** Any interface or attribute that needs to be visible to more than one component belongs in the Metadata component, not in the component that first needs it. `Attribute/` holds PHP 8 attributes; `Contract/` holds shared interfaces and marker contracts.
 
 ## Development Commands
 
