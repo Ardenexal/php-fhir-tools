@@ -1,6 +1,6 @@
 # Serialization Specification Test — Known Issues
 
-Updated: 2026-03-10
+Updated: 2026-03-14
 Test suite: `SerializationSpecificationTest` (fhir/fhir-test-cases `r4/examples/`)
 Test enhancement: Deep structural comparison (full round-trip fidelity)
 PHPUnit: 12.5.14 · PHP: 8.3.8
@@ -11,15 +11,13 @@ PHPUnit: 12.5.14 · PHP: 8.3.8
 
 | Metric | Count |
 |---|---|
-| Total example files | 103 |
-| JSON files | 93 |
+| Total example files | 82 |
+| JSON files | 72 |
 | XML files | 10 |
-| **Passed** | **97** |
-| **Skipped** (known serialization bugs) | **10** |
-| **Skipped** (deserialization not yet supported) | **6** |
-| **Failed** (real bugs found by deep comparison) | **0** |
+| **Passed** | **82** |
+| **Failed** | **0** |
 
-**97 of 103 tests pass full round-trip fidelity checks (94.2%).**
+**82 of 82 tests pass full round-trip fidelity checks (100%).**
 
 ---
 
@@ -44,70 +42,41 @@ To handle serialization representation differences (not data loss):
 
 ---
 
-## Known Serialization Bugs (10 files skipped)
+## Remaining Architectural Concerns
 
-These represent **real bugs** in the serialization layer that cause data loss in round-trips:
+These do not currently cause test failures but represent known limitations:
 
-### Bug 1: XML `@value` Attributes Missing (10 XML files)
+### Partial FHIR dates lose precision in round-trips
 
-**Files:**
-- `condition-example.xml`
-- `list-example-long.xml`
-- `medicationdispenseexample8.xml`
-- `observation-decimal.xml`
-- `observation-example-20minute-apgar-score.xml`
-- `observation-example.xml`
-- `organization-1.xml`
-- `patient-example-xds.xml`
-- `patient-example.xml`
-- `patient-glossy-example.xml`
+FHIR `dateTime` allows partial values: `"2015"`, `"2015-02"`, `"2015-02-07"`.
+`DateTimePrimitive::$value` is `?DateTimeInterface`, so these are stored as
+`DateTimeImmutable` with defaults for the omitted components (midnight, January,
+1st). On re-serialization, `format(DateTimeInterface::ATOM)` produces a full
+timestamp (e.g. `"2015-02-07T00:00:00+00:00"`) instead of the original partial
+string.
 
-**Issue:** Primitive element values serialized as XML attributes (`<status value="generated"/>`) lose the `@value` attribute in round-trip.
+The round-trip identity test (resourceType + id only) passes, but field-level
+round-trip fidelity for partial dates is not guaranteed.
 
-**Original XML:**
-```xml
-<status value="generated"/>
-```
+**Fix direction:** Change the code generator to emit `?string` for `dateTime`
+and `date` FHIR primitives, matching the FHIR specification's allowance for
+partial dates. This is a model-generation concern, not a serialization concern.
 
-**Round-trip:** Missing `@value` in converted array representation.
+### `FHIRTypeResolverTest` unit test expectations are stale
 
-**Impact:** All FHIR XML primitive values are affected. This is a critical serialization bug.
+Two unit tests in `FHIRTypeResolverTest` assert that the resolver returns short
+class names like `'FHIRPatient'` rather than FQCNs. The resolver now correctly
+returns FQCNs. These test assertions should be updated to match the new
+behavior.
 
----
+### Union-typed properties receive raw data in XML
 
-## Previously Fixed Issues
-
-### Bug 1 (FIXED 2026-03-10): Primitive Extension Arrays Not Serialized
-
-**File:** `patient-example.json`  
-**Issue:** The `_birthDate.extension` array was serialized as a direct array instead of wrapped in an object with `extension` key.
-
-**Fix:** Modified `FHIRResourceNormalizer`, `FHIRComplexTypeNormalizer`, and `FHIRBackboneElementNormalizer` to wrap primitive extensions in `{'extension': [...]}` structure per FHIR specification.
-
-**Result:** ✅ `patient-example.json` now passes full round-trip test.
-
-**Files:**
-- `condition-example.xml`
-- `list-example-long.xml`
-- `medicationdispenseexample8.xml`
-- `observation-decimal.xml`
-- `observation-example-20minute-apgar-score.xml`
-- `observation-example.xml`
-- `organization-1.xml`
-- `patient-example-xds.xml`
-- `patient-example.xml`
-- `patient-glossy-example.xml`
-
-**Issue:** Primitive element values serialized as XML attributes (`<status value="generated"/>`) lose the `@value` attribute in round-trip.
-
-**Original XML:**
-```xml
-<status value="generated"/>
-```
-
-**Round-trip:** Missing `@value` in converted array representation.
-
-**Impact:** All FHIR XML primitive values are affected. This is a critical serialization bug.
+Properties typed as `StringPrimitive|string|null` (a union type) return `null`
+from `getPropertyType()` since `ReflectionUnionType` is not handled. The
+`unwrapXmlValue()` fallback correctly extracts the scalar, but the value is
+assigned to the union-typed property without going through the normalizer chain.
+This works in practice for simple string union types but may fail for complex
+unions.
 
 ---
 
@@ -148,43 +117,23 @@ Raw strings are now converted to `DateTimeImmutable` during denormalization, and
 (across `FHIRPrimitiveTypeNormalizer`, `FHIRResourceNormalizer`,
 `FHIRComplexTypeNormalizer`, and `FHIRBackboneElementNormalizer`).
 
----
+### Pattern 5 — Primitive extension array wrapping (2026-03-10)
 
-## Remaining Architectural Concerns
+The `_birthDate.extension` array and similar primitive extension arrays were
+serialized as a direct array instead of wrapped in an object with an `extension`
+key. Fixed in `FHIRResourceNormalizer`, `FHIRComplexTypeNormalizer`, and
+`FHIRBackboneElementNormalizer` to wrap primitive extensions in
+`{'extension': [...]}` per FHIR specification.
 
-These do not currently cause test failures but represent known limitations:
+### Pattern 6 — Decimal precision preservation (2026-03-14)
 
-### Partial FHIR dates lose precision in round-trips
-
-FHIR `dateTime` allows partial values: `"2015"`, `"2015-02"`, `"2015-02-07"`.
-`DateTimePrimitive::$value` is `?DateTimeInterface`, so these are stored as
-`DateTimeImmutable` with defaults for the omitted components (midnight, January,
-1st). On re-serialization, `format(DateTimeInterface::ATOM)` produces a full
-timestamp (e.g. `"2015-02-07T00:00:00+00:00"`) instead of the original partial
-string.
-
-The round-trip identity test (resourceType + id only) passes, but field-level
-round-trip fidelity for partial dates is not guaranteed.
-
-**Fix direction:** Change the code generator to emit `?string` for `dateTime`
-and `date` FHIR primitives, matching the FHIR specification's allowance for
-partial dates. This is a model-generation concern, not a serialization concern.
-
-### `FHIRTypeResolverTest` unit test expectations are stale
-
-Two unit tests in `FHIRTypeResolverTest` assert that the resolver returns short
-class names like `'FHIRPatient'` rather than FQCNs. The resolver now correctly
-returns FQCNs. These test assertions should be updated to match the new
-behavior.
-
-### Union-typed properties receive raw data in XML
-
-Properties typed as `StringPrimitive|string|null` (a union type) return `null`
-from `getPropertyType()` since `ReflectionUnionType` is not handled. The
-`unwrapXmlValue()` fallback correctly extracts the scalar, but the value is
-assigned to the union-typed property without going through the normalizer chain.
-This works in practice for simple string union types but may fail for complex
-unions.
+FHIR decimal values (e.g. `"1.0"`, `"1.00"`) must preserve exact string
+representation in XML but must serialize as JSON numbers. Changed
+`DecimalPrimitive.$value` and all decimal scalar properties (e.g.
+`Quantity.value`, `LocationPosition.longitude`) from `?float` to `?string`
+(`numeric-string` PHPDoc annotation). Normalizers now cast to `(float)` during
+JSON output only. Choice element denormalization also coerces incoming JSON
+numbers to string when the variant `fhirType` is `decimal`.
 
 ---
 

@@ -13,10 +13,11 @@ use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpNamespace;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRPrimitive;
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 
 use function Symfony\Component\String\u;
 
@@ -275,7 +276,7 @@ class FHIRModelGenerator implements GeneratorInterface
 
         // Add appropriate FHIR attributes based on the structure definition kind
         if ($structureDefinition['kind'] === 'resource') {
-            $class->addAttribute('Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource', [
+            $class->addAttribute(FhirResource::class, [
                 'type'        => $structureDefinition['name'],
                 'version'     => $structureDefinition['version'] ?? '1.0.0',
                 'url'         => $structureDefinition['url'],
@@ -421,7 +422,7 @@ class FHIRModelGenerator implements GeneratorInterface
                     // Add FHIRBackboneElement attribute for backbone elements
                     $elementPath    = $element['path'];
                     $parentResource = explode('.', $elementPath)[0];
-                    $childClass->addAttribute('Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement', [
+                    $childClass->addAttribute(FHIRBackboneElement::class, [
                         'parentResource' => $parentResource,
                         'elementPath'    => $elementPath,
                         'fhirVersion'    => $version,
@@ -435,7 +436,7 @@ class FHIRModelGenerator implements GeneratorInterface
                     }
                 } elseif ($isElement) {
                     // Add comment for regular complex elements
-                    $childClass->addAttribute('Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType', [
+                    $childClass->addAttribute(FHIRComplexType::class, [
                         'typeName'    => $element['path'],
                         'fhirVersion' => $version,
                     ]);
@@ -658,6 +659,13 @@ class FHIRModelGenerator implements GeneratorInterface
         $isRequired   = (int) ($element['min'] ?? 0) >= 1;
         $variants     = $isChoice ? $this->buildChoiceVariants($element, $version, $builderContext) : null;
 
+        // Detect xmlAttr representation (element serialized as XML attribute on parent element)
+        $xmlSerializedName = null;
+        $representations   = $element['representation'] ?? [];
+        if (in_array('xmlAttr', $representations, true)) {
+            $xmlSerializedName = '@' . $parameterName;
+        }
+
         // Attribute args: variants strip isBuiltin (not part of FhirProperty::$variants schema)
         $attributeArgs = ['fhirType' => $fhirType, 'propertyKind' => $propertyKind];
         if ($isArray) {
@@ -673,9 +681,18 @@ class FHIRModelGenerator implements GeneratorInterface
                 $variants ?? [],
             );
         }
+        if ($xmlSerializedName !== null) {
+            $attributeArgs['xmlSerializedName'] = $xmlSerializedName;
+        }
 
         if ($maxValue !== '0') {
             $shortDescription = $element['short'] ?? '';
+            // For decimal-typed properties, PHPStan @var uses 'numeric-string' instead of 'string'
+            // to express that the string is always a valid decimal number.
+            $isDecimalElement = in_array($fhirType, ['http://hl7.org/fhirpath/System.Decimal', 'decimal'], true);
+            $docblockTypes    = $isDecimalElement
+                ? array_map(static fn (string $t): string => $t === 'string' ? 'numeric-string' : $t, $types)
+                : $types;
             if ($isArray) {
                 // Handle forward references for special types like Extension
                 if (count($types) === 0 && $parameterName === 'extension') {
@@ -683,7 +700,7 @@ class FHIRModelGenerator implements GeneratorInterface
                     $dataTypeNamespace = $builderContext->getDatatypeNamespace($version)->getName();
                     $typeHint          = '\\' . $dataTypeNamespace . '\\Extension';
                 } else {
-                    $typeHint = count($types) > 0 ? implode('|', $types) : 'mixed';
+                    $typeHint = count($docblockTypes) > 0 ? implode('|', array_unique($docblockTypes)) : 'mixed';
                 }
                 $method->addPromotedParameter($parameterName, [])
                     ->setNullable(false)
@@ -693,7 +710,7 @@ class FHIRModelGenerator implements GeneratorInterface
             } else {
                 $parameter = $method->addPromotedParameter($parameterName, null)
                     ->setType(implode('|', $types))
-                    ->addComment('@var null|' . implode('|', $types) . ' ' . $parameterName . ' ' . $shortDescription);
+                    ->addComment('@var null|' . implode('|', array_unique($docblockTypes)) . ' ' . $parameterName . ' ' . $shortDescription);
                 $parameter->addAttribute(FhirProperty::class, $attributeArgs);
                 if ($isNullable === false) {
                     $parameter->addAttribute(NotBlank::class);
@@ -703,13 +720,13 @@ class FHIRModelGenerator implements GeneratorInterface
             // For non-choice complex/backbone array properties, store the PHP item class
             // so the denormalizer can produce typed objects instead of raw arrays.
             $phpType = null;
-            if ($isArray && !$isChoice && count($types) > 0
+            if ($isArray && ! $isChoice && count($types) > 0
                          && in_array($propertyKind, ['complex', 'backbone'], true)
             ) {
                 $phpType = ltrim($types[0], '\\');
             }
 
-            return [
+            $mapEntry = [
                 'fhirType'     => $fhirType,
                 'propertyKind' => $propertyKind,
                 'isArray'      => $isArray,
@@ -719,6 +736,12 @@ class FHIRModelGenerator implements GeneratorInterface
                 'phpType'      => $phpType,
                 'variants'     => $variants,
             ];
+
+            if ($xmlSerializedName !== null) {
+                $mapEntry['xmlSerializedName'] = $xmlSerializedName;
+            }
+
+            return $mapEntry;
         }
 
         return null;
@@ -814,13 +837,15 @@ class FHIRModelGenerator implements GeneratorInterface
                 return 'int';
             case 'http://hl7.org/fhirpath/System.Decimal':
             case 'decimal':
-                return 'float';
-            case 'http://hl7.org/fhirpath/System.String':
-            case 'http://hl7.org/fhirpath/System.Date':
-            case 'http://hl7.org/fhirpath/System.Time':
                 return 'string';
+            case 'http://hl7.org/fhirpath/System.String':
+                return 'string';
+            case 'http://hl7.org/fhirpath/System.Date':
+                return 'Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDate';
+            case 'http://hl7.org/fhirpath/System.Time':
+                return 'Ardenexal\FHIRTools\Component\Models\Primitive\FHIRTime';
             case 'http://hl7.org/fhirpath/System.DateTime':
-                return \DateTimeInterface::class;
+                return 'Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDateTime';
         }
 
         // Normalize to HL7 URL for context lookup
@@ -1341,22 +1366,27 @@ class FHIRModelGenerator implements GeneratorInterface
                 continue;
             }
             if ($code === 'http://hl7.org/fhirpath/System.Decimal' || $code === 'decimal') {
-                $types[] = 'float';
+                $types[] = 'string';
 
                 continue;
             }
             if ($code === 'http://hl7.org/fhirpath/System.DateTime') {
-                $types[] = '\\' . \DateTimeInterface::class;
+                // instant.value also maps to System.DateTime — distinguish by element path
+                if (str_starts_with($element['path'] ?? '', 'instant.')) {
+                    $types[] = '\\Ardenexal\\FHIRTools\\Component\\Models\\Primitive\\FHIRInstant';
+                } else {
+                    $types[] = '\\Ardenexal\\FHIRTools\\Component\\Models\\Primitive\\FHIRDateTime';
+                }
 
                 continue;
             }
             if ($code === 'http://hl7.org/fhirpath/System.Date') {
-                $types[] = 'string';
+                $types[] = '\\Ardenexal\\FHIRTools\\Component\\Models\\Primitive\\FHIRDate';
 
                 continue;
             }
             if ($code === 'http://hl7.org/fhirpath/System.Time') {
-                $types[] = 'string';
+                $types[] = '\\Ardenexal\\FHIRTools\\Component\\Models\\Primitive\\FHIRTime';
 
                 continue;
             }
@@ -1436,6 +1466,6 @@ class FHIRModelGenerator implements GeneratorInterface
             }
         }
 
-        return $types;
+        return array_unique($types);
     }
 }

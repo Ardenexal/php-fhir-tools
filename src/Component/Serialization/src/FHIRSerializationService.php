@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContextFactory;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationDebugInfo;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
@@ -169,6 +169,9 @@ class FHIRSerializationService
 
             // Strip DOCTYPE declarations to prevent XXE entity definitions from being processed
             $xmlContext[XmlEncoder::DECODER_IGNORED_NODE_TYPES] = [\XML_DOCUMENT_TYPE_NODE];
+            // Preserve all attribute values as strings so numeric-looking values (e.g. "1.0",
+            // "2002") are not cast to float/int, which would lose precision on round-trip.
+            $xmlContext[XmlEncoder::TYPE_CAST_ATTRIBUTES] = false;
 
             $result = $this->serializer->deserialize($xmlData, $targetClass, 'xml', $xmlContext);
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\StructureDefinitionResource;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
@@ -36,14 +37,15 @@ class SerializationController extends AbstractController
      * @var array<string, string>
      */
     private const RESOURCE_TYPES = [
-        'Patient'              => PatientResource::class,
-        'Observation'          => ObservationResource::class,
-        'Condition'            => ConditionResource::class,
-        'Encounter'            => EncounterResource::class,
-        'MedicationRequest'    => MedicationRequestResource::class,
-        'Organization'         => OrganizationResource::class,
-        'Practitioner'         => PractitionerResource::class,
-        'Bundle'               => BundleResource::class,
+        'Patient'             => PatientResource::class,
+        'StructureDefinition' => StructureDefinitionResource::class,
+        'Observation'         => ObservationResource::class,
+        'Condition'           => ConditionResource::class,
+        'Encounter'           => EncounterResource::class,
+        'MedicationRequest'   => MedicationRequestResource::class,
+        'Organization'        => OrganizationResource::class,
+        'Practitioner'        => PractitionerResource::class,
+        'Bundle'              => BundleResource::class,
     ];
 
     public function __construct(
@@ -191,15 +193,15 @@ class SerializationController extends AbstractController
     private function doMetadata(object $object): array
     {
         return [
-            'type'             => 'metadata',
-            'class'            => get_class($object),
-            'resource_type'    => $this->metadataExtractor->extractResourceType($object),
-            'fhir_type'        => $this->metadataExtractor->extractFHIRType($object),
-            'fhir_version'     => $this->metadataExtractor->extractFHIRVersion($object),
-            'is_resource'      => $this->metadataExtractor->isResource($object),
-            'is_complex_type'  => $this->metadataExtractor->isComplexType($object),
-            'parent_resource'  => $this->metadataExtractor->extractParentResource($object),
-            'element_path'     => $this->metadataExtractor->extractElementPath($object),
+            'type'            => 'metadata',
+            'class'           => get_class($object),
+            'resource_type'   => $this->metadataExtractor->extractResourceType($object),
+            'fhir_type'       => $this->metadataExtractor->extractFHIRType($object),
+            'fhir_version'    => $this->metadataExtractor->extractFHIRVersion($object),
+            'is_resource'     => $this->metadataExtractor->isResource($object),
+            'is_complex_type' => $this->metadataExtractor->isComplexType($object),
+            'parent_resource' => $this->metadataExtractor->extractParentResource($object),
+            'element_path'    => $this->metadataExtractor->extractElementPath($object),
         ];
     }
 

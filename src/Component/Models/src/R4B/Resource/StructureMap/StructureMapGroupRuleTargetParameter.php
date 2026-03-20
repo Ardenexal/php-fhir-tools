@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\StructureMap;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\IdPrimitive;
@@ -20,14 +20,15 @@ class StructureMapGroupRuleTargetParameter extends BackboneElement
 {
     public const FHIR_PROPERTY_MAP = [
         'id' => [
-            'fhirType'     => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind' => 'scalar',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
+            'fhirType'          => 'http://hl7.org/fhirpath/System.String',
+            'propertyKind'      => 'scalar',
+            'isArray'           => false,
+            'isRequired'        => false,
+            'isChoice'          => false,
+            'jsonKey'           => null,
+            'phpType'           => null,
+            'variants'          => null,
+            'xmlSerializedName' => '@id',
         ],
         'extension' => [
             'fhirType'     => 'Extension',
@@ -89,7 +90,7 @@ class StructureMapGroupRuleTargetParameter extends BackboneElement
                 [
                     'fhirType'     => 'decimal',
                     'propertyKind' => 'scalar',
-                    'phpType'      => 'float',
+                    'phpType'      => 'string',
                     'jsonKey'      => 'valueDecimal',
                     'isBuiltin'    => true,
                 ],
@@ -99,7 +100,7 @@ class StructureMapGroupRuleTargetParameter extends BackboneElement
 
     public function __construct(
         /** @var string|null id Unique id for inter-element referencing */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
         public ?string $id = null,
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -107,7 +108,7 @@ class StructureMapGroupRuleTargetParameter extends BackboneElement
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
-        /** @var IdPrimitive|StringPrimitive|string|bool|int|float|null value Parameter value - variable or literal */
+        /** @var IdPrimitive|StringPrimitive|string|bool|int|null value Parameter value - variable or literal */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -128,11 +129,11 @@ class StructureMapGroupRuleTargetParameter extends BackboneElement
                 ],
                 ['fhirType' => 'boolean', 'propertyKind' => 'scalar', 'phpType' => 'bool', 'jsonKey' => 'valueBoolean'],
                 ['fhirType' => 'integer', 'propertyKind' => 'scalar', 'phpType' => 'int', 'jsonKey' => 'valueInteger'],
-                ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'float', 'jsonKey' => 'valueDecimal'],
+                ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'string', 'jsonKey' => 'valueDecimal'],
             ],
         )]
         #[NotBlank]
-        public IdPrimitive|StringPrimitive|string|bool|int|float|null $value = null,
+        public IdPrimitive|StringPrimitive|string|bool|int|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

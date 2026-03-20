@@ -232,11 +232,11 @@ final class FHIRPathEvaluatorTest extends TestCase
     }
 
     // Collection equality tests
-    public function testCollectionEqualityOrderIndependent(): void
+    public function testCollectionEqualityIsPositional(): void
     {
         $result = $this->evaluate('(1 | 2 | 3) = (3 | 2 | 1)', null);
 
-        self::assertTrue($result->first());
+        self::assertFalse($result->first());
     }
 
     public function testCollectionEqualitySimple(): void
@@ -264,7 +264,7 @@ final class FHIRPathEvaluatorTest extends TestCase
     {
         $result = $this->evaluate('(1 | 2) != (2 | 1)', null);
 
-        self::assertFalse($result->first());
+        self::assertTrue($result->first());
     }
 
     public function testEquivalenceOperator(): void

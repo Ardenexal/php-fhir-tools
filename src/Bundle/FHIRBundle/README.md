@@ -20,7 +20,7 @@ If needed, register the bundle in `config/bundles.php`:
 ```php
 return [
     // ...
-    Ardenexal\FHIRTools\Bundle\FHIRBundle\FHIRBundle::class => ['all' => true],
+    \Ardenexal\FHIRTools\Bundle\FHIRBundle\src\FHIRBundle::class => ['all' => true],
 ];
 ```
 

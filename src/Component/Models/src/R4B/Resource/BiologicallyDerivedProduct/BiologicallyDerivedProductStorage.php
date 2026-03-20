@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\BiologicallyDerivedProduct;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BiologicallyDerivedProductStorageScaleType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
@@ -20,14 +20,15 @@ class BiologicallyDerivedProductStorage extends BackboneElement
 {
     public const FHIR_PROPERTY_MAP = [
         'id' => [
-            'fhirType'     => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind' => 'scalar',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
+            'fhirType'          => 'http://hl7.org/fhirpath/System.String',
+            'propertyKind'      => 'scalar',
+            'isArray'           => false,
+            'isRequired'        => false,
+            'isChoice'          => false,
+            'jsonKey'           => null,
+            'phpType'           => null,
+            'variants'          => null,
+            'xmlSerializedName' => '@id',
         ],
         'extension' => [
             'fhirType'     => 'Extension',
@@ -93,7 +94,7 @@ class BiologicallyDerivedProductStorage extends BackboneElement
 
     public function __construct(
         /** @var string|null id Unique id for inter-element referencing */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
         public ?string $id = null,
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -104,9 +105,9 @@ class BiologicallyDerivedProductStorage extends BackboneElement
         /** @var StringPrimitive|string|null description Description of storage */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $description = null,
-        /** @var float|null temperature Storage temperature */
+        /** @var numeric-string|null temperature Storage temperature */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $temperature = null,
+        public ?string $temperature = null,
         /** @var BiologicallyDerivedProductStorageScaleType|null scale farenheit | celsius | kelvin */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
         public ?BiologicallyDerivedProductStorageScaleType $scale = null,

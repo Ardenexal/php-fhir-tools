@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\Base64BinaryPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
@@ -36,14 +36,15 @@ class Extension extends Element
 {
     public const FHIR_PROPERTY_MAP = [
         'id' => [
-            'fhirType'     => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind' => 'scalar',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
+            'fhirType'          => 'http://hl7.org/fhirpath/System.String',
+            'propertyKind'      => 'scalar',
+            'isArray'           => false,
+            'isRequired'        => false,
+            'isChoice'          => false,
+            'jsonKey'           => null,
+            'phpType'           => null,
+            'variants'          => null,
+            'xmlSerializedName' => '@id',
         ],
         'extension' => [
             'fhirType'     => 'Extension',
@@ -56,14 +57,15 @@ class Extension extends Element
             'variants'     => null,
         ],
         'url' => [
-            'fhirType'     => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind' => 'scalar',
-            'isArray'      => false,
-            'isRequired'   => true,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
+            'fhirType'          => 'http://hl7.org/fhirpath/System.String',
+            'propertyKind'      => 'scalar',
+            'isArray'           => false,
+            'isRequired'        => true,
+            'isChoice'          => false,
+            'jsonKey'           => null,
+            'phpType'           => null,
+            'variants'          => null,
+            'xmlSerializedName' => '@url',
         ],
         'value' => [
             'fhirType'     => 'choice',
@@ -119,7 +121,7 @@ class Extension extends Element
                 [
                     'fhirType'     => 'decimal',
                     'propertyKind' => 'scalar',
-                    'phpType'      => 'float',
+                    'phpType'      => 'string',
                     'jsonKey'      => 'valueDecimal',
                     'isBuiltin'    => true,
                 ],
@@ -430,15 +432,15 @@ class Extension extends Element
 
     public function __construct(
         /** @var string|null id Unique id for inter-element referencing */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
         public ?string $id = null,
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var string|null url identifies the meaning of the extension */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', isRequired: true, xmlSerializedName: '@url'), NotBlank]
         public ?string $url = null,
-        /** @var Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|float|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|string|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|Meta|null value Value of extension */
+        /** @var Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|string|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|Meta|null value Value of extension */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -475,7 +477,7 @@ class Extension extends Element
                     'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive',
                     'jsonKey'      => 'valueDateTime',
                 ],
-                ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'float', 'jsonKey' => 'valueDecimal'],
+                ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'string', 'jsonKey' => 'valueDecimal'],
                 [
                     'fhirType'     => 'id',
                     'propertyKind' => 'primitive',
@@ -731,7 +733,7 @@ class Extension extends Element
                 ],
             ],
         )]
-        public Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|float|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|string|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|Meta|null $value = null,
+        public Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|string|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|Meta|null $value = null,
     ) {
         parent::__construct($id, $extension);
     }

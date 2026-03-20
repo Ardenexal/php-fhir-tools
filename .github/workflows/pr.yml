@@ -1,275 +1,315 @@
 name: Pull Request
 
 on:
-  pull_request:
+    pull_request:
 
 permissions:
     contents: read
     pull-requests: write
 jobs:
-  validate:
-    runs-on: ubuntu-latest
-    env:
-      XDEBUG_MODE: off
-      COMPOSER_NO_INTERACTION: 1
+    checks:
+        runs-on: ubuntu-latest
+        steps:
+            -   uses: actions/checkout@v4
+                with:
+                    # Fetch full history for better diff analysis
+                    fetch-depth: 0
 
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        # Fetch full history for better diff analysis
-        fetch-depth: 0
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: '8.3'
+                    extensions: ctype, iconv, zip
 
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.3'
-        extensions: ctype, iconv, zip
+            -   name: Cache Composer packages
+                id: composer-cache
+                uses: actions/cache@v4
+                with:
+                    path: vendor
+                    key: ${{ runner.os }}-php-8.3-${{ hashFiles('**/composer.lock') }}
+                    restore-keys: |
+                        ${{ runner.os }}-php-8.3-
 
-    - name: Cache Composer packages
-      id: composer-cache
-      uses: actions/cache@v4
-      with:
-        path: vendor
-        key: ${{ runner.os }}-php-8.3-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-php-8.3-
+            -   name: Install dependencies
+                run: composer install --prefer-dist --no-progress --no-suggest
+            -   name: Security audit
+                run: composer audit
+    style:
+        runs-on: ubuntu-latest
+        env:
+            XDEBUG_MODE: off
+            COMPOSER_NO_INTERACTION: 1
 
-    - name: Install dependencies
-      run: composer install --prefer-dist --no-progress --no-suggest
+        steps:
+            -   uses: actions/checkout@v4
+                with:
+                    # Fetch full history for better diff analysis
+                    fetch-depth: 0
 
-    - name: Validate composer files
-      run: composer validate --strict
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: '8.3'
+                    extensions: ctype, iconv, zip
 
-    - name: Check code style (Pint) - All Components
-      run: composer run lint -- --test
+            -   name: Cache Composer packages
+                id: composer-cache
+                uses: actions/cache@v4
+                with:
+                    path: vendor
+                    key: ${{ runner.os }}-php-8.3-${{ hashFiles('**/composer.lock') }}
+                    restore-keys: |
+                        ${{ runner.os }}-php-8.3-
 
-    - name: Run PHPStan static analysis - All Components
-      run: composer run phpstan
+            -   name: Install dependencies
+                run: composer install --prefer-dist --no-progress --no-suggest
 
-    - name: Run unit tests
-      run: composer run test-unit -- --no-coverage
+            -   name: Validate composer files
+                run: composer validate --strict
 
-    - name: Run integration tests
-      run: composer run test-integration -- --no-coverage
+            -   name: Security audit
+                run: composer audit
 
-    - name: Run FHIR tests
-      run: composer run test-fhir -- --no-coverage
+    unit-tests:
+        runs-on: ubuntu-latest
+        env:
+            XDEBUG_MODE: coverage
+            COMPOSER_NO_INTERACTION: 1
+        steps:
+            -   uses: actions/checkout@v4
+                with:
+                    # Fetch full history for better diff analysis
+                    fetch-depth: 0
 
-    - name: Security audit
-      run: composer audit
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: '8.3'
+                    extensions: ctype, iconv, zip
 
-    # - name: Validate commit messages
-    #   run: |
-    #     # Check if commit messages follow conventional commits
-    #     git log --oneline origin/main..HEAD | while read line; do
-    #       commit_msg=$(echo "$line" | cut -d' ' -f2-)
-    #       if ! echo "$commit_msg" | grep -qE '^(feat|fix|chore|test|docs|refactor|perf|style)(\(.+\))?: .+'; then
-    #         echo "❌ Commit message does not follow conventional commits format: $commit_msg"
-    #         echo "Expected format: type: description"
-    #         echo "Valid types: feat, fix, chore, test, docs, refactor, perf, style"
-    #         exit 1
-    #       fi
-    #     done
-    #     echo "✅ All commit messages follow conventional commits format"
+            -   name: Cache Composer packages
+                id: composer-cache
+                uses: actions/cache@v4
+                with:
+                    path: vendor
+                    key: ${{ runner.os }}-php-8.3-${{ hashFiles('**/composer.lock') }}
+                    restore-keys: |
+                        ${{ runner.os }}-php-8.3-
 
-  component-quality:
-    runs-on: ubuntu-latest
-    needs: validate
-    strategy:
-      matrix:
-        component: [bundle, codegen, serialization]
+            -   name: Install dependencies
+                run: composer install --prefer-dist --no-progress --no-suggest
 
-    steps:
-    - uses: actions/checkout@v4
+            -   name: Run unit tests
+                run: composer run test-unit -- --log-junit=./results/unit-tests.xml --coverage-clover ./results/coverage.xml
+            -   name: Upload test results to Codecov
+                if: ${{ !cancelled() }}
+                uses: codecov/codecov-action@v5
+                with:
+                    token: ${{ secrets.CODECOV_TOKEN }}
+                    directory: ./results
 
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.3'
-        extensions: ctype, iconv, zip
+    integration-tests:
+        runs-on: ubuntu-latest
+        env:
+            COMPOSER_NO_INTERACTION: 1
+            XDEBUG_MODE: coverage
+        steps:
+            -   uses: actions/checkout@v4
+                with:
+                    # Fetch full history for better diff analysis
+                    fetch-depth: 0
 
-    - name: Install dependencies
-      run: composer install --prefer-dist --no-progress --no-suggest
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: '8.3'
+                    extensions: ctype, iconv, zip
 
-    - name: Run ${{ matrix.component }} quality checks
-      run: composer run quality:${{ matrix.component }}
+            -   name: Cache Composer packages
+                id: composer-cache
+                uses: actions/cache@v4
+                with:
+                    path: vendor
+                    key: ${{ runner.os }}-php-8.3-${{ hashFiles('**/composer.lock') }}
+                    restore-keys: |
+                        ${{ runner.os }}-php-8.3-
 
-  performance:
-    runs-on: ubuntu-latest
-    needs: validate
+            -   name: Install dependencies
+                run: composer install --prefer-dist --no-progress --no-suggest
 
-    steps:
-    - uses: actions/checkout@v4
 
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.3'
-        extensions: ctype, iconv, zip
+            -   name: Run integration tests
+                run: composer run test-integration -- --log-junit=./results/integration-tests.xml --coverage-clover ./results/integration-coverage.xml
 
-    - name: Install dependencies
-      run: composer install --prefer-dist --no-progress --no-suggest
+            -   name: Run FHIRPath specification tests
+                run: composer run test-fhirpath-spec -- --log-junit=./results/fhir-path-tests.xml --coverage-clover ./results/fhir-path-coverage.xml
 
-    - name: Install demo dependencies
-      run: composer install --working-dir=demo --prefer-dist --no-progress
+            -   name: Security audit
+                run: composer audit
+            -   name: Upload test results to Codecov
+                if: ${{ !cancelled() }}
+                uses: codecov/codecov-action@v5
+                with:
+                    token: ${{ secrets.CODECOV_TOKEN }}
+                    directory: ./results
 
-    - name: Test command performance
-      run: |
-        echo "Testing basic command performance..."
-        time php demo/bin/console list > /dev/null
-        echo "✅ Command execution completed successfully"
+    recipe-validation:
+        runs-on: ubuntu-latest
+        env:
+            XDEBUG_MODE: coverage
+        steps:
+            -   uses: actions/checkout@v4
 
-  recipe-validation:
-    runs-on: ubuntu-latest
-    needs: validate
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: '8.3'
+                    extensions: ctype, iconv, zip
 
-    steps:
-    - uses: actions/checkout@v4
+            -   name: Install dependencies
+                run: composer install --prefer-dist --no-progress --no-suggest
 
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.3'
-        extensions: ctype, iconv, zip
+            -   name: Validate Symfony Flex recipe
+                run: composer run validate-recipe
 
-    - name: Install dependencies
-      run: composer install --prefer-dist --no-progress --no-suggest
+            -   name: Test recipe installation
+                run: composer run test-recipe -- --log-junit=./results/recipe-tests.xml --coverage-clover ./results/coverage.xml
+            -   name: Upload test results to Codecov
+                if: ${{ !cancelled() }}
+                uses: codecov/codecov-action@v5
+                with:
+                    token: ${{ secrets.CODECOV_TOKEN }}
+                    directory: ./results
 
-    - name: Validate Symfony Flex recipe
-      run: composer run validate-recipe
+    fhir-generation-test:
+        runs-on: ubuntu-latest
+        needs: [ unit-tests,integration-tests ]
+        permissions:
+            pull-requests: write
+            contents: read
 
-    - name: Test recipe installation
-      run: composer run test-recipe
+        steps:
+            -   uses: actions/checkout@v4
 
-  fhir-generation-test:
-    runs-on: ubuntu-latest
-    needs: [validate, component-quality]
-    permissions:
-      pull-requests: write
-      contents: read
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: '8.3'
+                    extensions: ctype, iconv, zip, curl
 
-    steps:
-    - uses: actions/checkout@v4
+            -   name: Install dependencies
+                run: composer install --prefer-dist --no-progress --no-suggest
 
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.3'
-        extensions: ctype, iconv, zip, curl
+            -   name: Install demo dependencies
+                run: composer install --working-dir=demo --prefer-dist --no-progress
 
-    - name: Install dependencies
-      run: composer install --prefer-dist --no-progress --no-suggest
+            -   name: Test FHIR Model Generation
+                id: fhir-test
+                run: |
+                    echo "🧪 Testing FHIR Model Generation..." >> fhir_output.txt
+                    echo "=================================" >> fhir_output.txt
+                    echo "" >> fhir_output.txt
 
-    - name: Install demo dependencies
-      run: composer install --working-dir=demo --prefer-dist --no-progress
+                    # Test with a smaller FHIR package for faster execution
+                    echo "📦 Generating FHIR models from hl7.fhir.r4b.core package..." >> fhir_output.txt
+                    echo "" >> fhir_output.txt
 
-    - name: Test FHIR Model Generation
-      id: fhir-test
-      run: |
-        echo "🧪 Testing FHIR Model Generation..." >> fhir_output.txt
-        echo "=================================" >> fhir_output.txt
-        echo "" >> fhir_output.txt
+                    # Capture both stdout and stderr, and measure execution time
+                    start_time=$(date +%s)
 
-        # Test with a smaller FHIR package for faster execution
-        echo "📦 Generating FHIR models from hl7.fhir.r4b.core package..." >> fhir_output.txt
-        echo "" >> fhir_output.txt
+                    if timeout 300 php demo/bin/console fhir:generate --package=hl7.fhir.r4b.core -v >> fhir_output.txt 2>&1; then
+                      end_time=$(date +%s)
+                      execution_time=$((end_time - start_time))
 
-        # Capture both stdout and stderr, and measure execution time
-        start_time=$(date +%s)
+                      echo "" >> fhir_output.txt
+                      echo "✅ **FHIR Generation Successful!**" >> fhir_output.txt
+                      echo "⏱️ Execution time: ${execution_time} seconds" >> fhir_output.txt
+                      echo "" >> fhir_output.txt
 
-        if timeout 300 php demo/bin/console fhir:generate --package=hl7.fhir.r4b.core -v >> fhir_output.txt 2>&1; then
-          end_time=$(date +%s)
-          execution_time=$((end_time - start_time))
+                      # Count generated files
+                      if [ -d "output" ]; then
+                        file_count=$(find output -name "*.php" | wc -l)
+                        echo "📁 Generated ${file_count} PHP model files" >> fhir_output.txt
 
-          echo "" >> fhir_output.txt
-          echo "✅ **FHIR Generation Successful!**" >> fhir_output.txt
-          echo "⏱️ Execution time: ${execution_time} seconds" >> fhir_output.txt
-          echo "" >> fhir_output.txt
+                        # Show some example generated files
+                        echo "" >> fhir_output.txt
+                        echo "📋 **Sample Generated Files:**" >> fhir_output.txt
+                        find output -name "*.php" | head -10 | while read file; do
+                          echo "- $(basename "$file")" >> fhir_output.txt
+                        done
 
-          # Count generated files
-          if [ -d "output" ]; then
-            file_count=$(find output -name "*.php" | wc -l)
-            echo "📁 Generated ${file_count} PHP model files" >> fhir_output.txt
+                        if [ $file_count -gt 10 ]; then
+                          echo "- ... and $((file_count - 10)) more files" >> fhir_output.txt
+                        fi
+                      fi
 
-            # Show some example generated files
-            echo "" >> fhir_output.txt
-            echo "📋 **Sample Generated Files:**" >> fhir_output.txt
-            find output -name "*.php" | head -10 | while read file; do
-              echo "- $(basename "$file")" >> fhir_output.txt
-            done
+                      echo "FHIR_SUCCESS=true" >> $GITHUB_OUTPUT
+                    else
+                      end_time=$(date +%s)
+                      execution_time=$((end_time - start_time))
 
-            if [ $file_count -gt 10 ]; then
-              echo "- ... and $((file_count - 10)) more files" >> fhir_output.txt
-            fi
-          fi
+                      echo "" >> fhir_output.txt
+                      echo "❌ **FHIR Generation Failed**" >> fhir_output.txt
+                      echo "⏱️ Execution time: ${execution_time} seconds (timed out at 300s)" >> fhir_output.txt
+                      echo "" >> fhir_output.txt
+                      echo "Please check the error output above for details." >> fhir_output.txt
 
-          echo "FHIR_SUCCESS=true" >> $GITHUB_OUTPUT
-        else
-          end_time=$(date +%s)
-          execution_time=$((end_time - start_time))
+                      echo "FHIR_SUCCESS=false" >> $GITHUB_OUTPUT
+                    fi
 
-          echo "" >> fhir_output.txt
-          echo "❌ **FHIR Generation Failed**" >> fhir_output.txt
-          echo "⏱️ Execution time: ${execution_time} seconds (timed out at 300s)" >> fhir_output.txt
-          echo "" >> fhir_output.txt
-          echo "Please check the error output above for details." >> fhir_output.txt
+                    # Add system information
+                    echo "" >> fhir_output.txt
+                    echo "🖥️ **System Information:**" >> fhir_output.txt
+                    echo "- PHP Version: $(php -v | head -n1)" >> fhir_output.txt
+                    echo "- Memory Limit: $(php -r 'echo ini_get("memory_limit");')" >> fhir_output.txt
+                    echo "- OS: $(uname -s) $(uname -r)" >> fhir_output.txt
 
-          echo "FHIR_SUCCESS=false" >> $GITHUB_OUTPUT
-        fi
+            -   name: Comment PR with FHIR Generation Results
+                uses: actions/github-script@v7
+                with:
+                    script: |
+                        const fs = require('fs');
 
-        # Add system information
-        echo "" >> fhir_output.txt
-        echo "🖥️ **System Information:**" >> fhir_output.txt
-        echo "- PHP Version: $(php -v | head -n1)" >> fhir_output.txt
-        echo "- Memory Limit: $(php -r 'echo ini_get("memory_limit");')" >> fhir_output.txt
-        echo "- OS: $(uname -s) $(uname -r)" >> fhir_output.txt
+                        // Read the FHIR generation output
+                        let fhirOutput;
+                        try {
+                          fhirOutput = fs.readFileSync('fhir_output.txt', 'utf8');
+                        } catch (error) {
+                          fhirOutput = '❌ Could not read FHIR generation output file.';
+                        }
 
-    - name: Comment PR with FHIR Generation Results
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const fs = require('fs');
+                        // Determine if this is a success or failure
+                        const isSuccess = '${{ steps.fhir-test.outputs.FHIR_SUCCESS }}' === 'true';
+                        const emoji = isSuccess ? '✅' : '❌';
+                        const status = isSuccess ? 'SUCCESS' : 'FAILED';
 
-          // Read the FHIR generation output
-          let fhirOutput;
-          try {
-            fhirOutput = fs.readFileSync('fhir_output.txt', 'utf8');
-          } catch (error) {
-            fhirOutput = '❌ Could not read FHIR generation output file.';
-          }
+                        // Create the comment body
+                        const commentBody = `## ${emoji} FHIR Model Generation Test ${status}
 
-          // Determine if this is a success or failure
-          const isSuccess = '${{ steps.fhir-test.outputs.FHIR_SUCCESS }}' === 'true';
-          const emoji = isSuccess ? '✅' : '❌';
-          const status = isSuccess ? 'SUCCESS' : 'FAILED';
+                        This automated test validates that the FHIR model generation functionality works correctly with the changes in this PR.
 
-          // Create the comment body
-          const commentBody = `## ${emoji} FHIR Model Generation Test ${status}
+                        <details>
+                        <summary>📋 Click to view detailed output</summary>
 
-          This automated test validates that the FHIR model generation functionality works correctly with the changes in this PR.
+                        \`\`\`
+                        ${fhirOutput}
+                        \`\`\`
 
-          <details>
-          <summary>📋 Click to view detailed output</summary>
+                        </details>
 
-          \`\`\`
-          ${fhirOutput}
-          \`\`\`
+                        ---
 
-          </details>
+                        ${isSuccess ?
+                          '🎉 The FHIR model generation completed successfully! The enhanced package management system is working correctly.' :
+                          '⚠️ The FHIR model generation encountered issues. Please review the output above and fix any problems before merging.'
+                        }
 
-          ---
+                        *This comment was automatically generated by the GitHub Actions workflow.*`;
 
-          ${isSuccess ?
-            '🎉 The FHIR model generation completed successfully! The enhanced package management system is working correctly.' :
-            '⚠️ The FHIR model generation encountered issues. Please review the output above and fix any problems before merging.'
-          }
-
-          *This comment was automatically generated by the GitHub Actions workflow.*`;
-
-          // Post the comment
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: commentBody
-          });
+                        // Post the comment
+                        github.rest.issues.createComment({
+                          issue_number: context.issue.number,
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          body: commentBody
+                        });

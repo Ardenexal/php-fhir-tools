@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\ExplanationOfBenefit;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
@@ -20,14 +20,15 @@ class ExplanationOfBenefitItemAdjudication extends BackboneElement
 {
     public const FHIR_PROPERTY_MAP = [
         'id' => [
-            'fhirType'     => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind' => 'scalar',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
+            'fhirType'          => 'http://hl7.org/fhirpath/System.String',
+            'propertyKind'      => 'scalar',
+            'isArray'           => false,
+            'isRequired'        => false,
+            'isChoice'          => false,
+            'jsonKey'           => null,
+            'phpType'           => null,
+            'variants'          => null,
+            'xmlSerializedName' => '@id',
         ],
         'extension' => [
             'fhirType'     => 'Extension',
@@ -93,7 +94,7 @@ class ExplanationOfBenefitItemAdjudication extends BackboneElement
 
     public function __construct(
         /** @var string|null id Unique id for inter-element referencing */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
         public ?string $id = null,
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -110,9 +111,9 @@ class ExplanationOfBenefitItemAdjudication extends BackboneElement
         /** @var Money|null amount Monetary amount */
         #[FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
         public ?Money $amount = null,
-        /** @var float|null value Non-monitary value */
+        /** @var numeric-string|null value Non-monitary value */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $value = null,
+        public ?string $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

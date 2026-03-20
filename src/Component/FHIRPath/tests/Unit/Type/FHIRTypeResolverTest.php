@@ -11,6 +11,8 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Tests\Fixtures\Models\R4B\Primitive\F
 use Ardenexal\FHIRTools\Component\FHIRPath\Tests\Fixtures\Models\R4B\Primitive\FHIRDecimal;
 use Ardenexal\FHIRTools\Component\FHIRPath\Tests\Fixtures\Models\R4B\Primitive\FHIRDate;
 use Ardenexal\FHIRTools\Component\FHIRPath\Tests\Fixtures\Models\R4B\Primitive\FHIRDateTime;
+use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDate as FHIRDateValue;
+use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDateTime as FHIRDateTimeValue;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -51,10 +53,10 @@ final class FHIRTypeResolverTest extends TestCase
         $fhirDecimal = new FHIRDecimal(value: 99.99);
         self::assertSame('decimal', $this->resolver->inferType($fhirDecimal));
 
-        $fhirDate = new FHIRDate(value: '2024-01-01');
+        $fhirDate = new FHIRDate(value: FHIRDateValue::parse('2024-01-01'));
         self::assertSame('date', $this->resolver->inferType($fhirDate));
 
-        $fhirDateTime = new FHIRDateTime(value: new \DateTime('2024-01-01T10:00:00Z'));
+        $fhirDateTime = new FHIRDateTime(value: FHIRDateTimeValue::parse('2024-01-01T10:00:00+00:00'));
         self::assertSame('dateTime', $this->resolver->inferType($fhirDateTime));
     }
 

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\RiskEvidenceSynthesis;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -19,14 +19,15 @@ class RiskEvidenceSynthesisRiskEstimate extends BackboneElement
 {
     public const FHIR_PROPERTY_MAP = [
         'id' => [
-            'fhirType'     => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind' => 'scalar',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
+            'fhirType'          => 'http://hl7.org/fhirpath/System.String',
+            'propertyKind'      => 'scalar',
+            'isArray'           => false,
+            'isRequired'        => false,
+            'isChoice'          => false,
+            'jsonKey'           => null,
+            'phpType'           => null,
+            'variants'          => null,
+            'xmlSerializedName' => '@id',
         ],
         'extension' => [
             'fhirType'     => 'Extension',
@@ -122,7 +123,7 @@ class RiskEvidenceSynthesisRiskEstimate extends BackboneElement
 
     public function __construct(
         /** @var string|null id Unique id for inter-element referencing */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
         public ?string $id = null,
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -136,9 +137,9 @@ class RiskEvidenceSynthesisRiskEstimate extends BackboneElement
         /** @var CodeableConcept|null type Type of risk estimate */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $type = null,
-        /** @var float|null value Point estimate */
+        /** @var numeric-string|null value Point estimate */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $value = null,
+        public ?string $value = null,
         /** @var CodeableConcept|null unitOfMeasure What unit is the outcome described in? */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $unitOfMeasure = null,

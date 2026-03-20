@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CodeGeneration\Package;
 
-use Ardenexal\FHIRTools\Exception\FHIRToolsException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\PackageException;
 
 /**
  * Handles retry logic with exponential backoff for network operations
@@ -70,7 +70,7 @@ class RetryHandler
      *
      * @return T The result of the successful operation
      *
-     * @throws FHIRToolsException When all retry attempts are exhausted
+     * @throws \Throwable
      */
     public function executeWithRetry(
         callable $operation,
@@ -207,7 +207,7 @@ class RetryHandler
      *
      * @return T
      *
-     * @throws FHIRToolsException
+     * @throws \Throwable
      */
     public function executeHttpWithRetry(callable $httpOperation, int $maxAttempts = 3): mixed
     {
@@ -220,7 +220,7 @@ class RetryHandler
             [
                 'Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface',
                 'Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface',
-                'Ardenexal\FHIRTools\Component\CodeGeneration\Exception\PackageException',
+                PackageException::class,
             ],
         );
     }
@@ -235,7 +235,7 @@ class RetryHandler
      *
      * @return T
      *
-     * @throws FHIRToolsException
+     * @throws \Throwable
      */
     public function executeFileWithRetry(callable $fileOperation, int $maxAttempts = 2): mixed
     {

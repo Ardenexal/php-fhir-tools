@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\Base64BinaryPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
@@ -36,14 +36,15 @@ class ElementDefinition extends BackboneElement
 {
     public const FHIR_PROPERTY_MAP = [
         'id' => [
-            'fhirType'     => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind' => 'scalar',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
+            'fhirType'          => 'http://hl7.org/fhirpath/System.String',
+            'propertyKind'      => 'scalar',
+            'isArray'           => false,
+            'isRequired'        => false,
+            'isChoice'          => false,
+            'jsonKey'           => null,
+            'phpType'           => null,
+            'variants'          => null,
+            'xmlSerializedName' => '@id',
         ],
         'extension' => [
             'fhirType'     => 'Extension',
@@ -289,7 +290,7 @@ class ElementDefinition extends BackboneElement
                 [
                     'fhirType'     => 'decimal',
                     'propertyKind' => 'scalar',
-                    'phpType'      => 'float',
+                    'phpType'      => 'string',
                     'jsonKey'      => 'defaultValueDecimal',
                     'isBuiltin'    => true,
                 ],
@@ -670,7 +671,7 @@ class ElementDefinition extends BackboneElement
                 [
                     'fhirType'     => 'decimal',
                     'propertyKind' => 'scalar',
-                    'phpType'      => 'float',
+                    'phpType'      => 'string',
                     'jsonKey'      => 'fixedDecimal',
                     'isBuiltin'    => true,
                 ],
@@ -1031,7 +1032,7 @@ class ElementDefinition extends BackboneElement
                 [
                     'fhirType'     => 'decimal',
                     'propertyKind' => 'scalar',
-                    'phpType'      => 'float',
+                    'phpType'      => 'string',
                     'jsonKey'      => 'patternDecimal',
                     'isBuiltin'    => true,
                 ],
@@ -1388,7 +1389,7 @@ class ElementDefinition extends BackboneElement
                 [
                     'fhirType'     => 'decimal',
                     'propertyKind' => 'scalar',
-                    'phpType'      => 'float',
+                    'phpType'      => 'string',
                     'jsonKey'      => 'minValueDecimal',
                     'isBuiltin'    => true,
                 ],
@@ -1462,7 +1463,7 @@ class ElementDefinition extends BackboneElement
                 [
                     'fhirType'     => 'decimal',
                     'propertyKind' => 'scalar',
-                    'phpType'      => 'float',
+                    'phpType'      => 'string',
                     'jsonKey'      => 'maxValueDecimal',
                     'isBuiltin'    => true,
                 ],
@@ -1590,7 +1591,7 @@ class ElementDefinition extends BackboneElement
 
     public function __construct(
         /** @var string|null id Unique id for inter-element referencing */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
         public ?string $id = null,
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -1649,7 +1650,7 @@ class ElementDefinition extends BackboneElement
         /** @var array<ElementDefinitionType> type Data type and Profile for this element */
         #[FhirProperty(fhirType: 'Element', propertyKind: 'complex', isArray: true)]
         public array $type = [],
-        /** @var Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|float|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|string|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|Meta|null defaultValue Specified value if missing from instance */
+        /** @var Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|string|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|Meta|null defaultValue Specified value if missing from instance */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -1686,7 +1687,7 @@ class ElementDefinition extends BackboneElement
                     'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive',
                     'jsonKey'      => 'defaultValueDateTime',
                 ],
-                ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'float', 'jsonKey' => 'defaultValueDecimal'],
+                ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'string', 'jsonKey' => 'defaultValueDecimal'],
                 [
                     'fhirType'     => 'id',
                     'propertyKind' => 'primitive',
@@ -1942,14 +1943,14 @@ class ElementDefinition extends BackboneElement
                 ],
             ],
         )]
-        public Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|float|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|string|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|Meta|null $defaultValue = null,
+        public Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|string|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|Meta|null $defaultValue = null,
         /** @var MarkdownPrimitive|null meaningWhenMissing Implicit meaning when this element is missing */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $meaningWhenMissing = null,
         /** @var StringPrimitive|string|null orderMeaning What the order of the elements means */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $orderMeaning = null,
-        /** @var Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|float|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|string|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|Meta|null fixed Value must be exactly this */
+        /** @var Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|string|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|Meta|null fixed Value must be exactly this */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -1986,7 +1987,7 @@ class ElementDefinition extends BackboneElement
                     'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive',
                     'jsonKey'      => 'fixedDateTime',
                 ],
-                ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'float', 'jsonKey' => 'fixedDecimal'],
+                ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'string', 'jsonKey' => 'fixedDecimal'],
                 [
                     'fhirType'     => 'id',
                     'propertyKind' => 'primitive',
@@ -2242,8 +2243,8 @@ class ElementDefinition extends BackboneElement
                 ],
             ],
         )]
-        public Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|float|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|string|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|Meta|null $fixed = null,
-        /** @var Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|float|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|string|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|Meta|null pattern Value must have at least these property values */
+        public Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|string|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|Meta|null $fixed = null,
+        /** @var Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|string|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|Meta|null pattern Value must have at least these property values */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -2280,7 +2281,7 @@ class ElementDefinition extends BackboneElement
                     'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive',
                     'jsonKey'      => 'patternDateTime',
                 ],
-                ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'float', 'jsonKey' => 'patternDecimal'],
+                ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'string', 'jsonKey' => 'patternDecimal'],
                 [
                     'fhirType'     => 'id',
                     'propertyKind' => 'primitive',
@@ -2536,11 +2537,11 @@ class ElementDefinition extends BackboneElement
                 ],
             ],
         )]
-        public Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|float|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|string|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|Meta|null $pattern = null,
+        public Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|string|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|Meta|null $pattern = null,
         /** @var array<ElementDefinitionExample> example Example value (as defined for type) */
         #[FhirProperty(fhirType: 'Element', propertyKind: 'complex', isArray: true)]
         public array $example = [],
-        /** @var DatePrimitive|DateTimePrimitive|InstantPrimitive|TimePrimitive|float|int|PositiveIntPrimitive|UnsignedIntPrimitive|Quantity|null minValue Minimum Allowed Value (for some types) */
+        /** @var DatePrimitive|DateTimePrimitive|InstantPrimitive|TimePrimitive|string|int|PositiveIntPrimitive|UnsignedIntPrimitive|Quantity|null minValue Minimum Allowed Value (for some types) */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -2570,7 +2571,7 @@ class ElementDefinition extends BackboneElement
                     'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\TimePrimitive',
                     'jsonKey'      => 'minValueTime',
                 ],
-                ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'float', 'jsonKey' => 'minValueDecimal'],
+                ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'string', 'jsonKey' => 'minValueDecimal'],
                 ['fhirType' => 'integer', 'propertyKind' => 'scalar', 'phpType' => 'int', 'jsonKey' => 'minValueInteger'],
                 [
                     'fhirType'     => 'positiveInt',
@@ -2592,8 +2593,8 @@ class ElementDefinition extends BackboneElement
                 ],
             ],
         )]
-        public DatePrimitive|DateTimePrimitive|InstantPrimitive|TimePrimitive|float|int|PositiveIntPrimitive|UnsignedIntPrimitive|Quantity|null $minValue = null,
-        /** @var DatePrimitive|DateTimePrimitive|InstantPrimitive|TimePrimitive|float|int|PositiveIntPrimitive|UnsignedIntPrimitive|Quantity|null maxValue Maximum Allowed Value (for some types) */
+        public DatePrimitive|DateTimePrimitive|InstantPrimitive|TimePrimitive|string|int|PositiveIntPrimitive|UnsignedIntPrimitive|Quantity|null $minValue = null,
+        /** @var DatePrimitive|DateTimePrimitive|InstantPrimitive|TimePrimitive|string|int|PositiveIntPrimitive|UnsignedIntPrimitive|Quantity|null maxValue Maximum Allowed Value (for some types) */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -2623,7 +2624,7 @@ class ElementDefinition extends BackboneElement
                     'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\TimePrimitive',
                     'jsonKey'      => 'maxValueTime',
                 ],
-                ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'float', 'jsonKey' => 'maxValueDecimal'],
+                ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'string', 'jsonKey' => 'maxValueDecimal'],
                 ['fhirType' => 'integer', 'propertyKind' => 'scalar', 'phpType' => 'int', 'jsonKey' => 'maxValueInteger'],
                 [
                     'fhirType'     => 'positiveInt',
@@ -2645,7 +2646,7 @@ class ElementDefinition extends BackboneElement
                 ],
             ],
         )]
-        public DatePrimitive|DateTimePrimitive|InstantPrimitive|TimePrimitive|float|int|PositiveIntPrimitive|UnsignedIntPrimitive|Quantity|null $maxValue = null,
+        public DatePrimitive|DateTimePrimitive|InstantPrimitive|TimePrimitive|string|int|PositiveIntPrimitive|UnsignedIntPrimitive|Quantity|null $maxValue = null,
         /** @var int|null maxLength Max length for strings */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
         public ?int $maxLength = null,

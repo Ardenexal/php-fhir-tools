@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty;
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta;
@@ -275,9 +275,9 @@ class TestReportResource extends DomainResourceResource
         /** @var TestReportResultType|null result pass | fail | pending */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?TestReportResultType $result = null,
-        /** @var float|null score The final score (percentage of tests passed) resulting from the execution of the TestScript */
+        /** @var numeric-string|null score The final score (percentage of tests passed) resulting from the execution of the TestScript */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $score = null,
+        public ?string $score = null,
         /** @var StringPrimitive|string|null tester Name of the tester producing this report (Organization or individual) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $tester = null,

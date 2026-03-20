@@ -35,7 +35,7 @@ Add the bundle to `config/bundles.php`:
 
 return [
     // ... other bundles
-    Ardenexal\FHIRTools\Bundle\FHIRBundle\FHIRBundle::class => ['all'],
+    \Ardenexal\FHIRTools\Bundle\FHIRBundle\src\FHIRBundle::class => ['all'],
 ];
 ```
 

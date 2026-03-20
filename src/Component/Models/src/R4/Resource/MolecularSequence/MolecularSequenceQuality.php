@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\MolecularSequence;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -21,14 +21,15 @@ class MolecularSequenceQuality extends BackboneElement
 {
     public const FHIR_PROPERTY_MAP = [
         'id' => [
-            'fhirType'     => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind' => 'scalar',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
+            'fhirType'          => 'http://hl7.org/fhirpath/System.String',
+            'propertyKind'      => 'scalar',
+            'isArray'           => false,
+            'isRequired'        => false,
+            'isChoice'          => false,
+            'jsonKey'           => null,
+            'phpType'           => null,
+            'variants'          => null,
+            'xmlSerializedName' => '@id',
         ],
         'extension' => [
             'fhirType'     => 'Extension',
@@ -204,7 +205,7 @@ class MolecularSequenceQuality extends BackboneElement
 
     public function __construct(
         /** @var string|null id Unique id for inter-element referencing */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
         public ?string $id = null,
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -230,30 +231,30 @@ class MolecularSequenceQuality extends BackboneElement
         /** @var CodeableConcept|null method Method to get quality */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $method = null,
-        /** @var float|null truthTP True positives from the perspective of the truth data */
+        /** @var numeric-string|null truthTP True positives from the perspective of the truth data */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $truthTP = null,
-        /** @var float|null queryTP True positives from the perspective of the query data */
+        public ?string $truthTP = null,
+        /** @var numeric-string|null queryTP True positives from the perspective of the query data */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $queryTP = null,
-        /** @var float|null truthFN False negatives */
+        public ?string $queryTP = null,
+        /** @var numeric-string|null truthFN False negatives */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $truthFN = null,
-        /** @var float|null queryFP False positives */
+        public ?string $truthFN = null,
+        /** @var numeric-string|null queryFP False positives */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $queryFP = null,
-        /** @var float|null gtFP False positives where the non-REF alleles in the Truth and Query Call Sets match */
+        public ?string $queryFP = null,
+        /** @var numeric-string|null gtFP False positives where the non-REF alleles in the Truth and Query Call Sets match */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $gtFP = null,
-        /** @var float|null precision Precision of comparison */
+        public ?string $gtFP = null,
+        /** @var numeric-string|null precision Precision of comparison */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $precision = null,
-        /** @var float|null recall Recall of comparison */
+        public ?string $precision = null,
+        /** @var numeric-string|null recall Recall of comparison */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $recall = null,
-        /** @var float|null fScore F-score */
+        public ?string $recall = null,
+        /** @var numeric-string|null fScore F-score */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $fScore = null,
+        public ?string $fScore = null,
         /** @var MolecularSequenceQualityRoc|null roc Receiver Operator Characteristic (ROC) Curve */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
         public ?MolecularSequenceQualityRoc $roc = null,

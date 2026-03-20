@@ -113,7 +113,8 @@ final class ToStringFunction extends AbstractFunction
         if (is_array($value) && array_key_exists('value', $value) && array_key_exists('unit', $value) && is_numeric($value['value']) && is_string($value['unit'])) {
             $rawVal = $value['value'];
 
-            // PHP int → no decimal point; PHP float/string-numeric → always decimal notation
+            // PHP int → no decimal point; whole-number float → no decimal point;
+            // fractional float/string-numeric → always decimal notation
             if (is_int($rawVal)) {
                 $strVal = (string) $rawVal;
             } else {

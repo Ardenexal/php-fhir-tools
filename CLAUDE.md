@@ -14,6 +14,9 @@ src/
 ├── Component/
 │   ├── CodeGeneration/src/         # FHIR class generation
 │   ├── Serialization/src/          # FHIR JSON/XML serialization
+│   ├── Metadata/src/               # Shared attributes and contracts
+│   │   ├── Attribute/              # PHP 8 attributes (FHIRPrimitive, FhirProperty, etc.)
+│   │   └── Contract/               # Shared interfaces (e.g. FHIRTemporalValue)
 │   ├── Models/src/                 # Generated FHIR models
 │   └── FHIRPath/src/               # FHIRPath expression evaluator
 ├── Exception/                      # Project-wide exceptions
@@ -21,6 +24,8 @@ src/
 ```
 
 **Namespace pattern:** `Ardenexal\FHIRTools\Component\{ComponentName}\`
+
+**Metadata component conventions:** Any interface or attribute that needs to be visible to more than one component belongs in the Metadata component, not in the component that first needs it. `Attribute/` holds PHP 8 attributes; `Contract/` holds shared interfaces and marker contracts.
 
 ## Development Commands
 
@@ -42,7 +47,6 @@ composer test
 # Run specific test suites
 composer test-unit
 composer test-integration
-composer test-fhir
 composer test-fhirpath-spec     # FHIRPath specification conformance tests
 
 # Component-specific tests
@@ -127,8 +131,7 @@ composer phpstan-ai -- --ai-limit=100 --ai-offset=100        # page 2
 
 ## Testing Guidelines
 
-- Tests located in `tests/` directory
-- Use `Ardenexal\FHIRTools\Tests\` namespace
+- Tests located in `src/Component/[Package]/tests/` directory
 - Test fixtures in `tests/Fixtures/`
 - Integration tests verify FHIR conformance and serialization round-trips
 

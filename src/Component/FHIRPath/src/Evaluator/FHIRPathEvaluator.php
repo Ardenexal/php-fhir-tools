@@ -19,6 +19,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Expression\UnaryOperatorNode;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\FHIRPathSemanticException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Function\ToQuantityFunction;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTemporalValue;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\TokenType;
 use Ardenexal\FHIRTools\Component\FHIRPath\Function\FunctionRegistry;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDate;
@@ -852,6 +853,9 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      * property is a scalar FHIR primitive type (not a System.* URL type). Returns null
      * when the FHIR_PROPERTY_MAP is absent, the property is not in the map, the property
      * is not a scalar, or the fhirType is a FHIRPath System type URL.
+     *
+     * For choice properties (value[x]), the active variant is identified from the stored
+     * value's PHP type — see resolveChoiceVariantType().
      */
     private function resolveFhirPropertyType(object $node, string $propertyName): ?string
     {
@@ -873,6 +877,16 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             ) {
                 return $meta['fhirType'];
             }
+
+            // For choice properties (value[x]), identify the active variant by matching
+            // the stored PHP value's type against the available variants.
+            if (!empty($meta['variants'])) {
+                $storedValue  = property_exists($node, $propertyName) ? $node->$propertyName : null;
+                $resolvedType = $this->resolveChoiceVariantType($storedValue, $meta['variants']);
+                if ($resolvedType !== null) {
+                    return $resolvedType;
+                }
+            }
         }
 
         // Check if this property is a variant of a choice property (e.g. 'valueBoolean' as part of 'value[x]')
@@ -890,6 +904,58 @@ final class FHIRPathEvaluator implements ExpressionVisitor
                     && !str_starts_with($variant['fhirType'], 'http://')
                 ) {
                     return $variant['fhirType'];
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Identify the FHIR type of a choice element's stored value by matching its PHP type
+     * against the available variants from FHIR_PROPERTY_MAP.
+     *
+     * For unambiguous PHP scalar types (bool, int, float), returns the first matching
+     * variant's fhirType. For PHP strings, applies a targeted heuristic: if the string is
+     * numeric with a decimal point AND the choice has a 'decimal' variant, returns 'decimal'.
+     * This handles the case where FHIR decimal values are stored as precision-preserving
+     * PHP strings in generated models (phpType: 'string' for fhirType: 'decimal').
+     *
+     * Returns null when the type cannot be determined unambiguously.
+     *
+     * @param array<int, array{fhirType?: string, phpType?: string, propertyKind?: string, jsonKey?: string, isBuiltin?: bool}> $variants
+     */
+    private function resolveChoiceVariantType(mixed $value, array $variants): ?string
+    {
+        if ($value === null || !is_scalar($value)) {
+            return null;
+        }
+
+        // For non-string scalar PHP types there is at most one matching phpType per variant
+        foreach ($variants as $variant) {
+            $fhirType = $variant['fhirType'] ?? null;
+            $phpType  = $variant['phpType']  ?? null;
+
+            if ($fhirType === null || str_starts_with($fhirType, 'http://')) {
+                continue;
+            }
+
+            if (($phpType === 'bool'  && is_bool($value))
+                || ($phpType === 'int'   && is_int($value))
+                || ($phpType === 'float' && is_float($value))
+            ) {
+                return $fhirType;
+            }
+        }
+
+        // Heuristic for decimal: FHIR decimal values are stored as precision-preserving
+        // PHP strings (phpType: 'string') to avoid float rounding errors. Detect them by
+        // checking that the string is numeric with a decimal point AND a decimal variant
+        // exists. Plain integer strings ('42') are excluded to avoid false-positives.
+        if (is_string($value) && str_contains($value, '.') && is_numeric($value)) {
+            foreach ($variants as $variant) {
+                if (($variant['fhirType'] ?? null) === 'decimal') {
+                    return 'decimal';
                 }
             }
         }
@@ -1296,7 +1362,15 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         }
 
         if ($this->primitiveCache[$class] && property_exists($value, 'value')) {
-            return $value->value; // e.g. StringPrimitive->value = 'Peter'
+            $extracted = $value->value; // e.g. StringPrimitive->value = 'Peter'
+
+            // FHIRTemporalValue (FHIRDate, FHIRDateTime, FHIRTime, FHIRInstant) → string
+            // so date comparisons and precision logic work correctly
+            if ($extracted instanceof FHIRTemporalValue) {
+                return (string) $extracted;
+            }
+
+            return $extracted;
         }
 
         return $value;

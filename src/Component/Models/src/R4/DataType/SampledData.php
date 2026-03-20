@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -22,14 +22,15 @@ class SampledData extends Element
 {
     public const FHIR_PROPERTY_MAP = [
         'id' => [
-            'fhirType'     => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind' => 'scalar',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
+            'fhirType'          => 'http://hl7.org/fhirpath/System.String',
+            'propertyKind'      => 'scalar',
+            'isArray'           => false,
+            'isRequired'        => false,
+            'isChoice'          => false,
+            'jsonKey'           => null,
+            'phpType'           => null,
+            'variants'          => null,
+            'xmlSerializedName' => '@id',
         ],
         'extension' => [
             'fhirType'     => 'Extension',
@@ -115,7 +116,7 @@ class SampledData extends Element
 
     public function __construct(
         /** @var string|null id Unique id for inter-element referencing */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
         public ?string $id = null,
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -123,18 +124,18 @@ class SampledData extends Element
         /** @var Quantity|null origin Zero value and units */
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?Quantity $origin = null,
-        /** @var float|null period Number of milliseconds between samples */
+        /** @var numeric-string|null period Number of milliseconds between samples */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar', isRequired: true), NotBlank]
-        public ?float $period = null,
-        /** @var float|null factor Multiply data by this before adding to origin */
+        public ?string $period = null,
+        /** @var numeric-string|null factor Multiply data by this before adding to origin */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $factor = null,
-        /** @var float|null lowerLimit Lower limit of detection */
+        public ?string $factor = null,
+        /** @var numeric-string|null lowerLimit Lower limit of detection */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $lowerLimit = null,
-        /** @var float|null upperLimit Upper limit of detection */
+        public ?string $lowerLimit = null,
+        /** @var numeric-string|null upperLimit Upper limit of detection */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-        public ?float $upperLimit = null,
+        public ?string $upperLimit = null,
         /** @var PositiveIntPrimitive|null dimensions Number of sample points at each time point */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?PositiveIntPrimitive $dimensions = null,

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\Questionnaire;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -26,14 +26,15 @@ class QuestionnaireItemEnableWhen extends BackboneElement
 {
     public const FHIR_PROPERTY_MAP = [
         'id' => [
-            'fhirType'     => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind' => 'scalar',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
+            'fhirType'          => 'http://hl7.org/fhirpath/System.String',
+            'propertyKind'      => 'scalar',
+            'isArray'           => false,
+            'isRequired'        => false,
+            'isChoice'          => false,
+            'jsonKey'           => null,
+            'phpType'           => null,
+            'variants'          => null,
+            'xmlSerializedName' => '@id',
         ],
         'extension' => [
             'fhirType'     => 'Extension',
@@ -94,7 +95,7 @@ class QuestionnaireItemEnableWhen extends BackboneElement
                 [
                     'fhirType'     => 'decimal',
                     'propertyKind' => 'scalar',
-                    'phpType'      => 'float',
+                    'phpType'      => 'string',
                     'jsonKey'      => 'answerDecimal',
                     'isBuiltin'    => true,
                 ],
@@ -160,7 +161,7 @@ class QuestionnaireItemEnableWhen extends BackboneElement
 
     public function __construct(
         /** @var string|null id Unique id for inter-element referencing */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
         public ?string $id = null,
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
@@ -174,7 +175,7 @@ class QuestionnaireItemEnableWhen extends BackboneElement
         /** @var QuestionnaireItemOperatorType|null operator exists | = | != | > | < | >= | <= */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?QuestionnaireItemOperatorType $operator = null,
-        /** @var bool|float|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|string|Coding|Quantity|Reference|null answer Value for question comparison based on operator */
+        /** @var bool|string|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|Coding|Quantity|Reference|null answer Value for question comparison based on operator */
         #[FhirProperty(
             fhirType: 'choice',
             propertyKind: 'choice',
@@ -182,7 +183,7 @@ class QuestionnaireItemEnableWhen extends BackboneElement
             isChoice: true,
             variants: [
                 ['fhirType' => 'boolean', 'propertyKind' => 'scalar', 'phpType' => 'bool', 'jsonKey' => 'answerBoolean'],
-                ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'float', 'jsonKey' => 'answerDecimal'],
+                ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'string', 'jsonKey' => 'answerDecimal'],
                 ['fhirType' => 'integer', 'propertyKind' => 'scalar', 'phpType' => 'int', 'jsonKey' => 'answerInteger'],
                 [
                     'fhirType'     => 'date',
@@ -229,7 +230,7 @@ class QuestionnaireItemEnableWhen extends BackboneElement
             ],
         )]
         #[NotBlank]
-        public bool|float|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|string|Coding|Quantity|Reference|null $answer = null,
+        public bool|string|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|Coding|Quantity|Reference|null $answer = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

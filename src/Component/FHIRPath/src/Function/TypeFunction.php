@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRPrimitive;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;

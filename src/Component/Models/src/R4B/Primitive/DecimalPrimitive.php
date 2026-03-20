@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Primitive;
 
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FHIRPrimitive;
-use Ardenexal\FHIRTools\Component\CodeGeneration\Attributes\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Element;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
@@ -21,14 +21,15 @@ class DecimalPrimitive extends Element
 {
     public const FHIR_PROPERTY_MAP = [
         'id' => [
-            'fhirType'     => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind' => 'scalar',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
+            'fhirType'          => 'http://hl7.org/fhirpath/System.String',
+            'propertyKind'      => 'scalar',
+            'isArray'           => false,
+            'isRequired'        => false,
+            'isChoice'          => false,
+            'jsonKey'           => null,
+            'phpType'           => null,
+            'variants'          => null,
+            'xmlSerializedName' => '@id',
         ],
         'extension' => [
             'fhirType'     => 'Extension',
@@ -41,27 +42,28 @@ class DecimalPrimitive extends Element
             'variants'     => null,
         ],
         'value' => [
-            'fhirType'     => 'http://hl7.org/fhirpath/System.Decimal',
-            'propertyKind' => 'scalar',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
+            'fhirType'          => 'http://hl7.org/fhirpath/System.Decimal',
+            'propertyKind'      => 'scalar',
+            'isArray'           => false,
+            'isRequired'        => false,
+            'isChoice'          => false,
+            'jsonKey'           => null,
+            'phpType'           => null,
+            'variants'          => null,
+            'xmlSerializedName' => '@value',
         ],
     ];
 
     public function __construct(
         /** @var string|null id xml:id (or equivalent in JSON) */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
         public ?string $id = null,
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
-        /** @var float|null value Primitive value for decimal */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.Decimal', propertyKind: 'scalar')]
-        public ?float $value = null,
+        /** @var numeric-string|null value Primitive value for decimal */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.Decimal', propertyKind: 'scalar', xmlSerializedName: '@value')]
+        public ?string $value = null,
     ) {
         parent::__construct($id, $extension);
     }

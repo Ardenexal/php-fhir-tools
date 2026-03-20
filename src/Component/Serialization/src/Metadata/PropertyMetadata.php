@@ -16,15 +16,17 @@ namespace Ardenexal\FHIRTools\Component\Serialization\Metadata;
 final class PropertyMetadata
 {
     /**
-     * @param string                             $fhirType     FHIR type code ('date', 'HumanName', 'choice', etc.)
-     * @param string                             $propertyKind Semantic category — see FhirProperty attribute doc
-     * @param bool                               $isArray      True when the property holds a list
-     * @param bool                               $isRequired   True when cardinality is 1..*
-     * @param bool                               $isChoice     True for choice elements (value[x])
-     * @param list<PropertyVariantMetadata>|null $variants     Non-null only when isChoice is true
-     * @param string|null                        $jsonKey      Key override; null = use PHP property name
-     * @param string|null                        $phpItemClass FQCN for complex/backbone array item class (e.g. HumanName::class);
-     *                                                         null for primitives, scalars, and choice elements
+     * @param string                             $fhirType          FHIR type code ('date', 'HumanName', 'choice', etc.)
+     * @param string                             $propertyKind      Semantic category — see FhirProperty attribute doc
+     * @param bool                               $isArray           True when the property holds a list
+     * @param bool                               $isRequired        True when cardinality is 1..*
+     * @param bool                               $isChoice          True for choice elements (value[x])
+     * @param list<PropertyVariantMetadata>|null $variants          Non-null only when isChoice is true
+     * @param string|null                        $jsonKey           Key override; null = use PHP property name
+     * @param string|null                        $phpItemClass      FQCN for complex/backbone array item class (e.g. HumanName::class);
+     *                                                              null for primitives, scalars, and choice elements
+     * @param string|null                        $xmlSerializedName XmlEncoder key when the property is an XML attribute (e.g. '@id', '@url');
+     *                                                              null for normal child-element serialization
      */
     public function __construct(
         public readonly string $fhirType,
@@ -35,6 +37,7 @@ final class PropertyMetadata
         public readonly ?array $variants,
         public readonly ?string $jsonKey,
         public readonly ?string $phpItemClass = null,
+        public readonly ?string $xmlSerializedName = null,
     ) {
     }
 }

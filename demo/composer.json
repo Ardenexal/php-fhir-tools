@@ -3,18 +3,13 @@
     "license": "proprietary",
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "repositories": [
-        {"type": "path", "url": "../src/Bundle/FHIRBundle"},
-        {"type": "path", "url": "../src/Component/CodeGeneration"},
-        {"type": "path", "url": "../src/Component/Serialization"},
-        {"type": "path", "url": "../src/Component/FHIRPath"},
-        {"type": "path", "url": "../src/Component/Models"}
-    ],
     "require": {
         "php": ">=8.3",
+        "brick/date-time": "^0.9.0",
         "ext-ctype": "*",
         "ext-iconv": "*",
         "phpdocumentor/reflection-docblock": "^5.6.6",
+        "nette/php-generator": "^4.2.2",
         "phpstan/phpdoc-parser": "^2.3.2",
         "symfony/asset": "7.4.*",
         "symfony/asset-mapper": "7.4.*",
@@ -28,15 +23,14 @@
         "symfony/intl": "7.4.*",
         "symfony/mime": "7.4.*",
         "symfony/runtime": "7.4.*",
+        "symfony/serializer": "7.4.*",
         "symfony/stimulus-bundle": "^2.32",
         "symfony/translation": "7.4.*",
         "symfony/twig-bundle": "7.4.*",
         "symfony/ux-turbo": "^2.32",
         "symfony/yaml": "7.4.*",
         "twig/extra-bundle": "^2.12|^3.23",
-        "twig/twig": "^2.12|^3.23",
-        "ardenexal/fhir-bundle": "*",
-        "ardenexal/fhir-models": "*"
+        "twig/twig": "^2.12|^3.23"
     },
     "config": {
         "allow-plugins": {
@@ -49,7 +43,13 @@
     },
     "autoload": {
         "psr-4": {
-            "App\\": "src/"
+            "App\\": "src/",
+            "Ardenexal\\FHIRTools\\Bundle\\FHIRBundle\\": "../src/Bundle/FHIRBundle/src/",
+            "Ardenexal\\FHIRTools\\Component\\CodeGeneration\\": "../src/Component/CodeGeneration/src/",
+            "Ardenexal\\FHIRTools\\Component\\Serialization\\": "../src/Component/Serialization/src/",
+            "Ardenexal\\FHIRTools\\Component\\Models\\": "../src/Component/Models/src/",
+            "Ardenexal\\FHIRTools\\Component\\Metadata\\": "../src/Component/Metadata/src/",
+            "Ardenexal\\FHIRTools\\Component\\FHIRPath\\": "../src/Component/FHIRPath/src/"
         }
     },
     "autoload-dev": {
