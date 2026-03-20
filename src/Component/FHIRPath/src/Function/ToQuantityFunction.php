@@ -24,7 +24,7 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
  *  - Anything else            → empty {}
  *  - Empty input              → empty {}
  *
- * Internal Quantity representation: ['value' => float, 'unit' => string, 'code' => string, 'system' => string|null]
+ * Internal Quantity representation: ['value' => int|float, 'unit' => string, 'code' => string, 'system' => string|null]
  *
  * The static tryConvert() helper is shared with convertsToQuantity().
  *
@@ -72,7 +72,7 @@ final class ToQuantityFunction extends AbstractFunction
      * Returns null when the value cannot be converted (which becomes empty {} in FHIRPath).
      * Used by convertsToQuantity() to check convertibility without throwing.
      *
-     * @return array{value: float, unit: string, code: string, system?: string|null}|null
+     * @return array{value: int|float, unit: string, code: string, system?: string|null}|null
      */
     public static function tryConvert(mixed $value, ?string $requiredUnit = null): ?array
     {
@@ -104,7 +104,7 @@ final class ToQuantityFunction extends AbstractFunction
             return null;
         }
 
-        /** @var array{value: float, unit: string, code: string, system?: string|null} $quantity */
+        /** @var array{value: int|float, unit: string, code: string, system?: string|null} $quantity */
         return $quantity;
     }
 
@@ -142,12 +142,13 @@ final class ToQuantityFunction extends AbstractFunction
      *  - "10'mg'"    → {value: 10.0, unit: 'mg'}   (no space before quote)
      *  - "10"        → {value: 10.0, unit: '1'}    (plain numeric, dimensionless)
      *  - "-5.5 'kg'" → {value: -5.5, unit: 'kg'}
-     *  - "7 days"    → {value: 7.0, unit: 'days'}  (calendar duration)
-     *  - "1 week"    → {value: 1.0, unit: 'week'}  (calendar duration)
+     *  - "7 days"    → {value: 7, unit: 'days'}    (calendar duration, integer)
+     *  - "1 week"    → {value: 1, unit: 'week'}    (calendar duration, integer)
+     *  - "1.0 week"  → {value: 1.0, unit: 'week'}  (calendar duration, decimal)
      *
      * @param string $value The string to parse
      *
-     * @return array{value: float, unit: string}|null The parsed Quantity or null if invalid
+     * @return array{value: int|float, unit: string}|null The parsed Quantity or null if invalid
      */
     private static function parseQuantityString(string $value): ?array
     {
@@ -158,7 +159,10 @@ final class ToQuantityFunction extends AbstractFunction
         $calendarUnits = 'year|years|month|months|week|weeks|day|days|hour|hours|minute|minutes|second|seconds|millisecond|milliseconds';
         if (preg_match("/^([+-]?\d+(?:\.\d+)?)\s+({$calendarUnits})$/", $trimmed, $matches) === 1) {
             // $matches[1] = numeric value, $matches[2] = duration keyword
-            return self::buildQuantity((float) $matches[1], $matches[2], $matches[2], self::UCUM_SYSTEM_URL);
+            // Preserve integer vs decimal: "1 week" → int 1, "1.0 week" → float 1.0
+            $numStr = $matches[1];
+            $numVal = str_contains($numStr, '.') ? (float) $numStr : (int) $numStr;
+            return self::buildQuantity($numVal, $matches[2], $matches[2], self::UCUM_SYSTEM_URL);
         }
 
         // FHIRPath quantity literal: number followed by a quoted unit (e.g. "10 'mg'")
@@ -166,7 +170,10 @@ final class ToQuantityFunction extends AbstractFunction
         // preg_match returns 1 on successful match, 0 on no match
         if (preg_match("/^([+-]?\d+(?:\.\d+)?)\s*'([^']*)'$/", $trimmed, $matches) === 1) {
             // $matches[1] = the numeric value, $matches[2] = the unit (inside quotes)
-            return self::buildQuantity((float) $matches[1], $matches[2], $matches[2], self::UCUM_SYSTEM_URL);
+            // Preserve integer vs decimal: "10 'mg'" → int 10, "10.0 'mg'" → float 10.0
+            $numStr = $matches[1];
+            $numVal = str_contains($numStr, '.') ? (float) $numStr : (int) $numStr;
+            return self::buildQuantity($numVal, $matches[2], $matches[2], self::UCUM_SYSTEM_URL);
         }
 
         // Plain numeric string → dimensionless Quantity with unit '1'
@@ -174,7 +181,9 @@ final class ToQuantityFunction extends AbstractFunction
         // preg_match returns 1 on successful match
         if (preg_match('/^[+-]?\d+(?:\.\d+)?$/', $trimmed) === 1) {
             // '1' represents a dimensionless quantity (no specific unit)
-            return self::buildQuantity((float) $trimmed, '1', '1');
+            // Preserve integer vs decimal: "10" → int 10, "10.0" → float 10.0
+            $numVal = str_contains($trimmed, '.') ? (float) $trimmed : (int) $trimmed;
+            return self::buildQuantity($numVal, '1', '1');
         }
 
         return null;
@@ -183,9 +192,9 @@ final class ToQuantityFunction extends AbstractFunction
     /**
      * Build a normalized quantity array.
      *
-     * @return array{value: float, unit: string, code: string, system?: string|null}
+     * @return array{value: int|float, unit: string, code: string, system?: string|null}
      */
-    private static function buildQuantity(float $value, string $unit, ?string $code = null, ?string $system = null): array
+    private static function buildQuantity(int|float $value, string $unit, ?string $code = null, ?string $system = null): array
     {
         $quantity = [
             'value' => $value,

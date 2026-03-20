@@ -50,7 +50,7 @@ final class ComparisonServiceTest extends TestCase
         self::assertFalse($resultNotEqual->first());
     }
 
-    public function testCollectionEqualityOrderIndependent(): void
+    public function testCollectionEqualityIsPositional(): void
     {
         $col1 = Collection::from([1, 2, 3]);
         $col2 = Collection::from([3, 2, 1]);
@@ -60,7 +60,7 @@ final class ComparisonServiceTest extends TestCase
         $resultNotEqual = $this->service->compareEquality($col1, $col3, '=');
 
         self::assertTrue($resultEqual->isSingle());
-        self::assertTrue($resultEqual->first());
+        self::assertFalse($resultEqual->first());
         self::assertTrue($resultNotEqual->isSingle());
         self::assertFalse($resultNotEqual->first());
     }
@@ -91,7 +91,7 @@ final class ComparisonServiceTest extends TestCase
         self::assertFalse($resultEqual->first());
     }
 
-    public function testCollectionNotEquals(): void
+    public function testCollectionNotEqualsIsPositional(): void
     {
         $col1 = Collection::from([1, 2, 3]);
         $col2 = Collection::from([3, 2, 1]);
@@ -101,7 +101,7 @@ final class ComparisonServiceTest extends TestCase
         $resultNotEqual = $this->service->compareEquality($col1, $col3, '!=');
 
         self::assertTrue($resultEqual->isSingle());
-        self::assertFalse($resultEqual->first());
+        self::assertTrue($resultEqual->first());
         self::assertTrue($resultNotEqual->isSingle());
         self::assertTrue($resultNotEqual->first());
     }
@@ -198,7 +198,7 @@ final class ComparisonServiceTest extends TestCase
         $resultNotEqual = $this->service->compareEquality($col1, $col3, '=');
 
         self::assertTrue($resultEqual->isSingle());
-        self::assertTrue($resultEqual->first());
+        self::assertFalse($resultEqual->first());
         self::assertTrue($resultNotEqual->isSingle());
         self::assertFalse($resultNotEqual->first());
     }

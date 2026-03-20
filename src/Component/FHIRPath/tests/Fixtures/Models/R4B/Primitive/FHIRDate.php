@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Tests\Fixtures\Models\R4B\Primi
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\FHIRPath\Tests\Fixtures\Models\R4B\DataType\FHIRElement;
+use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDate as FHIRDateValue;
 
 /**
  * Mock FHIRDate primitive for testing.
@@ -16,7 +17,7 @@ class FHIRDate extends FHIRElement
     public function __construct(
         ?string $id = null,
         array $extension = [],
-        public ?string $value = null,
+        public ?FHIRDateValue $value = null,
     ) {
         parent::__construct($id, $extension);
     }

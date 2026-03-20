@@ -96,7 +96,7 @@ final class QuantityAndStringFunctionTest extends TestCase
         $result   = $this->evaluate('s.toQuantity()', $resource);
         $quantity = $result->first();
         self::assertIsArray($quantity);
-        self::assertSame(10.0, $quantity['value']);
+        self::assertSame(10, $quantity['value']);
         self::assertSame('1', $quantity['unit']);
     }
 
@@ -126,7 +126,7 @@ final class QuantityAndStringFunctionTest extends TestCase
         $result   = $this->evaluate("s.toQuantity('mg')", $resource);
         $quantity = $result->first();
         self::assertIsArray($quantity);
-        self::assertSame(10.0, $quantity['value']);
+        self::assertSame(10, $quantity['value']);
         self::assertSame('mg', $quantity['unit']);
     }
 
