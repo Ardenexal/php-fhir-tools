@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Primitive;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRTime;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Element;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 
@@ -61,9 +62,9 @@ class TimePrimitive extends Element
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
-        /** @var string|null value Primitive value for time */
+        /** @var FHIRTime|null value Primitive value for time */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.Time', propertyKind: 'scalar', xmlSerializedName: '@value')]
-        public ?string $value = null,
+        public ?FHIRTime $value = null,
     ) {
         parent::__construct($id, $extension);
     }

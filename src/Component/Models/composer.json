@@ -13,7 +13,8 @@
     "prefer-stable": true,
     "require": {
         "php": ">=8.2",
-        "ardenexal/fhir-metadata": "^0.1"
+        "ardenexal/fhir-metadata": "^0.1",
+        "brick/date-time": "^0.9.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^12.5",
