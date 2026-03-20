@@ -100,7 +100,7 @@ jobs:
                 run: composer install --prefer-dist --no-progress --no-suggest
 
             -   name: Run unit tests
-                run: composer run test-unit -- --log-junit=./results/unit-tests.xml --coverage-clover /results/coverage.xml
+                run: composer run test-unit -- --log-junit=./results/unit-tests.xml --coverage-clover ./results/coverage.xml
             -   name: Upload test results to Codecov
                 if: ${{ !cancelled() }}
                 uses: codecov/test-results-action@v1
@@ -139,10 +139,10 @@ jobs:
 
 
             -   name: Run integration tests
-                run: composer run test-integration -- --log-junit=./results/integration-tests.xml --coverage-clover /results/integration-coverage.xml
+                run: composer run test-integration -- --log-junit=./results/integration-tests.xml --coverage-clover ./results/integration-coverage.xml
 
             -   name: Run FHIRPath specification tests
-                run: composer run test-fhirpath-spec -- --log-junit=./results/fhir-path-tests.xml --coverage-clover /results/fhir-path-coverage.xml
+                run: composer run test-fhirpath-spec -- --log-junit=./results/fhir-path-tests.xml --coverage-clover ./results/fhir-path-coverage.xml
 
             -   name: Security audit
                 run: composer audit
@@ -173,7 +173,7 @@ jobs:
                 run: composer run validate-recipe
 
             -   name: Test recipe installation
-                run: composer run test-recipe -- --log-junit=./results/recipe-tests.xml --coverage-clover /results/coverage.xml
+                run: composer run test-recipe -- --log-junit=./results/recipe-tests.xml --coverage-clover ./results/coverage.xml
             -   name: Upload test results to Codecov
                 if: ${{ !cancelled() }}
                 uses: codecov/test-results-action@v1
