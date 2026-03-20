@@ -101,7 +101,7 @@ jobs:
             run: composer install --prefer-dist --no-progress --no-suggest
 
           - name: Run unit tests
-            run: composer run test-unit -- --no-coverage
+            run: composer run test-unit -- --no-coverage --junitxml=./test-results/unit-tests.xml
 
   integration-tests:
       runs-on: ubuntu-latest
@@ -135,10 +135,10 @@ jobs:
 
 
           -   name: Run integration tests
-              run: composer run test-integration -- --no-coverage
+              run: composer run test-integration -- --no-coverage --junitxml=./test-results/integration-tests.xml
 
           -   name: Run FHIRPath specification tests
-              run: composer run test-fhirpath-spec -- --no-coverage
+              run: composer run test-fhirpath-spec -- --no-coverage --junitxml=./test-results/fhir-path-tests.xml
 
           -   name: Security audit
               run: composer audit
@@ -162,7 +162,7 @@ jobs:
       run: composer run validate-recipe
 
     - name: Test recipe installation
-      run: composer run test-recipe
+      run: composer run test-recipe -- --no-coverage --junitxml=./test-results/recipe-tests.xml
 
   fhir-generation-test:
     runs-on: ubuntu-latest
@@ -296,3 +296,9 @@ jobs:
             repo: context.repo.repo,
             body: commentBody
           });
+    -   name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+            token: ${{ secrets.CODECOV_TOKEN }}
+            directory: ./test-results
