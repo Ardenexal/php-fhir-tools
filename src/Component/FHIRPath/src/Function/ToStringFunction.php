@@ -117,8 +117,6 @@ final class ToStringFunction extends AbstractFunction
             // fractional float/string-numeric → always decimal notation
             if (is_int($rawVal)) {
                 $strVal = (string) $rawVal;
-            } elseif (is_float($rawVal) && !is_infinite($rawVal) && !is_nan($rawVal) && floor($rawVal) === $rawVal) {
-                $strVal = number_format($rawVal, 0, '.', '');
             } else {
                 $strVal = self::formatDecimal((float) $rawVal);
             }
