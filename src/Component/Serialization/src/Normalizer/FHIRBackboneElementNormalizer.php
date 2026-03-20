@@ -217,7 +217,7 @@ class FHIRBackboneElementNormalizer extends AbstractFHIRNormalizer
                                         }
 
                                         // Cast to correct PHP scalar type based on FhirProperty metadata
-                                        $scalarPhpType = $meta?->phpType;
+                                        $scalarPhpType = $meta?->phpItemClass;
                                         if ($scalarPhpType === 'int') {
                                             $denormalizedValue = (int) $denormalizedValue;
                                         } elseif ($scalarPhpType === 'float') {
