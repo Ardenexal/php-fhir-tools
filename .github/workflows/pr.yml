@@ -103,7 +103,7 @@ jobs:
                 run: composer run test-unit -- --log-junit=./results/unit-tests.xml --coverage-clover ./results/coverage.xml
             -   name: Upload test results to Codecov
                 if: ${{ !cancelled() }}
-                uses: codecov/test-results-action@v1
+                uses: codecov/codecov-action@v5
                 with:
                     token: ${{ secrets.CODECOV_TOKEN }}
                     directory: ./results
@@ -148,7 +148,7 @@ jobs:
                 run: composer audit
             -   name: Upload test results to Codecov
                 if: ${{ !cancelled() }}
-                uses: codecov/test-results-action@v1
+                uses: codecov/codecov-action@v5
                 with:
                     token: ${{ secrets.CODECOV_TOKEN }}
                     directory: ./results
@@ -176,7 +176,7 @@ jobs:
                 run: composer run test-recipe -- --log-junit=./results/recipe-tests.xml --coverage-clover ./results/coverage.xml
             -   name: Upload test results to Codecov
                 if: ${{ !cancelled() }}
-                uses: codecov/test-results-action@v1
+                uses: codecov/codecov-action@v5
                 with:
                     token: ${{ secrets.CODECOV_TOKEN }}
                     directory: ./results
