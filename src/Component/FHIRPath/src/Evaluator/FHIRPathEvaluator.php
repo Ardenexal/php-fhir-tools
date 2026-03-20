@@ -1370,11 +1370,6 @@ final class FHIRPathEvaluator implements ExpressionVisitor
                 return (string) $extracted;
             }
 
-            // DateTimeInterface fallback (fixture models still use ?DateTimeInterface in tests)
-            if ($extracted instanceof \DateTimeInterface) {
-                return $extracted->format(\DateTimeInterface::ATOM);
-            }
-
             return $extracted;
         }
 

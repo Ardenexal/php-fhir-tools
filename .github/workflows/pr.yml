@@ -101,13 +101,13 @@ jobs:
                 run: composer install --prefer-dist --no-progress --no-suggest
 
             -   name: Run unit tests
-                run: composer run test-unit -- --no-coverage --log-junit=./test-results/unit-tests.xml
+                run: composer run test-unit -- --no-coverage --log-junit=./results/unit-tests.xml --coverage-clover /results/coverage.xml
             -   name: Upload test results to Codecov
                 if: ${{ !cancelled() }}
                 uses: codecov/test-results-action@v1
                 with:
                     token: ${{ secrets.CODECOV_TOKEN }}
-                    directory: ./test-results
+                    directory: ./results
 
     integration-tests:
         runs-on: ubuntu-latest
@@ -141,10 +141,10 @@ jobs:
 
 
             -   name: Run integration tests
-                run: composer run test-integration -- --no-coverage --log-junit=./test-results/integration-tests.xml
+                run: composer run test-integration -- --no-coverage --log-junit=./results/integration-tests.xml --coverage-clover /results/integration-coverage.xml
 
             -   name: Run FHIRPath specification tests
-                run: composer run test-fhirpath-spec -- --no-coverage --log-junit=./test-results/fhir-path-tests.xml
+                run: composer run test-fhirpath-spec -- --no-coverage --log-junit=./results/fhir-path-tests.xml --coverage-clover /results/fhir-path-coverage.xml
 
             -   name: Security audit
                 run: composer audit
@@ -153,7 +153,7 @@ jobs:
                 uses: codecov/test-results-action@v1
                 with:
                     token: ${{ secrets.CODECOV_TOKEN }}
-                    directory: ./test-results
+                    directory: ./results
 
     recipe-validation:
         runs-on: ubuntu-latest
@@ -174,13 +174,13 @@ jobs:
                 run: composer run validate-recipe
 
             -   name: Test recipe installation
-                run: composer run test-recipe -- --no-coverage --log-junit=./test-results/recipe-tests.xml
+                run: composer run test-recipe -- --no-coverage --log-junit=./results/recipe-tests.xml --coverage-clover /results/coverage.xml
             -   name: Upload test results to Codecov
                 if: ${{ !cancelled() }}
                 uses: codecov/test-results-action@v1
                 with:
                     token: ${{ secrets.CODECOV_TOKEN }}
-                    directory: ./test-results
+                    directory: ./results
 
     fhir-generation-test:
         runs-on: ubuntu-latest
