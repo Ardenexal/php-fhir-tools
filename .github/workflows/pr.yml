@@ -155,8 +155,8 @@ jobs:
 
     recipe-validation:
         runs-on: ubuntu-latest
-    env:
-        XDEBUG_MODE: coverage
+        env:
+            XDEBUG_MODE: coverage
     steps:
             -   uses: actions/checkout@v4
 
