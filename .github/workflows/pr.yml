@@ -137,8 +137,8 @@ jobs:
           -   name: Run integration tests
               run: composer run test-integration -- --no-coverage
 
-          -   name: Run FHIR tests
-              run: composer run test-fhir -- --no-coverage
+          -   name: Run FHIRPath specification tests
+              run: composer run test-fhirpath-spec -- --no-coverage
 
           -   name: Security audit
               run: composer audit

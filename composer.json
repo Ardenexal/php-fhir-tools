@@ -116,6 +116,7 @@
         "test-ai-fhir": "php scripts/ai-test-runner.php --testsuite=fhir",
         "test-ai-fhirpath-spec": "php scripts/ai-test-runner.php --testsuite=fhirpath-spec",
         "test": "php ./vendor/phpunit/phpunit/phpunit --testdox --testdox-summary",
+        "test-unit": "php ./vendor/phpunit/phpunit/phpunit --testsuite=unit",
         "test-coverage": "php ./vendor/phpunit/phpunit/phpunit --coverage-html coverage",
         "test-integration": "php ./vendor/phpunit/phpunit/phpunit --testsuite=integration",
         "test-fhirpath-spec": "php ./vendor/phpunit/phpunit/phpunit --testsuite=fhirpath-spec",
@@ -126,7 +127,8 @@
         "test:components": [
             "@test:bundle",
             "@test:codegen",
-            "@test:serialization"
+            "@test:serialization",
+            "@test:fhir-path"
         ],
         "quality:all": [
             "@lint",
