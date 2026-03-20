@@ -839,11 +839,13 @@ class FHIRModelGenerator implements GeneratorInterface
             case 'decimal':
                 return 'string';
             case 'http://hl7.org/fhirpath/System.String':
-            case 'http://hl7.org/fhirpath/System.Date':
-            case 'http://hl7.org/fhirpath/System.Time':
                 return 'string';
+            case 'http://hl7.org/fhirpath/System.Date':
+                return 'Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDate';
+            case 'http://hl7.org/fhirpath/System.Time':
+                return 'Ardenexal\FHIRTools\Component\Models\Primitive\FHIRTime';
             case 'http://hl7.org/fhirpath/System.DateTime':
-                return \DateTimeInterface::class;
+                return 'Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDateTime';
         }
 
         // Normalize to HL7 URL for context lookup
@@ -1369,17 +1371,22 @@ class FHIRModelGenerator implements GeneratorInterface
                 continue;
             }
             if ($code === 'http://hl7.org/fhirpath/System.DateTime') {
-                $types[] = '\\' . \DateTimeInterface::class;
+                // instant.value also maps to System.DateTime — distinguish by element path
+                if (str_starts_with($element['path'] ?? '', 'instant.')) {
+                    $types[] = '\\Ardenexal\\FHIRTools\\Component\\Models\\Primitive\\FHIRInstant';
+                } else {
+                    $types[] = '\\Ardenexal\\FHIRTools\\Component\\Models\\Primitive\\FHIRDateTime';
+                }
 
                 continue;
             }
             if ($code === 'http://hl7.org/fhirpath/System.Date') {
-                $types[] = 'string';
+                $types[] = '\\Ardenexal\\FHIRTools\\Component\\Models\\Primitive\\FHIRDate';
 
                 continue;
             }
             if ($code === 'http://hl7.org/fhirpath/System.Time') {
-                $types[] = 'string';
+                $types[] = '\\Ardenexal\\FHIRTools\\Component\\Models\\Primitive\\FHIRTime';
 
                 continue;
             }

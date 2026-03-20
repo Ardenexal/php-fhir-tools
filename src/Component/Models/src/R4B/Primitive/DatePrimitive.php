@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Primitive;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDate;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Element;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
@@ -61,9 +62,9 @@ class DatePrimitive extends Element
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
-        /** @var string|null value Primitive value for date */
+        /** @var FHIRDate|null value Primitive value for date */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.Date', propertyKind: 'scalar', xmlSerializedName: '@value')]
-        public ?string $value = null,
+        public ?FHIRDate $value = null,
     ) {
         parent::__construct($id, $extension);
     }

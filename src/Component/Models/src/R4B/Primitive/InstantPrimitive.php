@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Primitive;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRInstant;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Element;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
@@ -61,9 +62,9 @@ class InstantPrimitive extends Element
         /** @var array<Extension> extension Additional content defined by implementations */
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
-        /** @var \DateTimeInterface|null value Primitive value for instant */
+        /** @var FHIRInstant|null value Primitive value for instant */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.DateTime', propertyKind: 'scalar', xmlSerializedName: '@value')]
-        public ?\DateTimeInterface $value = null,
+        public ?FHIRInstant $value = null,
     ) {
         parent::__construct($id, $extension);
     }
