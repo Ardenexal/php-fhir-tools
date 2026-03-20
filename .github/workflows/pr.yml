@@ -73,9 +73,8 @@ jobs:
     unit-tests:
         runs-on: ubuntu-latest
         env:
-            XDEBUG_MODE: off
+            XDEBUG_MODE: coverage
             COMPOSER_NO_INTERACTION: 1
-
         steps:
             -   uses: actions/checkout@v4
                 with:
@@ -113,7 +112,7 @@ jobs:
         runs-on: ubuntu-latest
         env:
             COMPOSER_NO_INTERACTION: 1
-
+            XDEBUG_MODE: coverage
         steps:
             -   uses: actions/checkout@v4
                 with:
@@ -156,8 +155,9 @@ jobs:
 
     recipe-validation:
         runs-on: ubuntu-latest
-
-        steps:
+    env:
+        XDEBUG_MODE: coverage
+    steps:
             -   uses: actions/checkout@v4
 
             -   name: Setup PHP
