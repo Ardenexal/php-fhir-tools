@@ -905,7 +905,7 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
                         $denormalizedValue = $this->unwrapXmlValue($value, $propertyType);
 
                         // Cast to correct PHP scalar type based on FhirProperty metadata
-                        $scalarPhpType = $propertyMetadata?->phpType;
+                        $scalarPhpType = $propertyMetadata?->phpItemClass;
                         if ($scalarPhpType === 'int') {
                             $denormalizedValue = (int) $denormalizedValue;
                         } elseif ($scalarPhpType === 'float') {
