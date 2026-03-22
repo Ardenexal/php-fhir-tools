@@ -1,97 +1,44 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubscriptionTopic;
+
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\MarkdownPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * @description Event definition which can be used to trigger the SubscriptionTopic.
  */
-#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement(parentResource: 'SubscriptionTopic', elementPath: 'SubscriptionTopic.eventTrigger', fhirVersion: 'R4B')]
-class SubscriptionTopicEventTrigger extends \Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement
+#[FHIRBackboneElement(parentResource: 'SubscriptionTopic', elementPath: 'SubscriptionTopic.eventTrigger', fhirVersion: 'R4B')]
+class SubscriptionTopicEventTrigger extends BackboneElement
 {
-	public const FHIR_PROPERTY_MAP = [
-		'id' => [
-			'fhirType' => 'http://hl7.org/fhirpath/System.String',
-			'propertyKind' => 'scalar',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-			'xmlSerializedName' => '@id',
-		],
-		'extension' => [
-			'fhirType' => 'Extension',
-			'propertyKind' => 'extension',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'modifierExtension' => [
-			'fhirType' => 'Extension',
-			'propertyKind' => 'modifierExtension',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'description' => [
-			'fhirType' => 'markdown',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'event' => [
-			'fhirType' => 'CodeableConcept',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => true,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'resource' => [
-			'fhirType' => 'uri',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => true,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-	];
-
-	public function __construct(
-		/** @var null|string id Unique id for inter-element referencing */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
-		public ?string $id = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension> extension Additional content defined by implementations */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
-		public array $modifierExtension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\MarkdownPrimitive description Text representation of the event trigger */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\MarkdownPrimitive $description = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept event Event which can trigger a notification from the SubscriptionTopic */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), \Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept $event = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive resource Data Type or Resource (reference to definition) for this trigger definition */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isRequired: true), \Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive $resource = null,
-	) {
-		parent::__construct($id, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
+        public ?string $id = null,
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        public array $modifierExtension = [],
+        /** @var MarkdownPrimitive|null description Text representation of the event trigger */
+        #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
+        public ?MarkdownPrimitive $description = null,
+        /** @var CodeableConcept|null event Event which can trigger a notification from the SubscriptionTopic */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        public ?CodeableConcept $event = null,
+        /** @var UriPrimitive|null resource Data Type or Resource (reference to definition) for this trigger definition */
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isRequired: true), NotBlank]
+        public ?UriPrimitive $resource = null,
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
 }

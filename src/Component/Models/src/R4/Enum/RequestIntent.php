@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -10,18 +12,18 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum RequestIntent: string
 {
-	/** Proposal */
-	case proposal = 'proposal';
+    /** Proposal */
+    case proposal = 'proposal';
 
-	/** Plan */
-	case plan = 'plan';
+    /** Plan */
+    case plan = 'plan';
 
-	/** Directive */
-	case directive = 'directive';
+    /** Directive */
+    case directive = 'directive';
 
-	/** Order */
-	case order = 'order';
+    /** Order */
+    case order = 'order';
 
-	/** Option */
-	case option = 'option';
+    /** Option */
+    case option = 'option';
 }

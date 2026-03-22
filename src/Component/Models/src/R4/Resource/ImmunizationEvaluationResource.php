@@ -1,374 +1,150 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\ImmunizationEvaluationStatusCodesType;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
 /**
  * @author Health Level Seven International (Public Health and Emergency Response)
+ *
  * @see http://hl7.org/fhir/StructureDefinition/ImmunizationEvaluation
+ *
  * @description Describes a comparison of an immunization event against published recommendations to determine if the administration is "valid" in relation to those  recommendations.
  */
-#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource(
-	type: 'ImmunizationEvaluation',
-	version: '4.0.1',
-	url: 'http://hl7.org/fhir/StructureDefinition/ImmunizationEvaluation',
-	fhirVersion: 'R4',
+#[FhirResource(
+    type: 'ImmunizationEvaluation',
+    version: '4.0.1',
+    url: 'http://hl7.org/fhir/StructureDefinition/ImmunizationEvaluation',
+    fhirVersion: 'R4',
 )]
 class ImmunizationEvaluationResource extends DomainResourceResource
 {
-	public const FHIR_PROPERTY_MAP = [
-		'id' => [
-			'fhirType' => 'http://hl7.org/fhirpath/System.String',
-			'propertyKind' => 'scalar',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'meta' => [
-			'fhirType' => 'Meta',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'implicitRules' => [
-			'fhirType' => 'uri',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'language' => [
-			'fhirType' => 'code',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'text' => [
-			'fhirType' => 'Narrative',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'contained' => [
-			'fhirType' => 'Resource',
-			'propertyKind' => 'resource',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'extension' => [
-			'fhirType' => 'Extension',
-			'propertyKind' => 'extension',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'modifierExtension' => [
-			'fhirType' => 'Extension',
-			'propertyKind' => 'modifierExtension',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'identifier' => [
-			'fhirType' => 'Identifier',
-			'propertyKind' => 'complex',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
-			'variants' => null,
-		],
-		'status' => [
-			'fhirType' => 'code',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => true,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'patient' => [
-			'fhirType' => 'Reference',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => true,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'date' => [
-			'fhirType' => 'dateTime',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'authority' => [
-			'fhirType' => 'Reference',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'targetDisease' => [
-			'fhirType' => 'CodeableConcept',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => true,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'immunizationEvent' => [
-			'fhirType' => 'Reference',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => true,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'doseStatus' => [
-			'fhirType' => 'CodeableConcept',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => true,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'doseStatusReason' => [
-			'fhirType' => 'CodeableConcept',
-			'propertyKind' => 'complex',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
-			'variants' => null,
-		],
-		'description' => [
-			'fhirType' => 'string',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'series' => [
-			'fhirType' => 'string',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'doseNumber' => [
-			'fhirType' => 'choice',
-			'propertyKind' => 'choice',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => true,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => [
-				[
-					'fhirType' => 'positiveInt',
-					'propertyKind' => 'primitive',
-					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive',
-					'jsonKey' => 'doseNumberPositiveInt',
-					'isBuiltin' => false,
-				],
-				[
-					'fhirType' => 'string',
-					'propertyKind' => 'primitive',
-					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive',
-					'jsonKey' => 'doseNumberString',
-					'isBuiltin' => false,
-				],
-			],
-		],
-		'seriesDoses' => [
-			'fhirType' => 'choice',
-			'propertyKind' => 'choice',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => true,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => [
-				[
-					'fhirType' => 'positiveInt',
-					'propertyKind' => 'primitive',
-					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive',
-					'jsonKey' => 'seriesDosesPositiveInt',
-					'isBuiltin' => false,
-				],
-				[
-					'fhirType' => 'string',
-					'propertyKind' => 'primitive',
-					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive',
-					'jsonKey' => 'seriesDosesString',
-					'isBuiltin' => false,
-				],
-			],
-		],
-	];
-
-	public function __construct(
-		/** @var null|string id Logical id of this artifact */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
-		public ?string $id = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta meta Metadata about the resource */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta $meta = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive implicitRules A set of rules under which this content was created */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive $implicitRules = null,
-		/** @var null|string language Language of the resource content */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
-		public ?string $language = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative text Text summary of the resource, for human interpretation */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative $text = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\ResourceResource> contained Contained, inline Resources */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
-		public array $contained = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> extension Additional content defined by implementations */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> modifierExtension Extensions that cannot be ignored */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
-		public array $modifierExtension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier> identifier Business identifier */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'Identifier',
-			propertyKind: 'complex',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
-		)]
-		public array $identifier = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\ImmunizationEvaluationStatusCodesType status completed | entered-in-error */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), \Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\ImmunizationEvaluationStatusCodesType $status = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference patient Who this evaluation is for */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), \Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference $patient = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive date Date evaluation was performed */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive $date = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference authority Who is responsible for publishing the recommendations */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference $authority = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept targetDisease Evaluation target disease */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), \Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept $targetDisease = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference immunizationEvent Immunization being evaluated */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), \Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference $immunizationEvent = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept doseStatus Status of the dose relative to published recommendations */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), \Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept $doseStatus = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept> doseStatusReason Reason for the dose status */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'CodeableConcept',
-			propertyKind: 'complex',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
-		)]
-		public array $doseStatusReason = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string description Evaluation notes */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
-		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string|null $description = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string series Name of vaccine series */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
-		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string|null $series = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string doseNumber Dose number within series */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'choice',
-			propertyKind: 'choice',
-			isChoice: true,
-			variants: [
-			[
-				'fhirType' => 'positiveInt',
-				'propertyKind' => 'primitive',
-				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive',
-				'jsonKey' => 'doseNumberPositiveInt',
-			],
-			[
-				'fhirType' => 'string',
-				'propertyKind' => 'primitive',
-				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive',
-				'jsonKey' => 'doseNumberString',
-			],
-		],
-		)]
-		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string|null $doseNumber = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string seriesDoses Recommended number of doses for immunity */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'choice',
-			propertyKind: 'choice',
-			isChoice: true,
-			variants: [
-			[
-				'fhirType' => 'positiveInt',
-				'propertyKind' => 'primitive',
-				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive',
-				'jsonKey' => 'seriesDosesPositiveInt',
-			],
-			[
-				'fhirType' => 'string',
-				'propertyKind' => 'primitive',
-				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive',
-				'jsonKey' => 'seriesDosesString',
-			],
-		],
-		)]
-		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string|null $seriesDoses = null,
-	) {
-		parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Logical id of this artifact */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        public ?string $id = null,
+        /** @var Meta|null meta Metadata about the resource */
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        public ?Meta $meta = null,
+        /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        public ?UriPrimitive $implicitRules = null,
+        /** @var string|null language Language of the resource content */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        public ?string $language = null,
+        /** @var Narrative|null text Text summary of the resource, for human interpretation */
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        public ?Narrative $text = null,
+        /** @var array<ResourceResource> contained Contained, inline Resources */
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        public array $contained = [],
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        public array $modifierExtension = [],
+        /** @var array<Identifier> identifier Business identifier */
+        #[FhirProperty(
+            fhirType: 'Identifier',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
+        )]
+        public array $identifier = [],
+        /** @var ImmunizationEvaluationStatusCodesType|null status completed | entered-in-error */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        public ?ImmunizationEvaluationStatusCodesType $status = null,
+        /** @var Reference|null patient Who this evaluation is for */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank]
+        public ?Reference $patient = null,
+        /** @var DateTimePrimitive|null date Date evaluation was performed */
+        #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
+        public ?DateTimePrimitive $date = null,
+        /** @var Reference|null authority Who is responsible for publishing the recommendations */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $authority = null,
+        /** @var CodeableConcept|null targetDisease Evaluation target disease */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        public ?CodeableConcept $targetDisease = null,
+        /** @var Reference|null immunizationEvent Immunization being evaluated */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank]
+        public ?Reference $immunizationEvent = null,
+        /** @var CodeableConcept|null doseStatus Status of the dose relative to published recommendations */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        public ?CodeableConcept $doseStatus = null,
+        /** @var array<CodeableConcept> doseStatusReason Reason for the dose status */
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
+        )]
+        public array $doseStatusReason = [],
+        /** @var StringPrimitive|string|null description Evaluation notes */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+        public StringPrimitive|string|null $description = null,
+        /** @var StringPrimitive|string|null series Name of vaccine series */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+        public StringPrimitive|string|null $series = null,
+        /** @var PositiveIntPrimitive|StringPrimitive|string|null doseNumber Dose number within series */
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'positiveInt',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive',
+                    'jsonKey'      => 'doseNumberPositiveInt',
+                ],
+                [
+                    'fhirType'     => 'string',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive',
+                    'jsonKey'      => 'doseNumberString',
+                ],
+            ],
+        )]
+        public PositiveIntPrimitive|StringPrimitive|string|null $doseNumber = null,
+        /** @var PositiveIntPrimitive|StringPrimitive|string|null seriesDoses Recommended number of doses for immunity */
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'positiveInt',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive',
+                    'jsonKey'      => 'seriesDosesPositiveInt',
+                ],
+                [
+                    'fhirType'     => 'string',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive',
+                    'jsonKey'      => 'seriesDosesString',
+                ],
+            ],
+        )]
+        public PositiveIntPrimitive|StringPrimitive|string|null $seriesDoses = null,
+    ) {
+        parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
+    }
 }

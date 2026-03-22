@@ -1,541 +1,214 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactDetail;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\EvidenceVariableTypeType;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Period;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\PublicationStatusType;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\RelatedArtifact;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\UsageContext;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\EvidenceVariable\EvidenceVariableCharacteristic;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
 /**
  * @author Health Level Seven International (Clinical Decision Support)
+ *
  * @see http://hl7.org/fhir/StructureDefinition/EvidenceVariable
+ *
  * @description The EvidenceVariable resource describes a "PICO" element that knowledge (evidence, assertion, recommendation) is about.
  */
-#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource(
-	type: 'EvidenceVariable',
-	version: '4.0.1',
-	url: 'http://hl7.org/fhir/StructureDefinition/EvidenceVariable',
-	fhirVersion: 'R4',
+#[FhirResource(
+    type: 'EvidenceVariable',
+    version: '4.0.1',
+    url: 'http://hl7.org/fhir/StructureDefinition/EvidenceVariable',
+    fhirVersion: 'R4',
 )]
 class EvidenceVariableResource extends DomainResourceResource
 {
-	public const FHIR_PROPERTY_MAP = [
-		'id' => [
-			'fhirType' => 'http://hl7.org/fhirpath/System.String',
-			'propertyKind' => 'scalar',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'meta' => [
-			'fhirType' => 'Meta',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'implicitRules' => [
-			'fhirType' => 'uri',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'language' => [
-			'fhirType' => 'code',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'text' => [
-			'fhirType' => 'Narrative',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'contained' => [
-			'fhirType' => 'Resource',
-			'propertyKind' => 'resource',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'extension' => [
-			'fhirType' => 'Extension',
-			'propertyKind' => 'extension',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'modifierExtension' => [
-			'fhirType' => 'Extension',
-			'propertyKind' => 'modifierExtension',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'url' => [
-			'fhirType' => 'uri',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'identifier' => [
-			'fhirType' => 'Identifier',
-			'propertyKind' => 'complex',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
-			'variants' => null,
-		],
-		'version' => [
-			'fhirType' => 'string',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'name' => [
-			'fhirType' => 'string',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'title' => [
-			'fhirType' => 'string',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'shortTitle' => [
-			'fhirType' => 'string',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'subtitle' => [
-			'fhirType' => 'string',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'status' => [
-			'fhirType' => 'code',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => true,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'date' => [
-			'fhirType' => 'dateTime',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'publisher' => [
-			'fhirType' => 'string',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'contact' => [
-			'fhirType' => 'ContactDetail',
-			'propertyKind' => 'complex',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactDetail',
-			'variants' => null,
-		],
-		'description' => [
-			'fhirType' => 'markdown',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'note' => [
-			'fhirType' => 'Annotation',
-			'propertyKind' => 'complex',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation',
-			'variants' => null,
-		],
-		'useContext' => [
-			'fhirType' => 'UsageContext',
-			'propertyKind' => 'complex',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\UsageContext',
-			'variants' => null,
-		],
-		'jurisdiction' => [
-			'fhirType' => 'CodeableConcept',
-			'propertyKind' => 'complex',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
-			'variants' => null,
-		],
-		'copyright' => [
-			'fhirType' => 'markdown',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'approvalDate' => [
-			'fhirType' => 'date',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'lastReviewDate' => [
-			'fhirType' => 'date',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'effectivePeriod' => [
-			'fhirType' => 'Period',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'topic' => [
-			'fhirType' => 'CodeableConcept',
-			'propertyKind' => 'complex',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
-			'variants' => null,
-		],
-		'author' => [
-			'fhirType' => 'ContactDetail',
-			'propertyKind' => 'complex',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactDetail',
-			'variants' => null,
-		],
-		'editor' => [
-			'fhirType' => 'ContactDetail',
-			'propertyKind' => 'complex',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactDetail',
-			'variants' => null,
-		],
-		'reviewer' => [
-			'fhirType' => 'ContactDetail',
-			'propertyKind' => 'complex',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactDetail',
-			'variants' => null,
-		],
-		'endorser' => [
-			'fhirType' => 'ContactDetail',
-			'propertyKind' => 'complex',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactDetail',
-			'variants' => null,
-		],
-		'relatedArtifact' => [
-			'fhirType' => 'RelatedArtifact',
-			'propertyKind' => 'complex',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\RelatedArtifact',
-			'variants' => null,
-		],
-		'type' => [
-			'fhirType' => 'code',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'characteristic' => [
-			'fhirType' => 'BackboneElement',
-			'propertyKind' => 'backbone',
-			'isArray' => true,
-			'isRequired' => true,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\EvidenceVariable\EvidenceVariableCharacteristic',
-			'variants' => null,
-		],
-	];
-
-	public function __construct(
-		/** @var null|string id Logical id of this artifact */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
-		public ?string $id = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta meta Metadata about the resource */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta $meta = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive implicitRules A set of rules under which this content was created */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive $implicitRules = null,
-		/** @var null|string language Language of the resource content */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
-		public ?string $language = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative text Text summary of the resource, for human interpretation */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative $text = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\ResourceResource> contained Contained, inline Resources */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
-		public array $contained = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> extension Additional content defined by implementations */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> modifierExtension Extensions that cannot be ignored */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
-		public array $modifierExtension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive url Canonical identifier for this evidence variable, represented as a URI (globally unique) */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive $url = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier> identifier Additional identifier for the evidence variable */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'Identifier',
-			propertyKind: 'complex',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
-		)]
-		public array $identifier = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string version Business version of the evidence variable */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
-		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string|null $version = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string name Name for this evidence variable (computer friendly) */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
-		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string|null $name = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string title Name for this evidence variable (human friendly) */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
-		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string|null $title = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string shortTitle Title for use in informal contexts */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
-		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string|null $shortTitle = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string subtitle Subordinate title of the EvidenceVariable */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
-		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string|null $subtitle = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\PublicationStatusType status draft | active | retired | unknown */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), \Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\PublicationStatusType $status = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive date Date last changed */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive $date = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string publisher Name of the publisher (organization or individual) */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
-		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string|null $publisher = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactDetail> contact Contact details for the publisher */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'ContactDetail',
-			propertyKind: 'complex',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactDetail',
-		)]
-		public array $contact = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive description Natural language description of the evidence variable */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive $description = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation> note Used for footnotes or explanatory notes */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'Annotation',
-			propertyKind: 'complex',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation',
-		)]
-		public array $note = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\UsageContext> useContext The context that the content is intended to support */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'UsageContext',
-			propertyKind: 'complex',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\UsageContext',
-		)]
-		public array $useContext = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept> jurisdiction Intended jurisdiction for evidence variable (if applicable) */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'CodeableConcept',
-			propertyKind: 'complex',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
-		)]
-		public array $jurisdiction = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive copyright Use and/or publishing restrictions */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive $copyright = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive approvalDate When the evidence variable was approved by publisher */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive $approvalDate = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive lastReviewDate When the evidence variable was last reviewed */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive $lastReviewDate = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Period effectivePeriod When the evidence variable is expected to be used */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Period $effectivePeriod = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept> topic The category of the EvidenceVariable, such as Education, Treatment, Assessment, etc. */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'CodeableConcept',
-			propertyKind: 'complex',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
-		)]
-		public array $topic = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactDetail> author Who authored the content */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'ContactDetail',
-			propertyKind: 'complex',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactDetail',
-		)]
-		public array $author = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactDetail> editor Who edited the content */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'ContactDetail',
-			propertyKind: 'complex',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactDetail',
-		)]
-		public array $editor = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactDetail> reviewer Who reviewed the content */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'ContactDetail',
-			propertyKind: 'complex',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactDetail',
-		)]
-		public array $reviewer = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactDetail> endorser Who endorsed the content */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'ContactDetail',
-			propertyKind: 'complex',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactDetail',
-		)]
-		public array $endorser = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\RelatedArtifact> relatedArtifact Additional documentation, citations, etc. */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'RelatedArtifact',
-			propertyKind: 'complex',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\RelatedArtifact',
-		)]
-		public array $relatedArtifact = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\EvidenceVariableTypeType type dichotomous | continuous | descriptive */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\EvidenceVariableTypeType $type = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\EvidenceVariable\EvidenceVariableCharacteristic> characteristic What defines the members of the evidence element */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'BackboneElement',
-			propertyKind: 'backbone',
-			isArray: true,
-			isRequired: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\EvidenceVariable\EvidenceVariableCharacteristic',
-		)]
-		public array $characteristic = [],
-	) {
-		parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Logical id of this artifact */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        public ?string $id = null,
+        /** @var Meta|null meta Metadata about the resource */
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        public ?Meta $meta = null,
+        /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        public ?UriPrimitive $implicitRules = null,
+        /** @var string|null language Language of the resource content */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        public ?string $language = null,
+        /** @var Narrative|null text Text summary of the resource, for human interpretation */
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        public ?Narrative $text = null,
+        /** @var array<ResourceResource> contained Contained, inline Resources */
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        public array $contained = [],
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        public array $modifierExtension = [],
+        /** @var UriPrimitive|null url Canonical identifier for this evidence variable, represented as a URI (globally unique) */
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        public ?UriPrimitive $url = null,
+        /** @var array<Identifier> identifier Additional identifier for the evidence variable */
+        #[FhirProperty(
+            fhirType: 'Identifier',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
+        )]
+        public array $identifier = [],
+        /** @var StringPrimitive|string|null version Business version of the evidence variable */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+        public StringPrimitive|string|null $version = null,
+        /** @var StringPrimitive|string|null name Name for this evidence variable (computer friendly) */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+        public StringPrimitive|string|null $name = null,
+        /** @var StringPrimitive|string|null title Name for this evidence variable (human friendly) */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+        public StringPrimitive|string|null $title = null,
+        /** @var StringPrimitive|string|null shortTitle Title for use in informal contexts */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+        public StringPrimitive|string|null $shortTitle = null,
+        /** @var StringPrimitive|string|null subtitle Subordinate title of the EvidenceVariable */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+        public StringPrimitive|string|null $subtitle = null,
+        /** @var PublicationStatusType|null status draft | active | retired | unknown */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        public ?PublicationStatusType $status = null,
+        /** @var DateTimePrimitive|null date Date last changed */
+        #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
+        public ?DateTimePrimitive $date = null,
+        /** @var StringPrimitive|string|null publisher Name of the publisher (organization or individual) */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+        public StringPrimitive|string|null $publisher = null,
+        /** @var array<ContactDetail> contact Contact details for the publisher */
+        #[FhirProperty(
+            fhirType: 'ContactDetail',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactDetail',
+        )]
+        public array $contact = [],
+        /** @var MarkdownPrimitive|null description Natural language description of the evidence variable */
+        #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
+        public ?MarkdownPrimitive $description = null,
+        /** @var array<Annotation> note Used for footnotes or explanatory notes */
+        #[FhirProperty(
+            fhirType: 'Annotation',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation',
+        )]
+        public array $note = [],
+        /** @var array<UsageContext> useContext The context that the content is intended to support */
+        #[FhirProperty(
+            fhirType: 'UsageContext',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\UsageContext',
+        )]
+        public array $useContext = [],
+        /** @var array<CodeableConcept> jurisdiction Intended jurisdiction for evidence variable (if applicable) */
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
+        )]
+        public array $jurisdiction = [],
+        /** @var MarkdownPrimitive|null copyright Use and/or publishing restrictions */
+        #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
+        public ?MarkdownPrimitive $copyright = null,
+        /** @var DatePrimitive|null approvalDate When the evidence variable was approved by publisher */
+        #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
+        public ?DatePrimitive $approvalDate = null,
+        /** @var DatePrimitive|null lastReviewDate When the evidence variable was last reviewed */
+        #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
+        public ?DatePrimitive $lastReviewDate = null,
+        /** @var Period|null effectivePeriod When the evidence variable is expected to be used */
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        public ?Period $effectivePeriod = null,
+        /** @var array<CodeableConcept> topic The category of the EvidenceVariable, such as Education, Treatment, Assessment, etc. */
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
+        )]
+        public array $topic = [],
+        /** @var array<ContactDetail> author Who authored the content */
+        #[FhirProperty(
+            fhirType: 'ContactDetail',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactDetail',
+        )]
+        public array $author = [],
+        /** @var array<ContactDetail> editor Who edited the content */
+        #[FhirProperty(
+            fhirType: 'ContactDetail',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactDetail',
+        )]
+        public array $editor = [],
+        /** @var array<ContactDetail> reviewer Who reviewed the content */
+        #[FhirProperty(
+            fhirType: 'ContactDetail',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactDetail',
+        )]
+        public array $reviewer = [],
+        /** @var array<ContactDetail> endorser Who endorsed the content */
+        #[FhirProperty(
+            fhirType: 'ContactDetail',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactDetail',
+        )]
+        public array $endorser = [],
+        /** @var array<RelatedArtifact> relatedArtifact Additional documentation, citations, etc. */
+        #[FhirProperty(
+            fhirType: 'RelatedArtifact',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\RelatedArtifact',
+        )]
+        public array $relatedArtifact = [],
+        /** @var EvidenceVariableTypeType|null type dichotomous | continuous | descriptive */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        public ?EvidenceVariableTypeType $type = null,
+        /** @var array<EvidenceVariableCharacteristic> characteristic What defines the members of the evidence element */
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            isRequired: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\EvidenceVariable\EvidenceVariableCharacteristic',
+        )]
+        public array $characteristic = [],
+    ) {
+        parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
+    }
 }

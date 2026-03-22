@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Serialization\Metadata;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * Resolves and caches PropertyMetadata for FHIR model classes.
  *
  * Resolution order per class:
- *  1. Warm in-process cache (keyed by class-string, populated on first access)
- *  2. FHIR_PROPERTY_MAP const — O(1) array read, no reflection (preferred for generated classes)
- *  3. #[FhirProperty] attribute reflection — once per class per process for non-generated classes
- *  4. Empty array — class has no FHIR property metadata
+ *  1. L1: in-process array cache (keyed by class-string)
+ *  2. L2: PSR-6 cache pool (if configured via Symfony bundle)
+ *  3. L3: #[FhirProperty] attribute reflection — once per class per process
  *
  * @author Ardenexal
  */
@@ -22,91 +22,59 @@ class PropertyMetadataProvider implements PropertyMetadataProviderInterface
     /** @var array<class-string, array<string, PropertyMetadata>> */
     private array $cache = [];
 
+    public function __construct(
+        private ?CacheItemPoolInterface $psrCache = null,
+    ) {
+    }
+
+    /**
+     * Returns the canonical PSR-6 cache key for a FHIR model class.
+     */
+    public static function cacheKey(string $className): string
+    {
+        return 'fhir.property_metadata.' . hash('sha256', $className);
+    }
+
     /**
      * {@inheritDoc}
      */
     public function getPropertyMetadata(string $className): array
     {
-        if (array_key_exists($className, $this->cache)) {
+        // L1: in-process cache
+        if (isset($this->cache[$className])) {
             return $this->cache[$className];
         }
 
-        $metadata                = $this->resolveMetadata($className);
+        // L2: PSR-6 (if configured)
+        if ($this->psrCache !== null) {
+            $item = $this->psrCache->getItem(self::cacheKey($className));
+            if ($item->isHit()) {
+                $value = $item->get();
+                if (is_array($value)) {
+                    /** @var array<string, PropertyMetadata> $value */
+                    $this->cache[$className] = $value;
+
+                    return $value;
+                }
+            }
+        }
+
+        // L3: reflection on #[FhirProperty] attributes
+        $metadata = $this->resolveFromAttributes($className);
+
+        // Write-through: populate L1 and L2 on miss
         $this->cache[$className] = $metadata;
+        if ($this->psrCache !== null && $metadata !== []) {
+            $item = $this->psrCache->getItem(self::cacheKey($className));
+            $item->set($metadata);
+            $this->psrCache->save($item);
+        }
 
         return $metadata;
     }
 
     /**
-     * Resolve metadata for a class — const path first, attribute reflection second.
-     *
-     * @param class-string $className
-     *
-     * @return array<string, PropertyMetadata>
-     */
-    private function resolveMetadata(string $className): array
-    {
-        // Fast path: read compiled FHIR_PROPERTY_MAP const (no reflection)
-        if (defined($className . '::FHIR_PROPERTY_MAP')) {
-            /** @var array<string, array{fhirType: string, propertyKind: string, isArray: bool, isRequired: bool, isChoice: bool, jsonKey: string|null, phpType?: string|null, xmlSerializedName?: string|null, variants: list<array{fhirType: string, propertyKind: string, phpType: string, jsonKey: string, isBuiltin: bool}>|null}> $map */
-            $map = constant($className . '::FHIR_PROPERTY_MAP');
-
-            return $this->hydrateFromMap($map);
-        }
-
-        // Slow path: walk constructor promoted parameters for #[FhirProperty] attributes
-        return $this->resolveFromAttributes($className);
-    }
-
-    /**
-     * Hydrate PropertyMetadata objects from a FHIR_PROPERTY_MAP const value.
-     *
-     * @param array<string, array{fhirType: string, propertyKind: string, isArray: bool, isRequired: bool, isChoice: bool, jsonKey: string|null, phpType?: string|null, xmlSerializedName?: string|null, variants: list<array{fhirType: string, propertyKind: string, phpType: string, jsonKey: string, isBuiltin: bool}>|null}> $map
-     *
-     * @return array<string, PropertyMetadata>
-     */
-    private function hydrateFromMap(array $map): array
-    {
-        $result = [];
-
-        foreach ($map as $propertyName => $entry) {
-            $variants = null;
-            if ($entry['isChoice'] && isset($entry['variants'])) {
-                $variants = array_map(
-                    static fn (array $v): PropertyVariantMetadata => new PropertyVariantMetadata(
-                        $v['fhirType'],
-                        $v['propertyKind'],
-                        $v['phpType'],
-                        $v['jsonKey'],
-                        $v['isBuiltin'],
-                    ),
-                    $entry['variants'],
-                );
-            }
-
-            $phpItemClass      = $entry['phpType']           ?? null;
-            $xmlSerializedName = $entry['xmlSerializedName'] ?? null;
-
-            $result[$propertyName] = new PropertyMetadata(
-                $entry['fhirType'],
-                $entry['propertyKind'],
-                $entry['isArray'],
-                $entry['isRequired'],
-                $entry['isChoice'],
-                $variants,
-                $entry['jsonKey'],
-                $phpItemClass,
-                $xmlSerializedName,
-            );
-        }
-
-        return $result;
-    }
-
-    /**
      * Resolve metadata by reflecting #[FhirProperty] attributes on constructor parameters.
-     *
-     * Used only for classes that do not have a FHIR_PROPERTY_MAP const (e.g. hand-written models).
      *
      * @param class-string $className
      *
@@ -154,7 +122,7 @@ class PropertyMetadataProvider implements PropertyMetadataProviderInterface
                     $attr->isChoice,
                     $variants,
                     $attr->jsonKey,
-                    null,
+                    $attr->phpType,
                     $attr->xmlSerializedName,
                 );
             }

@@ -70,6 +70,12 @@ class FHIRExtension extends Extension
         // Load service definitions
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yaml');
+
+        // Inject PSR-6 pool into PropertyMetadataProvider (services.yaml must be loaded first)
+        if ($cachePool !== null) {
+            $container->getDefinition(PropertyMetadataProvider::class)
+                ->setArgument('$psrCache', new Reference('fhir.metadata_cache'));
+        }
     }
 
     public function getAlias(): string

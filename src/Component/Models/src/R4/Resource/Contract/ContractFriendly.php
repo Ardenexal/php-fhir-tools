@@ -1,106 +1,57 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\Contract;
+
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Attachment;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * @description The "patient friendly language" versionof the Contract in whole or in parts. "Patient friendly language" means the representation of the Contract and Contract Provisions in a manner that is readily accessible and understandable by a layperson in accordance with best practices for communication styles that ensure that those agreeing to or signing the Contract understand the roles, actions, obligations, responsibilities, and implication of the agreement.
  */
-#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement(parentResource: 'Contract', elementPath: 'Contract.friendly', fhirVersion: 'R4')]
-class ContractFriendly extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement
+#[FHIRBackboneElement(parentResource: 'Contract', elementPath: 'Contract.friendly', fhirVersion: 'R4')]
+class ContractFriendly extends BackboneElement
 {
-	public const FHIR_PROPERTY_MAP = [
-		'id' => [
-			'fhirType' => 'http://hl7.org/fhirpath/System.String',
-			'propertyKind' => 'scalar',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-			'xmlSerializedName' => '@id',
-		],
-		'extension' => [
-			'fhirType' => 'Extension',
-			'propertyKind' => 'extension',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'modifierExtension' => [
-			'fhirType' => 'Extension',
-			'propertyKind' => 'modifierExtension',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'content' => [
-			'fhirType' => 'choice',
-			'propertyKind' => 'choice',
-			'isArray' => false,
-			'isRequired' => true,
-			'isChoice' => true,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => [
-				[
-					'fhirType' => 'Attachment',
-					'propertyKind' => 'complex',
-					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Attachment',
-					'jsonKey' => 'contentAttachment',
-					'isBuiltin' => false,
-				],
-				[
-					'fhirType' => 'Reference',
-					'propertyKind' => 'complex',
-					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
-					'jsonKey' => 'contentReference',
-					'isBuiltin' => false,
-				],
-			],
-		],
-	];
-
-	public function __construct(
-		/** @var null|string id Unique id for inter-element referencing */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
-		public ?string $id = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> extension Additional content defined by implementations */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
-		public array $modifierExtension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Attachment|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference content Easily comprehended representation of this Contract */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'choice',
-			propertyKind: 'choice',
-			isRequired: true,
-			isChoice: true,
-			variants: [
-			[
-				'fhirType' => 'Attachment',
-				'propertyKind' => 'complex',
-				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Attachment',
-				'jsonKey' => 'contentAttachment',
-			],
-			[
-				'fhirType' => 'Reference',
-				'propertyKind' => 'complex',
-				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
-				'jsonKey' => 'contentReference',
-			],
-		],
-		)]
-		#[\Symfony\Component\Validator\Constraints\NotBlank]
-		public \Ardenexal\FHIRTools\Component\Models\R4\DataType\Attachment|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference|null $content = null,
-	) {
-		parent::__construct($id, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
+        public ?string $id = null,
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        public array $modifierExtension = [],
+        /** @var Attachment|Reference|null content Easily comprehended representation of this Contract */
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isRequired: true,
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'Attachment',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Attachment',
+                    'jsonKey'      => 'contentAttachment',
+                ],
+                [
+                    'fhirType'     => 'Reference',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
+                    'jsonKey'      => 'contentReference',
+                ],
+            ],
+        )]
+        #[NotBlank]
+        public Attachment|Reference|null $content = null,
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
 }

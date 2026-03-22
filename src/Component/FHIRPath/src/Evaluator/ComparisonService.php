@@ -387,7 +387,7 @@ final class ComparisonService
             $rightValues = array_values($right);
             $itemCount   = count($leftValues);
 
-            for ($i = 0; $i < $itemCount; $i++) {
+            for ($i = 0; $i < $itemCount; ++$i) {
                 $isEqual = $this->valuesEqual($leftValues[$i], $rightValues[$i], false);
 
                 if ($isEqual === null) {

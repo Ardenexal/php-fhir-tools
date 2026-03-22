@@ -1,290 +1,109 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Meta;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Narrative;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\TestReportResultType;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\TestReportStatusType;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\Resource\TestReport\TestReportParticipant;
+use Ardenexal\FHIRTools\Component\Models\R4B\Resource\TestReport\TestReportSetup;
+use Ardenexal\FHIRTools\Component\Models\R4B\Resource\TestReport\TestReportTeardown;
+use Ardenexal\FHIRTools\Component\Models\R4B\Resource\TestReport\TestReportTest;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
 /**
  * @author Health Level Seven International (FHIR Infrastructure)
+ *
  * @see http://hl7.org/fhir/StructureDefinition/TestReport
+ *
  * @description A summary of information based on the results of executing a TestScript.
  */
-#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource(type: 'TestReport', version: '4.3.0', url: 'http://hl7.org/fhir/StructureDefinition/TestReport', fhirVersion: 'R4B')]
+#[FhirResource(type: 'TestReport', version: '4.3.0', url: 'http://hl7.org/fhir/StructureDefinition/TestReport', fhirVersion: 'R4B')]
 class TestReportResource extends DomainResourceResource
 {
-	public const FHIR_PROPERTY_MAP = [
-		'id' => [
-			'fhirType' => 'http://hl7.org/fhirpath/System.String',
-			'propertyKind' => 'scalar',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'meta' => [
-			'fhirType' => 'Meta',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'implicitRules' => [
-			'fhirType' => 'uri',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'language' => [
-			'fhirType' => 'code',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'text' => [
-			'fhirType' => 'Narrative',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'contained' => [
-			'fhirType' => 'Resource',
-			'propertyKind' => 'resource',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'extension' => [
-			'fhirType' => 'Extension',
-			'propertyKind' => 'extension',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'modifierExtension' => [
-			'fhirType' => 'Extension',
-			'propertyKind' => 'modifierExtension',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'identifier' => [
-			'fhirType' => 'Identifier',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'name' => [
-			'fhirType' => 'string',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'status' => [
-			'fhirType' => 'code',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => true,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'testScript' => [
-			'fhirType' => 'Reference',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => true,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'result' => [
-			'fhirType' => 'code',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => true,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'score' => [
-			'fhirType' => 'decimal',
-			'propertyKind' => 'scalar',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'tester' => [
-			'fhirType' => 'string',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'issued' => [
-			'fhirType' => 'dateTime',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'participant' => [
-			'fhirType' => 'BackboneElement',
-			'propertyKind' => 'backbone',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\TestReport\TestReportParticipant',
-			'variants' => null,
-		],
-		'setup' => [
-			'fhirType' => 'BackboneElement',
-			'propertyKind' => 'backbone',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'test' => [
-			'fhirType' => 'BackboneElement',
-			'propertyKind' => 'backbone',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\TestReport\TestReportTest',
-			'variants' => null,
-		],
-		'teardown' => [
-			'fhirType' => 'BackboneElement',
-			'propertyKind' => 'backbone',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-	];
-
-	public function __construct(
-		/** @var null|string id Logical id of this artifact */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
-		public ?string $id = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Meta meta Metadata about the resource */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Meta $meta = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive implicitRules A set of rules under which this content was created */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive $implicitRules = null,
-		/** @var null|string language Language of the resource content */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
-		public ?string $language = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Narrative text Text summary of the resource, for human interpretation */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Narrative $text = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\ResourceResource> contained Contained, inline Resources */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
-		public array $contained = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension> extension Additional content defined by implementations */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension> modifierExtension Extensions that cannot be ignored */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
-		public array $modifierExtension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier identifier External identifier */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier $identifier = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive|string name Informal name of the executed TestScript */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
-		public \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive|string|null $name = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\TestReportStatusType status completed | in-progress | waiting | stopped | entered-in-error */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), \Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\TestReportStatusType $status = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference testScript Reference to the  version-specific TestScript that was executed to produce this TestReport */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), \Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference $testScript = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\TestReportResultType result pass | fail | pending */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), \Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\TestReportResultType $result = null,
-		/** @var null|numeric-string score The final score (percentage of tests passed) resulting from the execution of the TestScript */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-		public ?string $score = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive|string tester Name of the tester producing this report (Organization or individual) */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
-		public \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive|string|null $tester = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive issued When the TestScript was executed and this TestReport was generated */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive $issued = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\TestReport\TestReportParticipant> participant A participant in the test execution, either the execution engine, a client, or a server */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'BackboneElement',
-			propertyKind: 'backbone',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\TestReport\TestReportParticipant',
-		)]
-		public array $participant = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\TestReport\TestReportSetup setup The results of the series of required setup operations before the tests were executed */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
-		public ?TestReport\TestReportSetup $setup = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\TestReport\TestReportTest> test A test executed from the test script */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'BackboneElement',
-			propertyKind: 'backbone',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\TestReport\TestReportTest',
-		)]
-		public array $test = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\TestReport\TestReportTeardown teardown The results of running the series of required clean up steps */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
-		public ?TestReport\TestReportTeardown $teardown = null,
-	) {
-		parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Logical id of this artifact */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        public ?string $id = null,
+        /** @var Meta|null meta Metadata about the resource */
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        public ?Meta $meta = null,
+        /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        public ?UriPrimitive $implicitRules = null,
+        /** @var string|null language Language of the resource content */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        public ?string $language = null,
+        /** @var Narrative|null text Text summary of the resource, for human interpretation */
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        public ?Narrative $text = null,
+        /** @var array<ResourceResource> contained Contained, inline Resources */
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        public array $contained = [],
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        public array $modifierExtension = [],
+        /** @var Identifier|null identifier External identifier */
+        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
+        public ?Identifier $identifier = null,
+        /** @var StringPrimitive|string|null name Informal name of the executed TestScript */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+        public StringPrimitive|string|null $name = null,
+        /** @var TestReportStatusType|null status completed | in-progress | waiting | stopped | entered-in-error */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        public ?TestReportStatusType $status = null,
+        /** @var Reference|null testScript Reference to the  version-specific TestScript that was executed to produce this TestReport */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank]
+        public ?Reference $testScript = null,
+        /** @var TestReportResultType|null result pass | fail | pending */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        public ?TestReportResultType $result = null,
+        /** @var numeric-string|null score The final score (percentage of tests passed) resulting from the execution of the TestScript */
+        #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
+        public ?string $score = null,
+        /** @var StringPrimitive|string|null tester Name of the tester producing this report (Organization or individual) */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+        public StringPrimitive|string|null $tester = null,
+        /** @var DateTimePrimitive|null issued When the TestScript was executed and this TestReport was generated */
+        #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
+        public ?DateTimePrimitive $issued = null,
+        /** @var array<TestReportParticipant> participant A participant in the test execution, either the execution engine, a client, or a server */
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\TestReport\TestReportParticipant',
+        )]
+        public array $participant = [],
+        /** @var TestReportSetup|null setup The results of the series of required setup operations before the tests were executed */
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        public ?TestReportSetup $setup = null,
+        /** @var array<TestReportTest> test A test executed from the test script */
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\TestReport\TestReportTest',
+        )]
+        public array $test = [],
+        /** @var TestReportTeardown|null teardown The results of running the series of required clean up steps */
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        public ?TestReportTeardown $teardown = null,
+    ) {
+        parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
+    }
 }

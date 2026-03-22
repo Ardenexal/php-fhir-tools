@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,30 +12,30 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum CarePlanActivityKind: string
 {
-	/** Resource */
-	case resource = 'Resource';
+    /** Resource */
+    case resource = 'Resource';
 
-	/** Appointment */
-	case appointment = 'Appointment';
+    /** Appointment */
+    case appointment = 'Appointment';
 
-	/** CommunicationRequest */
-	case communicationrequest = 'CommunicationRequest';
+    /** CommunicationRequest */
+    case communicationrequest = 'CommunicationRequest';
 
-	/** DeviceRequest */
-	case devicerequest = 'DeviceRequest';
+    /** DeviceRequest */
+    case devicerequest = 'DeviceRequest';
 
-	/** MedicationRequest */
-	case medicationrequest = 'MedicationRequest';
+    /** MedicationRequest */
+    case medicationrequest = 'MedicationRequest';
 
-	/** NutritionOrder */
-	case nutritionorder = 'NutritionOrder';
+    /** NutritionOrder */
+    case nutritionorder = 'NutritionOrder';
 
-	/** Task */
-	case task = 'Task';
+    /** Task */
+    case task = 'Task';
 
-	/** ServiceRequest */
-	case servicerequest = 'ServiceRequest';
+    /** ServiceRequest */
+    case servicerequest = 'ServiceRequest';
 
-	/** VisionPrescription */
-	case visionprescription = 'VisionPrescription';
+    /** VisionPrescription */
+    case visionprescription = 'VisionPrescription';
 }

@@ -1,441 +1,193 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Meta;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Narrative;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\MarkdownPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionCode;
+use Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionMoiety;
+use Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionMolecularWeight;
+use Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionName;
+use Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionProperty;
+use Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionRelationship;
+use Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionSourceMaterial;
+use Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionStructure;
+
 /**
  * @author Health Level Seven International (Biomedical Research and Regulation)
+ *
  * @see http://hl7.org/fhir/StructureDefinition/SubstanceDefinition
+ *
  * @description The detailed description of a substance, typically at a level beyond what is used for prescribing.
  */
-#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource(
-	type: 'SubstanceDefinition',
-	version: '4.3.0',
-	url: 'http://hl7.org/fhir/StructureDefinition/SubstanceDefinition',
-	fhirVersion: 'R4B',
+#[FhirResource(
+    type: 'SubstanceDefinition',
+    version: '4.3.0',
+    url: 'http://hl7.org/fhir/StructureDefinition/SubstanceDefinition',
+    fhirVersion: 'R4B',
 )]
 class SubstanceDefinitionResource extends DomainResourceResource
 {
-	public const FHIR_PROPERTY_MAP = [
-		'id' => [
-			'fhirType' => 'http://hl7.org/fhirpath/System.String',
-			'propertyKind' => 'scalar',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'meta' => [
-			'fhirType' => 'Meta',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'implicitRules' => [
-			'fhirType' => 'uri',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'language' => [
-			'fhirType' => 'code',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'text' => [
-			'fhirType' => 'Narrative',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'contained' => [
-			'fhirType' => 'Resource',
-			'propertyKind' => 'resource',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'extension' => [
-			'fhirType' => 'Extension',
-			'propertyKind' => 'extension',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'modifierExtension' => [
-			'fhirType' => 'Extension',
-			'propertyKind' => 'modifierExtension',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'identifier' => [
-			'fhirType' => 'Identifier',
-			'propertyKind' => 'complex',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier',
-			'variants' => null,
-		],
-		'version' => [
-			'fhirType' => 'string',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'status' => [
-			'fhirType' => 'CodeableConcept',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'classification' => [
-			'fhirType' => 'CodeableConcept',
-			'propertyKind' => 'complex',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
-			'variants' => null,
-		],
-		'domain' => [
-			'fhirType' => 'CodeableConcept',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'grade' => [
-			'fhirType' => 'CodeableConcept',
-			'propertyKind' => 'complex',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
-			'variants' => null,
-		],
-		'description' => [
-			'fhirType' => 'markdown',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'informationSource' => [
-			'fhirType' => 'Reference',
-			'propertyKind' => 'complex',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
-			'variants' => null,
-		],
-		'note' => [
-			'fhirType' => 'Annotation',
-			'propertyKind' => 'complex',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation',
-			'variants' => null,
-		],
-		'manufacturer' => [
-			'fhirType' => 'Reference',
-			'propertyKind' => 'complex',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
-			'variants' => null,
-		],
-		'supplier' => [
-			'fhirType' => 'Reference',
-			'propertyKind' => 'complex',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
-			'variants' => null,
-		],
-		'moiety' => [
-			'fhirType' => 'BackboneElement',
-			'propertyKind' => 'backbone',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionMoiety',
-			'variants' => null,
-		],
-		'property' => [
-			'fhirType' => 'BackboneElement',
-			'propertyKind' => 'backbone',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionProperty',
-			'variants' => null,
-		],
-		'molecularWeight' => [
-			'fhirType' => 'BackboneElement',
-			'propertyKind' => 'backbone',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionMolecularWeight',
-			'variants' => null,
-		],
-		'structure' => [
-			'fhirType' => 'BackboneElement',
-			'propertyKind' => 'backbone',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'code' => [
-			'fhirType' => 'BackboneElement',
-			'propertyKind' => 'backbone',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionCode',
-			'variants' => null,
-		],
-		'name' => [
-			'fhirType' => 'BackboneElement',
-			'propertyKind' => 'backbone',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionName',
-			'variants' => null,
-		],
-		'relationship' => [
-			'fhirType' => 'BackboneElement',
-			'propertyKind' => 'backbone',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionRelationship',
-			'variants' => null,
-		],
-		'sourceMaterial' => [
-			'fhirType' => 'BackboneElement',
-			'propertyKind' => 'backbone',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-	];
-
-	public function __construct(
-		/** @var null|string id Logical id of this artifact */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
-		public ?string $id = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Meta meta Metadata about the resource */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Meta $meta = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive implicitRules A set of rules under which this content was created */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive $implicitRules = null,
-		/** @var null|string language Language of the resource content */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
-		public ?string $language = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Narrative text Text summary of the resource, for human interpretation */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Narrative $text = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\ResourceResource> contained Contained, inline Resources */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
-		public array $contained = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension> extension Additional content defined by implementations */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension> modifierExtension Extensions that cannot be ignored */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
-		public array $modifierExtension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier> identifier Identifier by which this substance is known */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'Identifier',
-			propertyKind: 'complex',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier',
-		)]
-		public array $identifier = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive|string version A business level version identifier of the substance */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
-		public \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive|string|null $version = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept status Status of substance within the catalogue e.g. active, retired */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept $status = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept> classification A categorization, high level e.g. polymer or nucleic acid, or food, chemical, biological, or lower e.g. polymer linear or branch chain, or type of impurity */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'CodeableConcept',
-			propertyKind: 'complex',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
-		)]
-		public array $classification = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept domain If the substance applies to human or veterinary use */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept $domain = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept> grade The quality standard, established benchmark, to which substance complies (e.g. USP/NF, BP) */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'CodeableConcept',
-			propertyKind: 'complex',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
-		)]
-		public array $grade = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\MarkdownPrimitive description Textual description of the substance */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\MarkdownPrimitive $description = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference> informationSource Supporting literature */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'Reference',
-			propertyKind: 'complex',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
-		)]
-		public array $informationSource = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation> note Textual comment about the substance's catalogue or registry record */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'Annotation',
-			propertyKind: 'complex',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation',
-		)]
-		public array $note = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference> manufacturer The entity that creates, makes, produces or fabricates the substance */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'Reference',
-			propertyKind: 'complex',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
-		)]
-		public array $manufacturer = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference> supplier An entity that is the source for the substance. It may be different from the manufacturer */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'Reference',
-			propertyKind: 'complex',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
-		)]
-		public array $supplier = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionMoiety> moiety Moiety, for structural modifications */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'BackboneElement',
-			propertyKind: 'backbone',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionMoiety',
-		)]
-		public array $moiety = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionProperty> property General specifications for this substance */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'BackboneElement',
-			propertyKind: 'backbone',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionProperty',
-		)]
-		public array $property = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionMolecularWeight> molecularWeight The molecular weight or weight range */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'BackboneElement',
-			propertyKind: 'backbone',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionMolecularWeight',
-		)]
-		public array $molecularWeight = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionStructure structure Structural information */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
-		public ?SubstanceDefinition\SubstanceDefinitionStructure $structure = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionCode> code Codes associated with the substance */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'BackboneElement',
-			propertyKind: 'backbone',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionCode',
-		)]
-		public array $code = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionName> name Names applicable to this substance */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'BackboneElement',
-			propertyKind: 'backbone',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionName',
-		)]
-		public array $name = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionRelationship> relationship A link between this substance and another */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'BackboneElement',
-			propertyKind: 'backbone',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionRelationship',
-		)]
-		public array $relationship = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionSourceMaterial sourceMaterial Material or taxonomic/anatomical source */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
-		public ?SubstanceDefinition\SubstanceDefinitionSourceMaterial $sourceMaterial = null,
-	) {
-		parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Logical id of this artifact */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        public ?string $id = null,
+        /** @var Meta|null meta Metadata about the resource */
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        public ?Meta $meta = null,
+        /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        public ?UriPrimitive $implicitRules = null,
+        /** @var string|null language Language of the resource content */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        public ?string $language = null,
+        /** @var Narrative|null text Text summary of the resource, for human interpretation */
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        public ?Narrative $text = null,
+        /** @var array<ResourceResource> contained Contained, inline Resources */
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        public array $contained = [],
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        public array $modifierExtension = [],
+        /** @var array<Identifier> identifier Identifier by which this substance is known */
+        #[FhirProperty(
+            fhirType: 'Identifier',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier',
+        )]
+        public array $identifier = [],
+        /** @var StringPrimitive|string|null version A business level version identifier of the substance */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+        public StringPrimitive|string|null $version = null,
+        /** @var CodeableConcept|null status Status of substance within the catalogue e.g. active, retired */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $status = null,
+        /** @var array<CodeableConcept> classification A categorization, high level e.g. polymer or nucleic acid, or food, chemical, biological, or lower e.g. polymer linear or branch chain, or type of impurity */
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
+        )]
+        public array $classification = [],
+        /** @var CodeableConcept|null domain If the substance applies to human or veterinary use */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $domain = null,
+        /** @var array<CodeableConcept> grade The quality standard, established benchmark, to which substance complies (e.g. USP/NF, BP) */
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
+        )]
+        public array $grade = [],
+        /** @var MarkdownPrimitive|null description Textual description of the substance */
+        #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
+        public ?MarkdownPrimitive $description = null,
+        /** @var array<Reference> informationSource Supporting literature */
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
+        )]
+        public array $informationSource = [],
+        /** @var array<Annotation> note Textual comment about the substance's catalogue or registry record */
+        #[FhirProperty(
+            fhirType: 'Annotation',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation',
+        )]
+        public array $note = [],
+        /** @var array<Reference> manufacturer The entity that creates, makes, produces or fabricates the substance */
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
+        )]
+        public array $manufacturer = [],
+        /** @var array<Reference> supplier An entity that is the source for the substance. It may be different from the manufacturer */
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
+        )]
+        public array $supplier = [],
+        /** @var array<SubstanceDefinitionMoiety> moiety Moiety, for structural modifications */
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionMoiety',
+        )]
+        public array $moiety = [],
+        /** @var array<SubstanceDefinitionProperty> property General specifications for this substance */
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionProperty',
+        )]
+        public array $property = [],
+        /** @var array<SubstanceDefinitionMolecularWeight> molecularWeight The molecular weight or weight range */
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionMolecularWeight',
+        )]
+        public array $molecularWeight = [],
+        /** @var SubstanceDefinitionStructure|null structure Structural information */
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        public ?SubstanceDefinitionStructure $structure = null,
+        /** @var array<SubstanceDefinitionCode> code Codes associated with the substance */
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionCode',
+        )]
+        public array $code = [],
+        /** @var array<SubstanceDefinitionName> name Names applicable to this substance */
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionName',
+        )]
+        public array $name = [],
+        /** @var array<SubstanceDefinitionRelationship> relationship A link between this substance and another */
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubstanceDefinition\SubstanceDefinitionRelationship',
+        )]
+        public array $relationship = [],
+        /** @var SubstanceDefinitionSourceMaterial|null sourceMaterial Material or taxonomic/anatomical source */
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        public ?SubstanceDefinitionSourceMaterial $sourceMaterial = null,
+    ) {
+        parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
+    }
 }

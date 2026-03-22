@@ -162,6 +162,7 @@ final class ToQuantityFunction extends AbstractFunction
             // Preserve integer vs decimal: "1 week" → int 1, "1.0 week" → float 1.0
             $numStr = $matches[1];
             $numVal = str_contains($numStr, '.') ? (float) $numStr : (int) $numStr;
+
             return self::buildQuantity($numVal, $matches[2], $matches[2], self::UCUM_SYSTEM_URL);
         }
 
@@ -173,6 +174,7 @@ final class ToQuantityFunction extends AbstractFunction
             // Preserve integer vs decimal: "10 'mg'" → int 10, "10.0 'mg'" → float 10.0
             $numStr = $matches[1];
             $numVal = str_contains($numStr, '.') ? (float) $numStr : (int) $numStr;
+
             return self::buildQuantity($numVal, $matches[2], $matches[2], self::UCUM_SYSTEM_URL);
         }
 
@@ -183,6 +185,7 @@ final class ToQuantityFunction extends AbstractFunction
             // '1' represents a dimensionless quantity (no specific unit)
             // Preserve integer vs decimal: "10" → int 10, "10.0" → float 10.0
             $numVal = str_contains($trimmed, '.') ? (float) $trimmed : (int) $trimmed;
+
             return self::buildQuantity($numVal, '1', '1');
         }
 

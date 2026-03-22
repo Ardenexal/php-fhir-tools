@@ -1,17 +1,23 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
+use Ardenexal\FHIRTools\Component\Models\R4B\Enum\QualityType;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
+
 /**
  * @fhir-code-type QualityType
+ *
  * @description Code type wrapper for QualityType enum
  */
-class QualityTypeType extends \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive
+class QualityTypeType extends CodePrimitive
 {
-	public function __construct(
-		/** @param \Ardenexal\FHIRTools\Component\Models\R4B\Enum\QualityType|string|null $value The code value (enum or string) */
-		string|null $value = null,
-	) {
-		parent::__construct(value: $value);
-	}
+    public function __construct(
+        /** @param QualityType|string|null $value The code value (enum or string) */
+        ?string $value = null,
+    ) {
+        parent::__construct(value: $value);
+    }
 }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,27 +12,27 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum CarePlanActivityStatus: string
 {
-	/** Not Started */
-	case notstarted = 'not-started';
+    /** Not Started */
+    case notstarted = 'not-started';
 
-	/** Scheduled */
-	case scheduled = 'scheduled';
+    /** Scheduled */
+    case scheduled = 'scheduled';
 
-	/** In Progress */
-	case inprogress = 'in-progress';
+    /** In Progress */
+    case inprogress = 'in-progress';
 
-	/** On Hold */
-	case onhold = 'on-hold';
+    /** On Hold */
+    case onhold = 'on-hold';
 
-	/** Completed */
-	case completed = 'completed';
+    /** Completed */
+    case completed = 'completed';
 
-	/** Cancelled */
-	case cancelled = 'cancelled';
+    /** Cancelled */
+    case cancelled = 'cancelled';
 
-	/** Unknown */
-	case unknown = 'unknown';
+    /** Unknown */
+    case unknown = 'unknown';
 
-	/** Entered in Error */
-	case enteredinerror = 'entered-in-error';
+    /** Entered in Error */
+    case enteredinerror = 'entered-in-error';
 }

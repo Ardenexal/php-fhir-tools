@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
 
@@ -10,9 +12,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  */
 enum CriteriaNotExistsBehavior: string
 {
-	/** test passes */
-	case testpasses = 'test-passes';
+    /** test passes */
+    case testpasses = 'test-passes';
 
-	/** test fails */
-	case testfails = 'test-fails';
+    /** test fails */
+    case testfails = 'test-fails';
 }

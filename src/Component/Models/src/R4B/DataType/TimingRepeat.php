@@ -1,286 +1,98 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
+
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\PositiveIntPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\TimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UnsignedIntPrimitive;
 
 /**
  * @description A set of rules that describe when the event is scheduled.
  */
-#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType(typeName: 'Timing.repeat', fhirVersion: 'R4B')]
+#[FHIRComplexType(typeName: 'Timing.repeat', fhirVersion: 'R4B')]
 class TimingRepeat extends Element
 {
-	public const FHIR_PROPERTY_MAP = [
-		'id' => [
-			'fhirType' => 'http://hl7.org/fhirpath/System.String',
-			'propertyKind' => 'scalar',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-			'xmlSerializedName' => '@id',
-		],
-		'extension' => [
-			'fhirType' => 'Extension',
-			'propertyKind' => 'extension',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'bounds' => [
-			'fhirType' => 'choice',
-			'propertyKind' => 'choice',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => true,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => [
-				[
-					'fhirType' => 'Duration',
-					'propertyKind' => 'complex',
-					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Duration',
-					'jsonKey' => 'boundsDuration',
-					'isBuiltin' => false,
-				],
-				[
-					'fhirType' => 'Range',
-					'propertyKind' => 'complex',
-					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Range',
-					'jsonKey' => 'boundsRange',
-					'isBuiltin' => false,
-				],
-				[
-					'fhirType' => 'Period',
-					'propertyKind' => 'complex',
-					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Period',
-					'jsonKey' => 'boundsPeriod',
-					'isBuiltin' => false,
-				],
-			],
-		],
-		'count' => [
-			'fhirType' => 'positiveInt',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'countMax' => [
-			'fhirType' => 'positiveInt',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'duration' => [
-			'fhirType' => 'decimal',
-			'propertyKind' => 'scalar',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'durationMax' => [
-			'fhirType' => 'decimal',
-			'propertyKind' => 'scalar',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'durationUnit' => [
-			'fhirType' => 'code',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'frequency' => [
-			'fhirType' => 'positiveInt',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'frequencyMax' => [
-			'fhirType' => 'positiveInt',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'period' => [
-			'fhirType' => 'decimal',
-			'propertyKind' => 'scalar',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'periodMax' => [
-			'fhirType' => 'decimal',
-			'propertyKind' => 'scalar',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'periodUnit' => [
-			'fhirType' => 'code',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'dayOfWeek' => [
-			'fhirType' => 'code',
-			'propertyKind' => 'primitive',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'timeOfDay' => [
-			'fhirType' => 'time',
-			'propertyKind' => 'primitive',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'when' => [
-			'fhirType' => 'code',
-			'propertyKind' => 'primitive',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'offset' => [
-			'fhirType' => 'unsignedInt',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-	];
-
-	public function __construct(
-		/** @var null|string id Unique id for inter-element referencing */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
-		public ?string $id = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension> extension Additional content defined by implementations */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
-		public array $extension = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Duration|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Range|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Period bounds Length/Range of lengths, or (Start and/or end) limits */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'choice',
-			propertyKind: 'choice',
-			isChoice: true,
-			variants: [
-			[
-				'fhirType' => 'Duration',
-				'propertyKind' => 'complex',
-				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Duration',
-				'jsonKey' => 'boundsDuration',
-			],
-			[
-				'fhirType' => 'Range',
-				'propertyKind' => 'complex',
-				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Range',
-				'jsonKey' => 'boundsRange',
-			],
-			[
-				'fhirType' => 'Period',
-				'propertyKind' => 'complex',
-				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Period',
-				'jsonKey' => 'boundsPeriod',
-			],
-		],
-		)]
-		public Duration|Range|Period|null $bounds = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\PositiveIntPrimitive count Number of times to repeat */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\PositiveIntPrimitive $count = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\PositiveIntPrimitive countMax Maximum number of times to repeat */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\PositiveIntPrimitive $countMax = null,
-		/** @var null|numeric-string duration How long when it happens */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-		public ?string $duration = null,
-		/** @var null|numeric-string durationMax How long when it happens (Max) */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-		public ?string $durationMax = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\UnitsOfTimeType durationUnit s | min | h | d | wk | mo | a - unit of time (UCUM) */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
-		public ?UnitsOfTimeType $durationUnit = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\PositiveIntPrimitive frequency Event occurs frequency times per period */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\PositiveIntPrimitive $frequency = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\PositiveIntPrimitive frequencyMax Event occurs up to frequencyMax times per period */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\PositiveIntPrimitive $frequencyMax = null,
-		/** @var null|numeric-string period Event occurs frequency times per period */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-		public ?string $period = null,
-		/** @var null|numeric-string periodMax Upper limit of period (3-4 hours) */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
-		public ?string $periodMax = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\UnitsOfTimeType periodUnit s | min | h | d | wk | mo | a - unit of time (UCUM) */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
-		public ?UnitsOfTimeType $periodUnit = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\DaysOfWeekType> dayOfWeek mon | tue | wed | thu | fri | sat | sun */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true)]
-		public array $dayOfWeek = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\TimePrimitive> timeOfDay Time of day for action */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'time', propertyKind: 'primitive', isArray: true)]
-		public array $timeOfDay = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\EventTimingType> when Code for time period of occurrence */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true)]
-		public array $when = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UnsignedIntPrimitive offset Minutes from event (before or after) */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'unsignedInt', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UnsignedIntPrimitive $offset = null,
-	) {
-		parent::__construct($id, $extension);
-	}
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
+        public ?string $id = null,
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var Duration|Range|Period|null bounds Length/Range of lengths, or (Start and/or end) limits */
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'Duration',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Duration',
+                    'jsonKey'      => 'boundsDuration',
+                ],
+                [
+                    'fhirType'     => 'Range',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Range',
+                    'jsonKey'      => 'boundsRange',
+                ],
+                [
+                    'fhirType'     => 'Period',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Period',
+                    'jsonKey'      => 'boundsPeriod',
+                ],
+            ],
+        )]
+        public Duration|Range|Period|null $bounds = null,
+        /** @var PositiveIntPrimitive|null count Number of times to repeat */
+        #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]
+        public ?PositiveIntPrimitive $count = null,
+        /** @var PositiveIntPrimitive|null countMax Maximum number of times to repeat */
+        #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]
+        public ?PositiveIntPrimitive $countMax = null,
+        /** @var numeric-string|null duration How long when it happens */
+        #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
+        public ?string $duration = null,
+        /** @var numeric-string|null durationMax How long when it happens (Max) */
+        #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
+        public ?string $durationMax = null,
+        /** @var UnitsOfTimeType|null durationUnit s | min | h | d | wk | mo | a - unit of time (UCUM) */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        public ?UnitsOfTimeType $durationUnit = null,
+        /** @var PositiveIntPrimitive|null frequency Event occurs frequency times per period */
+        #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]
+        public ?PositiveIntPrimitive $frequency = null,
+        /** @var PositiveIntPrimitive|null frequencyMax Event occurs up to frequencyMax times per period */
+        #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]
+        public ?PositiveIntPrimitive $frequencyMax = null,
+        /** @var numeric-string|null period Event occurs frequency times per period */
+        #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
+        public ?string $period = null,
+        /** @var numeric-string|null periodMax Upper limit of period (3-4 hours) */
+        #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
+        public ?string $periodMax = null,
+        /** @var UnitsOfTimeType|null periodUnit s | min | h | d | wk | mo | a - unit of time (UCUM) */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        public ?UnitsOfTimeType $periodUnit = null,
+        /** @var array<DaysOfWeekType> dayOfWeek mon | tue | wed | thu | fri | sat | sun */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true)]
+        public array $dayOfWeek = [],
+        /** @var array<TimePrimitive> timeOfDay Time of day for action */
+        #[FhirProperty(fhirType: 'time', propertyKind: 'primitive', isArray: true)]
+        public array $timeOfDay = [],
+        /** @var array<EventTimingType> when Code for time period of occurrence */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true)]
+        public array $when = [],
+        /** @var UnsignedIntPrimitive|null offset Minutes from event (before or after) */
+        #[FhirProperty(fhirType: 'unsignedInt', propertyKind: 'primitive')]
+        public ?UnsignedIntPrimitive $offset = null,
+    ) {
+        parent::__construct($id, $extension);
+    }
 }

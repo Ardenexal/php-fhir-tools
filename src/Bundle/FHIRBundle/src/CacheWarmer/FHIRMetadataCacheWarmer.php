@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\CacheWarmer;
 
+use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProviderInterface;
 use Composer\Autoload\ClassLoader;
 use Psr\Cache\CacheItemPoolInterface;
@@ -21,12 +22,14 @@ final class FHIRMetadataCacheWarmer implements CacheWarmerInterface
 {
     private const MODELS_NAMESPACE = 'Ardenexal\\FHIRTools\\Component\\Models\\';
 
+    /** @deprecated Use PropertyMetadataProvider::cacheKey() directly */
     public const CACHE_KEY_PREFIX = 'fhir.property_metadata.';
 
     public function __construct(
         private readonly PropertyMetadataProviderInterface $metadataProvider,
         private readonly CacheItemPoolInterface $cache,
-    ) {}
+    ) {
+    }
 
     public function isOptional(): bool
     {
@@ -106,6 +109,6 @@ final class FHIRMetadataCacheWarmer implements CacheWarmerInterface
 
     public static function cacheKey(string $className): string
     {
-        return self::CACHE_KEY_PREFIX . hash('sha256', $className);
+        return PropertyMetadataProvider::cacheKey($className);
     }
 }

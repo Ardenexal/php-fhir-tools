@@ -1,338 +1,142 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Period;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\SupplyDeliveryStatusType;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\SupplyDelivery\SupplyDeliverySuppliedItem;
+
 /**
  * @author Health Level Seven International (Orders and Observations)
+ *
  * @see http://hl7.org/fhir/StructureDefinition/SupplyDelivery
+ *
  * @description Record of delivery of what is supplied.
  */
-#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource(
-	type: 'SupplyDelivery',
-	version: '4.0.1',
-	url: 'http://hl7.org/fhir/StructureDefinition/SupplyDelivery',
-	fhirVersion: 'R4',
+#[FhirResource(
+    type: 'SupplyDelivery',
+    version: '4.0.1',
+    url: 'http://hl7.org/fhir/StructureDefinition/SupplyDelivery',
+    fhirVersion: 'R4',
 )]
 class SupplyDeliveryResource extends DomainResourceResource
 {
-	public const FHIR_PROPERTY_MAP = [
-		'id' => [
-			'fhirType' => 'http://hl7.org/fhirpath/System.String',
-			'propertyKind' => 'scalar',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'meta' => [
-			'fhirType' => 'Meta',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'implicitRules' => [
-			'fhirType' => 'uri',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'language' => [
-			'fhirType' => 'code',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'text' => [
-			'fhirType' => 'Narrative',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'contained' => [
-			'fhirType' => 'Resource',
-			'propertyKind' => 'resource',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'extension' => [
-			'fhirType' => 'Extension',
-			'propertyKind' => 'extension',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'modifierExtension' => [
-			'fhirType' => 'Extension',
-			'propertyKind' => 'modifierExtension',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'identifier' => [
-			'fhirType' => 'Identifier',
-			'propertyKind' => 'complex',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
-			'variants' => null,
-		],
-		'basedOn' => [
-			'fhirType' => 'Reference',
-			'propertyKind' => 'complex',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
-			'variants' => null,
-		],
-		'partOf' => [
-			'fhirType' => 'Reference',
-			'propertyKind' => 'complex',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
-			'variants' => null,
-		],
-		'status' => [
-			'fhirType' => 'code',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'patient' => [
-			'fhirType' => 'Reference',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'type' => [
-			'fhirType' => 'CodeableConcept',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'suppliedItem' => [
-			'fhirType' => 'BackboneElement',
-			'propertyKind' => 'backbone',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'occurrence' => [
-			'fhirType' => 'choice',
-			'propertyKind' => 'choice',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => true,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => [
-				[
-					'fhirType' => 'dateTime',
-					'propertyKind' => 'primitive',
-					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive',
-					'jsonKey' => 'occurrenceDateTime',
-					'isBuiltin' => false,
-				],
-				[
-					'fhirType' => 'Period',
-					'propertyKind' => 'complex',
-					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Period',
-					'jsonKey' => 'occurrencePeriod',
-					'isBuiltin' => false,
-				],
-				[
-					'fhirType' => 'Timing',
-					'propertyKind' => 'complex',
-					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing',
-					'jsonKey' => 'occurrenceTiming',
-					'isBuiltin' => false,
-				],
-			],
-		],
-		'supplier' => [
-			'fhirType' => 'Reference',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'destination' => [
-			'fhirType' => 'Reference',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'receiver' => [
-			'fhirType' => 'Reference',
-			'propertyKind' => 'complex',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
-			'variants' => null,
-		],
-	];
-
-	public function __construct(
-		/** @var null|string id Logical id of this artifact */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
-		public ?string $id = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta meta Metadata about the resource */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta $meta = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive implicitRules A set of rules under which this content was created */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive $implicitRules = null,
-		/** @var null|string language Language of the resource content */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
-		public ?string $language = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative text Text summary of the resource, for human interpretation */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative $text = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\ResourceResource> contained Contained, inline Resources */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
-		public array $contained = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> extension Additional content defined by implementations */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> modifierExtension Extensions that cannot be ignored */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
-		public array $modifierExtension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier> identifier External identifier */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'Identifier',
-			propertyKind: 'complex',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
-		)]
-		public array $identifier = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference> basedOn Fulfills plan, proposal or order */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'Reference',
-			propertyKind: 'complex',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
-		)]
-		public array $basedOn = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference> partOf Part of referenced event */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'Reference',
-			propertyKind: 'complex',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
-		)]
-		public array $partOf = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\SupplyDeliveryStatusType status in-progress | completed | abandoned | entered-in-error */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\SupplyDeliveryStatusType $status = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference patient Patient for whom the item is supplied */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference $patient = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept type Category of dispense event */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept $type = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\SupplyDelivery\SupplyDeliverySuppliedItem suppliedItem The item that is delivered or supplied */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
-		public ?SupplyDelivery\SupplyDeliverySuppliedItem $suppliedItem = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Period|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing occurrence When event occurred */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'choice',
-			propertyKind: 'choice',
-			isChoice: true,
-			variants: [
-			[
-				'fhirType' => 'dateTime',
-				'propertyKind' => 'primitive',
-				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive',
-				'jsonKey' => 'occurrenceDateTime',
-			],
-			[
-				'fhirType' => 'Period',
-				'propertyKind' => 'complex',
-				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Period',
-				'jsonKey' => 'occurrencePeriod',
-			],
-			[
-				'fhirType' => 'Timing',
-				'propertyKind' => 'complex',
-				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing',
-				'jsonKey' => 'occurrenceTiming',
-			],
-		],
-		)]
-		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Period|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing|null $occurrence = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference supplier Dispenser */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference $supplier = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference destination Where the Supply was sent */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference $destination = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference> receiver Who collected the Supply */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'Reference',
-			propertyKind: 'complex',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
-		)]
-		public array $receiver = [],
-	) {
-		parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Logical id of this artifact */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        public ?string $id = null,
+        /** @var Meta|null meta Metadata about the resource */
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        public ?Meta $meta = null,
+        /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        public ?UriPrimitive $implicitRules = null,
+        /** @var string|null language Language of the resource content */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        public ?string $language = null,
+        /** @var Narrative|null text Text summary of the resource, for human interpretation */
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        public ?Narrative $text = null,
+        /** @var array<ResourceResource> contained Contained, inline Resources */
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        public array $contained = [],
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        public array $modifierExtension = [],
+        /** @var array<Identifier> identifier External identifier */
+        #[FhirProperty(
+            fhirType: 'Identifier',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
+        )]
+        public array $identifier = [],
+        /** @var array<Reference> basedOn Fulfills plan, proposal or order */
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
+        )]
+        public array $basedOn = [],
+        /** @var array<Reference> partOf Part of referenced event */
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
+        )]
+        public array $partOf = [],
+        /** @var SupplyDeliveryStatusType|null status in-progress | completed | abandoned | entered-in-error */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        public ?SupplyDeliveryStatusType $status = null,
+        /** @var Reference|null patient Patient for whom the item is supplied */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $patient = null,
+        /** @var CodeableConcept|null type Category of dispense event */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $type = null,
+        /** @var SupplyDeliverySuppliedItem|null suppliedItem The item that is delivered or supplied */
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        public ?SupplyDeliverySuppliedItem $suppliedItem = null,
+        /** @var DateTimePrimitive|Period|Timing|null occurrence When event occurred */
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'dateTime',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive',
+                    'jsonKey'      => 'occurrenceDateTime',
+                ],
+                [
+                    'fhirType'     => 'Period',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Period',
+                    'jsonKey'      => 'occurrencePeriod',
+                ],
+                [
+                    'fhirType'     => 'Timing',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing',
+                    'jsonKey'      => 'occurrenceTiming',
+                ],
+            ],
+        )]
+        public DateTimePrimitive|Period|Timing|null $occurrence = null,
+        /** @var Reference|null supplier Dispenser */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $supplier = null,
+        /** @var Reference|null destination Where the Supply was sent */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $destination = null,
+        /** @var array<Reference> receiver Who collected the Supply */
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
+        )]
+        public array $receiver = [],
+    ) {
+        parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
+    }
 }

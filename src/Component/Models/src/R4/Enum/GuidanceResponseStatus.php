@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -10,21 +12,21 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum GuidanceResponseStatus: string
 {
-	/** Success */
-	case success = 'success';
+    /** Success */
+    case success = 'success';
 
-	/** Data Requested */
-	case datarequested = 'data-requested';
+    /** Data Requested */
+    case datarequested = 'data-requested';
 
-	/** Data Required */
-	case datarequired = 'data-required';
+    /** Data Required */
+    case datarequired = 'data-required';
 
-	/** In Progress */
-	case inprogress = 'in-progress';
+    /** In Progress */
+    case inprogress = 'in-progress';
 
-	/** Failure */
-	case failure = 'failure';
+    /** Failure */
+    case failure = 'failure';
 
-	/** Entered In Error */
-	case enteredinerror = 'entered-in-error';
+    /** Entered In Error */
+    case enteredinerror = 'entered-in-error';
 }

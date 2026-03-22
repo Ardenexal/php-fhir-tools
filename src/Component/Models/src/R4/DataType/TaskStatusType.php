@@ -1,17 +1,23 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
+use Ardenexal\FHIRTools\Component\Models\R4\Enum\TaskStatus;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
+
 /**
  * @fhir-code-type TaskStatus
+ *
  * @description Code type wrapper for TaskStatus enum
  */
-class TaskStatusType extends \Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive
+class TaskStatusType extends CodePrimitive
 {
-	public function __construct(
-		/** @param \Ardenexal\FHIRTools\Component\Models\R4\Enum\TaskStatus|string|null $value The code value (enum or string) */
-		string|null $value = null,
-	) {
-		parent::__construct(value: $value);
-	}
+    public function __construct(
+        /** @param TaskStatus|string|null $value The code value (enum or string) */
+        ?string $value = null,
+    ) {
+        parent::__construct(value: $value);
+    }
 }

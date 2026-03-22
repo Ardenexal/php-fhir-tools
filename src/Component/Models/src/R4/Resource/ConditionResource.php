@@ -1,519 +1,217 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Age;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Period;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Range;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\Condition\ConditionEvidence;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\Condition\ConditionStage;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
 /**
  * @author Health Level Seven International (Patient Care)
+ *
  * @see http://hl7.org/fhir/StructureDefinition/Condition
+ *
  * @description A clinical condition, problem, diagnosis, or other event, situation, issue, or clinical concept that has risen to a level of concern.
  */
-#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource(type: 'Condition', version: '4.0.1', url: 'http://hl7.org/fhir/StructureDefinition/Condition', fhirVersion: 'R4')]
+#[FhirResource(type: 'Condition', version: '4.0.1', url: 'http://hl7.org/fhir/StructureDefinition/Condition', fhirVersion: 'R4')]
 class ConditionResource extends DomainResourceResource
 {
-	public const FHIR_PROPERTY_MAP = [
-		'id' => [
-			'fhirType' => 'http://hl7.org/fhirpath/System.String',
-			'propertyKind' => 'scalar',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'meta' => [
-			'fhirType' => 'Meta',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'implicitRules' => [
-			'fhirType' => 'uri',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'language' => [
-			'fhirType' => 'code',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'text' => [
-			'fhirType' => 'Narrative',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'contained' => [
-			'fhirType' => 'Resource',
-			'propertyKind' => 'resource',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'extension' => [
-			'fhirType' => 'Extension',
-			'propertyKind' => 'extension',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'modifierExtension' => [
-			'fhirType' => 'Extension',
-			'propertyKind' => 'modifierExtension',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'identifier' => [
-			'fhirType' => 'Identifier',
-			'propertyKind' => 'complex',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
-			'variants' => null,
-		],
-		'clinicalStatus' => [
-			'fhirType' => 'CodeableConcept',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'verificationStatus' => [
-			'fhirType' => 'CodeableConcept',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'category' => [
-			'fhirType' => 'CodeableConcept',
-			'propertyKind' => 'complex',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
-			'variants' => null,
-		],
-		'severity' => [
-			'fhirType' => 'CodeableConcept',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'code' => [
-			'fhirType' => 'CodeableConcept',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'bodySite' => [
-			'fhirType' => 'CodeableConcept',
-			'propertyKind' => 'complex',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
-			'variants' => null,
-		],
-		'subject' => [
-			'fhirType' => 'Reference',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => true,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'encounter' => [
-			'fhirType' => 'Reference',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'onset' => [
-			'fhirType' => 'choice',
-			'propertyKind' => 'choice',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => true,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => [
-				[
-					'fhirType' => 'dateTime',
-					'propertyKind' => 'primitive',
-					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive',
-					'jsonKey' => 'onsetDateTime',
-					'isBuiltin' => false,
-				],
-				[
-					'fhirType' => 'Age',
-					'propertyKind' => 'complex',
-					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Age',
-					'jsonKey' => 'onsetAge',
-					'isBuiltin' => false,
-				],
-				[
-					'fhirType' => 'Period',
-					'propertyKind' => 'complex',
-					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Period',
-					'jsonKey' => 'onsetPeriod',
-					'isBuiltin' => false,
-				],
-				[
-					'fhirType' => 'Range',
-					'propertyKind' => 'complex',
-					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Range',
-					'jsonKey' => 'onsetRange',
-					'isBuiltin' => false,
-				],
-				[
-					'fhirType' => 'string',
-					'propertyKind' => 'primitive',
-					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive',
-					'jsonKey' => 'onsetString',
-					'isBuiltin' => false,
-				],
-			],
-		],
-		'abatement' => [
-			'fhirType' => 'choice',
-			'propertyKind' => 'choice',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => true,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => [
-				[
-					'fhirType' => 'dateTime',
-					'propertyKind' => 'primitive',
-					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive',
-					'jsonKey' => 'abatementDateTime',
-					'isBuiltin' => false,
-				],
-				[
-					'fhirType' => 'Age',
-					'propertyKind' => 'complex',
-					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Age',
-					'jsonKey' => 'abatementAge',
-					'isBuiltin' => false,
-				],
-				[
-					'fhirType' => 'Period',
-					'propertyKind' => 'complex',
-					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Period',
-					'jsonKey' => 'abatementPeriod',
-					'isBuiltin' => false,
-				],
-				[
-					'fhirType' => 'Range',
-					'propertyKind' => 'complex',
-					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Range',
-					'jsonKey' => 'abatementRange',
-					'isBuiltin' => false,
-				],
-				[
-					'fhirType' => 'string',
-					'propertyKind' => 'primitive',
-					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive',
-					'jsonKey' => 'abatementString',
-					'isBuiltin' => false,
-				],
-			],
-		],
-		'recordedDate' => [
-			'fhirType' => 'dateTime',
-			'propertyKind' => 'primitive',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'recorder' => [
-			'fhirType' => 'Reference',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'asserter' => [
-			'fhirType' => 'Reference',
-			'propertyKind' => 'complex',
-			'isArray' => false,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => null,
-			'variants' => null,
-		],
-		'stage' => [
-			'fhirType' => 'BackboneElement',
-			'propertyKind' => 'backbone',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Condition\ConditionStage',
-			'variants' => null,
-		],
-		'evidence' => [
-			'fhirType' => 'BackboneElement',
-			'propertyKind' => 'backbone',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Condition\ConditionEvidence',
-			'variants' => null,
-		],
-		'note' => [
-			'fhirType' => 'Annotation',
-			'propertyKind' => 'complex',
-			'isArray' => true,
-			'isRequired' => false,
-			'isChoice' => false,
-			'jsonKey' => null,
-			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation',
-			'variants' => null,
-		],
-	];
-
-	public function __construct(
-		/** @var null|string id Logical id of this artifact */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
-		public ?string $id = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta meta Metadata about the resource */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta $meta = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive implicitRules A set of rules under which this content was created */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive $implicitRules = null,
-		/** @var null|string language Language of the resource content */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
-		public ?string $language = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative text Text summary of the resource, for human interpretation */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative $text = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\ResourceResource> contained Contained, inline Resources */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
-		public array $contained = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> extension Additional content defined by implementations */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
-		public array $extension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> modifierExtension Extensions that cannot be ignored */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
-		public array $modifierExtension = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier> identifier External Ids for this condition */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'Identifier',
-			propertyKind: 'complex',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
-		)]
-		public array $identifier = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept clinicalStatus active | recurrence | relapse | inactive | remission | resolved */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept $clinicalStatus = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept verificationStatus unconfirmed | provisional | differential | confirmed | refuted | entered-in-error */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept $verificationStatus = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept> category problem-list-item | encounter-diagnosis */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'CodeableConcept',
-			propertyKind: 'complex',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
-		)]
-		public array $category = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept severity Subjective severity of condition */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept $severity = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept code Identification of the condition, problem or diagnosis */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept $code = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept> bodySite Anatomical location, if relevant */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'CodeableConcept',
-			propertyKind: 'complex',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
-		)]
-		public array $bodySite = [],
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference subject Who has the condition? */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), \Symfony\Component\Validator\Constraints\NotBlank]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference $subject = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference encounter Encounter created as part of */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference $encounter = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Age|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Period|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Range|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string onset Estimated or actual date,  date-time, or age */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'choice',
-			propertyKind: 'choice',
-			isChoice: true,
-			variants: [
-			[
-				'fhirType' => 'dateTime',
-				'propertyKind' => 'primitive',
-				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive',
-				'jsonKey' => 'onsetDateTime',
-			],
-			[
-				'fhirType' => 'Age',
-				'propertyKind' => 'complex',
-				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Age',
-				'jsonKey' => 'onsetAge',
-			],
-			[
-				'fhirType' => 'Period',
-				'propertyKind' => 'complex',
-				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Period',
-				'jsonKey' => 'onsetPeriod',
-			],
-			[
-				'fhirType' => 'Range',
-				'propertyKind' => 'complex',
-				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Range',
-				'jsonKey' => 'onsetRange',
-			],
-			[
-				'fhirType' => 'string',
-				'propertyKind' => 'primitive',
-				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive',
-				'jsonKey' => 'onsetString',
-			],
-		],
-		)]
-		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Age|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Period|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Range|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string|null $onset = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Age|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Period|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Range|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string abatement When in resolution/remission */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'choice',
-			propertyKind: 'choice',
-			isChoice: true,
-			variants: [
-			[
-				'fhirType' => 'dateTime',
-				'propertyKind' => 'primitive',
-				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive',
-				'jsonKey' => 'abatementDateTime',
-			],
-			[
-				'fhirType' => 'Age',
-				'propertyKind' => 'complex',
-				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Age',
-				'jsonKey' => 'abatementAge',
-			],
-			[
-				'fhirType' => 'Period',
-				'propertyKind' => 'complex',
-				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Period',
-				'jsonKey' => 'abatementPeriod',
-			],
-			[
-				'fhirType' => 'Range',
-				'propertyKind' => 'complex',
-				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Range',
-				'jsonKey' => 'abatementRange',
-			],
-			[
-				'fhirType' => 'string',
-				'propertyKind' => 'primitive',
-				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive',
-				'jsonKey' => 'abatementString',
-			],
-		],
-		)]
-		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Age|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Period|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Range|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string|null $abatement = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive recordedDate Date record was first recorded */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive $recordedDate = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference recorder Who recorded the condition */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference $recorder = null,
-		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference asserter Person who asserts this condition */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference $asserter = null,
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\Condition\ConditionStage> stage Stage/grade, usually assessed formally */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'BackboneElement',
-			propertyKind: 'backbone',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Condition\ConditionStage',
-		)]
-		public array $stage = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\Condition\ConditionEvidence> evidence Supporting evidence */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'BackboneElement',
-			propertyKind: 'backbone',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Condition\ConditionEvidence',
-		)]
-		public array $evidence = [],
-		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation> note Additional information about the Condition */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
-			fhirType: 'Annotation',
-			propertyKind: 'complex',
-			isArray: true,
-			phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation',
-		)]
-		public array $note = [],
-	) {
-		parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
-	}
+    public function __construct(
+        /** @var string|null id Logical id of this artifact */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        public ?string $id = null,
+        /** @var Meta|null meta Metadata about the resource */
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        public ?Meta $meta = null,
+        /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        public ?UriPrimitive $implicitRules = null,
+        /** @var string|null language Language of the resource content */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        public ?string $language = null,
+        /** @var Narrative|null text Text summary of the resource, for human interpretation */
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        public ?Narrative $text = null,
+        /** @var array<ResourceResource> contained Contained, inline Resources */
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        public array $contained = [],
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        public array $modifierExtension = [],
+        /** @var array<Identifier> identifier External Ids for this condition */
+        #[FhirProperty(
+            fhirType: 'Identifier',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
+        )]
+        public array $identifier = [],
+        /** @var CodeableConcept|null clinicalStatus active | recurrence | relapse | inactive | remission | resolved */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $clinicalStatus = null,
+        /** @var CodeableConcept|null verificationStatus unconfirmed | provisional | differential | confirmed | refuted | entered-in-error */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $verificationStatus = null,
+        /** @var array<CodeableConcept> category problem-list-item | encounter-diagnosis */
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
+        )]
+        public array $category = [],
+        /** @var CodeableConcept|null severity Subjective severity of condition */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $severity = null,
+        /** @var CodeableConcept|null code Identification of the condition, problem or diagnosis */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $code = null,
+        /** @var array<CodeableConcept> bodySite Anatomical location, if relevant */
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
+        )]
+        public array $bodySite = [],
+        /** @var Reference|null subject Who has the condition? */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank]
+        public ?Reference $subject = null,
+        /** @var Reference|null encounter Encounter created as part of */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $encounter = null,
+        /** @var DateTimePrimitive|Age|Period|Range|StringPrimitive|string|null onset Estimated or actual date,  date-time, or age */
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'dateTime',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive',
+                    'jsonKey'      => 'onsetDateTime',
+                ],
+                [
+                    'fhirType'     => 'Age',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Age',
+                    'jsonKey'      => 'onsetAge',
+                ],
+                [
+                    'fhirType'     => 'Period',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Period',
+                    'jsonKey'      => 'onsetPeriod',
+                ],
+                [
+                    'fhirType'     => 'Range',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Range',
+                    'jsonKey'      => 'onsetRange',
+                ],
+                [
+                    'fhirType'     => 'string',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive',
+                    'jsonKey'      => 'onsetString',
+                ],
+            ],
+        )]
+        public DateTimePrimitive|Age|Period|Range|StringPrimitive|string|null $onset = null,
+        /** @var DateTimePrimitive|Age|Period|Range|StringPrimitive|string|null abatement When in resolution/remission */
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'dateTime',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive',
+                    'jsonKey'      => 'abatementDateTime',
+                ],
+                [
+                    'fhirType'     => 'Age',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Age',
+                    'jsonKey'      => 'abatementAge',
+                ],
+                [
+                    'fhirType'     => 'Period',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Period',
+                    'jsonKey'      => 'abatementPeriod',
+                ],
+                [
+                    'fhirType'     => 'Range',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Range',
+                    'jsonKey'      => 'abatementRange',
+                ],
+                [
+                    'fhirType'     => 'string',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive',
+                    'jsonKey'      => 'abatementString',
+                ],
+            ],
+        )]
+        public DateTimePrimitive|Age|Period|Range|StringPrimitive|string|null $abatement = null,
+        /** @var DateTimePrimitive|null recordedDate Date record was first recorded */
+        #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
+        public ?DateTimePrimitive $recordedDate = null,
+        /** @var Reference|null recorder Who recorded the condition */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $recorder = null,
+        /** @var Reference|null asserter Person who asserts this condition */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $asserter = null,
+        /** @var array<ConditionStage> stage Stage/grade, usually assessed formally */
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Condition\ConditionStage',
+        )]
+        public array $stage = [],
+        /** @var array<ConditionEvidence> evidence Supporting evidence */
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Condition\ConditionEvidence',
+        )]
+        public array $evidence = [],
+        /** @var array<Annotation> note Additional information about the Condition */
+        #[FhirProperty(
+            fhirType: 'Annotation',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation',
+        )]
+        public array $note = [],
+    ) {
+        parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
+    }
 }
