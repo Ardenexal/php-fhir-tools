@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -12,21 +10,21 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum DeviceNameType: string
 {
-    /** UDI Label name */
-    case udilabelname = 'udi-label-name';
+	/** UDI Label name */
+	case udilabelname = 'udi-label-name';
 
-    /** User Friendly name */
-    case userfriendlyname = 'user-friendly-name';
+	/** User Friendly name */
+	case userfriendlyname = 'user-friendly-name';
 
-    /** Patient Reported name */
-    case patientreportedname = 'patient-reported-name';
+	/** Patient Reported name */
+	case patientreportedname = 'patient-reported-name';
 
-    /** Manufacturer name */
-    case manufacturername = 'manufacturer-name';
+	/** Manufacturer name */
+	case manufacturername = 'manufacturer-name';
 
-    /** Model name */
-    case modelname = 'model-name';
+	/** Model name */
+	case modelname = 'model-name';
 
-    /** other */
-    case other = 'other';
+	/** other */
+	case other = 'other';
 }

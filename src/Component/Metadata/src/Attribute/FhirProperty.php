@@ -55,6 +55,12 @@ final class FhirProperty
          * Corresponds to FHIR StructureDefinition element.representation = ["xmlAttr"].
          */
         public readonly ?string $xmlSerializedName = null,
+        /**
+         * Fully-qualified PHP class name for the item type of array complex/backbone properties.
+         * Null for scalars, primitives, non-array properties, and choice elements.
+         * Used by the serializer to denormalize array items into typed objects.
+         */
+        public readonly ?string $phpType = null,
     ) {
     }
 }

@@ -1,106 +1,97 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\SubstanceNucleicAcid;
-
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 
 /**
  * @description 5.3.6.8.1 Sugar ID (Mandatory).
  */
-#[FHIRBackboneElement(parentResource: 'SubstanceNucleicAcid', elementPath: 'SubstanceNucleicAcid.subunit.sugar', fhirVersion: 'R4')]
-class SubstanceNucleicAcidSubunitSugar extends BackboneElement
+#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement(parentResource: 'SubstanceNucleicAcid', elementPath: 'SubstanceNucleicAcid.subunit.sugar', fhirVersion: 'R4')]
+class SubstanceNucleicAcidSubunitSugar extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement
 {
-    public const FHIR_PROPERTY_MAP = [
-        'id' => [
-            'fhirType'          => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind'      => 'scalar',
-            'isArray'           => false,
-            'isRequired'        => false,
-            'isChoice'          => false,
-            'jsonKey'           => null,
-            'phpType'           => null,
-            'variants'          => null,
-            'xmlSerializedName' => '@id',
-        ],
-        'extension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'extension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'modifierExtension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'modifierExtension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'identifier' => [
-            'fhirType'     => 'Identifier',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'name' => [
-            'fhirType'     => 'string',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'residueSite' => [
-            'fhirType'     => 'string',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-    ];
+	public const FHIR_PROPERTY_MAP = [
+		'id' => [
+			'fhirType' => 'http://hl7.org/fhirpath/System.String',
+			'propertyKind' => 'scalar',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+			'xmlSerializedName' => '@id',
+		],
+		'extension' => [
+			'fhirType' => 'Extension',
+			'propertyKind' => 'extension',
+			'isArray' => true,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'modifierExtension' => [
+			'fhirType' => 'Extension',
+			'propertyKind' => 'modifierExtension',
+			'isArray' => true,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'identifier' => [
+			'fhirType' => 'Identifier',
+			'propertyKind' => 'complex',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'name' => [
+			'fhirType' => 'string',
+			'propertyKind' => 'primitive',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'residueSite' => [
+			'fhirType' => 'string',
+			'propertyKind' => 'primitive',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+	];
 
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
-        public ?string $id = null,
-        /** @var array<Extension> extension Additional content defined by implementations */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
-        public array $extension = [],
-        /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
-        public array $modifierExtension = [],
-        /** @var Identifier|null identifier The Substance ID of the sugar or sugar-like component that make up the nucleotide */
-        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
-        public ?Identifier $identifier = null,
-        /** @var StringPrimitive|string|null name The name of the sugar or sugar-like component that make up the nucleotide */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
-        public StringPrimitive|string|null $name = null,
-        /** @var StringPrimitive|string|null residueSite The residues that contain a given sugar will be captured. The order of given residues will be captured in the 5‘-3‘direction consistent with the base sequences listed above */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
-        public StringPrimitive|string|null $residueSite = null,
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> extension Additional content defined by implementations */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier identifier The Substance ID of the sugar or sugar-like component that make up the nucleotide */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier $identifier = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string name The name of the sugar or sugar-like component that make up the nucleotide */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string|null $name = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string residueSite The residues that contain a given sugar will be captured. The order of given residues will be captured in the 5‘-3‘direction consistent with the base sequences listed above */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string|null $residueSite = null,
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }

@@ -1,221 +1,213 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\SubstanceReferenceInformation;
-
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Range;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 
 /**
  * @description Todo.
  */
-#[FHIRBackboneElement(parentResource: 'SubstanceReferenceInformation', elementPath: 'SubstanceReferenceInformation.target', fhirVersion: 'R4')]
-class SubstanceReferenceInformationTarget extends BackboneElement
+#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement(parentResource: 'SubstanceReferenceInformation', elementPath: 'SubstanceReferenceInformation.target', fhirVersion: 'R4')]
+class SubstanceReferenceInformationTarget extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement
 {
-    public const FHIR_PROPERTY_MAP = [
-        'id' => [
-            'fhirType'          => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind'      => 'scalar',
-            'isArray'           => false,
-            'isRequired'        => false,
-            'isChoice'          => false,
-            'jsonKey'           => null,
-            'phpType'           => null,
-            'variants'          => null,
-            'xmlSerializedName' => '@id',
-        ],
-        'extension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'extension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'modifierExtension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'modifierExtension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'target' => [
-            'fhirType'     => 'Identifier',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'type' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'interaction' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'organism' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'organismType' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'amount' => [
-            'fhirType'     => 'choice',
-            'propertyKind' => 'choice',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => true,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => [
-                [
-                    'fhirType'     => 'Quantity',
-                    'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity',
-                    'jsonKey'      => 'amountQuantity',
-                    'isBuiltin'    => false,
-                ],
-                [
-                    'fhirType'     => 'Range',
-                    'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Range',
-                    'jsonKey'      => 'amountRange',
-                    'isBuiltin'    => false,
-                ],
-                [
-                    'fhirType'     => 'string',
-                    'propertyKind' => 'primitive',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive',
-                    'jsonKey'      => 'amountString',
-                    'isBuiltin'    => false,
-                ],
-            ],
-        ],
-        'amountType' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'source' => [
-            'fhirType'     => 'Reference',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
-            'variants'     => null,
-        ],
-    ];
+	public const FHIR_PROPERTY_MAP = [
+		'id' => [
+			'fhirType' => 'http://hl7.org/fhirpath/System.String',
+			'propertyKind' => 'scalar',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+			'xmlSerializedName' => '@id',
+		],
+		'extension' => [
+			'fhirType' => 'Extension',
+			'propertyKind' => 'extension',
+			'isArray' => true,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'modifierExtension' => [
+			'fhirType' => 'Extension',
+			'propertyKind' => 'modifierExtension',
+			'isArray' => true,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'target' => [
+			'fhirType' => 'Identifier',
+			'propertyKind' => 'complex',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'type' => [
+			'fhirType' => 'CodeableConcept',
+			'propertyKind' => 'complex',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'interaction' => [
+			'fhirType' => 'CodeableConcept',
+			'propertyKind' => 'complex',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'organism' => [
+			'fhirType' => 'CodeableConcept',
+			'propertyKind' => 'complex',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'organismType' => [
+			'fhirType' => 'CodeableConcept',
+			'propertyKind' => 'complex',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'amount' => [
+			'fhirType' => 'choice',
+			'propertyKind' => 'choice',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => true,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => [
+				[
+					'fhirType' => 'Quantity',
+					'propertyKind' => 'complex',
+					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity',
+					'jsonKey' => 'amountQuantity',
+					'isBuiltin' => false,
+				],
+				[
+					'fhirType' => 'Range',
+					'propertyKind' => 'complex',
+					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Range',
+					'jsonKey' => 'amountRange',
+					'isBuiltin' => false,
+				],
+				[
+					'fhirType' => 'string',
+					'propertyKind' => 'primitive',
+					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive',
+					'jsonKey' => 'amountString',
+					'isBuiltin' => false,
+				],
+			],
+		],
+		'amountType' => [
+			'fhirType' => 'CodeableConcept',
+			'propertyKind' => 'complex',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'source' => [
+			'fhirType' => 'Reference',
+			'propertyKind' => 'complex',
+			'isArray' => true,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
+			'variants' => null,
+		],
+	];
 
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
-        public ?string $id = null,
-        /** @var array<Extension> extension Additional content defined by implementations */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
-        public array $extension = [],
-        /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
-        public array $modifierExtension = [],
-        /** @var Identifier|null target Todo */
-        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
-        public ?Identifier $target = null,
-        /** @var CodeableConcept|null type Todo */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
-        public ?CodeableConcept $type = null,
-        /** @var CodeableConcept|null interaction Todo */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
-        public ?CodeableConcept $interaction = null,
-        /** @var CodeableConcept|null organism Todo */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
-        public ?CodeableConcept $organism = null,
-        /** @var CodeableConcept|null organismType Todo */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
-        public ?CodeableConcept $organismType = null,
-        /** @var Quantity|Range|StringPrimitive|string|null amount Todo */
-        #[FhirProperty(
-            fhirType: 'choice',
-            propertyKind: 'choice',
-            isChoice: true,
-            variants: [
-                [
-                    'fhirType'     => 'Quantity',
-                    'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity',
-                    'jsonKey'      => 'amountQuantity',
-                ],
-                [
-                    'fhirType'     => 'Range',
-                    'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Range',
-                    'jsonKey'      => 'amountRange',
-                ],
-                [
-                    'fhirType'     => 'string',
-                    'propertyKind' => 'primitive',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive',
-                    'jsonKey'      => 'amountString',
-                ],
-            ],
-        )]
-        public Quantity|Range|StringPrimitive|string|null $amount = null,
-        /** @var CodeableConcept|null amountType Todo */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
-        public ?CodeableConcept $amountType = null,
-        /** @var array<Reference> source Todo */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isArray: true)]
-        public array $source = [],
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> extension Additional content defined by implementations */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier target Todo */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier $target = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept type Todo */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept $type = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept interaction Todo */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept $interaction = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept organism Todo */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept $organism = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept organismType Todo */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept $organismType = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Range|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string amount Todo */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
+			fhirType: 'choice',
+			propertyKind: 'choice',
+			isChoice: true,
+			variants: [
+			[
+				'fhirType' => 'Quantity',
+				'propertyKind' => 'complex',
+				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity',
+				'jsonKey' => 'amountQuantity',
+			],
+			[
+				'fhirType' => 'Range',
+				'propertyKind' => 'complex',
+				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Range',
+				'jsonKey' => 'amountRange',
+			],
+			[
+				'fhirType' => 'string',
+				'propertyKind' => 'primitive',
+				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive',
+				'jsonKey' => 'amountString',
+			],
+		],
+		)]
+		public \Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Range|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|string|null $amount = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept amountType Todo */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept $amountType = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference> source Todo */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
+			fhirType: 'Reference',
+			propertyKind: 'complex',
+			isArray: true,
+			phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
+		)]
+		public array $source = [],
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }

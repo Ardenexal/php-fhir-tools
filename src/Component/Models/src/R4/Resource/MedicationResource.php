@@ -1,246 +1,238 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\MedicationStatusCodesType;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Ratio;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\Medication\MedicationBatch;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\Medication\MedicationIngredient;
-
 /**
  * @author Health Level Seven International (Pharmacy)
- *
  * @see http://hl7.org/fhir/StructureDefinition/Medication
- *
  * @description This resource is primarily used for the identification and definition of a medication for the purposes of prescribing, dispensing, and administering a medication as well as for making statements about medication use.
  */
-#[FhirResource(type: 'Medication', version: '4.0.1', url: 'http://hl7.org/fhir/StructureDefinition/Medication', fhirVersion: 'R4')]
+#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource(type: 'Medication', version: '4.0.1', url: 'http://hl7.org/fhir/StructureDefinition/Medication', fhirVersion: 'R4')]
 class MedicationResource extends DomainResourceResource
 {
-    public const FHIR_PROPERTY_MAP = [
-        'id' => [
-            'fhirType'     => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind' => 'scalar',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'meta' => [
-            'fhirType'     => 'Meta',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'implicitRules' => [
-            'fhirType'     => 'uri',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'language' => [
-            'fhirType'     => 'code',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'text' => [
-            'fhirType'     => 'Narrative',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'contained' => [
-            'fhirType'     => 'Resource',
-            'propertyKind' => 'resource',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'extension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'extension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'modifierExtension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'modifierExtension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'identifier' => [
-            'fhirType'     => 'Identifier',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
-            'variants'     => null,
-        ],
-        'code' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'status' => [
-            'fhirType'     => 'code',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'manufacturer' => [
-            'fhirType'     => 'Reference',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'form' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'amount' => [
-            'fhirType'     => 'Ratio',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'ingredient' => [
-            'fhirType'     => 'BackboneElement',
-            'propertyKind' => 'backbone',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Medication\MedicationIngredient',
-            'variants'     => null,
-        ],
-        'batch' => [
-            'fhirType'     => 'BackboneElement',
-            'propertyKind' => 'backbone',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-    ];
+	public const FHIR_PROPERTY_MAP = [
+		'id' => [
+			'fhirType' => 'http://hl7.org/fhirpath/System.String',
+			'propertyKind' => 'scalar',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'meta' => [
+			'fhirType' => 'Meta',
+			'propertyKind' => 'complex',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'implicitRules' => [
+			'fhirType' => 'uri',
+			'propertyKind' => 'primitive',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'language' => [
+			'fhirType' => 'code',
+			'propertyKind' => 'primitive',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'text' => [
+			'fhirType' => 'Narrative',
+			'propertyKind' => 'complex',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'contained' => [
+			'fhirType' => 'Resource',
+			'propertyKind' => 'resource',
+			'isArray' => true,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'extension' => [
+			'fhirType' => 'Extension',
+			'propertyKind' => 'extension',
+			'isArray' => true,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'modifierExtension' => [
+			'fhirType' => 'Extension',
+			'propertyKind' => 'modifierExtension',
+			'isArray' => true,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'identifier' => [
+			'fhirType' => 'Identifier',
+			'propertyKind' => 'complex',
+			'isArray' => true,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
+			'variants' => null,
+		],
+		'code' => [
+			'fhirType' => 'CodeableConcept',
+			'propertyKind' => 'complex',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'status' => [
+			'fhirType' => 'code',
+			'propertyKind' => 'primitive',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'manufacturer' => [
+			'fhirType' => 'Reference',
+			'propertyKind' => 'complex',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'form' => [
+			'fhirType' => 'CodeableConcept',
+			'propertyKind' => 'complex',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'amount' => [
+			'fhirType' => 'Ratio',
+			'propertyKind' => 'complex',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'ingredient' => [
+			'fhirType' => 'BackboneElement',
+			'propertyKind' => 'backbone',
+			'isArray' => true,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Medication\MedicationIngredient',
+			'variants' => null,
+		],
+		'batch' => [
+			'fhirType' => 'BackboneElement',
+			'propertyKind' => 'backbone',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+	];
 
-    public function __construct(
-        /** @var string|null id Logical id of this artifact */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
-        public ?string $id = null,
-        /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
-        public ?Meta $meta = null,
-        /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
-        public ?UriPrimitive $implicitRules = null,
-        /** @var string|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
-        public ?string $language = null,
-        /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
-        public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
-        public array $contained = [],
-        /** @var array<Extension> extension Additional content defined by implementations */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
-        public array $extension = [],
-        /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
-        public array $modifierExtension = [],
-        /** @var array<Identifier> identifier Business identifier for this medication */
-        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex', isArray: true)]
-        public array $identifier = [],
-        /** @var CodeableConcept|null code Codes that identify this medication */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
-        public ?CodeableConcept $code = null,
-        /** @var MedicationStatusCodesType|null status active | inactive | entered-in-error */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
-        public ?MedicationStatusCodesType $status = null,
-        /** @var Reference|null manufacturer Manufacturer of the item */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
-        public ?Reference $manufacturer = null,
-        /** @var CodeableConcept|null form powder | tablets | capsule + */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
-        public ?CodeableConcept $form = null,
-        /** @var Ratio|null amount Amount of drug in package */
-        #[FhirProperty(fhirType: 'Ratio', propertyKind: 'complex')]
-        public ?Ratio $amount = null,
-        /** @var array<MedicationIngredient> ingredient Active or inactive ingredient */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
-        public array $ingredient = [],
-        /** @var MedicationBatch|null batch Details about packaged medications */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
-        public ?MedicationBatch $batch = null,
-    ) {
-        parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Logical id of this artifact */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+		public ?string $id = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta meta Metadata about the resource */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta $meta = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive implicitRules A set of rules under which this content was created */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive $implicitRules = null,
+		/** @var null|string language Language of the resource content */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+		public ?string $language = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative text Text summary of the resource, for human interpretation */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative $text = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\ResourceResource> contained Contained, inline Resources */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+		public array $contained = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> extension Additional content defined by implementations */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> modifierExtension Extensions that cannot be ignored */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+		public array $modifierExtension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier> identifier Business identifier for this medication */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
+			fhirType: 'Identifier',
+			propertyKind: 'complex',
+			isArray: true,
+			phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
+		)]
+		public array $identifier = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept code Codes that identify this medication */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept $code = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\MedicationStatusCodesType status active | inactive | entered-in-error */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\MedicationStatusCodesType $status = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference manufacturer Manufacturer of the item */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference $manufacturer = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept form powder | tablets | capsule + */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept $form = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Ratio amount Amount of drug in package */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Ratio', propertyKind: 'complex')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Ratio $amount = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\Medication\MedicationIngredient> ingredient Active or inactive ingredient */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
+			fhirType: 'BackboneElement',
+			propertyKind: 'backbone',
+			isArray: true,
+			phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Medication\MedicationIngredient',
+		)]
+		public array $ingredient = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Resource\Medication\MedicationBatch batch Details about packaged medications */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+		public ?Medication\MedicationBatch $batch = null,
+	) {
+		parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
+	}
 }

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -12,24 +10,24 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum QuestionnaireItemOperator: string
 {
-    /** Exists */
-    case exists = 'exists';
+	/** Exists */
+	case exists = 'exists';
 
-    /** Equals */
-    case equals = '=';
+	/** Equals */
+	case equals = '=';
 
-    /** Not Equals */
-    case notequals = '!=';
+	/** Not Equals */
+	case notequals = '!=';
 
-    /** Greater Than */
-    case greaterthan = '>';
+	/** Greater Than */
+	case greaterthan = '>';
 
-    /** Less Than */
-    case lessthan = '<';
+	/** Less Than */
+	case lessthan = '<';
 
-    /** Greater or Equals */
-    case greaterorequals = '>=';
+	/** Greater or Equals */
+	case greaterorequals = '>=';
 
-    /** Less or Equals */
-    case lessorequals = '<=';
+	/** Less or Equals */
+	case lessorequals = '<=';
 }

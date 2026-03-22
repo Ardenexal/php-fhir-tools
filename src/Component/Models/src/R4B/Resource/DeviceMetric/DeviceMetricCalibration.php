@@ -1,107 +1,97 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\DeviceMetric;
-
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\DeviceMetricCalibrationStateType;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\DeviceMetricCalibrationTypeType;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\InstantPrimitive;
 
 /**
  * @description Describes the calibrations that have been performed or that are required to be performed.
  */
-#[FHIRBackboneElement(parentResource: 'DeviceMetric', elementPath: 'DeviceMetric.calibration', fhirVersion: 'R4B')]
-class DeviceMetricCalibration extends BackboneElement
+#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement(parentResource: 'DeviceMetric', elementPath: 'DeviceMetric.calibration', fhirVersion: 'R4B')]
+class DeviceMetricCalibration extends \Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement
 {
-    public const FHIR_PROPERTY_MAP = [
-        'id' => [
-            'fhirType'          => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind'      => 'scalar',
-            'isArray'           => false,
-            'isRequired'        => false,
-            'isChoice'          => false,
-            'jsonKey'           => null,
-            'phpType'           => null,
-            'variants'          => null,
-            'xmlSerializedName' => '@id',
-        ],
-        'extension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'extension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'modifierExtension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'modifierExtension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'type' => [
-            'fhirType'     => 'code',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'state' => [
-            'fhirType'     => 'code',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'time' => [
-            'fhirType'     => 'instant',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-    ];
+	public const FHIR_PROPERTY_MAP = [
+		'id' => [
+			'fhirType' => 'http://hl7.org/fhirpath/System.String',
+			'propertyKind' => 'scalar',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+			'xmlSerializedName' => '@id',
+		],
+		'extension' => [
+			'fhirType' => 'Extension',
+			'propertyKind' => 'extension',
+			'isArray' => true,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'modifierExtension' => [
+			'fhirType' => 'Extension',
+			'propertyKind' => 'modifierExtension',
+			'isArray' => true,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'type' => [
+			'fhirType' => 'code',
+			'propertyKind' => 'primitive',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'state' => [
+			'fhirType' => 'code',
+			'propertyKind' => 'primitive',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'time' => [
+			'fhirType' => 'instant',
+			'propertyKind' => 'primitive',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+	];
 
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
-        public ?string $id = null,
-        /** @var array<Extension> extension Additional content defined by implementations */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
-        public array $extension = [],
-        /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
-        public array $modifierExtension = [],
-        /** @var DeviceMetricCalibrationTypeType|null type unspecified | offset | gain | two-point */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
-        public ?DeviceMetricCalibrationTypeType $type = null,
-        /** @var DeviceMetricCalibrationStateType|null state not-calibrated | calibration-required | calibrated | unspecified */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
-        public ?DeviceMetricCalibrationStateType $state = null,
-        /** @var InstantPrimitive|null time Describes the time last calibration has been performed */
-        #[FhirProperty(fhirType: 'instant', propertyKind: 'primitive')]
-        public ?InstantPrimitive $time = null,
-    ) {
-        parent::__construct($id, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension> extension Additional content defined by implementations */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+		public array $modifierExtension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\DeviceMetricCalibrationTypeType type unspecified | offset | gain | two-point */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\DeviceMetricCalibrationTypeType $type = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\DeviceMetricCalibrationStateType state not-calibrated | calibration-required | calibrated | unspecified */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\DeviceMetricCalibrationStateType $state = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\InstantPrimitive time Describes the time last calibration has been performed */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'instant', propertyKind: 'primitive')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\InstantPrimitive $time = null,
+	) {
+		parent::__construct($id, $extension, $modifierExtension);
+	}
 }

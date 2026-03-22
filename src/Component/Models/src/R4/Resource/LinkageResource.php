@@ -1,176 +1,169 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\Linkage\LinkageItem;
-
 /**
  * @author Health Level Seven International (Patient Care)
- *
  * @see http://hl7.org/fhir/StructureDefinition/Linkage
- *
  * @description Identifies two or more records (resource instances) that refer to the same real-world "occurrence".
  */
-#[FhirResource(type: 'Linkage', version: '4.0.1', url: 'http://hl7.org/fhir/StructureDefinition/Linkage', fhirVersion: 'R4')]
+#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource(type: 'Linkage', version: '4.0.1', url: 'http://hl7.org/fhir/StructureDefinition/Linkage', fhirVersion: 'R4')]
 class LinkageResource extends DomainResourceResource
 {
-    public const FHIR_PROPERTY_MAP = [
-        'id' => [
-            'fhirType'     => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind' => 'scalar',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'meta' => [
-            'fhirType'     => 'Meta',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'implicitRules' => [
-            'fhirType'     => 'uri',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'language' => [
-            'fhirType'     => 'code',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'text' => [
-            'fhirType'     => 'Narrative',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'contained' => [
-            'fhirType'     => 'Resource',
-            'propertyKind' => 'resource',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'extension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'extension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'modifierExtension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'modifierExtension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'active' => [
-            'fhirType'     => 'boolean',
-            'propertyKind' => 'scalar',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'author' => [
-            'fhirType'     => 'Reference',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'item' => [
-            'fhirType'     => 'BackboneElement',
-            'propertyKind' => 'backbone',
-            'isArray'      => true,
-            'isRequired'   => true,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Linkage\LinkageItem',
-            'variants'     => null,
-        ],
-    ];
+	public const FHIR_PROPERTY_MAP = [
+		'id' => [
+			'fhirType' => 'http://hl7.org/fhirpath/System.String',
+			'propertyKind' => 'scalar',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'meta' => [
+			'fhirType' => 'Meta',
+			'propertyKind' => 'complex',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'implicitRules' => [
+			'fhirType' => 'uri',
+			'propertyKind' => 'primitive',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'language' => [
+			'fhirType' => 'code',
+			'propertyKind' => 'primitive',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'text' => [
+			'fhirType' => 'Narrative',
+			'propertyKind' => 'complex',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'contained' => [
+			'fhirType' => 'Resource',
+			'propertyKind' => 'resource',
+			'isArray' => true,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'extension' => [
+			'fhirType' => 'Extension',
+			'propertyKind' => 'extension',
+			'isArray' => true,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'modifierExtension' => [
+			'fhirType' => 'Extension',
+			'propertyKind' => 'modifierExtension',
+			'isArray' => true,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'active' => [
+			'fhirType' => 'boolean',
+			'propertyKind' => 'scalar',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'author' => [
+			'fhirType' => 'Reference',
+			'propertyKind' => 'complex',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'item' => [
+			'fhirType' => 'BackboneElement',
+			'propertyKind' => 'backbone',
+			'isArray' => true,
+			'isRequired' => true,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Linkage\LinkageItem',
+			'variants' => null,
+		],
+	];
 
-    public function __construct(
-        /** @var string|null id Logical id of this artifact */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
-        public ?string $id = null,
-        /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
-        public ?Meta $meta = null,
-        /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
-        public ?UriPrimitive $implicitRules = null,
-        /** @var string|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
-        public ?string $language = null,
-        /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
-        public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
-        public array $contained = [],
-        /** @var array<Extension> extension Additional content defined by implementations */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
-        public array $extension = [],
-        /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
-        public array $modifierExtension = [],
-        /** @var bool|null active Whether this linkage assertion is active or not */
-        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
-        public ?bool $active = null,
-        /** @var Reference|null author Who is responsible for linkages */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
-        public ?Reference $author = null,
-        /** @var array<LinkageItem> item Item to be linked */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true, isRequired: true)]
-        public array $item = [],
-    ) {
-        parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Logical id of this artifact */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+		public ?string $id = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta meta Metadata about the resource */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta $meta = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive implicitRules A set of rules under which this content was created */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive $implicitRules = null,
+		/** @var null|string language Language of the resource content */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+		public ?string $language = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative text Text summary of the resource, for human interpretation */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative $text = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\ResourceResource> contained Contained, inline Resources */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+		public array $contained = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> extension Additional content defined by implementations */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> modifierExtension Extensions that cannot be ignored */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+		public array $modifierExtension = [],
+		/** @var null|bool active Whether this linkage assertion is active or not */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
+		public ?bool $active = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference author Who is responsible for linkages */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference $author = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\Resource\Linkage\LinkageItem> item Item to be linked */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
+			fhirType: 'BackboneElement',
+			propertyKind: 'backbone',
+			isArray: true,
+			isRequired: true,
+			phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Linkage\LinkageItem',
+		)]
+		public array $item = [],
+	) {
+		parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
+	}
 }

@@ -1,71 +1,61 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Primitive;
 
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
-use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDateTime;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Element;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
-
 /**
  * @author HL7 FHIR Standard
- *
  * @see http://hl7.org/fhir/StructureDefinition/dateTime
- *
  * @description A date, date-time or partial date (e.g. just year or year + month).  If hours and minutes are specified, a time zone SHALL be populated. The format is a union of the schema types gYear, gYearMonth, date and dateTime. Seconds must be provided due to schema type constraints but may be zero-filled and may be ignored.                 Dates SHALL be valid dates.
  */
-#[FHIRPrimitive(primitiveType: 'dateTime', fhirVersion: 'R4')]
-class DateTimePrimitive extends Element
+#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive(primitiveType: 'dateTime', fhirVersion: 'R4')]
+class DateTimePrimitive extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\Element
 {
-    public const FHIR_PROPERTY_MAP = [
-        'id' => [
-            'fhirType'          => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind'      => 'scalar',
-            'isArray'           => false,
-            'isRequired'        => false,
-            'isChoice'          => false,
-            'jsonKey'           => null,
-            'phpType'           => null,
-            'variants'          => null,
-            'xmlSerializedName' => '@id',
-        ],
-        'extension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'extension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'value' => [
-            'fhirType'          => 'http://hl7.org/fhirpath/System.DateTime',
-            'propertyKind'      => 'scalar',
-            'isArray'           => false,
-            'isRequired'        => false,
-            'isChoice'          => false,
-            'jsonKey'           => null,
-            'phpType'           => null,
-            'variants'          => null,
-            'xmlSerializedName' => '@value',
-        ],
-    ];
+	public const FHIR_PROPERTY_MAP = [
+		'id' => [
+			'fhirType' => 'http://hl7.org/fhirpath/System.String',
+			'propertyKind' => 'scalar',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+			'xmlSerializedName' => '@id',
+		],
+		'extension' => [
+			'fhirType' => 'Extension',
+			'propertyKind' => 'extension',
+			'isArray' => true,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'value' => [
+			'fhirType' => 'http://hl7.org/fhirpath/System.DateTime',
+			'propertyKind' => 'scalar',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+			'xmlSerializedName' => '@value',
+		],
+	];
 
-    public function __construct(
-        /** @var string|null id xml:id (or equivalent in JSON) */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
-        public ?string $id = null,
-        /** @var array<Extension> extension Additional content defined by implementations */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
-        public array $extension = [],
-        /** @var FHIRDateTime|null value Primitive value for dateTime */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.DateTime', propertyKind: 'scalar', xmlSerializedName: '@value')]
-        public ?FHIRDateTime $value = null,
-    ) {
-        parent::__construct($id, $extension);
-    }
+	public function __construct(
+		/** @var null|string id xml:id (or equivalent in JSON) */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension> extension Additional content defined by implementations */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+		public array $extension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDateTime value Primitive value for dateTime */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.DateTime', propertyKind: 'scalar', xmlSerializedName: '@value')]
+		public ?\Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDateTime $value = null,
+	) {
+		parent::__construct($id, $extension);
+	}
 }

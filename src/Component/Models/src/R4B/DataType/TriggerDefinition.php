@@ -1,182 +1,176 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DatePrimitive;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
-use Symfony\Component\Validator\Constraints\NotBlank;
-
 /**
  * @author HL7 FHIR Standard
- *
  * @see http://hl7.org/fhir/StructureDefinition/TriggerDefinition
- *
  * @description A description of a triggering event. Triggering events can be named events, data events, or periodic, as determined by the type element.
  */
-#[FHIRComplexType(typeName: 'TriggerDefinition', fhirVersion: 'R4B')]
+#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType(typeName: 'TriggerDefinition', fhirVersion: 'R4B')]
 class TriggerDefinition extends Element
 {
-    public const FHIR_PROPERTY_MAP = [
-        'id' => [
-            'fhirType'          => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind'      => 'scalar',
-            'isArray'           => false,
-            'isRequired'        => false,
-            'isChoice'          => false,
-            'jsonKey'           => null,
-            'phpType'           => null,
-            'variants'          => null,
-            'xmlSerializedName' => '@id',
-        ],
-        'extension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'extension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'type' => [
-            'fhirType'     => 'code',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => true,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'name' => [
-            'fhirType'     => 'string',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'timing' => [
-            'fhirType'     => 'choice',
-            'propertyKind' => 'choice',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => true,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => [
-                [
-                    'fhirType'     => 'Timing',
-                    'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing',
-                    'jsonKey'      => 'timingTiming',
-                    'isBuiltin'    => false,
-                ],
-                [
-                    'fhirType'     => 'Reference',
-                    'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
-                    'jsonKey'      => 'timingReference',
-                    'isBuiltin'    => false,
-                ],
-                [
-                    'fhirType'     => 'date',
-                    'propertyKind' => 'primitive',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DatePrimitive',
-                    'jsonKey'      => 'timingDate',
-                    'isBuiltin'    => false,
-                ],
-                [
-                    'fhirType'     => 'dateTime',
-                    'propertyKind' => 'primitive',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive',
-                    'jsonKey'      => 'timingDateTime',
-                    'isBuiltin'    => false,
-                ],
-            ],
-        ],
-        'data' => [
-            'fhirType'     => 'DataRequirement',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\DataRequirement',
-            'variants'     => null,
-        ],
-        'condition' => [
-            'fhirType'     => 'Expression',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-    ];
+	public const FHIR_PROPERTY_MAP = [
+		'id' => [
+			'fhirType' => 'http://hl7.org/fhirpath/System.String',
+			'propertyKind' => 'scalar',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+			'xmlSerializedName' => '@id',
+		],
+		'extension' => [
+			'fhirType' => 'Extension',
+			'propertyKind' => 'extension',
+			'isArray' => true,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'type' => [
+			'fhirType' => 'code',
+			'propertyKind' => 'primitive',
+			'isArray' => false,
+			'isRequired' => true,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'name' => [
+			'fhirType' => 'string',
+			'propertyKind' => 'primitive',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'timing' => [
+			'fhirType' => 'choice',
+			'propertyKind' => 'choice',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => true,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => [
+				[
+					'fhirType' => 'Timing',
+					'propertyKind' => 'complex',
+					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing',
+					'jsonKey' => 'timingTiming',
+					'isBuiltin' => false,
+				],
+				[
+					'fhirType' => 'Reference',
+					'propertyKind' => 'complex',
+					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
+					'jsonKey' => 'timingReference',
+					'isBuiltin' => false,
+				],
+				[
+					'fhirType' => 'date',
+					'propertyKind' => 'primitive',
+					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DatePrimitive',
+					'jsonKey' => 'timingDate',
+					'isBuiltin' => false,
+				],
+				[
+					'fhirType' => 'dateTime',
+					'propertyKind' => 'primitive',
+					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive',
+					'jsonKey' => 'timingDateTime',
+					'isBuiltin' => false,
+				],
+			],
+		],
+		'data' => [
+			'fhirType' => 'DataRequirement',
+			'propertyKind' => 'complex',
+			'isArray' => true,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\DataRequirement',
+			'variants' => null,
+		],
+		'condition' => [
+			'fhirType' => 'Expression',
+			'propertyKind' => 'complex',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+	];
 
-    public function __construct(
-        /** @var string|null id Unique id for inter-element referencing */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
-        public ?string $id = null,
-        /** @var array<Extension> extension Additional content defined by implementations */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
-        public array $extension = [],
-        /** @var TriggerTypeType|null type named-event | periodic | data-changed | data-added | data-modified | data-removed | data-accessed | data-access-ended */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
-        public ?TriggerTypeType $type = null,
-        /** @var StringPrimitive|string|null name Name or URI that identifies the event */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
-        public StringPrimitive|string|null $name = null,
-        /** @var Timing|Reference|DatePrimitive|DateTimePrimitive|null timing Timing of the event */
-        #[FhirProperty(
-            fhirType: 'choice',
-            propertyKind: 'choice',
-            isChoice: true,
-            variants: [
-                [
-                    'fhirType'     => 'Timing',
-                    'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing',
-                    'jsonKey'      => 'timingTiming',
-                ],
-                [
-                    'fhirType'     => 'Reference',
-                    'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
-                    'jsonKey'      => 'timingReference',
-                ],
-                [
-                    'fhirType'     => 'date',
-                    'propertyKind' => 'primitive',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DatePrimitive',
-                    'jsonKey'      => 'timingDate',
-                ],
-                [
-                    'fhirType'     => 'dateTime',
-                    'propertyKind' => 'primitive',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive',
-                    'jsonKey'      => 'timingDateTime',
-                ],
-            ],
-        )]
-        public Timing|Reference|DatePrimitive|DateTimePrimitive|null $timing = null,
-        /** @var array<DataRequirement> data Triggering data of the event (multiple = 'and') */
-        #[FhirProperty(fhirType: 'DataRequirement', propertyKind: 'complex', isArray: true)]
-        public array $data = [],
-        /** @var Expression|null condition Whether the event triggers (boolean expression) */
-        #[FhirProperty(fhirType: 'Expression', propertyKind: 'complex')]
-        public ?Expression $condition = null,
-    ) {
-        parent::__construct($id, $extension);
-    }
+	public function __construct(
+		/** @var null|string id Unique id for inter-element referencing */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
+		public ?string $id = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension> extension Additional content defined by implementations */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+		public array $extension = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\TriggerTypeType type named-event | periodic | data-changed | data-added | data-modified | data-removed | data-accessed | data-access-ended */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), \Symfony\Component\Validator\Constraints\NotBlank]
+		public ?TriggerTypeType $type = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive|string name Name or URI that identifies the event */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+		public \Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive|string|null $name = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DatePrimitive|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive timing Timing of the event */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
+			fhirType: 'choice',
+			propertyKind: 'choice',
+			isChoice: true,
+			variants: [
+			[
+				'fhirType' => 'Timing',
+				'propertyKind' => 'complex',
+				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing',
+				'jsonKey' => 'timingTiming',
+			],
+			[
+				'fhirType' => 'Reference',
+				'propertyKind' => 'complex',
+				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
+				'jsonKey' => 'timingReference',
+			],
+			[
+				'fhirType' => 'date',
+				'propertyKind' => 'primitive',
+				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DatePrimitive',
+				'jsonKey' => 'timingDate',
+			],
+			[
+				'fhirType' => 'dateTime',
+				'propertyKind' => 'primitive',
+				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive',
+				'jsonKey' => 'timingDateTime',
+			],
+		],
+		)]
+		public Timing|Reference|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DatePrimitive|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive|null $timing = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\DataRequirement> data Triggering data of the event (multiple = 'and') */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
+			fhirType: 'DataRequirement',
+			propertyKind: 'complex',
+			isArray: true,
+			phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\DataRequirement',
+		)]
+		public array $data = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Expression condition Whether the event triggers (boolean expression) */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Expression', propertyKind: 'complex')]
+		public ?Expression $condition = null,
+	) {
+		parent::__construct($id, $extension);
+	}
 }

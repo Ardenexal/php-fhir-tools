@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -12,9 +10,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum ActionPrecheckBehavior: string
 {
-    /** Yes */
-    case yes = 'yes';
+	/** Yes */
+	case yes = 'yes';
 
-    /** No */
-    case no = 'no';
+	/** No */
+	case no = 'no';
 }

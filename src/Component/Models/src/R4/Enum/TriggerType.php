@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -12,18 +10,18 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum TriggerType: string
 {
-    /** Named Event */
-    case namedevent = 'named-event';
+	/** Named Event */
+	case namedevent = 'named-event';
 
-    /** Periodic */
-    case periodic = 'periodic';
+	/** Periodic */
+	case periodic = 'periodic';
 
-    /** Data Changed */
-    case datachanged = 'data-changed';
+	/** Data Changed */
+	case datachanged = 'data-changed';
 
-    /** Data Accessed */
-    case dataaccessed = 'data-accessed';
+	/** Data Accessed */
+	case dataaccessed = 'data-accessed';
 
-    /** Data Access Ended */
-    case dataaccessended = 'data-access-ended';
+	/** Data Access Ended */
+	case dataaccessended = 'data-access-ended';
 }

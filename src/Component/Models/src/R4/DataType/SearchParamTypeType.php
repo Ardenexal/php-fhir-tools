@@ -1,23 +1,17 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
-use Ardenexal\FHIRTools\Component\Models\R4\Enum\SearchParamType;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
-
 /**
  * @fhir-code-type SearchParamType
- *
  * @description Code type wrapper for SearchParamType enum
  */
-class SearchParamTypeType extends CodePrimitive
+class SearchParamTypeType extends \Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive
 {
-    public function __construct(
-        /** @param SearchParamType|string|null $value The code value (enum or string) */
-        ?string $value = null,
-    ) {
-        parent::__construct(value: $value);
-    }
+	public function __construct(
+		/** @param \Ardenexal\FHIRTools\Component\Models\R4\Enum\SearchParamType|string|null $value The code value (enum or string) */
+		string|null $value = null,
+	) {
+		parent::__construct(value: $value);
+	}
 }

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -12,12 +10,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum MeasureReportStatus: string
 {
-    /** Complete */
-    case complete = 'complete';
+	/** Complete */
+	case complete = 'complete';
 
-    /** Pending */
-    case pending = 'pending';
+	/** Pending */
+	case pending = 'pending';
 
-    /** Error */
-    case error = 'error';
+	/** Error */
+	case error = 'error';
 }

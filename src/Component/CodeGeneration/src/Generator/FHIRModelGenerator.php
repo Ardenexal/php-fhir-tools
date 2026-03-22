@@ -685,6 +685,14 @@ class FHIRModelGenerator implements GeneratorInterface
             $attributeArgs['xmlSerializedName'] = $xmlSerializedName;
         }
 
+        // Emit phpType in the attribute for complex/backbone array properties (non-choice)
+        // so the serializer can denormalize array items into typed objects via attribute reflection.
+        if ($isArray && ! $isChoice && count($types) > 0
+            && in_array($propertyKind, ['complex', 'backbone'], true)
+        ) {
+            $attributeArgs['phpType'] = ltrim($types[0], '\\');
+        }
+
         if ($maxValue !== '0') {
             $shortDescription = $element['short'] ?? '';
             // For decimal-typed properties, PHPStan @var uses 'numeric-string' instead of 'string'

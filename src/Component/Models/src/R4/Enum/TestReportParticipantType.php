@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -12,12 +10,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum TestReportParticipantType: string
 {
-    /** Test Engine */
-    case testengine = 'test-engine';
+	/** Test Engine */
+	case testengine = 'test-engine';
 
-    /** Client */
-    case client = 'client';
+	/** Client */
+	case client = 'client';
 
-    /** Server */
-    case server = 'server';
+	/** Server */
+	case server = 'server';
 }

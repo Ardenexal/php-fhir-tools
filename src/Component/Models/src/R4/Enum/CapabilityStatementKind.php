@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -12,12 +10,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum CapabilityStatementKind: string
 {
-    /** Instance */
-    case instance = 'instance';
+	/** Instance */
+	case instance = 'instance';
 
-    /** Capability */
-    case capability = 'capability';
+	/** Capability */
+	case capability = 'capability';
 
-    /** Requirements */
-    case requirements = 'requirements';
+	/** Requirements */
+	case requirements = 'requirements';
 }

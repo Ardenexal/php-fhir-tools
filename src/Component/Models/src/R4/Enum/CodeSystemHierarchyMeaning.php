@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -12,15 +10,15 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum CodeSystemHierarchyMeaning: string
 {
-    /** Grouped By */
-    case groupedby = 'grouped-by';
+	/** Grouped By */
+	case groupedby = 'grouped-by';
 
-    /** Is-A */
-    case i_sa = 'is-a';
+	/** Is-A */
+	case i_sa = 'is-a';
 
-    /** Part Of */
-    case partof = 'part-of';
+	/** Part Of */
+	case partof = 'part-of';
 
-    /** Classified With */
-    case classifiedwith = 'classified-with';
+	/** Classified With */
+	case classifiedwith = 'classified-with';
 }

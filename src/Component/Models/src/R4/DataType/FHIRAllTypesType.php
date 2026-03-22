@@ -1,23 +1,17 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
-use Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRAllTypes;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
-
 /**
  * @fhir-code-type FHIRAllTypes
- *
  * @description Code type wrapper for FHIRAllTypes enum
  */
-class FHIRAllTypesType extends CodePrimitive
+class FHIRAllTypesType extends \Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive
 {
-    public function __construct(
-        /** @param FHIRAllTypes|string|null $value The code value (enum or string) */
-        ?string $value = null,
-    ) {
-        parent::__construct(value: $value);
-    }
+	public function __construct(
+		/** @param \Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRAllTypes|string|null $value The code value (enum or string) */
+		string|null $value = null,
+	) {
+		parent::__construct(value: $value);
+	}
 }

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -12,18 +10,18 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum InvoiceStatus: string
 {
-    /** draft */
-    case draft = 'draft';
+	/** draft */
+	case draft = 'draft';
 
-    /** issued */
-    case issued = 'issued';
+	/** issued */
+	case issued = 'issued';
 
-    /** balanced */
-    case balanced = 'balanced';
+	/** balanced */
+	case balanced = 'balanced';
 
-    /** cancelled */
-    case cancelled = 'cancelled';
+	/** cancelled */
+	case cancelled = 'cancelled';
 
-    /** entered in error */
-    case enteredinerror = 'entered-in-error';
+	/** entered in error */
+	case enteredinerror = 'entered-in-error';
 }

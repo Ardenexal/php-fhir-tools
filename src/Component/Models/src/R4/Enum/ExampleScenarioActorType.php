@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
@@ -12,9 +10,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
  */
 enum ExampleScenarioActorType: string
 {
-    /** Person */
-    case person = 'person';
+	/** Person */
+	case person = 'person';
 
-    /** System */
-    case system = 'entity';
+	/** System */
+	case system = 'entity';
 }

@@ -1,347 +1,357 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Attachment;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\ConsentStateType;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Meta;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Narrative;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
-use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Consent\ConsentPolicy;
-use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Consent\ConsentProvision;
-use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Consent\ConsentVerification;
-use Symfony\Component\Validator\Constraints\NotBlank;
-
 /**
  * @author Health Level Seven International (Community Based Collaborative Care)
- *
  * @see http://hl7.org/fhir/StructureDefinition/Consent
- *
  * @description A record of a healthcare consumer’s  choices, which permits or denies identified recipient(s) or recipient role(s) to perform one or more actions within a given policy context, for specific purposes and periods of time.
  */
-#[FhirResource(type: 'Consent', version: '4.3.0', url: 'http://hl7.org/fhir/StructureDefinition/Consent', fhirVersion: 'R4B')]
+#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource(type: 'Consent', version: '4.3.0', url: 'http://hl7.org/fhir/StructureDefinition/Consent', fhirVersion: 'R4B')]
 class ConsentResource extends DomainResourceResource
 {
-    public const FHIR_PROPERTY_MAP = [
-        'id' => [
-            'fhirType'     => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind' => 'scalar',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'meta' => [
-            'fhirType'     => 'Meta',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'implicitRules' => [
-            'fhirType'     => 'uri',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'language' => [
-            'fhirType'     => 'code',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'text' => [
-            'fhirType'     => 'Narrative',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'contained' => [
-            'fhirType'     => 'Resource',
-            'propertyKind' => 'resource',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'extension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'extension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'modifierExtension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'modifierExtension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'identifier' => [
-            'fhirType'     => 'Identifier',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier',
-            'variants'     => null,
-        ],
-        'status' => [
-            'fhirType'     => 'code',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => true,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'scope' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => true,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'category' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => true,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
-            'variants'     => null,
-        ],
-        'patient' => [
-            'fhirType'     => 'Reference',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'dateTime' => [
-            'fhirType'     => 'dateTime',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'performer' => [
-            'fhirType'     => 'Reference',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
-            'variants'     => null,
-        ],
-        'organization' => [
-            'fhirType'     => 'Reference',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
-            'variants'     => null,
-        ],
-        'source' => [
-            'fhirType'     => 'choice',
-            'propertyKind' => 'choice',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => true,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => [
-                [
-                    'fhirType'     => 'Attachment',
-                    'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Attachment',
-                    'jsonKey'      => 'sourceAttachment',
-                    'isBuiltin'    => false,
-                ],
-                [
-                    'fhirType'     => 'Reference',
-                    'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
-                    'jsonKey'      => 'sourceReference',
-                    'isBuiltin'    => false,
-                ],
-            ],
-        ],
-        'policy' => [
-            'fhirType'     => 'BackboneElement',
-            'propertyKind' => 'backbone',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Consent\ConsentPolicy',
-            'variants'     => null,
-        ],
-        'policyRule' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'verification' => [
-            'fhirType'     => 'BackboneElement',
-            'propertyKind' => 'backbone',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Consent\ConsentVerification',
-            'variants'     => null,
-        ],
-        'provision' => [
-            'fhirType'     => 'BackboneElement',
-            'propertyKind' => 'backbone',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-    ];
+	public const FHIR_PROPERTY_MAP = [
+		'id' => [
+			'fhirType' => 'http://hl7.org/fhirpath/System.String',
+			'propertyKind' => 'scalar',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'meta' => [
+			'fhirType' => 'Meta',
+			'propertyKind' => 'complex',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'implicitRules' => [
+			'fhirType' => 'uri',
+			'propertyKind' => 'primitive',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'language' => [
+			'fhirType' => 'code',
+			'propertyKind' => 'primitive',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'text' => [
+			'fhirType' => 'Narrative',
+			'propertyKind' => 'complex',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'contained' => [
+			'fhirType' => 'Resource',
+			'propertyKind' => 'resource',
+			'isArray' => true,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'extension' => [
+			'fhirType' => 'Extension',
+			'propertyKind' => 'extension',
+			'isArray' => true,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'modifierExtension' => [
+			'fhirType' => 'Extension',
+			'propertyKind' => 'modifierExtension',
+			'isArray' => true,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'identifier' => [
+			'fhirType' => 'Identifier',
+			'propertyKind' => 'complex',
+			'isArray' => true,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier',
+			'variants' => null,
+		],
+		'status' => [
+			'fhirType' => 'code',
+			'propertyKind' => 'primitive',
+			'isArray' => false,
+			'isRequired' => true,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'scope' => [
+			'fhirType' => 'CodeableConcept',
+			'propertyKind' => 'complex',
+			'isArray' => false,
+			'isRequired' => true,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'category' => [
+			'fhirType' => 'CodeableConcept',
+			'propertyKind' => 'complex',
+			'isArray' => true,
+			'isRequired' => true,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
+			'variants' => null,
+		],
+		'patient' => [
+			'fhirType' => 'Reference',
+			'propertyKind' => 'complex',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'dateTime' => [
+			'fhirType' => 'dateTime',
+			'propertyKind' => 'primitive',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'performer' => [
+			'fhirType' => 'Reference',
+			'propertyKind' => 'complex',
+			'isArray' => true,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
+			'variants' => null,
+		],
+		'organization' => [
+			'fhirType' => 'Reference',
+			'propertyKind' => 'complex',
+			'isArray' => true,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
+			'variants' => null,
+		],
+		'source' => [
+			'fhirType' => 'choice',
+			'propertyKind' => 'choice',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => true,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => [
+				[
+					'fhirType' => 'Attachment',
+					'propertyKind' => 'complex',
+					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Attachment',
+					'jsonKey' => 'sourceAttachment',
+					'isBuiltin' => false,
+				],
+				[
+					'fhirType' => 'Reference',
+					'propertyKind' => 'complex',
+					'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
+					'jsonKey' => 'sourceReference',
+					'isBuiltin' => false,
+				],
+			],
+		],
+		'policy' => [
+			'fhirType' => 'BackboneElement',
+			'propertyKind' => 'backbone',
+			'isArray' => true,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Consent\ConsentPolicy',
+			'variants' => null,
+		],
+		'policyRule' => [
+			'fhirType' => 'CodeableConcept',
+			'propertyKind' => 'complex',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+		'verification' => [
+			'fhirType' => 'BackboneElement',
+			'propertyKind' => 'backbone',
+			'isArray' => true,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Consent\ConsentVerification',
+			'variants' => null,
+		],
+		'provision' => [
+			'fhirType' => 'BackboneElement',
+			'propertyKind' => 'backbone',
+			'isArray' => false,
+			'isRequired' => false,
+			'isChoice' => false,
+			'jsonKey' => null,
+			'phpType' => null,
+			'variants' => null,
+		],
+	];
 
-    public function __construct(
-        /** @var string|null id Logical id of this artifact */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
-        public ?string $id = null,
-        /** @var Meta|null meta Metadata about the resource */
-        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
-        public ?Meta $meta = null,
-        /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
-        public ?UriPrimitive $implicitRules = null,
-        /** @var string|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
-        public ?string $language = null,
-        /** @var Narrative|null text Text summary of the resource, for human interpretation */
-        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
-        public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
-        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
-        public array $contained = [],
-        /** @var array<Extension> extension Additional content defined by implementations */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
-        public array $extension = [],
-        /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
-        public array $modifierExtension = [],
-        /** @var array<Identifier> identifier Identifier for this record (external references) */
-        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex', isArray: true)]
-        public array $identifier = [],
-        /** @var ConsentStateType|null status draft | proposed | active | rejected | inactive | entered-in-error */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
-        public ?ConsentStateType $status = null,
-        /** @var CodeableConcept|null scope Which of the four areas this resource covers (extensible) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
-        public ?CodeableConcept $scope = null,
-        /** @var array<CodeableConcept> category Classification of the consent statement - for indexing/retrieval */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true, isRequired: true)]
-        public array $category = [],
-        /** @var Reference|null patient Who the consent applies to */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
-        public ?Reference $patient = null,
-        /** @var DateTimePrimitive|null dateTime When this Consent was created or indexed */
-        #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
-        public ?DateTimePrimitive $dateTime = null,
-        /** @var array<Reference> performer Who is agreeing to the policy and rules */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isArray: true)]
-        public array $performer = [],
-        /** @var array<Reference> organization Custodian of the consent */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isArray: true)]
-        public array $organization = [],
-        /** @var Attachment|Reference|null source Source from which this consent is taken */
-        #[FhirProperty(
-            fhirType: 'choice',
-            propertyKind: 'choice',
-            isChoice: true,
-            variants: [
-                [
-                    'fhirType'     => 'Attachment',
-                    'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Attachment',
-                    'jsonKey'      => 'sourceAttachment',
-                ],
-                [
-                    'fhirType'     => 'Reference',
-                    'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
-                    'jsonKey'      => 'sourceReference',
-                ],
-            ],
-        )]
-        public Attachment|Reference|null $source = null,
-        /** @var array<ConsentPolicy> policy Policies covered by this consent */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
-        public array $policy = [],
-        /** @var CodeableConcept|null policyRule Regulation that this consents to */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
-        public ?CodeableConcept $policyRule = null,
-        /** @var array<ConsentVerification> verification Consent Verified by patient or family */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
-        public array $verification = [],
-        /** @var ConsentProvision|null provision Constraints to the base Consent.policyRule */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
-        public ?ConsentProvision $provision = null,
-    ) {
-        parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
-    }
+	public function __construct(
+		/** @var null|string id Logical id of this artifact */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+		public ?string $id = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Meta meta Metadata about the resource */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Meta $meta = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive implicitRules A set of rules under which this content was created */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive $implicitRules = null,
+		/** @var null|string language Language of the resource content */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+		public ?string $language = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Narrative text Text summary of the resource, for human interpretation */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Narrative $text = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\ResourceResource> contained Contained, inline Resources */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+		public array $contained = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension> extension Additional content defined by implementations */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+		public array $extension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension> modifierExtension Extensions that cannot be ignored */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+		public array $modifierExtension = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier> identifier Identifier for this record (external references) */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
+			fhirType: 'Identifier',
+			propertyKind: 'complex',
+			isArray: true,
+			phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier',
+		)]
+		public array $identifier = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\ConsentStateType status draft | proposed | active | rejected | inactive | entered-in-error */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), \Symfony\Component\Validator\Constraints\NotBlank]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\ConsentStateType $status = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept scope Which of the four areas this resource covers (extensible) */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), \Symfony\Component\Validator\Constraints\NotBlank]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept $scope = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept> category Classification of the consent statement - for indexing/retrieval */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
+			fhirType: 'CodeableConcept',
+			propertyKind: 'complex',
+			isArray: true,
+			isRequired: true,
+			phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
+		)]
+		public array $category = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference patient Who the consent applies to */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference $patient = null,
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive dateTime When this Consent was created or indexed */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive $dateTime = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference> performer Who is agreeing to the policy and rules */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
+			fhirType: 'Reference',
+			propertyKind: 'complex',
+			isArray: true,
+			phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
+		)]
+		public array $performer = [],
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference> organization Custodian of the consent */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
+			fhirType: 'Reference',
+			propertyKind: 'complex',
+			isArray: true,
+			phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
+		)]
+		public array $organization = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Attachment|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference source Source from which this consent is taken */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
+			fhirType: 'choice',
+			propertyKind: 'choice',
+			isChoice: true,
+			variants: [
+			[
+				'fhirType' => 'Attachment',
+				'propertyKind' => 'complex',
+				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Attachment',
+				'jsonKey' => 'sourceAttachment',
+			],
+			[
+				'fhirType' => 'Reference',
+				'propertyKind' => 'complex',
+				'phpType' => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
+				'jsonKey' => 'sourceReference',
+			],
+		],
+		)]
+		public \Ardenexal\FHIRTools\Component\Models\R4B\DataType\Attachment|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference|null $source = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\Consent\ConsentPolicy> policy Policies covered by this consent */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
+			fhirType: 'BackboneElement',
+			propertyKind: 'backbone',
+			isArray: true,
+			phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Consent\ConsentPolicy',
+		)]
+		public array $policy = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept policyRule Regulation that this consents to */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept $policyRule = null,
+		/** @var  array<\Ardenexal\FHIRTools\Component\Models\R4B\Resource\Consent\ConsentVerification> verification Consent Verified by patient or family */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(
+			fhirType: 'BackboneElement',
+			propertyKind: 'backbone',
+			isArray: true,
+			phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Consent\ConsentVerification',
+		)]
+		public array $verification = [],
+		/** @var null|\Ardenexal\FHIRTools\Component\Models\R4B\Resource\Consent\ConsentProvision provision Constraints to the base Consent.policyRule */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+		public ?Consent\ConsentProvision $provision = null,
+	) {
+		parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
+	}
 }
