@@ -357,9 +357,6 @@ class FHIRModelGenerator implements GeneratorInterface
             throw GenerationException::invalidElementPath('ClassType has no namespace');
         }
 
-        /** @var array<string, mixed> $mapEntries */
-        $mapEntries = [];
-
         foreach ($propertyElements as $propertyElement) {
             // This is a primitive type
             if (! array_key_exists('_properties', $propertyElement) || count($propertyElement['_properties']) === 0) {
@@ -378,10 +375,7 @@ class FHIRModelGenerator implements GeneratorInterface
                 ) {
                     $parentParameters[] = $this->convertToMethodName($element['base']['path']);
                 }
-                $paramEntry = $this->addElementAsProperty($propertyElement['_element'], $constructor, $version, $builderContext, $classNamespace);
-                if ($paramEntry !== null) {
-                    $mapEntries[$this->convertToMethodName($propertyElement['_element']['path'])] = $paramEntry;
-                }
+                $this->addElementAsProperty($propertyElement['_element'], $constructor, $version, $builderContext, $classNamespace);
             } else {
                 $element = $propertyElement['_element'];
 
@@ -459,10 +453,7 @@ class FHIRModelGenerator implements GeneratorInterface
                 ) {
                     $parentParameters[] = $this->convertToMethodName($element['base']['path']);
                 }
-                $paramEntry = $this->addElementAsProperty($element, $constructor, $version, $builderContext, $classNamespace);
-                if ($paramEntry !== null) {
-                    $mapEntries[$this->convertToMethodName($element['path'])] = $paramEntry;
-                }
+                $this->addElementAsProperty($element, $constructor, $version, $builderContext, $classNamespace);
 
                 if (isset($propertyElement['_properties'])) {
                     // Recursively process nested elements for ValueSet dependencies
@@ -473,11 +464,6 @@ class FHIRModelGenerator implements GeneratorInterface
 
         if ($classType->getExtends() !== null && count($parentParameters) > 0) {
             $constructor->addBody('parent::__construct($' . implode(', $', $parentParameters) . ');');
-        }
-
-        if (! empty($mapEntries)) {
-            $classType->addConstant('FHIR_PROPERTY_MAP', $mapEntries)
-                ->setVisibility('public');
         }
 
         return $classType;
@@ -622,11 +608,8 @@ class FHIRModelGenerator implements GeneratorInterface
      * @param BuilderContextInterface $builderContext
      * @param PhpNamespace            $namespace
      * @param EnumType|null           $enum
-     *
-     * @return array{fhirType: string, propertyKind: string, isArray: bool, isRequired: bool, isChoice: bool, jsonKey: string|null, phpType: string|null, variants: list<array{fhirType: string, propertyKind: string, phpType: string, jsonKey: string, isBuiltin: bool}>|null}|null
-     *                                                                                                                                                                                                                                                                                Entry for FHIR_PROPERTY_MAP, or null when max=0
      */
-    private function addElementAsProperty(array $element, Method $method, string $version, BuilderContextInterface $builderContext, PhpNamespace $namespace, ?EnumType $enum = null): ?array
+    private function addElementAsProperty(array $element, Method $method, string $version, BuilderContextInterface $builderContext, PhpNamespace $namespace, ?EnumType $enum = null): void
     {
         $types = [];
         if (! isset($element['type']) && isset($element['contentReference'])) {
@@ -652,7 +635,7 @@ class FHIRModelGenerator implements GeneratorInterface
         $isArray    = ! in_array($maxValue, ['1', '0'], true);
         $isNullable = $minValue === 0 && $isArray === false;
 
-        // Build FHIR property metadata for #[FhirProperty] attribute and FHIR_PROPERTY_MAP const
+        // Build FHIR property metadata for #[FhirProperty] attribute
         $isChoice     = str_contains($element['path'], '[x]');
         $fhirType     = $isChoice ? 'choice' : ($element['type'][0]['code'] ?? 'unknown');
         $propertyKind = $this->resolvePropertyKind($parameterName, $element);
@@ -683,6 +666,14 @@ class FHIRModelGenerator implements GeneratorInterface
         }
         if ($xmlSerializedName !== null) {
             $attributeArgs['xmlSerializedName'] = $xmlSerializedName;
+        }
+
+        // Emit phpType in the attribute for complex/backbone array properties (non-choice)
+        // so the serializer can denormalize array items into typed objects via attribute reflection.
+        if ($isArray && ! $isChoice && count($types) > 0
+                     && in_array($propertyKind, ['complex', 'backbone'], true)
+        ) {
+            $attributeArgs['phpType'] = ltrim($types[0], '\\');
         }
 
         if ($maxValue !== '0') {
@@ -716,35 +707,7 @@ class FHIRModelGenerator implements GeneratorInterface
                     $parameter->addAttribute(NotBlank::class);
                 }
             }
-
-            // For non-choice complex/backbone array properties, store the PHP item class
-            // so the denormalizer can produce typed objects instead of raw arrays.
-            $phpType = null;
-            if ($isArray && ! $isChoice && count($types) > 0
-                         && in_array($propertyKind, ['complex', 'backbone'], true)
-            ) {
-                $phpType = ltrim($types[0], '\\');
-            }
-
-            $mapEntry = [
-                'fhirType'     => $fhirType,
-                'propertyKind' => $propertyKind,
-                'isArray'      => $isArray,
-                'isRequired'   => $isRequired,
-                'isChoice'     => $isChoice,
-                'jsonKey'      => null,
-                'phpType'      => $phpType,
-                'variants'     => $variants,
-            ];
-
-            if ($xmlSerializedName !== null) {
-                $mapEntry['xmlSerializedName'] = $xmlSerializedName;
-            }
-
-            return $mapEntry;
         }
-
-        return null;
     }
 
     /**

@@ -24,145 +24,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 #[FHIRBackboneElement(parentResource: 'QuestionnaireResponse', elementPath: 'QuestionnaireResponse.item.answer', fhirVersion: 'R4')]
 class QuestionnaireResponseItemAnswer extends BackboneElement
 {
-    public const FHIR_PROPERTY_MAP = [
-        'id' => [
-            'fhirType'          => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind'      => 'scalar',
-            'isArray'           => false,
-            'isRequired'        => false,
-            'isChoice'          => false,
-            'jsonKey'           => null,
-            'phpType'           => null,
-            'variants'          => null,
-            'xmlSerializedName' => '@id',
-        ],
-        'extension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'extension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'modifierExtension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'modifierExtension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'value' => [
-            'fhirType'     => 'choice',
-            'propertyKind' => 'choice',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => true,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => [
-                [
-                    'fhirType'     => 'boolean',
-                    'propertyKind' => 'scalar',
-                    'phpType'      => 'bool',
-                    'jsonKey'      => 'valueBoolean',
-                    'isBuiltin'    => true,
-                ],
-                [
-                    'fhirType'     => 'decimal',
-                    'propertyKind' => 'scalar',
-                    'phpType'      => 'string',
-                    'jsonKey'      => 'valueDecimal',
-                    'isBuiltin'    => true,
-                ],
-                [
-                    'fhirType'     => 'integer',
-                    'propertyKind' => 'scalar',
-                    'phpType'      => 'int',
-                    'jsonKey'      => 'valueInteger',
-                    'isBuiltin'    => true,
-                ],
-                [
-                    'fhirType'     => 'date',
-                    'propertyKind' => 'primitive',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive',
-                    'jsonKey'      => 'valueDate',
-                    'isBuiltin'    => false,
-                ],
-                [
-                    'fhirType'     => 'dateTime',
-                    'propertyKind' => 'primitive',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive',
-                    'jsonKey'      => 'valueDateTime',
-                    'isBuiltin'    => false,
-                ],
-                [
-                    'fhirType'     => 'time',
-                    'propertyKind' => 'primitive',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\TimePrimitive',
-                    'jsonKey'      => 'valueTime',
-                    'isBuiltin'    => false,
-                ],
-                [
-                    'fhirType'     => 'string',
-                    'propertyKind' => 'primitive',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive',
-                    'jsonKey'      => 'valueString',
-                    'isBuiltin'    => false,
-                ],
-                [
-                    'fhirType'     => 'uri',
-                    'propertyKind' => 'primitive',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive',
-                    'jsonKey'      => 'valueUri',
-                    'isBuiltin'    => false,
-                ],
-                [
-                    'fhirType'     => 'Attachment',
-                    'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Attachment',
-                    'jsonKey'      => 'valueAttachment',
-                    'isBuiltin'    => false,
-                ],
-                [
-                    'fhirType'     => 'Coding',
-                    'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding',
-                    'jsonKey'      => 'valueCoding',
-                    'isBuiltin'    => false,
-                ],
-                [
-                    'fhirType'     => 'Quantity',
-                    'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity',
-                    'jsonKey'      => 'valueQuantity',
-                    'isBuiltin'    => false,
-                ],
-                [
-                    'fhirType'     => 'Reference',
-                    'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
-                    'jsonKey'      => 'valueReference',
-                    'isBuiltin'    => false,
-                ],
-            ],
-        ],
-        'item' => [
-            'fhirType'     => 'unknown',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\QuestionnaireResponse\QuestionnaireResponseItem',
-            'variants'     => null,
-        ],
-    ];
-
     public function __construct(
         /** @var string|null id Unique id for inter-element referencing */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
@@ -240,7 +101,12 @@ class QuestionnaireResponseItemAnswer extends BackboneElement
         )]
         public bool|string|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|UriPrimitive|Attachment|Coding|Quantity|Reference|null $value = null,
         /** @var array<QuestionnaireResponseItem> item Nested groups and questions */
-        #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'unknown',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\QuestionnaireResponse\QuestionnaireResponseItem',
+        )]
         public array $item = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

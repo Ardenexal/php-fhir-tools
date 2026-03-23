@@ -6,7 +6,6 @@ namespace Ardenexal\FHIRTools\Component\Serialization\Tests\Integration;
 
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\BundleResource;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -263,11 +262,9 @@ class BundleXmlToJsonConversionTest extends TestCase
      *
      * Actual (incorrect) structure:
      *   "type": { "coding": { "system": { "@value": "http://..." }, "code": { "@value": "MR" } } }
-     *
      */
     public function testIdentifierTypeCodingIsArrayNotObject(): void
     {
-
         $xml = file_get_contents(__DIR__ . '/../../Fixtures/bundle-response-medsallergies.xml');
         self::assertNotFalse($xml);
 

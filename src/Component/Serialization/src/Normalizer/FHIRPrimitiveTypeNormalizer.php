@@ -543,16 +543,10 @@ class FHIRPrimitiveTypeNormalizer extends AbstractFHIRNormalizer
             try {
                 return $class::parse($value);
             } catch (\Throwable $e) {
-                throw new NotNormalizableValueException(
-                    sprintf('Expected %s string, got invalid value: %s', $class, $value),
-                    0,
-                    $e,
-                );
+                throw new NotNormalizableValueException(sprintf('Expected %s string, got invalid value: %s', $class, $value), 0, $e);
             }
         }
 
-        throw new NotNormalizableValueException(
-            sprintf('Expected %s value, got %s', $class, gettype($value)),
-        );
+        throw new NotNormalizableValueException(sprintf('Expected %s value, got %s', $class, gettype($value)));
     }
 }

@@ -17,60 +17,6 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Ratio;
 #[FHIRBackboneElement(parentResource: 'NutritionProduct', elementPath: 'NutritionProduct.nutrient', fhirVersion: 'R4B')]
 class NutritionProductNutrient extends BackboneElement
 {
-    public const FHIR_PROPERTY_MAP = [
-        'id' => [
-            'fhirType'          => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind'      => 'scalar',
-            'isArray'           => false,
-            'isRequired'        => false,
-            'isChoice'          => false,
-            'jsonKey'           => null,
-            'phpType'           => null,
-            'variants'          => null,
-            'xmlSerializedName' => '@id',
-        ],
-        'extension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'extension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'modifierExtension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'modifierExtension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'item' => [
-            'fhirType'     => 'CodeableReference',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'amount' => [
-            'fhirType'     => 'Ratio',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Ratio',
-            'variants'     => null,
-        ],
-    ];
-
     public function __construct(
         /** @var string|null id Unique id for inter-element referencing */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
@@ -85,7 +31,12 @@ class NutritionProductNutrient extends BackboneElement
         #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex')]
         public ?CodeableReference $item = null,
         /** @var array<Ratio> amount The amount of nutrient expressed in one or more units: X per pack / per serving / per dose */
-        #[FhirProperty(fhirType: 'Ratio', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'Ratio',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Ratio',
+        )]
         public array $amount = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

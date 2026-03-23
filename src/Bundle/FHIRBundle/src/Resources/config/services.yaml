@@ -39,7 +39,11 @@ services:
         public: true
 
     # Serialization - Metadata
-    Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor: ~
+    Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider: ~
+
+    Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor:
+        arguments:
+            $propertyMetadataProvider: '@Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider'
 
     Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface:
         alias: 'Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor'

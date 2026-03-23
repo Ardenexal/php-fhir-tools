@@ -43,7 +43,7 @@ class ExcludeFunction extends AbstractFunction
 
         // Normalize exclusion items so FHIR primitive wrappers compare equal to plain scalars
         $normalizedOtherItems = array_map(
-            fn($o) => $context->normalizeValue($o),
+            fn ($o) => $context->normalizeValue($o),
             $otherResult->toArray(),
         );
 
