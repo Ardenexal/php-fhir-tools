@@ -19,8 +19,11 @@ use PhpBench\Attributes as Bench;
 class FHIRPathEvaluationBench
 {
     private const EXPR_SIMPLE  = 'Patient.name.given';
+
     private const EXPR_FILTER  = "Patient.name.where(use = 'official').given";
+
     private const EXPR_DEEP    = 'Patient.contact.where(relationship.coding.code = \'N\').name.family';
+
     private const EXPR_CHAIN   = 'Patient.name.given.where($this.length() > 3).first()';
 
     private FHIRPathService $service;

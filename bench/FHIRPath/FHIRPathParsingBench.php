@@ -43,7 +43,7 @@ class FHIRPathParsingBench
     public function benchParseComplex(): void
     {
         $tokens = $this->lexer->tokenize(
-            "Patient.name.where(use = 'official' and family.exists()).given.first()"
+            "Patient.name.where(use = 'official' and family.exists()).given.first()",
         );
         $this->parser->parse($tokens);
     }
@@ -55,7 +55,7 @@ class FHIRPathParsingBench
     public function benchParseDeep(): void
     {
         $tokens = $this->lexer->tokenize(
-            'Patient.name.where(use = \'official\').given.where($this.length() > 3 and $this.startsWith(\'Jo\')).first()'
+            'Patient.name.where(use = \'official\').given.where($this.length() > 3 and $this.startsWith(\'Jo\')).first()',
         );
         $this->parser->parse($tokens);
     }
