@@ -973,7 +973,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
 
     /**
      * Identify the FHIR type of a choice element's stored value by matching its PHP type
-     * against the available variants from FHIR_PROPERTY_MAP.
+     * against the available variants from the #[FhirProperty] attribute.
      *
      * For unambiguous PHP scalar types (bool, int, float), returns the first matching
      * variant's fhirType. For PHP strings, applies a targeted heuristic: if the string is
@@ -983,7 +983,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      *
      * Returns null when the type cannot be determined unambiguously.
      *
-     * @param array<int, array{fhirType?: string, phpType?: string, propertyKind?: string, jsonKey?: string, isBuiltin?: bool}> $variants
+     * @param list<array{fhirType: string, propertyKind: string, phpType: string, jsonKey: string}> $variants
      */
     private function resolveChoiceVariantType(mixed $value, array $variants): ?string
     {
@@ -993,18 +993,15 @@ final class FHIRPathEvaluator implements ExpressionVisitor
 
         // For non-string scalar PHP types there is at most one matching phpType per variant
         foreach ($variants as $variant) {
-            $fhirType = $variant['fhirType'] ?? null;
-            $phpType  = $variant['phpType']  ?? null;
-
-            if ($fhirType === null || str_starts_with($fhirType, 'http://')) {
+            if (str_starts_with($variant['fhirType'], 'http://')) {
                 continue;
             }
 
-            if (($phpType === 'bool'  && is_bool($value))
-                || ($phpType === 'int'   && is_int($value))
-                || ($phpType === 'float' && is_float($value))
+            if (($variant['phpType'] === 'bool'  && is_bool($value))
+                || ($variant['phpType'] === 'int'   && is_int($value))
+                || ($variant['phpType'] === 'float' && is_float($value))
             ) {
-                return $fhirType;
+                return $variant['fhirType'];
             }
         }
 
@@ -1014,7 +1011,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         // exists. Plain integer strings ('42') are excluded to avoid false-positives.
         if (is_string($value) && str_contains($value, '.') && is_numeric($value)) {
             foreach ($variants as $variant) {
-                if (($variant['fhirType'] ?? null) === 'decimal') {
+                if ($variant['fhirType'] === 'decimal') {
                     return 'decimal';
                 }
             }

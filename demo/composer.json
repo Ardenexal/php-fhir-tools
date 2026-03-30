@@ -8,7 +8,7 @@
         "brick/date-time": "^0.9.0",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "phpdocumentor/reflection-docblock": "^5.6.6",
+        "phpdocumentor/reflection-docblock": "^5.6.7",
         "nette/php-generator": "^4.2.2",
         "phpstan/phpdoc-parser": "^2.3.2",
         "symfony/asset": "7.4.*",
@@ -24,13 +24,13 @@
         "symfony/mime": "7.4.*",
         "symfony/runtime": "7.4.*",
         "symfony/serializer": "7.4.*",
-        "symfony/stimulus-bundle": "^2.32",
+        "symfony/stimulus-bundle": "^2.34",
         "symfony/translation": "7.4.*",
         "symfony/twig-bundle": "7.4.*",
-        "symfony/ux-turbo": "^2.32",
+        "symfony/ux-turbo": "^2.34",
         "symfony/yaml": "7.4.*",
-        "twig/extra-bundle": "^2.12|^3.23",
-        "twig/twig": "^2.12|^3.23"
+        "twig/extra-bundle": "^2.12|^3.24",
+        "twig/twig": "^2.12|^3.24"
     },
     "config": {
         "allow-plugins": {
@@ -95,7 +95,7 @@
         "symfony/browser-kit": "7.4.*",
         "symfony/css-selector": "7.4.*",
         "symfony/debug-bundle": "7.4.*",
-        "symfony/maker-bundle": "^1.66",
+        "symfony/maker-bundle": "^1.67",
         "symfony/stopwatch": "7.4.*",
         "symfony/web-profiler-bundle": "7.4.*"
     }
