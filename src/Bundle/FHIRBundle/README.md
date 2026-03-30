@@ -31,21 +31,32 @@ return [
 ```yaml
 # config/packages/fhir.yaml
 fhir:
-    generation:
-        output_directory: '%kernel.project_dir%/src/FHIR'
-        base_namespace: 'App\\FHIR'
-    serialization:
-        strict_validation: true
+    output_directory: '%kernel.project_dir%/output'   # where generated models are written
+    cache_directory: '%kernel.cache_dir%/fhir'
+    default_version: R4B   # R4 | R4B | R5
+    validation:
+        enabled: true
+        strict_mode: false
     path:
-        cache_size: 100
+        cache_size: 100   # max cached FHIRPath expressions
+    serialization:
+        metadata_cache_pool: cache.app   # PSR-6 pool for property metadata; set to ~ to disable
+        enable_cache_warmer: false        # set to true to pre-populate metadata cache on cache:warmup
 ```
 
-### Environment Variables
+### Metadata Caching
 
-```bash
-FHIR_OUTPUT_DIR=/path/to/output
-FHIR_BASE_NAMESPACE=MyApp\\FHIR
-FHIR_DEBUG=false
+The bundle uses a PSR-6 cache pool to store FHIR property metadata so it doesn't need to be resolved via reflection on every request.
+
+- **`metadata_cache_pool`** — the Symfony cache pool service ID to use (default: `cache.app`). Set to `~` (null) to disable persistent caching and always resolve from attributes at runtime.
+- **`enable_cache_warmer`** — when `true`, registers a `kernel.cache_warmer` that pre-populates the pool for all discovered FHIR model classes during `bin/console cache:warmup`. Defaults to `false` to avoid slowing down deployments when not needed. Only takes effect when `metadata_cache_pool` is set.
+
+```yaml
+# To pre-warm a dedicated pool:
+fhir:
+    serialization:
+        metadata_cache_pool: cache.fhir_metadata
+        enable_cache_warmer: true
 ```
 
 ## Registered Services
