@@ -313,3 +313,94 @@ jobs:
                           repo: context.repo.repo,
                           body: commentBody
                         });
+
+    benchmarks:
+        runs-on: ubuntu-latest
+        needs: [ unit-tests, integration-tests ]
+        permissions:
+            pull-requests: write
+            contents: read
+
+        steps:
+            -   uses: actions/checkout@v4
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: '8.3'
+                    extensions: ctype, iconv, zip, bcmath
+
+            -   name: Cache Composer packages
+                uses: actions/cache@v4
+                with:
+                    path: vendor
+                    key: ${{ runner.os }}-php-8.3-${{ hashFiles('**/composer.lock') }}
+                    restore-keys: |
+                        ${{ runner.os }}-php-8.3-
+
+            -   name: Install dependencies
+                run: composer install --prefer-dist --no-progress --no-suggest
+
+            -   name: Run benchmarks
+                id: bench
+                run: |
+                    mkdir -p results
+                    php ./vendor/bin/phpbench run bench/ --report=aggregate --no-interaction > results/benchmarks.txt 2>&1 || true
+
+            -   name: Assert no regression against baseline
+                id: regression
+                if: hashFiles('.phpbench/*.xml') != ''
+                run: |
+                    php ./vendor/bin/phpbench run bench/ \
+                        --report=compare \
+                        --ref=baseline \
+                        --assert="mode(variant.time.avg) < mode(baseline.time.avg) * 1.50" \
+                        --no-interaction \
+                        > results/regression.txt 2>&1
+                    echo "exit_code=$?" >> $GITHUB_OUTPUT
+                continue-on-error: true
+
+            -   name: Comment PR with benchmark results
+                if: ${{ !cancelled() }}
+                uses: actions/github-script@v7
+                with:
+                    script: |
+                        const fs = require('fs');
+
+                        let benchOutput = '';
+                        try {
+                            benchOutput = fs.readFileSync('results/benchmarks.txt', 'utf8');
+                        } catch (e) {
+                            benchOutput = 'Could not read benchmark output.';
+                        }
+
+                        const baselineExists = '${{ hashFiles('.phpbench/*.xml') }}' !== '';
+                        let regressionSection = '';
+
+                        if (baselineExists) {
+                            let regressionOutput = '';
+                            try {
+                                regressionOutput = fs.readFileSync('results/regression.txt', 'utf8');
+                            } catch (e) {
+                                regressionOutput = 'Could not read regression output.';
+                            }
+                            const passed = '${{ steps.regression.outputs.exit_code }}' === '0';
+                            const icon = passed ? '✅' : '❌';
+                            const label = passed ? 'Regression check passed' : 'Regression detected (>50% slower than baseline)';
+                            regressionSection = `\n### ${icon} ${label}\n\n<details>\n<summary>Comparison vs baseline</summary>\n\n\`\`\`\n${regressionOutput}\n\`\`\`\n</details>`;
+                        } else {
+                            regressionSection = '\n> No baseline stored yet. Run `composer bench:baseline` and commit `.phpbench/` to enable regression checks.';
+                        }
+
+                        const commentBody = `## Benchmark Results\n\n<details>\n<summary>Serialization + FHIRPath benchmarks</summary>\n\n\`\`\`\n${benchOutput}\n\`\`\`\n</details>\n${regressionSection}\n\n*Run \`composer bench\` locally for full results.*`;
+
+                        github.rest.issues.createComment({
+                            issue_number: context.issue.number,
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            body: commentBody
+                        });
+
+            -   name: Fail if regression detected
+                if: steps.regression.outputs.exit_code != '0' && hashFiles('.phpbench/*.xml') != ''
+                run: exit 1

@@ -1,0 +1,10 @@
+{
+    "$schema": "vendor/phpbench/phpbench/phpbench.schema.json",
+    "runner.bootstrap": "bench/bootstrap.php",
+    "runner.path": "bench",
+    "storage.driver": "xml",
+    "storage.xml_storage_path": ".phpbench",
+    "runner.iterations": [5],
+    "runner.revs": [10],
+    "runner.warmup": 1
+}
