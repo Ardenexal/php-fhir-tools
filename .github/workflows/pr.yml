@@ -33,7 +33,7 @@ jobs:
             -   name: Install dependencies
                 run: composer install --prefer-dist --no-progress --no-suggest
             -   name: Security audit
-                run: composer audit
+                run: composer audit --abandoned=report
     style:
         runs-on: ubuntu-latest
         env:

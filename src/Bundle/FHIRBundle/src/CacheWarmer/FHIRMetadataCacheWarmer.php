@@ -22,6 +22,8 @@ final class FHIRMetadataCacheWarmer implements CacheWarmerInterface
 {
     private const MODELS_NAMESPACE = 'Ardenexal\\FHIRTools\\Component\\Models\\';
 
+    private const COMMIT_BATCH_SIZE = 100;
+
     /** @deprecated Use PropertyMetadataProvider::cacheKey() directly */
     public const CACHE_KEY_PREFIX = 'fhir.property_metadata.';
 
@@ -67,6 +69,8 @@ final class FHIRMetadataCacheWarmer implements CacheWarmerInterface
         $finder = new Finder();
         $finder->files()->in($rootDir)->name('*.php');
 
+        $deferred = 0;
+
         foreach ($finder as $file) {
             $class = $this->deriveClassName($file);
 
@@ -83,6 +87,11 @@ final class FHIRMetadataCacheWarmer implements CacheWarmerInterface
             $item = $this->cache->getItem(self::cacheKey($class));
             $item->set($metadata);
             $this->cache->saveDeferred($item);
+            ++$deferred;
+
+            if ($deferred % self::COMMIT_BATCH_SIZE === 0) {
+                $this->cache->commit();
+            }
         }
 
         $this->cache->commit();

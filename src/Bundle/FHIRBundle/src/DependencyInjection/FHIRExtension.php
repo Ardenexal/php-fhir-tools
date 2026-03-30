@@ -49,22 +49,25 @@ class FHIRExtension extends Extension
         $container->setParameter('fhir.is_symfony_74_or_higher', SymfonyVersionHelper::isSymfony74OrHigher());
 
         // Serialization metadata cache pool
-        $cachePool = $config['serialization']['metadata_cache_pool'] ?? null;
+        $cachePool        = $config['serialization']['metadata_cache_pool'] ?? null;
+        $enableCacheWarmer = $config['serialization']['enable_cache_warmer'] ?? false;
         $container->setParameter('fhir.serialization.metadata_cache_pool', $cachePool);
 
         if ($cachePool !== null) {
             // Alias nominated PSR-6 pool so the warmer can depend on an abstract ID
             $container->setAlias('fhir.metadata_cache', $cachePool)->setPublic(false);
 
-            // Register the cache warmer conditionally (requires fhir.metadata_cache to exist)
-            $container->register(FHIRMetadataCacheWarmer::class, FHIRMetadataCacheWarmer::class)
-                ->setAutowired(false)
-                ->setArguments([
-                    new Reference(PropertyMetadataProvider::class),
-                    new Reference('fhir.metadata_cache'),
-                ])
-                ->addTag('kernel.cache_warmer')
-                ->setPublic(false);
+            // Register the cache warmer only when explicitly enabled
+            if ($enableCacheWarmer) {
+                $container->register(FHIRMetadataCacheWarmer::class, FHIRMetadataCacheWarmer::class)
+                    ->setAutowired(false)
+                    ->setArguments([
+                        new Reference(PropertyMetadataProvider::class),
+                        new Reference('fhir.metadata_cache'),
+                    ])
+                    ->addTag('kernel.cache_warmer')
+                    ->setPublic(false);
+            }
         }
 
         // Load service definitions
