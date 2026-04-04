@@ -48,11 +48,12 @@ jobs:
                     labels: ${{ steps.meta.outputs.labels }}
 
             -   name: Join Tailscale network
-                uses: tailscale/github-action@v2
+                uses: tailscale/github-action@v4
                 with:
                     oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
                     oauth-secret: ${{ secrets.TS_OAUTH_CLIENT_SECRET }}
                     tags: tag:ci
+                    version: latest
 
             -   name: Deploy to server
                 uses: appleboy/ssh-action@v1
