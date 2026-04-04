@@ -1,4 +1,7 @@
 
+# Override root .gitignore — the demo app's lock file should be tracked
+!composer.lock
+
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
