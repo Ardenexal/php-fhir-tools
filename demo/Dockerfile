@@ -2,7 +2,7 @@ FROM dunglas/frankenphp:1-php8.5-bookworm
 
 # Install extensions not already present in the base image
 # (dom, xml, xmlwriter, xmlreader, simplexml, mbstring, ctype, iconv are pre-installed)
-RUN install-php-extensions bcmath intl opcache
+RUN install-php-extensions bcmath intl opcache zip
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
