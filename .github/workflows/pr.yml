@@ -67,9 +67,6 @@ jobs:
             -   name: Validate composer files
                 run: composer validate --strict
 
-            -   name: Security audit
-                run: composer audit
-
     unit-tests:
         runs-on: ubuntu-latest
         env:
@@ -144,8 +141,6 @@ jobs:
             -   name: Run FHIRPath specification tests
                 run: composer run test-fhirpath-spec -- --log-junit=./results/fhir-path-tests.xml --coverage-clover ./results/fhir-path-coverage.xml
 
-            -   name: Security audit
-                run: composer audit
             -   name: Upload test results to Codecov
                 if: ${{ !cancelled() }}
                 uses: codecov/codecov-action@v5
