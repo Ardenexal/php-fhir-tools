@@ -199,22 +199,14 @@ class BuilderContext implements BuilderContextInterface
             return $definitions;
         }
 
-        // Build dependency graph with both inheritance and type dependencies
+        // Build dependency graph from inheritance (baseDefinition) only.
+        // Property-type references (element.type.code) are intentionally excluded:
+        // they create cycles (e.g. Element has a property of type 'string', but 'string'
+        // inherits from Element), which break the inheritance ordering guarantee.
         $dependencies = [];
         foreach ($structureDefinitions as $url => $definition) {
-            $deps = [];
-
-            // Add inheritance dependency (baseDefinition)
             if (isset($definition['baseDefinition'])) {
-                $deps[] = $definition['baseDefinition'];
-            }
-
-            // Add type dependencies from elements
-            $typeDeps = $this->extractTypeDependencies($definition, $structureDefinitions);
-            $deps     = array_merge($deps, $typeDeps);
-
-            if (! empty($deps)) {
-                $dependencies[$url] = array_unique($deps);
+                $dependencies[$url] = [$definition['baseDefinition']];
             }
         }
 
@@ -247,7 +239,7 @@ class BuilderContext implements BuilderContextInterface
             // Mark as currently visiting
             $visiting[$url] = true;
 
-            // Visit all dependencies (both inheritance and type deps) if they exist in our definition set
+            // Visit all inheritance dependencies if they exist in our definition set
             if (isset($dependencies[$url])) {
                 foreach ($dependencies[$url] as $depUrl) {
                     if (isset($structureDefinitions[$depUrl])) {
@@ -272,83 +264,6 @@ class BuilderContext implements BuilderContextInterface
         // Merge sorted StructureDefinitions with other resources
         // Other resources maintain their original order
         return array_merge($sorted, $otherResources);
-    }
-
-    /**
-     * Extract type dependencies from a StructureDefinition's elements
-     *
-     * Scans all elements in the snapshot to find type references that create
-     * dependencies on other StructureDefinitions. Only includes types that
-     * actually exist in the current definition set.
-     *
-     * @param array<string, mixed>                $definition           The StructureDefinition to analyze
-     * @param array<string, array<string, mixed>> $structureDefinitions All available StructureDefinitions
-     *
-     * @return array<string> Array of URLs for dependent types
-     */
-    private function extractTypeDependencies(array $definition, array $structureDefinitions): array
-    {
-        $typeDeps = [];
-
-        // Only process if snapshot with elements exists
-        if (! isset($definition['snapshot']['element']) || ! is_array($definition['snapshot']['element'])) {
-            return $typeDeps;
-        }
-
-        foreach ($definition['snapshot']['element'] as $element) {
-            if (! isset($element['type']) || ! is_array($element['type'])) {
-                continue;
-            }
-
-            foreach ($element['type'] as $type) {
-                $code = $type['code'] ?? null;
-                if ($code === null) {
-                    continue;
-                }
-
-                // Normalize type code to URL and check if it's a dependency
-                $typeUrl = $this->normalizeTypeCodeToUrl($code);
-                if ($typeUrl !== null && isset($structureDefinitions[$typeUrl])) {
-                    $typeDeps[] = $typeUrl;
-                }
-            }
-        }
-
-        return array_unique($typeDeps);
-    }
-
-    /**
-     * Normalize a type code to a canonical StructureDefinition URL
-     *
-     * Handles various type code formats:
-     * - Simple names: "HumanName" → "http://hl7.org/fhir/StructureDefinition/HumanName"
-     * - Already URLs: kept as-is
-     * - System types: "http://hl7.org/fhirpath/System.String" → null (not a dependency)
-     *
-     * Note: This method does not filter primitives or check existence - that's handled
-     * by the caller (extractTypeDependencies) which only includes types that exist
-     * in the current $structureDefinitions array.
-     *
-     * @param string $code The type code to normalize
-     *
-     * @return string|null The canonical URL or null if it's a system type
-     */
-    private function normalizeTypeCodeToUrl(string $code): ?string
-    {
-        // Skip FHIRPath System types - these are not StructureDefinitions
-        if (str_starts_with($code, 'http://hl7.org/fhirpath/System.')) {
-            return null;
-        }
-
-        // If already a full URL, return as-is
-        if (str_starts_with($code, 'http://') || str_starts_with($code, 'https://')) {
-            return $code;
-        }
-
-        // Convert simple name to canonical FHIR URL
-        // Primitives and external types will be filtered out by the caller
-        // since they won't exist in the $structureDefinitions array
-        return 'http://hl7.org/fhir/StructureDefinition/' . $code;
     }
 
     public function getDefinition(string $url): ?array
