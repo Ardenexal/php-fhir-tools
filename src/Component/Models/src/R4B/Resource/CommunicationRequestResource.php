@@ -36,324 +36,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 )]
 class CommunicationRequestResource extends DomainResourceResource
 {
-    public const FHIR_PROPERTY_MAP = [
-        'id' => [
-            'fhirType'     => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind' => 'scalar',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'meta' => [
-            'fhirType'     => 'Meta',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'implicitRules' => [
-            'fhirType'     => 'uri',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'language' => [
-            'fhirType'     => 'code',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'text' => [
-            'fhirType'     => 'Narrative',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'contained' => [
-            'fhirType'     => 'Resource',
-            'propertyKind' => 'resource',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'extension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'extension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'modifierExtension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'modifierExtension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'identifier' => [
-            'fhirType'     => 'Identifier',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier',
-            'variants'     => null,
-        ],
-        'basedOn' => [
-            'fhirType'     => 'Reference',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
-            'variants'     => null,
-        ],
-        'replaces' => [
-            'fhirType'     => 'Reference',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
-            'variants'     => null,
-        ],
-        'groupIdentifier' => [
-            'fhirType'     => 'Identifier',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'status' => [
-            'fhirType'     => 'code',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => true,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'statusReason' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'category' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
-            'variants'     => null,
-        ],
-        'priority' => [
-            'fhirType'     => 'code',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'doNotPerform' => [
-            'fhirType'     => 'boolean',
-            'propertyKind' => 'scalar',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'medium' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
-            'variants'     => null,
-        ],
-        'subject' => [
-            'fhirType'     => 'Reference',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'about' => [
-            'fhirType'     => 'Reference',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
-            'variants'     => null,
-        ],
-        'encounter' => [
-            'fhirType'     => 'Reference',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'payload' => [
-            'fhirType'     => 'BackboneElement',
-            'propertyKind' => 'backbone',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\CommunicationRequest\CommunicationRequestPayload',
-            'variants'     => null,
-        ],
-        'occurrence' => [
-            'fhirType'     => 'choice',
-            'propertyKind' => 'choice',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => true,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => [
-                [
-                    'fhirType'     => 'dateTime',
-                    'propertyKind' => 'primitive',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive',
-                    'jsonKey'      => 'occurrenceDateTime',
-                    'isBuiltin'    => false,
-                ],
-                [
-                    'fhirType'     => 'Period',
-                    'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Period',
-                    'jsonKey'      => 'occurrencePeriod',
-                    'isBuiltin'    => false,
-                ],
-            ],
-        ],
-        'authoredOn' => [
-            'fhirType'     => 'dateTime',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'requester' => [
-            'fhirType'     => 'Reference',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'recipient' => [
-            'fhirType'     => 'Reference',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
-            'variants'     => null,
-        ],
-        'sender' => [
-            'fhirType'     => 'Reference',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'reasonCode' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
-            'variants'     => null,
-        ],
-        'reasonReference' => [
-            'fhirType'     => 'Reference',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
-            'variants'     => null,
-        ],
-        'note' => [
-            'fhirType'     => 'Annotation',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation',
-            'variants'     => null,
-        ],
-    ];
-
     public function __construct(
         /** @var string|null id Logical id of this artifact */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
@@ -380,13 +62,28 @@ class CommunicationRequestResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
         /** @var array<Identifier> identifier Unique identifier */
-        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'Identifier',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier',
+        )]
         public array $identifier = [],
         /** @var array<Reference> basedOn Fulfills plan or proposal */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
+        )]
         public array $basedOn = [],
         /** @var array<Reference> replaces Request(s) replaced by this request */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
+        )]
         public array $replaces = [],
         /** @var Identifier|null groupIdentifier Composite request this is part of */
         #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
@@ -398,7 +95,12 @@ class CommunicationRequestResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $statusReason = null,
         /** @var array<CodeableConcept> category Message category */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
+        )]
         public array $category = [],
         /** @var RequestPriorityType|null priority routine | urgent | asap | stat */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
@@ -407,19 +109,34 @@ class CommunicationRequestResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $doNotPerform = null,
         /** @var array<CodeableConcept> medium A channel of communication */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
+        )]
         public array $medium = [],
         /** @var Reference|null subject Focus of message */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $subject = null,
         /** @var array<Reference> about Resources that pertain to this communication request */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
+        )]
         public array $about = [],
         /** @var Reference|null encounter Encounter created as part of */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $encounter = null,
         /** @var array<CommunicationRequestPayload> payload Message payload */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\CommunicationRequest\CommunicationRequestPayload',
+        )]
         public array $payload = [],
         /** @var DateTimePrimitive|Period|null occurrence When scheduled */
         #[FhirProperty(
@@ -449,19 +166,39 @@ class CommunicationRequestResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $requester = null,
         /** @var array<Reference> recipient Message recipient */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
+        )]
         public array $recipient = [],
         /** @var Reference|null sender Message sender */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $sender = null,
         /** @var array<CodeableConcept> reasonCode Why is communication needed? */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
+        )]
         public array $reasonCode = [],
         /** @var array<Reference> reasonReference Why is communication needed? */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
+        )]
         public array $reasonReference = [],
         /** @var array<Annotation> note Comments made about communication request */
-        #[FhirProperty(fhirType: 'Annotation', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'Annotation',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation',
+        )]
         public array $note = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

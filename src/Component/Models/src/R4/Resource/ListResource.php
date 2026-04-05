@@ -31,219 +31,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 #[FhirResource(type: 'List', version: '4.0.1', url: 'http://hl7.org/fhir/StructureDefinition/List', fhirVersion: 'R4')]
 class ListResource extends DomainResourceResource
 {
-    public const FHIR_PROPERTY_MAP = [
-        'id' => [
-            'fhirType'     => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind' => 'scalar',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'meta' => [
-            'fhirType'     => 'Meta',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'implicitRules' => [
-            'fhirType'     => 'uri',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'language' => [
-            'fhirType'     => 'code',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'text' => [
-            'fhirType'     => 'Narrative',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'contained' => [
-            'fhirType'     => 'Resource',
-            'propertyKind' => 'resource',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'extension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'extension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'modifierExtension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'modifierExtension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'identifier' => [
-            'fhirType'     => 'Identifier',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
-            'variants'     => null,
-        ],
-        'status' => [
-            'fhirType'     => 'code',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => true,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'mode' => [
-            'fhirType'     => 'code',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => true,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'title' => [
-            'fhirType'     => 'string',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'code' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'subject' => [
-            'fhirType'     => 'Reference',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'encounter' => [
-            'fhirType'     => 'Reference',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'date' => [
-            'fhirType'     => 'dateTime',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'source' => [
-            'fhirType'     => 'Reference',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'orderedBy' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'note' => [
-            'fhirType'     => 'Annotation',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation',
-            'variants'     => null,
-        ],
-        'entry' => [
-            'fhirType'     => 'BackboneElement',
-            'propertyKind' => 'backbone',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\List\ListEntry',
-            'variants'     => null,
-        ],
-        'emptyReason' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-    ];
-
     public function __construct(
         /** @var string|null id Logical id of this artifact */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
@@ -270,7 +57,12 @@ class ListResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
         /** @var array<Identifier> identifier Business identifier */
-        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'Identifier',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier',
+        )]
         public array $identifier = [],
         /** @var ListStatusType|null status current | retired | entered-in-error */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
@@ -300,10 +92,20 @@ class ListResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $orderedBy = null,
         /** @var array<Annotation> note Comments about the list */
-        #[FhirProperty(fhirType: 'Annotation', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'Annotation',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation',
+        )]
         public array $note = [],
         /** @var array<ListEntry> entry Entries in the list */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\List\ListEntry',
+        )]
         public array $entry = [],
         /** @var CodeableConcept|null emptyReason Why list is empty */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]

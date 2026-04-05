@@ -19,30 +19,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 #[FHIRPrimitive(primitiveType: 'xhtml', fhirVersion: 'R4B')]
 class XhtmlPrimitive extends Element
 {
-    public const FHIR_PROPERTY_MAP = [
-        'id' => [
-            'fhirType'          => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind'      => 'scalar',
-            'isArray'           => false,
-            'isRequired'        => false,
-            'isChoice'          => false,
-            'jsonKey'           => null,
-            'phpType'           => null,
-            'variants'          => null,
-            'xmlSerializedName' => '@id',
-        ],
-        'value' => [
-            'fhirType'     => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind' => 'scalar',
-            'isArray'      => false,
-            'isRequired'   => true,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-    ];
-
     public function __construct(
         /** @var string|null id xml:id (or equivalent in JSON) */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]

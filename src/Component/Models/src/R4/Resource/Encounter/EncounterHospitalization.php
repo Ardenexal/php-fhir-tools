@@ -18,130 +18,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 #[FHIRBackboneElement(parentResource: 'Encounter', elementPath: 'Encounter.hospitalization', fhirVersion: 'R4')]
 class EncounterHospitalization extends BackboneElement
 {
-    public const FHIR_PROPERTY_MAP = [
-        'id' => [
-            'fhirType'          => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind'      => 'scalar',
-            'isArray'           => false,
-            'isRequired'        => false,
-            'isChoice'          => false,
-            'jsonKey'           => null,
-            'phpType'           => null,
-            'variants'          => null,
-            'xmlSerializedName' => '@id',
-        ],
-        'extension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'extension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'modifierExtension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'modifierExtension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'preAdmissionIdentifier' => [
-            'fhirType'     => 'Identifier',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'origin' => [
-            'fhirType'     => 'Reference',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'admitSource' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'reAdmission' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'dietPreference' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
-            'variants'     => null,
-        ],
-        'specialCourtesy' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
-            'variants'     => null,
-        ],
-        'specialArrangement' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
-            'variants'     => null,
-        ],
-        'destination' => [
-            'fhirType'     => 'Reference',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'dischargeDisposition' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-    ];
-
     public function __construct(
         /** @var string|null id Unique id for inter-element referencing */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
@@ -165,13 +41,28 @@ class EncounterHospitalization extends BackboneElement
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $reAdmission = null,
         /** @var array<CodeableConcept> dietPreference Diet preferences reported by the patient */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
+        )]
         public array $dietPreference = [],
         /** @var array<CodeableConcept> specialCourtesy Special courtesies (VIP, board member) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
+        )]
         public array $specialCourtesy = [],
         /** @var array<CodeableConcept> specialArrangement Wheelchair, translator, stretcher, etc. */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
+        )]
         public array $specialArrangement = [],
         /** @var Reference|null destination Location/organization to which the patient is discharged */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]

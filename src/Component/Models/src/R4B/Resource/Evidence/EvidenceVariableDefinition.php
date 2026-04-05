@@ -20,100 +20,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 #[FHIRBackboneElement(parentResource: 'Evidence', elementPath: 'Evidence.variableDefinition', fhirVersion: 'R4B')]
 class EvidenceVariableDefinition extends BackboneElement
 {
-    public const FHIR_PROPERTY_MAP = [
-        'id' => [
-            'fhirType'          => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind'      => 'scalar',
-            'isArray'           => false,
-            'isRequired'        => false,
-            'isChoice'          => false,
-            'jsonKey'           => null,
-            'phpType'           => null,
-            'variants'          => null,
-            'xmlSerializedName' => '@id',
-        ],
-        'extension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'extension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'modifierExtension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'modifierExtension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'description' => [
-            'fhirType'     => 'markdown',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'note' => [
-            'fhirType'     => 'Annotation',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation',
-            'variants'     => null,
-        ],
-        'variableRole' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => true,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'observed' => [
-            'fhirType'     => 'Reference',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'intended' => [
-            'fhirType'     => 'Reference',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'directnessMatch' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-    ];
-
     public function __construct(
         /** @var string|null id Unique id for inter-element referencing */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
@@ -128,7 +34,12 @@ class EvidenceVariableDefinition extends BackboneElement
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $description = null,
         /** @var array<Annotation> note Footnotes and/or explanatory notes */
-        #[FhirProperty(fhirType: 'Annotation', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'Annotation',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation',
+        )]
         public array $note = [],
         /** @var CodeableConcept|null variableRole population | subpopulation | exposure | referenceExposure | measuredVariable | confounder */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]

@@ -30,199 +30,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 #[FhirResource(type: 'Account', version: '4.3.0', url: 'http://hl7.org/fhir/StructureDefinition/Account', fhirVersion: 'R4B')]
 class AccountResource extends DomainResourceResource
 {
-    public const FHIR_PROPERTY_MAP = [
-        'id' => [
-            'fhirType'     => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind' => 'scalar',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'meta' => [
-            'fhirType'     => 'Meta',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'implicitRules' => [
-            'fhirType'     => 'uri',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'language' => [
-            'fhirType'     => 'code',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'text' => [
-            'fhirType'     => 'Narrative',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'contained' => [
-            'fhirType'     => 'Resource',
-            'propertyKind' => 'resource',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'extension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'extension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'modifierExtension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'modifierExtension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'identifier' => [
-            'fhirType'     => 'Identifier',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier',
-            'variants'     => null,
-        ],
-        'status' => [
-            'fhirType'     => 'code',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => true,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'type' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'name' => [
-            'fhirType'     => 'string',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'subject' => [
-            'fhirType'     => 'Reference',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
-            'variants'     => null,
-        ],
-        'servicePeriod' => [
-            'fhirType'     => 'Period',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'coverage' => [
-            'fhirType'     => 'BackboneElement',
-            'propertyKind' => 'backbone',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Account\AccountCoverage',
-            'variants'     => null,
-        ],
-        'owner' => [
-            'fhirType'     => 'Reference',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'description' => [
-            'fhirType'     => 'string',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'guarantor' => [
-            'fhirType'     => 'BackboneElement',
-            'propertyKind' => 'backbone',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Account\AccountGuarantor',
-            'variants'     => null,
-        ],
-        'partOf' => [
-            'fhirType'     => 'Reference',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-    ];
-
     public function __construct(
         /** @var string|null id Logical id of this artifact */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
@@ -249,7 +56,12 @@ class AccountResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
         /** @var array<Identifier> identifier Account number */
-        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'Identifier',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier',
+        )]
         public array $identifier = [],
         /** @var AccountStatusType|null status active | inactive | entered-in-error | on-hold | unknown */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
@@ -261,13 +73,23 @@ class AccountResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $name = null,
         /** @var array<Reference> subject The entity that caused the expenses */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
+        )]
         public array $subject = [],
         /** @var Period|null servicePeriod Transaction window */
         #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
         public ?Period $servicePeriod = null,
         /** @var array<AccountCoverage> coverage The party(s) that are responsible for covering the payment of this account, and what order should they be applied to the account */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Account\AccountCoverage',
+        )]
         public array $coverage = [],
         /** @var Reference|null owner Entity managing the Account */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
@@ -276,7 +98,12 @@ class AccountResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $description = null,
         /** @var array<AccountGuarantor> guarantor The parties ultimately responsible for balancing the Account */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Account\AccountGuarantor',
+        )]
         public array $guarantor = [],
         /** @var Reference|null partOf Reference to a parent Account */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]

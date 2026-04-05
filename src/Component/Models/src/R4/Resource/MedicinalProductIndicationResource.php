@@ -31,179 +31,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\MedicinalProductIndication\
 )]
 class MedicinalProductIndicationResource extends DomainResourceResource
 {
-    public const FHIR_PROPERTY_MAP = [
-        'id' => [
-            'fhirType'     => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind' => 'scalar',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'meta' => [
-            'fhirType'     => 'Meta',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'implicitRules' => [
-            'fhirType'     => 'uri',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'language' => [
-            'fhirType'     => 'code',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'text' => [
-            'fhirType'     => 'Narrative',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'contained' => [
-            'fhirType'     => 'Resource',
-            'propertyKind' => 'resource',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'extension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'extension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'modifierExtension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'modifierExtension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'subject' => [
-            'fhirType'     => 'Reference',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
-            'variants'     => null,
-        ],
-        'diseaseSymptomProcedure' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'diseaseStatus' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'comorbidity' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
-            'variants'     => null,
-        ],
-        'intendedEffect' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'duration' => [
-            'fhirType'     => 'Quantity',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'otherTherapy' => [
-            'fhirType'     => 'BackboneElement',
-            'propertyKind' => 'backbone',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\MedicinalProductIndication\MedicinalProductIndicationOtherTherapy',
-            'variants'     => null,
-        ],
-        'undesirableEffect' => [
-            'fhirType'     => 'Reference',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
-            'variants'     => null,
-        ],
-        'population' => [
-            'fhirType'     => 'Population',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Population',
-            'variants'     => null,
-        ],
-    ];
-
     public function __construct(
         /** @var string|null id Logical id of this artifact */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
@@ -230,7 +57,12 @@ class MedicinalProductIndicationResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
         /** @var array<Reference> subject The medication for which this is an indication */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
+        )]
         public array $subject = [],
         /** @var CodeableConcept|null diseaseSymptomProcedure The disease, symptom or procedure that is the indication for treatment */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
@@ -239,7 +71,12 @@ class MedicinalProductIndicationResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $diseaseStatus = null,
         /** @var array<CodeableConcept> comorbidity Comorbidity (concurrent condition) or co-infection as part of the indication */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
+        )]
         public array $comorbidity = [],
         /** @var CodeableConcept|null intendedEffect The intended effect, aim or strategy to be achieved by the indication */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
@@ -248,13 +85,28 @@ class MedicinalProductIndicationResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
         public ?Quantity $duration = null,
         /** @var array<MedicinalProductIndicationOtherTherapy> otherTherapy Information about the use of the medicinal product in relation to other therapies described as part of the indication */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\MedicinalProductIndication\MedicinalProductIndicationOtherTherapy',
+        )]
         public array $otherTherapy = [],
         /** @var array<Reference> undesirableEffect Describe the undesirable effects of the medicinal product */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
+        )]
         public array $undesirableEffect = [],
         /** @var array<Population> population The population group to which this applies */
-        #[FhirProperty(fhirType: 'Population', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'Population',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Population',
+        )]
         public array $population = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

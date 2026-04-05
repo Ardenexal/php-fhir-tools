@@ -18,100 +18,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 #[FHIRBackboneElement(parentResource: 'NutritionOrder', elementPath: 'NutritionOrder.oralDiet', fhirVersion: 'R4')]
 class NutritionOrderOralDiet extends BackboneElement
 {
-    public const FHIR_PROPERTY_MAP = [
-        'id' => [
-            'fhirType'          => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind'      => 'scalar',
-            'isArray'           => false,
-            'isRequired'        => false,
-            'isChoice'          => false,
-            'jsonKey'           => null,
-            'phpType'           => null,
-            'variants'          => null,
-            'xmlSerializedName' => '@id',
-        ],
-        'extension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'extension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'modifierExtension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'modifierExtension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'type' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
-            'variants'     => null,
-        ],
-        'schedule' => [
-            'fhirType'     => 'Timing',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing',
-            'variants'     => null,
-        ],
-        'nutrient' => [
-            'fhirType'     => 'BackboneElement',
-            'propertyKind' => 'backbone',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\NutritionOrder\NutritionOrderOralDietNutrient',
-            'variants'     => null,
-        ],
-        'texture' => [
-            'fhirType'     => 'BackboneElement',
-            'propertyKind' => 'backbone',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\NutritionOrder\NutritionOrderOralDietTexture',
-            'variants'     => null,
-        ],
-        'fluidConsistencyType' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
-            'variants'     => null,
-        ],
-        'instruction' => [
-            'fhirType'     => 'string',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-    ];
-
     public function __construct(
         /** @var string|null id Unique id for inter-element referencing */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
@@ -123,19 +29,44 @@ class NutritionOrderOralDiet extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
         /** @var array<CodeableConcept> type Type of oral diet or diet restrictions that describe what can be consumed orally */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
+        )]
         public array $type = [],
         /** @var array<Timing> schedule Scheduled frequency of diet */
-        #[FhirProperty(fhirType: 'Timing', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'Timing',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing',
+        )]
         public array $schedule = [],
         /** @var array<NutritionOrderOralDietNutrient> nutrient Required  nutrient modifications */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\NutritionOrder\NutritionOrderOralDietNutrient',
+        )]
         public array $nutrient = [],
         /** @var array<NutritionOrderOralDietTexture> texture Required  texture modifications */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\NutritionOrder\NutritionOrderOralDietTexture',
+        )]
         public array $texture = [],
         /** @var array<CodeableConcept> fluidConsistencyType The required consistency of fluids and liquids provided to the patient */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
+        )]
         public array $fluidConsistencyType = [],
         /** @var StringPrimitive|string|null instruction Instructions or additional information about the oral diet */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

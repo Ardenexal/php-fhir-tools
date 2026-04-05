@@ -21,70 +21,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 )]
 class EffectEvidenceSynthesisCertaintyCertaintySubcomponent extends BackboneElement
 {
-    public const FHIR_PROPERTY_MAP = [
-        'id' => [
-            'fhirType'          => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind'      => 'scalar',
-            'isArray'           => false,
-            'isRequired'        => false,
-            'isChoice'          => false,
-            'jsonKey'           => null,
-            'phpType'           => null,
-            'variants'          => null,
-            'xmlSerializedName' => '@id',
-        ],
-        'extension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'extension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'modifierExtension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'modifierExtension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'type' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'rating' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
-            'variants'     => null,
-        ],
-        'note' => [
-            'fhirType'     => 'Annotation',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation',
-            'variants'     => null,
-        ],
-    ];
-
     public function __construct(
         /** @var string|null id Unique id for inter-element referencing */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
@@ -99,10 +35,20 @@ class EffectEvidenceSynthesisCertaintyCertaintySubcomponent extends BackboneElem
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $type = null,
         /** @var array<CodeableConcept> rating Subcomponent certainty rating */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
+        )]
         public array $rating = [],
         /** @var array<Annotation> note Used for footnotes or explanatory notes */
-        #[FhirProperty(fhirType: 'Annotation', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'Annotation',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation',
+        )]
         public array $note = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -24,257 +24,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 #[FHIRBackboneElement(parentResource: 'ClaimResponse', elementPath: 'ClaimResponse.addItem', fhirVersion: 'R4')]
 class ClaimResponseAddItem extends BackboneElement
 {
-    public const FHIR_PROPERTY_MAP = [
-        'id' => [
-            'fhirType'          => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind'      => 'scalar',
-            'isArray'           => false,
-            'isRequired'        => false,
-            'isChoice'          => false,
-            'jsonKey'           => null,
-            'phpType'           => null,
-            'variants'          => null,
-            'xmlSerializedName' => '@id',
-        ],
-        'extension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'extension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'modifierExtension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'modifierExtension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'itemSequence' => [
-            'fhirType'     => 'positiveInt',
-            'propertyKind' => 'primitive',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'detailSequence' => [
-            'fhirType'     => 'positiveInt',
-            'propertyKind' => 'primitive',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'subdetailSequence' => [
-            'fhirType'     => 'positiveInt',
-            'propertyKind' => 'primitive',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'provider' => [
-            'fhirType'     => 'Reference',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
-            'variants'     => null,
-        ],
-        'productOrService' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => true,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'modifier' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
-            'variants'     => null,
-        ],
-        'programCode' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
-            'variants'     => null,
-        ],
-        'serviced' => [
-            'fhirType'     => 'choice',
-            'propertyKind' => 'choice',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => true,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => [
-                [
-                    'fhirType'     => 'date',
-                    'propertyKind' => 'primitive',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive',
-                    'jsonKey'      => 'servicedDate',
-                    'isBuiltin'    => false,
-                ],
-                [
-                    'fhirType'     => 'Period',
-                    'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Period',
-                    'jsonKey'      => 'servicedPeriod',
-                    'isBuiltin'    => false,
-                ],
-            ],
-        ],
-        'location' => [
-            'fhirType'     => 'choice',
-            'propertyKind' => 'choice',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => true,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => [
-                [
-                    'fhirType'     => 'CodeableConcept',
-                    'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
-                    'jsonKey'      => 'locationCodeableConcept',
-                    'isBuiltin'    => false,
-                ],
-                [
-                    'fhirType'     => 'Address',
-                    'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Address',
-                    'jsonKey'      => 'locationAddress',
-                    'isBuiltin'    => false,
-                ],
-                [
-                    'fhirType'     => 'Reference',
-                    'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
-                    'jsonKey'      => 'locationReference',
-                    'isBuiltin'    => false,
-                ],
-            ],
-        ],
-        'quantity' => [
-            'fhirType'     => 'Quantity',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'unitPrice' => [
-            'fhirType'     => 'Money',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'factor' => [
-            'fhirType'     => 'decimal',
-            'propertyKind' => 'scalar',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'net' => [
-            'fhirType'     => 'Money',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'bodySite' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'subSite' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
-            'variants'     => null,
-        ],
-        'noteNumber' => [
-            'fhirType'     => 'positiveInt',
-            'propertyKind' => 'primitive',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'adjudication' => [
-            'fhirType'     => 'unknown',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => true,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ClaimResponse\ClaimResponseItemAdjudication',
-            'variants'     => null,
-        ],
-        'detail' => [
-            'fhirType'     => 'BackboneElement',
-            'propertyKind' => 'backbone',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ClaimResponse\ClaimResponseAddItemDetail',
-            'variants'     => null,
-        ],
-    ];
-
     public function __construct(
         /** @var string|null id Unique id for inter-element referencing */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
@@ -295,16 +44,31 @@ class ClaimResponseAddItem extends BackboneElement
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isArray: true)]
         public array $subdetailSequence = [],
         /** @var array<Reference> provider Authorized providers */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
+        )]
         public array $provider = [],
         /** @var CodeableConcept|null productOrService Billing, service, product, or drug code */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?CodeableConcept $productOrService = null,
         /** @var array<CodeableConcept> modifier Service/Product billing modifiers */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
+        )]
         public array $modifier = [],
         /** @var array<CodeableConcept> programCode Program the product or service is provided under */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
+        )]
         public array $programCode = [],
         /** @var DatePrimitive|Period|null serviced Date or dates of service or product delivery */
         #[FhirProperty(
@@ -370,16 +134,32 @@ class ClaimResponseAddItem extends BackboneElement
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $bodySite = null,
         /** @var array<CodeableConcept> subSite Anatomical sub-location */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
+        )]
         public array $subSite = [],
         /** @var array<PositiveIntPrimitive> noteNumber Applicable note numbers */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isArray: true)]
         public array $noteNumber = [],
         /** @var array<ClaimResponseItemAdjudication> adjudication Added items adjudication */
-        #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex', isArray: true, isRequired: true)]
+        #[FhirProperty(
+            fhirType: 'unknown',
+            propertyKind: 'complex',
+            isArray: true,
+            isRequired: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ClaimResponse\ClaimResponseItemAdjudication',
+        )]
         public array $adjudication = [],
         /** @var array<ClaimResponseAddItemDetail> detail Insurer added line details */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ClaimResponse\ClaimResponseAddItemDetail',
+        )]
         public array $detail = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

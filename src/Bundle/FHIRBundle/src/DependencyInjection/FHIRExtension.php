@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\DependencyInjection;
 
+use Ardenexal\FHIRTools\Bundle\FHIRBundle\CacheWarmer\FHIRMetadataCacheWarmer;
 use Ardenexal\FHIRTools\Bundle\FHIRBundle\Compatibility\SymfonyVersionHelper;
+use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * FHIR Bundle Extension for dependency injection configuration.
@@ -45,9 +48,37 @@ class FHIRExtension extends Extension
         $container->setParameter('fhir.is_symfony_70_or_higher', SymfonyVersionHelper::isSymfony70OrHigher());
         $container->setParameter('fhir.is_symfony_74_or_higher', SymfonyVersionHelper::isSymfony74OrHigher());
 
+        // Serialization metadata cache pool
+        $cachePool        = $config['serialization']['metadata_cache_pool'] ?? null;
+        $enableCacheWarmer = $config['serialization']['enable_cache_warmer'] ?? false;
+        $container->setParameter('fhir.serialization.metadata_cache_pool', $cachePool);
+
+        if ($cachePool !== null) {
+            // Alias nominated PSR-6 pool so the warmer can depend on an abstract ID
+            $container->setAlias('fhir.metadata_cache', $cachePool)->setPublic(false);
+
+            // Register the cache warmer only when explicitly enabled
+            if ($enableCacheWarmer) {
+                $container->register(FHIRMetadataCacheWarmer::class, FHIRMetadataCacheWarmer::class)
+                    ->setAutowired(false)
+                    ->setArguments([
+                        new Reference(PropertyMetadataProvider::class),
+                        new Reference('fhir.metadata_cache'),
+                    ])
+                    ->addTag('kernel.cache_warmer')
+                    ->setPublic(false);
+            }
+        }
+
         // Load service definitions
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yaml');
+
+        // Inject PSR-6 pool into PropertyMetadataProvider (services.yaml must be loaded first)
+        if ($cachePool !== null) {
+            $container->getDefinition(PropertyMetadataProvider::class)
+                ->setArgument('$psrCache', new Reference('fhir.metadata_cache'));
+        }
     }
 
     public function getAlias(): string

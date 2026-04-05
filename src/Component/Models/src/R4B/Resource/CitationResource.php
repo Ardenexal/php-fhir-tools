@@ -38,379 +38,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 #[FhirResource(type: 'Citation', version: '4.3.0', url: 'http://hl7.org/fhir/StructureDefinition/Citation', fhirVersion: 'R4B')]
 class CitationResource extends DomainResourceResource
 {
-    public const FHIR_PROPERTY_MAP = [
-        'id' => [
-            'fhirType'     => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind' => 'scalar',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'meta' => [
-            'fhirType'     => 'Meta',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'implicitRules' => [
-            'fhirType'     => 'uri',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'language' => [
-            'fhirType'     => 'code',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'text' => [
-            'fhirType'     => 'Narrative',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'contained' => [
-            'fhirType'     => 'Resource',
-            'propertyKind' => 'resource',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'extension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'extension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'modifierExtension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'modifierExtension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'url' => [
-            'fhirType'     => 'uri',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'identifier' => [
-            'fhirType'     => 'Identifier',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier',
-            'variants'     => null,
-        ],
-        'version' => [
-            'fhirType'     => 'string',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'name' => [
-            'fhirType'     => 'string',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'title' => [
-            'fhirType'     => 'string',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'status' => [
-            'fhirType'     => 'code',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => true,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'experimental' => [
-            'fhirType'     => 'boolean',
-            'propertyKind' => 'scalar',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'date' => [
-            'fhirType'     => 'dateTime',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'publisher' => [
-            'fhirType'     => 'string',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'contact' => [
-            'fhirType'     => 'ContactDetail',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\ContactDetail',
-            'variants'     => null,
-        ],
-        'description' => [
-            'fhirType'     => 'markdown',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'useContext' => [
-            'fhirType'     => 'UsageContext',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\UsageContext',
-            'variants'     => null,
-        ],
-        'jurisdiction' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
-            'variants'     => null,
-        ],
-        'purpose' => [
-            'fhirType'     => 'markdown',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'copyright' => [
-            'fhirType'     => 'markdown',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'approvalDate' => [
-            'fhirType'     => 'date',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'lastReviewDate' => [
-            'fhirType'     => 'date',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'effectivePeriod' => [
-            'fhirType'     => 'Period',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'author' => [
-            'fhirType'     => 'ContactDetail',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\ContactDetail',
-            'variants'     => null,
-        ],
-        'editor' => [
-            'fhirType'     => 'ContactDetail',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\ContactDetail',
-            'variants'     => null,
-        ],
-        'reviewer' => [
-            'fhirType'     => 'ContactDetail',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\ContactDetail',
-            'variants'     => null,
-        ],
-        'endorser' => [
-            'fhirType'     => 'ContactDetail',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\ContactDetail',
-            'variants'     => null,
-        ],
-        'summary' => [
-            'fhirType'     => 'BackboneElement',
-            'propertyKind' => 'backbone',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Citation\CitationSummary',
-            'variants'     => null,
-        ],
-        'classification' => [
-            'fhirType'     => 'BackboneElement',
-            'propertyKind' => 'backbone',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Citation\CitationClassification',
-            'variants'     => null,
-        ],
-        'note' => [
-            'fhirType'     => 'Annotation',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation',
-            'variants'     => null,
-        ],
-        'currentState' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
-            'variants'     => null,
-        ],
-        'statusDate' => [
-            'fhirType'     => 'BackboneElement',
-            'propertyKind' => 'backbone',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Citation\CitationStatusDate',
-            'variants'     => null,
-        ],
-        'relatesTo' => [
-            'fhirType'     => 'BackboneElement',
-            'propertyKind' => 'backbone',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Citation\CitationRelatesTo',
-            'variants'     => null,
-        ],
-        'citedArtifact' => [
-            'fhirType'     => 'BackboneElement',
-            'propertyKind' => 'backbone',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-    ];
-
     public function __construct(
         /** @var string|null id Logical id of this artifact */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
@@ -440,7 +67,12 @@ class CitationResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
         public ?UriPrimitive $url = null,
         /** @var array<Identifier> identifier Identifier for the Citation resource itself */
-        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'Identifier',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier',
+        )]
         public array $identifier = [],
         /** @var StringPrimitive|string|null version Business version of the citation */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -464,16 +96,31 @@ class CitationResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $publisher = null,
         /** @var array<ContactDetail> contact Contact details for the publisher of the Citation Resource */
-        #[FhirProperty(fhirType: 'ContactDetail', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'ContactDetail',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\ContactDetail',
+        )]
         public array $contact = [],
         /** @var MarkdownPrimitive|null description Natural language description of the citation */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $description = null,
         /** @var array<UsageContext> useContext The context that the Citation Resource content is intended to support */
-        #[FhirProperty(fhirType: 'UsageContext', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'UsageContext',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\UsageContext',
+        )]
         public array $useContext = [],
         /** @var array<CodeableConcept> jurisdiction Intended jurisdiction for citation (if applicable) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
+        )]
         public array $jurisdiction = [],
         /** @var MarkdownPrimitive|null purpose Why this citation is defined */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -491,34 +138,84 @@ class CitationResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
         public ?Period $effectivePeriod = null,
         /** @var array<ContactDetail> author Who authored the Citation */
-        #[FhirProperty(fhirType: 'ContactDetail', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'ContactDetail',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\ContactDetail',
+        )]
         public array $author = [],
         /** @var array<ContactDetail> editor Who edited the Citation */
-        #[FhirProperty(fhirType: 'ContactDetail', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'ContactDetail',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\ContactDetail',
+        )]
         public array $editor = [],
         /** @var array<ContactDetail> reviewer Who reviewed the Citation */
-        #[FhirProperty(fhirType: 'ContactDetail', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'ContactDetail',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\ContactDetail',
+        )]
         public array $reviewer = [],
         /** @var array<ContactDetail> endorser Who endorsed the Citation */
-        #[FhirProperty(fhirType: 'ContactDetail', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'ContactDetail',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\ContactDetail',
+        )]
         public array $endorser = [],
         /** @var array<CitationSummary> summary A human-readable display of the citation */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Citation\CitationSummary',
+        )]
         public array $summary = [],
         /** @var array<CitationClassification> classification The assignment to an organizing scheme */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Citation\CitationClassification',
+        )]
         public array $classification = [],
         /** @var array<Annotation> note Used for general notes and annotations not coded elsewhere */
-        #[FhirProperty(fhirType: 'Annotation', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'Annotation',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation',
+        )]
         public array $note = [],
         /** @var array<CodeableConcept> currentState The status of the citation */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
+        )]
         public array $currentState = [],
         /** @var array<CitationStatusDate> statusDate An effective date or period for a status of the citation */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Citation\CitationStatusDate',
+        )]
         public array $statusDate = [],
         /** @var array<CitationRelatesTo> relatesTo Artifact related to the Citation Resource */
-        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Citation\CitationRelatesTo',
+        )]
         public array $relatesTo = [],
         /** @var CitationCitedArtifact|null citedArtifact The article or artifact being described */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]

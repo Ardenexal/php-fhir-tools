@@ -820,6 +820,10 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     path?: array{
  *         cache_size?: int|Param, // Maximum number of FHIRPath expressions to cache // Default: 100
  *     },
+ *     serialization?: array{
+ *         metadata_cache_pool?: scalar|Param|null, // PSR-6 cache pool service ID for property metadata. Set to null to disable persistent caching. // Default: "cache.app"
+ *         enable_cache_warmer?: bool|Param, // Pre-populate the metadata cache during cache:warmup. Only takes effect when metadata_cache_pool is set. // Default: false
+ *     },
  * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,

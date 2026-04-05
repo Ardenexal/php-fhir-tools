@@ -21,90 +21,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 #[FHIRBackboneElement(parentResource: 'Evidence', elementPath: 'Evidence.statistic.modelCharacteristic.variable', fhirVersion: 'R4B')]
 class EvidenceStatisticModelCharacteristicVariable extends BackboneElement
 {
-    public const FHIR_PROPERTY_MAP = [
-        'id' => [
-            'fhirType'          => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind'      => 'scalar',
-            'isArray'           => false,
-            'isRequired'        => false,
-            'isChoice'          => false,
-            'jsonKey'           => null,
-            'phpType'           => null,
-            'variants'          => null,
-            'xmlSerializedName' => '@id',
-        ],
-        'extension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'extension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'modifierExtension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'modifierExtension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'variableDefinition' => [
-            'fhirType'     => 'Reference',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => true,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'handling' => [
-            'fhirType'     => 'code',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'valueCategory' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
-            'variants'     => null,
-        ],
-        'valueQuantity' => [
-            'fhirType'     => 'Quantity',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity',
-            'variants'     => null,
-        ],
-        'valueRange' => [
-            'fhirType'     => 'Range',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Range',
-            'variants'     => null,
-        ],
-    ];
-
     public function __construct(
         /** @var string|null id Unique id for inter-element referencing */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
@@ -122,13 +38,28 @@ class EvidenceStatisticModelCharacteristicVariable extends BackboneElement
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
         public ?EvidenceVariableHandlingType $handling = null,
         /** @var array<CodeableConcept> valueCategory Description for grouping of ordinal or polychotomous variables */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
+        )]
         public array $valueCategory = [],
         /** @var array<Quantity> valueQuantity Discrete value for grouping of ordinal or polychotomous variables */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'Quantity',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity',
+        )]
         public array $valueQuantity = [],
         /** @var array<Range> valueRange Range of values for grouping of ordinal or polychotomous variables */
-        #[FhirProperty(fhirType: 'Range', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'Range',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Range',
+        )]
         public array $valueRange = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

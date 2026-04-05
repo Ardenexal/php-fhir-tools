@@ -16,50 +16,6 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 #[FHIRBackboneElement(parentResource: 'StructureDefinition', elementPath: 'StructureDefinition.differential', fhirVersion: 'R4B')]
 class StructureDefinitionDifferential extends BackboneElement
 {
-    public const FHIR_PROPERTY_MAP = [
-        'id' => [
-            'fhirType'          => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind'      => 'scalar',
-            'isArray'           => false,
-            'isRequired'        => false,
-            'isChoice'          => false,
-            'jsonKey'           => null,
-            'phpType'           => null,
-            'variants'          => null,
-            'xmlSerializedName' => '@id',
-        ],
-        'extension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'extension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'modifierExtension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'modifierExtension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'element' => [
-            'fhirType'     => 'ElementDefinition',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => true,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\ElementDefinition',
-            'variants'     => null,
-        ],
-    ];
-
     public function __construct(
         /** @var string|null id Unique id for inter-element referencing */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
@@ -71,7 +27,13 @@ class StructureDefinitionDifferential extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
         /** @var array<ElementDefinition> element Definition of elements in the resource (if no StructureDefinition) */
-        #[FhirProperty(fhirType: 'ElementDefinition', propertyKind: 'complex', isArray: true, isRequired: true)]
+        #[FhirProperty(
+            fhirType: 'ElementDefinition',
+            propertyKind: 'complex',
+            isArray: true,
+            isRequired: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\ElementDefinition',
+        )]
         public array $element = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

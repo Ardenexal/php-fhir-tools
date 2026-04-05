@@ -20,120 +20,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 #[FHIRBackboneElement(parentResource: 'Immunization', elementPath: 'Immunization.protocolApplied', fhirVersion: 'R4')]
 class ImmunizationProtocolApplied extends BackboneElement
 {
-    public const FHIR_PROPERTY_MAP = [
-        'id' => [
-            'fhirType'          => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind'      => 'scalar',
-            'isArray'           => false,
-            'isRequired'        => false,
-            'isChoice'          => false,
-            'jsonKey'           => null,
-            'phpType'           => null,
-            'variants'          => null,
-            'xmlSerializedName' => '@id',
-        ],
-        'extension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'extension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'modifierExtension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'modifierExtension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'series' => [
-            'fhirType'     => 'string',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'authority' => [
-            'fhirType'     => 'Reference',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'targetDisease' => [
-            'fhirType'     => 'CodeableConcept',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
-            'variants'     => null,
-        ],
-        'doseNumber' => [
-            'fhirType'     => 'choice',
-            'propertyKind' => 'choice',
-            'isArray'      => false,
-            'isRequired'   => true,
-            'isChoice'     => true,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => [
-                [
-                    'fhirType'     => 'positiveInt',
-                    'propertyKind' => 'primitive',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive',
-                    'jsonKey'      => 'doseNumberPositiveInt',
-                    'isBuiltin'    => false,
-                ],
-                [
-                    'fhirType'     => 'string',
-                    'propertyKind' => 'primitive',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive',
-                    'jsonKey'      => 'doseNumberString',
-                    'isBuiltin'    => false,
-                ],
-            ],
-        ],
-        'seriesDoses' => [
-            'fhirType'     => 'choice',
-            'propertyKind' => 'choice',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => true,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => [
-                [
-                    'fhirType'     => 'positiveInt',
-                    'propertyKind' => 'primitive',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive',
-                    'jsonKey'      => 'seriesDosesPositiveInt',
-                    'isBuiltin'    => false,
-                ],
-                [
-                    'fhirType'     => 'string',
-                    'propertyKind' => 'primitive',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive',
-                    'jsonKey'      => 'seriesDosesString',
-                    'isBuiltin'    => false,
-                ],
-            ],
-        ],
-    ];
-
     public function __construct(
         /** @var string|null id Unique id for inter-element referencing */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
@@ -151,7 +37,12 @@ class ImmunizationProtocolApplied extends BackboneElement
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $authority = null,
         /** @var array<CodeableConcept> targetDisease Vaccine preventatable disease being targetted */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
+        )]
         public array $targetDisease = [],
         /** @var PositiveIntPrimitive|StringPrimitive|string|null doseNumber Dose number within series */
         #[FhirProperty(

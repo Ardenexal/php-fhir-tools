@@ -21,90 +21,6 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 #[FHIRComplexType(typeName: 'Meta', fhirVersion: 'R4B')]
 class Meta extends Element
 {
-    public const FHIR_PROPERTY_MAP = [
-        'id' => [
-            'fhirType'          => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind'      => 'scalar',
-            'isArray'           => false,
-            'isRequired'        => false,
-            'isChoice'          => false,
-            'jsonKey'           => null,
-            'phpType'           => null,
-            'variants'          => null,
-            'xmlSerializedName' => '@id',
-        ],
-        'extension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'extension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'versionId' => [
-            'fhirType'     => 'id',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'lastUpdated' => [
-            'fhirType'     => 'instant',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'source' => [
-            'fhirType'     => 'uri',
-            'propertyKind' => 'primitive',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'profile' => [
-            'fhirType'     => 'canonical',
-            'propertyKind' => 'primitive',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'security' => [
-            'fhirType'     => 'Coding',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding',
-            'variants'     => null,
-        ],
-        'tag' => [
-            'fhirType'     => 'Coding',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding',
-            'variants'     => null,
-        ],
-    ];
-
     public function __construct(
         /** @var string|null id Unique id for inter-element referencing */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
@@ -125,10 +41,20 @@ class Meta extends Element
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true)]
         public array $profile = [],
         /** @var array<Coding> security Security Labels applied to this resource */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'Coding',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding',
+        )]
         public array $security = [],
         /** @var array<Coding> tag Tags applied to this resource */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'Coding',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding',
+        )]
         public array $tag = [],
     ) {
         parent::__construct($id, $extension);

@@ -28,6 +28,7 @@
         "brick/date-time": "^0.9.0",
         "composer/semver": "^3.4.4",
         "nette/php-generator": "^4.2.1",
+        "psr/cache": "^3.0",
         "psr/http-client": "^1.0",
         "symfony/config": "^6.4|^7.4",
         "symfony/console": "^6.4|^7.4",
@@ -49,6 +50,7 @@
         "fhir/fhir-test-cases": "1.7.49",
         "giorgiosironi/eris": "^1.0",
         "laravel/pint": "^1.27.1",
+        "phpbench/phpbench": "^1.4",
         "phpstan/phpstan": "^2.1.39",
         "phpstan/phpstan-symfony": "^2.0.14",
         "phpunit/phpunit": "^11.0|^12.5.14",
@@ -80,7 +82,8 @@
             "Ardenexal\\FHIRTools\\Tests\\": "tests/",
             "Ardenexal\\FHIRTools\\Bundle\\FHIRBundle\\Tests\\": "src/Bundle/FHIRBundle/tests/",
             "Ardenexal\\FHIRTools\\Component\\FHIRPath\\Tests\\": "src/Component/FHIRPath/tests/",
-            "Ardenexal\\FHIRTools\\Component\\Serialization\\Tests\\": "src/Component/Serialization/tests/"
+            "Ardenexal\\FHIRTools\\Component\\Serialization\\Tests\\": "src/Component/Serialization/tests/",
+            "Ardenexal\\FHIRTools\\Benchmarks\\": "bench/"
         }
     },
     "replace": {
@@ -183,6 +186,11 @@
         "validate-recipe": "php scripts/validate-recipe.php",
         "test-recipe": "php ./vendor/phpunit/phpunit/phpunit tests/Integration/FlexRecipeTest.php",
         "test-package-installation": "php scripts/test-package-installation.php",
-        "start-demo": "cd demo && symfony server:start"
+        "start-demo": "cd demo && symfony server:start",
+        "bench": "php ./vendor/bin/phpbench run bench/ --report=aggregate",
+        "bench:serialization": "php ./vendor/bin/phpbench run bench/Serialization/ --report=aggregate",
+        "bench:fhirpath": "php ./vendor/bin/phpbench run bench/FHIRPath/ --report=aggregate",
+        "bench:baseline": "php ./vendor/bin/phpbench run bench/ --report=aggregate --store --tag=baseline",
+        "bench:regression": "php ./vendor/bin/phpbench run bench/ --report=compare --ref=baseline --assert=\"mode(variant.time.avg) < mode(baseline.time.avg) * 1.50\""
     }
 }

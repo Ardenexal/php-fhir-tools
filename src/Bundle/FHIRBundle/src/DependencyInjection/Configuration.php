@@ -85,6 +85,19 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('serialization')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('metadata_cache_pool')
+                            ->defaultValue('cache.app')
+                            ->info('PSR-6 cache pool service ID for property metadata. Set to null to disable persistent caching.')
+                        ->end()
+                        ->booleanNode('enable_cache_warmer')
+                            ->defaultFalse()
+                            ->info('Pre-populate the metadata cache during cache:warmup. Only takes effect when metadata_cache_pool is set.')
+                        ->end()
+                    ->end()
+                ->end()
             ->end();
 
         return $treeBuilder;

@@ -17,70 +17,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
 #[FHIRBackboneElement(parentResource: 'MedicationKnowledge', elementPath: 'MedicationKnowledge.kinetics', fhirVersion: 'R4')]
 class MedicationKnowledgeKinetics extends BackboneElement
 {
-    public const FHIR_PROPERTY_MAP = [
-        'id' => [
-            'fhirType'          => 'http://hl7.org/fhirpath/System.String',
-            'propertyKind'      => 'scalar',
-            'isArray'           => false,
-            'isRequired'        => false,
-            'isChoice'          => false,
-            'jsonKey'           => null,
-            'phpType'           => null,
-            'variants'          => null,
-            'xmlSerializedName' => '@id',
-        ],
-        'extension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'extension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'modifierExtension' => [
-            'fhirType'     => 'Extension',
-            'propertyKind' => 'modifierExtension',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-        'areaUnderCurve' => [
-            'fhirType'     => 'Quantity',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity',
-            'variants'     => null,
-        ],
-        'lethalDose50' => [
-            'fhirType'     => 'Quantity',
-            'propertyKind' => 'complex',
-            'isArray'      => true,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity',
-            'variants'     => null,
-        ],
-        'halfLifePeriod' => [
-            'fhirType'     => 'Duration',
-            'propertyKind' => 'complex',
-            'isArray'      => false,
-            'isRequired'   => false,
-            'isChoice'     => false,
-            'jsonKey'      => null,
-            'phpType'      => null,
-            'variants'     => null,
-        ],
-    ];
-
     public function __construct(
         /** @var string|null id Unique id for inter-element referencing */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
@@ -92,10 +28,20 @@ class MedicationKnowledgeKinetics extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
         /** @var array<Quantity> areaUnderCurve The drug concentration measured at certain discrete points in time */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'Quantity',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity',
+        )]
         public array $areaUnderCurve = [],
         /** @var array<Quantity> lethalDose50 The median lethal dose of a drug */
-        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'Quantity',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity',
+        )]
         public array $lethalDose50 = [],
         /** @var Duration|null halfLifePeriod Time required for concentration in the body to decrease by half */
         #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex')]
