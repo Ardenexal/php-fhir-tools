@@ -1,0 +1,37 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "au-core-patient",
+  "url": "http://hl7.org.au/fhir/core/StructureDefinition/au-core-patient",
+  "version": "1.0.0",
+  "name": "AUCorePatient",
+  "title": "AU Core Patient",
+  "status": "active",
+  "publisher": "HL7 Australia",
+  "description": "This profile sets minimum expectations for a Patient resource in the context of AU Core.",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Patient",
+  "derivation": "constraint",
+  "baseDefinition": "http://hl7.org.au/fhir/StructureDefinition/au-patient",
+  "snapshot": {
+    "element": [
+      {
+        "id": "Patient",
+        "path": "Patient",
+        "short": "AU Core Patient",
+        "definition": "An AU Core patient.",
+        "min": 0,
+        "max": "*"
+      },
+      {
+        "id": "Patient.name",
+        "path": "Patient.name",
+        "short": "A name associated with the patient",
+        "min": 1,
+        "max": "*",
+        "type": [{"code": "HumanName"}]
+      }
+    ]
+  }
+}

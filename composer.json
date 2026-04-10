@@ -164,6 +164,9 @@
             "@quality:serialization",
             "@quality:fhir-path"
         ],
+        "generate-ig-au-base": "php ./demo/bin/console fhir:generate-ig --package=hl7.fhir.au.base -vvv",
+        "generate-ig-au-core": "php ./demo/bin/console fhir:generate-ig --package=hl7.fhir.au.base --package=hl7.fhir.au.core -vvv",
+        "generate-ig-us-core": "php ./demo/bin/console fhir:generate-ig --package=hl7.fhir.us.core -vvv",
         "generate-models": "php ./demo/bin/console fhir:generate -vvv",
         "generate-models-all": [
             "echo 'Generating FHIR R4 models...'",

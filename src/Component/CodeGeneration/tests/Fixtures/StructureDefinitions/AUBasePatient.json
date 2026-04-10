@@ -1,0 +1,44 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "au-patient",
+  "url": "http://hl7.org.au/fhir/StructureDefinition/au-patient",
+  "version": "4.2.2-preview",
+  "name": "AUBasePatient",
+  "title": "AU Base Patient",
+  "status": "active",
+  "publisher": "HL7 Australia",
+  "description": "This profile defines a patient administration details structure that includes core localisation concepts for use in an Australian context.",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Patient",
+  "derivation": "constraint",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
+  "snapshot": {
+    "element": [
+      {
+        "id": "Patient",
+        "path": "Patient",
+        "short": "AU Base Patient",
+        "definition": "A patient in an Australian healthcare context.",
+        "min": 0,
+        "max": "*"
+      },
+      {
+        "id": "Patient.id",
+        "path": "Patient.id",
+        "min": 0,
+        "max": "1",
+        "type": [{"code": "http://hl7.org/fhirpath/System.String"}]
+      },
+      {
+        "id": "Patient.name",
+        "path": "Patient.name",
+        "short": "A name associated with the patient",
+        "min": 0,
+        "max": "*",
+        "type": [{"code": "HumanName"}]
+      }
+    ]
+  }
+}

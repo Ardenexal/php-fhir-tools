@@ -19,8 +19,11 @@ services:
             $pathService: '@Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService'
         tags: ["console.command"]
 
-    # Code Generation Command
+    # Code Generation Commands
     Ardenexal\FHIRTools\Component\CodeGeneration\Command\FHIRModelGeneratorCommand:
+        tags: ["console.command"]
+
+    Ardenexal\FHIRTools\Component\CodeGeneration\Command\FHIRIGGeneratorCommand:
         tags: ["console.command"]
 
     # Code Generation Services
@@ -28,6 +31,10 @@ services:
 
     Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator:
         public: true
+
+    Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRExtensionGenerator: ~
+
+    Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRProfileGenerator: ~
 
     Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader:
         public: true
