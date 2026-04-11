@@ -24,6 +24,11 @@ services:
         tags: ["console.command"]
 
     Ardenexal\FHIRTools\Component\CodeGeneration\Command\FHIRIGGeneratorCommand:
+        arguments:
+            $configuredPackages: '%fhir.ig.packages%'
+            $offlineByDefault: '%fhir.ig.offline%'
+            $igOutputDirectory: '%fhir.ig.output_directory%'
+            $igBaseNamespace: '%fhir.ig.namespace%'
         tags: ["console.command"]
 
     # Code Generation Services

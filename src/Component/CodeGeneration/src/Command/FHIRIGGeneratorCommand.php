@@ -85,7 +85,8 @@ class FHIRIGGeneratorCommand extends Command
     ];
 
     /**
-     * Base namespace root for generated IG classes.
+     * Default namespace root for generated IG classes (library-internal fallback).
+     * Override via the fhir.ig.namespace bundle configuration key.
      */
     private const string IG_BASE_NAMESPACE = 'Ardenexal\\FHIRTools\\Component\\Models\\IG';
 
@@ -100,6 +101,23 @@ class FHIRIGGeneratorCommand extends Command
 
     private ErrorCollector $errorCollector;
 
+    /** Effective base namespace for generated IG classes, resolved from bundle config or the default. */
+    private string $igBaseNamespace;
+
+    /** Effective output directory base, resolved from bundle config or computed from __DIR__. */
+    private ?string $igOutputDirectory;
+
+    /**
+     * IG packages declared in bundle config (fhir.ig.packages), used as a default when
+     * no --package CLI arguments are supplied at runtime.
+     *
+     * @var list<string>
+     */
+    private array $configuredPackages;
+
+    /** Default value for --offline, driven by fhir.ig.offline in bundle config. */
+    private bool $offlineByDefault;
+
     /**
      * One BuilderContext per FHIR version, shared across all processed IG packages.
      * Base types and IG types are all registered here so later packages can extend earlier ones.
@@ -108,15 +126,33 @@ class FHIRIGGeneratorCommand extends Command
      */
     private array $context;
 
+    /**
+     * @param array<string> $configuredPackages IG packages from fhir.ig.packages bundle config
+     * @param bool          $offlineByDefault   fhir.ig.offline bundle config value
+     * @param string|null   $igOutputDirectory  fhir.ig.output_directory bundle config value
+     * @param string|null   $igBaseNamespace    fhir.ig.namespace bundle config value
+     */
     public function __construct(
         Filesystem $filesystem,
         PackageLoader $packageLoader,
+        array $configuredPackages = [],
+        bool $offlineByDefault = false,
+        ?string $igOutputDirectory = null,
+        ?string $igBaseNamespace = null,
     ) {
         parent::__construct();
-        $this->filesystem     = $filesystem;
-        $this->packageLoader  = $packageLoader;
-        $this->errorCollector = new ErrorCollector();
-        $this->context        = [
+        $this->filesystem        = $filesystem;
+        $this->packageLoader     = $packageLoader;
+        $this->configuredPackages = array_values($configuredPackages);
+        $this->offlineByDefault  = $offlineByDefault;
+        $this->igOutputDirectory = ($igOutputDirectory !== '' && $igOutputDirectory !== null)
+            ? $igOutputDirectory
+            : null;
+        $this->igBaseNamespace   = ($igBaseNamespace !== '' && $igBaseNamespace !== null)
+            ? $igBaseNamespace
+            : self::IG_BASE_NAMESPACE;
+        $this->errorCollector    = new ErrorCollector();
+        $this->context           = [
             'R4'  => new BuilderContext(),
             'R4B' => new BuilderContext(),
             'R5'  => new BuilderContext(),
@@ -126,19 +162,29 @@ class FHIRIGGeneratorCommand extends Command
     /**
      * Entry point for `fhir:generate-ig`.
      *
+     * When --package is supplied, those packages are used exclusively.
+     * When --package is omitted, the packages configured under fhir.ig.packages in the
+     * bundle configuration are used, enabling a no-argument workflow for end-user projects.
+     *
      * @param OutputInterface $output      Console output
      * @param array<string>   $packages    IG packages to generate, e.g. ['hl7.fhir.au.base#1.0.0']
      * @param bool            $offlineMode Use cached packages only — no network
      */
     public function __invoke(
         OutputInterface $output,
-        #[Option(description: 'IG packages to generate (specify in dependency order).', name: 'package')]
+        #[Option(description: 'IG packages to generate (specify in dependency order). Overrides fhir.ig.packages config when supplied.', name: 'package')]
         array $packages = [],
-        #[Option(description: 'Work offline using only cached packages.', name: 'offline')]
+        #[Option(description: 'Work offline using only cached packages. Defaults to fhir.ig.offline config when not passed.', name: 'offline')]
         bool $offlineMode = false,
     ): int {
-        if (empty($packages)) {
-            $output->writeln('<error>No packages specified. Use --package=hl7.fhir.au.base</error>');
+        // Resolve effective package list: CLI args take priority, config is the fallback
+        $effectivePackages = !empty($packages) ? $packages : $this->configuredPackages;
+        $effectiveOffline  = $offlineMode || $this->offlineByDefault;
+
+        if (empty($effectivePackages)) {
+            $output->writeln(
+                '<error>No packages specified. Use --package=hl7.fhir.au.base or configure fhir.ig.packages in your bundle configuration.</error>'
+            );
 
             return Command::FAILURE;
         }
@@ -146,7 +192,7 @@ class FHIRIGGeneratorCommand extends Command
         try {
             $this->errorCollector->clear();
 
-            return $this->executeGeneration($output, $packages, $offlineMode);
+            return $this->executeGeneration($output, $effectivePackages, $effectiveOffline);
         } catch (\Throwable $e) {
             $output->writeln("<error>Fatal error: {$e->getMessage()}</error>");
 
@@ -380,7 +426,7 @@ class FHIRIGGeneratorCommand extends Command
         string $slug,
         array $definitions,
     ): void {
-        $baseNs          = self::IG_BASE_NAMESPACE . "\\{$version}\\{$slug}";
+        $baseNs          = $this->igBaseNamespace . "\\{$version}\\{$slug}";
         $extensionNs     = new PhpNamespace("{$baseNs}\\Extension");
         $profileNs       = new PhpNamespace("{$baseNs}\\Profile");
 
@@ -443,7 +489,24 @@ class FHIRIGGeneratorCommand extends Command
     }
 
     /**
-     * Write a generated class to disk under Models/src/IG/{version}/{slug}/{category}/.
+     * Resolve the base output path for IG classes.
+     *
+     * When fhir.ig.output_directory is configured, that path is used directly.
+     * Otherwise the library's own Models/src/IG directory is used as the default,
+     * preserving backward compatibility for internal code generation.
+     */
+    private function resolveIGBasePath(): string
+    {
+        if ($this->igOutputDirectory !== null) {
+            return Path::canonicalize($this->igOutputDirectory);
+        }
+
+        // Library-internal default: src/Component/Models/src/IG
+        return Path::canonicalize(__DIR__ . '/../../../Models/src/IG');
+    }
+
+    /**
+     * Write a generated class to disk under {igOutputDirectory}/{version}/{slug}/{category}/.
      */
     private function writeClass(
         OutputInterface $output,
@@ -453,9 +516,8 @@ class FHIRIGGeneratorCommand extends Command
         string $slug,
         string $category,
     ): void {
-        $basePath   = Path::canonicalize(__DIR__ . '/../../../Models/src');
         $outputPath = Path::canonicalize(
-            "{$basePath}/IG/{$version}/{$slug}/{$category}/{$class->getName()}.php"
+            $this->resolveIGBasePath() . "/{$version}/{$slug}/{$category}/{$class->getName()}.php"
         );
 
         $directory = dirname($outputPath);
