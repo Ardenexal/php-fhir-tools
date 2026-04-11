@@ -51,6 +51,9 @@ If you've installed `ardenexal/fhir-bundle` in your Symfony application:
 # Generate FHIR models
 php bin/console fhir:generate --package=hl7.fhir.r4.core -vvv
 
+# Generate typed classes for an Implementation Guide
+php bin/console fhir:generate-ig --package=hl7.fhir.us.core
+
 # Evaluate FHIRPath expressions
 php bin/console fhir:path:evaluate "5 + 3"
 
@@ -146,7 +149,8 @@ When you install `ardenexal/fhir-bundle` in your Symfony application, you get th
 
 | Command | Description |
 |---------|-------------|
-| `fhir:generate` | Generate PHP model classes from FHIR packages |
+| `fhir:generate` | Generate PHP model classes from FHIR packages (R4, R4B, R5) |
+| `fhir:generate-ig` | Generate typed extension and profile classes for FHIR IGs |
 | `fhir:path:evaluate` | Evaluate a FHIRPath expression against FHIR data |
 | `fhir:path:validate` | Validate FHIRPath expression syntax |
 
