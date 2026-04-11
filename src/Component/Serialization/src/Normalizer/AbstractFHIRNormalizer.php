@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Serialization\Normalizer;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTemporalValue;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadata;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyVariantMetadata;
@@ -36,7 +37,8 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     public function __construct(
         protected readonly FHIRMetadataExtractorInterface $metadataExtractor,
         ?NormalizerInterface $normalizer = null,
-        ?DenormalizerInterface $denormalizer = null
+        ?DenormalizerInterface $denormalizer = null,
+        protected ?FHIRIGTypeRegistry $igTypeRegistry = null,
     ) {
         $this->normalizer   = $normalizer;
         $this->denormalizer = $denormalizer;
@@ -440,6 +442,10 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     /**
      * Denormalize an extension array from JSON/_property data to Extension objects.
      *
+     * When an IG type registry is configured, the extension's URL is checked against it
+     * first. If a typed extension class is registered for that URL it is used; otherwise
+     * the call falls back to the base Extension class.
+     *
      * @param array<array<string, mixed>|object> $extensionData Raw extension array from JSON
      * @param string|null                        $format        The format being processed ('json', 'xml')
      * @param array<string, mixed>               $context       Denormalization context
@@ -454,12 +460,20 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         }
 
         $denormalizedExtensions = [];
-        $extensionClass         = 'Ardenexal\\FHIRTools\\Component\\Models\\R4\\DataType\\Extension';
+        $fallbackClass          = 'Ardenexal\\FHIRTools\\Component\\Models\\R4\\DataType\\Extension';
 
         foreach ($extensionData as $extension) {
-            $denormalizedExtensions[] = is_array($extension)
-                ? $this->denormalizer->denormalize($extension, $extensionClass, $format, $context)
-                : $extension; // Already an object
+            if (!is_array($extension)) {
+                $denormalizedExtensions[] = $extension; // Already an object
+                continue;
+            }
+
+            $targetClass = $fallbackClass;
+            if ($this->igTypeRegistry !== null && isset($extension['url']) && is_string($extension['url'])) {
+                $targetClass = $this->igTypeRegistry->resolveExtensionClass($extension['url']) ?? $fallbackClass;
+            }
+
+            $denormalizedExtensions[] = $this->denormalizer->denormalize($extension, $targetClass, $format, $context);
         }
 
         return $denormalizedExtensions;

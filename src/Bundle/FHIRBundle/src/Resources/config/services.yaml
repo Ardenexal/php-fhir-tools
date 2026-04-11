@@ -61,6 +61,9 @@ services:
         alias: 'Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor'
         public: true
 
+    # Serialization - IG Type Registry (maps populated by FHIRIGRegistryCompilerPass at container build time)
+    Ardenexal\FHIRTools\Component\Serialization\FHIRIGTypeRegistry: ~
+
     # Serialization - Type Resolver
     Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolver: ~
 

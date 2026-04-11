@@ -76,6 +76,11 @@ class PropertyMetadataProvider implements PropertyMetadataProviderInterface
     /**
      * Resolve metadata by reflecting #[FhirProperty] attributes on constructor parameters.
      *
+     * Walks the full class hierarchy (child → parent) so that typed IG subclasses — which
+     * only declare new properties in their own constructor — still inherit metadata for
+     * all parameters defined in ancestor constructors. Child parameters override parent
+     * parameters with the same name.
+     *
      * @param class-string $className
      *
      * @return array<string, PropertyMetadata>
@@ -83,48 +88,66 @@ class PropertyMetadataProvider implements PropertyMetadataProviderInterface
     private function resolveFromAttributes(string $className): array
     {
         try {
-            $reflection  = new \ReflectionClass($className);
-            $constructor = $reflection->getConstructor();
-
-            if ($constructor === null) {
-                return [];
+            // Collect the class hierarchy from root → child so child params win on merge.
+            $classes  = [];
+            $current  = new \ReflectionClass($className);
+            while ($current !== false) {
+                $classes[] = $current;
+                $current   = $current->getParentClass();
             }
+            $classes = array_reverse($classes); // root first
 
-            $result = [];
+            $result           = [];
+            $seenConstructors = [];
 
-            foreach ($constructor->getParameters() as $parameter) {
-                $attributes = $parameter->getAttributes(FhirProperty::class);
-                if (empty($attributes)) {
+            foreach ($classes as $class) {
+                $constructor = $class->getConstructor();
+                if ($constructor === null) {
                     continue;
                 }
 
-                /** @var FhirProperty $attr */
-                $attr = $attributes[0]->newInstance();
+                // Skip constructors that were already processed (inherited without override).
+                $constructorKey = $constructor->getDeclaringClass()->getName();
+                if (isset($seenConstructors[$constructorKey])) {
+                    continue;
+                }
+                $seenConstructors[$constructorKey] = true;
 
-                $variants = null;
-                if ($attr->isChoice && $attr->variants !== null) {
-                    $variants = array_map(
-                        static fn (array $v): PropertyVariantMetadata => PropertyVariantMetadata::fromArray(
-                            $v['fhirType'],
-                            $v['propertyKind'],
-                            $v['phpType'],
-                            $v['jsonKey'],
-                        ),
-                        $attr->variants,
+                foreach ($constructor->getParameters() as $parameter) {
+                    $attributes = $parameter->getAttributes(FhirProperty::class);
+                    if (empty($attributes)) {
+                        continue;
+                    }
+
+                    /** @var FhirProperty $attr */
+                    $attr = $attributes[0]->newInstance();
+
+                    $variants = null;
+                    if ($attr->isChoice && $attr->variants !== null) {
+                        $variants = array_map(
+                            static fn (array $v): PropertyVariantMetadata => PropertyVariantMetadata::fromArray(
+                                $v['fhirType'],
+                                $v['propertyKind'],
+                                $v['phpType'],
+                                $v['jsonKey'],
+                            ),
+                            $attr->variants,
+                        );
+                    }
+
+                    // Child param silently overwrites a parent param of the same name.
+                    $result[$parameter->getName()] = new PropertyMetadata(
+                        $attr->fhirType,
+                        $attr->propertyKind,
+                        $attr->isArray,
+                        $attr->isRequired,
+                        $attr->isChoice,
+                        $variants,
+                        $attr->jsonKey,
+                        $attr->phpType,
+                        $attr->xmlSerializedName,
                     );
                 }
-
-                $result[$parameter->getName()] = new PropertyMetadata(
-                    $attr->fhirType,
-                    $attr->propertyKind,
-                    $attr->isArray,
-                    $attr->isRequired,
-                    $attr->isChoice,
-                    $variants,
-                    $attr->jsonKey,
-                    $attr->phpType,
-                    $attr->xmlSerializedName,
-                );
             }
 
             return $result;

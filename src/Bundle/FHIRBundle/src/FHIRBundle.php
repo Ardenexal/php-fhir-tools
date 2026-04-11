@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Bundle\FHIRBundle;
 
+use Ardenexal\FHIRTools\Bundle\FHIRBundle\DependencyInjection\Compiler\FHIRIGRegistryCompilerPass;
 use Ardenexal\FHIRTools\Bundle\FHIRBundle\DependencyInjection\Compiler\FHIRServicePass;
 use Ardenexal\FHIRTools\Bundle\FHIRBundle\DependencyInjection\FHIRExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -24,6 +25,7 @@ class FHIRBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new FHIRServicePass());
+        $container->addCompilerPass(new FHIRIGRegistryCompilerPass());
     }
 
     public function getContainerExtension(): FHIRExtension
