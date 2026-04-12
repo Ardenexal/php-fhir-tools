@@ -23,6 +23,7 @@
         <testsuite name="unit">
             <directory>src/Bundle/FHIRBundle/tests</directory>
             <directory>src/Component/CodeGeneration/tests/Unit</directory>
+            <directory>src/Component/Metadata/tests/Unit</directory>
             <directory>src/Component/Serialization/tests/Unit</directory>
             <directory>src/Component/FHIRPath/tests/Unit</directory>
         </testsuite>
@@ -46,6 +47,7 @@
             <directory>src</directory>
             <directory>src/Bundle/FHIRBundle</directory>
             <directory>src/Component/CodeGeneration/src</directory>
+            <directory>src/Component/Metadata/src</directory>
             <directory>src/Component/Serialization/src</directory>
             <directory>src/Component/FHIRPath/src</directory>
         </include>

@@ -18,6 +18,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Traits\FHIRExtensionsTrait;
 
 use function Symfony\Component\String\u;
 
@@ -316,6 +318,24 @@ class FHIRModelGenerator implements GeneratorInterface
         if (isset($structureDefinition['snapshot']['element'][0]['definition']) === true) {
             $class->addComment('@description ' . $structureDefinition['snapshot']['element'][0]['definition']);
         }
+
+        // Inject FHIRExtensionsTrait into Element and DomainResource base classes so that all
+        // data types, complex types, backbone elements, and resources inherit extension helpers.
+        if (in_array($structureDefinition['name'], ['Element', 'DomainResource'], true)) {
+            $namespace->addUse(FHIRExtensionsTrait::class);
+            $class->addTrait(FHIRExtensionsTrait::class);
+        }
+
+        // Extension must implement FHIRExtensionInterface so that findExtensionByUrl() can
+        // type-safely match any Extension object regardless of the FHIR version.
+        if ($structureDefinition['name'] === 'Extension') {
+            $namespace->addUse(FHIRExtensionInterface::class);
+            $class->addImplement(FHIRExtensionInterface::class);
+            $getUrl = $class->addMethod('getExtensionUrl');
+            $getUrl->setReturnType('?string');
+            $getUrl->setBody('return $this->url;');
+        }
+
         $class->addMethod('__construct');
         $parentParameters = [];
 
