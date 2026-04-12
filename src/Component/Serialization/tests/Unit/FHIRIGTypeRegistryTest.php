@@ -7,9 +7,6 @@ namespace Ardenexal\FHIRTools\Component\Serialization\Tests\Unit;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 
-/**
- * @covers \Ardenexal\FHIRTools\Component\Serialization\FHIRIGTypeRegistry
- */
 class FHIRIGTypeRegistryTest extends TestCase
 {
     public function testResolveExtensionClassReturnsClassForKnownUrl(): void

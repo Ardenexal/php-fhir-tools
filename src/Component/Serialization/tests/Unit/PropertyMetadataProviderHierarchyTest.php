@@ -56,9 +56,6 @@ class HierarchyStubGrandchild extends HierarchyStubChild
     }
 }
 
-/**
- * @covers \Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider
- */
 class PropertyMetadataProviderHierarchyTest extends TestCase
 {
     private PropertyMetadataProvider $provider;

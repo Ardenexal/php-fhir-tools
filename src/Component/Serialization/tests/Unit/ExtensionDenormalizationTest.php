@@ -8,7 +8,6 @@ use Ardenexal\FHIRTools\Component\Serialization\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\AbstractFHIRNormalizer;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -54,17 +53,14 @@ class TestableNormalizer extends AbstractFHIRNormalizer
     }
 }
 
-/**
- * @covers \Ardenexal\FHIRTools\Component\Serialization\Normalizer\AbstractFHIRNormalizer
- */
 class ExtensionDenormalizationTest extends TestCase
 {
-    private FHIRMetadataExtractorInterface&MockObject $metadataExtractor;
+    private FHIRMetadataExtractorInterface $metadataExtractor;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->metadataExtractor = $this->createMock(FHIRMetadataExtractorInterface::class);
+        $this->metadataExtractor = $this->createStub(FHIRMetadataExtractorInterface::class);
     }
 
     public function testWithoutRegistryFallsBackToBaseExtensionClass(): void

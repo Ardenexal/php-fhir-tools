@@ -8,9 +8,6 @@ use Ardenexal\FHIRTools\Component\Serialization\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolver;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 
-/**
- * @covers \Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolver
- */
 class FHIRTypeResolverProfileTest extends TestCase
 {
     public function testResolveResourceTypeReturnsProfileClassWhenMetaProfileMatches(): void

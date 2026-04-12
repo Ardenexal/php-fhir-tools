@@ -224,19 +224,15 @@ class FHIRSerializationService
     {
         $originalClass = get_class($fhirObject);
 
-        // Serialize
-        $serialized = match ($format) {
-            'json'  => $this->serializeToJson($fhirObject, $context),
-            'xml'   => $this->serializeToXml($fhirObject, $context),
-            default => throw new FHIRSerializationException("Unsupported format: {$format}")
-        };
-
-        // Deserialize
-        $deserialized = match ($format) {
-            'json'  => $this->deserializeFromJson($serialized, $originalClass, $context),
-            'xml'   => $this->deserializeFromXml($serialized, $originalClass, $context),
-            default => throw new FHIRSerializationException("Unsupported format: {$format}")
-        };
+        if ($format === 'json') {
+            $serialized   = $this->serializeToJson($fhirObject, $context);
+            $deserialized = $this->deserializeFromJson($serialized, $originalClass, $context);
+        } elseif ($format === 'xml') {
+            $serialized   = $this->serializeToXml($fhirObject, $context);
+            $deserialized = $this->deserializeFromXml($serialized, $originalClass, $context);
+        } else {
+            throw new FHIRSerializationException("Unsupported format: {$format}");
+        }
 
         return $deserialized;
     }
