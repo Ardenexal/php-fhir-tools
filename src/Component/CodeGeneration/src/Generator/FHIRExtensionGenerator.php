@@ -556,7 +556,7 @@ class FHIRExtensionGenerator
 
             $result[] = [
                 'sliceName'  => $sliceName,
-                'paramName'  => (string) u($sliceName)->camel(),
+                'paramName'  => $this->resolveSliceParamName((string) u($sliceName)->camel()),
                 'phpType'    => $phpType,
                 'sliceCode'  => $sliceCode,
                 'isArray'    => $isArray,
@@ -566,6 +566,20 @@ class FHIRExtensionGenerator
         }
 
         return $result;
+    }
+
+    /**
+     * Resolve a camel-cased slice name to a safe PHP parameter/property name.
+     *
+     * Slice names that match parent Extension property names (value, url, id, extension)
+     * would cause a compile error due to PHP's property type invariance rules.
+     * Such names are suffixed with "Slice" to avoid the conflict.
+     */
+    private function resolveSliceParamName(string $camelName): string
+    {
+        static $reserved = ['value', 'url', 'id', 'extension'];
+
+        return in_array($camelName, $reserved, true) ? $camelName . 'Slice' : $camelName;
     }
 
     /**
