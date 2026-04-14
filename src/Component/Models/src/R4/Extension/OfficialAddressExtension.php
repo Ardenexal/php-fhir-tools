@@ -13,7 +13,7 @@ class OfficialAddressExtension extends \Ardenexal\FHIRTools\Component\Models\R4\
 	public function __construct(
 		/** @var bool|CodeableConcept|null value Value of extension (bool|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept|null) */
 		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'choice', propertyKind: 'choice', isChoice: true)]
-		public ?bool $value = null,
+		bool|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept|null $value = null,
 		?string $id = null,
 		array $extension = [],
 	) {
@@ -21,7 +21,7 @@ class OfficialAddressExtension extends \Ardenexal\FHIRTools\Component\Models\R4\
 		    id: $id,
 		    extension: $extension,
 		    url: 'http://hl7.org/fhir/StructureDefinition/address-official',
-		    value: $this->value,
+		    value: $value,
 		);
 	}
 }

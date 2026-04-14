@@ -14,24 +14,24 @@ class TargetInvariantExtension extends \Ardenexal\FHIRTools\Component\Models\R4\
 		/** @var IdPrimitive key Unique identifier */
 		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'id', propertyKind: 'primitive')]
 		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\IdPrimitive $key,
-		/** @var StringPrimitive|null requirements Why the invariant is defined */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive $requirements = null,
 		/** @var CodePrimitive severity error | warning */
 		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
 		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive $severity,
 		/** @var Expression expression The invariant expression */
 		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Expression', propertyKind: 'complex')]
 		public \Ardenexal\FHIRTools\Component\Models\R4\DataType\Expression $expression,
+		/** @var StringPrimitive|null requirements Why the invariant is defined */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive $requirements = null,
 		?string $id = null,
 	) {
 		$subExtensions = [];
 		$subExtensions[] = new Extension(url: 'key', value: $this->key);
+		$subExtensions[] = new Extension(url: 'severity', value: $this->severity);
+		$subExtensions[] = new Extension(url: 'expression', value: $this->expression);
 		if ($this->requirements !== null) {
 		    $subExtensions[] = new Extension(url: 'requirements', value: $this->requirements);
 		}
-		$subExtensions[] = new Extension(url: 'severity', value: $this->severity);
-		$subExtensions[] = new Extension(url: 'expression', value: $this->expression);
 		parent::__construct(
 		    id: $id,
 		    extension: $subExtensions,

@@ -298,10 +298,10 @@ class FHIRExtensionGenerator
             array_unique($phpTypes),
         ));
 
-        $param = $constructor->addPromotedParameter('value')
-            ->setPublic()
-            ->setType($phpTypes[0])
-            ->setNullable(true)
+        // Use a regular (non-promoted) parameter to avoid redeclaring the parent Extension::$value
+        // property with a narrower type, which PHP rejects as a property type invariance violation.
+        $param = $constructor->addParameter('value')
+            ->setType($unionType)
             ->setDefaultValue(null);
         $param->addAttribute(FhirProperty::class, [
             'fhirType'     => 'choice',
@@ -323,7 +323,7 @@ class FHIRExtensionGenerator
             "    id: \$id,\n" .
             "    extension: \$extension,\n" .
             "    url: '{$url}',\n" .
-            "    value: \$this->value,\n" .
+            "    value: \$value,\n" .
             ');',
         );
     }
@@ -348,6 +348,16 @@ class FHIRExtensionGenerator
         ?ErrorCollector $errorCollector = null,
     ): void {
         $slices    = $this->collectSlices($elements, $version, $context, $namespace, $errorCollector);
+
+        // PHP deprecates optional parameters appearing before required ones (E_DEPRECATED).
+        // Sort slices so non-nullable/non-array (required) ones come first.
+        usort($slices, static function (array $a, array $b): int {
+            $aRequired = $a['isRequired'] && !$a['isArray'];
+            $bRequired = $b['isRequired'] && !$b['isArray'];
+
+            return ($bRequired ? 1 : 0) <=> ($aRequired ? 1 : 0);
+        });
+
         $bodyLines = ['$subExtensions = [];'];
 
         foreach ($slices as $sliceData) {

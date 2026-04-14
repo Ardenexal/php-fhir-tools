@@ -13,7 +13,7 @@ class SpecProcessingTimeExtension extends \Ardenexal\FHIRTools\Component\Models\
 	public function __construct(
 		/** @var Period|Duration|null value Value of extension (\Ardenexal\FHIRTools\Component\Models\R4\DataType\Period|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Duration|null) */
 		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'choice', propertyKind: 'choice', isChoice: true)]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Period $value = null,
+		\Ardenexal\FHIRTools\Component\Models\R4\DataType\Period|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Duration|null $value = null,
 		?string $id = null,
 		array $extension = [],
 	) {
@@ -21,7 +21,7 @@ class SpecProcessingTimeExtension extends \Ardenexal\FHIRTools\Component\Models\
 		    id: $id,
 		    extension: $extension,
 		    url: 'http://hl7.org/fhir/StructureDefinition/specimen-processingTime',
-		    value: $this->value,
+		    value: $value,
 		);
 	}
 }

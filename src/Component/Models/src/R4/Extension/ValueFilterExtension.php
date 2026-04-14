@@ -11,28 +11,28 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 class ValueFilterExtension extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension implements \Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface
 {
 	public function __construct(
+		/** @var CodePrimitive comparator Extension */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive $comparator,
 		/** @var StringPrimitive|null path Extension */
 		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
 		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive $path = null,
 		/** @var StringPrimitive|null searchParam Extension */
 		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
 		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive $searchParam = null,
-		/** @var CodePrimitive comparator Extension */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
-		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive $comparator,
 		/** @var bool|null valueSlice Extension */
 		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
 		public ?bool $valueSlice = null,
 		?string $id = null,
 	) {
 		$subExtensions = [];
+		$subExtensions[] = new Extension(url: 'comparator', value: $this->comparator);
 		if ($this->path !== null) {
 		    $subExtensions[] = new Extension(url: 'path', value: $this->path);
 		}
 		if ($this->searchParam !== null) {
 		    $subExtensions[] = new Extension(url: 'searchParam', value: $this->searchParam);
 		}
-		$subExtensions[] = new Extension(url: 'comparator', value: $this->comparator);
 		if ($this->valueSlice !== null) {
 		    $subExtensions[] = new Extension(url: 'value', value: $this->valueSlice);
 		}

@@ -13,7 +13,7 @@ class FMHAbatementExtension extends \Ardenexal\FHIRTools\Component\Models\R4\Dat
 	public function __construct(
 		/** @var DatePrimitive|Age|bool|null value Value of extension (\Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Age|bool|null) */
 		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'choice', propertyKind: 'choice', isChoice: true)]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive $value = null,
+		\Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Age|bool|null $value = null,
 		?string $id = null,
 		array $extension = [],
 	) {
@@ -21,7 +21,7 @@ class FMHAbatementExtension extends \Ardenexal\FHIRTools\Component\Models\R4\Dat
 		    id: $id,
 		    extension: $extension,
 		    url: 'http://hl7.org/fhir/StructureDefinition/familymemberhistory-abatement',
-		    value: $this->value,
+		    value: $value,
 		);
 	}
 }

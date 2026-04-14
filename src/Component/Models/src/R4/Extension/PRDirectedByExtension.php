@@ -13,7 +13,7 @@ class PRDirectedByExtension extends \Ardenexal\FHIRTools\Component\Models\R4\Dat
 	public function __construct(
 		/** @var CodeableConcept|Reference|null value Value of extension (\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference|null) */
 		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'choice', propertyKind: 'choice', isChoice: true)]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept $value = null,
+		\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference|null $value = null,
 		?string $id = null,
 		array $extension = [],
 	) {
@@ -21,7 +21,7 @@ class PRDirectedByExtension extends \Ardenexal\FHIRTools\Component\Models\R4\Dat
 		    id: $id,
 		    extension: $extension,
 		    url: 'http://hl7.org/fhir/StructureDefinition/procedure-directedBy',
-		    value: $this->value,
+		    value: $value,
 		);
 	}
 }

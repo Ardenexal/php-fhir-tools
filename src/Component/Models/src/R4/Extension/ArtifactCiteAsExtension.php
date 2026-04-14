@@ -13,7 +13,7 @@ class ArtifactCiteAsExtension extends \Ardenexal\FHIRTools\Component\Models\R4\D
 	public function __construct(
 		/** @var Reference|MarkdownPrimitive|null value Value of extension (\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive|null) */
 		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'choice', propertyKind: 'choice', isChoice: true)]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference $value = null,
+		\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive|null $value = null,
 		?string $id = null,
 		array $extension = [],
 	) {
@@ -21,7 +21,7 @@ class ArtifactCiteAsExtension extends \Ardenexal\FHIRTools\Component\Models\R4\D
 		    id: $id,
 		    extension: $extension,
 		    url: 'http://hl7.org/fhir/StructureDefinition/artifact-citeAs',
-		    value: $this->value,
+		    value: $value,
 		);
 	}
 }

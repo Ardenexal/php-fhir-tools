@@ -14,47 +14,84 @@ use Symfony\Component\Finder\Finder;
 /**
  * Populates FHIRIGTypeRegistry at container compile time.
  *
- * When both `fhir.ig.output_directory` and `fhir.ig.namespace` are configured, this pass
- * scans the output directory for PHP files, derives their fully-qualified class name from
- * the namespace and the file's relative path, and reads #[FHIRExtensionDefinition] /
- * #[FHIRProfile] attributes via reflection to build the extension and profile maps.
+ * Builds extension and profile URL → typed PHP class mappings from two sources:
  *
- * Requires the IG classes to be autoloadable (composer dump-autoload must have been run
- * after the IG directory and namespace were added to composer.json). Classes that cannot
- * be loaded are silently skipped.
+ * 1. **IG output directory** (`fhir.ig.output_directory`) — user-generated IG classes
+ *    (e.g. AU Base extensions, US Core profiles). Classes are discovered via the configured
+ *    `fhir.ig.namespace` combined with each file's relative path.
+ *
+ * 2. **Base models extension directories** — typed extension classes generated from base
+ *    FHIR packages (e.g. `hl7.fhir.uv.extensions.r4`) and stored in the Models component
+ *    under `Models/src/{R4,R4B,R5}/Extension/`. The directories are auto-detected at compile
+ *    time via reflection on known sentinel DataType classes — no additional configuration
+ *    is needed.
+ *
+ * Requires IG and Models classes to be autoloadable (run `composer dump-autoload` after
+ * generating classes). Classes that cannot be loaded are silently skipped.
  *
  * @author Ardenexal
  */
 class FHIRIGRegistryCompilerPass implements CompilerPassInterface
 {
+    /**
+     * Known base FHIR versions and the sentinel DataType\Extension class used to locate
+     * each version's Extension directory via reflection.
+     *
+     * @var array<string, class-string>
+     */
+    private const array BASE_VERSION_SENTINELS = [
+        'R4'  => 'Ardenexal\\FHIRTools\\Component\\Models\\R4\\DataType\\Extension',
+        'R4B' => 'Ardenexal\\FHIRTools\\Component\\Models\\R4B\\DataType\\Extension',
+        'R5'  => 'Ardenexal\\FHIRTools\\Component\\Models\\R5\\DataType\\Extension',
+    ];
+
     public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition(FHIRIGTypeRegistry::class)) {
             return;
         }
 
-        $outputDir  = $container->getParameter('fhir.ig.output_directory');
-        $namespace  = $container->getParameter('fhir.ig.namespace');
-
-        if (!is_string($outputDir) || $outputDir === '' || !is_string($namespace) || $namespace === '') {
-            return;
-        }
-
-        if (!is_dir($outputDir)) {
-            return;
-        }
-
         $extensionMappings = [];
         $profileMappings   = [];
 
+        // 1. Scan user IG output directory (IG-specific extensions and profiles).
+        $outputDir = $container->getParameter('fhir.ig.output_directory');
+        $namespace = $container->getParameter('fhir.ig.namespace');
+
+        if (is_string($outputDir) && $outputDir !== '' && is_string($namespace) && $namespace !== '' && is_dir($outputDir)) {
+            $this->scanDirectoryIntoMappings($outputDir, $namespace, $extensionMappings, $profileMappings);
+        }
+
+        // 2. Scan base models Extension directories for each supported FHIR version.
+        //    Base extension classes (e.g. PGenderIdentityExtension) live here and also
+        //    carry #[FHIRExtensionDefinition] attributes that must be registered so the
+        //    deserializer can resolve them to their typed classes.
+        foreach ($this->resolveBaseExtensionDirectories() as $dir => $ns) {
+            $this->scanDirectoryIntoMappings($dir, $ns, $extensionMappings, $profileMappings);
+        }
+
+        $registryDef = $container->getDefinition(FHIRIGTypeRegistry::class);
+        $registryDef->setArgument('$extensionMappings', $extensionMappings);
+        $registryDef->setArgument('$profileMappings', $profileMappings);
+    }
+
+    /**
+     * Scan a directory for PHP files and populate URL→class mappings using
+     * #[FHIRExtensionDefinition] and #[FHIRProfile] attributes.
+     *
+     * @param array<string, class-string> $extensionMappings
+     * @param array<string, class-string> $profileMappings
+     */
+    private function scanDirectoryIntoMappings(
+        string $directory,
+        string $namespace,
+        array &$extensionMappings,
+        array &$profileMappings,
+    ): void {
         $finder = new Finder();
-        $finder->files()->in($outputDir)->name('*.php')->sortByName();
+        $finder->files()->in($directory)->name('*.php')->sortByName();
 
         foreach ($finder as $file) {
-            // Derive FQCN from namespace + relative path, e.g.:
-            //   namespace = "App\FHIR\IG"
-            //   relative  = "R4/UsCore/Extension/PatientBirthPlaceExtension.php"
-            //   class     = "App\FHIR\IG\R4\UsCore\Extension\PatientBirthPlaceExtension"
             $relativePath = $file->getRelativePathname();
             $classSuffix  = str_replace(['/', '\\', DIRECTORY_SEPARATOR], '\\', $relativePath);
             $classSuffix  = preg_replace('/\.php$/i', '', $classSuffix) ?? $classSuffix;
@@ -64,25 +101,61 @@ class FHIRIGRegistryCompilerPass implements CompilerPassInterface
                 continue; // Autoloader not configured for this path — skip gracefully.
             }
 
-            $refl = new \ReflectionClass($className);
-
+            $refl     = new \ReflectionClass($className);
             $extAttrs = $refl->getAttributes(FHIRExtensionDefinition::class);
+
             if (!empty($extAttrs)) {
                 /** @var FHIRExtensionDefinition $attr */
-                $attr                            = $extAttrs[0]->newInstance();
-                $extensionMappings[$attr->url]   = $className;
+                $attr                          = $extAttrs[0]->newInstance();
+                $extensionMappings[$attr->url] = $className;
             }
 
             $profAttrs = $refl->getAttributes(FHIRProfile::class);
+
             if (!empty($profAttrs)) {
                 /** @var FHIRProfile $attr */
-                $attr                                  = $profAttrs[0]->newInstance();
-                $profileMappings[$attr->profileUrl]    = $className;
+                $attr                            = $profAttrs[0]->newInstance();
+                $profileMappings[$attr->profileUrl] = $className;
             }
         }
+    }
 
-        $registryDef = $container->getDefinition(FHIRIGTypeRegistry::class);
-        $registryDef->setArgument('$extensionMappings', $extensionMappings);
-        $registryDef->setArgument('$profileMappings', $profileMappings);
+    /**
+     * Auto-detect base models Extension directories for each supported FHIR version.
+     *
+     * Uses reflection on known sentinel DataType\Extension classes to find their source
+     * files, then resolves the sibling Extension/ directory. This works in both the
+     * monorepo and consumer apps where the Models component is installed via Composer.
+     *
+     * @return array<string, string> directory path → namespace root
+     */
+    private function resolveBaseExtensionDirectories(): array
+    {
+        $dirs = [];
+
+        foreach (self::BASE_VERSION_SENTINELS as $version => $sentinelClass) {
+            if (!class_exists($sentinelClass)) {
+                continue; // Models for this version not installed — skip.
+            }
+
+            $sentinelFile = (new \ReflectionClass($sentinelClass))->getFileName();
+
+            if ($sentinelFile === false) {
+                continue;
+            }
+
+            // sentinel is in …/Models/src/{version}/DataType/Extension.php
+            // Extension classes are in …/Models/src/{version}/Extension/
+            $extensionDir = dirname(dirname($sentinelFile)) . DIRECTORY_SEPARATOR . 'Extension';
+
+            if (!is_dir($extensionDir)) {
+                continue;
+            }
+
+            $namespace          = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\Extension";
+            $dirs[$extensionDir] = $namespace;
+        }
+
+        return $dirs;
     }
 }

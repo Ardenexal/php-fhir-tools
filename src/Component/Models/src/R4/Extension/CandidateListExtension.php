@@ -1,35 +1,27 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
-
 /**
- * @author Health Level Seven, Inc. - FHIR I WG
- *
+ * @author HL7 International / Orders and Observations
  * @see http://hl7.org/fhir/StructureDefinition/task-candidateList
- *
- * @description Identifies the individuals who are candidates for being the owner of the task.
+ * @description Identifies the individuals who are candidates for being the owner of the task. Use Task.requestedPerformer in R5+
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/task-candidateList', fhirVersion: 'R4')]
-class CandidateListExtension extends Extension
+#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/task-candidateList', fhirVersion: 'R4')]
+class CandidateListExtension extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension
 {
-    public function __construct(
-        /** @var Reference|null valueReference Value of extension */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
-        public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference $valueReference = null,
-        ?string $id = null,
-        array $extension = [],
-    ) {
-        parent::__construct(
-            id: $id,
-            extension: $extension,
-            url: 'http://hl7.org/fhir/StructureDefinition/task-candidateList',
-            value: $this->valueReference,
-        );
-    }
+	public function __construct(
+		/** @var Reference|null valueReference Value of extension */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference $valueReference = null,
+		?string $id = null,
+		array $extension = [],
+	) {
+		parent::__construct(
+		    id: $id,
+		    extension: $extension,
+		    url: 'http://hl7.org/fhir/StructureDefinition/task-candidateList',
+		    value: $this->valueReference,
+		);
+	}
 }

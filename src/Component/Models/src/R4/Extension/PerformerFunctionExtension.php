@@ -1,35 +1,27 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
-
 /**
- * @author Health Level Seven, Inc. - FHIR WG
- *
+ * @author HL7 International / FHIR Infrastructure
  * @see http://hl7.org/fhir/StructureDefinition/event-performerFunction
- *
  * @description Distinguishes the type of involvement of the performer in the event. For example, 'author',  'verifier' or 'responsible party'.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/event-performerFunction', fhirVersion: 'R4')]
-class PerformerFunctionExtension extends Extension
+#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/event-performerFunction', fhirVersion: 'R4')]
+class PerformerFunctionExtension extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension
 {
-    public function __construct(
-        /** @var CodeableConcept|null valueCodeableConcept Value of extension */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
-        public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept $valueCodeableConcept = null,
-        ?string $id = null,
-        array $extension = [],
-    ) {
-        parent::__construct(
-            id: $id,
-            extension: $extension,
-            url: 'http://hl7.org/fhir/StructureDefinition/event-performerFunction',
-            value: $this->valueCodeableConcept,
-        );
-    }
+	public function __construct(
+		/** @var CodeableConcept|null valueCodeableConcept Value of extension */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept $valueCodeableConcept = null,
+		?string $id = null,
+		array $extension = [],
+	) {
+		parent::__construct(
+		    id: $id,
+		    extension: $extension,
+		    url: 'http://hl7.org/fhir/StructureDefinition/event-performerFunction',
+		    value: $this->valueCodeableConcept,
+		);
+	}
 }

@@ -13,7 +13,7 @@ class ArtifactVersionAlgorithmExtension extends \Ardenexal\FHIRTools\Component\M
 	public function __construct(
 		/** @var StringPrimitive|Coding|null value Value of extension (\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding|null) */
 		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'choice', propertyKind: 'choice', isChoice: true)]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive $value = null,
+		\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding|null $value = null,
 		?string $id = null,
 		array $extension = [],
 	) {
@@ -21,7 +21,7 @@ class ArtifactVersionAlgorithmExtension extends \Ardenexal\FHIRTools\Component\M
 		    id: $id,
 		    extension: $extension,
 		    url: 'http://hl7.org/fhir/StructureDefinition/artifact-versionAlgorithm',
-		    value: $this->value,
+		    value: $value,
 		);
 	}
 }

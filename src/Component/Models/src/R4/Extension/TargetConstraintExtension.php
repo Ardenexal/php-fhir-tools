@@ -14,9 +14,6 @@ class TargetConstraintExtension extends \Ardenexal\FHIRTools\Component\Models\R4
 		/** @var IdPrimitive key Unique identifier */
 		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'id', propertyKind: 'primitive')]
 		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\IdPrimitive $key,
-		/** @var MarkdownPrimitive|null requirements Why the constraint is defined */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive $requirements = null,
 		/** @var CodePrimitive severity error | warning */
 		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
 		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive $severity,
@@ -26,6 +23,9 @@ class TargetConstraintExtension extends \Ardenexal\FHIRTools\Component\Models\R4
 		/** @var StringPrimitive human Human-readable rule */
 		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
 		public \Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive $human,
+		/** @var MarkdownPrimitive|null requirements Why the constraint is defined */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive $requirements = null,
 		/** @var array<StringPrimitive> location Relative path to elements */
 		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
 		public array $location = [],
@@ -33,12 +33,12 @@ class TargetConstraintExtension extends \Ardenexal\FHIRTools\Component\Models\R4
 	) {
 		$subExtensions = [];
 		$subExtensions[] = new Extension(url: 'key', value: $this->key);
-		if ($this->requirements !== null) {
-		    $subExtensions[] = new Extension(url: 'requirements', value: $this->requirements);
-		}
 		$subExtensions[] = new Extension(url: 'severity', value: $this->severity);
 		$subExtensions[] = new Extension(url: 'expression', value: $this->expression);
 		$subExtensions[] = new Extension(url: 'human', value: $this->human);
+		if ($this->requirements !== null) {
+		    $subExtensions[] = new Extension(url: 'requirements', value: $this->requirements);
+		}
 		foreach ($this->location as $v) {
 		    $subExtensions[] = new Extension(url: 'location', value: $v);
 		}

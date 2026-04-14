@@ -11,19 +11,19 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 class QOptionRestrictionExtension extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension implements \Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface
 {
 	public function __construct(
-		/** @var array<int> option Option to exclude */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'integer', propertyKind: 'scalar', isArray: true)]
-		public array $option = [],
 		/** @var Expression expression Expression to trigger exclusion */
 		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Expression', propertyKind: 'complex')]
 		public \Ardenexal\FHIRTools\Component\Models\R4\DataType\Expression $expression,
+		/** @var array<int> option Option to exclude */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'integer', propertyKind: 'scalar', isArray: true)]
+		public array $option = [],
 		?string $id = null,
 	) {
 		$subExtensions = [];
+		$subExtensions[] = new Extension(url: 'expression', value: $this->expression);
 		foreach ($this->option as $v) {
 		    $subExtensions[] = new Extension(url: 'option', value: $v);
 		}
-		$subExtensions[] = new Extension(url: 'expression', value: $this->expression);
 		parent::__construct(
 		    id: $id,
 		    extension: $subExtensions,

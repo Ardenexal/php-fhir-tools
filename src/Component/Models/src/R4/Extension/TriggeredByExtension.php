@@ -13,7 +13,7 @@ class TriggeredByExtension extends \Ardenexal\FHIRTools\Component\Models\R4\Data
 	public function __construct(
 		/** @var CanonicalPrimitive|Reference|UriPrimitive|null value Value of extension (\Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive|null) */
 		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'choice', propertyKind: 'choice', isChoice: true)]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive $value = null,
+		\Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive|\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive|null $value = null,
 		?string $id = null,
 		array $extension = [],
 	) {
@@ -21,7 +21,7 @@ class TriggeredByExtension extends \Ardenexal\FHIRTools\Component\Models\R4\Data
 		    id: $id,
 		    extension: $extension,
 		    url: 'http://hl7.org/fhir/StructureDefinition/workflow-triggeredBy',
-		    value: $this->value,
+		    value: $value,
 		);
 	}
 }

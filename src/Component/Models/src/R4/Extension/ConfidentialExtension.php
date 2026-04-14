@@ -13,7 +13,7 @@ class ConfidentialExtension extends \Ardenexal\FHIRTools\Component\Models\R4\Dat
 	public function __construct(
 		/** @var UriPrimitive|CodeableConcept|null value Value of extension (\Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept|null) */
 		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'choice', propertyKind: 'choice', isChoice: true)]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive $value = null,
+		\Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive|\Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept|null $value = null,
 		?string $id = null,
 		array $extension = [],
 	) {
@@ -21,7 +21,7 @@ class ConfidentialExtension extends \Ardenexal\FHIRTools\Component\Models\R4\Dat
 		    id: $id,
 		    extension: $extension,
 		    url: 'http://hl7.org/fhir/StructureDefinition/confidential',
-		    value: $this->value,
+		    value: $value,
 		);
 	}
 }

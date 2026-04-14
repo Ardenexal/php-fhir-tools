@@ -13,7 +13,7 @@ class ArtifactReferenceExtension extends \Ardenexal\FHIRTools\Component\Models\R
 	public function __construct(
 		/** @var Reference|CanonicalPrimitive|UriPrimitive|null value Value of extension (\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive|null) */
 		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'choice', propertyKind: 'choice', isChoice: true)]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference $value = null,
+		\Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive|\Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive|null $value = null,
 		?string $id = null,
 		array $extension = [],
 	) {
@@ -21,7 +21,7 @@ class ArtifactReferenceExtension extends \Ardenexal\FHIRTools\Component\Models\R
 		    id: $id,
 		    extension: $extension,
 		    url: 'http://hl7.org/fhir/StructureDefinition/artifact-reference',
-		    value: $this->value,
+		    value: $value,
 		);
 	}
 }

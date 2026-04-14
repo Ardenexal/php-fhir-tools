@@ -60,28 +60,62 @@ class PackageMetadata
     /**
      * Create PackageMetadata from package.json data
      *
+     * Raw FHIR version strings from package.json (e.g. "4.0.1") are normalized
+     * to the named forms used throughout this toolkit ("R4", "R4B", "R5").
+     *
      * @param array<string, mixed> $packageData Raw package.json data
      *
      * @return self The created PackageMetadata instance
      */
     public static function fromPackageData(array $packageData): self
     {
+        $rawVersions = $packageData['fhirVersions'] ?? [];
+
         return new self(
-            name: $packageData['name']                 ?? '',
-            version: $packageData['version']           ?? '',
-            fhirVersions: $packageData['fhirVersions'] ?? [],
-            url: $packageData['url']                   ?? '',
-            description: $packageData['description']   ?? '',
-            author: $packageData['author']             ?? '',
-            license: $packageData['license']           ?? '',
+            name: $packageData['name']       ?? '',
+            version: $packageData['version'] ?? '',
+            fhirVersions: array_values(array_unique(
+                array_map(
+                    static fn (string $v): string => self::normalizeFhirVersion($v),
+                    array_filter($rawVersions, static fn (mixed $v): bool => is_string($v)),
+                ),
+            )),
+            url: $packageData['url']               ?? '',
+            description: $packageData['description'] ?? '',
+            author: $packageData['author']           ?? '',
+            license: $packageData['license']         ?? '',
             dependencies: $packageData['dependencies'] ?? [],
-            title: $packageData['title']               ?? $packageData['name'] ?? '',
-            checksum: $packageData['checksum']         ?? null,
+            title: $packageData['title']             ?? $packageData['name'] ?? '',
+            checksum: $packageData['checksum']       ?? null,
             additionalData: array_diff_key($packageData, array_flip([
                 'name', 'version', 'fhirVersions', 'url', 'description',
                 'author', 'license', 'dependencies', 'title', 'checksum',
             ])),
         );
+    }
+
+    /**
+     * Normalize a raw FHIR version string from package.json to the named form
+     * expected by generators ("R4", "R4B", "R5").
+     *
+     * FHIR packages use numeric version strings that correspond to spec releases:
+     *   4.0.x → R4   (e.g. "4.0.1", "4.0.0")
+     *   4.3.x → R4B  (e.g. "4.3.0")
+     *   5.0.x → R5   (e.g. "5.0.0", "5.0.0-snapshot3")
+     *
+     * Named forms that are already normalized ("R4", "R4B", "R5") pass through
+     * unchanged, as do any unknown strings, to avoid breaking forward-compatibility
+     * with future FHIR versions.
+     */
+    private static function normalizeFhirVersion(string $version): string
+    {
+        return match (true) {
+            $version === 'R4' || $version === 'R4B' || $version === 'R5' => $version,
+            str_starts_with($version, '4.0')                             => 'R4',
+            str_starts_with($version, '4.3')                             => 'R4B',
+            str_starts_with($version, '5.0')                             => 'R5',
+            default                                                       => $version,
+        };
     }
 
     /**
