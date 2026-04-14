@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\CodeGeneration\Command;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
-use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\PackageException;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRExtensionGenerator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator;
@@ -141,11 +140,11 @@ class FHIRIGGeneratorCommand extends Command
         ?string $igBaseNamespace = null,
     ) {
         parent::__construct();
-        $this->filesystem        = $filesystem;
-        $this->packageLoader     = $packageLoader;
+        $this->filesystem         = $filesystem;
+        $this->packageLoader      = $packageLoader;
         $this->configuredPackages = array_values($configuredPackages);
-        $this->offlineByDefault  = $offlineByDefault;
-        $this->igOutputDirectory = ($igOutputDirectory !== '' && $igOutputDirectory !== null)
+        $this->offlineByDefault   = $offlineByDefault;
+        $this->igOutputDirectory  = ($igOutputDirectory !== '' && $igOutputDirectory !== null)
             ? $igOutputDirectory
             : null;
         $this->igBaseNamespace   = ($igBaseNamespace !== '' && $igBaseNamespace !== null)
@@ -183,7 +182,7 @@ class FHIRIGGeneratorCommand extends Command
 
         if (empty($effectivePackages)) {
             $output->writeln(
-                '<error>No packages specified. Use --package=hl7.fhir.au.base or configure fhir.ig.packages in your bundle configuration.</error>'
+                '<error>No packages specified. Use --package=hl7.fhir.au.base or configure fhir.ig.packages in your bundle configuration.</error>',
             );
 
             return Command::FAILURE;
@@ -273,6 +272,30 @@ class FHIRIGGeneratorCommand extends Command
             $this->loadBasePackages($output, $fhirVersion, $offlineMode);
             $this->generateBaseTypesInMemory($output, $fhirVersion);
 
+            // Load the full transitive dependency tree of all IG packages into context.
+            // Dependency packages are only used for type resolution — no PHP files are written
+            // for them. Pre-mark the explicitly listed IG packages as already handled so they
+            // are not re-loaded as deps (generateIGPackage handles them with file writing).
+            //
+            // NOTE: if an IG package A depends on another IG package B that is also in the
+            // user's --package list, A's dep-loader skips B (pre-marked). This means A relies
+            // on generateIGPackage(B) having already registered B's types before A is
+            // generated. This works correctly as long as packages are listed in dependency
+            // order (B before A). Listing them out of order will produce fallback FQCNs with
+            // a warning rather than a hard error.
+            $depLoaded = [];
+            foreach ($igData as $ig) {
+                $depLoaded[$ig['metadata']->getName()] = true;
+            }
+
+            foreach ($igData as $ig) {
+                if (!in_array($fhirVersion, $ig['metadata']->getFhirVersions(), true)) {
+                    continue;
+                }
+
+                $this->loadDependencyPackagesIntoContext($output, $ig['metadata'], $fhirVersion, $offlineMode, $depLoaded);
+            }
+
             // Process each IG package in the order specified (dependency order)
             foreach ($igData as $ig) {
                 $versionMatch = in_array($fhirVersion, $ig['metadata']->getFhirVersions(), true);
@@ -297,6 +320,13 @@ class FHIRIGGeneratorCommand extends Command
             $output->writeln($this->errorCollector->getDetailedOutput());
 
             return Command::FAILURE;
+        }
+
+        if ($this->errorCollector->hasWarnings()) {
+            $output->writeln('<comment>Generation warnings:</comment>');
+            foreach ($this->errorCollector->getWarnings() as $warning) {
+                $output->writeln("  <comment>[WARN] {$warning['message']}</comment>");
+            }
         }
 
         $output->writeln('<info>IG class generation completed successfully!</info>');
@@ -375,7 +405,7 @@ class FHIRIGGeneratorCommand extends Command
                 continue;
             }
 
-            $kind = $def['kind'] ?? '';
+            $kind     = $def['kind'] ?? '';
             $targetNs = match ($kind) {
                 'resource'       => $resourceNs,
                 'complex-type'   => $datatypeNs,
@@ -460,12 +490,12 @@ class FHIRIGGeneratorCommand extends Command
 
             try {
                 if ($type === 'Extension') {
-                    $class = $extensionGenerator->generate($def, $version, $this->context[$version], $extensionNs);
+                    $class = $extensionGenerator->generate($def, $version, $this->context[$version], $extensionNs, $this->errorCollector);
                     $this->context[$version]->addType($url, $extensionNs->getName(), $class);
                     $generated[] = ['class' => $class, 'namespace' => $extensionNs, 'category' => 'Extension'];
                     $output->writeln("    Extension: <comment>{$class->getName()}</comment>");
                 } elseif (in_array($kind, ['resource', 'complex-type'], true)) {
-                    $class = $profileGenerator->generate($def, $version, $this->context[$version], $profileNs);
+                    $class = $profileGenerator->generate($def, $version, $this->context[$version], $profileNs, $this->errorCollector);
                     $this->context[$version]->addType($url, $profileNs->getName(), $class);
                     $generated[] = ['class' => $class, 'namespace' => $profileNs, 'category' => 'Profile'];
                     $output->writeln("    Profile:   <comment>{$class->getName()}</comment>");
@@ -484,7 +514,7 @@ class FHIRIGGeneratorCommand extends Command
         $extCount     = count(array_filter($generated, fn ($g) => $g['category'] === 'Extension'));
         $profileCount = count(array_filter($generated, fn ($g) => $g['category'] === 'Profile'));
         $output->writeln(
-            "  <info>Generated {$extCount} extension(s) and {$profileCount} profile(s) for {$slug}.</info>"
+            "  <info>Generated {$extCount} extension(s) and {$profileCount} profile(s) for {$slug}.</info>",
         );
     }
 
@@ -517,7 +547,7 @@ class FHIRIGGeneratorCommand extends Command
         string $category,
     ): void {
         $outputPath = Path::canonicalize(
-            $this->resolveIGBasePath() . "/{$version}/{$slug}/{$category}/{$class->getName()}.php"
+            $this->resolveIGBasePath() . "/{$version}/{$slug}/{$category}/{$class->getName()}.php",
         );
 
         $directory = dirname($outputPath);
@@ -589,5 +619,129 @@ class FHIRIGGeneratorCommand extends Command
             static fn (string $p): string => u($p)->title(allWords: false)->toString(),
             array_values($meaningful),
         ));
+    }
+
+    /**
+     * Recursively install and load the full transitive dependency tree of an IG package into
+     * the per-version BuilderContext for type resolution.
+     *
+     * Dependencies are loaded into context (definitions + in-memory type registry) but no PHP
+     * files are written to disk. This allows extension/profile generators to resolve
+     * cross-package type references via BuilderContext::getType() during IG class generation.
+     *
+     * Packages already covered by BASE_PACKAGES (core FHIR types, terminology) are skipped
+     * since they are loaded separately by loadBasePackages(). The $loaded set prevents
+     * re-processing the same package across multiple recursion branches.
+     *
+     * @param array<string, bool> $loaded Visited package names — mutated in place to track progress
+     */
+    private function loadDependencyPackagesIntoContext(
+        OutputInterface $output,
+        PackageMetadata $metadata,
+        string $version,
+        bool $offlineMode,
+        array &$loaded,
+    ): void {
+        $basePackageNames = array_map(
+            static fn (string $spec): string => explode('#', $spec, 2)[0],
+            self::BASE_PACKAGES[$version] ?? [],
+        );
+
+        foreach ($metadata->getDependencies() as $depName => $depConstraint) {
+            if (isset($loaded[$depName])) {
+                continue;
+            }
+
+            if (in_array($depName, $basePackageNames, true)) {
+                continue;
+            }
+
+            $loaded[$depName] = true;
+
+            try {
+                $depMetadata = $this->packageLoader->installPackage(
+                    packageName: $depName,
+                    version: $depConstraint !== '' ? $depConstraint : null,
+                    registry: null,
+                    resolveDeps: false,
+                    offlineMode: $offlineMode,
+                );
+                $definitions = $this->packageLoader->loadPackageStructureDefinitions($depMetadata);
+
+                // Merge dep definitions into context so type lookups can find them
+                $this->context[$version]->loadDefinitions($definitions);
+
+                // Recurse FIRST (depth-first post-order) so that this dep's own transitive
+                // dependencies are already in context before we generate this dep's classes.
+                // Without this ordering, a package B whose StructureDefinitions reference
+                // types from package C would produce fallback FQCNs for C's types.
+                $this->loadDependencyPackagesIntoContext($output, $depMetadata, $version, $offlineMode, $loaded);
+
+                // Now all transitive types are registered; generate this dep's classes.
+                $this->registerDepTypesInContext($version, $definitions, $depName);
+
+                if ($output->isVerbose()) {
+                    $output->writeln("    Loaded dependency <comment>{$depName}</comment> into context");
+                }
+            } catch (\Throwable $e) {
+                $output->writeln(
+                    "<comment>  Warning: could not load dependency {$depName}: {$e->getMessage()}</comment>",
+                );
+            }
+        }
+    }
+
+    /**
+     * Generate in-memory extension and profile classes for a dependency package and register
+     * them in the per-version BuilderContext.
+     *
+     * No PHP files are written to disk. The registered class info (FQCN + namespace) mirrors
+     * what would be written if the user ran `fhir:generate-ig --package={depName}` — so any
+     * IG that references these types will emit the correct PHP class names.
+     *
+     * @param array<string, array<string, mixed>> $definitions Definitions from the dep package
+     */
+    private function registerDepTypesInContext(string $version, array $definitions, string $depName): void
+    {
+        $slug        = $this->derivePackageSlug($depName);
+        $baseNs      = $this->igBaseNamespace . "\\{$version}\\{$slug}";
+        $extensionNs = new PhpNamespace("{$baseNs}\\Extension");
+        $profileNs   = new PhpNamespace("{$baseNs}\\Profile");
+
+        $extensionGenerator = new FHIRExtensionGenerator();
+        $profileGenerator   = new FHIRProfileGenerator();
+
+        foreach ($definitions as $url => $def) {
+            if (($def['resourceType'] ?? '') !== 'StructureDefinition') {
+                continue;
+            }
+
+            if (($def['derivation'] ?? '') !== 'constraint' || ($def['kind'] ?? '') === 'logical') {
+                continue;
+            }
+
+            // Skip if already registered (e.g. from an earlier dep in the same tree)
+            if ($this->context[$version]->getType($url) !== null) {
+                continue;
+            }
+
+            try {
+                $type = $def['type'] ?? '';
+                $kind = $def['kind'] ?? '';
+
+                if ($type === 'Extension') {
+                    $class = $extensionGenerator->generate($def, $version, $this->context[$version], $extensionNs, $this->errorCollector);
+                    $this->context[$version]->addType($url, $extensionNs->getName(), $class);
+                } elseif (in_array($kind, ['resource', 'complex-type'], true)) {
+                    $class = $profileGenerator->generate($def, $version, $this->context[$version], $profileNs, $this->errorCollector);
+                    $this->context[$version]->addType($url, $profileNs->getName(), $class);
+                }
+            } catch (\Throwable $e) {
+                $this->errorCollector->addWarning(
+                    "Could not register dependency type '{$url}' from '{$depName}': {$e->getMessage()}",
+                    $url,
+                );
+            }
+        }
     }
 }

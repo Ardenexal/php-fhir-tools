@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;
+use Nette\PhpGenerator\Method;
 
 use function Symfony\Component\String\u;
 
@@ -89,8 +90,9 @@ class FHIRExtensionGenerator
      *
      * @param array<string, mixed> $structureDefinition StructureDefinition with type=Extension, derivation=constraint
      * @param string               $version             FHIR version (e.g. 'R4')
-     * @param BuilderContext        $context             Builder context for type resolution
-     * @param PhpNamespace          $namespace           Target namespace for the generated class
+     * @param BuilderContext       $context             Builder context for type resolution
+     * @param PhpNamespace         $namespace           Target namespace for the generated class
+     * @param ErrorCollector|null  $errorCollector      Optional collector for unresolvable-type warnings
      *
      * @return ClassType The generated PHP class
      */
@@ -99,8 +101,9 @@ class FHIRExtensionGenerator
         string $version,
         BuilderContext $context,
         PhpNamespace $namespace,
+        ?ErrorCollector $errorCollector = null,
     ): ClassType {
-        $url       = $structureDefinition['url'] ?? '';
+        $url       = $structureDefinition['url']  ?? '';
         $name      = $structureDefinition['name'] ?? 'UnknownExtension';
         $className = ClassNameResolver::resolveClassName($url, $name) . 'Extension';
 
@@ -127,9 +130,9 @@ class FHIRExtensionGenerator
         $constructor = $class->addMethod('__construct');
 
         if ($this->isComplexExtension($elements)) {
-            $this->buildComplexConstructor($constructor, $elements, $version, $context, $namespace, $extensionFqcn, $url);
+            $this->buildComplexConstructor($constructor, $elements, $version, $context, $namespace, $extensionFqcn, $url, $errorCollector);
         } else {
-            $this->buildSimpleConstructor($constructor, $elements, $version, $context, $namespace, $url);
+            $this->buildSimpleConstructor($constructor, $elements, $version, $context, $namespace, $url, $errorCollector);
         }
 
         return $class;
@@ -169,12 +172,13 @@ class FHIRExtensionGenerator
      * @param array<int, mixed> $elements
      */
     private function buildSimpleConstructor(
-        \Nette\PhpGenerator\Method $constructor,
+        Method $constructor,
         array $elements,
         string $version,
         BuilderContext $context,
         PhpNamespace $namespace,
         string $url,
+        ?ErrorCollector $errorCollector = null,
     ): void {
         // Find the value[x] element
         $valueElement = $this->findValueElement($elements);
@@ -185,7 +189,7 @@ class FHIRExtensionGenerator
             if (count($types) === 1) {
                 // Single concrete type: generate a named, typed property
                 $code      = $types[0]['code'] ?? 'string';
-                $phpType   = $this->resolvePhpType($code, $version, $context);
+                $phpType   = $this->resolvePhpType($code, $version, $context, $errorCollector);
                 $paramName = 'value' . u($code)->pascal()->toString();
                 $shortDesc = $valueElement['short'] ?? 'Value of extension';
 
@@ -222,7 +226,7 @@ class FHIRExtensionGenerator
                     "    extension: \$extension,\n" .
                     "    url: '{$url}',\n" .
                     "    value: \$this->{$paramName},\n" .
-                    ");"
+                    ');',
                 );
 
                 return;
@@ -230,7 +234,7 @@ class FHIRExtensionGenerator
 
             if (count($types) > 1) {
                 // Multiple allowed types: expose as a generic value property
-                $this->buildMultiTypeValueConstructor($constructor, $types, $version, $context, $namespace, $url);
+                $this->buildMultiTypeValueConstructor($constructor, $types, $version, $context, $namespace, $url, $errorCollector);
 
                 return;
             }
@@ -250,7 +254,7 @@ class FHIRExtensionGenerator
             "    id: \$id,\n" .
             "    extension: \$extension,\n" .
             "    url: '{$url}',\n" .
-            ");"
+            ');',
         );
     }
 
@@ -260,12 +264,13 @@ class FHIRExtensionGenerator
      * @param list<array{code: string}> $types
      */
     private function buildMultiTypeValueConstructor(
-        \Nette\PhpGenerator\Method $constructor,
+        Method $constructor,
         array $types,
         string $version,
         BuilderContext $context,
         PhpNamespace $namespace,
         string $url,
+        ?ErrorCollector $errorCollector = null,
     ): void {
         // Union of all allowed PHP types
         $phpTypes  = [];
@@ -273,7 +278,7 @@ class FHIRExtensionGenerator
 
         foreach ($types as $t) {
             $code        = $t['code'];
-            $phpTypes[]  = $this->resolvePhpType($code, $version, $context);
+            $phpTypes[]  = $this->resolvePhpType($code, $version, $context, $errorCollector);
             $fhirTypes[] = $code;
 
             $phpType = end($phpTypes);
@@ -314,7 +319,7 @@ class FHIRExtensionGenerator
             "    extension: \$extension,\n" .
             "    url: '{$url}',\n" .
             "    value: \$this->value,\n" .
-            ");"
+            ');',
         );
     }
 
@@ -328,13 +333,14 @@ class FHIRExtensionGenerator
      * @param array<int, mixed> $elements
      */
     private function buildComplexConstructor(
-        \Nette\PhpGenerator\Method $constructor,
+        Method $constructor,
         array $elements,
         string $version,
         BuilderContext $context,
         PhpNamespace $namespace,
         string $extensionFqcn,
         string $url,
+        ?ErrorCollector $errorCollector = null,
     ): void {
         // Collect slice definitions (Extension.extension elements with a sliceName)
         $slices = [];
@@ -357,7 +363,7 @@ class FHIRExtensionGenerator
             $isArray    = !in_array($maxValue, ['0', '1'], true);
             $isRequired = $minValue >= 1;
             $shortDesc  = $slice['short'] ?? $sliceName;
-            $sliceId    = $slice['id'] ?? "Extension.extension:{$sliceName}";
+            $sliceId    = $slice['id']    ?? "Extension.extension:{$sliceName}";
 
             // Find this slice's value[x] element to determine its PHP type
             $sliceValueElement = $this->findSliceValueElement($elements, $sliceId);
@@ -367,7 +373,7 @@ class FHIRExtensionGenerator
             if ($sliceValueElement !== null && !empty($sliceValueElement['type'])) {
                 $sliceCode = $sliceValueElement['type'][0]['code'] ?? null;
                 if ($sliceCode !== null) {
-                    $phpType = $this->resolvePhpType($sliceCode, $version, $context);
+                    $phpType = $this->resolvePhpType($sliceCode, $version, $context, $errorCollector);
                     if ($phpType !== 'bool' && $phpType !== 'int' && $phpType !== 'string') {
                         $namespace->addUse(ltrim($phpType, '\\'));
                     }
@@ -396,7 +402,7 @@ class FHIRExtensionGenerator
 
                 $bodyLines[] = "foreach (\$this->{$paramName} as \$v) {";
                 $bodyLines[] = "    \$subExtensions[] = new Extension(url: '{$sliceName}', value: \$v);";
-                $bodyLines[] = "}";
+                $bodyLines[] = '}';
             } else {
                 $resolvedType  = $phpType ?? 'string';
                 $shortType     = (string) u($resolvedType)->afterLast('\\');
@@ -405,8 +411,11 @@ class FHIRExtensionGenerator
                 $param = $constructor->addPromotedParameter($paramName)
                     ->setPublic()
                     ->setType($resolvedType)
-                    ->setNullable($nullability)
-                    ->setDefaultValue($nullability ? null : '');
+                    ->setNullable($nullability);
+
+                if ($nullability) {
+                    $param->setDefaultValue(null);
+                }
 
                 if ($sliceCode !== null) {
                     $param->addAttribute(FhirProperty::class, [
@@ -421,7 +430,7 @@ class FHIRExtensionGenerator
                 if ($nullability) {
                     $bodyLines[] = "if (\$this->{$paramName} !== null) {";
                     $bodyLines[] = "    \$subExtensions[] = new Extension(url: '{$sliceName}', value: \$this->{$paramName});";
-                    $bodyLines[] = "}";
+                    $bodyLines[] = '}';
                 } else {
                     $bodyLines[] = "\$subExtensions[] = new Extension(url: '{$sliceName}', value: \$this->{$paramName});";
                 }
@@ -504,24 +513,28 @@ class FHIRExtensionGenerator
      * Checks the BuilderContext first (covers any type already generated), then falls
      * back to the known namespace convention for primitive and data types.
      */
-    private function resolvePhpType(string $code, string $version, BuilderContext $context): string
+    private function resolvePhpType(string $code, string $version, BuilderContext $context, ?ErrorCollector $errorCollector = null): string
     {
         return match ($code) {
-            'boolean'                          => 'bool',
-            'integer'                          => 'int',
-            'decimal'                          => 'string',
+            'boolean'                                 => 'bool',
+            'integer'                                 => 'int',
+            'decimal'                                 => 'string',
             'http://hl7.org/fhirpath/System.Boolean'  => 'bool',
             'http://hl7.org/fhirpath/System.Integer'  => 'int',
             'http://hl7.org/fhirpath/System.Decimal'  => 'string',
             'http://hl7.org/fhirpath/System.String'   => 'string',
-            default                            => $this->resolveObjectPhpType($code, $version, $context),
+            default                                   => $this->resolveObjectPhpType($code, $version, $context, $errorCollector),
         };
     }
 
     /**
      * Resolve a non-scalar FHIR type code to a PHP class FQCN.
+     *
+     * When the type URL is not found in the BuilderContext (e.g. it belongs to a dependency
+     * package that could not be loaded), a pascal-cased fallback FQCN is returned and a
+     * warning is recorded via the ErrorCollector so the caller can surface it to the user.
      */
-    private function resolveObjectPhpType(string $code, string $version, BuilderContext $context): string
+    private function resolveObjectPhpType(string $code, string $version, BuilderContext $context, ?ErrorCollector $errorCollector = null): string
     {
         // Normalize to URL for context lookup
         $url = str_starts_with($code, 'http://') || str_starts_with($code, 'https://')
@@ -541,8 +554,18 @@ class FHIRExtensionGenerator
             return "\\{$baseNs}\\Primitive\\{$className}";
         }
 
-        // Assume DataType for unknown complex types
-        return "\\{$baseNs}\\DataType\\{$code}";
+        // Fallback: produce a valid pascal-cased PHP identifier and warn so the user knows
+        // this type could not be resolved (the package providing it may not be installed).
+        $className    = u($code)->pascal()->toString();
+        $fallbackFqcn = "\\{$baseNs}\\DataType\\{$className}";
+
+        $errorCollector?->addWarning(
+            "Could not resolve type URL '{$url}' — using fallback FQCN '{$fallbackFqcn}'. "
+            . 'Ensure the package providing this type is included in your --package list.',
+            $url,
+        );
+
+        return $fallbackFqcn;
     }
 
     /**

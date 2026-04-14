@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Component\CodeGeneration\tests\Unit\Generator;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRExtensionGenerator;
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;
 use PHPUnit\Framework\TestCase;
@@ -196,6 +196,97 @@ class FHIRExtensionGeneratorTest extends TestCase
         }
 
         self::assertTrue($found, 'FHIRExtensionDefinition attribute missing from complex extension class');
+    }
+
+    // -----------------------------------------------------------------
+    // Helpers
+    // -----------------------------------------------------------------
+
+    // -----------------------------------------------------------------
+    // Cross-package type resolution: unresolvable URL → warning + valid FQCN
+    // -----------------------------------------------------------------
+
+    public function testUnresolvableTypeUrlRecordsWarningInErrorCollector(): void
+    {
+        // A simple extension whose value[x] type is an external URL not in context
+        $sd = [
+            'resourceType' => 'StructureDefinition',
+            'url'          => 'http://example.org/fhir/StructureDefinition/test-ext',
+            'name'         => 'TestExt',
+            'type'         => 'Extension',
+            'derivation'   => 'constraint',
+            'kind'         => 'complex-type',
+            'snapshot'     => [
+                'element' => [
+                    ['path' => 'Extension', 'id' => 'Extension'],
+                    [
+                        'path' => 'Extension.value[x]',
+                        'id'   => 'Extension.value[x]',
+                        'max'  => '1',
+                        'type' => [['code' => 'http://hl7.org/fhir/StructureDefinition/individual-genderIdentity']],
+                    ],
+                ],
+            ],
+        ];
+
+        $errorCollector = new ErrorCollector();
+        $this->generator->generate($sd, 'R4', $this->context, $this->namespace, $errorCollector);
+
+        self::assertTrue($errorCollector->hasWarnings(), 'Expected a warning for unresolvable cross-package type URL');
+
+        $warnings = $errorCollector->getWarnings();
+        self::assertStringContainsString('individual-genderIdentity', $warnings[0]['message']);
+        self::assertStringContainsString('Could not resolve type URL', $warnings[0]['message']);
+    }
+
+    public function testUnresolvableTypeUrlFallbackProducesValidPhpIdentifier(): void
+    {
+        // Extension whose value type is a hyphenated cross-package URL not in context
+        $sd = [
+            'resourceType' => 'StructureDefinition',
+            'url'          => 'http://example.org/fhir/StructureDefinition/test-ext',
+            'name'         => 'TestExt',
+            'type'         => 'Extension',
+            'derivation'   => 'constraint',
+            'kind'         => 'complex-type',
+            'snapshot'     => [
+                'element' => [
+                    ['path' => 'Extension', 'id' => 'Extension'],
+                    [
+                        'path' => 'Extension.value[x]',
+                        'id'   => 'Extension.value[x]',
+                        'max'  => '1',
+                        'type' => [['code' => 'individual-genderIdentity']],
+                    ],
+                ],
+            ],
+        ];
+
+        $class       = $this->generator->generate($sd, 'R4', $this->context, $this->namespace);
+        $constructor = $class->getMethod('__construct');
+        $params      = $constructor->getParameters();
+
+        // The type hint must be a valid PHP identifier (no hyphens)
+        $valueParam = array_values(array_filter(
+            $params,
+            static fn ($p) => str_starts_with($p->getName(), 'value'),
+        ))[0] ?? null;
+
+        self::assertNotNull($valueParam, 'Expected a value parameter on the constructor');
+
+        $type = (string) $valueParam->getType();
+        self::assertStringNotContainsString('-', $type, 'Fallback FQCN must not contain hyphens');
+        self::assertStringContainsString('IndividualGenderIdentity', $type, 'Fallback FQCN should be pascal-cased');
+    }
+
+    public function testNoWarningWhenTypeIsResolvedFromContext(): void
+    {
+        // SimpleExtension uses Address, which is pre-registered in setUp()
+        $sd             = $this->loadFixture('SimpleExtension.json');
+        $errorCollector = new ErrorCollector();
+        $this->generator->generate($sd, 'R4', $this->context, $this->namespace, $errorCollector);
+
+        self::assertFalse($errorCollector->hasWarnings(), 'No warnings expected when type resolves from context');
     }
 
     // -----------------------------------------------------------------

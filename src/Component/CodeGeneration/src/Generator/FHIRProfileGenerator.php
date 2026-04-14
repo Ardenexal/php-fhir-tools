@@ -49,8 +49,9 @@ class FHIRProfileGenerator
      *
      * @param array<string, mixed> $structureDefinition StructureDefinition with derivation=constraint
      * @param string               $version             FHIR version (e.g. 'R4')
-     * @param BuilderContext        $context             Builder context for parent class resolution
-     * @param PhpNamespace          $namespace           Target namespace for the generated class
+     * @param BuilderContext       $context             Builder context for parent class resolution
+     * @param PhpNamespace         $namespace           Target namespace for the generated class
+     * @param ErrorCollector|null  $errorCollector      Optional collector for unresolvable-type warnings
      *
      * @return ClassType The generated PHP class
      *
@@ -61,12 +62,13 @@ class FHIRProfileGenerator
         string $version,
         BuilderContext $context,
         PhpNamespace $namespace,
+        ?ErrorCollector $errorCollector = null,
     ): ClassType {
-        $url               = $structureDefinition['url'] ?? '';
-        $name              = $structureDefinition['name'] ?? 'UnknownProfile';
-        $baseType          = $structureDefinition['type'] ?? '';
+        $url               = $structureDefinition['url']            ?? '';
+        $name              = $structureDefinition['name']           ?? 'UnknownProfile';
+        $baseType          = $structureDefinition['type']           ?? '';
         $baseDefinitionUrl = $structureDefinition['baseDefinition'] ?? '';
-        $kind              = $structureDefinition['kind'] ?? 'resource';
+        $kind              = $structureDefinition['kind']           ?? 'resource';
 
         $className = $this->resolveProfileClassName($name, $kind);
 
@@ -86,7 +88,7 @@ class FHIRProfileGenerator
         }
 
         // Resolve the parent class — may be a base FHIR type or an IG profile class
-        $parentFqcn = $this->resolveParentFqcn($baseDefinitionUrl, $version, $context);
+        $parentFqcn = $this->resolveParentFqcn($baseDefinitionUrl, $version, $context, $errorCollector);
         $class->setExtends('\\' . $parentFqcn);
         $namespace->addUse($parentFqcn);
 
@@ -124,9 +126,12 @@ class FHIRProfileGenerator
      *   2. BuilderContext resources — covers FHIR resource types
      *   3. Fallback: construct FQCN from the FHIR type name using known namespace conventions
      *
+     * When the fallback is used, a warning is recorded via the ErrorCollector so the caller
+     * can surface it to the user.
+     *
      * @throws \RuntimeException When the base definition cannot be resolved
      */
-    private function resolveParentFqcn(string $baseDefinitionUrl, string $version, BuilderContext $context): string
+    private function resolveParentFqcn(string $baseDefinitionUrl, string $version, BuilderContext $context, ?ErrorCollector $errorCollector = null): string
     {
         // Try types first (covers DataType, Primitive, and IG profiles)
         $info = $context->getType($baseDefinitionUrl);
@@ -141,12 +146,19 @@ class FHIRProfileGenerator
         }
 
         // Fallback: derive class name from the URL segment
-        $segment   = (string) u($baseDefinitionUrl)->afterLast('/');
-        $baseNs    = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}";
-        $className = u($segment)->pascal()->toString();
+        $segment      = (string) u($baseDefinitionUrl)->afterLast('/');
+        $baseNs       = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}";
+        $className    = u($segment)->pascal()->toString();
+        $fallbackFqcn = "{$baseNs}\\Resource\\{$className}Resource";
+
+        $errorCollector?->addWarning(
+            "Could not resolve baseDefinition URL '{$baseDefinitionUrl}' — using fallback FQCN "
+            . "'{$fallbackFqcn}'. Ensure the package providing this type is included in your --package list.",
+            $baseDefinitionUrl,
+        );
 
         // Heuristic: if it looks like a resource (starts with uppercase and is known FHIR kind),
         // put it in Resource/ with the Resource suffix. Otherwise DataType/.
-        return "{$baseNs}\\Resource\\{$className}Resource";
+        return $fallbackFqcn;
     }
 }

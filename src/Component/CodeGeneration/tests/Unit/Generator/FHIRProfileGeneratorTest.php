@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Component\CodeGeneration\tests\Unit\Generator;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRProfileGenerator;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Nette\PhpGenerator\ClassType;
@@ -177,6 +178,42 @@ class FHIRProfileGeneratorTest extends TestCase
         }
 
         self::assertTrue($found, 'FHIRProfile attribute missing from AU Core profile class');
+    }
+
+    // -----------------------------------------------------------------
+    // Cross-package base definition: unresolvable URL → warning
+    // -----------------------------------------------------------------
+
+    public function testUnresolvableBaseDefinitionRecordsWarning(): void
+    {
+        // A profile whose baseDefinition is from an unloaded external package
+        $sd = [
+            'resourceType'   => 'StructureDefinition',
+            'url'            => 'http://example.org/fhir/StructureDefinition/my-profile',
+            'name'           => 'MyProfile',
+            'type'           => 'Patient',
+            'kind'           => 'resource',
+            'derivation'     => 'constraint',
+            'baseDefinition' => 'http://hl7.org/fhir/uv/extensions/StructureDefinition/ext-patient-nationality',
+        ];
+
+        $errorCollector = new ErrorCollector();
+        $this->generator->generate($sd, 'R4', $this->context, $this->namespace, $errorCollector);
+
+        self::assertTrue($errorCollector->hasWarnings(), 'Expected a warning for unresolvable baseDefinition URL');
+
+        $warnings = $errorCollector->getWarnings();
+        self::assertStringContainsString('Could not resolve baseDefinition URL', $warnings[0]['message']);
+        self::assertStringContainsString('ext-patient-nationality', $warnings[0]['message']);
+    }
+
+    public function testNoWarningWhenBaseDefinitionResolvesFromContext(): void
+    {
+        $sd             = $this->loadFixture('AUBasePatient.json');
+        $errorCollector = new ErrorCollector();
+        $this->generator->generate($sd, 'R4', $this->context, $this->namespace, $errorCollector);
+
+        self::assertFalse($errorCollector->hasWarnings(), 'No warnings expected when baseDefinition resolves from context');
     }
 
     // -----------------------------------------------------------------
