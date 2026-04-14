@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Serialization\Normalizer;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
@@ -100,7 +101,22 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
         try {
             /** @var class-string $resolvedType */
             $reflection = new \ReflectionClass($resolvedType);
-            $object     = $reflection->newInstanceWithoutConstructor();
+
+            // Fast path for typed complex extensions: instead of the reflection-based property
+            // loop (which can only populate $extension with plain Extension objects), delegate
+            // to the static fromSubExtensions() factory so that the typed promoted properties
+            // ($value, $period, $comment, etc.) are populated correctly on the returned object.
+            if (is_a($resolvedType, FHIRComplexExtensionInterface::class, true)
+                && isset($data['extension'])
+                && is_array($data['extension'])
+            ) {
+                $subExtensions = $this->denormalizeExtensionArray($data['extension'], $format, $context);
+                $id            = isset($data['id']) && is_string($data['id']) ? $data['id'] : null;
+
+                return $resolvedType::fromSubExtensions($subExtensions, $id);
+            }
+
+            $object = $reflection->newInstanceWithoutConstructor();
 
             // Get property metadata for choice element mapping
             $metaMap = $this->getPropertyMetadataMap($object);
@@ -174,7 +190,19 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
                             $denormalizedValue = $this->denormalizePrimitiveProperty($meta, $property, $reflection, $value, $format, $context, $metaMap);
                         } else {
                             $phpItemClass = $meta?->phpItemClass;
-                            if ($phpItemClass !== null && is_array($value)) {
+                            if ($meta !== null
+                                && ($meta->propertyKind === 'extension' || $meta->propertyKind === 'modifierExtension')
+                                && is_array($value)
+                            ) {
+                                // Extension/modifierExtension: phpItemClass is null for these properties.
+                                // Use denormalizeExtensionArray() which handles IG registry lookups and
+                                // falls back to the base Extension class for unknown URLs.
+                                $items = $value;
+                                if ($format === 'xml' && !array_is_list($items)) {
+                                    $items = [$items];
+                                }
+                                $denormalizedValue = $this->denormalizeExtensionArray($items, $format, $context);
+                            } elseif ($phpItemClass !== null && is_array($value)) {
                                 // Array of typed complex/backbone items: denormalize each element to the typed class.
                                 if ($format === 'xml') {
                                     $items = $this->unwrapXmlValue($value, 'array');

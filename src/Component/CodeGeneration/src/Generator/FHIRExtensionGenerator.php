@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\CodeGeneration\Generator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\Method;
@@ -130,7 +131,11 @@ class FHIRExtensionGenerator
         $constructor = $class->addMethod('__construct');
 
         if ($this->isComplexExtension($elements)) {
+            $complexInterfaceFqcn = FHIRComplexExtensionInterface::class;
+            $namespace->addUse($complexInterfaceFqcn);
+            $class->addImplement('\\' . $complexInterfaceFqcn);
             $this->buildComplexConstructor($constructor, $elements, $version, $context, $namespace, $extensionFqcn, $url, $errorCollector);
+            $this->buildFromSubExtensionsMethod($class, $elements, $version, $context, $namespace, $url, $errorCollector);
         } else {
             $this->buildSimpleConstructor($constructor, $elements, $version, $context, $namespace, $url, $errorCollector);
         }
@@ -342,45 +347,17 @@ class FHIRExtensionGenerator
         string $url,
         ?ErrorCollector $errorCollector = null,
     ): void {
-        // Collect slice definitions (Extension.extension elements with a sliceName)
-        $slices = [];
-        foreach ($elements as $element) {
-            if (!is_array($element)) {
-                continue;
-            }
-
-            if (($element['path'] ?? '') === 'Extension.extension' && isset($element['sliceName'])) {
-                $slices[] = $element;
-            }
-        }
-
+        $slices    = $this->collectSlices($elements, $version, $context, $namespace, $errorCollector);
         $bodyLines = ['$subExtensions = [];'];
 
-        foreach ($slices as $slice) {
-            $sliceName  = $slice['sliceName'];
-            $maxValue   = $slice['max'] ?? '1';
-            $minValue   = (int) ($slice['min'] ?? 0);
-            $isArray    = !in_array($maxValue, ['0', '1'], true);
-            $isRequired = $minValue >= 1;
-            $shortDesc  = $slice['short'] ?? $sliceName;
-            $sliceId    = $slice['id']    ?? "Extension.extension:{$sliceName}";
-
-            // Find this slice's value[x] element to determine its PHP type
-            $sliceValueElement = $this->findSliceValueElement($elements, $sliceId);
-            $sliceCode         = null;
-            $phpType           = null;
-
-            if ($sliceValueElement !== null && !empty($sliceValueElement['type'])) {
-                $sliceCode = $sliceValueElement['type'][0]['code'] ?? null;
-                if ($sliceCode !== null) {
-                    $phpType = $this->resolvePhpType($sliceCode, $version, $context, $errorCollector);
-                    if ($phpType !== 'bool' && $phpType !== 'int' && $phpType !== 'string') {
-                        $namespace->addUse(ltrim($phpType, '\\'));
-                    }
-                }
-            }
-
-            $paramName = (string) u($sliceName)->camel();
+        foreach ($slices as $sliceData) {
+            $sliceName  = $sliceData['sliceName'];
+            $paramName  = $sliceData['paramName'];
+            $phpType    = $sliceData['phpType'];
+            $sliceCode  = $sliceData['sliceCode'];
+            $isArray    = $sliceData['isArray'];
+            $isRequired = $sliceData['isRequired'];
+            $shortDesc  = $sliceData['shortDesc'];
 
             if ($isArray) {
                 $shortType = $phpType !== null ? (string) u($phpType)->afterLast('\\') : 'mixed';
@@ -404,9 +381,9 @@ class FHIRExtensionGenerator
                 $bodyLines[] = "    \$subExtensions[] = new Extension(url: '{$sliceName}', value: \$v);";
                 $bodyLines[] = '}';
             } else {
-                $resolvedType  = $phpType ?? 'string';
-                $shortType     = (string) u($resolvedType)->afterLast('\\');
-                $nullability   = !$isRequired;
+                $resolvedType = $phpType ?? 'string';
+                $shortType    = (string) u($resolvedType)->afterLast('\\');
+                $nullability  = !$isRequired;
 
                 $param = $constructor->addPromotedParameter($paramName)
                     ->setPublic()
@@ -449,6 +426,166 @@ class FHIRExtensionGenerator
         $bodyLines[] = ');';
 
         $constructor->setBody(implode("\n", $bodyLines));
+    }
+
+    /**
+     * Generate the static fromSubExtensions() factory method for a complex extension.
+     *
+     * The generated method reconstructs a typed extension instance from an array of
+     * already-denormalized sub-extension objects (each implementing FHIRExtensionInterface)
+     * by matching each sub-extension's URL to the appropriate typed parameter.
+     *
+     * @param array<int, mixed> $elements
+     */
+    private function buildFromSubExtensionsMethod(
+        ClassType $class,
+        array $elements,
+        string $version,
+        BuilderContext $context,
+        PhpNamespace $namespace,
+        string $url,
+        ?ErrorCollector $errorCollector = null,
+    ): void {
+        $slices = $this->collectSlices($elements, $version, $context, $namespace, $errorCollector);
+
+        $method = $class->addMethod('fromSubExtensions')
+            ->setStatic(true)
+            ->setReturnType('static')
+            ->setVisibility('public');
+
+        $method->addParameter('subExtensions')->setType('array');
+        $method->addParameter('id')
+            ->setType('string')
+            ->setNullable(true)
+            ->setDefaultValue(null);
+
+        $method->addComment('Reconstruct from an array of already-denormalized sub-extension objects.');
+        $method->addComment('@param array<\Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface> $subExtensions');
+        $method->addComment('@param string|null $id');
+
+        // Initialise parameter variables
+        $lines = [];
+        foreach ($slices as $slice) {
+            $paramName = $slice['paramName'];
+            $lines[]   = "\${$paramName} = " . ($slice['isArray'] ? '[]' : 'null') . ';';
+        }
+
+        if (!empty($slices)) {
+            $lines[] = '';
+            $lines[] = 'foreach ($subExtensions as $ext) {';
+            $lines[] = '    $extUrl = $ext->getExtensionUrl();';
+
+            foreach ($slices as $slice) {
+                $sliceName  = $slice['sliceName'];
+                $paramName  = $slice['paramName'];
+                $phpType    = $slice['phpType'];
+                $isArray    = $slice['isArray'];
+                $typeCheck  = $this->buildTypeCheck('$ext->value', $phpType);
+
+                if ($isArray) {
+                    $lines[] = "    if (\$extUrl === '{$sliceName}' && {$typeCheck}) {";
+                    $lines[] = "        \${$paramName}[] = \$ext->value;";
+                    $lines[] = '    }';
+                } else {
+                    $lines[] = "    if (\$extUrl === '{$sliceName}' && {$typeCheck}) {";
+                    $lines[] = "        \${$paramName} = \$ext->value;";
+                    $lines[] = '    }';
+                }
+            }
+
+            $lines[] = '}';
+            $lines[] = '';
+        }
+
+        $args    = array_map(static fn (array $s): string => "\${$s['paramName']}", $slices);
+        $args[]  = '$id';
+        $lines[] = 'return new static(' . implode(', ', $args) . ');';
+
+        $method->setBody(implode("\n", $lines));
+    }
+
+    /**
+     * Collect all slice definitions from a snapshot element list and resolve their PHP types.
+     *
+     * Returns structured slice data used by both buildComplexConstructor() and
+     * buildFromSubExtensionsMethod() to avoid duplicating the type-resolution logic.
+     *
+     * @param array<int, mixed> $elements
+     *
+     * @return list<array{sliceName: string, paramName: string, phpType: string|null, sliceCode: string|null, isArray: bool, isRequired: bool, shortDesc: string}>
+     */
+    private function collectSlices(
+        array $elements,
+        string $version,
+        BuilderContext $context,
+        PhpNamespace $namespace,
+        ?ErrorCollector $errorCollector = null,
+    ): array {
+        $rawSlices = [];
+        foreach ($elements as $element) {
+            if (!is_array($element)) {
+                continue;
+            }
+
+            if (($element['path'] ?? '') === 'Extension.extension' && isset($element['sliceName'])) {
+                $rawSlices[] = $element;
+            }
+        }
+
+        $result = [];
+        foreach ($rawSlices as $slice) {
+            $sliceName = $slice['sliceName'];
+            $maxValue  = $slice['max'] ?? '1';
+            $minValue  = (int) ($slice['min'] ?? 0);
+            $isArray   = !in_array($maxValue, ['0', '1'], true);
+            $sliceId   = $slice['id'] ?? "Extension.extension:{$sliceName}";
+
+            $sliceValueElement = $this->findSliceValueElement($elements, $sliceId);
+            $sliceCode         = null;
+            $phpType           = null;
+
+            if ($sliceValueElement !== null && !empty($sliceValueElement['type'])) {
+                $sliceCode = $sliceValueElement['type'][0]['code'] ?? null;
+                if ($sliceCode !== null) {
+                    $phpType = $this->resolvePhpType($sliceCode, $version, $context, $errorCollector);
+                    if ($phpType !== 'bool' && $phpType !== 'int' && $phpType !== 'string') {
+                        $namespace->addUse(ltrim($phpType, '\\'));
+                    }
+                }
+            }
+
+            $result[] = [
+                'sliceName'  => $sliceName,
+                'paramName'  => (string) u($sliceName)->camel(),
+                'phpType'    => $phpType,
+                'sliceCode'  => $sliceCode,
+                'isArray'    => $isArray,
+                'isRequired' => $minValue >= 1,
+                'shortDesc'  => $slice['short'] ?? $sliceName,
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Build a PHP boolean type-check expression for use in the fromSubExtensions body.
+     *
+     * PHP scalar types (bool, int, string) use is_* checks; class types use instanceof.
+     * A null $phpType (unresolvable) falls back to a null-check only.
+     */
+    private function buildTypeCheck(string $varExpr, ?string $phpType): string
+    {
+        if ($phpType === null) {
+            return "{$varExpr} !== null";
+        }
+
+        return match ($phpType) {
+            'bool'   => "is_bool({$varExpr})",
+            'int'    => "is_int({$varExpr})",
+            'string' => "is_string({$varExpr})",
+            default  => "{$varExpr} instanceof " . (string) u($phpType)->afterLast('\\'),
+        };
     }
 
     /**

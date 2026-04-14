@@ -1,0 +1,123 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "individual-genderIdentity",
+  "url": "http://hl7.org/fhir/StructureDefinition/individual-genderIdentity",
+  "version": "5.0.0",
+  "name": "IndividualGenderIdentity",
+  "title": "Individual Gender Identity",
+  "status": "active",
+  "publisher": "HL7 International",
+  "description": "The gender the individual identifies with.",
+  "fhirVersion": "4.0.1",
+  "kind": "complex-type",
+  "abstract": false,
+  "type": "Extension",
+  "derivation": "constraint",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Extension",
+  "snapshot": {
+    "element": [
+      {
+        "id": "Extension",
+        "path": "Extension",
+        "short": "The gender the individual identifies with",
+        "min": 0,
+        "max": "*"
+      },
+      {
+        "id": "Extension.id",
+        "path": "Extension.id",
+        "min": 0,
+        "max": "1",
+        "type": [{"code": "http://hl7.org/fhirpath/System.String"}]
+      },
+      {
+        "id": "Extension.extension:value",
+        "path": "Extension.extension",
+        "sliceName": "value",
+        "short": "The gender identity value",
+        "definition": "A gender identity of the individual.",
+        "min": 0,
+        "max": "1",
+        "type": [{"code": "Extension"}]
+      },
+      {
+        "id": "Extension.extension:value.url",
+        "path": "Extension.extension.url",
+        "min": 1,
+        "max": "1",
+        "fixedUri": "value"
+      },
+      {
+        "id": "Extension.extension:value.value[x]",
+        "path": "Extension.extension.value[x]",
+        "short": "The gender identity value",
+        "min": 1,
+        "max": "1",
+        "type": [{"code": "CodeableConcept"}]
+      },
+      {
+        "id": "Extension.extension:period",
+        "path": "Extension.extension",
+        "sliceName": "period",
+        "short": "The time period during which the gender identity applies",
+        "definition": "The time period during which the gender identity applies.",
+        "min": 0,
+        "max": "1",
+        "type": [{"code": "Extension"}]
+      },
+      {
+        "id": "Extension.extension:period.url",
+        "path": "Extension.extension.url",
+        "min": 1,
+        "max": "1",
+        "fixedUri": "period"
+      },
+      {
+        "id": "Extension.extension:period.value[x]",
+        "path": "Extension.extension.value[x]",
+        "short": "The time period",
+        "min": 0,
+        "max": "1",
+        "type": [{"code": "Period"}]
+      },
+      {
+        "id": "Extension.extension:comment",
+        "path": "Extension.extension",
+        "sliceName": "comment",
+        "short": "Context",
+        "definition": "Additional commentary about the gender identity.",
+        "min": 0,
+        "max": "1",
+        "type": [{"code": "Extension"}]
+      },
+      {
+        "id": "Extension.extension:comment.url",
+        "path": "Extension.extension.url",
+        "min": 1,
+        "max": "1",
+        "fixedUri": "comment"
+      },
+      {
+        "id": "Extension.extension:comment.value[x]",
+        "path": "Extension.extension.value[x]",
+        "short": "Additional commentary",
+        "min": 0,
+        "max": "1",
+        "type": [{"code": "string"}]
+      },
+      {
+        "id": "Extension.url",
+        "path": "Extension.url",
+        "min": 1,
+        "max": "1",
+        "fixedUri": "http://hl7.org/fhir/StructureDefinition/individual-genderIdentity"
+      },
+      {
+        "id": "Extension.value[x]",
+        "path": "Extension.value[x]",
+        "min": 0,
+        "max": "0"
+      }
+    ]
+  }
+}

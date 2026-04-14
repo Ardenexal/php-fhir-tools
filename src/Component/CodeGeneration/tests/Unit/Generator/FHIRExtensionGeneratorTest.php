@@ -55,6 +55,22 @@ class FHIRExtensionGeneratorTest extends TestCase
             $codingClass,
         );
 
+        // Pre-register CodeableConcept
+        $ccClass = new ClassType('CodeableConcept', new PhpNamespace('Ardenexal\\FHIRTools\\Component\\Models\\R4\\DataType'));
+        $this->context->addType(
+            'http://hl7.org/fhir/StructureDefinition/CodeableConcept',
+            'Ardenexal\\FHIRTools\\Component\\Models\\R4\\DataType',
+            $ccClass,
+        );
+
+        // Pre-register Period
+        $periodClass = new ClassType('Period', new PhpNamespace('Ardenexal\\FHIRTools\\Component\\Models\\R4\\DataType'));
+        $this->context->addType(
+            'http://hl7.org/fhir/StructureDefinition/Period',
+            'Ardenexal\\FHIRTools\\Component\\Models\\R4\\DataType',
+            $periodClass,
+        );
+
         $this->namespace = new PhpNamespace('Ardenexal\\FHIRTools\\Component\\Models\\IG\\R4\\TestIg\\Extension');
     }
 
@@ -201,6 +217,105 @@ class FHIRExtensionGeneratorTest extends TestCase
     // -----------------------------------------------------------------
     // Helpers
     // -----------------------------------------------------------------
+
+    // -----------------------------------------------------------------
+    // Complex extension fromSubExtensions (individual-genderIdentity: CodeableConcept + Period + string)
+    // -----------------------------------------------------------------
+
+    public function testComplexExtensionImplementsFHIRComplexExtensionInterface(): void
+    {
+        $sd    = $this->loadFixture('IndividualGenderIdentityStyleExtension.json');
+        $class = $this->generator->generate($sd, 'R4', $this->context, $this->namespace);
+
+        $implements = $class->getImplements();
+        self::assertNotEmpty($implements, 'Complex extension class should implement at least one interface');
+
+        $found = false;
+        foreach ($implements as $iface) {
+            if (str_contains($iface, 'FHIRComplexExtensionInterface')) {
+                $found = true;
+                break;
+            }
+        }
+
+        self::assertTrue($found, 'Complex extension class should implement FHIRComplexExtensionInterface');
+    }
+
+    public function testComplexExtensionHasFromSubExtensionsStaticMethod(): void
+    {
+        $sd    = $this->loadFixture('IndividualGenderIdentityStyleExtension.json');
+        $class = $this->generator->generate($sd, 'R4', $this->context, $this->namespace);
+
+        self::assertTrue(
+            $class->hasMethod('fromSubExtensions'),
+            'Complex extension must have a fromSubExtensions static method',
+        );
+
+        $method = $class->getMethod('fromSubExtensions');
+        self::assertTrue($method->isStatic(), 'fromSubExtensions must be static');
+    }
+
+    public function testFromSubExtensionsHasSubExtensionsAndIdParameters(): void
+    {
+        $sd     = $this->loadFixture('IndividualGenderIdentityStyleExtension.json');
+        $class  = $this->generator->generate($sd, 'R4', $this->context, $this->namespace);
+        $method = $class->getMethod('fromSubExtensions');
+        $params = $method->getParameters();
+
+        self::assertArrayHasKey('subExtensions', $params, 'fromSubExtensions must have a $subExtensions parameter');
+        self::assertArrayHasKey('id', $params, 'fromSubExtensions must have an $id parameter');
+
+        self::assertSame('array', (string) $params['subExtensions']->getType());
+        self::assertTrue($params['id']->isNullable(), '$id must be nullable');
+    }
+
+    public function testFromSubExtensionsBodyChecksSliceUrls(): void
+    {
+        $sd     = $this->loadFixture('IndividualGenderIdentityStyleExtension.json');
+        $class  = $this->generator->generate($sd, 'R4', $this->context, $this->namespace);
+        $body   = $class->getMethod('fromSubExtensions')->getBody();
+
+        self::assertStringContainsString("'value'", $body, 'fromSubExtensions body should check slice URL "value"');
+        self::assertStringContainsString("'period'", $body, 'fromSubExtensions body should check slice URL "period"');
+        self::assertStringContainsString("'comment'", $body, 'fromSubExtensions body should check slice URL "comment"');
+        self::assertStringContainsString('return new static(', $body, 'fromSubExtensions must return new static(...)');
+    }
+
+    public function testFromSubExtensionsBodyUsesInstanceofForClassTypes(): void
+    {
+        $sd    = $this->loadFixture('IndividualGenderIdentityStyleExtension.json');
+        $class = $this->generator->generate($sd, 'R4', $this->context, $this->namespace);
+        $body  = $class->getMethod('fromSubExtensions')->getBody();
+
+        self::assertStringContainsString('instanceof', $body, 'fromSubExtensions must use instanceof for class types');
+        self::assertStringContainsString('CodeableConcept', $body);
+        self::assertStringContainsString('Period', $body);
+    }
+
+    public function testFromSubExtensionsBodyUsesInstanceofForFhirStringPrimitive(): void
+    {
+        $sd    = $this->loadFixture('IndividualGenderIdentityStyleExtension.json');
+        $class = $this->generator->generate($sd, 'R4', $this->context, $this->namespace);
+        $body  = $class->getMethod('fromSubExtensions')->getBody();
+
+        // FHIR 'string' resolves to the StringPrimitive class, so the body should use instanceof
+        self::assertStringContainsString('StringPrimitive', $body, 'fromSubExtensions body should reference StringPrimitive for FHIR string slice');
+    }
+
+    public function testSimpleExtensionDoesNotImplementComplexInterface(): void
+    {
+        $sd         = $this->loadFixture('SimpleExtension.json');
+        $class      = $this->generator->generate($sd, 'R4', $this->context, $this->namespace);
+        $implements = $class->getImplements();
+
+        foreach ($implements as $iface) {
+            self::assertStringNotContainsString(
+                'FHIRComplexExtensionInterface',
+                $iface,
+                'Simple extension must NOT implement FHIRComplexExtensionInterface',
+            );
+        }
+    }
 
     // -----------------------------------------------------------------
     // Cross-package type resolution: unresolvable URL → warning + valid FQCN

@@ -15,6 +15,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 
 /**
  * Abstract base class for FHIR normalizers providing shared utility methods.
@@ -451,6 +452,12 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
      * @param array<string, mixed>               $context       Denormalization context
      *
      * @return array<array<string, mixed>|object> Array of Extension objects (or raw arrays as fallback)
+     */
+    /**
+     * @param array<mixed>         $extensionData
+     * @param array<string, mixed> $context
+     *
+     * @return array<FHIRExtensionInterface>
      */
     protected function denormalizeExtensionArray(array $extensionData, ?string $format, array $context): array
     {

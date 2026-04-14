@@ -272,6 +272,12 @@ class FHIRIGGeneratorCommand extends Command
             $this->loadBasePackages($output, $fhirVersion, $offlineMode);
             $this->generateBaseTypesInMemory($output, $fhirVersion);
 
+            // Generate + write base FHIR core profiles (derivation=constraint) and register
+            // them in context. This ensures that IG profiles which extend a core constraint
+            // profile (e.g. AU Core blood pressure → hl7.fhir.r4.core bp profile →
+            // Observation) can resolve the parent FQCN instead of falling back to a heuristic.
+            $this->generateBaseProfilesInMemory($output, $fhirVersion);
+
             // Load the full transitive dependency tree of all IG packages into context.
             // Dependency packages are only used for type resolution — no PHP files are written
             // for them. Pre-mark the explicitly listed IG packages as already handled so they
@@ -436,6 +442,103 @@ class FHIRIGGeneratorCommand extends Command
         }
 
         $output->writeln("    Registered <comment>{$count}</comment> base types.");
+    }
+
+    /**
+     * Generate PHP profile classes for all constraint StructureDefinitions from already-loaded
+     * base packages, write them to disk, and register them in the BuilderContext.
+     *
+     * This step is required so that IG profiles whose baseDefinition points to a FHIR core
+     * constraint profile (e.g. http://hl7.org/fhir/StructureDefinition/bp → vitalsigns → Observation)
+     * can resolve the parent FQCN via context lookup instead of falling back to a heuristic class
+     * name that does not exist.
+     *
+     * Generated files are written to Models/src/{version}/Profile/ alongside the canonical
+     * base FHIR types.
+     */
+    private function generateBaseProfilesInMemory(OutputInterface $output, string $version): void
+    {
+        $output->writeln("  Registering base {$version} constraint profiles...");
+
+        $profileNs        = new PhpNamespace(self::MODELS_BASE_NAMESPACE . "\\{$version}\\Profile");
+        $profileGenerator = new FHIRProfileGenerator();
+        $errorCollector   = new ErrorCollector();
+
+        $count = 0;
+        foreach ($this->context[$version]->getDefinitions() as $def) {
+            if (($def['resourceType'] ?? '') !== 'StructureDefinition') {
+                continue;
+            }
+
+            if (($def['derivation'] ?? '') !== 'constraint') {
+                continue;
+            }
+
+            if (($def['kind'] ?? '') === 'logical' || ($def['type'] ?? '') === 'Extension') {
+                continue;
+            }
+
+            $kind = $def['kind'] ?? '';
+            if (!in_array($kind, ['resource', 'complex-type'], true)) {
+                continue;
+            }
+
+            $url = $def['url'] ?? '';
+            // Skip if already registered (e.g. by a prior run or dependency load)
+            if ($url === '' || $this->context[$version]->getType($url) !== null) {
+                continue;
+            }
+
+            try {
+                $class = $profileGenerator->generate($def, $version, $this->context[$version], $profileNs, $errorCollector);
+                $this->context[$version]->addType($url, $profileNs->getName(), $class);
+                $this->writeBaseProfileClass($output, $class, $profileNs, $version);
+                ++$count;
+            } catch (\Throwable $e) {
+                // Non-fatal: warn and continue so that one bad definition does not abort the run
+                $output->writeln(
+                    "<comment>  Warning: could not generate base profile for '{$url}': {$e->getMessage()}</comment>",
+                );
+            }
+        }
+
+        $output->writeln("    Registered <comment>{$count}</comment> base constraint profiles.");
+    }
+
+    /**
+     * Write a base FHIR core profile class to Models/src/{version}/Profile/.
+     */
+    private function writeBaseProfileClass(
+        OutputInterface $output,
+        ClassType $class,
+        PhpNamespace $namespace,
+        string $version,
+    ): void {
+        $outputPath = Path::canonicalize(
+            $this->resolveBaseModelsPath() . "/{$version}/Profile/{$class->getName()}.php",
+        );
+
+        $directory = dirname($outputPath);
+        if (!$this->filesystem->exists($directory)) {
+            $this->filesystem->mkdir($directory, 0755);
+        }
+
+        $contents = $this->renderPhpFile($class, $namespace->getName());
+        $this->filesystem->dumpFile($outputPath, $contents);
+
+        if ($output->isVerbose()) {
+            $output->writeln("    Written base profile: {$outputPath}");
+        }
+    }
+
+    /**
+     * Resolve the absolute path to the canonical Models/src directory.
+     *
+     * Used to write base FHIR core profile classes alongside the generated model types.
+     */
+    private function resolveBaseModelsPath(): string
+    {
+        return Path::canonicalize(__DIR__ . '/../../../Models/src');
     }
 
     /**
