@@ -1,0 +1,70 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\MedicationRequest;
+
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Duration;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UnsignedIntPrimitive;
+
+/**
+ * @description Indicates the specific details for the dispense or medication supply part of a medication request (also known as a Medication Prescription or Medication Order).  Note that this information is not always sent with the order.  There may be in some settings (e.g. hospitals) institutional or system support for completing the dispense details in the pharmacy department.
+ */
+#[FHIRBackboneElement(parentResource: 'MedicationRequest', elementPath: 'MedicationRequest.dispenseRequest', fhirVersion: 'R5')]
+class MedicationRequestDispenseRequest extends BackboneElement
+{
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
+        public ?string $id = null,
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        public array $modifierExtension = [],
+        /** @var MedicationRequestDispenseRequestInitialFill|null initialFill First fill details */
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        public ?MedicationRequestDispenseRequestInitialFill $initialFill = null,
+        /** @var Duration|null dispenseInterval Minimum period of time between dispenses */
+        #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex')]
+        public ?Duration $dispenseInterval = null,
+        /** @var Period|null validityPeriod Time period supply is authorized for */
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        public ?Period $validityPeriod = null,
+        /** @var UnsignedIntPrimitive|null numberOfRepeatsAllowed Number of refills authorized */
+        #[FhirProperty(fhirType: 'unsignedInt', propertyKind: 'primitive')]
+        public ?UnsignedIntPrimitive $numberOfRepeatsAllowed = null,
+        /** @var Quantity|null quantity Amount of medication to supply per dispense */
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        public ?Quantity $quantity = null,
+        /** @var Duration|null expectedSupplyDuration Number of days supply per dispense */
+        #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex')]
+        public ?Duration $expectedSupplyDuration = null,
+        /** @var Reference|null dispenser Intended performer of dispense */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $dispenser = null,
+        /** @var array<Annotation> dispenserInstruction Additional information for the dispenser */
+        #[FhirProperty(
+            fhirType: 'Annotation',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation',
+        )]
+        public array $dispenserInstruction = [],
+        /** @var CodeableConcept|null doseAdministrationAid Type of adherence packaging to use for the dispense */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $doseAdministrationAid = null,
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
+}

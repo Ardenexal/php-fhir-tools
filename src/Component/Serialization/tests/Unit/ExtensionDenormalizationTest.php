@@ -9,7 +9,6 @@ use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorIn
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\AbstractFHIRNormalizer;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * Concrete subclass of AbstractFHIRNormalizer that exposes the protected
@@ -171,7 +170,7 @@ class ExtensionDenormalizationTest extends TestCase
         );
 
         $existingObject = new \stdClass();
-        $result = $normalizer->exposeDenormalizeExtensionArray([$existingObject], 'json', []);
+        $result         = $normalizer->exposeDenormalizeExtensionArray([$existingObject], 'json', []);
 
         self::assertCount(1, $result);
         self::assertSame($existingObject, $result[0]);

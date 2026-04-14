@@ -78,9 +78,9 @@ class FHIRIGGeneratorCommand extends Command
      * @var array<string, list<string>>
      */
     private const array BASE_PACKAGES = [
-        'R4'  => ['hl7.terminology.r4#7.0.0', 'hl7.fhir.r4.core#4.0.1'],
-        'R4B' => ['hl7.terminology.r4b#7.0.0', 'hl7.fhir.r4b.core#4.3.0'],
-        'R5'  => ['hl7.terminology.r5#7.0.0', 'hl7.fhir.r5.core#5.0.0'],
+        'R4'  => ['hl7.terminology.r4#7.0.0', 'hl7.fhir.r4.core#4.0.1', 'hl7.fhir.uv.extensions.r4#5.2.0'],
+        'R4B' => ['hl7.terminology.r4b#6.0.2', 'hl7.fhir.r4b.core#4.3.0', 'hl7.fhir.uv.extensions.r4b#5.2.0'],
+        'R5'  => ['hl7.terminology.r5#7.0.0', 'hl7.fhir.r5.core#5.0.0', 'hl7.fhir.uv.extensions.r5#5.2.0'],
     ];
 
     /**
@@ -272,10 +272,18 @@ class FHIRIGGeneratorCommand extends Command
             $this->loadBasePackages($output, $fhirVersion, $offlineMode);
             $this->generateBaseTypesInMemory($output, $fhirVersion);
 
+            // Register base FHIR core extensions (derivation=constraint, type=Extension) in
+            // context so that IG extension generators can resolve them as parent class FQCNs.
+            // Files are only written when they do not already exist (they may have been produced
+            // by a prior `fhir:generate` run).
+            $this->generateBaseExtensionsInMemory($output, $fhirVersion);
+
             // Generate + write base FHIR core profiles (derivation=constraint) and register
             // them in context. This ensures that IG profiles which extend a core constraint
             // profile (e.g. AU Core blood pressure → hl7.fhir.r4.core bp profile →
             // Observation) can resolve the parent FQCN instead of falling back to a heuristic.
+            // Files are only written when they do not already exist (they may have been produced
+            // by a prior `fhir:generate` run).
             $this->generateBaseProfilesInMemory($output, $fhirVersion);
 
             // Load the full transitive dependency tree of all IG packages into context.
@@ -445,6 +453,55 @@ class FHIRIGGeneratorCommand extends Command
     }
 
     /**
+     * Generate PHP extension classes for all named extensions (derivation=constraint, type=Extension)
+     * from already-loaded base packages, register them in the BuilderContext, and write them to
+     * Models/src/{version}/Extension/ if not already present on disk.
+     *
+     * This step is required so that IG extensions whose baseDefinition points to a FHIR core
+     * extension can resolve the parent FQCN via context lookup. Writing is skipped when the file
+     * already exists (e.g. produced by a prior `fhir:generate` run) to avoid redundant work.
+     */
+    private function generateBaseExtensionsInMemory(OutputInterface $output, string $version): void
+    {
+        $output->writeln("  Registering base {$version} extensions...");
+
+        $extensionNs        = new PhpNamespace(self::MODELS_BASE_NAMESPACE . "\\{$version}\\Extension");
+        $extensionGenerator = new FHIRExtensionGenerator();
+        $errorCollector     = new ErrorCollector();
+
+        $count = 0;
+        foreach ($this->context[$version]->getDefinitions() as $def) {
+            if (($def['resourceType'] ?? '') !== 'StructureDefinition') {
+                continue;
+            }
+
+            if (($def['derivation'] ?? '') !== 'constraint' || ($def['type'] ?? '') !== 'Extension') {
+                continue;
+            }
+
+            $url = $def['url'] ?? '';
+            // Skip if already registered (e.g. by a prior run or dependency load)
+            if ($url === '' || $this->context[$version]->getType($url) !== null) {
+                continue;
+            }
+
+            try {
+                $class = $extensionGenerator->generate($def, $version, $this->context[$version], $extensionNs, $errorCollector);
+                $this->context[$version]->addType($url, $extensionNs->getName(), $class);
+                $this->writeBaseExtensionClass($output, $class, $extensionNs, $version);
+                ++$count;
+            } catch (\Throwable $e) {
+                // Non-fatal: warn and continue so that one bad definition does not abort the run
+                $output->writeln(
+                    "<comment>  Warning: could not generate base extension for '{$url}': {$e->getMessage()}</comment>",
+                );
+            }
+        }
+
+        $output->writeln("    Registered <comment>{$count}</comment> base extensions.");
+    }
+
+    /**
      * Generate PHP profile classes for all constraint StructureDefinitions from already-loaded
      * base packages, write them to disk, and register them in the BuilderContext.
      *
@@ -454,7 +511,8 @@ class FHIRIGGeneratorCommand extends Command
      * name that does not exist.
      *
      * Generated files are written to Models/src/{version}/Profile/ alongside the canonical
-     * base FHIR types.
+     * base FHIR types. Writing is skipped when the file already exists (e.g. produced by a
+     * prior `fhir:generate` run) to avoid redundant work.
      */
     private function generateBaseProfilesInMemory(OutputInterface $output, string $version): void
     {
@@ -506,7 +564,43 @@ class FHIRIGGeneratorCommand extends Command
     }
 
     /**
+     * Write a base FHIR core extension class to Models/src/{version}/Extension/.
+     * Skips the write if the file already exists (e.g. written by a prior `fhir:generate` run).
+     */
+    private function writeBaseExtensionClass(
+        OutputInterface $output,
+        ClassType $class,
+        PhpNamespace $namespace,
+        string $version,
+    ): void {
+        $outputPath = Path::canonicalize(
+            $this->resolveBaseModelsPath() . "/{$version}/Extension/{$class->getName()}.php",
+        );
+
+        if ($this->filesystem->exists($outputPath)) {
+            if ($output->isVerbose()) {
+                $output->writeln("    Skipped (already exists): {$outputPath}");
+            }
+
+            return;
+        }
+
+        $directory = dirname($outputPath);
+        if (!$this->filesystem->exists($directory)) {
+            $this->filesystem->mkdir($directory, 0755);
+        }
+
+        $contents = $this->renderPhpFile($class, $namespace->getName());
+        $this->filesystem->dumpFile($outputPath, $contents);
+
+        if ($output->isVerbose()) {
+            $output->writeln("    Written base extension: {$outputPath}");
+        }
+    }
+
+    /**
      * Write a base FHIR core profile class to Models/src/{version}/Profile/.
+     * Skips the write if the file already exists (e.g. written by a prior `fhir:generate` run).
      */
     private function writeBaseProfileClass(
         OutputInterface $output,
@@ -517,6 +611,14 @@ class FHIRIGGeneratorCommand extends Command
         $outputPath = Path::canonicalize(
             $this->resolveBaseModelsPath() . "/{$version}/Profile/{$class->getName()}.php",
         );
+
+        if ($this->filesystem->exists($outputPath)) {
+            if ($output->isVerbose()) {
+                $output->writeln("    Skipped (already exists): {$outputPath}");
+            }
+
+            return;
+        }
 
         $directory = dirname($outputPath);
         if (!$this->filesystem->exists($directory)) {

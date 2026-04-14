@@ -1,0 +1,73 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\RegulatedAuthorization;
+
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
+
+/**
+ * @description The case or regulatory procedure for granting or amending a regulated authorization. An authorization is granted in response to submissions/applications by those seeking authorization. A case is the administrative process that deals with the application(s) that relate to this and assesses them. Note: This area is subject to ongoing review and the workgroup is seeking implementer feedback on its use (see link at bottom of page).
+ */
+#[FHIRBackboneElement(parentResource: 'RegulatedAuthorization', elementPath: 'RegulatedAuthorization.case', fhirVersion: 'R5')]
+class RegulatedAuthorizationCase extends BackboneElement
+{
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
+        public ?string $id = null,
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        public array $modifierExtension = [],
+        /** @var Identifier|null identifier Identifier by which this case can be referenced */
+        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
+        public ?Identifier $identifier = null,
+        /** @var CodeableConcept|null type The defining type of case */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $type = null,
+        /** @var CodeableConcept|null status The status associated with the case */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $status = null,
+        /** @var Period|DateTimePrimitive|null date Relevant date for this case */
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'Period',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Period',
+                    'jsonKey'      => 'datePeriod',
+                ],
+                [
+                    'fhirType'     => 'dateTime',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive',
+                    'jsonKey'      => 'dateDateTime',
+                ],
+            ],
+        )]
+        public Period|DateTimePrimitive|null $date = null,
+        /** @var array<RegulatedAuthorizationCase> application Applications submitted to obtain a regulated authorization. Steps within the longer running case or procedure */
+        #[FhirProperty(
+            fhirType: 'unknown',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\RegulatedAuthorization\RegulatedAuthorizationCase',
+        )]
+        public array $application = [],
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
+}

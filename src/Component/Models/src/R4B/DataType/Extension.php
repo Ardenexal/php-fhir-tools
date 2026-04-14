@@ -23,6 +23,8 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UnsignedIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UrlPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UuidPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Dosage;
+use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -35,6 +37,11 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 #[FHIRComplexType(typeName: 'Extension', fhirVersion: 'R4B')]
 class Extension extends Element implements FHIRExtensionInterface
 {
+    public function getExtensionUrl(): ?string
+    {
+        return $this->url;
+    }
+
     public function __construct(
         /** @var string|null id Unique id for inter-element referencing */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
@@ -285,7 +292,7 @@ class Extension extends Element implements FHIRExtensionInterface
                 [
                     'fhirType'     => 'Timing',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing',
                     'jsonKey'      => 'valueTiming',
                 ],
                 [
@@ -339,7 +346,7 @@ class Extension extends Element implements FHIRExtensionInterface
                 [
                     'fhirType'     => 'Dosage',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Dosage',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Dosage',
                     'jsonKey'      => 'valueDosage',
                 ],
             ],
@@ -347,10 +354,5 @@ class Extension extends Element implements FHIRExtensionInterface
         public Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|string|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|CodeableReference|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|RatioRange|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|null $value = null,
     ) {
         parent::__construct($id, $extension);
-    }
-
-    public function getExtensionUrl(): ?string
-    {
-        return $this->url;
     }
 }

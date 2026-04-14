@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\Timing;
 
 /**
  * @author HL7 FHIR Standard

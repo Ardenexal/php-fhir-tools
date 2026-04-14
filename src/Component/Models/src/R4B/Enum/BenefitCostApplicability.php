@@ -10,6 +10,14 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Enum;
  * Version: 4.3.0
  * Description: Whether the cost applies to in-network or out-of-network providers.
  */
-enum BenefitCostApplicability
+enum BenefitCostApplicability: string
 {
+    /** In Network */
+    case innetwork = 'in-network';
+
+    /** Out of Network */
+    case outofnetwork = 'out-of-network';
+
+    /** Other */
+    case other = 'other';
 }

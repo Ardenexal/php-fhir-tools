@@ -33,7 +33,7 @@ class FHIRIGRegistryCompilerPass implements CompilerPassInterface
             return;
         }
 
-        $outputDir = $container->getParameter('fhir.ig.output_directory');
+        $outputDir  = $container->getParameter('fhir.ig.output_directory');
         $namespace  = $container->getParameter('fhir.ig.namespace');
 
         if (!is_string($outputDir) || $outputDir === '' || !is_string($namespace) || $namespace === '') {

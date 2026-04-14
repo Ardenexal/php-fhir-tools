@@ -1433,8 +1433,14 @@ class FHIRModelGenerator implements GeneratorInterface
                 // This handles cases where the type hasn't been registered yet or lookup failed
                 try {
                     $correctNamespace = $this->getNamespaceForFhirType($code, $version, $builderContext);
-                    $className        = u($code)->pascal()->toString();
-                    $types[]          = '\\' . $correctNamespace . '\\' . $className;
+                    $primitiveTypes   = [
+                        'boolean', 'integer', 'integer64', 'string', 'decimal', 'uri', 'url',
+                        'canonical', 'base64Binary', 'instant', 'date', 'dateTime', 'time', 'code',
+                        'oid', 'id', 'markdown', 'unsignedInt', 'positiveInt', 'uuid', 'xhtml',
+                    ];
+                    $suffix    = in_array($code, $primitiveTypes, true) ? 'Primitive' : '';
+                    $className = u($code)->pascal()->toString() . $suffix;
+                    $types[]   = '\\' . $correctNamespace . '\\' . $className;
                 } catch (\Throwable $e) {
                     // Log the error but don't fail generation - the type may be resolved later
                     error_log(

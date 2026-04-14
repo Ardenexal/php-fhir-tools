@@ -19,7 +19,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Ratio;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\SampledData;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\InstantPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
@@ -137,7 +136,7 @@ class ObservationResource extends DomainResourceResource
                 [
                     'fhirType'     => 'Timing',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Timing',
                     'jsonKey'      => 'effectiveTiming',
                 ],
                 [

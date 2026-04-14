@@ -1,0 +1,27 @@
+<?php declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
+
+/**
+ * @author HL7 International / Terminology Infrastructure
+ * @see http://hl7.org/fhir/StructureDefinition/valueset-steward
+ * @description The entity that is responsible for the content of the Value Set Definition. This is a textual description of the organizational entity responsible for the content and maintenance.
+ */
+#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-steward', fhirVersion: 'R4')]
+class ValueSetStewardExtension extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension
+{
+	public function __construct(
+		/** @var ContactDetail|null valueContactDetail Value of extension */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'ContactDetail', propertyKind: 'complex')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactDetail $valueContactDetail = null,
+		?string $id = null,
+		array $extension = [],
+	) {
+		parent::__construct(
+		    id: $id,
+		    extension: $extension,
+		    url: 'http://hl7.org/fhir/StructureDefinition/valueset-steward',
+		    value: $this->valueContactDetail,
+		);
+	}
+}

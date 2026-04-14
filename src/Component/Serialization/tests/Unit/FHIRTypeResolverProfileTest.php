@@ -22,7 +22,7 @@ class FHIRTypeResolverProfileTest extends TestCase
 
         $data = [
             'resourceType' => 'Patient',
-            'meta' => [
+            'meta'         => [
                 'profile' => ['http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient'],
             ],
         ];
@@ -37,7 +37,7 @@ class FHIRTypeResolverProfileTest extends TestCase
 
         $data = [
             'resourceType' => 'Patient',
-            'meta' => [
+            'meta'         => [
                 'profile' => ['http://example.com/some-profile'],
             ],
         ];
@@ -72,7 +72,7 @@ class FHIRTypeResolverProfileTest extends TestCase
 
         $data = [
             'resourceType' => 'Patient',
-            'meta' => [
+            'meta'         => [
                 'profile' => ['http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient'],
             ],
         ];
@@ -97,7 +97,7 @@ class FHIRTypeResolverProfileTest extends TestCase
         // profile-a listed first in meta.profile → should return stdClass
         $data = [
             'resourceType' => 'Patient',
-            'meta' => [
+            'meta'         => [
                 'profile' => [
                     'http://example.com/profile-a',
                     'http://example.com/profile-b',

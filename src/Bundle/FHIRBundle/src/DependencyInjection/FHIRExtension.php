@@ -55,7 +55,7 @@ class FHIRExtension extends Extension
         $container->setParameter('fhir.ig.namespace', $config['ig']['namespace']);
 
         // Serialization metadata cache pool
-        $cachePool        = $config['serialization']['metadata_cache_pool'] ?? null;
+        $cachePool         = $config['serialization']['metadata_cache_pool'] ?? null;
         $enableCacheWarmer = $config['serialization']['enable_cache_warmer'] ?? false;
         $container->setParameter('fhir.serialization.metadata_cache_pool', $cachePool);
 

@@ -824,6 +824,12 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         metadata_cache_pool?: scalar|Param|null, // PSR-6 cache pool service ID for property metadata. Set to null to disable persistent caching. // Default: "cache.app"
  *         enable_cache_warmer?: bool|Param, // Pre-populate the metadata cache during cache:warmup. Only takes effect when metadata_cache_pool is set. // Default: false
  *     },
+ *     ig?: array{ // Implementation Guide (IG) code generation settings.
+ *         packages?: list<scalar|Param|null>,
+ *         offline?: bool|Param, // Use only locally cached packages; skip network downloads when generating IG classes. // Default: false
+ *         output_directory?: scalar|Param|null, // Root directory for generated IG PHP classes. Defaults to output_directory/IG when null. Must match the PSR-4 source root for ig.namespace. // Default: null
+ *         namespace?: scalar|Param|null, // Root PHP namespace for generated IG classes (e.g. "App\FHIR\IG"). Must match the PSR-4 autoload mapping in composer.json. Defaults to the library internal namespace when null. // Default: null
+ *     },
  * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,

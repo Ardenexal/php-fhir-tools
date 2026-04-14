@@ -1,0 +1,43 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
+
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
+
+/**
+ * @author HL7 FHIR Standard
+ *
+ * @see http://hl7.org/fhir/StructureDefinition/Timing
+ *
+ * @description Specifies an event that may occur multiple times. Timing schedules are used to record when things are planned, expected or requested to occur. The most common usage is in dosage instructions for medications. They are also used when planning care of various kinds, and may be used for reporting the schedule to which past regular activities were carried out.
+ */
+#[FHIRComplexType(typeName: 'Timing', fhirVersion: 'R5')]
+class Timing extends BackboneType
+{
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
+        public ?string $id = null,
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        public array $modifierExtension = [],
+        /** @var array<DateTimePrimitive> event When the event occurs */
+        #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive', isArray: true)]
+        public array $event = [],
+        /** @var TimingRepeat|null repeat When the event is to occur */
+        #[FhirProperty(fhirType: 'Element', propertyKind: 'complex')]
+        public ?TimingRepeat $repeat = null,
+        /** @var CodeableConcept|null code C | BID | TID | QID | AM | PM | QD | QOD | + */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $code = null,
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
+}

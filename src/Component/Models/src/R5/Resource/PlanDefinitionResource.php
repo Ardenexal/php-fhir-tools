@@ -1,0 +1,301 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
+
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Meta;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Narrative;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\PublicationStatusType;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\RelatedArtifact;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\UsageContext;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\PlanDefinition\PlanDefinitionAction;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\PlanDefinition\PlanDefinitionActor;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\PlanDefinition\PlanDefinitionGoal;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
+/**
+ * @author Health Level Seven International (Clinical Decision Support)
+ *
+ * @see http://hl7.org/fhir/StructureDefinition/PlanDefinition
+ *
+ * @description This resource allows for the definition of various types of plans as a sharable, consumable, and executable artifact. The resource is general enough to support the description of a broad range of clinical and non-clinical artifacts such as clinical decision support rules, order sets, protocols, and drug quality specifications.
+ */
+#[FhirResource(
+    type: 'PlanDefinition',
+    version: '5.0.0',
+    url: 'http://hl7.org/fhir/StructureDefinition/PlanDefinition',
+    fhirVersion: 'R5',
+)]
+class PlanDefinitionResource extends DomainResourceResource
+{
+    public function __construct(
+        /** @var string|null id Logical id of this artifact */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        public ?string $id = null,
+        /** @var Meta|null meta Metadata about the resource */
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        public ?Meta $meta = null,
+        /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        public ?UriPrimitive $implicitRules = null,
+        /** @var AllLanguagesType|null language Language of the resource content */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        public ?AllLanguagesType $language = null,
+        /** @var Narrative|null text Text summary of the resource, for human interpretation */
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        public ?Narrative $text = null,
+        /** @var array<ResourceResource> contained Contained, inline Resources */
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        public array $contained = [],
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        public array $modifierExtension = [],
+        /** @var UriPrimitive|null url Canonical identifier for this plan definition, represented as a URI (globally unique) */
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        public ?UriPrimitive $url = null,
+        /** @var array<Identifier> identifier Additional identifier for the plan definition */
+        #[FhirProperty(
+            fhirType: 'Identifier',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
+        )]
+        public array $identifier = [],
+        /** @var StringPrimitive|string|null version Business version of the plan definition */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+        public StringPrimitive|string|null $version = null,
+        /** @var StringPrimitive|string|Coding|null versionAlgorithm How to compare versions */
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'string',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive',
+                    'jsonKey'      => 'versionAlgorithmString',
+                ],
+                [
+                    'fhirType'     => 'Coding',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding',
+                    'jsonKey'      => 'versionAlgorithmCoding',
+                ],
+            ],
+        )]
+        public StringPrimitive|string|Coding|null $versionAlgorithm = null,
+        /** @var StringPrimitive|string|null name Name for this plan definition (computer friendly) */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+        public StringPrimitive|string|null $name = null,
+        /** @var StringPrimitive|string|null title Name for this plan definition (human friendly) */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+        public StringPrimitive|string|null $title = null,
+        /** @var StringPrimitive|string|null subtitle Subordinate title of the plan definition */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+        public StringPrimitive|string|null $subtitle = null,
+        /** @var CodeableConcept|null type order-set | clinical-protocol | eca-rule | workflow-definition */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $type = null,
+        /** @var PublicationStatusType|null status draft | active | retired | unknown */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        public ?PublicationStatusType $status = null,
+        /** @var bool|null experimental For testing purposes, not real usage */
+        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
+        public ?bool $experimental = null,
+        /** @var CodeableConcept|Reference|CanonicalPrimitive|null subject Type of individual the plan definition is focused on */
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'CodeableConcept',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
+                    'jsonKey'      => 'subjectCodeableConcept',
+                ],
+                [
+                    'fhirType'     => 'Reference',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
+                    'jsonKey'      => 'subjectReference',
+                ],
+                [
+                    'fhirType'     => 'canonical',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive',
+                    'jsonKey'      => 'subjectCanonical',
+                ],
+            ],
+        )]
+        public CodeableConcept|Reference|CanonicalPrimitive|null $subject = null,
+        /** @var DateTimePrimitive|null date Date last changed */
+        #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
+        public ?DateTimePrimitive $date = null,
+        /** @var StringPrimitive|string|null publisher Name of the publisher/steward (organization or individual) */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+        public StringPrimitive|string|null $publisher = null,
+        /** @var array<ContactDetail> contact Contact details for the publisher */
+        #[FhirProperty(
+            fhirType: 'ContactDetail',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
+        )]
+        public array $contact = [],
+        /** @var MarkdownPrimitive|null description Natural language description of the plan definition */
+        #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
+        public ?MarkdownPrimitive $description = null,
+        /** @var array<UsageContext> useContext The context that the content is intended to support */
+        #[FhirProperty(
+            fhirType: 'UsageContext',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\UsageContext',
+        )]
+        public array $useContext = [],
+        /** @var array<CodeableConcept> jurisdiction Intended jurisdiction for plan definition (if applicable) */
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
+        )]
+        public array $jurisdiction = [],
+        /** @var MarkdownPrimitive|null purpose Why this plan definition is defined */
+        #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
+        public ?MarkdownPrimitive $purpose = null,
+        /** @var MarkdownPrimitive|null usage Describes the clinical usage of the plan */
+        #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
+        public ?MarkdownPrimitive $usage = null,
+        /** @var MarkdownPrimitive|null copyright Use and/or publishing restrictions */
+        #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
+        public ?MarkdownPrimitive $copyright = null,
+        /** @var StringPrimitive|string|null copyrightLabel Copyright holder and year(s) */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+        public StringPrimitive|string|null $copyrightLabel = null,
+        /** @var DatePrimitive|null approvalDate When the plan definition was approved by publisher */
+        #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
+        public ?DatePrimitive $approvalDate = null,
+        /** @var DatePrimitive|null lastReviewDate When the plan definition was last reviewed by the publisher */
+        #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
+        public ?DatePrimitive $lastReviewDate = null,
+        /** @var Period|null effectivePeriod When the plan definition is expected to be used */
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        public ?Period $effectivePeriod = null,
+        /** @var array<CodeableConcept> topic E.g. Education, Treatment, Assessment */
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
+        )]
+        public array $topic = [],
+        /** @var array<ContactDetail> author Who authored the content */
+        #[FhirProperty(
+            fhirType: 'ContactDetail',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
+        )]
+        public array $author = [],
+        /** @var array<ContactDetail> editor Who edited the content */
+        #[FhirProperty(
+            fhirType: 'ContactDetail',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
+        )]
+        public array $editor = [],
+        /** @var array<ContactDetail> reviewer Who reviewed the content */
+        #[FhirProperty(
+            fhirType: 'ContactDetail',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
+        )]
+        public array $reviewer = [],
+        /** @var array<ContactDetail> endorser Who endorsed the content */
+        #[FhirProperty(
+            fhirType: 'ContactDetail',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
+        )]
+        public array $endorser = [],
+        /** @var array<RelatedArtifact> relatedArtifact Additional documentation, citations */
+        #[FhirProperty(
+            fhirType: 'RelatedArtifact',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\RelatedArtifact',
+        )]
+        public array $relatedArtifact = [],
+        /** @var array<CanonicalPrimitive> library Logic used by the plan definition */
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true)]
+        public array $library = [],
+        /** @var array<PlanDefinitionGoal> goal What the plan is trying to accomplish */
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\PlanDefinition\PlanDefinitionGoal',
+        )]
+        public array $goal = [],
+        /** @var array<PlanDefinitionActor> actor Actors within the plan */
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\PlanDefinition\PlanDefinitionActor',
+        )]
+        public array $actor = [],
+        /** @var array<PlanDefinitionAction> action Action defined by the plan */
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\PlanDefinition\PlanDefinitionAction',
+        )]
+        public array $action = [],
+        /** @var bool|CodeableConcept|null asNeeded Preconditions for service */
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                ['fhirType' => 'boolean', 'propertyKind' => 'scalar', 'phpType' => 'bool', 'jsonKey' => 'asNeededBoolean'],
+                [
+                    'fhirType'     => 'CodeableConcept',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
+                    'jsonKey'      => 'asNeededCodeableConcept',
+                ],
+            ],
+        )]
+        public bool|CodeableConcept|null $asNeeded = null,
+    ) {
+        parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
+    }
+}

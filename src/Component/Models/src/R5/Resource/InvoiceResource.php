@@ -1,0 +1,165 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
+
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\InvoiceStatusType;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Meta;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\MonetaryComponent;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Money;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Narrative;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\Invoice\InvoiceLineItem;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\Invoice\InvoiceParticipant;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
+/**
+ * @author Health Level Seven International (Financial Management)
+ *
+ * @see http://hl7.org/fhir/StructureDefinition/Invoice
+ *
+ * @description Invoice containing collected ChargeItems from an Account with calculated individual and total price for Billing purpose.
+ */
+#[FhirResource(type: 'Invoice', version: '5.0.0', url: 'http://hl7.org/fhir/StructureDefinition/Invoice', fhirVersion: 'R5')]
+class InvoiceResource extends DomainResourceResource
+{
+    public function __construct(
+        /** @var string|null id Logical id of this artifact */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        public ?string $id = null,
+        /** @var Meta|null meta Metadata about the resource */
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        public ?Meta $meta = null,
+        /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        public ?UriPrimitive $implicitRules = null,
+        /** @var AllLanguagesType|null language Language of the resource content */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        public ?AllLanguagesType $language = null,
+        /** @var Narrative|null text Text summary of the resource, for human interpretation */
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        public ?Narrative $text = null,
+        /** @var array<ResourceResource> contained Contained, inline Resources */
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        public array $contained = [],
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        public array $modifierExtension = [],
+        /** @var array<Identifier> identifier Business Identifier for item */
+        #[FhirProperty(
+            fhirType: 'Identifier',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
+        )]
+        public array $identifier = [],
+        /** @var InvoiceStatusType|null status draft | issued | balanced | cancelled | entered-in-error */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        public ?InvoiceStatusType $status = null,
+        /** @var StringPrimitive|string|null cancelledReason Reason for cancellation of this Invoice */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+        public StringPrimitive|string|null $cancelledReason = null,
+        /** @var CodeableConcept|null type Type of Invoice */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $type = null,
+        /** @var Reference|null subject Recipient(s) of goods and services */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $subject = null,
+        /** @var Reference|null recipient Recipient of this invoice */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $recipient = null,
+        /** @var DateTimePrimitive|null date DEPRICATED */
+        #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
+        public ?DateTimePrimitive $date = null,
+        /** @var DateTimePrimitive|null creation When posted */
+        #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
+        public ?DateTimePrimitive $creation = null,
+        /** @var DatePrimitive|Period|null period Billing date or period */
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'date',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive',
+                    'jsonKey'      => 'periodDate',
+                ],
+                [
+                    'fhirType'     => 'Period',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Period',
+                    'jsonKey'      => 'periodPeriod',
+                ],
+            ],
+        )]
+        public DatePrimitive|Period|null $period = null,
+        /** @var array<InvoiceParticipant> participant Participant in creation of this Invoice */
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Invoice\InvoiceParticipant',
+        )]
+        public array $participant = [],
+        /** @var Reference|null issuer Issuing Organization of Invoice */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $issuer = null,
+        /** @var Reference|null account Account that is being balanced */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $account = null,
+        /** @var array<InvoiceLineItem> lineItem Line items of this Invoice */
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Invoice\InvoiceLineItem',
+        )]
+        public array $lineItem = [],
+        /** @var array<MonetaryComponent> totalPriceComponent Components of Invoice total */
+        #[FhirProperty(
+            fhirType: 'MonetaryComponent',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\MonetaryComponent',
+        )]
+        public array $totalPriceComponent = [],
+        /** @var Money|null totalNet Net total of this Invoice */
+        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
+        public ?Money $totalNet = null,
+        /** @var Money|null totalGross Gross total of this Invoice */
+        #[FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
+        public ?Money $totalGross = null,
+        /** @var MarkdownPrimitive|null paymentTerms Payment details */
+        #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
+        public ?MarkdownPrimitive $paymentTerms = null,
+        /** @var array<Annotation> note Comments made about the invoice */
+        #[FhirProperty(
+            fhirType: 'Annotation',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation',
+        )]
+        public array $note = [],
+    ) {
+        parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
+    }
+}

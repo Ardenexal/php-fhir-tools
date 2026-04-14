@@ -1,0 +1,22 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R5\Profile;
+
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\ObservationResource;
+
+/**
+ * @author Grahame Grieve
+ *
+ * @see http://hl7.org/fhir/StructureDefinition/triglyceride
+ *
+ * @description Triglyceride Result
+ */
+#[FHIRProfile(profileUrl: 'http://hl7.org/fhir/StructureDefinition/triglyceride', baseType: 'Observation', fhirVersion: 'R5')]
+class ExampleLipidProfile extends ObservationResource
+{
+    /** Canonical URL of this profile's StructureDefinition. */
+    public const string PROFILE_URL = 'http://hl7.org/fhir/StructureDefinition/triglyceride';
+}

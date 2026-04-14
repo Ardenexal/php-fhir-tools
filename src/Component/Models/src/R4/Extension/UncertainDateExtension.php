@@ -1,0 +1,27 @@
+<?php declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
+
+/**
+ * @author HL7 International / FHIR Infrastructure
+ * @see http://hl7.org/fhir/StructureDefinition/timing-uncertainDate
+ * @description When present, this extension indicates that the date of a period start or end is uncertain and falls within its own period.  DEPRECATED: use [uncertainPeriod](StructureDefinition-uncertainPeriod.html) instead.
+ */
+#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/timing-uncertainDate', fhirVersion: 'R4')]
+class UncertainDateExtension extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension
+{
+	public function __construct(
+		/** @var Period|null valuePeriod Value of extension */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Period $valuePeriod = null,
+		?string $id = null,
+		array $extension = [],
+	) {
+		parent::__construct(
+		    id: $id,
+		    extension: $extension,
+		    url: 'http://hl7.org/fhir/StructureDefinition/timing-uncertainDate',
+		    value: $this->valuePeriod,
+		);
+	}
+}

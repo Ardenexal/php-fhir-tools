@@ -1,0 +1,77 @@
+<?php declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
+
+/**
+ * @author HL7 International / Patient Administration
+ * @see http://hl7.org/fhir/StructureDefinition/patient-sexParameterForClinicalUse
+ * @description A Sex Parameter for Clinical Use is a parameter that provides guidance on how a recipient should apply settings or reference ranges that are derived from observable information such as an organ inventory, recent hormone lab tests, genetic testing, menstrual status, obstetric history, etc..  This property is intended for use in clinical decision making, and indicates that treatment or diagnostic tests should consider best practices associated with the relevant reference population.  When exchanging these concepts, refer to the guidance in the [Gender Harmony Implementation Guide](http://hl7.org/xprod/ig/uv/gender-harmony/).
+ */
+#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-sexParameterForClinicalUse', fhirVersion: 'R4')]
+class PatSexParameterForClinicalUseExtension extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension implements \Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface
+{
+	public function __construct(
+		/** @var CodeableConcept valueSlice A context-specific sex parameter for clinical use */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+		public \Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept $valueSlice,
+		/** @var Period|null period When the sex for clinical use applies */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Period $period = null,
+		/** @var StringPrimitive|null comment Comments about the sex parameter for clinical use */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive $comment = null,
+		/** @var array<CodeableConcept> supportingInfo Source of the sex for clincal use */
+		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true)]
+		public array $supportingInfo = [],
+		?string $id = null,
+	) {
+		$subExtensions = [];
+		$subExtensions[] = new Extension(url: 'value', value: $this->valueSlice);
+		if ($this->period !== null) {
+		    $subExtensions[] = new Extension(url: 'period', value: $this->period);
+		}
+		if ($this->comment !== null) {
+		    $subExtensions[] = new Extension(url: 'comment', value: $this->comment);
+		}
+		foreach ($this->supportingInfo as $v) {
+		    $subExtensions[] = new Extension(url: 'supportingInfo', value: $v);
+		}
+		parent::__construct(
+		    id: $id,
+		    extension: $subExtensions,
+		    url: 'http://hl7.org/fhir/StructureDefinition/patient-sexParameterForClinicalUse',
+		);
+	}
+
+
+	/**
+	 * Reconstruct from an array of already-denormalized sub-extension objects.
+	 * @param array<\Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface> $subExtensions
+	 * @param string|null $id
+	 */
+	public static function fromSubExtensions(array $subExtensions, ?string $id = null): static
+	{
+		$valueSlice = null;
+		$period = null;
+		$comment = null;
+		$supportingInfo = [];
+
+		foreach ($subExtensions as $ext) {
+		    $extUrl = $ext->getExtensionUrl();
+		    if ($extUrl === 'value' && $ext->value instanceof CodeableConcept) {
+		        $valueSlice = $ext->value;
+		    }
+		    if ($extUrl === 'period' && $ext->value instanceof Period) {
+		        $period = $ext->value;
+		    }
+		    if ($extUrl === 'comment' && $ext->value instanceof StringPrimitive) {
+		        $comment = $ext->value;
+		    }
+		    if ($extUrl === 'supportingInfo' && $ext->value instanceof CodeableConcept) {
+		        $supportingInfo[] = $ext->value;
+		    }
+		}
+
+		return new static($valueSlice, $period, $comment, $supportingInfo, $id);
+	}
+}

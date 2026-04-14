@@ -4,12 +4,11 @@ fhir:
         enabled: true
         strict_mode: false
 
-    # Implementation Guide generation — run: php bin/console fhir:generate-ig
-    # ig:
-    #     namespace: 'App\FHIR\IG'                     # must match PSR-4 autoload in composer.json
-    #     output_directory: '%kernel.project_dir%/src/FHIRIG'
-    #     offline: false                                # set true to skip network downloads
-    #     packages:                                     # specify in dependency order
-    #         - hl7.fhir.us.core
-    #         - hl7.fhir.au.base#1.0.0
-    #         - hl7.fhir.au.core#1.0.0                 # extends au.base, listed after it
+    # Implementation Guide generation — run: php bin/console fhir:generate-ig --package=hl7.fhir.au.base
+    # Or use the root composer scripts: composer generate-ig-au-base, generate-ig-au-core, generate-ig-us-core
+    # After generation, clear the Symfony cache: php bin/console cache:clear
+    ig:
+        namespace: 'App\FHIR\IG'                       # must match PSR-4 autoload in composer.json
+        output_directory: '%kernel.project_dir%/src/FHIRIG'
+        offline: false                                  # set true to skip network downloads
+        packages: []                                    # specify in dependency order via CLI --package args

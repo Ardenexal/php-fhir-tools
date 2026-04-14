@@ -330,17 +330,14 @@ class FHIRBackboneElementNormalizer extends AbstractFHIRNormalizer
             return null;
         }
 
-        $result = [];
-        foreach ($extensions as $extension) {
-            if ($this->denormalizer !== null && is_array($extension)) {
-                // Try to denormalize as Extension object - simplified for now
-                $result[] = $extension;
-            } else {
-                $result[] = $this->denormalizeBasicValue($extension, $format, $context);
-            }
+        if ($format === 'xml' && !array_is_list($extensions)) {
+            $extensions = [$extensions];
         }
 
-        return $result;
+        /** @var list<mixed> $result */
+        $result = array_values($this->denormalizeExtensionArray(array_values($extensions), $format, $context));
+
+        return empty($result) ? null : $result;
     }
 
     /**

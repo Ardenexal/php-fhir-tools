@@ -1,0 +1,214 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
+
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Meta;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Narrative;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\RequestIntentType;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\RequestPriorityType;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\RequestStatusType;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Timing;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\DeviceRequest\DeviceRequestParameter;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
+/**
+ * @author Health Level Seven International (Orders and Observations)
+ *
+ * @see http://hl7.org/fhir/StructureDefinition/DeviceRequest
+ *
+ * @description Represents a request for a patient to employ a medical device. The device may be an implantable device, or an external assistive device, such as a walker.
+ */
+#[FhirResource(type: 'DeviceRequest', version: '5.0.0', url: 'http://hl7.org/fhir/StructureDefinition/DeviceRequest', fhirVersion: 'R5')]
+class DeviceRequestResource extends DomainResourceResource
+{
+    public function __construct(
+        /** @var string|null id Logical id of this artifact */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        public ?string $id = null,
+        /** @var Meta|null meta Metadata about the resource */
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        public ?Meta $meta = null,
+        /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        public ?UriPrimitive $implicitRules = null,
+        /** @var AllLanguagesType|null language Language of the resource content */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        public ?AllLanguagesType $language = null,
+        /** @var Narrative|null text Text summary of the resource, for human interpretation */
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        public ?Narrative $text = null,
+        /** @var array<ResourceResource> contained Contained, inline Resources */
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        public array $contained = [],
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        public array $modifierExtension = [],
+        /** @var array<Identifier> identifier External Request identifier */
+        #[FhirProperty(
+            fhirType: 'Identifier',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
+        )]
+        public array $identifier = [],
+        /** @var array<CanonicalPrimitive> instantiatesCanonical Instantiates FHIR protocol or definition */
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true)]
+        public array $instantiatesCanonical = [],
+        /** @var array<UriPrimitive> instantiatesUri Instantiates external protocol or definition */
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isArray: true)]
+        public array $instantiatesUri = [],
+        /** @var array<Reference> basedOn What request fulfills */
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
+        )]
+        public array $basedOn = [],
+        /** @var array<Reference> replaces What request replaces */
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
+        )]
+        public array $replaces = [],
+        /** @var Identifier|null groupIdentifier Identifier of composite request */
+        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
+        public ?Identifier $groupIdentifier = null,
+        /** @var RequestStatusType|null status draft | active | on-hold | revoked | completed | entered-in-error | unknown */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        public ?RequestStatusType $status = null,
+        /** @var RequestIntentType|null intent proposal | plan | directive | order | original-order | reflex-order | filler-order | instance-order | option */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        public ?RequestIntentType $intent = null,
+        /** @var RequestPriorityType|null priority routine | urgent | asap | stat */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        public ?RequestPriorityType $priority = null,
+        /** @var bool|null doNotPerform True if the request is to stop or not to start using the device */
+        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
+        public ?bool $doNotPerform = null,
+        /** @var CodeableReference|null code Device requested */
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex', isRequired: true), NotBlank]
+        public ?CodeableReference $code = null,
+        /** @var int|null quantity Quantity of devices to supply */
+        #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
+        public ?int $quantity = null,
+        /** @var array<DeviceRequestParameter> parameter Device details */
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\DeviceRequest\DeviceRequestParameter',
+        )]
+        public array $parameter = [],
+        /** @var Reference|null subject Focus of request */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank]
+        public ?Reference $subject = null,
+        /** @var Reference|null encounter Encounter motivating request */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $encounter = null,
+        /** @var DateTimePrimitive|Period|Timing|null occurrence Desired time or schedule for use */
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'dateTime',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive',
+                    'jsonKey'      => 'occurrenceDateTime',
+                ],
+                [
+                    'fhirType'     => 'Period',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Period',
+                    'jsonKey'      => 'occurrencePeriod',
+                ],
+                [
+                    'fhirType'     => 'Timing',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Timing',
+                    'jsonKey'      => 'occurrenceTiming',
+                ],
+            ],
+        )]
+        public DateTimePrimitive|Period|Timing|null $occurrence = null,
+        /** @var DateTimePrimitive|null authoredOn When recorded */
+        #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
+        public ?DateTimePrimitive $authoredOn = null,
+        /** @var Reference|null requester Who/what submitted the device request */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $requester = null,
+        /** @var CodeableReference|null performer Requested Filler */
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex')]
+        public ?CodeableReference $performer = null,
+        /** @var array<CodeableReference> reason Coded/Linked Reason for request */
+        #[FhirProperty(
+            fhirType: 'CodeableReference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
+        )]
+        public array $reason = [],
+        /** @var bool|null asNeeded PRN status of request */
+        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
+        public ?bool $asNeeded = null,
+        /** @var CodeableConcept|null asNeededFor Device usage reason */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $asNeededFor = null,
+        /** @var array<Reference> insurance Associated insurance coverage */
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
+        )]
+        public array $insurance = [],
+        /** @var array<Reference> supportingInfo Additional clinical information */
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
+        )]
+        public array $supportingInfo = [],
+        /** @var array<Annotation> note Notes or comments */
+        #[FhirProperty(
+            fhirType: 'Annotation',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation',
+        )]
+        public array $note = [],
+        /** @var array<Reference> relevantHistory Request provenance */
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
+        )]
+        public array $relevantHistory = [],
+    ) {
+        parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
+    }
+}

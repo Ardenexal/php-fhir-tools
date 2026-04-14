@@ -23,6 +23,8 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UnsignedIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UrlPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UuidPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\Dosage;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\Timing;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -35,6 +37,11 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 #[FHIRComplexType(typeName: 'Extension', fhirVersion: 'R4')]
 class Extension extends Element implements FHIRExtensionInterface
 {
+    public function getExtensionUrl(): ?string
+    {
+        return $this->url;
+    }
+
     public function __construct(
         /** @var string|null id Unique id for inter-element referencing */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
@@ -273,7 +280,7 @@ class Extension extends Element implements FHIRExtensionInterface
                 [
                     'fhirType'     => 'Timing',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Timing',
                     'jsonKey'      => 'valueTiming',
                 ],
                 [
@@ -327,7 +334,7 @@ class Extension extends Element implements FHIRExtensionInterface
                 [
                     'fhirType'     => 'Dosage',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Dosage',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Dosage',
                     'jsonKey'      => 'valueDosage',
                 ],
                 [
@@ -341,10 +348,5 @@ class Extension extends Element implements FHIRExtensionInterface
         public Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|string|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|Meta|null $value = null,
     ) {
         parent::__construct($id, $extension);
-    }
-
-    public function getExtensionUrl(): ?string
-    {
-        return $this->url;
     }
 }

@@ -53,7 +53,7 @@ class FHIRIGTypeRegistryTest extends TestCase
 
     public function testGetExtensionMappingsReturnsMap(): void
     {
-        $map = ['http://example.com/ext' => \stdClass::class];
+        $map      = ['http://example.com/ext' => \stdClass::class];
         $registry = new FHIRIGTypeRegistry(extensionMappings: $map);
 
         self::assertSame($map, $registry->getExtensionMappings());
@@ -61,7 +61,7 @@ class FHIRIGTypeRegistryTest extends TestCase
 
     public function testGetProfileMappingsReturnsMap(): void
     {
-        $map = ['http://example.com/profile' => \stdClass::class];
+        $map      = ['http://example.com/profile' => \stdClass::class];
         $registry = new FHIRIGTypeRegistry(profileMappings: $map);
 
         self::assertSame($map, $registry->getProfileMappings());
