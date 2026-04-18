@@ -1,0 +1,69 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
+
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
+/**
+ * @author HL7 FHIR Standard
+ *
+ * @see http://hl7.org/fhir/StructureDefinition/UsageContext
+ *
+ * @description Specifies clinical/business/etc. metadata that can be used to retrieve, index and/or categorize an artifact. This metadata can either be specific to the applicable population (e.g., age category, DRG) or the specific context of care (e.g., venue, care setting, provider of care).
+ */
+#[FHIRComplexType(typeName: 'UsageContext', fhirVersion: 'R5')]
+class UsageContext extends DataType
+{
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
+        public ?string $id = null,
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var Coding|null code Type of context being specified */
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true), NotBlank]
+        public ?Coding $code = null,
+        /** @var CodeableConcept|Quantity|Range|Reference|null value Value that defines the context */
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isRequired: true,
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'CodeableConcept',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
+                    'jsonKey'      => 'valueCodeableConcept',
+                ],
+                [
+                    'fhirType'     => 'Quantity',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity',
+                    'jsonKey'      => 'valueQuantity',
+                ],
+                [
+                    'fhirType'     => 'Range',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Range',
+                    'jsonKey'      => 'valueRange',
+                ],
+                [
+                    'fhirType'     => 'Reference',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
+                    'jsonKey'      => 'valueReference',
+                ],
+            ],
+        )]
+        #[NotBlank]
+        public CodeableConcept|Quantity|Range|Reference|null $value = null,
+    ) {
+        parent::__construct($id, $extension);
+    }
+}

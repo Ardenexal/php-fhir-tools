@@ -48,8 +48,14 @@ class FHIRExtension extends Extension
         $container->setParameter('fhir.is_symfony_70_or_higher', SymfonyVersionHelper::isSymfony70OrHigher());
         $container->setParameter('fhir.is_symfony_74_or_higher', SymfonyVersionHelper::isSymfony74OrHigher());
 
+        // IG generation configuration
+        $container->setParameter('fhir.ig.packages', $config['ig']['packages']);
+        $container->setParameter('fhir.ig.offline', $config['ig']['offline']);
+        $container->setParameter('fhir.ig.output_directory', $config['ig']['output_directory']);
+        $container->setParameter('fhir.ig.namespace', $config['ig']['namespace']);
+
         // Serialization metadata cache pool
-        $cachePool        = $config['serialization']['metadata_cache_pool'] ?? null;
+        $cachePool         = $config['serialization']['metadata_cache_pool'] ?? null;
         $enableCacheWarmer = $config['serialization']['enable_cache_warmer'] ?? false;
         $container->setParameter('fhir.serialization.metadata_cache_pool', $cachePool);
 

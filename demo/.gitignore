@@ -2,6 +2,9 @@
 # Override root .gitignore — the demo app's lock file should be tracked
 !composer.lock
 
+# Generated FHIR IG classes (run `composer generate-ig-*` to regenerate)
+/src/FHIRIG/
+
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php

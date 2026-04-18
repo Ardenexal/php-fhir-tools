@@ -1,0 +1,222 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
+
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\ImmunizationStatusCodesType;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Meta;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Narrative;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\Immunization\ImmunizationPerformer;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\Immunization\ImmunizationProgramEligibility;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\Immunization\ImmunizationProtocolApplied;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\Immunization\ImmunizationReaction;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
+/**
+ * @author Health Level Seven International (Public Health and Emergency Response)
+ *
+ * @see http://hl7.org/fhir/StructureDefinition/Immunization
+ *
+ * @description Describes the event of a patient being administered a vaccine or a record of an immunization as reported by a patient, a clinician or another party.
+ */
+#[FhirResource(type: 'Immunization', version: '5.0.0', url: 'http://hl7.org/fhir/StructureDefinition/Immunization', fhirVersion: 'R5')]
+class ImmunizationResource extends DomainResourceResource
+{
+    public function __construct(
+        /** @var string|null id Logical id of this artifact */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        public ?string $id = null,
+        /** @var Meta|null meta Metadata about the resource */
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        public ?Meta $meta = null,
+        /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        public ?UriPrimitive $implicitRules = null,
+        /** @var AllLanguagesType|null language Language of the resource content */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        public ?AllLanguagesType $language = null,
+        /** @var Narrative|null text Text summary of the resource, for human interpretation */
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        public ?Narrative $text = null,
+        /** @var array<ResourceResource> contained Contained, inline Resources */
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        public array $contained = [],
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        public array $modifierExtension = [],
+        /** @var array<Identifier> identifier Business identifier */
+        #[FhirProperty(
+            fhirType: 'Identifier',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
+        )]
+        public array $identifier = [],
+        /** @var array<Reference> basedOn Authority that the immunization event is based on */
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
+        )]
+        public array $basedOn = [],
+        /** @var ImmunizationStatusCodesType|null status completed | entered-in-error | not-done */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        public ?ImmunizationStatusCodesType $status = null,
+        /** @var CodeableConcept|null statusReason Reason for current status */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $statusReason = null,
+        /** @var CodeableConcept|null vaccineCode Vaccine administered */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        public ?CodeableConcept $vaccineCode = null,
+        /** @var CodeableReference|null administeredProduct Product that was administered */
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex')]
+        public ?CodeableReference $administeredProduct = null,
+        /** @var CodeableReference|null manufacturer Vaccine manufacturer */
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex')]
+        public ?CodeableReference $manufacturer = null,
+        /** @var StringPrimitive|string|null lotNumber Vaccine lot number */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+        public StringPrimitive|string|null $lotNumber = null,
+        /** @var DatePrimitive|null expirationDate Vaccine expiration date */
+        #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
+        public ?DatePrimitive $expirationDate = null,
+        /** @var Reference|null patient Who was immunized */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank]
+        public ?Reference $patient = null,
+        /** @var Reference|null encounter Encounter immunization was part of */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $encounter = null,
+        /** @var array<Reference> supportingInformation Additional information in support of the immunization */
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
+        )]
+        public array $supportingInformation = [],
+        /** @var DateTimePrimitive|StringPrimitive|string|null occurrence Vaccine administration date */
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isRequired: true,
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'dateTime',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive',
+                    'jsonKey'      => 'occurrenceDateTime',
+                ],
+                [
+                    'fhirType'     => 'string',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive',
+                    'jsonKey'      => 'occurrenceString',
+                ],
+            ],
+        )]
+        #[NotBlank]
+        public DateTimePrimitive|StringPrimitive|string|null $occurrence = null,
+        /** @var bool|null primarySource Indicates context the data was captured in */
+        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
+        public ?bool $primarySource = null,
+        /** @var CodeableReference|null informationSource Indicates the source of a  reported record */
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex')]
+        public ?CodeableReference $informationSource = null,
+        /** @var Reference|null location Where immunization occurred */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $location = null,
+        /** @var CodeableConcept|null site Body site vaccine  was administered */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $site = null,
+        /** @var CodeableConcept|null route How vaccine entered body */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $route = null,
+        /** @var Quantity|null doseQuantity Amount of vaccine administered */
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        public ?Quantity $doseQuantity = null,
+        /** @var array<ImmunizationPerformer> performer Who performed event */
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Immunization\ImmunizationPerformer',
+        )]
+        public array $performer = [],
+        /** @var array<Annotation> note Additional immunization notes */
+        #[FhirProperty(
+            fhirType: 'Annotation',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation',
+        )]
+        public array $note = [],
+        /** @var array<CodeableReference> reason Why immunization occurred */
+        #[FhirProperty(
+            fhirType: 'CodeableReference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
+        )]
+        public array $reason = [],
+        /** @var bool|null isSubpotent Dose potency */
+        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
+        public ?bool $isSubpotent = null,
+        /** @var array<CodeableConcept> subpotentReason Reason for being subpotent */
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
+        )]
+        public array $subpotentReason = [],
+        /** @var array<ImmunizationProgramEligibility> programEligibility Patient eligibility for a specific vaccination program */
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Immunization\ImmunizationProgramEligibility',
+        )]
+        public array $programEligibility = [],
+        /** @var CodeableConcept|null fundingSource Funding source for the vaccine */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $fundingSource = null,
+        /** @var array<ImmunizationReaction> reaction Details of a reaction that follows immunization */
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Immunization\ImmunizationReaction',
+        )]
+        public array $reaction = [],
+        /** @var array<ImmunizationProtocolApplied> protocolApplied Protocol followed by the provider */
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Immunization\ImmunizationProtocolApplied',
+        )]
+        public array $protocolApplied = [],
+    ) {
+        parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
+    }
+}

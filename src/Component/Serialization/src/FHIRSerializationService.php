@@ -32,6 +32,7 @@ class FHIRSerializationService
         private readonly SerializerInterface $serializer,
         private readonly FHIRSerializationContextFactory $contextFactory,
         private readonly FHIRSerializationDebugInfo $debugInfo,
+        private readonly FHIRTypeResolverInterface $typeResolver = new FHIRTypeResolver(),
     ) {
     }
 
@@ -212,36 +213,6 @@ class FHIRSerializationService
     }
 
     /**
-     * Perform a round-trip serialization test (serialize then deserialize).
-     *
-     * @param object               $fhirObject The FHIR object to test
-     * @param string               $format     The format to test ('json' or 'xml')
-     * @param array<string, mixed> $context    Additional context
-     *
-     * @throws FHIRSerializationException If round-trip fails
-     */
-    public function roundTripTest(object $fhirObject, string $format = 'json', array $context = []): object
-    {
-        $originalClass = get_class($fhirObject);
-
-        // Serialize
-        $serialized = match ($format) {
-            'json'  => $this->serializeToJson($fhirObject, $context),
-            'xml'   => $this->serializeToXml($fhirObject, $context),
-            default => throw new FHIRSerializationException("Unsupported format: {$format}")
-        };
-
-        // Deserialize
-        $deserialized = match ($format) {
-            'json'  => $this->deserializeFromJson($serialized, $originalClass, $context),
-            'xml'   => $this->deserializeFromXml($serialized, $originalClass, $context),
-            default => throw new FHIRSerializationException("Unsupported format: {$format}")
-        };
-
-        return $deserialized;
-    }
-
-    /**
      * Get serialization debug information for the last operation.
      *
      * @return array<string, mixed>
@@ -272,32 +243,32 @@ class FHIRSerializationService
     /**
      * Detect the target class from the data content.
      *
-     * Tries Models convention (Ardenexal\FHIRTools\Component\Models\{Version}\Resource\{Type}Resource)
-     * across all supported FHIR versions before giving up.
+     * Delegates to FHIRTypeResolver so that profile-based resolution (via meta.profile) and
+     * the IG type registry are applied when available, in addition to the default resourceType
+     * convention lookup.
      */
     private function detectTargetClass(string $data, string $format): string
     {
-        $resourceType = null;
+        /** @var array<string, mixed>|null $decoded */
+        $decoded = null;
 
         if ($format === 'json') {
             $decoded = json_decode($data, true);
-            if (is_array($decoded) && isset($decoded['resourceType']) && is_string($decoded['resourceType'])) {
-                $resourceType = $decoded['resourceType'];
+            if (!is_array($decoded)) {
+                $decoded = null;
             }
         } elseif ($format === 'xml') {
             // Strip DOCTYPE to prevent XXE, then extract the root element name
             $xml = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NONET | LIBXML_NOERROR);
             if ($xml !== false) {
-                $resourceType = $xml->getName();
+                $decoded = ['resourceType' => $xml->getName()];
             }
         }
 
-        if ($resourceType !== null) {
-            foreach (['R4', 'R4B', 'R5'] as $version) {
-                $candidate = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\Resource\\{$resourceType}Resource";
-                if (class_exists($candidate)) {
-                    return $candidate;
-                }
+        if ($decoded !== null) {
+            $resolved = $this->typeResolver->resolveResourceType($decoded);
+            if ($resolved !== null) {
+                return $resolved;
             }
         }
 

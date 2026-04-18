@@ -13,8 +13,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\ProdCharacteristic;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\ProductShelfLife;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
@@ -141,7 +139,7 @@ class DeviceDefinitionResource extends DomainResourceResource
             fhirType: 'ProductShelfLife',
             propertyKind: 'complex',
             isArray: true,
-            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\ProductShelfLife',
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ProductShelfLife',
         )]
         public array $shelfLifeStorage = [],
         /** @var ProdCharacteristic|null physicalCharacteristics Dimensions, color etc. */

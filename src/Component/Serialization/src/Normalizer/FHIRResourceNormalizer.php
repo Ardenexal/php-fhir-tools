@@ -8,6 +8,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationDebugInfo;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
@@ -30,9 +31,10 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
         FHIRMetadataExtractorInterface $metadataExtractor,
         private readonly FHIRTypeResolverInterface $typeResolver,
         ?NormalizerInterface $normalizer = null,
-        ?DenormalizerInterface $denormalizer = null
+        ?DenormalizerInterface $denormalizer = null,
+        ?FHIRIGTypeRegistry $igTypeRegistry = null,
     ) {
-        parent::__construct($metadataExtractor, $normalizer, $denormalizer);
+        parent::__construct($metadataExtractor, $normalizer, $denormalizer, $igTypeRegistry);
     }
 
     /**
@@ -198,13 +200,22 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
             return false;
         }
 
-        // Check if the type is a FHIR resource class
+        // Check if the type is a FHIR resource class, walking the parent chain so that
+        // profile subclasses (e.g. AUBasePatientProfile extends PatientResource) are also
+        // accepted even though #[FhirResource] is only on the base resource class.
         try {
             /** @var class-string $type */
-            $reflection = new \ReflectionClass($type);
-            $attributes = $reflection->getAttributes(FhirResource::class);
+            $refl = new \ReflectionClass($type);
 
-            return !empty($attributes);
+            do {
+                if (!empty($refl->getAttributes(FhirResource::class))) {
+                    return true;
+                }
+
+                $refl = $refl->getParentClass();
+            } while ($refl !== false);
+
+            return false;
         } catch (\ReflectionException) {
             return false;
         }
@@ -711,7 +722,15 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
                     $meta         = $metaMap[$elementName] ?? null;
                     $phpItemClass = $meta?->phpItemClass;
 
-                    if ($phpItemClass !== null && $this->denormalizer !== null && is_array($value)) {
+                    if ($meta !== null
+                        && ($meta->propertyKind === 'extension' || $meta->propertyKind === 'modifierExtension')
+                        && is_array($value)
+                    ) {
+                        // Extension/modifierExtension: phpItemClass is null for these properties.
+                        // Use denormalizeExtensionArray() which handles IG registry lookups and
+                        // falls back to the base Extension class for unknown URLs.
+                        $denormalizedValue = $this->denormalizeExtensionArray($value, 'json', $context);
+                    } elseif ($phpItemClass !== null && $this->denormalizer !== null && is_array($value)) {
                         // Complex/backbone array property: denormalize each JSON array item to a typed object.
                         $denormalizedValue = [];
                         foreach ($value as $item) {

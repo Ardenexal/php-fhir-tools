@@ -19,8 +19,16 @@ services:
             $pathService: '@Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService'
         tags: ["console.command"]
 
-    # Code Generation Command
+    # Code Generation Commands
     Ardenexal\FHIRTools\Component\CodeGeneration\Command\FHIRModelGeneratorCommand:
+        tags: ["console.command"]
+
+    Ardenexal\FHIRTools\Component\CodeGeneration\Command\FHIRIGGeneratorCommand:
+        arguments:
+            $configuredPackages: '%fhir.ig.packages%'
+            $offlineByDefault: '%fhir.ig.offline%'
+            $igOutputDirectory: '%fhir.ig.output_directory%'
+            $igBaseNamespace: '%fhir.ig.namespace%'
         tags: ["console.command"]
 
     # Code Generation Services
@@ -28,6 +36,10 @@ services:
 
     Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator:
         public: true
+
+    Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRExtensionGenerator: ~
+
+    Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRProfileGenerator: ~
 
     Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader:
         public: true
@@ -48,6 +60,9 @@ services:
     Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface:
         alias: 'Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor'
         public: true
+
+    # Serialization - IG Type Registry (maps populated by FHIRIGRegistryCompilerPass at container build time)
+    Ardenexal\FHIRTools\Component\Serialization\FHIRIGTypeRegistry: ~
 
     # Serialization - Type Resolver
     Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolver: ~

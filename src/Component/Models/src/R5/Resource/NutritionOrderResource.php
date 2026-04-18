@@ -1,0 +1,186 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
+
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Meta;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Narrative;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\RequestIntentType;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\RequestPriorityType;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\RequestStatusType;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\NutritionOrder\NutritionOrderEnteralFormula;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\NutritionOrder\NutritionOrderOralDiet;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\NutritionOrder\NutritionOrderSupplement;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
+/**
+ * @author Health Level Seven International (Orders and Observations)
+ *
+ * @see http://hl7.org/fhir/StructureDefinition/NutritionOrder
+ *
+ * @description A request to supply a diet, formula feeding (enteral) or oral nutritional supplement to a patient/resident.
+ */
+#[FhirResource(
+    type: 'NutritionOrder',
+    version: '5.0.0',
+    url: 'http://hl7.org/fhir/StructureDefinition/NutritionOrder',
+    fhirVersion: 'R5',
+)]
+class NutritionOrderResource extends DomainResourceResource
+{
+    public function __construct(
+        /** @var string|null id Logical id of this artifact */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        public ?string $id = null,
+        /** @var Meta|null meta Metadata about the resource */
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        public ?Meta $meta = null,
+        /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        public ?UriPrimitive $implicitRules = null,
+        /** @var AllLanguagesType|null language Language of the resource content */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        public ?AllLanguagesType $language = null,
+        /** @var Narrative|null text Text summary of the resource, for human interpretation */
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        public ?Narrative $text = null,
+        /** @var array<ResourceResource> contained Contained, inline Resources */
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        public array $contained = [],
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        public array $modifierExtension = [],
+        /** @var array<Identifier> identifier Identifiers assigned to this order */
+        #[FhirProperty(
+            fhirType: 'Identifier',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
+        )]
+        public array $identifier = [],
+        /** @var array<CanonicalPrimitive> instantiatesCanonical Instantiates FHIR protocol or definition */
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true)]
+        public array $instantiatesCanonical = [],
+        /** @var array<UriPrimitive> instantiatesUri Instantiates external protocol or definition */
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isArray: true)]
+        public array $instantiatesUri = [],
+        /** @var array<UriPrimitive> instantiates Instantiates protocol or definition */
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isArray: true)]
+        public array $instantiates = [],
+        /** @var array<Reference> basedOn What this order fulfills */
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
+        )]
+        public array $basedOn = [],
+        /** @var Identifier|null groupIdentifier Composite Request ID */
+        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
+        public ?Identifier $groupIdentifier = null,
+        /** @var RequestStatusType|null status draft | active | on-hold | revoked | completed | entered-in-error | unknown */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        public ?RequestStatusType $status = null,
+        /** @var RequestIntentType|null intent proposal | plan | directive | order | original-order | reflex-order | filler-order | instance-order | option */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        public ?RequestIntentType $intent = null,
+        /** @var RequestPriorityType|null priority routine | urgent | asap | stat */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        public ?RequestPriorityType $priority = null,
+        /** @var Reference|null subject Who requires the diet, formula or nutritional supplement */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank]
+        public ?Reference $subject = null,
+        /** @var Reference|null encounter The encounter associated with this nutrition order */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $encounter = null,
+        /** @var array<Reference> supportingInformation Information to support fulfilling of the nutrition order */
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
+        )]
+        public array $supportingInformation = [],
+        /** @var DateTimePrimitive|null dateTime Date and time the nutrition order was requested */
+        #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive', isRequired: true), NotBlank]
+        public ?DateTimePrimitive $dateTime = null,
+        /** @var Reference|null orderer Who ordered the diet, formula or nutritional supplement */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $orderer = null,
+        /** @var array<CodeableReference> performer Who is desired to perform the administration of what is being ordered */
+        #[FhirProperty(
+            fhirType: 'CodeableReference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
+        )]
+        public array $performer = [],
+        /** @var array<Reference> allergyIntolerance List of the patient's food and nutrition-related allergies and intolerances */
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
+        )]
+        public array $allergyIntolerance = [],
+        /** @var array<CodeableConcept> foodPreferenceModifier Order-specific modifier about the type of food that should be given */
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
+        )]
+        public array $foodPreferenceModifier = [],
+        /** @var array<CodeableConcept> excludeFoodModifier Order-specific modifier about the type of food that should not be given */
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
+        )]
+        public array $excludeFoodModifier = [],
+        /** @var bool|null outsideFoodAllowed Capture when a food item is brought in by the patient and/or family */
+        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
+        public ?bool $outsideFoodAllowed = null,
+        /** @var NutritionOrderOralDiet|null oralDiet Oral diet components */
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        public ?NutritionOrderOralDiet $oralDiet = null,
+        /** @var array<NutritionOrderSupplement> supplement Supplement components */
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\NutritionOrder\NutritionOrderSupplement',
+        )]
+        public array $supplement = [],
+        /** @var NutritionOrderEnteralFormula|null enteralFormula Enteral formula components */
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        public ?NutritionOrderEnteralFormula $enteralFormula = null,
+        /** @var array<Annotation> note Comments */
+        #[FhirProperty(
+            fhirType: 'Annotation',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation',
+        )]
+        public array $note = [],
+    ) {
+        parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
+    }
+}

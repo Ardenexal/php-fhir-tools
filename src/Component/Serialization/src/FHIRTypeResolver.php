@@ -45,7 +45,8 @@ class FHIRTypeResolver implements FHIRTypeResolverInterface
         array $choiceElementMapping = [],
         array $referenceTypeMapping = [],
         array $extensionValueMapping = [],
-        array $complexTypeMapping = []
+        array $complexTypeMapping = [],
+        private ?FHIRIGTypeRegistry $igTypeRegistry = null,
     ) {
         $this->resourceTypeMapping   = $resourceTypeMapping;
         $this->choiceElementMapping  = $choiceElementMapping;
@@ -119,6 +120,21 @@ class FHIRTypeResolver implements FHIRTypeResolverInterface
         $resourceType = $data['resourceType'];
         if (!is_string($resourceType)) {
             return null;
+        }
+
+        // Check meta.profile first — prefer the most-specific typed profile subclass when registered.
+        if ($this->igTypeRegistry !== null
+            && isset($data['meta']['profile'])
+            && is_array($data['meta']['profile'])
+        ) {
+            foreach ($data['meta']['profile'] as $profileUrl) {
+                if (is_string($profileUrl)) {
+                    $profileClass = $this->igTypeRegistry->resolveProfileClass($profileUrl);
+                    if ($profileClass !== null) {
+                        return $profileClass;
+                    }
+                }
+            }
         }
 
         // Return the mapped class name if available

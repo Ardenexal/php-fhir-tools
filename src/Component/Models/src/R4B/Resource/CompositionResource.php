@@ -8,6 +8,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CompositionStatusType;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\ConfidentialityType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Meta;
@@ -95,9 +96,9 @@ class CompositionResource extends DomainResourceResource
         /** @var StringPrimitive|string|null title Human Readable name/title */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $title = null,
-        /** @var string|null confidentiality As defined by affinity domain */
+        /** @var ConfidentialityType|null confidentiality As defined by affinity domain */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
-        public ?string $confidentiality = null,
+        public ?ConfidentialityType $confidentiality = null,
         /** @var array<CompositionAttester> attester Attests to accuracy of composition */
         #[FhirProperty(
             fhirType: 'BackboneElement',

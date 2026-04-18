@@ -1,0 +1,58 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
+
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\Base64BinaryPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\InstantPrimitive;
+
+/**
+ * @author HL7 FHIR Standard
+ *
+ * @see http://hl7.org/fhir/StructureDefinition/Signature
+ *
+ * @description A signature along with supporting context. The signature may be a digital signature that is cryptographic in nature, or some other signature acceptable to the domain. This other signature may be as simple as a graphical image representing a hand-written signature, or a signature ceremony Different signature approaches have different utilities.
+ */
+#[FHIRComplexType(typeName: 'Signature', fhirVersion: 'R5')]
+class Signature extends DataType
+{
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
+        public ?string $id = null,
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var array<Coding> type Indication of the reason the entity signed the object(s) */
+        #[FhirProperty(
+            fhirType: 'Coding',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding',
+        )]
+        public array $type = [],
+        /** @var InstantPrimitive|null when When the signature was created */
+        #[FhirProperty(fhirType: 'instant', propertyKind: 'primitive')]
+        public ?InstantPrimitive $when = null,
+        /** @var Reference|null who Who signed */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $who = null,
+        /** @var Reference|null onBehalfOf The party represented */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $onBehalfOf = null,
+        /** @var MimeTypesType|null targetFormat The technical format of the signed resources */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        public ?MimeTypesType $targetFormat = null,
+        /** @var MimeTypesType|null sigFormat The technical format of the signature */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        public ?MimeTypesType $sigFormat = null,
+        /** @var Base64BinaryPrimitive|null data The actual signature content (XML DigSig. JWS, picture, etc.) */
+        #[FhirProperty(fhirType: 'base64Binary', propertyKind: 'primitive')]
+        public ?Base64BinaryPrimitive $data = null,
+    ) {
+        parent::__construct($id, $extension);
+    }
+}

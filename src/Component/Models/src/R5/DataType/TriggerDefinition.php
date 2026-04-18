@@ -1,0 +1,91 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
+
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
+/**
+ * @author HL7 FHIR Standard
+ *
+ * @see http://hl7.org/fhir/StructureDefinition/TriggerDefinition
+ *
+ * @description A description of a triggering event. Triggering events can be named events, data events, or periodic, as determined by the type element.
+ */
+#[FHIRComplexType(typeName: 'TriggerDefinition', fhirVersion: 'R5')]
+class TriggerDefinition extends DataType
+{
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
+        public ?string $id = null,
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var TriggerTypeType|null type named-event | periodic | data-changed | data-added | data-modified | data-removed | data-accessed | data-access-ended */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        public ?TriggerTypeType $type = null,
+        /** @var StringPrimitive|string|null name Name or URI that identifies the event */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+        public StringPrimitive|string|null $name = null,
+        /** @var CodeableConcept|null code Coded definition of the event */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $code = null,
+        /** @var CanonicalPrimitive|null subscriptionTopic What event */
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
+        public ?CanonicalPrimitive $subscriptionTopic = null,
+        /** @var Timing|Reference|DatePrimitive|DateTimePrimitive|null timing Timing of the event */
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'Timing',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Timing',
+                    'jsonKey'      => 'timingTiming',
+                ],
+                [
+                    'fhirType'     => 'Reference',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
+                    'jsonKey'      => 'timingReference',
+                ],
+                [
+                    'fhirType'     => 'date',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive',
+                    'jsonKey'      => 'timingDate',
+                ],
+                [
+                    'fhirType'     => 'dateTime',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive',
+                    'jsonKey'      => 'timingDateTime',
+                ],
+            ],
+        )]
+        public Timing|Reference|DatePrimitive|DateTimePrimitive|null $timing = null,
+        /** @var array<DataRequirement> data Triggering data of the event (multiple = 'and') */
+        #[FhirProperty(
+            fhirType: 'DataRequirement',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\DataRequirement',
+        )]
+        public array $data = [],
+        /** @var Expression|null condition Whether the event triggers (boolean expression) */
+        #[FhirProperty(fhirType: 'Expression', propertyKind: 'complex')]
+        public ?Expression $condition = null,
+    ) {
+        parent::__construct($id, $extension);
+    }
+}

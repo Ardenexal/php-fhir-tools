@@ -13,6 +13,9 @@ composer run generate-models-r4
 # Generate R4B models
 composer run generate-models-r4b
 
+# Generate R5 models
+composer run generate-models-r5
+
 # Generate all versions (R4, R4B, R5)
 composer run generate-models-all
 ```
@@ -24,51 +27,49 @@ Generated models are organized in version-specific namespaces:
 ```
 Ardenexal\FHIRTools\Component\Models\
 ├── R4\
-│   ├── Resource\          # FHIR Resources (FHIRPatient, FHIRObservation, etc.)
-│   ├── DataType\          # Complex Data Types (FHIRHumanName, FHIRAddress, etc.)
-│   ├── Primitive\         # Primitive Types (FHIRString, FHIRInteger, etc.)
-│   └── Enum\              # Value Set Enums (FHIRAdministrativeGender, etc.)
+│   ├── Resource\          # FHIR Resources (PatientResource, ObservationResource, etc.)
+│   ├── DataType\          # Complex Data Types (HumanName, Address, etc.)
+│   ├── Primitive\         # Primitive Types (StringPrimitive, IntegerPrimitive, etc.)
+│   └── Enum\              # Value Set Enums (AdministrativeGender, etc.)
 ├── R4B\                   # Same structure as R4
-└── R5\                    # Same structure as R4
+└── R5\                    # Same structure as R4 (with Base and DataType intermediate types)
 ```
 
 Backbone elements are nested within their parent resource directory:
 
 ```
 R4\Resource\
-├── FHIRPatient.php
+├── PatientResource.php
 ├── Patient\
-│   ├── FHIRPatientContact.php
-│   ├── FHIRPatientCommunication.php
-│   └── FHIRPatientLink.php
+│   ├── PatientContact.php
+│   ├── PatientCommunication.php
+│   └── PatientLink.php
 ```
 
 ## Usage
 
 ```php
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRPatient;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\FHIRHumanName;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\FHIRString;
-use Ardenexal\FHIRTools\Component\Models\R4\Enum\FHIRAdministrativeGender;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\HumanName;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Enum\AdministrativeGender;
 
 // Create a patient
-$patient = new FHIRPatient(
-    id: new FHIRString('patient-123'),
+$patient = new PatientResource(
     name: [
-        new FHIRHumanName(
-            family: new FHIRString('Doe'),
-            given: [new FHIRString('John')],
+        new HumanName(
+            family: new StringPrimitive(value: 'Doe'),
+            given: [new StringPrimitive(value: 'John')],
         ),
     ],
 );
 
 // Access properties
-echo $patient->id->value;           // 'patient-123'
 echo $patient->name[0]->family->value; // 'Doe'
 
 // Enums
-$gender = FHIRAdministrativeGender::MALE;
-$cases = FHIRAdministrativeGender::cases(); // all enum values
+$gender = AdministrativeGender::Male;
+$cases = AdministrativeGender::cases(); // all enum values
 ```
 
 ## Version Isolation
@@ -76,8 +77,8 @@ $cases = FHIRAdministrativeGender::cases(); // all enum values
 Each FHIR version has its own namespace, so multiple versions can coexist:
 
 ```php
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\FHIRPatient as R4Patient;
-use Ardenexal\FHIRTools\Component\Models\R4B\Resource\FHIRPatient as R4BPatient;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource as R4Patient;
+use Ardenexal\FHIRTools\Component\Models\R4B\Resource\PatientResource as R4BPatient;
 ```
 
 ## Requirements

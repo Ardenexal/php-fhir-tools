@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Serialization\Normalizer;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTemporalValue;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadata;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyVariantMetadata;
@@ -14,6 +15,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 
 /**
  * Abstract base class for FHIR normalizers providing shared utility methods.
@@ -36,7 +38,8 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     public function __construct(
         protected readonly FHIRMetadataExtractorInterface $metadataExtractor,
         ?NormalizerInterface $normalizer = null,
-        ?DenormalizerInterface $denormalizer = null
+        ?DenormalizerInterface $denormalizer = null,
+        protected ?FHIRIGTypeRegistry $igTypeRegistry = null,
     ) {
         $this->normalizer   = $normalizer;
         $this->denormalizer = $denormalizer;
@@ -440,11 +443,21 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     /**
      * Denormalize an extension array from JSON/_property data to Extension objects.
      *
+     * When an IG type registry is configured, the extension's URL is checked against it
+     * first. If a typed extension class is registered for that URL it is used; otherwise
+     * the call falls back to the base Extension class.
+     *
      * @param array<array<string, mixed>|object> $extensionData Raw extension array from JSON
      * @param string|null                        $format        The format being processed ('json', 'xml')
      * @param array<string, mixed>               $context       Denormalization context
      *
      * @return array<array<string, mixed>|object> Array of Extension objects (or raw arrays as fallback)
+     */
+    /**
+     * @param array<mixed>         $extensionData
+     * @param array<string, mixed> $context
+     *
+     * @return array<FHIRExtensionInterface>
      */
     protected function denormalizeExtensionArray(array $extensionData, ?string $format, array $context): array
     {
@@ -454,15 +467,41 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         }
 
         $denormalizedExtensions = [];
-        $extensionClass         = 'Ardenexal\\FHIRTools\\Component\\Models\\R4\\DataType\\Extension';
+        $fallbackClass          = $this->resolveBaseExtensionClass();
 
         foreach ($extensionData as $extension) {
-            $denormalizedExtensions[] = is_array($extension)
-                ? $this->denormalizer->denormalize($extension, $extensionClass, $format, $context)
-                : $extension; // Already an object
+            if (!is_array($extension)) {
+                $denormalizedExtensions[] = $extension; // Already an object
+                continue;
+            }
+
+            $targetClass = $fallbackClass;
+            if ($this->igTypeRegistry !== null && isset($extension['url']) && is_string($extension['url'])) {
+                $targetClass = $this->igTypeRegistry->resolveExtensionClass($extension['url']) ?? $fallbackClass;
+            }
+
+            $denormalizedExtensions[] = $this->denormalizer->denormalize($extension, $targetClass, $format, $context);
         }
 
         return $denormalizedExtensions;
+    }
+
+    /**
+     * Resolve the base Extension class for the installed FHIR version.
+     *
+     * Probes R4 → R4B → R5 via class_exists() so that the correct fallback is used
+     * regardless of which version's Models package is installed.
+     */
+    private function resolveBaseExtensionClass(): string
+    {
+        foreach (['R4', 'R4B', 'R5'] as $version) {
+            $candidate = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\DataType\\Extension";
+            if (class_exists($candidate)) {
+                return $candidate;
+            }
+        }
+
+        return 'Ardenexal\\FHIRTools\\Component\\Models\\R4\\DataType\\Extension';
     }
 
     /**
