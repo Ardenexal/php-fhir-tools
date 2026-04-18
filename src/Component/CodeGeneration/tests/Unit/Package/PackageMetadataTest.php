@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Component\CodeGeneration\tests\U
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageMetadata;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * Unit tests for PackageMetadata
@@ -78,7 +79,7 @@ class PackageMetadataTest extends TestCase
      * Real FHIR packages (e.g. hl7.fhir.au.base) declare fhirVersions as numeric
      * strings like "4.0.1". The generators expect the named form "R4".
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('numericFhirVersionProvider')]
+    #[DataProvider('numericFhirVersionProvider')]
     public function testFromPackageDataNormalizesNumericFhirVersions(string $raw, string $expected): void
     {
         $metadata = PackageMetadata::fromPackageData([

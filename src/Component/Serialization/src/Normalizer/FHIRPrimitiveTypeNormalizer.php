@@ -349,19 +349,10 @@ class FHIRPrimitiveTypeNormalizer extends AbstractFHIRNormalizer
             if ($extensions !== null && $reflection->hasProperty('extension')) {
                 $extensionProperty = $reflection->getProperty('extension');
 
-                // Denormalize extensions to Extension objects
+                // Denormalize extensions — route through denormalizeExtensionArray() so IG registry
+                // lookups and version-aware fallback are applied consistently with other normalizers.
                 if ($this->denormalizer !== null && is_array($extensions)) {
-                    $denormalizedExtensions = [];
-                    foreach ($extensions as $extension) {
-                        if (is_array($extension)) {
-                            // Denormalize to Extension object (cleanXmlArtifacts already handled @ prefixes)
-                            $extensionClass           = 'Ardenexal\\FHIRTools\\Component\\Models\\R4\\DataType\\Extension';
-                            $denormalizedExtensions[] = $this->denormalizer->denormalize($extension, $extensionClass, $format, $context);
-                        } else {
-                            $denormalizedExtensions[] = $extension;
-                        }
-                    }
-                    $extensionProperty->setValue($instance, $denormalizedExtensions);
+                    $extensionProperty->setValue($instance, $this->denormalizeExtensionArray($extensions, $format, $context));
                 } else {
                     $extensionProperty->setValue($instance, $extensions);
                 }

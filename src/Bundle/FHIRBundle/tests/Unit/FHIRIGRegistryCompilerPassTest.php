@@ -67,8 +67,8 @@ class FHIRIGRegistryCompilerPassTest extends TestCase
         $class = $extensionMappings['http://hl7.org/fhir/StructureDefinition/individual-genderIdentity'] ?? null;
 
         self::assertNotNull($class);
-        self::assertStringStartsWith(
-            'Ardenexal\\FHIRTools\\Component\\Models\\R4\\Extension\\',
+        self::assertMatchesRegularExpression(
+            '/^Ardenexal\\\\FHIRTools\\\\Component\\\\Models\\\\R\d[A-Z]?\\\\Extension\\\\/',
             $class,
         );
         self::assertTrue(class_exists($class), "Resolved class {$class} must be autoloadable.");

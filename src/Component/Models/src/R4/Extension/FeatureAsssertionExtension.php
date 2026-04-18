@@ -1,10 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+
 /**
  * @author HL7 International / FHIR Infrastructure
+ *
  * @see http://hl7.org/fhir/StructureDefinition/feature-assertion
+ *
  * @description This extension asserts that the data in a resource was authored (collected/handled/created/transformed) by an application that claims conformance to the definition of a feature. Note that 'authoring' is often a client function, but that is not always the case.
  *
  *   For further information about features, see the [Application Feature Framework Implementation Guide](https://build.fhir.org/ig/HL7/capstmt/specification.html).
@@ -15,21 +24,21 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
  *
  *   A more complex alternative to this profile is to use the [[[http://hl7.org/fhir/StructureDefinition/obligations-profile]]] extension.
  */
-#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/feature-assertion', fhirVersion: 'R4')]
-class FeatureAsssertionExtension extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/feature-assertion', fhirVersion: 'R4')]
+class FeatureAsssertionExtension extends Extension
 {
-	public function __construct(
-		/** @var Coding|null valueCoding A code that identifies a feature */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding $valueCoding = null,
-		?string $id = null,
-		array $extension = [],
-	) {
-		parent::__construct(
-		    id: $id,
-		    extension: $extension,
-		    url: 'http://hl7.org/fhir/StructureDefinition/feature-assertion',
-		    value: $this->valueCoding,
-		);
-	}
+    public function __construct(
+        /** @var Coding|null valueCoding A code that identifies a feature */
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        public ?Coding $valueCoding = null,
+        ?string $id = null,
+        array $extension = [],
+    ) {
+        parent::__construct(
+            id: $id,
+            extension: $extension,
+            url: 'http://hl7.org/fhir/StructureDefinition/feature-assertion',
+            value: $this->valueCoding,
+        );
+    }
 }

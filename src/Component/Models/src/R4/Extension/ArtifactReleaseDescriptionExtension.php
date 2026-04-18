@@ -1,27 +1,36 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive;
+
 /**
  * @author HL7 International / Clinical Decision Support
+ *
  * @see http://hl7.org/fhir/StructureDefinition/artifact-releaseDescription
+ *
  * @description Release notes for a release of an artifact.
  */
-#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-releaseDescription', fhirVersion: 'R4')]
-class ArtifactReleaseDescriptionExtension extends \Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-releaseDescription', fhirVersion: 'R4')]
+class ArtifactReleaseDescriptionExtension extends Extension
 {
-	public function __construct(
-		/** @var MarkdownPrimitive|null valueMarkdown Value of extension */
-		#[\Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
-		public ?\Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive $valueMarkdown = null,
-		?string $id = null,
-		array $extension = [],
-	) {
-		parent::__construct(
-		    id: $id,
-		    extension: $extension,
-		    url: 'http://hl7.org/fhir/StructureDefinition/artifact-releaseDescription',
-		    value: $this->valueMarkdown,
-		);
-	}
+    public function __construct(
+        /** @var MarkdownPrimitive|null valueMarkdown Value of extension */
+        #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
+        public ?MarkdownPrimitive $valueMarkdown = null,
+        ?string $id = null,
+        array $extension = [],
+    ) {
+        parent::__construct(
+            id: $id,
+            extension: $extension,
+            url: 'http://hl7.org/fhir/StructureDefinition/artifact-releaseDescription',
+            value: $this->valueMarkdown,
+        );
+    }
 }

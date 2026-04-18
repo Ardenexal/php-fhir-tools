@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Serialization\Normalizer;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface;
@@ -139,8 +140,13 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
                     continue;
                 }
 
-                // First, check if this is a choice element variant (e.g., 'valueQuantity' -> 'value')
-                $choiceMapping = $this->findChoicePropertyByKey($metaMap, $elementName);
+                // First, check if this is a choice element variant (e.g., 'valueQuantity' -> 'value').
+                // Skip choice-element resolution when the class declares a property with this exact
+                // name — subclass explicit properties (e.g. $valueCoding on a typed Extension
+                // subclass) take priority over the inherited value[x] mapping.
+                $choiceMapping = !$reflection->hasProperty($elementName)
+                    ? $this->findChoicePropertyByKey($metaMap, $elementName)
+                    : null;
                 if ($choiceMapping !== null) {
                     [$propertyName, $phpType, $fhirType] = $choiceMapping;
 
@@ -253,6 +259,29 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
             // Apply _property extension data to already-denormalized primitive properties.
             $this->applyPrimitiveExtensions($reflection, $object, $data, $metaMap, $format, $context);
 
+            // Simple typed extension: copy the named value property (e.g. $valueCoding) back to the
+            // inherited Extension::$value choice property. The constructor does this via
+            // parent::__construct(value: $this->valueXxx), but newInstanceWithoutConstructor() skips it.
+            // Complex extensions (FHIRComplexExtensionInterface) are excluded: they use sub-extensions
+            // instead of value[x], so $value is correctly null for them.
+            if (!$object instanceof FHIRComplexExtensionInterface
+                && !empty($reflection->getAttributes(FHIRExtensionDefinition::class))
+                && $reflection->hasProperty('value')
+            ) {
+                $valueProperty = $reflection->getProperty('value');
+                foreach ($reflection->getProperties(\ReflectionProperty::IS_PUBLIC) as $prop) {
+                    $propName = $prop->getName();
+                    if ($propName !== 'value'
+                        && str_starts_with($propName, 'value')
+                        && $prop->isInitialized($object)
+                        && $prop->getValue($object) !== null
+                    ) {
+                        $valueProperty->setValue($object, $prop->getValue($object));
+                        break;
+                    }
+                }
+            }
+
             return $object;
         } catch (\ReflectionException $e) {
             throw new NotNormalizableValueException(sprintf('Cannot create instance of class "%s": %s', $resolvedType, $e->getMessage()), 0, $e);
@@ -274,7 +303,16 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
             $reflection = new \ReflectionClass($type);
             $attributes = $reflection->getAttributes(FHIRComplexType::class);
 
-            return !empty($attributes);
+            if (!empty($attributes)) {
+                return true;
+            }
+
+            // Typed extension subclasses carry #[FHIRExtensionDefinition] rather than
+            // #[FHIRComplexType]. Complex extensions also implement FHIRComplexExtensionInterface
+            // (fromSubExtensions fast-path). Simple typed extensions only have the attribute.
+            // Both are handled by the reflection-based property loop in denormalize().
+            return is_a($type, FHIRComplexExtensionInterface::class, true)
+                || !empty($reflection->getAttributes(FHIRExtensionDefinition::class));
         } catch (\ReflectionException) {
             return false;
         }

@@ -467,7 +467,7 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         }
 
         $denormalizedExtensions = [];
-        $fallbackClass          = 'Ardenexal\\FHIRTools\\Component\\Models\\R4\\DataType\\Extension';
+        $fallbackClass          = $this->resolveBaseExtensionClass();
 
         foreach ($extensionData as $extension) {
             if (!is_array($extension)) {
@@ -484,6 +484,24 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         }
 
         return $denormalizedExtensions;
+    }
+
+    /**
+     * Resolve the base Extension class for the installed FHIR version.
+     *
+     * Probes R4 → R4B → R5 via class_exists() so that the correct fallback is used
+     * regardless of which version's Models package is installed.
+     */
+    private function resolveBaseExtensionClass(): string
+    {
+        foreach (['R4', 'R4B', 'R5'] as $version) {
+            $candidate = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\DataType\\Extension";
+            if (class_exists($candidate)) {
+                return $candidate;
+            }
+        }
+
+        return 'Ardenexal\\FHIRTools\\Component\\Models\\R4\\DataType\\Extension';
     }
 
     /**

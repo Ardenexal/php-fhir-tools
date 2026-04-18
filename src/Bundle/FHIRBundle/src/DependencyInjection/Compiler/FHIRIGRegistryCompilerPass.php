@@ -37,6 +37,9 @@ class FHIRIGRegistryCompilerPass implements CompilerPassInterface
      * Known base FHIR versions and the sentinel DataType\Extension class used to locate
      * each version's Extension directory via reflection.
      *
+     * The sentinel is the DataType\Extension class (not a namespace). Its file path is used
+     * to compute the sibling Extension/ directory: DataType/Extension.php → ../Extension/.
+     *
      * @var array<string, class-string>
      */
     private const array BASE_VERSION_SENTINELS = [
@@ -106,16 +109,23 @@ class FHIRIGRegistryCompilerPass implements CompilerPassInterface
 
             if (!empty($extAttrs)) {
                 /** @var FHIRExtensionDefinition $attr */
-                $attr                          = $extAttrs[0]->newInstance();
-                $extensionMappings[$attr->url] = $className;
+                $attr = $extAttrs[0]->newInstance();
+                // First-wins: IG-specific classes (scanned first) take priority over base model
+                // classes, and earlier FHIR versions (R4 < R4B < R5) take priority over later
+                // ones when the same extension URL appears across multiple versions.
+                if (!array_key_exists($attr->url, $extensionMappings)) {
+                    $extensionMappings[$attr->url] = $className;
+                }
             }
 
             $profAttrs = $refl->getAttributes(FHIRProfile::class);
 
             if (!empty($profAttrs)) {
                 /** @var FHIRProfile $attr */
-                $attr                            = $profAttrs[0]->newInstance();
-                $profileMappings[$attr->profileUrl] = $className;
+                $attr = $profAttrs[0]->newInstance();
+                if (!array_key_exists($attr->profileUrl, $profileMappings)) {
+                    $profileMappings[$attr->profileUrl] = $className;
+                }
             }
         }
     }
@@ -152,7 +162,7 @@ class FHIRIGRegistryCompilerPass implements CompilerPassInterface
                 continue;
             }
 
-            $namespace          = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\Extension";
+            $namespace           = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\Extension";
             $dirs[$extensionDir] = $namespace;
         }
 

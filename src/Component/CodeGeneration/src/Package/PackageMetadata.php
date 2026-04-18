@@ -80,13 +80,13 @@ class PackageMetadata
                     array_filter($rawVersions, static fn (mixed $v): bool => is_string($v)),
                 ),
             )),
-            url: $packageData['url']               ?? '',
-            description: $packageData['description'] ?? '',
-            author: $packageData['author']           ?? '',
-            license: $packageData['license']         ?? '',
+            url: $packageData['url']                   ?? '',
+            description: $packageData['description']   ?? '',
+            author: $packageData['author']             ?? '',
+            license: $packageData['license']           ?? '',
             dependencies: $packageData['dependencies'] ?? [],
-            title: $packageData['title']             ?? $packageData['name'] ?? '',
-            checksum: $packageData['checksum']       ?? null,
+            title: $packageData['title']               ?? $packageData['name'] ?? '',
+            checksum: $packageData['checksum']         ?? null,
             additionalData: array_diff_key($packageData, array_flip([
                 'name', 'version', 'fhirVersions', 'url', 'description',
                 'author', 'license', 'dependencies', 'title', 'checksum',
@@ -110,10 +110,10 @@ class PackageMetadata
     private static function normalizeFhirVersion(string $version): string
     {
         return match (true) {
-            $version === 'R4' || $version === 'R4B' || $version === 'R5' => $version,
-            str_starts_with($version, '4.0')                             => 'R4',
-            str_starts_with($version, '4.3')                             => 'R4B',
-            str_starts_with($version, '5.0')                             => 'R5',
+            $version === 'R4' || $version === 'R4B' || $version === 'R5'  => $version,
+            str_starts_with($version, '4.0')                              => 'R4',
+            str_starts_with($version, '4.3')                              => 'R4B',
+            str_starts_with($version, '5.0')                              => 'R5',
             default                                                       => $version,
         };
     }

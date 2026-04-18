@@ -214,7 +214,7 @@ class FHIRExtensionGenerator
                     'fhirType'     => $code,
                     'propertyKind' => $this->resolvePropertyKindFromCode($code),
                 ]);
-                $param->addComment("@var {$shortType}|null {$paramName} {$shortDesc}");
+                $param->addComment("@var {$phpType}|null {$paramName} {$shortDesc}");
 
                 $constructor->addParameter('id')
                     ->setType('string')
@@ -308,7 +308,7 @@ class FHIRExtensionGenerator
             'propertyKind' => 'choice',
             'isChoice'     => true,
         ]);
-        $param->addComment("@var {$shortTypes}|null value Value of extension ({$unionType})");
+        $param->addComment("@var {$unionType} value Value of extension");
 
         $constructor->addParameter('id')
             ->setType('string')
@@ -351,7 +351,7 @@ class FHIRExtensionGenerator
 
         // PHP deprecates optional parameters appearing before required ones (E_DEPRECATED).
         // Sort slices so non-nullable/non-array (required) ones come first.
-        usort($slices, static function (array $a, array $b): int {
+        usort($slices, static function(array $a, array $b): int {
             $aRequired = $a['isRequired'] && !$a['isArray'];
             $bRequired = $b['isRequired'] && !$b['isArray'];
 
@@ -385,10 +385,11 @@ class FHIRExtensionGenerator
                     ]);
                 }
 
-                $param->addComment("@var array<{$shortType}> {$paramName} {$shortDesc}");
+                $arrayDocType = $phpType ?? 'mixed';
+                $param->addComment("@var array<{$arrayDocType}> {$paramName} {$shortDesc}");
 
                 $bodyLines[] = "foreach (\$this->{$paramName} as \$v) {";
-                $bodyLines[] = "    \$subExtensions[] = new Extension(url: '{$sliceName}', value: \$v);";
+                $bodyLines[] = "    \$subExtensions[] = new \\{$extensionFqcn}(url: '{$sliceName}', value: \$v);";
                 $bodyLines[] = '}';
             } else {
                 $resolvedType = $phpType ?? 'string';
@@ -412,14 +413,14 @@ class FHIRExtensionGenerator
                 }
 
                 $nullableDoc = $nullability ? '|null' : '';
-                $param->addComment("@var {$shortType}{$nullableDoc} {$paramName} {$shortDesc}");
+                $param->addComment("@var {$resolvedType}{$nullableDoc} {$paramName} {$shortDesc}");
 
                 if ($nullability) {
                     $bodyLines[] = "if (\$this->{$paramName} !== null) {";
-                    $bodyLines[] = "    \$subExtensions[] = new Extension(url: '{$sliceName}', value: \$this->{$paramName});";
+                    $bodyLines[] = "    \$subExtensions[] = new \\{$extensionFqcn}(url: '{$sliceName}', value: \$this->{$paramName});";
                     $bodyLines[] = '}';
                 } else {
-                    $bodyLines[] = "\$subExtensions[] = new Extension(url: '{$sliceName}', value: \$this->{$paramName});";
+                    $bodyLines[] = "\$subExtensions[] = new \\{$extensionFqcn}(url: '{$sliceName}', value: \$this->{$paramName});";
                 }
             }
         }
@@ -505,6 +506,20 @@ class FHIRExtensionGenerator
 
             $lines[] = '}';
             $lines[] = '';
+        }
+
+        // Guard: required (non-nullable, non-array) slices must be matched; throw a clear error
+        // rather than letting PHP produce a cryptic TypeError inside new static().
+        foreach ($slices as $slice) {
+            if ($slice['isRequired'] && !$slice['isArray']) {
+                $paramName  = $slice['paramName'];
+                $sliceName  = $slice['sliceName'];
+                $lines[]    = "if (\${$paramName} === null) {";
+                $lines[]    = '    throw new \\InvalidArgumentException(';
+                $lines[]    = "        'Required sub-extension \"{$sliceName}\" not found or type mismatch in ' . static::class . '::fromSubExtensions()',";
+                $lines[]    = '    );';
+                $lines[]    = '}';
+            }
         }
 
         $args    = array_map(static fn (array $s): string => "\${$s['paramName']}", $slices);
@@ -608,7 +623,7 @@ class FHIRExtensionGenerator
             'bool'   => "is_bool({$varExpr})",
             'int'    => "is_int({$varExpr})",
             'string' => "is_string({$varExpr})",
-            default  => "{$varExpr} instanceof " . (string) u($phpType)->afterLast('\\'),
+            default  => "{$varExpr} instanceof \\" . ltrim($phpType, '\\'),
         };
     }
 

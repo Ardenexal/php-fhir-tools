@@ -131,6 +131,31 @@ JSON;
     }
 
     /**
+     * Simple typed extensions must populate the inherited Extension::$value choice property
+     * in addition to their named typed property (e.g. $valueCoding).
+     *
+     * The constructor does this via parent::__construct(value: $this->valueXxx), but
+     * newInstanceWithoutConstructor() skips it — so the normalizer must mirror this.
+     */
+    public function testSimpleExtensionValuePropertyIsPopulated(): void
+    {
+        $patient = $this->service->deserialize(self::PATIENT_JSON);
+
+        $extensions = (new \ReflectionClass($patient))->getProperty('extension')->getValue($patient);
+        self::assertCount(2, $extensions);
+
+        // First extension (indigenous-status) is a simple typed extension with valueCoding.
+        $indigenousStatusExt = $extensions[0];
+        self::assertInstanceOf(FHIRExtensionInterface::class, $indigenousStatusExt);
+
+        $value = (new \ReflectionClass($indigenousStatusExt))->getProperty('value')->getValue($indigenousStatusExt);
+        self::assertNotNull(
+            $value,
+            'Simple extension $value must be populated during deserialization (mirrors constructor behaviour)',
+        );
+    }
+
+    /**
      * Nested sub-extensions inside a complex extension must also be Extension objects.
      *
      * The second top-level extension (individual-genderIdentity) contains its own

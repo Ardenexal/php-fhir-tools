@@ -590,7 +590,7 @@ class FHIRIGGeneratorCommand extends Command
             $this->filesystem->mkdir($directory, 0755);
         }
 
-        $contents = $this->renderPhpFile($class, $namespace->getName());
+        $contents = $this->renderPhpFile($class, $namespace);
         $this->filesystem->dumpFile($outputPath, $contents);
 
         if ($output->isVerbose()) {
@@ -625,7 +625,7 @@ class FHIRIGGeneratorCommand extends Command
             $this->filesystem->mkdir($directory, 0755);
         }
 
-        $contents = $this->renderPhpFile($class, $namespace->getName());
+        $contents = $this->renderPhpFile($class, $namespace);
         $this->filesystem->dumpFile($outputPath, $contents);
 
         if ($output->isVerbose()) {
@@ -760,7 +760,7 @@ class FHIRIGGeneratorCommand extends Command
             $this->filesystem->mkdir($directory, 0755);
         }
 
-        $contents = $this->renderPhpFile($class, $namespace->getName());
+        $contents = $this->renderPhpFile($class, $namespace);
         $this->filesystem->dumpFile($outputPath, $contents);
 
         if ($output->isVerbose()) {
@@ -769,19 +769,26 @@ class FHIRIGGeneratorCommand extends Command
     }
 
     /**
-     * Render a ClassType to a PHP file string with strict_types and namespace declaration.
+     * Render a ClassType to a PHP file string with strict_types, namespace declaration, and use imports.
+     *
+     * Uses two Nette Printer calls:
+     *   1. printNamespace() — emits the namespace declaration and all accumulated `use` imports.
+     *      Because ClassType objects are never add()ed to the PhpNamespace (the constructor only
+     *      stores a back-reference), getClasses() returns empty and no class body is printed here.
+     *   2. printClass() — emits the class body with FQCNs resolved to short names via the namespace.
+     *
+     * Combining the two produces a complete, valid PHP file.
      */
-    private function renderPhpFile(ClassType $class, string $namespaceName): string
+    private function renderPhpFile(ClassType $class, PhpNamespace $namespace): string
     {
         $printer = new Printer();
 
-        return <<<PHP
-        <?php declare(strict_types=1);
+        // Namespace declaration + use imports (no class body — see docblock above)
+        $header = $printer->printNamespace($namespace);
+        // Class body with short-name resolution from the namespace context
+        $classBody = $printer->printClass($class, $namespace);
 
-        namespace {$namespaceName};
-
-        {$printer->printClass($class, new PhpNamespace($namespaceName))}
-        PHP;
+        return "<?php declare(strict_types=1);\n\n" . $header . $classBody;
     }
 
     /**

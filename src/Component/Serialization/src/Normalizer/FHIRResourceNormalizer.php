@@ -200,13 +200,22 @@ class FHIRResourceNormalizer extends AbstractFHIRNormalizer
             return false;
         }
 
-        // Check if the type is a FHIR resource class
+        // Check if the type is a FHIR resource class, walking the parent chain so that
+        // profile subclasses (e.g. AUBasePatientProfile extends PatientResource) are also
+        // accepted even though #[FhirResource] is only on the base resource class.
         try {
             /** @var class-string $type */
-            $reflection = new \ReflectionClass($type);
-            $attributes = $reflection->getAttributes(FhirResource::class);
+            $refl = new \ReflectionClass($type);
 
-            return !empty($attributes);
+            do {
+                if (!empty($refl->getAttributes(FhirResource::class))) {
+                    return true;
+                }
+
+                $refl = $refl->getParentClass();
+            } while ($refl !== false);
+
+            return false;
         } catch (\ReflectionException) {
             return false;
         }
