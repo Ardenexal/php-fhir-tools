@@ -27,6 +27,8 @@
         "amphp/http-client": "^5.3.4",
         "brick/date-time": "^0.9.0",
         "composer/semver": "^3.4.4",
+        "matesofmate/composer-extension": "^0.2.0",
+        "matesofmate/phpstan-extension": "^0.2.0",
         "nette/php-generator": "^4.2.1",
         "psr/cache": "^3.0",
         "psr/http-client": "^1.0",
@@ -49,12 +51,16 @@
     "require-dev": {
         "fhir/fhir-test-cases": "1.7.49",
         "giorgiosironi/eris": "^1.0",
+        "helgesverre/toon": "^3.1",
         "laravel/pint": "^1.27.1",
+        "matesofmate/phpunit-extension": "^0.2.0",
         "phpbench/phpbench": "^1.4",
         "phpstan/phpstan": "^2.1.39",
         "phpstan/phpstan-symfony": "^2.0.14",
         "phpunit/phpunit": "^11.0|^12.5.14",
         "roave/security-advisories": "dev-latest",
+        "symfony/ai-mate": "^0.7.0",
+        "symfony/ai-symfony-mate-extension": "^0.7.0",
         "symfony/browser-kit": "^6.4|^7.4.4",
         "symfony/css-selector": "^6.4|^7.4",
         "symfony/dom-crawler": "^6.4|^7.4.4",
@@ -62,7 +68,8 @@
     },
     "config": {
         "allow-plugins": {
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "symfony/ai-mate-composer-plugin": true
         },
         "bump-after-update": true,
         "sort-packages": true
@@ -83,7 +90,8 @@
             "Ardenexal\\FHIRTools\\Bundle\\FHIRBundle\\Tests\\": "src/Bundle/FHIRBundle/tests/",
             "Ardenexal\\FHIRTools\\Component\\FHIRPath\\Tests\\": "src/Component/FHIRPath/tests/",
             "Ardenexal\\FHIRTools\\Component\\Serialization\\Tests\\": "src/Component/Serialization/tests/",
-            "Ardenexal\\FHIRTools\\Benchmarks\\": "bench/"
+            "Ardenexal\\FHIRTools\\Benchmarks\\": "bench/",
+            "App\\Mate\\": "mate/src/"
         }
     },
     "replace": {
@@ -195,5 +203,16 @@
         "bench:fhirpath": "php ./vendor/bin/phpbench run bench/FHIRPath/ --report=aggregate",
         "bench:baseline": "php ./vendor/bin/phpbench run bench/ --report=aggregate --store --tag=baseline",
         "bench:regression": "php ./vendor/bin/phpbench run bench/ --report=compare --ref=baseline --assert=\"mode(variant.time.avg) < mode(baseline.time.avg) * 1.50\""
+    },
+    "extra": {
+        "ai-mate": {
+            "extension": false,
+            "scan-dirs": [
+                "mate/src"
+            ],
+            "includes": [
+                "mate/config.php"
+            ]
+        }
     }
 }

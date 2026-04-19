@@ -99,6 +99,18 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
             $resolvedType = $type;
         }
 
+        // Discriminator-based slice resolution: if a type registry is available, check whether
+        // the data matches any registered slice discriminators for the resolved type (e.g. an
+        // Identifier with a specific system URI → AUIHIProfile). This enables automatic
+        // resolution of profiled complex types when deserializing typed arrays like Identifier[].
+        if ($this->igTypeRegistry !== null) {
+            /** @var class-string $resolvedType */
+            $sliceClass = $this->igTypeRegistry->resolveSliceClass($resolvedType, $data);
+            if ($sliceClass !== null && is_subclass_of($sliceClass, $resolvedType)) {
+                $resolvedType = $sliceClass;
+            }
+        }
+
         try {
             /** @var class-string $resolvedType */
             $reflection = new \ReflectionClass($resolvedType);
@@ -301,11 +313,18 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
         try {
             /** @var class-string $type */
             $reflection = new \ReflectionClass($type);
-            $attributes = $reflection->getAttributes(FHIRComplexType::class);
 
-            if (!empty($attributes)) {
-                return true;
-            }
+            // Walk the parent chain: profile subclasses (e.g. AUIHIProfile extends Identifier)
+            // carry #[FHIRProfile] rather than #[FHIRComplexType] directly.
+            $r = $reflection;
+
+            do {
+                if (!empty($r->getAttributes(FHIRComplexType::class))) {
+                    return true;
+                }
+
+                $r = $r->getParentClass();
+            } while ($r !== false);
 
             // Typed extension subclasses carry #[FHIRExtensionDefinition] rather than
             // #[FHIRComplexType]. Complex extensions also implement FHIRComplexExtensionInterface

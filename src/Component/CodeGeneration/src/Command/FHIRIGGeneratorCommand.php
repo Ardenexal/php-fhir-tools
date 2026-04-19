@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\CodeGeneration\Command;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRConstrainedComplexTypeGenerator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRExtensionGenerator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRProfileGenerator;
@@ -647,8 +648,9 @@ class FHIRIGGeneratorCommand extends Command
      * Generate extension and profile classes for one IG package and write them to disk.
      *
      * Constraint derivations are routed:
-     *   - type=Extension  → FHIRExtensionGenerator → Extension/ subdirectory
-     *   - other kinds     → FHIRProfileGenerator   → Profile/ subdirectory
+     *   - type=Extension                                       → FHIRExtensionGenerator             → Extension/
+     *   - kind=complex-type with fixed[x]/pattern[x] elements → FHIRConstrainedComplexTypeGenerator → Profile/
+     *   - other kinds                                         → FHIRProfileGenerator                → Profile/
      *
      * Generated types are also registered in the BuilderContext so that subsequent IG
      * packages (processed later in the loop) can resolve them as parent classes.
@@ -665,8 +667,9 @@ class FHIRIGGeneratorCommand extends Command
         $extensionNs     = new PhpNamespace("{$baseNs}\\Extension");
         $profileNs       = new PhpNamespace("{$baseNs}\\Profile");
 
-        $extensionGenerator = new FHIRExtensionGenerator();
-        $profileGenerator   = new FHIRProfileGenerator();
+        $extensionGenerator            = new FHIRExtensionGenerator();
+        $profileGenerator              = new FHIRProfileGenerator();
+        $constrainedComplexTypeGenerator = new FHIRConstrainedComplexTypeGenerator();
 
         /** @var list<array{class: ClassType, namespace: PhpNamespace, category: string}> $generated */
         $generated = [];
@@ -699,6 +702,11 @@ class FHIRIGGeneratorCommand extends Command
                     $this->context[$version]->addType($url, $extensionNs->getName(), $class);
                     $generated[] = ['class' => $class, 'namespace' => $extensionNs, 'category' => 'Extension'];
                     $output->writeln("    Extension: <comment>{$class->getName()}</comment>");
+                } elseif ($kind === 'complex-type' && FHIRConstrainedComplexTypeGenerator::hasConstrainedElements($def)) {
+                    $class = $constrainedComplexTypeGenerator->generate($def, $version, $this->context[$version], $profileNs, $this->errorCollector);
+                    $this->context[$version]->addType($url, $profileNs->getName(), $class);
+                    $generated[] = ['class' => $class, 'namespace' => $profileNs, 'category' => 'Profile'];
+                    $output->writeln("    Profile:   <comment>{$class->getName()}</comment> (constrained)");
                 } elseif (in_array($kind, ['resource', 'complex-type'], true)) {
                     $class = $profileGenerator->generate($def, $version, $this->context[$version], $profileNs, $this->errorCollector);
                     $this->context[$version]->addType($url, $profileNs->getName(), $class);
@@ -920,8 +928,9 @@ class FHIRIGGeneratorCommand extends Command
         $extensionNs = new PhpNamespace("{$baseNs}\\Extension");
         $profileNs   = new PhpNamespace("{$baseNs}\\Profile");
 
-        $extensionGenerator = new FHIRExtensionGenerator();
-        $profileGenerator   = new FHIRProfileGenerator();
+        $extensionGenerator              = new FHIRExtensionGenerator();
+        $profileGenerator                = new FHIRProfileGenerator();
+        $constrainedComplexTypeGenerator = new FHIRConstrainedComplexTypeGenerator();
 
         foreach ($definitions as $url => $def) {
             if (($def['resourceType'] ?? '') !== 'StructureDefinition') {
@@ -944,6 +953,9 @@ class FHIRIGGeneratorCommand extends Command
                 if ($type === 'Extension') {
                     $class = $extensionGenerator->generate($def, $version, $this->context[$version], $extensionNs, $this->errorCollector);
                     $this->context[$version]->addType($url, $extensionNs->getName(), $class);
+                } elseif ($kind === 'complex-type' && FHIRConstrainedComplexTypeGenerator::hasConstrainedElements($def)) {
+                    $class = $constrainedComplexTypeGenerator->generate($def, $version, $this->context[$version], $profileNs, $this->errorCollector);
+                    $this->context[$version]->addType($url, $profileNs->getName(), $class);
                 } elseif (in_array($kind, ['resource', 'complex-type'], true)) {
                     $class = $profileGenerator->generate($def, $version, $this->context[$version], $profileNs, $this->errorCollector);
                     $this->context[$version]->addType($url, $profileNs->getName(), $class);

@@ -45,18 +45,34 @@ class FHIRSerializationService
      */
     public static function createDefault(): self
     {
+        return self::createWithIG();
+    }
+
+    /**
+     * Create a fully-wired serialization service with IG-aware extension/profile/discriminator resolution.
+     *
+     * Scans base model Extension directories and an optional user IG output directory,
+     * building a FHIRIGTypeRegistry that enables typed extension deserialization,
+     * profile URL resolution, and discriminator-based slice resolution.
+     *
+     * @param string $igOutputDirectory Absolute path to IG output directory (e.g. '/app/src/FHIRIG').
+     *                                  Pass an empty string (default) to skip IG scanning.
+     * @param string $igNamespace       PSR-4 namespace root for the IG output directory
+     *                                  (e.g. 'App\FHIR\IG'). Pass an empty string (default) to skip.
+     */
+    public static function createWithIG(
+        string $igOutputDirectory = '',
+        string $igNamespace = '',
+    ): self {
         $metadataExtractor = new FHIRMetadataExtractor();
         $typeResolver      = new FHIRTypeResolver();
+        $registry          = FHIRIGTypeRegistryFactory::create($igOutputDirectory, $igNamespace);
 
-        // Create normalizers without an inner serializer reference.
-        // Each normalizer implements SerializerAwareInterface, so Symfony's Serializer
-        // will call setSerializer() on each one automatically, wiring the final
-        // fully-wired instance back in for recursive normalize/denormalize calls.
         $normalizers = [
-            new FHIRResourceNormalizer($metadataExtractor, $typeResolver),
-            new FHIRComplexTypeNormalizer($metadataExtractor, $typeResolver),
-            new FHIRPrimitiveTypeNormalizer($metadataExtractor),
-            new FHIRBackboneElementNormalizer($metadataExtractor),
+            new FHIRResourceNormalizer($metadataExtractor, $typeResolver, igTypeRegistry: $registry),
+            new FHIRComplexTypeNormalizer($metadataExtractor, $typeResolver, igTypeRegistry: $registry),
+            new FHIRPrimitiveTypeNormalizer($metadataExtractor, igTypeRegistry: $registry),
+            new FHIRBackboneElementNormalizer($metadataExtractor, igTypeRegistry: $registry),
         ];
 
         $serializer = new Serializer($normalizers, [new JsonEncoder(), new XmlEncoder()]);

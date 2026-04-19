@@ -194,9 +194,20 @@ class FHIRMetadataExtractor implements FHIRMetadataExtractorInterface
         }
 
         try {
+            // Walk the parent class hierarchy: profile subclasses (e.g. AUIHIProfile extends Identifier)
+            // carry #[FHIRProfile] rather than #[FHIRComplexType], so we must check parent classes.
             $reflection    = new \ReflectionClass($object);
-            $attributes    = $reflection->getAttributes(FHIRComplexType::class);
-            $isComplexType = !empty($attributes);
+            $isComplexType = false;
+            $r             = $reflection;
+
+            do {
+                if (!empty($r->getAttributes(FHIRComplexType::class))) {
+                    $isComplexType = true;
+                    break;
+                }
+
+                $r = $r->getParentClass();
+            } while ($r !== false);
 
             $this->cache->cacheStructureTypeMetadata($className, $isComplexType ? 'complex-type' : null);
 

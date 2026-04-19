@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\DependencyInjection\Compiler;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRSliceDiscriminator;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRIGTypeRegistry;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -54,15 +55,16 @@ class FHIRIGRegistryCompilerPass implements CompilerPassInterface
             return;
         }
 
-        $extensionMappings = [];
-        $profileMappings   = [];
+        $extensionMappings          = [];
+        $profileMappings            = [];
+        $sliceDiscriminatorMappings = [];
 
         // 1. Scan user IG output directory (IG-specific extensions and profiles).
         $outputDir = $container->getParameter('fhir.ig.output_directory');
         $namespace = $container->getParameter('fhir.ig.namespace');
 
         if (is_string($outputDir) && $outputDir !== '' && is_string($namespace) && $namespace !== '' && is_dir($outputDir)) {
-            $this->scanDirectoryIntoMappings($outputDir, $namespace, $extensionMappings, $profileMappings);
+            $this->scanDirectoryIntoMappings($outputDir, $namespace, $extensionMappings, $profileMappings, $sliceDiscriminatorMappings);
         }
 
         // 2. Scan base models Extension directories for each supported FHIR version.
@@ -70,26 +72,39 @@ class FHIRIGRegistryCompilerPass implements CompilerPassInterface
         //    carry #[FHIRExtensionDefinition] attributes that must be registered so the
         //    deserializer can resolve them to their typed classes.
         foreach ($this->resolveBaseExtensionDirectories() as $dir => $ns) {
-            $this->scanDirectoryIntoMappings($dir, $ns, $extensionMappings, $profileMappings);
+            $this->scanDirectoryIntoMappings($dir, $ns, $extensionMappings, $profileMappings, $sliceDiscriminatorMappings);
         }
 
         $registryDef = $container->getDefinition(FHIRIGTypeRegistry::class);
         $registryDef->setArgument('$extensionMappings', $extensionMappings);
         $registryDef->setArgument('$profileMappings', $profileMappings);
+        $registryDef->setArgument('$sliceDiscriminatorMappings', $sliceDiscriminatorMappings);
     }
 
     /**
      * Scan a directory for PHP files and populate URL→class mappings using
-     * #[FHIRExtensionDefinition] and #[FHIRProfile] attributes.
+     * #[FHIRExtensionDefinition], #[FHIRProfile], and #[FHIRSliceDiscriminator] attributes.
      *
-     * @param array<string, class-string> $extensionMappings
-     * @param array<string, class-string> $profileMappings
+     * Slice discriminator data is stored as plain arrays (not objects) because the Symfony
+     * container serializes arguments to PHP/XML during cache compilation and cannot dump
+     * object instances. FHIRIGTypeRegistry hydrates them to SliceDiscriminator objects
+     * in its constructor.
+     *
+     * @param array<string, class-string>                                                         $extensionMappings
+     * @param array<string, class-string>                                                         $profileMappings
+     * @param array<string, list<array{type: string, path: string, value: mixed, targetClass: class-string}>> $sliceDiscriminatorMappings
+     */
+    /**
+     * @param array<string, class-string>                                                                      $extensionMappings
+     * @param array<string, class-string>                                                                      $profileMappings
+     * @param array<string, list<array{type: string, path: string, value: mixed, targetClass: class-string}>>  $sliceDiscriminatorMappings
      */
     private function scanDirectoryIntoMappings(
         string $directory,
         string $namespace,
         array &$extensionMappings,
         array &$profileMappings,
+        array &$sliceDiscriminatorMappings,
     ): void {
         $finder = new Finder();
         $finder->files()->in($directory)->name('*.php')->sortByName();
@@ -125,6 +140,35 @@ class FHIRIGRegistryCompilerPass implements CompilerPassInterface
                 $attr = $profAttrs[0]->newInstance();
                 if (!array_key_exists($attr->profileUrl, $profileMappings)) {
                     $profileMappings[$attr->profileUrl] = $className;
+                }
+            }
+
+            // Scan for #[FHIRSliceDiscriminator] attributes (repeatable).
+            // These are emitted by FHIRConstrainedComplexTypeGenerator on profile classes
+            // that have fixed[x] or pattern[x] values in their StructureDefinition.
+            $discriminatorAttrs = $refl->getAttributes(FHIRSliceDiscriminator::class);
+
+            if (!empty($discriminatorAttrs)) {
+                // Resolve the base type FQCN from the parent class chain.
+                // The immediate parent of a constrained profile is either the base FHIR type
+                // (e.g. Identifier) or another IG profile class that ultimately extends it.
+                $parentClass = $refl->getParentClass();
+                if ($parentClass !== false) {
+                    $baseTypeFqcn = $parentClass->getName();
+
+                    foreach ($discriminatorAttrs as $discriminatorAttr) {
+                        /** @var FHIRSliceDiscriminator $discriminator */
+                        $discriminator = $discriminatorAttr->newInstance();
+                        // Store as a plain array — objects cannot be serialized by the
+                        // Symfony container's XmlDumper. FHIRIGTypeRegistry hydrates these.
+                        /** @var class-string $className */
+                        $sliceDiscriminatorMappings[$baseTypeFqcn][] = [
+                            'type'        => $discriminator->type,
+                            'path'        => $discriminator->path,
+                            'value'       => $discriminator->value,
+                            'targetClass' => $className,
+                        ];
+                    }
                 }
             }
         }

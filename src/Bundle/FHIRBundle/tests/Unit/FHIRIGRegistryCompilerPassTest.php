@@ -25,9 +25,18 @@ class FHIRIGRegistryCompilerPassTest extends TestCase
         $registryDef = new Definition(FHIRIGTypeRegistry::class);
         $registryDef->setArgument('$extensionMappings', []);
         $registryDef->setArgument('$profileMappings', []);
+        $registryDef->setArgument('$sliceDiscriminatorMappings', []);
         $container->setDefinition(FHIRIGTypeRegistry::class, $registryDef);
 
         return $container;
+    }
+
+    private function makeContainerWithFixtureProfile(): ContainerBuilder
+    {
+        $fixtureDir = dirname(__DIR__) . '/Fixtures/Profile';
+        $fixtureNs  = 'Ardenexal\\FHIRTools\\Bundle\\FHIRBundle\\Tests\\Fixtures\\Profile';
+
+        return $this->makeContainer($fixtureDir, $fixtureNs);
     }
 
     public function testBaseExtensionClassesAreRegistered(): void
@@ -119,5 +128,133 @@ class FHIRIGRegistryCompilerPassTest extends TestCase
 
         $this->expectNotToPerformAssertions();
         (new FHIRIGRegistryCompilerPass())->process($container);
+    }
+
+    // -----------------------------------------------------------------
+    // Slice discriminator mapping tests
+    // -----------------------------------------------------------------
+
+    public function testSliceDiscriminatorMappingsAreRegisteredForProfileWithDiscriminatorAttributes(): void
+    {
+        $container = $this->makeContainerWithFixtureProfile();
+        (new FHIRIGRegistryCompilerPass())->process($container);
+
+        /** @var array<string, list<array{type: string, path: string, value: mixed, targetClass: class-string}>> $sliceMappings */
+        $sliceMappings = $container->getDefinition(FHIRIGTypeRegistry::class)
+            ->getArgument('$sliceDiscriminatorMappings');
+
+        self::assertNotEmpty($sliceMappings, 'Slice discriminator mappings must be populated for profiles with #[FHIRSliceDiscriminator] attributes.');
+    }
+
+    public function testSliceDiscriminatorMappingsAreKeyedByBaseTypeFqcn(): void
+    {
+        $container = $this->makeContainerWithFixtureProfile();
+        (new FHIRIGRegistryCompilerPass())->process($container);
+
+        /** @var array<string, list<array{type: string, path: string, value: mixed, targetClass: class-string}>> $sliceMappings */
+        $sliceMappings = $container->getDefinition(FHIRIGTypeRegistry::class)
+            ->getArgument('$sliceDiscriminatorMappings');
+
+        // The fixture profile extends Identifier, so discriminators must be keyed by Identifier's FQCN.
+        $identifierFqcn = \Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier::class;
+
+        self::assertArrayHasKey(
+            $identifierFqcn,
+            $sliceMappings,
+            "Discriminators must be keyed by the parent class FQCN ({$identifierFqcn}).",
+        );
+    }
+
+    public function testAllDiscriminatorAttributesOnOneClassAreRegistered(): void
+    {
+        $container = $this->makeContainerWithFixtureProfile();
+        (new FHIRIGRegistryCompilerPass())->process($container);
+
+        /** @var array<string, list<array{type: string, path: string, value: mixed, targetClass: class-string}>> $sliceMappings */
+        $sliceMappings = $container->getDefinition(FHIRIGTypeRegistry::class)
+            ->getArgument('$sliceDiscriminatorMappings');
+
+        $identifierFqcn  = \Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier::class;
+        $discriminators  = $sliceMappings[$identifierFqcn] ?? [];
+        $fixtureClass    = \Ardenexal\FHIRTools\Bundle\FHIRBundle\Tests\Fixtures\Profile\AUIHIFixtureProfile::class;
+
+        $forFixture = array_filter($discriminators, fn ($d) => $d['targetClass'] === $fixtureClass);
+
+        // The fixture has two #[FHIRSliceDiscriminator] attributes — both must be registered.
+        self::assertCount(2, $forFixture, 'Both #[FHIRSliceDiscriminator] attributes on the fixture class must be registered.');
+    }
+
+    public function testDiscriminatorDataIsStoredAsPlainArraysNotObjects(): void
+    {
+        $container = $this->makeContainerWithFixtureProfile();
+        (new FHIRIGRegistryCompilerPass())->process($container);
+
+        /** @var array<string, list<array{type: string, path: string, value: mixed, targetClass: class-string}>> $sliceMappings */
+        $sliceMappings = $container->getDefinition(FHIRIGTypeRegistry::class)
+            ->getArgument('$sliceDiscriminatorMappings');
+
+        $identifierFqcn = \Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier::class;
+
+        foreach ($sliceMappings[$identifierFqcn] ?? [] as $entry) {
+            self::assertIsArray($entry, 'Discriminator entries must be plain arrays (not objects) for Symfony container serialization.');
+            self::assertArrayHasKey('type', $entry);
+            self::assertArrayHasKey('path', $entry);
+            self::assertArrayHasKey('value', $entry);
+            self::assertArrayHasKey('targetClass', $entry);
+        }
+    }
+
+    public function testValueDiscriminatorHasCorrectData(): void
+    {
+        $container = $this->makeContainerWithFixtureProfile();
+        (new FHIRIGRegistryCompilerPass())->process($container);
+
+        /** @var array<string, list<array{type: string, path: string, value: mixed, targetClass: class-string}>> $sliceMappings */
+        $sliceMappings = $container->getDefinition(FHIRIGTypeRegistry::class)
+            ->getArgument('$sliceDiscriminatorMappings');
+
+        $identifierFqcn = \Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier::class;
+        $fixtureClass   = \Ardenexal\FHIRTools\Bundle\FHIRBundle\Tests\Fixtures\Profile\AUIHIFixtureProfile::class;
+        $discriminators = $sliceMappings[$identifierFqcn] ?? [];
+
+        $valueDiscriminator = null;
+        foreach ($discriminators as $d) {
+            if ($d['targetClass'] === $fixtureClass && $d['type'] === 'value') {
+                $valueDiscriminator = $d;
+                break;
+            }
+        }
+
+        self::assertNotNull($valueDiscriminator, 'Value discriminator for fixture class must be registered.');
+        self::assertSame('system', $valueDiscriminator['path']);
+        self::assertSame('http://ns.electronichealth.net.au/id/hi/ihi/1.0', $valueDiscriminator['value']);
+        self::assertSame($fixtureClass, $valueDiscriminator['targetClass']);
+    }
+
+    public function testPatternDiscriminatorHasCorrectData(): void
+    {
+        $container = $this->makeContainerWithFixtureProfile();
+        (new FHIRIGRegistryCompilerPass())->process($container);
+
+        /** @var array<string, list<array{type: string, path: string, value: mixed, targetClass: class-string}>> $sliceMappings */
+        $sliceMappings = $container->getDefinition(FHIRIGTypeRegistry::class)
+            ->getArgument('$sliceDiscriminatorMappings');
+
+        $identifierFqcn = \Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier::class;
+        $fixtureClass   = \Ardenexal\FHIRTools\Bundle\FHIRBundle\Tests\Fixtures\Profile\AUIHIFixtureProfile::class;
+        $discriminators = $sliceMappings[$identifierFqcn] ?? [];
+
+        $patternDiscriminator = null;
+        foreach ($discriminators as $d) {
+            if ($d['targetClass'] === $fixtureClass && $d['type'] === 'pattern') {
+                $patternDiscriminator = $d;
+                break;
+            }
+        }
+
+        self::assertNotNull($patternDiscriminator, 'Pattern discriminator for fixture class must be registered.');
+        self::assertSame('type', $patternDiscriminator['path']);
+        self::assertIsArray($patternDiscriminator['value']);
+        self::assertArrayHasKey('coding', $patternDiscriminator['value']);
     }
 }
