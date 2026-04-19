@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UnsignedIntPrimitive;
 
@@ -29,9 +30,12 @@ class RSSiteRecruitmentExtension extends Extension implements FHIRComplexExtensi
         /** @var UnsignedIntPrimitive|null actualNumber The actual number of sites */
         #[FhirProperty(fhirType: 'unsignedInt', propertyKind: 'primitive')]
         public ?UnsignedIntPrimitive $actualNumber = null,
-        /** @var MarkdownPrimitive|null eligibility Inclusion and exclusion criteria */
+        /** @var MarkdownPrimitive|null description A human readable description */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
-        public ?MarkdownPrimitive $eligibility = null,
+        public ?MarkdownPrimitive $description = null,
+        /** @var Reference|null eligibilityCriteria Inclusion and exclusion criteria */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $eligibilityCriteria = null,
         ?string $id = null,
     ) {
         $subExtensions = [];
@@ -41,8 +45,11 @@ class RSSiteRecruitmentExtension extends Extension implements FHIRComplexExtensi
         if ($this->actualNumber !== null) {
             $subExtensions[] = new Extension(url: 'actualNumber', value: $this->actualNumber);
         }
-        if ($this->eligibility !== null) {
-            $subExtensions[] = new Extension(url: 'eligibility', value: $this->eligibility);
+        if ($this->description !== null) {
+            $subExtensions[] = new Extension(url: 'description', value: $this->description);
+        }
+        if ($this->eligibilityCriteria !== null) {
+            $subExtensions[] = new Extension(url: 'eligibilityCriteria', value: $this->eligibilityCriteria);
         }
         parent::__construct(
             id: $id,
@@ -59,9 +66,10 @@ class RSSiteRecruitmentExtension extends Extension implements FHIRComplexExtensi
      */
     public static function fromSubExtensions(array $subExtensions, ?string $id = null): static
     {
-        $targetNumber = null;
-        $actualNumber = null;
-        $eligibility  = null;
+        $targetNumber        = null;
+        $actualNumber        = null;
+        $description         = null;
+        $eligibilityCriteria = null;
 
         foreach ($subExtensions as $ext) {
             $extUrl = $ext->getExtensionUrl();
@@ -71,11 +79,14 @@ class RSSiteRecruitmentExtension extends Extension implements FHIRComplexExtensi
             if ($extUrl === 'actualNumber' && $ext->value instanceof UnsignedIntPrimitive) {
                 $actualNumber = $ext->value;
             }
-            if ($extUrl === 'eligibility' && $ext->value instanceof MarkdownPrimitive) {
-                $eligibility = $ext->value;
+            if ($extUrl === 'description' && $ext->value instanceof MarkdownPrimitive) {
+                $description = $ext->value;
+            }
+            if ($extUrl === 'eligibilityCriteria' && $ext->value instanceof Reference) {
+                $eligibilityCriteria = $ext->value;
             }
         }
 
-        return new static($targetNumber, $actualNumber, $eligibility, $id);
+        return new static($targetNumber, $actualNumber, $description, $eligibilityCriteria, $id);
     }
 }

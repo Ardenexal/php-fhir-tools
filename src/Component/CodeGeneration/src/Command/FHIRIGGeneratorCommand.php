@@ -667,8 +667,8 @@ class FHIRIGGeneratorCommand extends Command
         $extensionNs     = new PhpNamespace("{$baseNs}\\Extension");
         $profileNs       = new PhpNamespace("{$baseNs}\\Profile");
 
-        $extensionGenerator            = new FHIRExtensionGenerator();
-        $profileGenerator              = new FHIRProfileGenerator();
+        $extensionGenerator              = new FHIRExtensionGenerator();
+        $profileGenerator                = new FHIRProfileGenerator();
         $constrainedComplexTypeGenerator = new FHIRConstrainedComplexTypeGenerator();
 
         /** @var list<array{class: ClassType, namespace: PhpNamespace, category: string}> $generated */

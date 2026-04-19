@@ -15,7 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @see http://hl7.org/fhir/StructureDefinition/geolocation
  *
- * @description The absolute geographic location of the Location, expressed using the WGS84 datum (This is the same co-ordinate system used in KML).
+ * @description An absolute geographic location for the address, expressed using the WGS84 datum (This is the same co-ordinate system used in KML).
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/geolocation', fhirVersion: 'R4')]
 class GeolocationExtension extends Extension implements FHIRComplexExtensionInterface

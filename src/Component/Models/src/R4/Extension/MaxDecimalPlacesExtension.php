@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
 
 /**
  * @author HL7 International / FHIR Infrastructure
@@ -19,9 +20,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 class MaxDecimalPlacesExtension extends Extension
 {
     public function __construct(
-        /** @var int|null valueInteger Value of extension */
-        #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
-        public ?int $valueInteger = null,
+        /** @var int|Quantity|null value Value of extension */
+        #[FhirProperty(fhirType: 'choice', propertyKind: 'choice', isChoice: true)]
+        int|Quantity|null $value = null,
         ?string $id = null,
         array $extension = [],
     ) {
@@ -29,7 +30,7 @@ class MaxDecimalPlacesExtension extends Extension
             id: $id,
             extension: $extension,
             url: 'http://hl7.org/fhir/StructureDefinition/maxDecimalPlaces',
-            value: $this->valueInteger,
+            value: $value,
         );
     }
 }

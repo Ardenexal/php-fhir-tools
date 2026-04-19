@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\UsageContext;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 
 /**
@@ -50,6 +51,9 @@ class ObligationExtension extends Extension implements FHIRComplexExtensionInter
         /** @var StringPrimitive|null filterDocumentation Describes the intent of the filter (short) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public ?StringPrimitive $filterDocumentation = null,
+        /** @var PositiveIntPrimitive|null applicableNumber # of repetitions obligation applies to */
+        #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]
+        public ?PositiveIntPrimitive $applicableNumber = null,
         /** @var array<CanonicalPrimitive> process The obligation only applies when performing the indicated process */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true)]
         public array $process = [],
@@ -80,6 +84,9 @@ class ObligationExtension extends Extension implements FHIRComplexExtensionInter
         if ($this->filterDocumentation !== null) {
             $subExtensions[] = new Extension(url: 'filterDocumentation', value: $this->filterDocumentation);
         }
+        if ($this->applicableNumber !== null) {
+            $subExtensions[] = new Extension(url: 'applicable-number', value: $this->applicableNumber);
+        }
         foreach ($this->process as $v) {
             $subExtensions[] = new Extension(url: 'process', value: $v);
         }
@@ -106,6 +113,7 @@ class ObligationExtension extends Extension implements FHIRComplexExtensionInter
         $usage               = [];
         $filter              = null;
         $filterDocumentation = null;
+        $applicableNumber    = null;
         $process             = [];
 
         foreach ($subExtensions as $ext) {
@@ -134,11 +142,14 @@ class ObligationExtension extends Extension implements FHIRComplexExtensionInter
             if ($extUrl === 'filterDocumentation' && $ext->value instanceof StringPrimitive) {
                 $filterDocumentation = $ext->value;
             }
+            if ($extUrl === 'applicable-number' && $ext->value instanceof PositiveIntPrimitive) {
+                $applicableNumber = $ext->value;
+            }
             if ($extUrl === 'process' && $ext->value instanceof CanonicalPrimitive) {
                 $process[] = $ext->value;
             }
         }
 
-        return new static($name, $code, $elementId, $actor, $documentation, $usage, $filter, $filterDocumentation, $process, $id);
+        return new static($name, $code, $elementId, $actor, $documentation, $usage, $filter, $filterDocumentation, $applicableNumber, $process, $id);
     }
 }

@@ -90,14 +90,14 @@ class FHIRIGRegistryCompilerPass implements CompilerPassInterface
      * object instances. FHIRIGTypeRegistry hydrates them to SliceDiscriminator objects
      * in its constructor.
      *
-     * @param array<string, class-string>                                                         $extensionMappings
-     * @param array<string, class-string>                                                         $profileMappings
+     * @param array<string, class-string>                                                                     $extensionMappings
+     * @param array<string, class-string>                                                                     $profileMappings
      * @param array<string, list<array{type: string, path: string, value: mixed, targetClass: class-string}>> $sliceDiscriminatorMappings
      */
     /**
-     * @param array<string, class-string>                                                                      $extensionMappings
-     * @param array<string, class-string>                                                                      $profileMappings
-     * @param array<string, list<array{type: string, path: string, value: mixed, targetClass: class-string}>>  $sliceDiscriminatorMappings
+     * @param array<string, array<string, class-string>>                                                      $extensionMappings
+     * @param array<string, class-string>                                                                     $profileMappings
+     * @param array<string, list<array{type: string, path: string, value: mixed, targetClass: class-string}>> $sliceDiscriminatorMappings
      */
     private function scanDirectoryIntoMappings(
         string $directory,
@@ -125,11 +125,11 @@ class FHIRIGRegistryCompilerPass implements CompilerPassInterface
             if (!empty($extAttrs)) {
                 /** @var FHIRExtensionDefinition $attr */
                 $attr = $extAttrs[0]->newInstance();
-                // First-wins: IG-specific classes (scanned first) take priority over base model
-                // classes, and earlier FHIR versions (R4 < R4B < R5) take priority over later
-                // ones when the same extension URL appears across multiple versions.
-                if (!array_key_exists($attr->url, $extensionMappings)) {
-                    $extensionMappings[$attr->url] = $className;
+                // Store per version so each version normalizer resolves its own typed class.
+                // First-wins within a version: IG-specific classes (scanned first) take priority
+                // over base model classes for the same URL+version combination.
+                if (!isset($extensionMappings[$attr->url][$attr->fhirVersion])) {
+                    $extensionMappings[$attr->url][$attr->fhirVersion] = $className;
                 }
             }
 

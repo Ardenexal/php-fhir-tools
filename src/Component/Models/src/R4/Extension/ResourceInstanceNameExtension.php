@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @see http://hl7.org/fhir/StructureDefinition/resource-instance-name
  *
- * @description A natural language name for non-conformance and non-terminology resource instances that is represented in the resource for publication use.
+ * @description A natural language name for non-conformance and non-terminology resource instances that is represented in the resource for publication use. Note that this extension only used as part of the IG publication tooling process. Use the [Artifact Title extension](StructureDefinition-artifact-title.html) extension for use outside the IG publishing framework.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/resource-instance-name', fhirVersion: 'R4')]
 class ResourceInstanceNameExtension extends Extension

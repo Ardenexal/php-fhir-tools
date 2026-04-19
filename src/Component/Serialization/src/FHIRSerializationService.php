@@ -43,9 +43,9 @@ class FHIRSerializationService
      * available. Uses a two-phase construction to inject the Serializer back into
      * normalizers that need it for recursive object handling.
      */
-    public static function createDefault(): self
+    public static function createDefault(FhirVersion $version = FhirVersion::R4B): self
     {
-        return self::createWithIG();
+        return self::createWithIG(version: $version);
     }
 
     /**
@@ -63,16 +63,17 @@ class FHIRSerializationService
     public static function createWithIG(
         string $igOutputDirectory = '',
         string $igNamespace = '',
+        FhirVersion $version = FhirVersion::R4B
     ): self {
         $metadataExtractor = new FHIRMetadataExtractor();
-        $typeResolver      = new FHIRTypeResolver();
         $registry          = FHIRIGTypeRegistryFactory::create($igOutputDirectory, $igNamespace);
+        $typeResolver      = new FHIRTypeResolver(igTypeRegistry: $registry);
 
         $normalizers = [
-            new FHIRResourceNormalizer($metadataExtractor, $typeResolver, igTypeRegistry: $registry),
-            new FHIRComplexTypeNormalizer($metadataExtractor, $typeResolver, igTypeRegistry: $registry),
-            new FHIRPrimitiveTypeNormalizer($metadataExtractor, igTypeRegistry: $registry),
-            new FHIRBackboneElementNormalizer($metadataExtractor, igTypeRegistry: $registry),
+            new FHIRResourceNormalizer($metadataExtractor, $typeResolver, fhirVersion: $version->value, igTypeRegistry: $registry),
+            new FHIRComplexTypeNormalizer($metadataExtractor, $typeResolver, fhirVersion: $version->value, igTypeRegistry: $registry),
+            new FHIRPrimitiveTypeNormalizer($metadataExtractor, fhirVersion: $version->value, igTypeRegistry: $registry),
+            new FHIRBackboneElementNormalizer($metadataExtractor, fhirVersion: $version->value, igTypeRegistry: $registry),
         ];
 
         $serializer = new Serializer($normalizers, [new JsonEncoder(), new XmlEncoder()]);

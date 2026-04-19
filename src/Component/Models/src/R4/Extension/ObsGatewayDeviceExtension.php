@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
  *
  * @see http://hl7.org/fhir/StructureDefinition/observation-gatewayDevice
  *
- * @description To be used when the actual gateway used at the time of the observation, and the referenced device is also specified. The gateway device may be acting as a communication/data collector, translator or controller; This extension is useful when there is more than one gateway device, for example, where there are apps on a phone and each are a device, and more than one app is used to pass on the data to a FHIR Server. In that case you need to be able to say from the observation which specific app was used to act as gateway. Note that the Provenance/AuditEvent resources can represent the same information.
+ * @description To be used when the actual gateway used at the time of the observation, and the referenced device is also specified. The gateway device may be acting as a communication/data collector, translator or controller; This extension is useful when there is more than one gateway device, for example, where there are apps on a phone and each are a device, and more than one app is used to pass on the data to a FHIR Server. In that case you need to be able to say from the observation which specific app was used to act as gateway. Note that the Provenance/AuditEvent resources can represent the same information. Use Device Gateway (device-gateway) extension which allows codeableReference (Device) in R6 and requires cross version extension for codeable reference.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/observation-gatewayDevice', fhirVersion: 'R4')]
 class ObsGatewayDeviceExtension extends Extension

@@ -13,13 +13,49 @@ class FHIRIGTypeRegistryTest extends TestCase
     {
         $registry = new FHIRIGTypeRegistry(
             extensionMappings: [
-                'http://hl7.org/fhir/StructureDefinition/patient-birthPlace' => \stdClass::class,
+                'http://hl7.org/fhir/StructureDefinition/patient-birthPlace' => ['R4' => \stdClass::class],
             ],
         );
 
         self::assertSame(
             \stdClass::class,
             $registry->resolveExtensionClass('http://hl7.org/fhir/StructureDefinition/patient-birthPlace'),
+        );
+    }
+
+    public function testResolveExtensionClassPrefersRequestedVersion(): void
+    {
+        $registry = new FHIRIGTypeRegistry(
+            extensionMappings: [
+                'http://hl7.org/fhir/StructureDefinition/individual-genderIdentity' => [
+                    'R4'  => \stdClass::class,
+                    'R4B' => \ArrayObject::class,
+                ],
+            ],
+        );
+
+        self::assertSame(
+            \ArrayObject::class,
+            $registry->resolveExtensionClass('http://hl7.org/fhir/StructureDefinition/individual-genderIdentity', 'R4B'),
+        );
+
+        self::assertSame(
+            \stdClass::class,
+            $registry->resolveExtensionClass('http://hl7.org/fhir/StructureDefinition/individual-genderIdentity', 'R4'),
+        );
+    }
+
+    public function testResolveExtensionClassFallsBackToFirstVersionWhenNoVersionMatch(): void
+    {
+        $registry = new FHIRIGTypeRegistry(
+            extensionMappings: [
+                'http://hl7.org/fhir/StructureDefinition/patient-birthPlace' => ['R4' => \stdClass::class],
+            ],
+        );
+
+        self::assertSame(
+            \stdClass::class,
+            $registry->resolveExtensionClass('http://hl7.org/fhir/StructureDefinition/patient-birthPlace', 'R5'),
         );
     }
 
@@ -53,7 +89,7 @@ class FHIRIGTypeRegistryTest extends TestCase
 
     public function testGetExtensionMappingsReturnsMap(): void
     {
-        $map      = ['http://example.com/ext' => \stdClass::class];
+        $map      = ['http://example.com/ext' => ['R4' => \stdClass::class]];
         $registry = new FHIRIGTypeRegistry(extensionMappings: $map);
 
         self::assertSame($map, $registry->getExtensionMappings());

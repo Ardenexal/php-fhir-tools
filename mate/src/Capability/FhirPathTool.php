@@ -19,9 +19,9 @@ class FhirPathTool
     }
 
     /**
-     * @param string      $resource    FHIR resource as a JSON string (must include "resourceType").
+     * @param string      $resource    FHIR resource as a JSON string (must include "resourceType")
      * @param string      $expression  FHIRPath expression to evaluate, e.g. "Patient.name.given".
-     * @param string|null $fhirVersion Optional FHIR version hint: "R4", "R4B", or "R5".
+     * @param string|null $fhirVersion optional FHIR version hint: "R4", "R4B", or "R5"
      */
     #[McpTool('fhirpath-evaluate', 'Evaluate a FHIRPath expression against a JSON FHIR resource and return the result collection.')]
     public function evaluate(string $resource, string $expression, ?string $fhirVersion = null): string

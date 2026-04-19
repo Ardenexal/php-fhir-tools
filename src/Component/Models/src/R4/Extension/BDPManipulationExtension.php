@@ -8,8 +8,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableReference;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\Base64BinaryPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 
@@ -27,8 +27,8 @@ class BDPManipulationExtension extends Extension implements FHIRComplexExtension
         /** @var StringPrimitive|null description Description of manipulation */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public ?StringPrimitive $description = null,
-        /** @var array<CodeableReference> procedure Procesing procedure */
-        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex', isArray: true)]
+        /** @var array<Base64BinaryPrimitive> procedure Procesing procedure */
+        #[FhirProperty(fhirType: 'base64Binary', propertyKind: 'primitive', isArray: true)]
         public array $procedure = [],
         /** @var DateTimePrimitive|null timeX Time of manipulation */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
@@ -69,7 +69,7 @@ class BDPManipulationExtension extends Extension implements FHIRComplexExtension
             if ($extUrl === 'description' && $ext->value instanceof StringPrimitive) {
                 $description = $ext->value;
             }
-            if ($extUrl === 'procedure' && $ext->value instanceof CodeableReference) {
+            if ($extUrl === 'procedure' && $ext->value instanceof Base64BinaryPrimitive) {
                 $procedure[] = $ext->value;
             }
             if ($extUrl === 'time[x]' && $ext->value instanceof DateTimePrimitive) {

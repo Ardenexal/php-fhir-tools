@@ -16,7 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @see http://hl7.org/fhir/StructureDefinition/codesystem-otherName
  *
- * @description Human readable names for the codesystem.  This codesystem has been deprecated.  The codesystem-otherTitle extension should be used for capturing other human readable names.
+ * @description This extension has been deprecated.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/codesystem-otherName', fhirVersion: 'R4')]
 class CSOtherNameExtension extends Extension implements FHIRComplexExtensionInterface

@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @see http://hl7.org/fhir/StructureDefinition/elementdefinition-profile-element
  *
- * @description The specific element to use in the referenced profile, identified by the ElementDefinition.id. This is used when a backbone element is being profiled, rather than an established type.
+ * @description Provides the snapshot.element.id of the element within the profile containing this extension to use as the starting point for validation of the element on which the profile is declared. This is used when a backbone element is being profiled, rather than an established type.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-profile-element', fhirVersion: 'R4')]
 class ProfileElementExtension extends Extension

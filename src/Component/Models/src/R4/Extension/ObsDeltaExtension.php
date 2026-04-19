@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @see http://hl7.org/fhir/StructureDefinition/observation-delta
  *
- * @description The qualitative change in the value relative to the previous measurement. Usually only recorded if the change is clinically significant.
+ * @description The qualitative change in the value relative to the previous measurement. Usually only recorded if the change is clinically significant. Note: To perform a delta check one can instantiate a new observation (the comparison observation) with derivedFrom populated with references to the two prior Observations that triggered the delta check. Also, the Observation.interpretation of the comparison Observation has the code of the interpretation of the delta check.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/observation-delta', fhirVersion: 'R4')]
 class ObsDeltaExtension extends Extension

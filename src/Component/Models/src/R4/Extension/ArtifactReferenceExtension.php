@@ -16,7 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
  *
  * @see http://hl7.org/fhir/StructureDefinition/artifact-reference
  *
- * @description A reference to a resource, canonical resource, or non-FHIR resource.
+ * @description DEPRECATED: A reference to a resource, canonical resource, or non-FHIR resource.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-reference', fhirVersion: 'R4')]
 class ArtifactReferenceExtension extends Extension

@@ -9,6 +9,8 @@ use Ardenexal\FHIRTools\Component\Serialization\FHIRIGTypeRegistry;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Ardenexal\FHIRTools\Bundle\FHIRBundle\Tests\Fixtures\Profile\AUIHIFixtureProfile;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
 
 /**
  * Verifies that FHIRIGRegistryCompilerPass registers both IG output directory classes
@@ -156,7 +158,7 @@ class FHIRIGRegistryCompilerPassTest extends TestCase
             ->getArgument('$sliceDiscriminatorMappings');
 
         // The fixture profile extends Identifier, so discriminators must be keyed by Identifier's FQCN.
-        $identifierFqcn = \Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier::class;
+        $identifierFqcn = Identifier::class;
 
         self::assertArrayHasKey(
             $identifierFqcn,
@@ -174,9 +176,9 @@ class FHIRIGRegistryCompilerPassTest extends TestCase
         $sliceMappings = $container->getDefinition(FHIRIGTypeRegistry::class)
             ->getArgument('$sliceDiscriminatorMappings');
 
-        $identifierFqcn  = \Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier::class;
+        $identifierFqcn  = Identifier::class;
         $discriminators  = $sliceMappings[$identifierFqcn] ?? [];
-        $fixtureClass    = \Ardenexal\FHIRTools\Bundle\FHIRBundle\Tests\Fixtures\Profile\AUIHIFixtureProfile::class;
+        $fixtureClass    = AUIHIFixtureProfile::class;
 
         $forFixture = array_filter($discriminators, fn ($d) => $d['targetClass'] === $fixtureClass);
 
@@ -193,7 +195,7 @@ class FHIRIGRegistryCompilerPassTest extends TestCase
         $sliceMappings = $container->getDefinition(FHIRIGTypeRegistry::class)
             ->getArgument('$sliceDiscriminatorMappings');
 
-        $identifierFqcn = \Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier::class;
+        $identifierFqcn = Identifier::class;
 
         foreach ($sliceMappings[$identifierFqcn] ?? [] as $entry) {
             self::assertIsArray($entry, 'Discriminator entries must be plain arrays (not objects) for Symfony container serialization.');
@@ -213,8 +215,8 @@ class FHIRIGRegistryCompilerPassTest extends TestCase
         $sliceMappings = $container->getDefinition(FHIRIGTypeRegistry::class)
             ->getArgument('$sliceDiscriminatorMappings');
 
-        $identifierFqcn = \Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier::class;
-        $fixtureClass   = \Ardenexal\FHIRTools\Bundle\FHIRBundle\Tests\Fixtures\Profile\AUIHIFixtureProfile::class;
+        $identifierFqcn = Identifier::class;
+        $fixtureClass   = AUIHIFixtureProfile::class;
         $discriminators = $sliceMappings[$identifierFqcn] ?? [];
 
         $valueDiscriminator = null;
@@ -240,8 +242,8 @@ class FHIRIGRegistryCompilerPassTest extends TestCase
         $sliceMappings = $container->getDefinition(FHIRIGTypeRegistry::class)
             ->getArgument('$sliceDiscriminatorMappings');
 
-        $identifierFqcn = \Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier::class;
-        $fixtureClass   = \Ardenexal\FHIRTools\Bundle\FHIRBundle\Tests\Fixtures\Profile\AUIHIFixtureProfile::class;
+        $identifierFqcn = Identifier::class;
+        $fixtureClass   = AUIHIFixtureProfile::class;
         $discriminators = $sliceMappings[$identifierFqcn] ?? [];
 
         $patternDiscriminator = null;

@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
  *
  * @see http://hl7.org/fhir/StructureDefinition/biologicallyderivedproduct-collection-procedure
  *
- * @description Extension for the collection procedure of a biologically derived product.
+ * @description Extension for the collection procedure of a biologically derived product. Use biologicallyderivedproduct.collection.procedure in R6 or later
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/biologicallyderivedproduct-collection-procedure', fhirVersion: 'R4')]
 class BDPCollectionProcedureExtension extends Extension

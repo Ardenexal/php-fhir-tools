@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
  *
  * @see http://hl7.org/fhir/StructureDefinition/artifact-canonicalReference
  *
- * @description A reference to a canonical resource.
+ * @description DEPRECATED: A reference to a canonical resource.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-canonicalReference', fhirVersion: 'R4')]
 class ArtifactCanonicalReferenceExtension extends Extension

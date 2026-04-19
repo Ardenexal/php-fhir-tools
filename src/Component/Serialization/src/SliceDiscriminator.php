@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRSliceDiscriminator;
+
 /**
  * Runtime representation of a FHIR slice discriminator registered in FHIRIGTypeRegistry.
  *
@@ -11,7 +13,7 @@ namespace Ardenexal\FHIRTools\Component\Serialization;
  * specific constrained profile class. Created at container compile time by
  * FHIRIGRegistryCompilerPass from #[FHIRSliceDiscriminator] attributes on profile classes.
  *
- * @see \Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRSliceDiscriminator
+ * @see FHIRSliceDiscriminator
  * @see FHIRIGTypeRegistry::resolveSliceClass()
  *
  * @author Ardenexal

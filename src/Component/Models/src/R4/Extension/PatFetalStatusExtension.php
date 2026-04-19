@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
  *
  * @see http://hl7.org/fhir/StructureDefinition/patient-fetalStatus
  *
- * @description The fetal status of the subject when still in utero. This extension would not apply to Patients that have a birthDate.
+ * @description An indicator on the status of a fetal subject. Typically used in maternity where the patient record may be created before birth. This extension would not apply to Patients that have a birthDate.  A Patient.deceased flag cannot be used for fetal subjects because the fetus is not yet born. The status is used to express the vitality of the fetal subject.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-fetalStatus', fhirVersion: 'R4')]
 class PatFetalStatusExtension extends Extension
