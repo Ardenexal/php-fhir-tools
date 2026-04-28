@@ -60,10 +60,17 @@ class FHIRIGRegistryCompilerPassTest extends TestCase
             'Base extension individual-genderIdentity must be registered from the Models component.',
         );
 
-        self::assertStringContainsString(
-            'PGenderIdentityExtension',
-            $extensionMappings['http://hl7.org/fhir/StructureDefinition/individual-genderIdentity'],
-        );
+        $versionedMap = $extensionMappings['http://hl7.org/fhir/StructureDefinition/individual-genderIdentity'];
+        self::assertIsArray($versionedMap, 'Extension mapping must be keyed by FHIR version.');
+        self::assertNotEmpty($versionedMap);
+
+        foreach ($versionedMap as $version => $class) {
+            self::assertStringContainsString(
+                'PGenderIdentityExtension',
+                $class,
+                "Class for version {$version} must resolve to PGenderIdentityExtension.",
+            );
+        }
     }
 
     public function testBaseExtensionMappingPointsToCorrectNamespace(): void
@@ -75,14 +82,19 @@ class FHIRIGRegistryCompilerPassTest extends TestCase
         $extensionMappings = $container->getDefinition(FHIRIGTypeRegistry::class)
             ->getArgument('$extensionMappings');
 
-        $class = $extensionMappings['http://hl7.org/fhir/StructureDefinition/individual-genderIdentity'] ?? null;
+        $versionedMap = $extensionMappings['http://hl7.org/fhir/StructureDefinition/individual-genderIdentity'] ?? null;
 
-        self::assertNotNull($class);
-        self::assertMatchesRegularExpression(
-            '/^Ardenexal\\\\FHIRTools\\\\Component\\\\Models\\\\R\d[A-Z]?\\\\Extension\\\\/',
-            $class,
-        );
-        self::assertTrue(class_exists($class), "Resolved class {$class} must be autoloadable.");
+        self::assertIsArray($versionedMap, 'Extension mapping must be keyed by FHIR version.');
+        self::assertNotEmpty($versionedMap);
+
+        foreach ($versionedMap as $version => $class) {
+            self::assertMatchesRegularExpression(
+                '/^Ardenexal\\\\FHIRTools\\\\Component\\\\Models\\\\R\d[A-Z]?\\\\Extension\\\\/',
+                $class,
+                "Class for version {$version} must live in the Models component's Extension namespace.",
+            );
+            self::assertTrue(class_exists($class), "Resolved class {$class} must be autoloadable.");
+        }
     }
 
     public function testMultipleBaseExtensionsAreRegistered(): void
