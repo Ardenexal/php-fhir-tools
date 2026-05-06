@@ -16,7 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
  *
  * @see http://hl7.org/fhir/StructureDefinition/device-maintenanceresponsibility
  *
- * @description Extension containing the information about the person and/or organization responsible for the maintenance of the device.
+ * @description Extension containing the information about the person and/or organization responsible for the maintenance of the device. Use DeviceAssociation.relationship with a value of 'maintainer' after R5.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/device-maintenanceresponsibility', fhirVersion: 'R4')]
 class DeviceMaintenanceResponsibilityExtension extends Extension implements FHIRComplexExtensionInterface

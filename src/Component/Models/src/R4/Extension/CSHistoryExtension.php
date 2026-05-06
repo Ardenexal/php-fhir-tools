@@ -17,7 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @see http://hl7.org/fhir/StructureDefinition/codesystem-history
  *
- * @description Information on changes made to the Value Set Definition over time, and also has a contained audit trail of all such changes.  This extension is retired.  Recording history of a value set definition should be done using provenance bundles instead.
+ * @description Information on changes made to the Value Set Definition over time, and also has a contained audit trail of all such changes.  This extension is retired.  Recording history of a value set definition should be done using provenance instead.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/codesystem-history', fhirVersion: 'R4')]
 class CSHistoryExtension extends Extension implements FHIRComplexExtensionInterface

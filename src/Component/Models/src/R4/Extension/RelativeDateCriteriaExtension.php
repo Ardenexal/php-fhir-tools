@@ -20,7 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @see http://hl7.org/fhir/StructureDefinition/relative-date
  *
- * @description Specifies that a date is relative to some event. The event happens [Duration] after [Event]. DEPRECATED: This extension has been deprecated in favor of the new relative-time extension.
+ * @description Specifies that a date is relative to some event. The event happens [Duration] after [Event].
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/relative-date', fhirVersion: 'R4')]
 class RelativeDateCriteriaExtension extends Extension implements FHIRComplexExtensionInterface
@@ -32,24 +32,26 @@ class RelativeDateCriteriaExtension extends Extension implements FHIRComplexExte
         /** @var CodeableConcept targetCode Kind of event that the date is relative to */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public CodeableConcept $targetCode,
-        /** @var CodePrimitive relationship before-start | before | before-end | concurrent-with-start | concurrent | concurrent-with-end | after-start | after | after-end */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
-        public CodePrimitive $relationship,
-        /** @var Duration offset Duration after the event */
+        /** @var Duration offset Duration before or after the event */
         #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex')]
         public Duration $offset,
         /** @var StringPrimitive|null targetPath Relative to which element on the event */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public ?StringPrimitive $targetPath = null,
+        /** @var CodePrimitive|null relationship before-start | before | before-end | concurrent-with-start | concurrent | concurrent-with-end | after-start | after | after-end */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        public ?CodePrimitive $relationship = null,
         ?string $id = null,
     ) {
         $subExtensions   = [];
         $subExtensions[] = new Extension(url: 'targetReference', value: $this->targetReference);
         $subExtensions[] = new Extension(url: 'targetCode', value: $this->targetCode);
-        $subExtensions[] = new Extension(url: 'relationship', value: $this->relationship);
         $subExtensions[] = new Extension(url: 'offset', value: $this->offset);
         if ($this->targetPath !== null) {
             $subExtensions[] = new Extension(url: 'targetPath', value: $this->targetPath);
+        }
+        if ($this->relationship !== null) {
+            $subExtensions[] = new Extension(url: 'relationship', value: $this->relationship);
         }
         parent::__construct(
             id: $id,
@@ -96,9 +98,6 @@ class RelativeDateCriteriaExtension extends Extension implements FHIRComplexExte
         }
         if ($targetCode === null) {
             throw new \InvalidArgumentException('Required sub-extension "targetCode" not found or type mismatch in ' . static::class . '::fromSubExtensions()');
-        }
-        if ($relationship === null) {
-            throw new \InvalidArgumentException('Required sub-extension "relationship" not found or type mismatch in ' . static::class . '::fromSubExtensions()');
         }
         if ($offset === null) {
             throw new \InvalidArgumentException('Required sub-extension "offset" not found or type mismatch in ' . static::class . '::fromSubExtensions()');

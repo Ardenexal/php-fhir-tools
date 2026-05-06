@@ -7,7 +7,7 @@ use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorIn
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
-return static function (ContainerConfigurator $container): void {
+return static function(ContainerConfigurator $container): void {
     $services = $container->services()
         ->defaults()
         ->autowire()

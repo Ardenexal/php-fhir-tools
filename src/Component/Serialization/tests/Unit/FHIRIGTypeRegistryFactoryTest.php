@@ -120,17 +120,19 @@ class FHIRIGTypeRegistryFactoryTest extends TestCase
 
     public function testBaseExtensionUrlPointsToAutoloadableClass(): void
     {
+        $url      = 'http://hl7.org/fhir/StructureDefinition/individual-genderIdentity';
         $registry = FHIRIGTypeRegistryFactory::create();
         $mappings = $registry->getExtensionMappings();
 
         self::assertArrayHasKey(
-            'http://hl7.org/fhir/StructureDefinition/individual-genderIdentity',
+            $url,
             $mappings,
             'individual-genderIdentity extension must be registered from base models.',
         );
 
-        $class = $mappings['http://hl7.org/fhir/StructureDefinition/individual-genderIdentity'];
-        self::assertTrue(class_exists($class), "Resolved class {$class} must be autoloadable.");
+        foreach ($mappings[$url] as $version => $class) {
+            self::assertTrue(class_exists($class), "Resolved class {$class} for version {$version} must be autoloadable.");
+        }
     }
 
     // -----------------------------------------------------------------

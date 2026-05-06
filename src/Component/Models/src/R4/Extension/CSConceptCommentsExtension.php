@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @see http://hl7.org/fhir/StructureDefinition/codesystem-concept-comments
  *
- * @description A comment that explains how this code is used in this context (where the value set is expected to be used).  This extension is retired.  The comment codesystem property should be used instead.
+ * @description A comment that explains how this code is used in this context (where the value set is expected to be used).  This extension not permitted from R5, because the comment CodeSystem property should be used instead.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/codesystem-concept-comments', fhirVersion: 'R4')]
 class CSConceptCommentsExtension extends Extension

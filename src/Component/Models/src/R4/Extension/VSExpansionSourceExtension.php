@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
  *
  * @see http://hl7.org/fhir/StructureDefinition/valueset-expansionSource
  *
- * @description The logical URL of the ValueSet definition that was used to generate this expansion.  valueset.url should be used instead of this extension.
+ * @description The logical URL of the ValueSet definition that was used to generate this expansion. ValueSet.url should be used instead of this extension.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-expansionSource', fhirVersion: 'R4')]
 class VSExpansionSourceExtension extends Extension

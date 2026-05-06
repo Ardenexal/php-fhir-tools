@@ -9,6 +9,8 @@ use Ardenexal\FHIRTools\Component\Serialization\FHIRIGTypeRegistry;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Ardenexal\FHIRTools\Bundle\FHIRBundle\Tests\Fixtures\Profile\AUIHIFixtureProfile;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
 
 /**
  * Verifies that FHIRIGRegistryCompilerPass registers both IG output directory classes
@@ -58,10 +60,17 @@ class FHIRIGRegistryCompilerPassTest extends TestCase
             'Base extension individual-genderIdentity must be registered from the Models component.',
         );
 
-        self::assertStringContainsString(
-            'PGenderIdentityExtension',
-            $extensionMappings['http://hl7.org/fhir/StructureDefinition/individual-genderIdentity'],
-        );
+        $versionedMap = $extensionMappings['http://hl7.org/fhir/StructureDefinition/individual-genderIdentity'];
+        self::assertIsArray($versionedMap, 'Extension mapping must be keyed by FHIR version.');
+        self::assertNotEmpty($versionedMap);
+
+        foreach ($versionedMap as $version => $class) {
+            self::assertStringContainsString(
+                'PGenderIdentityExtension',
+                $class,
+                "Class for version {$version} must resolve to PGenderIdentityExtension.",
+            );
+        }
     }
 
     public function testBaseExtensionMappingPointsToCorrectNamespace(): void
@@ -73,14 +82,19 @@ class FHIRIGRegistryCompilerPassTest extends TestCase
         $extensionMappings = $container->getDefinition(FHIRIGTypeRegistry::class)
             ->getArgument('$extensionMappings');
 
-        $class = $extensionMappings['http://hl7.org/fhir/StructureDefinition/individual-genderIdentity'] ?? null;
+        $versionedMap = $extensionMappings['http://hl7.org/fhir/StructureDefinition/individual-genderIdentity'] ?? null;
 
-        self::assertNotNull($class);
-        self::assertMatchesRegularExpression(
-            '/^Ardenexal\\\\FHIRTools\\\\Component\\\\Models\\\\R\d[A-Z]?\\\\Extension\\\\/',
-            $class,
-        );
-        self::assertTrue(class_exists($class), "Resolved class {$class} must be autoloadable.");
+        self::assertIsArray($versionedMap, 'Extension mapping must be keyed by FHIR version.');
+        self::assertNotEmpty($versionedMap);
+
+        foreach ($versionedMap as $version => $class) {
+            self::assertMatchesRegularExpression(
+                '/^Ardenexal\\\\FHIRTools\\\\Component\\\\Models\\\\R\d[A-Z]?\\\\Extension\\\\/',
+                $class,
+                "Class for version {$version} must live in the Models component's Extension namespace.",
+            );
+            self::assertTrue(class_exists($class), "Resolved class {$class} must be autoloadable.");
+        }
     }
 
     public function testMultipleBaseExtensionsAreRegistered(): void
@@ -156,7 +170,7 @@ class FHIRIGRegistryCompilerPassTest extends TestCase
             ->getArgument('$sliceDiscriminatorMappings');
 
         // The fixture profile extends Identifier, so discriminators must be keyed by Identifier's FQCN.
-        $identifierFqcn = \Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier::class;
+        $identifierFqcn = Identifier::class;
 
         self::assertArrayHasKey(
             $identifierFqcn,
@@ -174,9 +188,9 @@ class FHIRIGRegistryCompilerPassTest extends TestCase
         $sliceMappings = $container->getDefinition(FHIRIGTypeRegistry::class)
             ->getArgument('$sliceDiscriminatorMappings');
 
-        $identifierFqcn  = \Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier::class;
+        $identifierFqcn  = Identifier::class;
         $discriminators  = $sliceMappings[$identifierFqcn] ?? [];
-        $fixtureClass    = \Ardenexal\FHIRTools\Bundle\FHIRBundle\Tests\Fixtures\Profile\AUIHIFixtureProfile::class;
+        $fixtureClass    = AUIHIFixtureProfile::class;
 
         $forFixture = array_filter($discriminators, fn ($d) => $d['targetClass'] === $fixtureClass);
 
@@ -193,7 +207,7 @@ class FHIRIGRegistryCompilerPassTest extends TestCase
         $sliceMappings = $container->getDefinition(FHIRIGTypeRegistry::class)
             ->getArgument('$sliceDiscriminatorMappings');
 
-        $identifierFqcn = \Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier::class;
+        $identifierFqcn = Identifier::class;
 
         foreach ($sliceMappings[$identifierFqcn] ?? [] as $entry) {
             self::assertIsArray($entry, 'Discriminator entries must be plain arrays (not objects) for Symfony container serialization.');
@@ -213,8 +227,8 @@ class FHIRIGRegistryCompilerPassTest extends TestCase
         $sliceMappings = $container->getDefinition(FHIRIGTypeRegistry::class)
             ->getArgument('$sliceDiscriminatorMappings');
 
-        $identifierFqcn = \Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier::class;
-        $fixtureClass   = \Ardenexal\FHIRTools\Bundle\FHIRBundle\Tests\Fixtures\Profile\AUIHIFixtureProfile::class;
+        $identifierFqcn = Identifier::class;
+        $fixtureClass   = AUIHIFixtureProfile::class;
         $discriminators = $sliceMappings[$identifierFqcn] ?? [];
 
         $valueDiscriminator = null;
@@ -240,8 +254,8 @@ class FHIRIGRegistryCompilerPassTest extends TestCase
         $sliceMappings = $container->getDefinition(FHIRIGTypeRegistry::class)
             ->getArgument('$sliceDiscriminatorMappings');
 
-        $identifierFqcn = \Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier::class;
-        $fixtureClass   = \Ardenexal\FHIRTools\Bundle\FHIRBundle\Tests\Fixtures\Profile\AUIHIFixtureProfile::class;
+        $identifierFqcn = Identifier::class;
+        $fixtureClass   = AUIHIFixtureProfile::class;
         $discriminators = $sliceMappings[$identifierFqcn] ?? [];
 
         $patternDiscriminator = null;

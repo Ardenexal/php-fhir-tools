@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @see http://hl7.org/fhir/StructureDefinition/specimen-reject-reason
  *
- * @description References a resource or provides a code or text that specifies a substance that is added to a laboratory specimen (part of the container device or added to the specimen indenpendently).
+ * @description Provides a code or text that specifies the reason a specimen is not usable for testing.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/specimen-reject-reason', fhirVersion: 'R4')]
 class SpecimenRejectReasonExtension extends Extension

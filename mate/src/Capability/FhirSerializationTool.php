@@ -27,8 +27,8 @@ class FhirSerializationTool
      * @param string      $data        FHIR resource as a JSON or XML string. Format is auto-detected.
      * @param string|null $targetClass Optional fully-qualified PHP class name to deserialize into.
      *                                 When omitted, the class is resolved from the resourceType field.
-     * @param bool        $roundTrip   When true, re-serializes the object back to the original format
-     *                                 and includes a matchesInput flag to verify round-trip fidelity.
+     * @param bool        $roundTrip   when true, re-serializes the object back to the original format
+     *                                 and includes a matchesInput flag to verify round-trip fidelity
      */
     #[McpTool('fhir-deserialize-inspect', 'Deserialize FHIR JSON or XML and return the rehydrated PHP object dumped via Symfony VarDumper, optionally round-tripped back to the source format to verify fidelity.')]
     public function inspect(string $data, ?string $targetClass = null, bool $roundTrip = false): string

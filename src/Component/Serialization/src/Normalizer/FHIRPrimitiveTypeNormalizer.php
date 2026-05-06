@@ -34,9 +34,10 @@ class FHIRPrimitiveTypeNormalizer extends AbstractFHIRNormalizer
         FHIRMetadataExtractorInterface $metadataExtractor,
         ?NormalizerInterface $normalizer = null,
         ?DenormalizerInterface $denormalizer = null,
+        string $fhirVersion = 'R4B',
         ?FHIRIGTypeRegistry $igTypeRegistry = null,
     ) {
-        parent::__construct($metadataExtractor, $normalizer, $denormalizer, $igTypeRegistry);
+        parent::__construct($metadataExtractor, $normalizer, $denormalizer, $fhirVersion, $igTypeRegistry);
     }
 
     /**
@@ -517,7 +518,7 @@ class FHIRPrimitiveTypeNormalizer extends AbstractFHIRNormalizer
      */
     private function parseTemporalValue(mixed $value, string $class): ?FHIRTemporalValue
     {
-        if ($value === null) {
+        if ($value === null || $value === '') {
             return null;
         }
 

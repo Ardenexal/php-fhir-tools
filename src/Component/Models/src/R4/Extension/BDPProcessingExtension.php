@@ -8,9 +8,9 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableReference;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\Base64BinaryPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 
@@ -28,9 +28,9 @@ class BDPProcessingExtension extends Extension implements FHIRComplexExtensionIn
         /** @var StringPrimitive|null description Processing of description */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public ?StringPrimitive $description = null,
-        /** @var CodeableReference|null procedure Procesing procedure */
-        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex')]
-        public ?CodeableReference $procedure = null,
+        /** @var Base64BinaryPrimitive|null procedure Procesing procedure */
+        #[FhirProperty(fhirType: 'base64Binary', propertyKind: 'primitive')]
+        public ?Base64BinaryPrimitive $procedure = null,
         /** @var Reference|null additive Substance added during processing */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $additive = null,
@@ -77,7 +77,7 @@ class BDPProcessingExtension extends Extension implements FHIRComplexExtensionIn
             if ($extUrl === 'description' && $ext->value instanceof StringPrimitive) {
                 $description = $ext->value;
             }
-            if ($extUrl === 'procedure' && $ext->value instanceof CodeableReference) {
+            if ($extUrl === 'procedure' && $ext->value instanceof Base64BinaryPrimitive) {
                 $procedure = $ext->value;
             }
             if ($extUrl === 'additive' && $ext->value instanceof Reference) {

@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
  *
  * @see http://hl7.org/fhir/StructureDefinition/elementdefinition-defaulttype
  *
- * @description The default type that applies if the instance doesn't specify a particular type, and there is a choice of types.  Only for use on logical models.
+ * @description The default type that applies if the instance doesn't specify a particular type, and there is a choice of types. This extension is only for use on logical models.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-defaulttype', fhirVersion: 'R4')]
 class DefaultTypeExtension extends Extension

@@ -70,7 +70,7 @@ class ExtensionDenormalizationTest extends TestCase
             ->method('denormalize')
             ->with(
                 ['url' => 'http://example.com/some-extension', 'valueString' => 'hello'],
-                'Ardenexal\\FHIRTools\\Component\\Models\\R4\\DataType\\Extension',
+                'Ardenexal\\FHIRTools\\Component\\Models\\R4B\\DataType\\Extension',
                 'json',
                 [],
             )
@@ -95,7 +95,7 @@ class ExtensionDenormalizationTest extends TestCase
     {
         $typedClass = \stdClass::class;
         $registry   = new FHIRIGTypeRegistry(
-            extensionMappings: ['http://hl7.org/fhir/StructureDefinition/patient-birthPlace' => $typedClass],
+            extensionMappings: ['http://hl7.org/fhir/StructureDefinition/patient-birthPlace' => ['R4B' => $typedClass]],
         );
 
         $denormalizer = $this->createMock(DenormalizerInterface::class);
@@ -114,6 +114,7 @@ class ExtensionDenormalizationTest extends TestCase
             $this->metadataExtractor,
             null,
             $denormalizer,
+            'R4B',
             $registry,
         );
 
@@ -127,7 +128,7 @@ class ExtensionDenormalizationTest extends TestCase
     public function testWithRegistryFallsBackForUnknownUrl(): void
     {
         $registry = new FHIRIGTypeRegistry(
-            extensionMappings: ['http://example.com/known-ext' => \stdClass::class],
+            extensionMappings: ['http://example.com/known-ext' => ['R4B' => \stdClass::class]],
         );
 
         $denormalizer = $this->createMock(DenormalizerInterface::class);
@@ -136,7 +137,7 @@ class ExtensionDenormalizationTest extends TestCase
             ->method('denormalize')
             ->with(
                 self::anything(),
-                'Ardenexal\\FHIRTools\\Component\\Models\\R4\\DataType\\Extension',
+                'Ardenexal\\FHIRTools\\Component\\Models\\R4B\\DataType\\Extension',
                 'json',
                 [],
             )
@@ -146,6 +147,7 @@ class ExtensionDenormalizationTest extends TestCase
             $this->metadataExtractor,
             null,
             $denormalizer,
+            'R4B',
             $registry,
         );
 
@@ -166,6 +168,7 @@ class ExtensionDenormalizationTest extends TestCase
             $this->metadataExtractor,
             null,
             $denormalizer,
+            'R4B',
             $registry,
         );
 

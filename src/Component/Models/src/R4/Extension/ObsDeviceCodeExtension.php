@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @see http://hl7.org/fhir/StructureDefinition/observation-deviceCode
  *
- * @description A code representing the the type of device used for this observation. This extension is deprecated, as there are alternate ways to represent this information through the use of Observation.device and the Device.type element.
+ * @description A code representing the the type of device used for this observation. Note: there are alternate ways to represent this information through the use of Observation.device and the Device.type element.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/observation-deviceCode', fhirVersion: 'R4')]
 class ObsDeviceCodeExtension extends Extension

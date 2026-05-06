@@ -60,6 +60,9 @@ class FHIRBundleServiceRegistrationTest extends TestCase
                         'enabled'     => $validationEnabled,
                         'strict_mode' => $strictMode,
                     ],
+                    'serialization'    => [
+                        'metadata_cache_pool' => null,
+                    ],
                 ],
             ];
 
@@ -68,7 +71,7 @@ class FHIRBundleServiceRegistrationTest extends TestCase
             $extension = $bundle->getContainerExtension();
             $extension->load([$config['fhir']], $container);
 
-            // Verify essential FHIR services are registered (before compilation)
+            // Verify essential FHIR services are registered (pre-compilation)
             $essentialServices = [
                 'Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader',
                 'Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService',

@@ -13,7 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @see http://hl7.org/fhir/StructureDefinition/codesystem-conceptOrder
  *
- * @description Identifies the relative order in which concepts within the value set should be presented to a user.  This extension has been deprecated and is not recommended for use as the purpose of this extension does not make sense for a code system.
+ * @description Identifies the relative order in which concepts within the value set should be presented to a user. In R6+, the order property is used in place of this extension.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/codesystem-conceptOrder', fhirVersion: 'R4')]
 class CSConceptOrderExtension extends Extension

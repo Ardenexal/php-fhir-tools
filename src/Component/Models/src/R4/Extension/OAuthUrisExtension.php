@@ -31,6 +31,12 @@ class OAuthUrisExtension extends Extension implements FHIRComplexExtensionInterf
         /** @var UriPrimitive|null register OAuth2 dynamic registration endpoint */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
         public ?UriPrimitive $register = null,
+        /** @var UriPrimitive|null introspect User-facing introspection end point */
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        public ?UriPrimitive $introspect = null,
+        /** @var UriPrimitive|null revoke User-facing revocation end point */
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        public ?UriPrimitive $revoke = null,
         /** @var UriPrimitive|null manage User-facing authorization management entry point */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
         public ?UriPrimitive $manage = null,
@@ -41,6 +47,12 @@ class OAuthUrisExtension extends Extension implements FHIRComplexExtensionInterf
         $subExtensions[] = new Extension(url: 'token', value: $this->token);
         if ($this->register !== null) {
             $subExtensions[] = new Extension(url: 'register', value: $this->register);
+        }
+        if ($this->introspect !== null) {
+            $subExtensions[] = new Extension(url: 'introspect', value: $this->introspect);
+        }
+        if ($this->revoke !== null) {
+            $subExtensions[] = new Extension(url: 'revoke', value: $this->revoke);
         }
         if ($this->manage !== null) {
             $subExtensions[] = new Extension(url: 'manage', value: $this->manage);
@@ -60,10 +72,12 @@ class OAuthUrisExtension extends Extension implements FHIRComplexExtensionInterf
      */
     public static function fromSubExtensions(array $subExtensions, ?string $id = null): static
     {
-        $authorize = null;
-        $token     = null;
-        $register  = null;
-        $manage    = null;
+        $authorize  = null;
+        $token      = null;
+        $register   = null;
+        $introspect = null;
+        $revoke     = null;
+        $manage     = null;
 
         foreach ($subExtensions as $ext) {
             $extUrl = $ext->getExtensionUrl();
@@ -75,6 +89,12 @@ class OAuthUrisExtension extends Extension implements FHIRComplexExtensionInterf
             }
             if ($extUrl === 'register' && $ext->value instanceof UriPrimitive) {
                 $register = $ext->value;
+            }
+            if ($extUrl === 'introspect' && $ext->value instanceof UriPrimitive) {
+                $introspect = $ext->value;
+            }
+            if ($extUrl === 'revoke' && $ext->value instanceof UriPrimitive) {
+                $revoke = $ext->value;
             }
             if ($extUrl === 'manage' && $ext->value instanceof UriPrimitive) {
                 $manage = $ext->value;
@@ -88,6 +108,6 @@ class OAuthUrisExtension extends Extension implements FHIRComplexExtensionInterf
             throw new \InvalidArgumentException('Required sub-extension "token" not found or type mismatch in ' . static::class . '::fromSubExtensions()');
         }
 
-        return new static($authorize, $token, $register, $manage, $id);
+        return new static($authorize, $token, $register, $introspect, $revoke, $manage, $id);
     }
 }

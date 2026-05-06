@@ -14,11 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
  *
  * @see http://hl7.org/fhir/StructureDefinition/referencesContained
  *
- * @description This indicates that the element containing this extension has content that makes reference to the specified contained resource.
- * * Expression may contain CQL or FHIRPath that makes reference to ValueSets
- * * string may contain FHIRPath referencing ValueSets or contain escaped XHTML referencing images (as Binaries)
- * * Narrative contains 'text' which is xhtml (and can't have extensions itself) which can also refer to images
- * * markdown can refer to images.
+ * @description This indicates that the element containing this extension has an expression, xhtml, or some other content that makes reference to the specified contained resource in a way that is not detectable by the dom-3 constraint.  This extension is included to make the reference 'visible' to the dom-3 constraint.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/referencesContained', fhirVersion: 'R4')]
 class ReferencesContainedExtension extends Extension

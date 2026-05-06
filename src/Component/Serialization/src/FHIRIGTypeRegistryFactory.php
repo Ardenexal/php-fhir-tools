@@ -74,8 +74,8 @@ final class FHIRIGTypeRegistryFactory
      * Scan a directory for PHP files and populate URL→class mappings from
      * #[FHIRExtensionDefinition], #[FHIRProfile], and #[FHIRSliceDiscriminator] attributes.
      *
-     * @param array<string, class-string>                                                                      $extensionMappings
-     * @param array<string, class-string>                                                                      $profileMappings
+     * @param array<string, array<string, class-string>>                                                      $extensionMappings
+     * @param array<string, class-string>                                                                     $profileMappings
      * @param array<string, list<array{type: string, path: string, value: mixed, targetClass: class-string}>> $sliceDiscriminatorMappings
      */
     private static function scanDirectory(
@@ -104,8 +104,8 @@ final class FHIRIGTypeRegistryFactory
             if (!empty($extAttrs)) {
                 /** @var FHIRExtensionDefinition $attr */
                 $attr = $extAttrs[0]->newInstance();
-                if (!array_key_exists($attr->url, $extensionMappings)) {
-                    $extensionMappings[$attr->url] = $className;
+                if (!isset($extensionMappings[$attr->url][$attr->fhirVersion])) {
+                    $extensionMappings[$attr->url][$attr->fhirVersion] = $className;
                 }
             }
 
@@ -153,7 +153,7 @@ final class FHIRIGTypeRegistryFactory
         $prefix = rtrim($namespace, '\\') . '\\';
         $base   = rtrim($directory, '/\\') . DIRECTORY_SEPARATOR;
 
-        spl_autoload_register(static function (string $class) use ($prefix, $base): void {
+        spl_autoload_register(static function(string $class) use ($prefix, $base): void {
             if (!str_starts_with($class, $prefix)) {
                 return;
             }

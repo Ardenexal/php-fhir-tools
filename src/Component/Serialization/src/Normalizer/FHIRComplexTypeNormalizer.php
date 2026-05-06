@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Normalizer;
 
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface;
@@ -33,9 +35,10 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
         private readonly FHIRTypeResolverInterface $typeResolver,
         ?NormalizerInterface $normalizer = null,
         ?DenormalizerInterface $denormalizer = null,
+        string $fhirVersion = 'R4B',
         ?FHIRIGTypeRegistry $igTypeRegistry = null,
     ) {
-        parent::__construct($metadataExtractor, $normalizer, $denormalizer, $igTypeRegistry);
+        parent::__construct($metadataExtractor, $normalizer, $denormalizer, $fhirVersion, $igTypeRegistry);
     }
 
     /**
@@ -129,7 +132,27 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
                 return $resolvedType::fromSubExtensions($subExtensions, $id);
             }
 
-            $object = $reflection->newInstanceWithoutConstructor();
+            // Backbone element classes (e.g. BundleEntry) use constructor-with-defaults so
+            // that properties absent from the data remain initialized to their declared default
+            // (e.g. ?ResourceResource $resource = null) and don't trigger "must not be accessed
+            // before initialization" errors on subsequent read access.
+            // All other complex types (Coding, Identifier, etc.) use newInstanceWithoutConstructor
+            // because constructor side-effects could interfere with property-loop population.
+            $isBackboneElement = !empty($reflection->getAttributes(FHIRBackboneElement::class));
+            if ($isBackboneElement) {
+                $constructor = $reflection->getConstructor();
+                if ($constructor !== null) {
+                    $args = [];
+                    foreach ($constructor->getParameters() as $param) {
+                        $args[] = $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null;
+                    }
+                    $object = $reflection->newInstanceArgs($args);
+                } else {
+                    $object = $reflection->newInstanceWithoutConstructor();
+                }
+            } else {
+                $object = $reflection->newInstanceWithoutConstructor();
+            }
 
             // Get property metadata for choice element mapping
             $metaMap = $this->getPropertyMetadataMap($object);
@@ -239,6 +262,29 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
                                         $denormalizedValue[] = $this->denormalizer->denormalize($item, $phpItemClass, $format, $context);
                                     }
                                 }
+                            } elseif ($meta !== null && $meta->propertyKind === 'resource' && $format === 'xml' && is_array($value)) {
+                                // Polymorphic resource property (e.g. Bundle.entry.resource) in XML:
+                                // The inner element name (e.g. 'Patient') identifies the concrete type.
+                                $resourceElementName = null;
+                                foreach ($value as $k => $v) {
+                                    if (is_string($k) && !str_starts_with($k, '@') && !str_starts_with($k, '#')) {
+                                        $resourceElementName = $k;
+                                        break;
+                                    }
+                                }
+
+                                if ($resourceElementName !== null) {
+                                    $resolvedClass = $this->typeResolver->resolveResourceType(['resourceType' => $resourceElementName]);
+                                    if ($resolvedClass !== null) {
+                                        $innerData          = is_array($value[$resourceElementName] ?? null) ? $value[$resourceElementName] : $value;
+                                        $denormalizedValue  = $this->denormalizer->denormalize($innerData, $resolvedClass, $format, $context);
+                                        $property->setValue($object, $denormalizedValue);
+                                        continue;
+                                    }
+                                }
+
+                                // No resource element found or type unresolvable — leave property at default (null).
+                                $denormalizedValue = null;
                             } else {
                                 $propertyType = $this->getPropertyType($property);
                                 if ($propertyType !== null && !$this->isBuiltinType($propertyType)) {
@@ -316,9 +362,18 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
 
             // Walk the parent chain: profile subclasses (e.g. AUIHIProfile extends Identifier)
             // carry #[FHIRProfile] rather than #[FHIRComplexType] directly.
+            // Short-circuit for primitive types (e.g. DatePrimitive, StringPrimitive, CodePrimitive
+            // and their subclasses like BundleTypeType) — defer to FHIRPrimitiveTypeNormalizer.
+            // These classes extend Element (which has #[FHIRComplexType]) but also carry
+            // #[FHIRPrimitive] on themselves or an ancestor, and need the primitive denorm path
+            // to correctly populate their typed $value property.
             $r = $reflection;
 
             do {
+                if (!empty($r->getAttributes(FHIRPrimitive::class))) {
+                    return false;
+                }
+
                 if (!empty($r->getAttributes(FHIRComplexType::class))) {
                     return true;
                 }
@@ -755,6 +810,22 @@ class FHIRComplexTypeNormalizer extends AbstractFHIRNormalizer
                 $data[$meta->xmlSerializedName] = is_bool($value)
                     ? ($value ? 'true' : 'false')
                     : (string) $value;
+                continue;
+            }
+
+            // Polymorphic resource property (e.g. BundleEntry.resource) for XML:
+            // wrap the serialized resource with its type element name so XmlEncoder emits
+            // <resource><Patient>...</Patient></resource> instead of flat <resource>...</resource>.
+            if ($meta !== null && $meta->propertyKind === 'resource' && is_object($value)) {
+                $itemResourceType = $this->metadataExtractor->extractResourceType($value);
+                if ($itemResourceType !== null) {
+                    $normalizedValue = $this->normalizer !== null
+                        ? $this->normalizer->normalize($value, 'xml', $context)
+                        : $this->normalizeBasicValue($value, 'xml', $context);
+                    if ($normalizedValue !== null) {
+                        $data[$xmlKey] = [$itemResourceType => $normalizedValue];
+                    }
+                }
                 continue;
             }
 

@@ -36,6 +36,9 @@ class PatSexParameterForClinicalUseExtension extends Extension implements FHIRCo
         /** @var array<CodeableConcept> supportingInfo Source of the sex for clincal use */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true)]
         public array $supportingInfo = [],
+        /** @var array<CodeableConcept> intendedClinicalUse The intended clinical uses for this sex parameter */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isArray: true)]
+        public array $intendedClinicalUse = [],
         ?string $id = null,
     ) {
         $subExtensions   = [];
@@ -48,6 +51,9 @@ class PatSexParameterForClinicalUseExtension extends Extension implements FHIRCo
         }
         foreach ($this->supportingInfo as $v) {
             $subExtensions[] = new Extension(url: 'supportingInfo', value: $v);
+        }
+        foreach ($this->intendedClinicalUse as $v) {
+            $subExtensions[] = new Extension(url: 'intendedClinicalUse', value: $v);
         }
         parent::__construct(
             id: $id,
@@ -64,10 +70,11 @@ class PatSexParameterForClinicalUseExtension extends Extension implements FHIRCo
      */
     public static function fromSubExtensions(array $subExtensions, ?string $id = null): static
     {
-        $valueSlice     = null;
-        $period         = null;
-        $comment        = null;
-        $supportingInfo = [];
+        $valueSlice          = null;
+        $period              = null;
+        $comment             = null;
+        $supportingInfo      = [];
+        $intendedClinicalUse = [];
 
         foreach ($subExtensions as $ext) {
             $extUrl = $ext->getExtensionUrl();
@@ -83,12 +90,15 @@ class PatSexParameterForClinicalUseExtension extends Extension implements FHIRCo
             if ($extUrl === 'supportingInfo' && $ext->value instanceof CodeableConcept) {
                 $supportingInfo[] = $ext->value;
             }
+            if ($extUrl === 'intendedClinicalUse' && $ext->value instanceof CodeableConcept) {
+                $intendedClinicalUse[] = $ext->value;
+            }
         }
 
         if ($valueSlice === null) {
             throw new \InvalidArgumentException('Required sub-extension "value" not found or type mismatch in ' . static::class . '::fromSubExtensions()');
         }
 
-        return new static($valueSlice, $period, $comment, $supportingInfo, $id);
+        return new static($valueSlice, $period, $comment, $supportingInfo, $intendedClinicalUse, $id);
     }
 }

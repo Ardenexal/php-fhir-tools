@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @see http://hl7.org/fhir/StructureDefinition/artifact-author
  *
- * @description An individual or organization primarily involved in the creation and maintenance of the artifact.
+ * @description An individual or organization primarily involved in the creation and maintenance of the artifact. The author of an artifact is distinct from the publisher to enable access and attribution use cases.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-author', fhirVersion: 'R4')]
 class ArtifactAuthorExtension extends Extension

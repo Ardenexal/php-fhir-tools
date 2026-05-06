@@ -103,7 +103,7 @@ class FHIRConstrainedComplexTypeGenerator
      */
     public static function hasConstrainedElements(array $structureDefinition): bool
     {
-        $baseType = $structureDefinition['type'] ?? '';
+        $baseType = $structureDefinition['type']                ?? '';
         $elements = $structureDefinition['snapshot']['element'] ?? [];
 
         if ($baseType === '' || !is_array($elements)) {
@@ -264,7 +264,7 @@ class FHIRConstrainedComplexTypeGenerator
      *
      * @param array<int, mixed> $elements
      *
-     * @return ExtractedConstraints  property name → constraint metadata
+     * @return ExtractedConstraints property name → constraint metadata
      */
     private function extractFixedConstraints(array $elements, string $baseType): array
     {
@@ -477,8 +477,8 @@ class FHIRConstrainedComplexTypeGenerator
             // Variable param: expose it as a constructor parameter
             $phpType    = $this->resolveParamPhpType($param);
             $isRequired = isset($minCardinality[$paramName]) && $minCardinality[$paramName] >= 1
-                && !$param->isVariadic()
-                && $phpType !== 'array';
+                                                             && !$param->isVariadic()
+                                                             && $phpType !== 'array';
 
             $varData = [
                 'name'       => $paramName,
@@ -537,7 +537,7 @@ class FHIRConstrainedComplexTypeGenerator
         }
 
         $constructor->setBody(
-            "parent::__construct(\n" . implode(",\n", $argLines) . ",\n);"
+            "parent::__construct(\n" . implode(",\n", $argLines) . ",\n);",
         );
     }
 
@@ -695,8 +695,8 @@ class FHIRConstrainedComplexTypeGenerator
         $namespace->addUse(ltrim($codingClass, '\\'));
         $shortClass = (string) u($codingClass)->afterLast('\\');
 
-        $uriClass = $this->resolvePhpClassForFhirType('uri', $version, $context);
-        $strClass = $this->resolvePhpClassForFhirType('string', $version, $context);
+        $uriClass  = $this->resolvePhpClassForFhirType('uri', $version, $context);
+        $strClass  = $this->resolvePhpClassForFhirType('string', $version, $context);
         $codeClass = $this->resolvePhpClassForFhirType('code', $version, $context);
 
         $args = [];

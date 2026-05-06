@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @see http://hl7.org/fhir/StructureDefinition/codesystem-replacedby
  *
- * @description A code that replaces this - use this code instead.  This extension has been retired as it is unusable with it's current context and because identification of replacement codes should be captured using concept properties.
+ * @description A code that replaces this - use this code instead.  This extension is not used in R6 because identification of replacement codes should be captured using concept properties.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/codesystem-replacedby', fhirVersion: 'R4')]
 class CSReplacedbyExtension extends Extension

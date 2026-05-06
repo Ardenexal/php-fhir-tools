@@ -22,12 +22,13 @@ namespace Ardenexal\FHIRTools\Component\Serialization;
 class FHIRIGTypeRegistry
 {
     /**
-     * @param array<string, class-string>            $extensionMappings Extension URL → typed extension class
-     * @param array<string, class-string>            $profileMappings   Profile URL → typed profile class
+     * @param array<string, array<string, class-string>>                                                      $extensionMappings          Extension URL → [fhirVersion → typed extension class].
+     *                                                                                                                                    Inner key is the FHIR version string ('R4', 'R4B', 'R5').
+     * @param array<string, class-string>                                                                     $profileMappings            Profile URL → typed profile class
      * @param array<string, list<array{type: string, path: string, value: mixed, targetClass: class-string}>> $sliceDiscriminatorMappings
-     *        Base type FQCN → list of discriminator data arrays. Plain arrays are used here
-     *        because the Symfony container cannot serialize object instances when dumping the
-     *        compiled container to PHP/XML. Hydration to SliceDiscriminator objects happens below.
+     *                                                                                                                                    Base type FQCN → list of discriminator data arrays. Plain arrays are used here
+     *                                                                                                                                    because the Symfony container cannot serialize object instances when dumping the
+     *                                                                                                                                    compiled container to PHP/XML. Hydration to SliceDiscriminator objects happens below.
      */
     public function __construct(
         private readonly array $extensionMappings = [],
@@ -55,16 +56,27 @@ class FHIRIGTypeRegistry
     private readonly array $sliceDiscriminatorMappings;
 
     /**
-     * Resolve the typed extension class for the given extension URL.
+     * Resolve the typed extension class for the given extension URL, preferring the given FHIR version.
      *
-     * Returns null when no typed class is registered for the URL,
-     * in which case callers should fall back to the base Extension class.
+     * When $version is provided and a class is registered for that version, it is returned.
+     * Otherwise falls back to any registered version (first-registered wins).
+     * Returns null when no typed class is registered for the URL.
      *
      * @return class-string|null
      */
-    public function resolveExtensionClass(string $url): ?string
+    public function resolveExtensionClass(string $url, string $version = ''): ?string
     {
-        return $this->extensionMappings[$url] ?? null;
+        $byVersion = $this->extensionMappings[$url] ?? null;
+
+        if ($byVersion === null) {
+            return null;
+        }
+
+        if ($version !== '' && isset($byVersion[$version])) {
+            return $byVersion[$version];
+        }
+
+        return reset($byVersion) ?: null;
     }
 
     /**
@@ -150,7 +162,7 @@ class FHIRIGTypeRegistry
     }
 
     /**
-     * @return array<string, class-string>
+     * @return array<string, array<string, class-string>>
      */
     public function getExtensionMappings(): array
     {
@@ -225,8 +237,8 @@ class FHIRIGTypeRegistry
      *
      * For other array patterns: performs a recursive subset check.
      *
-     * @param array<string, mixed>|mixed         $dataValue
-     * @param array<string, mixed>|mixed         $patternValue
+     * @param array<string, mixed>|mixed $dataValue
+     * @param array<string, mixed>|mixed $patternValue
      */
     private function matchesPattern(mixed $dataValue, mixed $patternValue): bool
     {

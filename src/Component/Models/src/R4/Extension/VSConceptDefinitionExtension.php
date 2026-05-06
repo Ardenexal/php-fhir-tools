@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @see http://hl7.org/fhir/StructureDefinition/valueset-concept-definition
  *
- * @description A definition that describes the meaning of this code when used as part of this value set. Use of this extension should NEVER result in a definition for a concept that changes the meaning of the concept as described in the code system. This SHALL only be used to further clarify or provide additional nuances to the meaning.
+ * @description A definition that describes the meaning of this code when used as part of this value set. Use of this extension SHALL NOT result in a definition for a concept that changes the meaning of the concept as described in the code system. This SHALL only be used to further clarify or provide additional nuances to the meaning.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-concept-definition', fhirVersion: 'R4')]
 class VSConceptDefinitionExtension extends Extension

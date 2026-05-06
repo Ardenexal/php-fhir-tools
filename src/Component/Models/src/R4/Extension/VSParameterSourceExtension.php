@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
  *
  * @see http://hl7.org/fhir/StructureDefinition/valueset-parameterSource
  *
- * @description Declares what the source of this parameter is.
+ * @description Allows a server to assert the source of a parameter used in the $expand.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-parameterSource', fhirVersion: 'R4')]
 class VSParameterSourceExtension extends Extension
