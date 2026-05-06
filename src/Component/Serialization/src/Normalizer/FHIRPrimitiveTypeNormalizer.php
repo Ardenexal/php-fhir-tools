@@ -518,7 +518,7 @@ class FHIRPrimitiveTypeNormalizer extends AbstractFHIRNormalizer
      */
     private function parseTemporalValue(mixed $value, string $class): ?FHIRTemporalValue
     {
-        if ($value === null) {
+        if ($value === null || $value === '') {
             return null;
         }
 

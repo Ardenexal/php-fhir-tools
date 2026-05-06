@@ -127,9 +127,13 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
                     }
                 }
 
-                // For XML, use @ prefix to create attribute; for JSON use plain key
-                $valueKey          = ($format === 'xml') ? '@value' : 'value';
-                $result[$valueKey] = $raw;
+                // For XML, use @ prefix to create attribute; for JSON use plain key.
+                // Only emit when non-null — null would cause XmlEncoder to produce value=""
+                // which re-parses as an empty string and fails temporal validation.
+                if ($raw !== null) {
+                    $valueKey          = ($format === 'xml') ? '@value' : 'value';
+                    $result[$valueKey] = $raw;
+                }
             }
         }
 
@@ -149,7 +153,7 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             }
         }
 
-        return $result;
+        return empty($result) ? null : $result;
     }
 
     /**
@@ -565,6 +569,17 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         // Correctly map "true" → true and "false" → false for bool-typed properties.
         if ($propertyType === 'bool' && is_string($value)) {
             return $value === 'true';
+        }
+
+        // Cast numeric string values to the declared PHP scalar type so that
+        // FHIRPath type inference (is(FHIR.integer)) sees the correct PHP type and
+        // choice-variant resolution picks the right variant (int vs string).
+        if ($propertyType === 'int' && is_string($value) && is_numeric($value)) {
+            return (int) $value;
+        }
+
+        if ($propertyType === 'float' && is_string($value) && is_numeric($value)) {
+            return (float) $value;
         }
 
         // XmlEncoder collapses single XML elements into scalars instead of arrays.
