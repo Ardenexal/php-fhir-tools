@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Serialization\Normalizer;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -27,9 +28,11 @@ class FHIRBackboneElementNormalizer extends AbstractFHIRNormalizer
     public function __construct(
         FHIRMetadataExtractorInterface $metadataExtractor,
         ?NormalizerInterface $normalizer = null,
-        ?DenormalizerInterface $denormalizer = null
+        ?DenormalizerInterface $denormalizer = null,
+        string $fhirVersion = 'R4B',
+        ?FHIRIGTypeRegistry $igTypeRegistry = null,
     ) {
-        parent::__construct($metadataExtractor, $normalizer, $denormalizer);
+        parent::__construct($metadataExtractor, $normalizer, $denormalizer, $fhirVersion, $igTypeRegistry);
     }
 
     /**
@@ -328,17 +331,14 @@ class FHIRBackboneElementNormalizer extends AbstractFHIRNormalizer
             return null;
         }
 
-        $result = [];
-        foreach ($extensions as $extension) {
-            if ($this->denormalizer !== null && is_array($extension)) {
-                // Try to denormalize as Extension object - simplified for now
-                $result[] = $extension;
-            } else {
-                $result[] = $this->denormalizeBasicValue($extension, $format, $context);
-            }
+        if ($format === 'xml' && !array_is_list($extensions)) {
+            $extensions = [$extensions];
         }
 
-        return $result;
+        /** @var list<mixed> $result */
+        $result = array_values($this->denormalizeExtensionArray(array_values($extensions), $format, $context));
+
+        return empty($result) ? null : $result;
     }
 
     /**

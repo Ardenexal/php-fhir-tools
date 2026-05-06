@@ -15,12 +15,12 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\GroupMeasureType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\TriggerDefinition;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\UsageContext;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\Timing;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -127,7 +127,7 @@ class EvidenceVariableCharacteristic extends BackboneElement
                 [
                     'fhirType'     => 'Timing',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Timing',
                     'jsonKey'      => 'participantEffectiveTiming',
                 ],
             ],

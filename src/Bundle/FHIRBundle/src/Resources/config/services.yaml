@@ -19,8 +19,16 @@ services:
             $pathService: '@Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService'
         tags: ["console.command"]
 
-    # Code Generation Command
+    # Code Generation Commands
     Ardenexal\FHIRTools\Component\CodeGeneration\Command\FHIRModelGeneratorCommand:
+        tags: ["console.command"]
+
+    Ardenexal\FHIRTools\Component\CodeGeneration\Command\FHIRIGGeneratorCommand:
+        arguments:
+            $configuredPackages: '%fhir.ig.packages%'
+            $offlineByDefault: '%fhir.ig.offline%'
+            $igOutputDirectory: '%fhir.ig.output_directory%'
+            $igBaseNamespace: '%fhir.ig.namespace%'
         tags: ["console.command"]
 
     # Code Generation Services
@@ -28,6 +36,10 @@ services:
 
     Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator:
         public: true
+
+    Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRExtensionGenerator: ~
+
+    Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRProfileGenerator: ~
 
     Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader:
         public: true
@@ -49,6 +61,9 @@ services:
         alias: 'Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor'
         public: true
 
+    # Serialization - IG Type Registry (maps populated by FHIRIGRegistryCompilerPass at container build time)
+    Ardenexal\FHIRTools\Component\Serialization\FHIRIGTypeRegistry: ~
+
     # Serialization - Type Resolver
     Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolver: ~
 
@@ -64,48 +79,27 @@ services:
             $operation: "initial"
             $format: "json"
 
-    # Serialization - Normalizers (tagged so Symfony's Serializer picks them up)
-    # The optional NormalizerInterface/DenormalizerInterface arguments are set to null
-    # to avoid a circular dependency with the Serializer service itself.
-    Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRResourceNormalizer:
-        arguments:
-            $normalizer: null
-            $denormalizer: null
-        tags: ["serializer.normalizer"]
-
-    Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRComplexTypeNormalizer:
-        arguments:
-            $normalizer: null
-            $denormalizer: null
-        tags: ["serializer.normalizer"]
-
-    Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRBackboneElementNormalizer:
-        arguments:
-            $normalizer: null
-            $denormalizer: null
-        tags: ["serializer.normalizer"]
-
-    Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRPrimitiveTypeNormalizer:
-        arguments:
-            $normalizer: null
-            $denormalizer: null
-        tags: ["serializer.normalizer"]
-
     # Serialization - Validator
     Ardenexal\FHIRTools\Component\Serialization\Validator\FHIRValidator:
         public: true
 
-    # Serialization - Main Service (correct namespace)
+    # Serialization - per-version normalizer stacks, Serializer instances, FHIRSerializationService
+    # instances, FHIRVersionedSerializationServiceLocator, and backward-compat aliases are all
+    # registered programmatically by FHIRVersionedSerializerPass at container compile time.
+    #
+    # The stubs below satisfy pre-compile container checks (e.g. unit tests that introspect the
+    # container before compilation). FHIRVersionedSerializerPass replaces both with versioned
+    # aliases at compile time via setAlias(), which removes any prior definition with the same ID.
     Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService:
+        public: true
+
+    fhir.serialization_service:
+        alias: 'Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService'
         public: true
 
     # Named service aliases
     fhir.model_generator:
         alias: 'Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator'
-        public: true
-
-    fhir.serialization_service:
-        alias: 'Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService'
         public: true
 
     fhir.package_loader:

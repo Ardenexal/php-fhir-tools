@@ -1416,6 +1416,13 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         }
 
         if ($this->primitiveCache[$class] && property_exists($value, 'value')) {
+            // Guard against typed properties that are declared but not yet initialized (e.g. when
+            // a primitive was constructed via newInstanceWithoutConstructor() without setValue being called).
+            $reflProp = new \ReflectionProperty($value, 'value');
+            if (!$reflProp->isInitialized($value)) {
+                return null;
+            }
+
             $extracted = $value->value; // e.g. StringPrimitive->value = 'Peter'
 
             // FHIRTemporalValue (FHIRDate, FHIRDateTime, FHIRTime, FHIRInstant) → string

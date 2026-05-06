@@ -43,25 +43,32 @@ class FHIRMetadataExtractor implements FHIRMetadataExtractorInterface
         }
 
         try {
-            $reflection = new \ReflectionClass($object);
-            $attributes = $reflection->getAttributes(FhirResource::class);
+            // Walk the parent chain so that profile subclasses (e.g. AUBasePatientProfile
+            // extends PatientResource) inherit the #[FhirResource] attribute from their base.
+            $refl = new \ReflectionClass($object);
 
-            if (empty($attributes)) {
-                $this->cache->cacheResourceMetadata($className, null);
+            do {
+                $attributes = $refl->getAttributes(FhirResource::class);
 
-                return null;
-            }
+                if (!empty($attributes)) {
+                    $attribute = $attributes[0]->newInstance();
+                    $metadata  = new FHIRResourceMetadata(
+                        $attribute->getResourceType(),
+                        $attribute->fhirVersion,
+                        $attribute->getProfile(),
+                    );
 
-            $attribute = $attributes[0]->newInstance();
-            $metadata  = new FHIRResourceMetadata(
-                $attribute->getResourceType(),
-                $attribute->fhirVersion,
-                $attribute->getProfile(),
-            );
+                    $this->cache->cacheResourceMetadata($className, $metadata);
 
-            $this->cache->cacheResourceMetadata($className, $metadata);
+                    return $metadata->resourceType;
+                }
 
-            return $metadata->resourceType;
+                $refl = $refl->getParentClass();
+            } while ($refl !== false);
+
+            $this->cache->cacheResourceMetadata($className, null);
+
+            return null;
         } catch (\ReflectionException) {
             $this->cache->cacheResourceMetadata($className, null);
 
@@ -149,13 +156,23 @@ class FHIRMetadataExtractor implements FHIRMetadataExtractorInterface
         }
 
         try {
-            $reflection = new \ReflectionClass($object);
-            $attributes = $reflection->getAttributes(FhirResource::class);
-            $isResource = !empty($attributes);
+            // Walk the parent chain so that profile subclasses (e.g. AUBasePatientProfile
+            // extends PatientResource) inherit the #[FhirResource] attribute from their base.
+            $refl = new \ReflectionClass($object);
 
-            $this->cache->cacheStructureTypeMetadata($className, $isResource ? 'resource' : null);
+            do {
+                if (!empty($refl->getAttributes(FhirResource::class))) {
+                    $this->cache->cacheStructureTypeMetadata($className, 'resource');
 
-            return $isResource;
+                    return true;
+                }
+
+                $refl = $refl->getParentClass();
+            } while ($refl !== false);
+
+            $this->cache->cacheStructureTypeMetadata($className, null);
+
+            return false;
         } catch (\ReflectionException) {
             $this->cache->cacheStructureTypeMetadata($className, null);
 
@@ -177,9 +194,20 @@ class FHIRMetadataExtractor implements FHIRMetadataExtractorInterface
         }
 
         try {
+            // Walk the parent class hierarchy: profile subclasses (e.g. AUIHIProfile extends Identifier)
+            // carry #[FHIRProfile] rather than #[FHIRComplexType], so we must check parent classes.
             $reflection    = new \ReflectionClass($object);
-            $attributes    = $reflection->getAttributes(FHIRComplexType::class);
-            $isComplexType = !empty($attributes);
+            $isComplexType = false;
+            $r             = $reflection;
+
+            do {
+                if (!empty($r->getAttributes(FHIRComplexType::class))) {
+                    $isComplexType = true;
+                    break;
+                }
+
+                $r = $r->getParentClass();
+            } while ($r !== false);
 
             $this->cache->cacheStructureTypeMetadata($className, $isComplexType ? 'complex-type' : null);
 

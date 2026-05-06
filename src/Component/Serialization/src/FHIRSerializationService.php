@@ -32,6 +32,7 @@ class FHIRSerializationService
         private readonly SerializerInterface $serializer,
         private readonly FHIRSerializationContextFactory $contextFactory,
         private readonly FHIRSerializationDebugInfo $debugInfo,
+        private readonly FHIRTypeResolverInterface $typeResolver = new FHIRTypeResolver(),
     ) {
     }
 
@@ -42,20 +43,37 @@ class FHIRSerializationService
      * available. Uses a two-phase construction to inject the Serializer back into
      * normalizers that need it for recursive object handling.
      */
-    public static function createDefault(): self
+    public static function createDefault(FhirVersion $version = FhirVersion::R4B): self
     {
-        $metadataExtractor = new FHIRMetadataExtractor();
-        $typeResolver      = new FHIRTypeResolver();
+        return self::createWithIG(version: $version);
+    }
 
-        // Create normalizers without an inner serializer reference.
-        // Each normalizer implements SerializerAwareInterface, so Symfony's Serializer
-        // will call setSerializer() on each one automatically, wiring the final
-        // fully-wired instance back in for recursive normalize/denormalize calls.
+    /**
+     * Create a fully-wired serialization service with IG-aware extension/profile/discriminator resolution.
+     *
+     * Scans base model Extension directories and an optional user IG output directory,
+     * building a FHIRIGTypeRegistry that enables typed extension deserialization,
+     * profile URL resolution, and discriminator-based slice resolution.
+     *
+     * @param string $igOutputDirectory Absolute path to IG output directory (e.g. '/app/src/FHIRIG').
+     *                                  Pass an empty string (default) to skip IG scanning.
+     * @param string $igNamespace       PSR-4 namespace root for the IG output directory
+     *                                  (e.g. 'App\FHIR\IG'). Pass an empty string (default) to skip.
+     */
+    public static function createWithIG(
+        string $igOutputDirectory = '',
+        string $igNamespace = '',
+        FhirVersion $version = FhirVersion::R4B
+    ): self {
+        $metadataExtractor = new FHIRMetadataExtractor();
+        $registry          = FHIRIGTypeRegistryFactory::create($igOutputDirectory, $igNamespace);
+        $typeResolver      = new FHIRTypeResolver(igTypeRegistry: $registry);
+
         $normalizers = [
-            new FHIRResourceNormalizer($metadataExtractor, $typeResolver),
-            new FHIRComplexTypeNormalizer($metadataExtractor, $typeResolver),
-            new FHIRPrimitiveTypeNormalizer($metadataExtractor),
-            new FHIRBackboneElementNormalizer($metadataExtractor),
+            new FHIRResourceNormalizer($metadataExtractor, $typeResolver, fhirVersion: $version->value, igTypeRegistry: $registry),
+            new FHIRComplexTypeNormalizer($metadataExtractor, $typeResolver, fhirVersion: $version->value, igTypeRegistry: $registry),
+            new FHIRPrimitiveTypeNormalizer($metadataExtractor, fhirVersion: $version->value, igTypeRegistry: $registry),
+            new FHIRBackboneElementNormalizer($metadataExtractor, fhirVersion: $version->value, igTypeRegistry: $registry),
         ];
 
         $serializer = new Serializer($normalizers, [new JsonEncoder(), new XmlEncoder()]);
@@ -212,36 +230,6 @@ class FHIRSerializationService
     }
 
     /**
-     * Perform a round-trip serialization test (serialize then deserialize).
-     *
-     * @param object               $fhirObject The FHIR object to test
-     * @param string               $format     The format to test ('json' or 'xml')
-     * @param array<string, mixed> $context    Additional context
-     *
-     * @throws FHIRSerializationException If round-trip fails
-     */
-    public function roundTripTest(object $fhirObject, string $format = 'json', array $context = []): object
-    {
-        $originalClass = get_class($fhirObject);
-
-        // Serialize
-        $serialized = match ($format) {
-            'json'  => $this->serializeToJson($fhirObject, $context),
-            'xml'   => $this->serializeToXml($fhirObject, $context),
-            default => throw new FHIRSerializationException("Unsupported format: {$format}")
-        };
-
-        // Deserialize
-        $deserialized = match ($format) {
-            'json'  => $this->deserializeFromJson($serialized, $originalClass, $context),
-            'xml'   => $this->deserializeFromXml($serialized, $originalClass, $context),
-            default => throw new FHIRSerializationException("Unsupported format: {$format}")
-        };
-
-        return $deserialized;
-    }
-
-    /**
      * Get serialization debug information for the last operation.
      *
      * @return array<string, mixed>
@@ -272,32 +260,32 @@ class FHIRSerializationService
     /**
      * Detect the target class from the data content.
      *
-     * Tries Models convention (Ardenexal\FHIRTools\Component\Models\{Version}\Resource\{Type}Resource)
-     * across all supported FHIR versions before giving up.
+     * Delegates to FHIRTypeResolver so that profile-based resolution (via meta.profile) and
+     * the IG type registry are applied when available, in addition to the default resourceType
+     * convention lookup.
      */
     private function detectTargetClass(string $data, string $format): string
     {
-        $resourceType = null;
+        /** @var array<string, mixed>|null $decoded */
+        $decoded = null;
 
         if ($format === 'json') {
             $decoded = json_decode($data, true);
-            if (is_array($decoded) && isset($decoded['resourceType']) && is_string($decoded['resourceType'])) {
-                $resourceType = $decoded['resourceType'];
+            if (!is_array($decoded)) {
+                $decoded = null;
             }
         } elseif ($format === 'xml') {
             // Strip DOCTYPE to prevent XXE, then extract the root element name
             $xml = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NONET | LIBXML_NOERROR);
             if ($xml !== false) {
-                $resourceType = $xml->getName();
+                $decoded = ['resourceType' => $xml->getName()];
             }
         }
 
-        if ($resourceType !== null) {
-            foreach (['R4', 'R4B', 'R5'] as $version) {
-                $candidate = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\Resource\\{$resourceType}Resource";
-                if (class_exists($candidate)) {
-                    return $candidate;
-                }
+        if ($decoded !== null) {
+            $resolved = $this->typeResolver->resolveResourceType($decoded);
+            if ($resolved !== null) {
+                return $resolved;
             }
         }
 

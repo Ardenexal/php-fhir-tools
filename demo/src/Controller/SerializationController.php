@@ -4,55 +4,50 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\StructureDefinitionResource;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
-use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRVersionedSerializationServiceLocator;
+use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Validator\FHIRValidator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\BundleResource;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\ConditionResource;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\EncounterResource;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\MedicationRequestResource;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\ObservationResource;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\OrganizationResource;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\PractitionerResource;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 
 /**
  * Interactive FHIR serialization and validation playground.
  *
  * Supports JSON/XML conversion, FHIR structure validation, and metadata inspection
- * for a subset of common R4 resource types.
+ * for any generated FHIR resource type across all versions (R4, R4B, R5) and IGs.
+ * The resource type is auto-detected from the input's resourceType field (JSON) or
+ * root element name (XML); a version selector can pin detection to a specific version.
  */
 #[Route('/serialization', name: 'app_serialization')]
 class SerializationController extends AbstractController
 {
     /**
-     * Maps display label → fully-qualified class name for common R4 resources.
+     * Available FHIR version constraints for the version selector.
+     * 'Auto' probes R4 → R4B → R5 in order; specific versions restrict detection.
      *
-     * @var array<string, string>
+     * @var list<string>
      */
-    private const RESOURCE_TYPES = [
-        'Patient'             => PatientResource::class,
-        'StructureDefinition' => StructureDefinitionResource::class,
-        'Observation'         => ObservationResource::class,
-        'Condition'           => ConditionResource::class,
-        'Encounter'           => EncounterResource::class,
-        'MedicationRequest'   => MedicationRequestResource::class,
-        'Organization'        => OrganizationResource::class,
-        'Practitioner'        => PractitionerResource::class,
-        'Bundle'              => BundleResource::class,
-    ];
+    /**
+     * Base namespace root for canonical FHIR model classes.
+     */
+    private const MODELS_BASE_NAMESPACE = 'Ardenexal\\FHIRTools\\Component\\Models';
 
     public function __construct(
-        private readonly FHIRSerializationService $serializationService,
+        private readonly FHIRVersionedSerializationServiceLocator $serializationLocator,
         private readonly FHIRValidator $validator,
         private readonly FHIRMetadataExtractorInterface $metadataExtractor,
     ) {
+    }
+
+    /** @return list<string> */
+    private function fhirVersionOptions(): array
+    {
+        return array_map(static fn (FhirVersion $v) => $v->value, FhirVersion::cases());
     }
 
     /** Render the serialization playground form. */
@@ -60,9 +55,9 @@ class SerializationController extends AbstractController
     public function index(): Response
     {
         return $this->render('serialization/index.html.twig', [
-            'resource_types' => array_keys(self::RESOURCE_TYPES),
+            'fhir_versions'  => $this->fhirVersionOptions(),
             'input'          => '',
-            'resource_type'  => 'Patient',
+            'fhir_version'   => 'Auto',
             'action'         => 'validate',
             'result'         => null,
             'error'          => null,
@@ -74,7 +69,7 @@ class SerializationController extends AbstractController
     public function process(Request $request): Response
     {
         $input        = trim((string) $request->request->get('input', ''));
-        $resourceType = (string) $request->request->get('resource_type', 'Patient');
+        $fhirVersion  = strtoupper((string) $request->request->get('fhir_version', 'R4'));
         $action       = (string) $request->request->get('action', 'validate');
 
         $result = null;
@@ -83,29 +78,26 @@ class SerializationController extends AbstractController
         if ($input === '') {
             $error = 'Please paste a FHIR resource in JSON or XML format.';
 
-            return $this->renderForm($input, $resourceType, $action, null, $error);
+            return $this->renderForm($input, $fhirVersion, $action, null, $error);
         }
 
-        $targetClass = self::RESOURCE_TYPES[$resourceType] ?? null;
+        $version = FhirVersion::tryFrom($fhirVersion);
 
-        if ($targetClass === null) {
-            $error = sprintf('Unknown resource type "%s".', $resourceType);
+        if ($version === null) {
+            $error = sprintf('Unknown FHIR version "%s". Supported: R4, R4B, R5.', $fhirVersion);
 
-            return $this->renderForm($input, $resourceType, $action, null, $error);
+            return $this->renderForm($input, $fhirVersion, $action, null, $error);
         }
 
+
+        $serializationService = $this->serializationLocator->get($version);
         try {
-            $format = $this->detectFormat($input);
-            $object = match ($format) {
-                'json'  => $this->serializationService->deserializeFromJson($input, $targetClass),
-                'xml'   => $this->serializationService->deserializeFromXml($input, $targetClass),
-                default => throw new FHIRSerializationException('Unable to detect format (expected JSON or XML)'),
-            };
+            $object = $this->deserialize($input, $fhirVersion);
 
             $result = match ($action) {
                 'validate'       => $this->doValidate($object),
-                'json_to_xml'    => $this->doConvert($object, 'xml'),
-                'xml_to_json'    => $this->doConvert($object, 'json'),
+                'json_to_xml'    => $this->doConvert($object, 'xml', $serializationService),
+                'xml_to_json'    => $this->doConvert($object, 'json', $serializationService),
                 'show_metadata'  => $this->doMetadata($object),
                 'dump_structure' => $this->doDumpStructure($object),
                 default          => throw new \InvalidArgumentException(sprintf('Unknown action "%s"', $action)),
@@ -116,12 +108,71 @@ class SerializationController extends AbstractController
             $error = 'Error: ' . $e->getMessage();
         }
 
-        return $this->renderForm($input, $resourceType, $action, $result, $error);
+        return $this->renderForm($input, $fhirVersion, $action, $result, $error);
     }
 
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
+
+    /**
+     * Deserialize the input, optionally constraining to a specific FHIR version.
+     *
+     * When $fhirVersion is 'Auto' the serialization service probes R4 → R4B → R5 and
+     * also checks IG profile URLs from meta.profile. When a specific version is given,
+     * the resourceType is extracted from the input and a concrete class is built.
+     *
+     * @throws FHIRSerializationException|\RuntimeException
+     */
+    private function deserialize(string $input, string $fhirVersion): object
+    {
+        if ($fhirVersion === 'Auto') {
+            $service = $this->serializationLocator->get(FhirVersion::R4);
+
+            return $service->deserialize($input);
+        }
+
+        $format           = $this->detectFormat($input);
+        $resourceTypeName = $this->extractResourceTypeFromInput($input, $format);
+        $targetClass      = sprintf('%s\\%s\\Resource\\%sResource', self::MODELS_BASE_NAMESPACE, $fhirVersion, $resourceTypeName);
+
+        if (!class_exists($targetClass)) {
+            throw new \RuntimeException(sprintf('No %s class found for resource type "%s". Try using Auto detection.', $fhirVersion, $resourceTypeName));
+        }
+
+        $service = $this->serializationLocator->get(FhirVersion::from($fhirVersion));
+
+        return $service->deserialize($input, $targetClass);
+    }
+
+    /**
+     * Extract the FHIR resource type name from a JSON or XML input string.
+     * For JSON reads the top-level "resourceType" key; for XML reads the root element name.
+     *
+     * @throws FHIRSerializationException
+     */
+    private function extractResourceTypeFromInput(string $input, string $format): string
+    {
+        if ($format === 'json') {
+            /** @var array<string, mixed>|null $decoded */
+            $decoded      = json_decode($input, true);
+            $resourceType = is_array($decoded) ? ($decoded['resourceType'] ?? null) : null;
+
+            if (!is_string($resourceType) || $resourceType === '') {
+                throw new FHIRSerializationException('JSON input is missing the "resourceType" field.');
+            }
+
+            return $resourceType;
+        }
+
+        $xml = @simplexml_load_string($input);
+
+        if ($xml === false) {
+            throw new FHIRSerializationException('Cannot parse XML to determine resource type.');
+        }
+
+        return $xml->getName();
+    }
 
     /** @return array<string, mixed> */
     private function doValidate(object $object): array
@@ -136,11 +187,11 @@ class SerializationController extends AbstractController
     }
 
     /** @return array<string, mixed> */
-    private function doConvert(object $object, string $targetFormat): array
+    private function doConvert(object $object, string $targetFormat, FHIRSerializationService $service): array
     {
         $output = match ($targetFormat) {
-            'xml'   => $this->serializationService->serializeToXml($object),
-            'json'  => $this->serializationService->serializeToJson($object),
+            'xml'   => $service->serializeToXml($object),
+            'json'  => $service->serializeToJson($object),
             default => throw new \InvalidArgumentException("Unsupported target format: {$targetFormat}"),
         };
 
@@ -231,18 +282,18 @@ class SerializationController extends AbstractController
 
     private function renderForm(
         string $input,
-        string $resourceType,
+        string $fhirVersion,
         string $action,
         ?array $result,
         ?string $error,
     ): Response {
         return $this->render('serialization/index.html.twig', [
-            'resource_types' => array_keys(self::RESOURCE_TYPES),
-            'input'          => $input,
-            'resource_type'  => $resourceType,
-            'action'         => $action,
-            'result'         => $result,
-            'error'          => $error,
+            'fhir_versions' => $this->fhirVersionOptions(),
+            'input'         => $input,
+            'fhir_version'  => $fhirVersion,
+            'action'        => $action,
+            'result'        => $result,
+            'error'         => $error,
         ]);
     }
 }

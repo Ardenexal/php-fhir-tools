@@ -1,0 +1,313 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
+
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRTypesType;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Meta;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Narrative;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\PublicationStatusType;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\RelatedArtifact;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\UsageContext;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\Measure\MeasureGroup;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\Measure\MeasureSupplementalData;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\Measure\MeasureTerm;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
+/**
+ * @author Health Level Seven International (Clinical Quality Information)
+ *
+ * @see http://hl7.org/fhir/StructureDefinition/Measure
+ *
+ * @description The Measure resource provides the definition of a quality measure.
+ */
+#[FhirResource(type: 'Measure', version: '5.0.0', url: 'http://hl7.org/fhir/StructureDefinition/Measure', fhirVersion: 'R5')]
+class MeasureResource extends DomainResourceResource
+{
+    public function __construct(
+        /** @var string|null id Logical id of this artifact */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        public ?string $id = null,
+        /** @var Meta|null meta Metadata about the resource */
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        public ?Meta $meta = null,
+        /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        public ?UriPrimitive $implicitRules = null,
+        /** @var AllLanguagesType|null language Language of the resource content */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        public ?AllLanguagesType $language = null,
+        /** @var Narrative|null text Text summary of the resource, for human interpretation */
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        public ?Narrative $text = null,
+        /** @var array<ResourceResource> contained Contained, inline Resources */
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        public array $contained = [],
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        public array $modifierExtension = [],
+        /** @var UriPrimitive|null url Canonical identifier for this measure, represented as a URI (globally unique) */
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        public ?UriPrimitive $url = null,
+        /** @var array<Identifier> identifier Additional identifier for the measure */
+        #[FhirProperty(
+            fhirType: 'Identifier',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
+        )]
+        public array $identifier = [],
+        /** @var StringPrimitive|string|null version Business version of the measure */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+        public StringPrimitive|string|null $version = null,
+        /** @var StringPrimitive|string|Coding|null versionAlgorithm How to compare versions */
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'string',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive',
+                    'jsonKey'      => 'versionAlgorithmString',
+                ],
+                [
+                    'fhirType'     => 'Coding',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding',
+                    'jsonKey'      => 'versionAlgorithmCoding',
+                ],
+            ],
+        )]
+        public StringPrimitive|string|Coding|null $versionAlgorithm = null,
+        /** @var StringPrimitive|string|null name Name for this measure (computer friendly) */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+        public StringPrimitive|string|null $name = null,
+        /** @var StringPrimitive|string|null title Name for this measure (human friendly) */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+        public StringPrimitive|string|null $title = null,
+        /** @var StringPrimitive|string|null subtitle Subordinate title of the measure */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+        public StringPrimitive|string|null $subtitle = null,
+        /** @var PublicationStatusType|null status draft | active | retired | unknown */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        public ?PublicationStatusType $status = null,
+        /** @var bool|null experimental For testing purposes, not real usage */
+        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
+        public ?bool $experimental = null,
+        /** @var CodeableConcept|Reference|null subject E.g. Patient, Practitioner, RelatedPerson, Organization, Location, Device */
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'CodeableConcept',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
+                    'jsonKey'      => 'subjectCodeableConcept',
+                ],
+                [
+                    'fhirType'     => 'Reference',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
+                    'jsonKey'      => 'subjectReference',
+                ],
+            ],
+        )]
+        public CodeableConcept|Reference|null $subject = null,
+        /** @var FHIRTypesType|null basis Population basis */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        public ?FHIRTypesType $basis = null,
+        /** @var DateTimePrimitive|null date Date last changed */
+        #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
+        public ?DateTimePrimitive $date = null,
+        /** @var StringPrimitive|string|null publisher Name of the publisher/steward (organization or individual) */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+        public StringPrimitive|string|null $publisher = null,
+        /** @var array<ContactDetail> contact Contact details for the publisher */
+        #[FhirProperty(
+            fhirType: 'ContactDetail',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
+        )]
+        public array $contact = [],
+        /** @var MarkdownPrimitive|null description Natural language description of the measure */
+        #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
+        public ?MarkdownPrimitive $description = null,
+        /** @var array<UsageContext> useContext The context that the content is intended to support */
+        #[FhirProperty(
+            fhirType: 'UsageContext',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\UsageContext',
+        )]
+        public array $useContext = [],
+        /** @var array<CodeableConcept> jurisdiction Intended jurisdiction for measure (if applicable) */
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
+        )]
+        public array $jurisdiction = [],
+        /** @var MarkdownPrimitive|null purpose Why this measure is defined */
+        #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
+        public ?MarkdownPrimitive $purpose = null,
+        /** @var MarkdownPrimitive|null usage Describes the clinical usage of the measure */
+        #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
+        public ?MarkdownPrimitive $usage = null,
+        /** @var MarkdownPrimitive|null copyright Use and/or publishing restrictions */
+        #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
+        public ?MarkdownPrimitive $copyright = null,
+        /** @var StringPrimitive|string|null copyrightLabel Copyright holder and year(s) */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+        public StringPrimitive|string|null $copyrightLabel = null,
+        /** @var DatePrimitive|null approvalDate When the measure was approved by publisher */
+        #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
+        public ?DatePrimitive $approvalDate = null,
+        /** @var DatePrimitive|null lastReviewDate When the measure was last reviewed by the publisher */
+        #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
+        public ?DatePrimitive $lastReviewDate = null,
+        /** @var Period|null effectivePeriod When the measure is expected to be used */
+        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
+        public ?Period $effectivePeriod = null,
+        /** @var array<CodeableConcept> topic The category of the measure, such as Education, Treatment, Assessment, etc */
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
+        )]
+        public array $topic = [],
+        /** @var array<ContactDetail> author Who authored the content */
+        #[FhirProperty(
+            fhirType: 'ContactDetail',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
+        )]
+        public array $author = [],
+        /** @var array<ContactDetail> editor Who edited the content */
+        #[FhirProperty(
+            fhirType: 'ContactDetail',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
+        )]
+        public array $editor = [],
+        /** @var array<ContactDetail> reviewer Who reviewed the content */
+        #[FhirProperty(
+            fhirType: 'ContactDetail',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
+        )]
+        public array $reviewer = [],
+        /** @var array<ContactDetail> endorser Who endorsed the content */
+        #[FhirProperty(
+            fhirType: 'ContactDetail',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
+        )]
+        public array $endorser = [],
+        /** @var array<RelatedArtifact> relatedArtifact Additional documentation, citations, etc */
+        #[FhirProperty(
+            fhirType: 'RelatedArtifact',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\RelatedArtifact',
+        )]
+        public array $relatedArtifact = [],
+        /** @var array<CanonicalPrimitive> library Logic used by the measure */
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true)]
+        public array $library = [],
+        /** @var MarkdownPrimitive|null disclaimer Disclaimer for use of the measure or its referenced content */
+        #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
+        public ?MarkdownPrimitive $disclaimer = null,
+        /** @var CodeableConcept|null scoring proportion | ratio | continuous-variable | cohort */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $scoring = null,
+        /** @var CodeableConcept|null scoringUnit What units? */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $scoringUnit = null,
+        /** @var CodeableConcept|null compositeScoring opportunity | all-or-nothing | linear | weighted */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $compositeScoring = null,
+        /** @var array<CodeableConcept> type process | outcome | structure | patient-reported-outcome | composite */
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
+        )]
+        public array $type = [],
+        /** @var MarkdownPrimitive|null riskAdjustment How risk adjustment is applied for this measure */
+        #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
+        public ?MarkdownPrimitive $riskAdjustment = null,
+        /** @var MarkdownPrimitive|null rateAggregation How is rate aggregation performed for this measure */
+        #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
+        public ?MarkdownPrimitive $rateAggregation = null,
+        /** @var MarkdownPrimitive|null rationale Detailed description of why the measure exists */
+        #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
+        public ?MarkdownPrimitive $rationale = null,
+        /** @var MarkdownPrimitive|null clinicalRecommendationStatement Summary of clinical guidelines */
+        #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
+        public ?MarkdownPrimitive $clinicalRecommendationStatement = null,
+        /** @var CodeableConcept|null improvementNotation increase | decrease */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $improvementNotation = null,
+        /** @var array<MeasureTerm> term Defined terms used in the measure documentation */
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Measure\MeasureTerm',
+        )]
+        public array $term = [],
+        /** @var MarkdownPrimitive|null guidance Additional guidance for implementers (deprecated) */
+        #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
+        public ?MarkdownPrimitive $guidance = null,
+        /** @var array<MeasureGroup> group Population criteria group */
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Measure\MeasureGroup',
+        )]
+        public array $group = [],
+        /** @var array<MeasureSupplementalData> supplementalData What other data should be reported with the measure */
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Measure\MeasureSupplementalData',
+        )]
+        public array $supplementalData = [],
+    ) {
+        parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
+    }
+}

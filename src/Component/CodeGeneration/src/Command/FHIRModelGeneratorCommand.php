@@ -8,7 +8,9 @@ use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\GenerationException;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\PackageException;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRExtensionGenerator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRProfileGenerator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRValueSetGenerator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader;
 use Nette\PhpGenerator\ClassType;
@@ -65,11 +67,17 @@ use Nette\InvalidStateException;
 class FHIRModelGeneratorCommand extends Command
 {
     /**
-     * The HL7 terminology package contains CodeSystem and ValueSet definitions shared
-     * across all FHIR versions. It's always required, so we prepend it automatically
-     * if the user didn't include it in their --package list.
+     * The HL7 terminology packages contain CodeSystem and ValueSet definitions shared
+     * across all FHIR versions. The correct version-specific package is prepended
+     * automatically based on the core packages being generated.
+     *
+     * @var array<string, string>
      */
-    private const string DEFAULT_TERMINOLOGY_PACKAGE = 'hl7.terminology.r4#7.0.0';
+    private const array TERMINOLOGY_PACKAGES = [
+        'r4'  => 'hl7.terminology.r4#7.0.0',
+        'r4b' => 'hl7.terminology.r4b#6.0.2',
+        'r5'  => 'hl7.terminology.r5#7.0.0',
+    ];
 
     /**
      * Pre-configured package sets for each FHIR version. Used as the default value
@@ -81,14 +89,17 @@ class FHIRModelGeneratorCommand extends Command
         'R4' => [
             'hl7.terminology.r4#7.0.0',
             'hl7.fhir.r4.core#4.0.1',
+            'hl7.fhir.uv.extensions.r4#5.2.0',
         ],
         'R4B' => [
-            'hl7.terminology.r4b#7.0.0',
+            'hl7.terminology.r4b#6.0.2',
             'hl7.fhir.r4b.core#4.3.0',
+            'hl7.fhir.uv.extensions.r4b#5.2.0',
         ],
         'R5' => [
             'hl7.terminology.r5#7.0.0',
             'hl7.fhir.r5.core#5.0.0',
+            'hl7.fhir.uv.extensions.r5#5.2.0',
         ],
     ];
 
@@ -177,11 +188,9 @@ class FHIRModelGeneratorCommand extends Command
     {
         $output->writeln('<info>Generating FHIR models...</info>');
 
-        // The terminology package defines shared CodeSystems and ValueSets (e.g. AdministrativeGender).
-        // Ensure it's always loaded first so those definitions are available when building classes.
-        if (! in_array(self::DEFAULT_TERMINOLOGY_PACKAGE, $packages, true)) {
-            array_unshift($packages, self::DEFAULT_TERMINOLOGY_PACKAGE);
-        }
+        // The terminology packages define shared CodeSystems and ValueSets (e.g. AdministrativeGender).
+        // Detect which FHIR versions are being generated and prepend the matching terminology packages.
+        $packages = $this->ensureTerminologyPackages($packages);
 
         // --- Phase 1: Load all packages, collecting affected FHIR versions ---
         $loadingPackagesIndicator = new ProgressIndicator($output);
@@ -314,6 +323,51 @@ class FHIRModelGeneratorCommand extends Command
     }
 
     /**
+     * Detect which FHIR versions are represented in the package list and prepend
+     * the matching terminology packages if not already present.
+     *
+     * Matches on the FHIR version segment in standard HL7 package names
+     * (e.g. "hl7.fhir.r5.core" → prepend R5 terminology). Falls back to R4
+     * terminology for packages whose names don't match a known version pattern.
+     *
+     * @param array<string> $packages
+     *
+     * @return array<string>
+     */
+    private function ensureTerminologyPackages(array $packages): array
+    {
+        $needed = [];
+
+        foreach (self::TERMINOLOGY_PACKAGES as $version => $terminologyPackage) {
+            // Skip if the terminology package is already in the list
+            $packageName    = explode('#', $terminologyPackage)[0];
+            $alreadyPresent = array_filter($packages, static fn (string $p) => str_starts_with($p, $packageName));
+            if ($alreadyPresent !== []) {
+                continue;
+            }
+
+            // Check if any package targets this FHIR version (e.g. ".r5." in "hl7.fhir.r5.core")
+            $versionSegment = ".{$version}.";
+            foreach ($packages as $package) {
+                if (str_contains(strtolower($package), $versionSegment)) {
+                    $needed[] = $terminologyPackage;
+                    break;
+                }
+            }
+        }
+
+        // If no version-specific terminology was detected, fall back to R4 terminology
+        if ($needed === []) {
+            $needed[] = self::TERMINOLOGY_PACKAGES['r4'];
+        }
+
+        // Prepend all needed terminology packages (before the core packages)
+        array_unshift($packages, ...$needed);
+
+        return $packages;
+    }
+
+    /**
      * Remove previously generated directories for the specified FHIR versions only.
      *
      * By scoping the clear to only the versions being regenerated, separate invocations
@@ -390,7 +444,16 @@ class FHIRModelGeneratorCommand extends Command
             $output->writeln('<comment>Warning: Enum generation failed but continuing with class generation</comment>');
         }
 
-        // Phase 3: Write all generated classes and enums to disk
+        // Phase 3: Generate base FHIR extensions (derivation=constraint, type=Extension).
+        // These are written to Models/src/{version}/Extension/ so that the IG generator
+        // can reference them as pre-built parent classes.
+        $this->buildExtensions($output, $fhirVersion);
+
+        // Phase 4: Generate base FHIR profiles (derivation=constraint, non-extension).
+        // These are written to Models/src/{version}/Profile/ and serve the same purpose.
+        $this->buildProfiles($output, $fhirVersion);
+
+        // Phase 5: Write all generated classes and enums to disk
         $this->outputGeneratedFiles($output, $fhirVersion);
     }
 
@@ -475,8 +538,152 @@ class FHIRModelGeneratorCommand extends Command
     }
 
     /**
-     * Generate PHP enums from FHIR ValueSets that were referenced during class building.
+     * Generate PHP extension classes from base FHIR StructureDefinitions with derivation=constraint
+     * and type=Extension, writing them to Models/src/{version}/Extension/.
      *
+     * These classes represent named FHIR extensions from the core packages (e.g. patient-birthPlace,
+     * us-core-race). Generating them here alongside the canonical base types means that
+     * FHIRIGGeneratorCommand can reference them as pre-built parent classes rather than having to
+     * reconstruct them from scratch at IG-generation time.
+     *
+     * Errors for individual definitions are non-fatal — a bad definition is logged and skipped.
+     */
+    private function buildExtensions(OutputInterface $output, string $version): void
+    {
+        $output->writeln('Generating base extension classes...');
+
+        $baseNamespace  = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}";
+        $extensionNs    = new PhpNamespace("{$baseNamespace}\\Extension");
+        $generator      = new FHIRExtensionGenerator();
+        $errorCollector = new ErrorCollector();
+        $count          = 0;
+
+        foreach ($this->context[$version]->getDefinitions() as $def) {
+            if (($def['resourceType'] ?? '') !== 'StructureDefinition') {
+                continue;
+            }
+
+            if (($def['derivation'] ?? '') !== 'constraint' || ($def['type'] ?? '') !== 'Extension') {
+                continue;
+            }
+
+            $url = $def['url'] ?? '';
+            // Skip if already registered from a prior run or dependency load
+            if ($url === '' || $this->context[$version]->getType($url) !== null) {
+                continue;
+            }
+
+            try {
+                $class = $generator->generate($def, $version, $this->context[$version], $extensionNs, $errorCollector);
+                $this->context[$version]->addType($url, $extensionNs->getName(), $class);
+
+                $outputPath = Path::canonicalize(
+                    __DIR__ . "/../../../Models/src/{$version}/Extension/{$class->getName()}.php",
+                );
+                $this->filesystem->mkdir(dirname($outputPath), 0755);
+                $this->filesystem->dumpFile($outputPath, self::asPhpFile($class, $extensionNs->getName()));
+
+                if ($output->isVerbose()) {
+                    $output->writeln("  Extension: {$class->getName()}");
+                }
+
+                ++$count;
+            } catch (\Throwable $e) {
+                $name = $def['name'] ?? $url;
+                $this->errorCollector->addError(
+                    "Could not generate base extension '{$name}': {$e->getMessage()}",
+                    $url,
+                    'BASE_EXTENSION_GENERATION_ERROR',
+                    'warning',
+                );
+                if ($output->isVerbose()) {
+                    $output->writeln("<comment>  Skipped base extension '{$name}': {$e->getMessage()}</comment>");
+                }
+            }
+        }
+
+        $output->writeln("<info>Generated {$count} base extensions</info>");
+    }
+
+    /**
+     * Generate PHP profile classes from base FHIR StructureDefinitions with derivation=constraint,
+     * kind=resource|complex-type, and type≠Extension. Writes to Models/src/{version}/Profile/.
+     *
+     * These represent core FHIR constraint profiles (e.g. bp, vitalsigns, headcircum). Making them
+     * part of the base model output allows FHIRIGGeneratorCommand to resolve their FQCNs for IG
+     * profiles that extend them, without needing to regenerate them on every IG generation run.
+     *
+     * Errors for individual definitions are non-fatal — a bad definition is logged and skipped.
+     */
+    private function buildProfiles(OutputInterface $output, string $version): void
+    {
+        $output->writeln('Generating base profile classes...');
+
+        $baseNamespace  = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}";
+        $profileNs      = new PhpNamespace("{$baseNamespace}\\Profile");
+        $generator      = new FHIRProfileGenerator();
+        $errorCollector = new ErrorCollector();
+        $count          = 0;
+
+        foreach ($this->context[$version]->getDefinitions() as $def) {
+            if (($def['resourceType'] ?? '') !== 'StructureDefinition') {
+                continue;
+            }
+
+            if (($def['derivation'] ?? '') !== 'constraint') {
+                continue;
+            }
+
+            // Extensions are handled by buildExtensions(); logical models are skipped entirely
+            if (($def['type'] ?? '') === 'Extension' || ($def['kind'] ?? '') === 'logical') {
+                continue;
+            }
+
+            $kind = $def['kind'] ?? '';
+            if (!in_array($kind, ['resource', 'complex-type'], true)) {
+                continue;
+            }
+
+            $url = $def['url'] ?? '';
+            // Skip if already registered (e.g. by a prior run or dependency load)
+            if ($url === '' || $this->context[$version]->getType($url) !== null) {
+                continue;
+            }
+
+            try {
+                $class = $generator->generate($def, $version, $this->context[$version], $profileNs, $errorCollector);
+                $this->context[$version]->addType($url, $profileNs->getName(), $class);
+
+                $outputPath = Path::canonicalize(
+                    __DIR__ . "/../../../Models/src/{$version}/Profile/{$class->getName()}.php",
+                );
+                $this->filesystem->mkdir(dirname($outputPath), 0755);
+                $this->filesystem->dumpFile($outputPath, self::asPhpFile($class, $profileNs->getName()));
+
+                if ($output->isVerbose()) {
+                    $output->writeln("  Profile: {$class->getName()}");
+                }
+
+                ++$count;
+            } catch (\Throwable $e) {
+                $name = $def['name'] ?? $url;
+                $this->errorCollector->addError(
+                    "Could not generate base profile '{$name}': {$e->getMessage()}",
+                    $url,
+                    'BASE_PROFILE_GENERATION_ERROR',
+                    'warning',
+                );
+                if ($output->isVerbose()) {
+                    $output->writeln("<comment>  Skipped base profile '{$name}': {$e->getMessage()}</comment>");
+                }
+            }
+        }
+
+        $output->writeln("<info>Generated {$count} base profiles</info>");
+    }
+
+    /**
+     * Generate PHP enums from FHIR ValueSets that were referenced during class building.     *
      * When FHIRModelGenerator encounters a property bound to a ValueSet (e.g. Patient.gender
      * is bound to the AdministrativeGender ValueSet), it records that ValueSet URL as a
      * "pending enum" in BuilderContext. This method processes all those pending enums.
@@ -704,6 +911,14 @@ class FHIRModelGeneratorCommand extends Command
 
             if (str_contains($attributeName, 'FHIRComplexType')) {
                 return new PhpNamespace("{$baseNamespace}\\DataType");
+            }
+
+            if (str_contains($attributeName, 'FHIRExtensionDefinition')) {
+                return new PhpNamespace("{$baseNamespace}\\Extension");
+            }
+
+            if (str_contains($attributeName, 'FHIRProfile')) {
+                return new PhpNamespace("{$baseNamespace}\\Profile");
             }
         }
 

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Traits\FHIRExtensionsTrait;
 
 /**
  * @author HL7 FHIR Standard
@@ -17,6 +18,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 #[FHIRComplexType(typeName: 'Element', fhirVersion: 'R4')]
 abstract class Element
 {
+    use FHIRExtensionsTrait;
+
     public function __construct(
         /** @var string|null id Unique id for inter-element referencing */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]

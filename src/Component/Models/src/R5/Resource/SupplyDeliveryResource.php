@@ -1,0 +1,148 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
+
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Meta;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Narrative;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\SupplyDeliveryStatusType;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Timing;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\SupplyDelivery\SupplyDeliverySuppliedItem;
+
+/**
+ * @author Health Level Seven International (Orders and Observations)
+ *
+ * @see http://hl7.org/fhir/StructureDefinition/SupplyDelivery
+ *
+ * @description Record of delivery of what is supplied.
+ */
+#[FhirResource(
+    type: 'SupplyDelivery',
+    version: '5.0.0',
+    url: 'http://hl7.org/fhir/StructureDefinition/SupplyDelivery',
+    fhirVersion: 'R5',
+)]
+class SupplyDeliveryResource extends DomainResourceResource
+{
+    public function __construct(
+        /** @var string|null id Logical id of this artifact */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        public ?string $id = null,
+        /** @var Meta|null meta Metadata about the resource */
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        public ?Meta $meta = null,
+        /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        public ?UriPrimitive $implicitRules = null,
+        /** @var AllLanguagesType|null language Language of the resource content */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        public ?AllLanguagesType $language = null,
+        /** @var Narrative|null text Text summary of the resource, for human interpretation */
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        public ?Narrative $text = null,
+        /** @var array<ResourceResource> contained Contained, inline Resources */
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        public array $contained = [],
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        public array $modifierExtension = [],
+        /** @var array<Identifier> identifier External identifier */
+        #[FhirProperty(
+            fhirType: 'Identifier',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
+        )]
+        public array $identifier = [],
+        /** @var array<Reference> basedOn Fulfills plan, proposal or order */
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
+        )]
+        public array $basedOn = [],
+        /** @var array<Reference> partOf Part of referenced event */
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
+        )]
+        public array $partOf = [],
+        /** @var SupplyDeliveryStatusType|null status in-progress | completed | abandoned | entered-in-error */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        public ?SupplyDeliveryStatusType $status = null,
+        /** @var Reference|null patient Patient for whom the item is supplied */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $patient = null,
+        /** @var CodeableConcept|null type Category of supply event */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $type = null,
+        /** @var array<SupplyDeliverySuppliedItem> suppliedItem The item that is delivered or supplied */
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\SupplyDelivery\SupplyDeliverySuppliedItem',
+        )]
+        public array $suppliedItem = [],
+        /** @var DateTimePrimitive|Period|Timing|null occurrence When event occurred */
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'dateTime',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive',
+                    'jsonKey'      => 'occurrenceDateTime',
+                ],
+                [
+                    'fhirType'     => 'Period',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Period',
+                    'jsonKey'      => 'occurrencePeriod',
+                ],
+                [
+                    'fhirType'     => 'Timing',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Timing',
+                    'jsonKey'      => 'occurrenceTiming',
+                ],
+            ],
+        )]
+        public DateTimePrimitive|Period|Timing|null $occurrence = null,
+        /** @var Reference|null supplier The item supplier */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $supplier = null,
+        /** @var Reference|null destination Where the delivery was sent */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $destination = null,
+        /** @var array<Reference> receiver Who received the delivery */
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
+        )]
+        public array $receiver = [],
+    ) {
+        parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
+    }
+}

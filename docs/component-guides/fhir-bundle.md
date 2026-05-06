@@ -260,28 +260,107 @@ services:
 
 The bundle provides several console commands:
 
-#### Generate FHIR Models
+#### Generate Base FHIR Models (`fhir:generate`)
+
+Generates canonical PHP model classes from a FHIR core package. Run once when setting up a new project or upgrading the FHIR version.
 
 ```bash
-# Generate models for FHIR R4B
-php bin/console fhir:generate R4B
+# Generate R4 models
+php bin/console fhir:generate --package=hl7.fhir.r4.core -vvv
 
-# Generate models with custom output directory
-php bin/console fhir:generate R4B --output-dir=/custom/path
+# Generate R4B models
+php bin/console fhir:generate --package=hl7.fhir.r4b.core -vvv
 
-# Generate models with verbose output
-php bin/console fhir:generate R4B -v
+# Offline mode (use cached packages only)
+php bin/console fhir:generate --package=hl7.fhir.r4.core --offline -vvv
 ```
 
-#### Validate FHIR Data
+#### Generate Implementation Guide Classes (`fhir:generate-ig`)
+
+Generates typed PHP classes for a FHIR Implementation Guide. The command produces two kinds of class, each in its own subdirectory under `IG/{version}/{slug}/`:
+
+- **Extension classes** — typed subclasses of `Extension` with the URL baked in and value properties narrowed to the concrete types the IG requires.
+- **Profile classes** — thin subclasses of the base resource or type carrying a `PROFILE_URL` constant and a `#[FHIRProfile]` attribute.
+
+The output namespace is completely isolated from the base models so both can evolve independently.
+
+**Recommended: configure packages in `fhir.yaml`**
+
+```yaml
+# config/packages/fhir.yaml
+fhir:
+    ig:
+        namespace: 'App\FHIR\IG'
+        output_directory: '%kernel.project_dir%/src/FHIRIG'
+        offline: false
+        packages:
+            - hl7.fhir.us.core          # simple case
+```
+
+Then run with no arguments:
 
 ```bash
-# Validate FHIR JSON file
-php bin/console fhir:validate patient.json
-
-# Validate with specific FHIR version
-php bin/console fhir:validate patient.json --version=R4B
+php bin/console fhir:generate-ig
 ```
+
+**Override packages at runtime**
+
+The `--package` option overrides `fhir.ig.packages` entirely when supplied. This is useful for one-off generation or CI pipelines:
+
+```bash
+# Single IG
+php bin/console fhir:generate-ig --package=hl7.fhir.us.core
+
+# Pin a specific version
+php bin/console fhir:generate-ig --package=hl7.fhir.us.core#6.1.0
+
+# Multi-level chain (AU Base → AU Core) — order matters
+php bin/console fhir:generate-ig \
+    --package=hl7.fhir.au.base#1.0.0 \
+    --package=hl7.fhir.au.core#1.0.0
+```
+
+**Multi-level profile inheritance**
+
+When an IG profiles another IG (e.g. AU Core extends AU Base which extends base FHIR R4), list the packages in dependency order. The generator builds a proper inheritance chain:
+
+```
+PatientResource          (base R4)
+  └── AUBasePatientProfile   (hl7.fhir.au.base)
+        └── AUCorePatientProfile   (hl7.fhir.au.core)
+```
+
+```yaml
+# config/packages/fhir.yaml
+fhir:
+    ig:
+        namespace: 'App\FHIR\IG'
+        output_directory: '%kernel.project_dir%/src/FHIRIG'
+        packages:
+            - hl7.fhir.au.base#1.0.0   # must come before au.core
+            - hl7.fhir.au.core#1.0.0
+```
+
+**PSR-4 autoloader registration**
+
+Add the generated directory to your `composer.json` autoloader and run `composer dump-autoload`:
+
+```json
+"autoload": {
+    "psr-4": {
+        "App\\FHIR\\IG\\": "src/FHIRIG/"
+    }
+}
+```
+
+**`fhir.ig` configuration reference**
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| `ig.packages` | `list<string>` | `[]` | IG packages in dependency order; accepts `name` or `name#version` |
+| `ig.offline` | `bool` | `false` | Use only cached packages; skip network downloads |
+| `ig.output_directory` | `string\|null` | `null` | Root directory for generated IG classes; defaults to library-internal path when null |
+| `ig.namespace` | `string\|null` | `null` | Root PHP namespace for generated IG classes; must match PSR-4 mapping |
 
 ### Creating Custom Commands
 

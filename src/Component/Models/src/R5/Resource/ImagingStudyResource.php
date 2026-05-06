@@ -1,0 +1,163 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
+
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\ImagingStudyStatusType;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Meta;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Narrative;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UnsignedIntPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\ImagingStudy\ImagingStudySeries;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
+/**
+ * @author Health Level Seven International (Imaging Integration)
+ *
+ * @see http://hl7.org/fhir/StructureDefinition/ImagingStudy
+ *
+ * @description Representation of the content produced in a DICOM imaging study. A study comprises a set of series, each of which includes a set of Service-Object Pair Instances (SOP Instances - images or other data) acquired or produced in a common context.  A series is of only one modality (e.g. X-ray, CT, MR, ultrasound), but a study may have multiple series of different modalities.
+ */
+#[FhirResource(type: 'ImagingStudy', version: '5.0.0', url: 'http://hl7.org/fhir/StructureDefinition/ImagingStudy', fhirVersion: 'R5')]
+class ImagingStudyResource extends DomainResourceResource
+{
+    public function __construct(
+        /** @var string|null id Logical id of this artifact */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        public ?string $id = null,
+        /** @var Meta|null meta Metadata about the resource */
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        public ?Meta $meta = null,
+        /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        public ?UriPrimitive $implicitRules = null,
+        /** @var AllLanguagesType|null language Language of the resource content */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        public ?AllLanguagesType $language = null,
+        /** @var Narrative|null text Text summary of the resource, for human interpretation */
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        public ?Narrative $text = null,
+        /** @var array<ResourceResource> contained Contained, inline Resources */
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        public array $contained = [],
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        public array $modifierExtension = [],
+        /** @var array<Identifier> identifier Identifiers for the whole study */
+        #[FhirProperty(
+            fhirType: 'Identifier',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
+        )]
+        public array $identifier = [],
+        /** @var ImagingStudyStatusType|null status registered | available | cancelled | entered-in-error | unknown */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        public ?ImagingStudyStatusType $status = null,
+        /** @var array<CodeableConcept> modality All of the distinct values for series' modalities */
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
+        )]
+        public array $modality = [],
+        /** @var Reference|null subject Who or what is the subject of the study */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank]
+        public ?Reference $subject = null,
+        /** @var Reference|null encounter Encounter with which this imaging study is associated */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $encounter = null,
+        /** @var DateTimePrimitive|null started When the study was started */
+        #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
+        public ?DateTimePrimitive $started = null,
+        /** @var array<Reference> basedOn Request fulfilled */
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
+        )]
+        public array $basedOn = [],
+        /** @var array<Reference> partOf Part of referenced event */
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
+        )]
+        public array $partOf = [],
+        /** @var Reference|null referrer Referring physician */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $referrer = null,
+        /** @var array<Reference> endpoint Study access endpoint */
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
+        )]
+        public array $endpoint = [],
+        /** @var UnsignedIntPrimitive|null numberOfSeries Number of Study Related Series */
+        #[FhirProperty(fhirType: 'unsignedInt', propertyKind: 'primitive')]
+        public ?UnsignedIntPrimitive $numberOfSeries = null,
+        /** @var UnsignedIntPrimitive|null numberOfInstances Number of Study Related Instances */
+        #[FhirProperty(fhirType: 'unsignedInt', propertyKind: 'primitive')]
+        public ?UnsignedIntPrimitive $numberOfInstances = null,
+        /** @var array<CodeableReference> procedure The performed procedure or code */
+        #[FhirProperty(
+            fhirType: 'CodeableReference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
+        )]
+        public array $procedure = [],
+        /** @var Reference|null location Where ImagingStudy occurred */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $location = null,
+        /** @var array<CodeableReference> reason Why the study was requested / performed */
+        #[FhirProperty(
+            fhirType: 'CodeableReference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
+        )]
+        public array $reason = [],
+        /** @var array<Annotation> note User-defined comments */
+        #[FhirProperty(
+            fhirType: 'Annotation',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation',
+        )]
+        public array $note = [],
+        /** @var StringPrimitive|string|null description Institution-generated description */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+        public StringPrimitive|string|null $description = null,
+        /** @var array<ImagingStudySeries> series Each study has one or more series of instances */
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ImagingStudy\ImagingStudySeries',
+        )]
+        public array $series = [],
+    ) {
+        parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
+    }
+}

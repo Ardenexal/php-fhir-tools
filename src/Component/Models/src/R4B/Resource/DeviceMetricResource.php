@@ -15,7 +15,6 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\DeviceMetric\DeviceMetricCalibration;
 use Symfony\Component\Validator\Constraints\NotBlank;

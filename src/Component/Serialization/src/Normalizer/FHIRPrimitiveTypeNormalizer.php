@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDate;
 use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDateTime;
 use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRInstant;
 use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRTime;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -32,9 +33,11 @@ class FHIRPrimitiveTypeNormalizer extends AbstractFHIRNormalizer
     public function __construct(
         FHIRMetadataExtractorInterface $metadataExtractor,
         ?NormalizerInterface $normalizer = null,
-        ?DenormalizerInterface $denormalizer = null
+        ?DenormalizerInterface $denormalizer = null,
+        string $fhirVersion = 'R4B',
+        ?FHIRIGTypeRegistry $igTypeRegistry = null,
     ) {
-        parent::__construct($metadataExtractor, $normalizer, $denormalizer);
+        parent::__construct($metadataExtractor, $normalizer, $denormalizer, $fhirVersion, $igTypeRegistry);
     }
 
     /**
@@ -347,19 +350,10 @@ class FHIRPrimitiveTypeNormalizer extends AbstractFHIRNormalizer
             if ($extensions !== null && $reflection->hasProperty('extension')) {
                 $extensionProperty = $reflection->getProperty('extension');
 
-                // Denormalize extensions to Extension objects
+                // Denormalize extensions — route through denormalizeExtensionArray() so IG registry
+                // lookups and version-aware fallback are applied consistently with other normalizers.
                 if ($this->denormalizer !== null && is_array($extensions)) {
-                    $denormalizedExtensions = [];
-                    foreach ($extensions as $extension) {
-                        if (is_array($extension)) {
-                            // Denormalize to Extension object (cleanXmlArtifacts already handled @ prefixes)
-                            $extensionClass           = 'Ardenexal\\FHIRTools\\Component\\Models\\R4\\DataType\\Extension';
-                            $denormalizedExtensions[] = $this->denormalizer->denormalize($extension, $extensionClass, $format, $context);
-                        } else {
-                            $denormalizedExtensions[] = $extension;
-                        }
-                    }
-                    $extensionProperty->setValue($instance, $denormalizedExtensions);
+                    $extensionProperty->setValue($instance, $this->denormalizeExtensionArray($extensions, $format, $context));
                 } else {
                     $extensionProperty->setValue($instance, $extensions);
                 }
@@ -524,7 +518,7 @@ class FHIRPrimitiveTypeNormalizer extends AbstractFHIRNormalizer
      */
     private function parseTemporalValue(mixed $value, string $class): ?FHIRTemporalValue
     {
-        if ($value === null) {
+        if ($value === null || $value === '') {
             return null;
         }
 

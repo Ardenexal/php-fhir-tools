@@ -1,0 +1,124 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "us-core-race",
+  "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race",
+  "version": "6.1.0",
+  "name": "USCoreRaceExtension",
+  "title": "US Core Race Extension",
+  "status": "active",
+  "publisher": "HL7 International - Cross-Group Projects",
+  "description": "Concepts classifying the person into a named category of humans sharing common history, traits, geographical origin or nationality.",
+  "fhirVersion": "4.0.1",
+  "kind": "complex-type",
+  "abstract": false,
+  "type": "Extension",
+  "derivation": "constraint",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Extension",
+  "snapshot": {
+    "element": [
+      {
+        "id": "Extension",
+        "path": "Extension",
+        "short": "US Core Race Extension",
+        "definition": "Concepts classifying the person into a named category of humans sharing common history, traits, geographical origin or nationality.",
+        "min": 0,
+        "max": "1"
+      },
+      {
+        "id": "Extension.id",
+        "path": "Extension.id",
+        "min": 0,
+        "max": "1",
+        "type": [{"code": "http://hl7.org/fhirpath/System.String"}]
+      },
+      {
+        "id": "Extension.extension:ombCategory",
+        "path": "Extension.extension",
+        "sliceName": "ombCategory",
+        "short": "American Indian or Alaska Native|Asian|Black or African American|Native Hawaiian or Other Pacific Islander|White",
+        "definition": "The 5 race category codes according to the [OMB Standards for Maintaining, Collecting, and Presenting Federal Data on Race and Ethnicity, Statistical Policy Directive No. 15, as revised, October 30, 1997](https://www.govinfo.gov/content/pkg/FR-1997-10-30/pdf/97-28653.pdf).",
+        "min": 0,
+        "max": "5",
+        "type": [{"code": "Extension"}]
+      },
+      {
+        "id": "Extension.extension:ombCategory.url",
+        "path": "Extension.extension.url",
+        "min": 1,
+        "max": "1",
+        "fixedUri": "ombCategory"
+      },
+      {
+        "id": "Extension.extension:ombCategory.value[x]",
+        "path": "Extension.extension.value[x]",
+        "short": "OMB race category",
+        "min": 1,
+        "max": "1",
+        "type": [{"code": "Coding"}]
+      },
+      {
+        "id": "Extension.extension:detailed",
+        "path": "Extension.extension",
+        "sliceName": "detailed",
+        "short": "Extended race codes",
+        "definition": "The 900+ CDC race codes that are subordinate to the 5 OMB race category codes.",
+        "min": 0,
+        "max": "*",
+        "type": [{"code": "Extension"}]
+      },
+      {
+        "id": "Extension.extension:detailed.url",
+        "path": "Extension.extension.url",
+        "min": 1,
+        "max": "1",
+        "fixedUri": "detailed"
+      },
+      {
+        "id": "Extension.extension:detailed.value[x]",
+        "path": "Extension.extension.value[x]",
+        "short": "Extended race code",
+        "min": 1,
+        "max": "1",
+        "type": [{"code": "Coding"}]
+      },
+      {
+        "id": "Extension.extension:text",
+        "path": "Extension.extension",
+        "sliceName": "text",
+        "short": "Race Text",
+        "definition": "Plain text representation of the race concept(s).",
+        "min": 1,
+        "max": "1",
+        "type": [{"code": "Extension"}]
+      },
+      {
+        "id": "Extension.extension:text.url",
+        "path": "Extension.extension.url",
+        "min": 1,
+        "max": "1",
+        "fixedUri": "text"
+      },
+      {
+        "id": "Extension.extension:text.value[x]",
+        "path": "Extension.extension.value[x]",
+        "short": "Race text",
+        "min": 1,
+        "max": "1",
+        "type": [{"code": "string"}]
+      },
+      {
+        "id": "Extension.url",
+        "path": "Extension.url",
+        "min": 1,
+        "max": "1",
+        "fixedUri": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race"
+      },
+      {
+        "id": "Extension.value[x]",
+        "path": "Extension.value[x]",
+        "min": 0,
+        "max": "0"
+      }
+    ]
+  }
+}

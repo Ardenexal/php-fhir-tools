@@ -20,7 +20,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\RequestIntentType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\RequestPriorityType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\RequestStatusType;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
@@ -185,7 +184,7 @@ class ServiceRequestResource extends DomainResourceResource
                 [
                     'fhirType'     => 'Timing',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Timing',
                     'jsonKey'      => 'occurrenceTiming',
                 ],
             ],

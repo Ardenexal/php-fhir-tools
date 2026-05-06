@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Enum;
 
 /**
- * ValueSet: ConceptMapEquivalence
+ * ValueSet: Concept Map Equivalence Value Set
  * URL: http://hl7.org/fhir/ValueSet/concept-map-equivalence
- * Version: 4.0.1
+ * Version: 5.3.0-ballot
  * Description: The degree of equivalence between concepts.
  */
 enum ConceptMapEquivalence: string

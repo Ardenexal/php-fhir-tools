@@ -48,14 +48,50 @@ enum EventTiming: string
     /** After Sleep */
     case aftersleep = 'PHS';
 
-    /** HS */
-    case hs = 'HS';
+    /** AC */
+    case ac = 'AC';
 
-    /** WAKE */
-    case wake = 'WAKE';
+    /** ACD */
+    case acd = 'ACD';
+
+    /** ACM */
+    case acm = 'ACM';
+
+    /** ACV */
+    case acv = 'ACV';
 
     /** C */
     case c = 'C';
+
+    /** HS */
+    case hs = 'HS';
+
+    /** IC */
+    case ic = 'IC';
+
+    /** ICD */
+    case icd = 'ICD';
+
+    /** ICM */
+    case icm = 'ICM';
+
+    /** ICV */
+    case icv = 'ICV';
+
+    /** PC */
+    case pc = 'PC';
+
+    /** PCD */
+    case pcd = 'PCD';
+
+    /** PCM */
+    case pcm = 'PCM';
+
+    /** PCV */
+    case pcv = 'PCV';
+
+    /** WAKE */
+    case wake = 'WAKE';
 
     /** CM */
     case cm = 'CM';
@@ -65,28 +101,4 @@ enum EventTiming: string
 
     /** CV */
     case cv = 'CV';
-
-    /** AC */
-    case ac = 'AC';
-
-    /** ACM */
-    case acm = 'ACM';
-
-    /** ACD */
-    case acd = 'ACD';
-
-    /** ACV */
-    case acv = 'ACV';
-
-    /** PC */
-    case pc = 'PC';
-
-    /** PCM */
-    case pcm = 'PCM';
-
-    /** PCD */
-    case pcd = 'PCD';
-
-    /** PCV */
-    case pcv = 'PCV';
 }

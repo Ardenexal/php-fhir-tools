@@ -7,6 +7,8 @@ namespace Ardenexal\FHIRTools\Component\Serialization\Normalizer;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTemporalValue;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRIGTypeRegistry;
+use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadata;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyVariantMetadata;
@@ -14,6 +16,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 
 /**
  * Abstract base class for FHIR normalizers providing shared utility methods.
@@ -33,13 +36,21 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     /** @var array<class-string, bool> */
     private array $decimalPrimitiveCache = [];
 
+    private readonly string $baseExtensionClass;
+
+    private readonly string $fhirVersion;
+
     public function __construct(
         protected readonly FHIRMetadataExtractorInterface $metadataExtractor,
         ?NormalizerInterface $normalizer = null,
-        ?DenormalizerInterface $denormalizer = null
+        ?DenormalizerInterface $denormalizer = null,
+        string $fhirVersion = 'R4B',
+        protected ?FHIRIGTypeRegistry $igTypeRegistry = null,
     ) {
-        $this->normalizer   = $normalizer;
-        $this->denormalizer = $denormalizer;
+        $this->normalizer           = $normalizer;
+        $this->denormalizer         = $denormalizer;
+        $this->fhirVersion          = $fhirVersion;
+        $this->baseExtensionClass   = FhirVersion::from($fhirVersion)->extensionFqcn();
     }
 
     /**
@@ -116,9 +127,13 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
                     }
                 }
 
-                // For XML, use @ prefix to create attribute; for JSON use plain key
-                $valueKey          = ($format === 'xml') ? '@value' : 'value';
-                $result[$valueKey] = $raw;
+                // For XML, use @ prefix to create attribute; for JSON use plain key.
+                // Only emit when non-null — null would cause XmlEncoder to produce value=""
+                // which re-parses as an empty string and fails temporal validation.
+                if ($raw !== null) {
+                    $valueKey          = ($format === 'xml') ? '@value' : 'value';
+                    $result[$valueKey] = $raw;
+                }
             }
         }
 
@@ -138,7 +153,7 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             }
         }
 
-        return $result;
+        return empty($result) ? null : $result;
     }
 
     /**
@@ -440,11 +455,14 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     /**
      * Denormalize an extension array from JSON/_property data to Extension objects.
      *
-     * @param array<array<string, mixed>|object> $extensionData Raw extension array from JSON
-     * @param string|null                        $format        The format being processed ('json', 'xml')
-     * @param array<string, mixed>               $context       Denormalization context
+     * When an IG type registry is configured, the extension's URL is checked against it
+     * first. If a typed extension class is registered for that URL it is used; otherwise
+     * the call falls back to the version-scoped base Extension class.
      *
-     * @return array<array<string, mixed>|object> Array of Extension objects (or raw arrays as fallback)
+     * @param array<mixed>         $extensionData
+     * @param array<string, mixed> $context
+     *
+     * @return array<FHIRExtensionInterface>
      */
     protected function denormalizeExtensionArray(array $extensionData, ?string $format, array $context): array
     {
@@ -454,12 +472,19 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         }
 
         $denormalizedExtensions = [];
-        $extensionClass         = 'Ardenexal\\FHIRTools\\Component\\Models\\R4\\DataType\\Extension';
 
         foreach ($extensionData as $extension) {
-            $denormalizedExtensions[] = is_array($extension)
-                ? $this->denormalizer->denormalize($extension, $extensionClass, $format, $context)
-                : $extension; // Already an object
+            if (!is_array($extension)) {
+                $denormalizedExtensions[] = $extension; // Already an object
+                continue;
+            }
+
+            $targetClass = $this->baseExtensionClass;
+            if ($this->igTypeRegistry !== null && isset($extension['url']) && is_string($extension['url'])) {
+                $targetClass = $this->igTypeRegistry->resolveExtensionClass($extension['url'], $this->fhirVersion) ?? $this->baseExtensionClass;
+            }
+
+            $denormalizedExtensions[] = $this->denormalizer->denormalize($extension, $targetClass, $format, $context);
         }
 
         return $denormalizedExtensions;
@@ -544,6 +569,17 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         // Correctly map "true" → true and "false" → false for bool-typed properties.
         if ($propertyType === 'bool' && is_string($value)) {
             return $value === 'true';
+        }
+
+        // Cast numeric string values to the declared PHP scalar type so that
+        // FHIRPath type inference (is(FHIR.integer)) sees the correct PHP type and
+        // choice-variant resolution picks the right variant (int vs string).
+        if ($propertyType === 'int' && is_string($value) && is_numeric($value)) {
+            return (int) $value;
+        }
+
+        if ($propertyType === 'float' && is_string($value) && is_numeric($value)) {
+            return (float) $value;
         }
 
         // XmlEncoder collapses single XML elements into scalars instead of arrays.

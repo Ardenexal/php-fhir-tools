@@ -36,7 +36,6 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\RelatedArtifact;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\SampledData;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Signature;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\TriggerDefinition;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\UsageContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\Base64BinaryPrimitive;
@@ -56,6 +55,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UrlPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UuidPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ResourceResource;
+use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -305,7 +305,7 @@ class ParametersParameter extends BackboneElement
                 [
                     'fhirType'     => 'Timing',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing',
                     'jsonKey'      => 'valueTiming',
                 ],
                 [

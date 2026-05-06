@@ -178,3 +178,10 @@ Before submitting changes, confirm:
 - **FHIRBundle Guide**: `/docs/component-guides/fhir-bundle.md` - Symfony integration
 - **CodeGeneration Guide**: `/docs/component-guides/code-generation.md` - Standalone generation
 - **Serialization Guide**: `/docs/component-guides/serialization.md` - JSON serialization
+
+<!-- BEGIN AI_MATE_INSTRUCTIONS -->
+AI Mate Summary:
+- Role: MCP-powered, project-aware coding guidance and tools.
+- Required action: Read and follow `mate/AGENT_INSTRUCTIONS.md` before taking any action in this project, and prefer MCP tools over raw CLI commands whenever possible.
+- Installed extensions: matesofmate/phpstan-extension, matesofmate/phpunit-extension, symfony/ai-mate, symfony/ai-symfony-mate-extension.
+<!-- END AI_MATE_INSTRUCTIONS -->

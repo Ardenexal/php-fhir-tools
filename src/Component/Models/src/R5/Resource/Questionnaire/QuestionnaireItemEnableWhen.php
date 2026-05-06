@@ -1,0 +1,102 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\Questionnaire;
+
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\QuestionnaireItemOperatorType;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\TimePrimitive;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
+/**
+ * @description A constraint indicating that this item should only be enabled (displayed/allow answers to be captured) when the specified condition is true.
+ */
+#[FHIRBackboneElement(parentResource: 'Questionnaire', elementPath: 'Questionnaire.item.enableWhen', fhirVersion: 'R5')]
+class QuestionnaireItemEnableWhen extends BackboneElement
+{
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
+        public ?string $id = null,
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        public array $modifierExtension = [],
+        /** @var StringPrimitive|string|null question The linkId of question that determines whether item is enabled/disabled */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
+        public StringPrimitive|string|null $question = null,
+        /** @var QuestionnaireItemOperatorType|null operator exists | = | != | > | < | >= | <= */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        public ?QuestionnaireItemOperatorType $operator = null,
+        /** @var bool|string|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|Coding|Quantity|Reference|null answer Value for question comparison based on operator */
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isRequired: true,
+            isChoice: true,
+            variants: [
+                ['fhirType' => 'boolean', 'propertyKind' => 'scalar', 'phpType' => 'bool', 'jsonKey' => 'answerBoolean'],
+                ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'string', 'jsonKey' => 'answerDecimal'],
+                ['fhirType' => 'integer', 'propertyKind' => 'scalar', 'phpType' => 'int', 'jsonKey' => 'answerInteger'],
+                [
+                    'fhirType'     => 'date',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive',
+                    'jsonKey'      => 'answerDate',
+                ],
+                [
+                    'fhirType'     => 'dateTime',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive',
+                    'jsonKey'      => 'answerDateTime',
+                ],
+                [
+                    'fhirType'     => 'time',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\TimePrimitive',
+                    'jsonKey'      => 'answerTime',
+                ],
+                [
+                    'fhirType'     => 'string',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive',
+                    'jsonKey'      => 'answerString',
+                ],
+                [
+                    'fhirType'     => 'Coding',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding',
+                    'jsonKey'      => 'answerCoding',
+                ],
+                [
+                    'fhirType'     => 'Quantity',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity',
+                    'jsonKey'      => 'answerQuantity',
+                ],
+                [
+                    'fhirType'     => 'Reference',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
+                    'jsonKey'      => 'answerReference',
+                ],
+            ],
+        )]
+        #[NotBlank]
+        public bool|string|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|Coding|Quantity|Reference|null $answer = null,
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
+}

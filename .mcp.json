@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+      "symfony-ai-mate": {
+          "command": "php",
+          "args": [
+              "vendor/symfony/ai-mate/bin/mate.php",
+              "serve"
+          ]
+      }
+
+  }
+}

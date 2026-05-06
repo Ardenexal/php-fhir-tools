@@ -10,8 +10,8 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing;
 
 /**
  * @description Oral nutritional products given in order to add further nutritional value to the patient's diet.
@@ -40,7 +40,7 @@ class NutritionOrderSupplement extends BackboneElement
             fhirType: 'Timing',
             propertyKind: 'complex',
             isArray: true,
-            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing',
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing',
         )]
         public array $schedule = [],
         /** @var Quantity|null quantity Amount of the nutritional supplement */

@@ -7,9 +7,11 @@ parameters:
     paths:
         - src/Bundle/FHIRBundle/
         - src/Component/CodeGeneration/src/
+        - src/Component/Metadata/src/
         - src/Component/Serialization/src/
         - src/Component/Models/src/
         - src/Component/FHIRPath/src/
+        - mate/src/
     excludePaths:
         - */vendor/*
         - src/Bundle/*/tests/*

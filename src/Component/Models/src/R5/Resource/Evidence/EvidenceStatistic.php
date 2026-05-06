@@ -1,0 +1,81 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\Evidence;
+
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UnsignedIntPrimitive;
+
+/**
+ * @description Values and parameters for a single statistic.
+ */
+#[FHIRBackboneElement(parentResource: 'Evidence', elementPath: 'Evidence.statistic', fhirVersion: 'R5')]
+class EvidenceStatistic extends BackboneElement
+{
+    public function __construct(
+        /** @var string|null id Unique id for inter-element referencing */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
+        public ?string $id = null,
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        public array $modifierExtension = [],
+        /** @var MarkdownPrimitive|null description Description of content */
+        #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
+        public ?MarkdownPrimitive $description = null,
+        /** @var array<Annotation> note Footnotes and/or explanatory notes */
+        #[FhirProperty(
+            fhirType: 'Annotation',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation',
+        )]
+        public array $note = [],
+        /** @var CodeableConcept|null statisticType Type of statistic, e.g., relative risk */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $statisticType = null,
+        /** @var CodeableConcept|null category Associated category for categorical variable */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $category = null,
+        /** @var Quantity|null quantity Statistic value */
+        #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
+        public ?Quantity $quantity = null,
+        /** @var UnsignedIntPrimitive|null numberOfEvents The number of events associated with the statistic */
+        #[FhirProperty(fhirType: 'unsignedInt', propertyKind: 'primitive')]
+        public ?UnsignedIntPrimitive $numberOfEvents = null,
+        /** @var UnsignedIntPrimitive|null numberAffected The number of participants affected */
+        #[FhirProperty(fhirType: 'unsignedInt', propertyKind: 'primitive')]
+        public ?UnsignedIntPrimitive $numberAffected = null,
+        /** @var EvidenceStatisticSampleSize|null sampleSize Number of samples in the statistic */
+        #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
+        public ?EvidenceStatisticSampleSize $sampleSize = null,
+        /** @var array<EvidenceStatisticAttributeEstimate> attributeEstimate An attribute of the Statistic */
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Evidence\EvidenceStatisticAttributeEstimate',
+        )]
+        public array $attributeEstimate = [],
+        /** @var array<EvidenceStatisticModelCharacteristic> modelCharacteristic An aspect of the statistical model */
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Evidence\EvidenceStatisticModelCharacteristic',
+        )]
+        public array $modelCharacteristic = [],
+    ) {
+        parent::__construct($id, $extension, $modifierExtension);
+    }
+}

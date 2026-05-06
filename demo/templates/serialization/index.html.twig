@@ -5,7 +5,7 @@
 {% block body %}
 <div class="mb-6">
     <h1 class="text-2xl font-bold text-gray-900">Serialization Playground</h1>
-    <p class="mt-1 text-gray-500 text-sm">Validate, convert, or inspect FHIR resources. Paste JSON or XML — the format is detected automatically.</p>
+    <p class="mt-1 text-gray-500 text-sm">Validate, convert, or inspect any FHIR resource. Paste JSON or XML — the resource type and format are detected automatically.</p>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -17,12 +17,14 @@
               class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label for="resource_type" class="block text-sm font-medium text-gray-700 mb-1">Resource type</label>
-                    <select id="resource_type"
-                            name="resource_type"
+                    <label for="fhir_version" class="block text-sm font-medium text-gray-700 mb-1">FHIR version</label>
+                    <select id="fhir_version"
+                            name="fhir_version"
                             class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        {% for type in resource_types %}
-                        <option value="{{ type }}" {% if type == resource_type %}selected{% endif %}>{{ type }}</option>
+                        {% for version in fhir_versions %}
+                        <option value="{{ version }}" {% if version == fhir_version %}selected{% endif %}>
+                            {{- version == 'Auto' ? 'Auto (detect from input)' : version -}}
+                        </option>
                         {% endfor %}
                     </select>
                 </div>
@@ -167,14 +169,15 @@
         </div>
 
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-            <h3 class="text-sm font-semibold text-gray-700 mb-2">Supported resource types</h3>
-            <ul class="text-xs text-gray-500 space-y-0.5">
-                {% for type in resource_types %}
-                <li>• {{ type }}</li>
-                {% endfor %}
+            <h3 class="text-sm font-semibold text-gray-700 mb-2">Tips</h3>
+            <ul class="text-xs text-gray-500 space-y-2">
+                <li><strong class="text-gray-700">Auto (detect from input)</strong> — resolves the resource class from the <code class="font-mono">resourceType</code> field (JSON) or root element (XML), probing R4 → R4B → R5. IG profiles are resolved via <code class="font-mono">meta.profile</code>.</li>
+                <li><strong class="text-gray-700">Pin a version</strong> — select R4, R4B, or R5 to restrict class lookup to that version only.</li>
+                <li><strong class="text-gray-700">IG profiles</strong> — include a <code class="font-mono">meta.profile</code> URL in your resource JSON to resolve to a generated AU Base / AU Core / US Core profile class (requires generated IG classes and a cache clear).</li>
             </ul>
         </div>
     </div>
 
 </div>
 {% endblock %}
+

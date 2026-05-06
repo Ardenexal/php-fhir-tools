@@ -9,8 +9,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing;
 
 /**
  * @description Diet given orally in contrast to enteral (tube) feeding.
@@ -41,7 +41,7 @@ class NutritionOrderOralDiet extends BackboneElement
             fhirType: 'Timing',
             propertyKind: 'complex',
             isArray: true,
-            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing',
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing',
         )]
         public array $schedule = [],
         /** @var array<NutritionOrderOralDietNutrient> nutrient Required  nutrient modifications */

@@ -37,7 +37,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\RelatedArtifact;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\SampledData;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Signature;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\StructureMapSourceListModeType;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\TriggerDefinition;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\UsageContext;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\Base64BinaryPrimitive;
@@ -56,6 +55,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UnsignedIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UrlPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UuidPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\Timing;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -314,7 +314,7 @@ class StructureMapGroupRuleSource extends BackboneElement
                 [
                     'fhirType'     => 'Timing',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Timing',
                     'jsonKey'      => 'defaultValueTiming',
                 ],
                 [

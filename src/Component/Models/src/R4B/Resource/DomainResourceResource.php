@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Traits\FHIRExtensionsTrait;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Narrative;
@@ -26,6 +27,8 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 )]
 abstract class DomainResourceResource extends ResourceResource
 {
+    use FHIRExtensionsTrait;
+
     public function __construct(
         /** @var string|null id Logical id of this artifact */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]

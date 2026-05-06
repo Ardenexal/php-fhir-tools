@@ -57,6 +57,9 @@ class Symfony74CompatibilityTest extends TestCase
                         'enabled'     => $validationEnabled,
                         'strict_mode' => $strictMode,
                     ],
+                    'serialization'    => [
+                        'metadata_cache_pool' => null,
+                    ],
                 ],
             ];
 

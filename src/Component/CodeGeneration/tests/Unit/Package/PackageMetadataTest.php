@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Component\CodeGeneration\tests\U
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageMetadata;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * Unit tests for PackageMetadata
@@ -70,6 +71,60 @@ class PackageMetadataTest extends TestCase
         self::assertSame('test-package', $metadata->getName());
         self::assertSame('1.0.0', $metadata->getVersion());
         self::assertSame(['custom_field' => 'custom_value'], $metadata->getAdditionalData());
+    }
+
+    /**
+     * Test that fromPackageData normalizes numeric FHIR version strings to named forms.
+     *
+     * Real FHIR packages (e.g. hl7.fhir.au.base) declare fhirVersions as numeric
+     * strings like "4.0.1". The generators expect the named form "R4".
+     */
+    #[DataProvider('numericFhirVersionProvider')]
+    public function testFromPackageDataNormalizesNumericFhirVersions(string $raw, string $expected): void
+    {
+        $metadata = PackageMetadata::fromPackageData([
+            'name'         => 'test-package',
+            'version'      => '1.0.0',
+            'fhirVersions' => [$raw],
+        ]);
+
+        self::assertSame([$expected], $metadata->getFhirVersions());
+    }
+
+    /**
+     * @return array<string, array{string, string}>
+     */
+    public static function numericFhirVersionProvider(): array
+    {
+        return [
+            'R4 exact (4.0.1)'              => ['4.0.1',              'R4'],
+            'R4 exact (4.0.0)'              => ['4.0.0',              'R4'],
+            'R4 pre-release (4.0.1-ballot)' => ['4.0.1-ballot',       'R4'],
+            'R4B exact (4.3.0)'             => ['4.3.0',              'R4B'],
+            'R4B pre-release (4.3.0-rc1)'   => ['4.3.0-rc1',          'R4B'],
+            'R5 exact (5.0.0)'              => ['5.0.0',              'R5'],
+            'R5 pre-release (5.0.0-snap3)'  => ['5.0.0-snapshot3',    'R5'],
+            'already R4'                    => ['R4',                 'R4'],
+            'already R4B'                   => ['R4B',                'R4B'],
+            'already R5'                    => ['R5',                 'R5'],
+            'unknown passes through'        => ['3.0.2',              '3.0.2'],
+        ];
+    }
+
+    /**
+     * Test that fromPackageData deduplicates fhirVersions after normalization.
+     *
+     * A package listing both "4.0.0" and "4.0.1" should produce a single "R4" entry.
+     */
+    public function testFromPackageDataDeduplicatesVersionsAfterNormalization(): void
+    {
+        $metadata = PackageMetadata::fromPackageData([
+            'name'         => 'test-package',
+            'version'      => '1.0.0',
+            'fhirVersions' => ['4.0.0', '4.0.1', 'R4'],
+        ]);
+
+        self::assertSame(['R4'], $metadata->getFhirVersions());
     }
 
     /**

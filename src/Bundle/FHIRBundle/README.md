@@ -42,6 +42,12 @@ fhir:
     serialization:
         metadata_cache_pool: cache.app   # PSR-6 pool for property metadata; set to ~ to disable
         enable_cache_warmer: false        # set to true to pre-populate metadata cache on cache:warmup
+    ig:
+        namespace: 'App\FHIR\IG'                      # must match PSR-4 autoload in composer.json
+        output_directory: '%kernel.project_dir%/src/FHIRIG'
+        offline: false
+        packages:                                      # specify in dependency order
+            - hl7.fhir.us.core
 ```
 
 ### Metadata Caching
@@ -101,7 +107,7 @@ class FHIRController extends AbstractController
 
 ## Console Commands
 
-### Generate FHIR Models
+### Generate Base FHIR Models
 
 ```bash
 # Generate models from a specific FHIR package
@@ -109,6 +115,46 @@ php bin/console fhir:generate --package=hl7.fhir.r4.core -vvv
 
 # Generate using only cached packages (no network)
 php bin/console fhir:generate --package=hl7.fhir.r4.core --offline -vvv
+```
+
+### Generate Implementation Guide Classes
+
+The `fhir:generate-ig` command generates typed PHP classes for a FHIR Implementation Guide — named extension subclasses and resource profile subclasses — into an isolated namespace separate from the base models.
+
+```bash
+# Use packages configured in fhir.ig.packages (no arguments needed)
+php bin/console fhir:generate-ig
+
+# Override packages at runtime (bypasses config)
+php bin/console fhir:generate-ig --package=hl7.fhir.us.core
+
+# Pin a specific version
+php bin/console fhir:generate-ig --package=hl7.fhir.us.core#6.1.0
+
+# Multi-level chain — list in dependency order
+php bin/console fhir:generate-ig --package=hl7.fhir.au.base#1.0.0 --package=hl7.fhir.au.core#1.0.0
+```
+
+Configure the packages in `config/packages/fhir.yaml` under `fhir.ig` so the command needs no arguments in CI or deploy scripts:
+
+```yaml
+fhir:
+    ig:
+        namespace: 'App\FHIR\IG'
+        output_directory: '%kernel.project_dir%/src/FHIRIG'
+        packages:
+            - hl7.fhir.au.base#1.0.0
+            - hl7.fhir.au.core#1.0.0   # extends au.base — listed after it
+```
+
+Add the generated directory to your `composer.json` autoloader:
+
+```json
+"autoload": {
+    "psr-4": {
+        "App\\FHIR\\IG\\": "src/FHIRIG/"
+    }
+}
 ```
 
 ### FHIRPath Commands

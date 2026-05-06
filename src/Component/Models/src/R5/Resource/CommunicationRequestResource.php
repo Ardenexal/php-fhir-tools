@@ -1,0 +1,209 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
+
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Meta;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Narrative;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\RequestIntentType;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\RequestPriorityType;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\RequestStatusType;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\CommunicationRequest\CommunicationRequestPayload;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
+/**
+ * @author Health Level Seven International (Patient Care)
+ *
+ * @see http://hl7.org/fhir/StructureDefinition/CommunicationRequest
+ *
+ * @description A request to convey information; e.g. the CDS system proposes that an alert be sent to a responsible provider, the CDS system proposes that the public health agency be notified about a reportable condition.
+ */
+#[FhirResource(
+    type: 'CommunicationRequest',
+    version: '5.0.0',
+    url: 'http://hl7.org/fhir/StructureDefinition/CommunicationRequest',
+    fhirVersion: 'R5',
+)]
+class CommunicationRequestResource extends DomainResourceResource
+{
+    public function __construct(
+        /** @var string|null id Logical id of this artifact */
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar')]
+        public ?string $id = null,
+        /** @var Meta|null meta Metadata about the resource */
+        #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
+        public ?Meta $meta = null,
+        /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        public ?UriPrimitive $implicitRules = null,
+        /** @var AllLanguagesType|null language Language of the resource content */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        public ?AllLanguagesType $language = null,
+        /** @var Narrative|null text Text summary of the resource, for human interpretation */
+        #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
+        public ?Narrative $text = null,
+        /** @var array<ResourceResource> contained Contained, inline Resources */
+        #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
+        public array $contained = [],
+        /** @var array<Extension> extension Additional content defined by implementations */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
+        public array $extension = [],
+        /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        public array $modifierExtension = [],
+        /** @var array<Identifier> identifier Unique identifier */
+        #[FhirProperty(
+            fhirType: 'Identifier',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier',
+        )]
+        public array $identifier = [],
+        /** @var array<Reference> basedOn Fulfills plan or proposal */
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
+        )]
+        public array $basedOn = [],
+        /** @var array<Reference> replaces Request(s) replaced by this request */
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
+        )]
+        public array $replaces = [],
+        /** @var Identifier|null groupIdentifier Composite request this is part of */
+        #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
+        public ?Identifier $groupIdentifier = null,
+        /** @var RequestStatusType|null status draft | active | on-hold | revoked | completed | entered-in-error | unknown */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        public ?RequestStatusType $status = null,
+        /** @var CodeableConcept|null statusReason Reason for current status */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $statusReason = null,
+        /** @var RequestIntentType|null intent proposal | plan | directive | order | original-order | reflex-order | filler-order | instance-order | option */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        public ?RequestIntentType $intent = null,
+        /** @var array<CodeableConcept> category Message category */
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
+        )]
+        public array $category = [],
+        /** @var RequestPriorityType|null priority routine | urgent | asap | stat */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        public ?RequestPriorityType $priority = null,
+        /** @var bool|null doNotPerform True if request is prohibiting action */
+        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
+        public ?bool $doNotPerform = null,
+        /** @var array<CodeableConcept> medium A channel of communication */
+        #[FhirProperty(
+            fhirType: 'CodeableConcept',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
+        )]
+        public array $medium = [],
+        /** @var Reference|null subject Focus of message */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $subject = null,
+        /** @var array<Reference> about Resources that pertain to this communication request */
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
+        )]
+        public array $about = [],
+        /** @var Reference|null encounter The Encounter during which this CommunicationRequest was created */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $encounter = null,
+        /** @var array<CommunicationRequestPayload> payload Message payload */
+        #[FhirProperty(
+            fhirType: 'BackboneElement',
+            propertyKind: 'backbone',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\CommunicationRequest\CommunicationRequestPayload',
+        )]
+        public array $payload = [],
+        /** @var DateTimePrimitive|Period|null occurrence When scheduled */
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'dateTime',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive',
+                    'jsonKey'      => 'occurrenceDateTime',
+                ],
+                [
+                    'fhirType'     => 'Period',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Period',
+                    'jsonKey'      => 'occurrencePeriod',
+                ],
+            ],
+        )]
+        public DateTimePrimitive|Period|null $occurrence = null,
+        /** @var DateTimePrimitive|null authoredOn When request transitioned to being actionable */
+        #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
+        public ?DateTimePrimitive $authoredOn = null,
+        /** @var Reference|null requester Who asks for the information to be shared */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $requester = null,
+        /** @var array<Reference> recipient Who to share the information with */
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
+        )]
+        public array $recipient = [],
+        /** @var array<Reference> informationProvider Who should share the information */
+        #[FhirProperty(
+            fhirType: 'Reference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
+        )]
+        public array $informationProvider = [],
+        /** @var array<CodeableReference> reason Why is communication needed? */
+        #[FhirProperty(
+            fhirType: 'CodeableReference',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
+        )]
+        public array $reason = [],
+        /** @var array<Annotation> note Comments made about communication request */
+        #[FhirProperty(
+            fhirType: 'Annotation',
+            propertyKind: 'complex',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation',
+        )]
+        public array $note = [],
+    ) {
+        parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
+    }
+}
