@@ -172,7 +172,7 @@ final class FHIRIGTypeRegistryFactory
      *
      * @return array<string, string> directory path → namespace root
      */
-    private static function resolveBaseExtensionDirectories(): array
+    public static function resolveBaseExtensionDirectories(): array
     {
         $dirs = [];
 

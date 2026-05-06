@@ -44,7 +44,7 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         protected readonly FHIRMetadataExtractorInterface $metadataExtractor,
         ?NormalizerInterface $normalizer = null,
         ?DenormalizerInterface $denormalizer = null,
-        string $fhirVersion = 'R4B',
+        string $fhirVersion = 'R4',
         protected ?FHIRIGTypeRegistry $igTypeRegistry = null,
     ) {
         $this->normalizer           = $normalizer;

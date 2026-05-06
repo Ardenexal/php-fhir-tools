@@ -29,7 +29,7 @@ class FHIRBackboneElementNormalizer extends AbstractFHIRNormalizer
         FHIRMetadataExtractorInterface $metadataExtractor,
         ?NormalizerInterface $normalizer = null,
         ?DenormalizerInterface $denormalizer = null,
-        string $fhirVersion = 'R4B',
+        string $fhirVersion = 'R4',
         ?FHIRIGTypeRegistry $igTypeRegistry = null,
     ) {
         parent::__construct($metadataExtractor, $normalizer, $denormalizer, $fhirVersion, $igTypeRegistry);

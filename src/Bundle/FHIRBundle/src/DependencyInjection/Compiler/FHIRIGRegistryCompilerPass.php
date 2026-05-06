@@ -8,6 +8,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRSliceDiscriminator;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRIGTypeRegistry;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRIGTypeRegistryFactory;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Finder\Finder;
@@ -34,21 +35,6 @@ use Symfony\Component\Finder\Finder;
  */
 class FHIRIGRegistryCompilerPass implements CompilerPassInterface
 {
-    /**
-     * Known base FHIR versions and the sentinel DataType\Extension class used to locate
-     * each version's Extension directory via reflection.
-     *
-     * The sentinel is the DataType\Extension class (not a namespace). Its file path is used
-     * to compute the sibling Extension/ directory: DataType/Extension.php → ../Extension/.
-     *
-     * @var array<string, class-string>
-     */
-    private const array BASE_VERSION_SENTINELS = [
-        'R4'  => 'Ardenexal\\FHIRTools\\Component\\Models\\R4\\DataType\\Extension',
-        'R4B' => 'Ardenexal\\FHIRTools\\Component\\Models\\R4B\\DataType\\Extension',
-        'R5'  => 'Ardenexal\\FHIRTools\\Component\\Models\\R5\\DataType\\Extension',
-    ];
-
     public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition(FHIRIGTypeRegistry::class)) {
@@ -71,7 +57,7 @@ class FHIRIGRegistryCompilerPass implements CompilerPassInterface
         //    Base extension classes (e.g. PGenderIdentityExtension) live here and also
         //    carry #[FHIRExtensionDefinition] attributes that must be registered so the
         //    deserializer can resolve them to their typed classes.
-        foreach ($this->resolveBaseExtensionDirectories() as $dir => $ns) {
+        foreach (FHIRIGTypeRegistryFactory::resolveBaseExtensionDirectories() as $dir => $ns) {
             $this->scanDirectoryIntoMappings($dir, $ns, $extensionMappings, $profileMappings, $sliceDiscriminatorMappings);
         }
 
@@ -90,11 +76,6 @@ class FHIRIGRegistryCompilerPass implements CompilerPassInterface
      * object instances. FHIRIGTypeRegistry hydrates them to SliceDiscriminator objects
      * in its constructor.
      *
-     * @param array<string, class-string>                                                                     $extensionMappings
-     * @param array<string, class-string>                                                                     $profileMappings
-     * @param array<string, list<array{type: string, path: string, value: mixed, targetClass: class-string}>> $sliceDiscriminatorMappings
-     */
-    /**
      * @param array<string, array<string, class-string>>                                                      $extensionMappings
      * @param array<string, class-string>                                                                     $profileMappings
      * @param array<string, list<array{type: string, path: string, value: mixed, targetClass: class-string}>> $sliceDiscriminatorMappings
@@ -172,44 +153,5 @@ class FHIRIGRegistryCompilerPass implements CompilerPassInterface
                 }
             }
         }
-    }
-
-    /**
-     * Auto-detect base models Extension directories for each supported FHIR version.
-     *
-     * Uses reflection on known sentinel DataType\Extension classes to find their source
-     * files, then resolves the sibling Extension/ directory. This works in both the
-     * monorepo and consumer apps where the Models component is installed via Composer.
-     *
-     * @return array<string, string> directory path → namespace root
-     */
-    private function resolveBaseExtensionDirectories(): array
-    {
-        $dirs = [];
-
-        foreach (self::BASE_VERSION_SENTINELS as $version => $sentinelClass) {
-            if (!class_exists($sentinelClass)) {
-                continue; // Models for this version not installed — skip.
-            }
-
-            $sentinelFile = (new \ReflectionClass($sentinelClass))->getFileName();
-
-            if ($sentinelFile === false) {
-                continue;
-            }
-
-            // sentinel is in …/Models/src/{version}/DataType/Extension.php
-            // Extension classes are in …/Models/src/{version}/Extension/
-            $extensionDir = dirname(dirname($sentinelFile)) . DIRECTORY_SEPARATOR . 'Extension';
-
-            if (!is_dir($extensionDir)) {
-                continue;
-            }
-
-            $namespace           = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\Extension";
-            $dirs[$extensionDir] = $namespace;
-        }
-
-        return $dirs;
     }
 }
