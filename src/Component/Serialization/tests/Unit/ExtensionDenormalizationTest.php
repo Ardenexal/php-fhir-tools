@@ -80,6 +80,7 @@ class ExtensionDenormalizationTest extends TestCase
             $this->metadataExtractor,
             null,
             $denormalizer,
+            'R4B',
         );
 
         $result = $normalizer->exposeDenormalizeExtensionArray(
