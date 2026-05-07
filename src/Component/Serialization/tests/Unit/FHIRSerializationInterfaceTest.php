@@ -8,7 +8,7 @@ use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProviderInterface;
-use Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRNormalizerInterface;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Common\FHIRNormalizerInterface;
 use Ardenexal\FHIRTools\Tests\Utilities\FHIRTestDataGenerator;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 use Eris\TestTrait;

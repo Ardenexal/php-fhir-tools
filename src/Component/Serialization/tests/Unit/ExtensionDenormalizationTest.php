@@ -6,7 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Serialization\Tests\Unit;
 
 use Ardenexal\FHIRTools\Component\Serialization\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
-use Ardenexal\FHIRTools\Component\Serialization\Normalizer\AbstractFHIRNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Common\AbstractFHIRNormalizer;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -70,7 +70,7 @@ class ExtensionDenormalizationTest extends TestCase
             ->method('denormalize')
             ->with(
                 ['url' => 'http://example.com/some-extension', 'valueString' => 'hello'],
-                'Ardenexal\\FHIRTools\\Component\\Models\\R4B\\DataType\\Extension',
+                'Ardenexal\\FHIRTools\\Component\\Models\\R4\\DataType\\Extension',
                 'json',
                 [],
             )
