@@ -288,6 +288,63 @@ class FHIRModelGeneratorIntegrationTest extends TestCase
     }
 
     /**
+     * Test that a non-boolean primitive-type generates Stringable with generic __toString
+     */
+    public function testPrimitiveTypeImplementsStringable(): void
+    {
+        $structureDefinition = $this->loadTestStructureDefinition('FHIRString.json');
+
+        $class = $this->generator->generateModelClassWithErrorHandling(
+            $structureDefinition,
+            'R4B',
+            $this->errorCollector,
+        );
+
+        self::assertNotNull($class, 'Primitive-type generation should succeed');
+        self::assertFalse($this->errorCollector->hasErrors(), 'No errors should occur during generation');
+
+        $interfaces = $class->getImplements();
+        self::assertContains(\Stringable::class, $interfaces, 'Primitive class should implement Stringable');
+
+        self::assertTrue($class->hasMethod('__toString'), 'Primitive class should have __toString method');
+        $toString = $class->getMethod('__toString');
+        self::assertSame('string', $toString->getReturnType(), '__toString must return string');
+
+        $body = $toString->getBody();
+        self::assertStringContainsString('(string) $this->value', $body, 'Non-boolean __toString should cast value to string');
+        self::assertStringNotContainsString("'true'", $body, 'Non-boolean __toString should not contain boolean literals');
+    }
+
+    /**
+     * Test that the boolean primitive-type generates __toString with true/false string literals
+     */
+    public function testBooleanPrimitiveTypeHasBooleanToString(): void
+    {
+        $structureDefinition = $this->loadTestStructureDefinition('FHIRBoolean.json');
+
+        $class = $this->generator->generateModelClassWithErrorHandling(
+            $structureDefinition,
+            'R4B',
+            $this->errorCollector,
+        );
+
+        self::assertNotNull($class, 'Boolean primitive-type generation should succeed');
+        self::assertFalse($this->errorCollector->hasErrors(), 'No errors should occur during generation');
+
+        $interfaces = $class->getImplements();
+        self::assertContains(\Stringable::class, $interfaces, 'Boolean primitive class should implement Stringable');
+
+        self::assertTrue($class->hasMethod('__toString'), 'Boolean primitive class should have __toString method');
+        $toString = $class->getMethod('__toString');
+        self::assertSame('string', $toString->getReturnType(), '__toString must return string');
+
+        $body = $toString->getBody();
+        self::assertStringContainsString("'true'", $body, 'Boolean __toString should return string literal "true"');
+        self::assertStringContainsString("'false'", $body, 'Boolean __toString should return string literal "false"');
+        self::assertStringNotContainsString('(string) $this->value', $body, 'Boolean __toString should not use generic cast');
+    }
+
+    /**
      * Load test StructureDefinition from fixtures
      */
     /**

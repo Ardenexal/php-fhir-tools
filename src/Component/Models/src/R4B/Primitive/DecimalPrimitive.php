@@ -17,8 +17,13 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  * @description A rational number with implicit precision
  */
 #[FHIRPrimitive(primitiveType: 'decimal', fhirVersion: 'R4B')]
-class DecimalPrimitive extends Element
+class DecimalPrimitive extends Element implements \Stringable
 {
+    public function __toString(): string
+    {
+        return $this->value === null ? '' : (string) $this->value;
+    }
+
     public function __construct(
         /** @var string|null id xml:id (or equivalent in JSON) */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]

@@ -17,8 +17,13 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\PrimitiveType;
  * @description String of characters used to identify a name or a resource
  */
 #[FHIRPrimitive(primitiveType: 'uri', fhirVersion: 'R5')]
-class UriPrimitive extends PrimitiveType
+class UriPrimitive extends PrimitiveType implements \Stringable
 {
+    public function __toString(): string
+    {
+        return $this->value === null ? '' : (string) $this->value;
+    }
+
     public function __construct(
         /** @var string|null id xml:id (or equivalent in JSON) */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]
