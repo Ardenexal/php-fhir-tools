@@ -18,8 +18,13 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  * @description A date or partial date (e.g. just year or year + month). There is no time zone. The format is a union of the schema types gYear, gYearMonth and date.  Dates SHALL be valid dates.
  */
 #[FHIRPrimitive(primitiveType: 'date', fhirVersion: 'R4B')]
-class DatePrimitive extends Element
+class DatePrimitive extends Element implements \Stringable
 {
+    public function __toString(): string
+    {
+        return $this->value === null ? '' : (string) $this->value;
+    }
+
     public function __construct(
         /** @var string|null id xml:id (or equivalent in JSON) */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]

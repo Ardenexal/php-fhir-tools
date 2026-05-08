@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-05-07
+
+### Fixed
+
+- Fix failing serialization unit tests
+- Update component version constraints to `^0.3`
+
 ## [0.3.0] - 2026-05-06
 
 ### Added
@@ -43,6 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [Infrastructure] Demo `composer.lock` constrained to PHP 8.3 compatible packages
 - [FHIRPath] PHPDoc type hints improved in `FHIRPathEvaluator`
 
-[Unreleased]: https://github.com/Ardenexal/FHIR-Structure-Definition-php-generator/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/Ardenexal/FHIR-Structure-Definition-php-generator/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/Ardenexal/FHIR-Structure-Definition-php-generator/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/Ardenexal/FHIR-Structure-Definition-php-generator/compare/0.2...v0.3.0
 [0.2]: https://github.com/Ardenexal/FHIR-Structure-Definition-php-generator/releases/tag/0.2

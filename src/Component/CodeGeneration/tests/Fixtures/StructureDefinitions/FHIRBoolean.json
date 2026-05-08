@@ -1,0 +1,16 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "boolean",
+  "url": "http://hl7.org/fhir/StructureDefinition/boolean",
+  "version": "4.3.0",
+  "name": "boolean",
+  "title": "boolean",
+  "status": "active",
+  "date": "2022-05-28",
+  "publisher": "HL7 FHIR Standard",
+  "description": "Value of 'true' or 'false'",
+  "fhirVersion": "4.3.0",
+  "kind": "primitive-type",
+  "abstract": false,
+  "type": "boolean"
+}

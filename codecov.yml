@@ -1,0 +1,17 @@
+coverage:
+  ignore:
+    - "src/Component/Models/src/**"
+
+  status:
+    project:
+      default:
+        threshold: 1%
+    patch:
+      default:
+        target: 70%
+        threshold: 5%
+
+comment:
+  layout: "condensed_header, condensed_files, condensed_footer"
+  behavior: default
+  require_changes: true

@@ -16,8 +16,13 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  * @description Any combination of letters, numerals, "-" and ".", with a length limit of 64 characters.  (This might be an integer, an unprefixed OID, UUID or any other identifier pattern that meets these constraints.)  Ids are case-insensitive.
  */
 #[FHIRPrimitive(primitiveType: 'id', fhirVersion: 'R4')]
-class IdPrimitive extends StringPrimitive
+class IdPrimitive extends StringPrimitive implements \Stringable
 {
+    public function __toString(): string
+    {
+        return $this->value === null ? '' : (string) $this->value;
+    }
+
     public function __construct(
         /** @var string|null id xml:id (or equivalent in JSON) */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]

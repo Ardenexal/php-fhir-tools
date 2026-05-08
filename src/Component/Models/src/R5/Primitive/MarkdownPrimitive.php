@@ -16,8 +16,13 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * @description A string that may contain Github Flavored Markdown syntax for optional processing by a mark down presentation engine
  */
 #[FHIRPrimitive(primitiveType: 'markdown', fhirVersion: 'R5')]
-class MarkdownPrimitive extends StringPrimitive
+class MarkdownPrimitive extends StringPrimitive implements \Stringable
 {
+    public function __toString(): string
+    {
+        return $this->value === null ? '' : (string) $this->value;
+    }
+
     public function __construct(
         /** @var string|null id xml:id (or equivalent in JSON) */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]

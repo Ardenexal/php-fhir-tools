@@ -1,0 +1,16 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "string",
+  "url": "http://hl7.org/fhir/StructureDefinition/string",
+  "version": "4.3.0",
+  "name": "string",
+  "title": "string",
+  "status": "active",
+  "date": "2022-05-28",
+  "publisher": "HL7 FHIR Standard",
+  "description": "A sequence of Unicode characters",
+  "fhirVersion": "4.3.0",
+  "kind": "primitive-type",
+  "abstract": false,
+  "type": "string"
+}

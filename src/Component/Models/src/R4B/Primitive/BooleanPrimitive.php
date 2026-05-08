@@ -17,8 +17,13 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  * @description Value of "true" or "false"
  */
 #[FHIRPrimitive(primitiveType: 'boolean', fhirVersion: 'R4B')]
-class BooleanPrimitive extends Element
+class BooleanPrimitive extends Element implements \Stringable
 {
+    public function __toString(): string
+    {
+        return $this->value === null ? '' : ($this->value ? 'true' : 'false');
+    }
+
     public function __construct(
         /** @var string|null id xml:id (or equivalent in JSON) */
         #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@id')]

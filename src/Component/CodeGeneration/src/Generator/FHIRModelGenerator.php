@@ -289,6 +289,16 @@ class FHIRModelGenerator implements GeneratorInterface
                 'primitiveType' => $structureDefinition['name'],
                 'fhirVersion'   => $version,
             ]);
+            // All generated primitive classes implement Stringable so callers can use
+            // (string) $primitive instead of accessing ->value directly.
+            $class->addImplement(\Stringable::class);
+            $toString = $class->addMethod('__toString');
+            $toString->setReturnType('string');
+            if ($structureDefinition['name'] === 'boolean') {
+                $toString->setBody("return \$this->value === null ? '' : (\$this->value ? 'true' : 'false');");
+            } else {
+                $toString->setBody("return \$this->value === null ? '' : (string) \$this->value;");
+            }
         } elseif ($structureDefinition['kind'] === 'complex-type') {
             // Check if this is a backbone element by looking at the base definition
             $isBackboneElement = isset($structureDefinition['baseDefinition'])
