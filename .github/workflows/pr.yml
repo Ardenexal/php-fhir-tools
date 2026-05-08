@@ -347,7 +347,7 @@ jobs:
                 if: hashFiles('.phpbench/**/*.xml') != ''
                 run: |
                     php ./vendor/bin/phpbench run bench/ \
-                        --report=compare \
+                        --report=benchmark_compare \
                         --ref=baseline \
                         --assert="mode(variant.time.avg) < mode(baseline.time.avg) * 1.50" \
                         --no-interaction \
