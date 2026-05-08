@@ -344,7 +344,7 @@ jobs:
 
             -   name: Assert no regression against baseline
                 id: regression
-                if: hashFiles('.phpbench/*.xml') != ''
+                if: hashFiles('.phpbench/**/*.xml') != ''
                 run: |
                     php ./vendor/bin/phpbench run bench/ \
                         --report=compare \
@@ -369,7 +369,7 @@ jobs:
                             benchOutput = 'Could not read benchmark output.';
                         }
 
-                        const baselineExists = '${{ hashFiles('.phpbench/*.xml') }}' !== '';
+                        const baselineExists = '${{ hashFiles('.phpbench/**/*.xml') }}' !== '';
                         let regressionSection = '';
 
                         if (baselineExists) {
@@ -397,5 +397,5 @@ jobs:
                         });
 
             -   name: Fail if regression detected
-                if: steps.regression.outputs.exit_code != '0' && hashFiles('.phpbench/*.xml') != ''
+                if: steps.regression.outputs.exit_code != '0' && hashFiles('.phpbench/**/*.xml') != ''
                 run: exit 1
