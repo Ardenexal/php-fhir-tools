@@ -179,7 +179,7 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
      */
     private function normalizeForJSON(object $object, string $resourceType, FHIRSerializationContext $fhirContext, array $context): array
     {
-        $data               = [];
+        $data                 = [];
         $data['resourceType'] = $resourceType;
 
         $properties = self::reflPublicProps($object);

@@ -107,7 +107,6 @@ class FHIRBackboneElementJsonNormalizer extends AbstractFHIRNormalizer
                 }
 
                 if ($property !== null) {
-
                     if ($elementName === 'extension' || $elementName === 'modifierExtension') {
                         $denormalizedValue = is_array($value)
                             ? array_values($this->denormalizeExtensionArray(array_values($value), 'json', $context))
@@ -134,7 +133,7 @@ class FHIRBackboneElementJsonNormalizer extends AbstractFHIRNormalizer
                                 }
                             }
                         } else {
-                            $propertyType = $this->getPropertyType($property);
+                            $propertyType      = $this->getPropertyType($property);
                             $denormalizedValue = ($propertyType !== null && !$this->isBuiltinType($propertyType))
                                 ? null
                                 : $this->denormalizeBasicValue($value, 'json', $context);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Tests\Unit;
 
+use Ardenexal\FHIRTools\Bundle\FHIRBundle\DependencyInjection\Compiler\FHIRVersionedSerializerPass;
 use Ardenexal\FHIRTools\Bundle\FHIRBundle\FHIRBundle;
 use Eris\Generator;
 use Eris\TestTrait;
@@ -119,25 +120,36 @@ class FHIRBundleServiceAccessibilityTest extends TestCase
                 }
             }
 
-            // Verify that normalizers are properly tagged
-            $normalizers = [
-                'Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRResourceNormalizer',
-                'Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRComplexTypeNormalizer',
-                'Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRPrimitiveTypeNormalizer',
-                'Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRBackboneElementNormalizer',
+            // Verify that FHIRVersionedSerializerPass registers all 8 format-specific normalizer
+            // services for the configured FHIR version. Normalizers are injected directly into
+            // the Serializer constructor (not tagged), so we call the pass directly and check IDs.
+            (new FHIRVersionedSerializerPass())->process($container);
+
+            $v                     = strtolower($fhirVersion);
+            $expectedNormalizerIds = [
+                "fhir.normalizer.resource.json.{$v}",
+                "fhir.normalizer.resource.xml.{$v}",
+                "fhir.normalizer.complex_type.json.{$v}",
+                "fhir.normalizer.complex_type.xml.{$v}",
+                "fhir.normalizer.primitive.json.{$v}",
+                "fhir.normalizer.primitive.xml.{$v}",
+                "fhir.normalizer.backbone.json.{$v}",
+                "fhir.normalizer.backbone.xml.{$v}",
             ];
 
-            foreach ($normalizers as $normalizerId) {
-                if ($container->hasDefinition($normalizerId)) {
-                    $definition = $container->getDefinition($normalizerId);
-                    $tags       = $definition->getTags();
-                    self::assertArrayHasKey(
-                        'serializer.normalizer',
-                        $tags,
-                        "Normalizer {$normalizerId} should be tagged as serializer.normalizer",
-                    );
-                }
+            foreach ($expectedNormalizerIds as $normalizerId) {
+                self::assertTrue(
+                    $container->hasDefinition($normalizerId),
+                    "Normalizer service {$normalizerId} should be registered by FHIRVersionedSerializerPass",
+                );
             }
+
+            $normalizerRefs = $container->getDefinition("fhir.serializer.{$v}")->getArgument(0);
+            self::assertCount(
+                8,
+                $normalizerRefs,
+                "fhir.serializer.{$v} should reference exactly 8 normalizers",
+            );
         });
     }
 }

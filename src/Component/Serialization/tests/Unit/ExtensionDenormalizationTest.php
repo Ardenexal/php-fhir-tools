@@ -70,7 +70,7 @@ class ExtensionDenormalizationTest extends TestCase
             ->method('denormalize')
             ->with(
                 ['url' => 'http://example.com/some-extension', 'valueString' => 'hello'],
-                'Ardenexal\\FHIRTools\\Component\\Models\\R4\\DataType\\Extension',
+                'Ardenexal\\FHIRTools\\Component\\Models\\R4B\\DataType\\Extension',
                 'json',
                 [],
             )

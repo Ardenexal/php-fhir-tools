@@ -38,8 +38,8 @@ use Symfony\Component\Serializer\Serializer;
  *     each wired to the correct FHIR version string so the base Extension FQCN is
  *     resolved at construction time without any runtime class_exists probing.
  *
- *   - A Symfony Serializer instance composed of those four normalizers plus JSON and
- *     XML encoders.
+ *   - A Symfony Serializer instance composed of those four normalizers for ear JSON and
+ *     XML encoder.
  *
  *   - A FHIRSerializationService instance (public, ID: fhir.serialization_service.{version})
  *     wrapping the version-scoped Serializer.

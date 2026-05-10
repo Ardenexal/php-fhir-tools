@@ -189,7 +189,7 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             return null;
         }
 
-        $result      = [];
+        $result        = [];
         $valueProperty = self::reflProp($value, 'value');
 
         if ($valueProperty !== null && $valueProperty->isInitialized($value)) {
@@ -628,7 +628,7 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
 
         return match ($primitiveAttribute->primitiveType) {
             'string', 'code', 'uri', 'url', 'canonical', 'base64Binary',
-            'oid', 'id', 'uuid', 'markdown', 'xhtml'            => $this->validateString($value),
+            'oid', 'id', 'uuid', 'markdown', 'xhtml'             => $this->validateString($value),
             'date'                                               => $this->parseTemporalValue($value, FHIRDate::class),
             'time'                                               => $this->parseTemporalValue($value, FHIRTime::class),
             'dateTime'                                           => $this->parseTemporalValue($value, FHIRDateTime::class),
@@ -906,7 +906,7 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
 
     /**
      * @param array<string, PropertyMetadata> $metaMap
-     * @param string|null                     $className Pass the FQCN to enable O(1) lookup via per-class index cache.
+     * @param string|null                     $className pass the FQCN to enable O(1) lookup via per-class index cache
      *
      * @return array{0: string, 1: string, 2: string}|null [propertyName, phpType, fhirType] or null
      */

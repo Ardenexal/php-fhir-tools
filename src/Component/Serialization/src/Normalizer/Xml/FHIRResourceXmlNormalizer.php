@@ -332,9 +332,9 @@ class FHIRResourceXmlNormalizer extends AbstractFHIRNormalizer
                             $rawValue = $this->unwrapXmlValue($value, $phpType);
 
                             $denormalizedValue = match ($phpType) {
-                                'int'  => (int) $rawValue,
+                                'int'   => (int) $rawValue,
                                 'float' => (float) $rawValue,
-                                'bool' => filter_var($rawValue, FILTER_VALIDATE_BOOLEAN),
+                                'bool'  => filter_var($rawValue, FILTER_VALIDATE_BOOLEAN),
                                 default => $rawValue,
                             };
                         }

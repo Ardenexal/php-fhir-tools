@@ -148,7 +148,7 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                         if ($this->denormalizer !== null && !$this->isBuiltinType($phpType)) {
                             $denormalizedValue = $this->denormalizer->denormalize($value, $phpType, 'xml', $context);
                         } else {
-                            $rawValue = $this->unwrapXmlValue($value, $phpType);
+                            $rawValue          = $this->unwrapXmlValue($value, $phpType);
                             $denormalizedValue = match ($phpType) {
                                 'int'   => (int) $rawValue,
                                 'float' => (float) $rawValue,
@@ -540,5 +540,4 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
 
         return $result;
     }
-
 }
