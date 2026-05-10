@@ -12,10 +12,14 @@ use Ardenexal\FHIRTools\Component\Serialization\FHIRVersionedSerializationServic
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface;
-use Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRBackboneElementNormalizer;
-use Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRComplexTypeNormalizer;
-use Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRPrimitiveTypeNormalizer;
-use Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRResourceNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRBackboneElementJsonNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRComplexTypeJsonNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRPrimitiveTypeJsonNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRResourceJsonNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRBackboneElementXmlNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRComplexTypeXmlNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRPrimitiveTypeXmlNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRResourceXmlNormalizer;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -34,8 +38,8 @@ use Symfony\Component\Serializer\Serializer;
  *     each wired to the correct FHIR version string so the base Extension FQCN is
  *     resolved at construction time without any runtime class_exists probing.
  *
- *   - A Symfony Serializer instance composed of those four normalizers plus JSON and
- *     XML encoders.
+ *   - A Symfony Serializer instance composed of those four normalizers for ear JSON and
+ *     XML encoder.
  *
  *   - A FHIRSerializationService instance (public, ID: fhir.serialization_service.{version})
  *     wrapping the version-scoped Serializer.
@@ -92,8 +96,8 @@ class FHIRVersionedSerializerPass implements CompilerPassInterface
 
         $igRegistryRef = new Reference(FHIRIGTypeRegistry::class);
 
-        $resourceId = "fhir.normalizer.resource.{$v}";
-        $container->register($resourceId, FHIRResourceNormalizer::class)
+        $resourceJsonId = "fhir.normalizer.resource.json.{$v}";
+        $container->register($resourceJsonId, FHIRResourceJsonNormalizer::class)
             ->setArguments([
                 new Reference(FHIRMetadataExtractorInterface::class),
                 new Reference(FHIRTypeResolverInterface::class),
@@ -104,8 +108,8 @@ class FHIRVersionedSerializerPass implements CompilerPassInterface
             ])
             ->setPublic(false);
 
-        $complexId = "fhir.normalizer.complex_type.{$v}";
-        $container->register($complexId, FHIRComplexTypeNormalizer::class)
+        $resourceXmlId = "fhir.normalizer.resource.xml.{$v}";
+        $container->register($resourceXmlId, FHIRResourceXmlNormalizer::class)
             ->setArguments([
                 new Reference(FHIRMetadataExtractorInterface::class),
                 new Reference(FHIRTypeResolverInterface::class),
@@ -116,8 +120,32 @@ class FHIRVersionedSerializerPass implements CompilerPassInterface
             ])
             ->setPublic(false);
 
-        $primitiveId = "fhir.normalizer.primitive.{$v}";
-        $container->register($primitiveId, FHIRPrimitiveTypeNormalizer::class)
+        $complexJsonId = "fhir.normalizer.complex_type.json.{$v}";
+        $container->register($complexJsonId, FHIRComplexTypeJsonNormalizer::class)
+            ->setArguments([
+                new Reference(FHIRMetadataExtractorInterface::class),
+                new Reference(FHIRTypeResolverInterface::class),
+                null,
+                null,
+                $version->value,
+                $igRegistryRef,
+            ])
+            ->setPublic(false);
+
+        $complexXmlId = "fhir.normalizer.complex_type.xml.{$v}";
+        $container->register($complexXmlId, FHIRComplexTypeXmlNormalizer::class)
+            ->setArguments([
+                new Reference(FHIRMetadataExtractorInterface::class),
+                new Reference(FHIRTypeResolverInterface::class),
+                null,
+                null,
+                $version->value,
+                $igRegistryRef,
+            ])
+            ->setPublic(false);
+
+        $primitiveJsonId = "fhir.normalizer.primitive.json.{$v}";
+        $container->register($primitiveJsonId, FHIRPrimitiveTypeJsonNormalizer::class)
             ->setArguments([
                 new Reference(FHIRMetadataExtractorInterface::class),
                 null,
@@ -127,10 +155,33 @@ class FHIRVersionedSerializerPass implements CompilerPassInterface
             ])
             ->setPublic(false);
 
-        $backboneId = "fhir.normalizer.backbone.{$v}";
-        $container->register($backboneId, FHIRBackboneElementNormalizer::class)
+        $primitiveXmlId = "fhir.normalizer.primitive.xml.{$v}";
+        $container->register($primitiveXmlId, FHIRPrimitiveTypeXmlNormalizer::class)
             ->setArguments([
                 new Reference(FHIRMetadataExtractorInterface::class),
+                null,
+                null,
+                $version->value,
+                $igRegistryRef,
+            ])
+            ->setPublic(false);
+
+        $backboneJsonId = "fhir.normalizer.backbone.json.{$v}";
+        $container->register($backboneJsonId, FHIRBackboneElementJsonNormalizer::class)
+            ->setArguments([
+                new Reference(FHIRMetadataExtractorInterface::class),
+                null,
+                null,
+                $version->value,
+                $igRegistryRef,
+            ])
+            ->setPublic(false);
+
+        $backboneXmlId = "fhir.normalizer.backbone.xml.{$v}";
+        $container->register($backboneXmlId, FHIRBackboneElementXmlNormalizer::class)
+            ->setArguments([
+                new Reference(FHIRMetadataExtractorInterface::class),
+                new Reference(FHIRTypeResolverInterface::class),
                 null,
                 null,
                 $version->value,
@@ -144,10 +195,14 @@ class FHIRVersionedSerializerPass implements CompilerPassInterface
         $container->register($serializerId, Serializer::class)
             ->setArguments([
                 [
-                    new Reference($resourceId),
-                    new Reference($complexId),
-                    new Reference($primitiveId),
-                    new Reference($backboneId),
+                    new Reference($resourceJsonId),
+                    new Reference($resourceXmlId),
+                    new Reference($complexJsonId),
+                    new Reference($complexXmlId),
+                    new Reference($primitiveJsonId),
+                    new Reference($primitiveXmlId),
+                    new Reference($backboneJsonId),
+                    new Reference($backboneXmlId),
                 ],
                 [
                     new Definition(JsonEncoder::class),
@@ -163,6 +218,7 @@ class FHIRVersionedSerializerPass implements CompilerPassInterface
                 new Reference($serializerId),
                 new Reference(FHIRSerializationContextFactory::class),
                 new Reference(FHIRSerializationDebugInfo::class),
+                new Reference(FHIRMetadataExtractorInterface::class),
             ])
             ->setPublic(true);
     }

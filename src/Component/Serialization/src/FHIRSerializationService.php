@@ -4,15 +4,19 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization;
 
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContextFactory;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationDebugInfo;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor;
-use Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRBackboneElementNormalizer;
-use Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRComplexTypeNormalizer;
-use Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRPrimitiveTypeNormalizer;
-use Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRResourceNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRBackboneElementJsonNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRComplexTypeJsonNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRPrimitiveTypeJsonNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Json\FHIRResourceJsonNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRBackboneElementXmlNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRComplexTypeXmlNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRPrimitiveTypeXmlNormalizer;
+use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRResourceXmlNormalizer;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Serializer;
@@ -32,6 +36,7 @@ class FHIRSerializationService
         private readonly SerializerInterface $serializer,
         private readonly FHIRSerializationContextFactory $contextFactory,
         private readonly FHIRSerializationDebugInfo $debugInfo,
+        private readonly FHIRMetadataExtractorInterface $metadataExtractor = new FHIRMetadataExtractor(),
         private readonly FHIRTypeResolverInterface $typeResolver = new FHIRTypeResolver(),
     ) {
     }
@@ -70,15 +75,19 @@ class FHIRSerializationService
         $typeResolver      = new FHIRTypeResolver(igTypeRegistry: $registry);
 
         $normalizers = [
-            new FHIRResourceNormalizer($metadataExtractor, $typeResolver, fhirVersion: $version->value, igTypeRegistry: $registry),
-            new FHIRComplexTypeNormalizer($metadataExtractor, $typeResolver, fhirVersion: $version->value, igTypeRegistry: $registry),
-            new FHIRPrimitiveTypeNormalizer($metadataExtractor, fhirVersion: $version->value, igTypeRegistry: $registry),
-            new FHIRBackboneElementNormalizer($metadataExtractor, fhirVersion: $version->value, igTypeRegistry: $registry),
+            new FHIRResourceJsonNormalizer($metadataExtractor, $typeResolver, fhirVersion: $version->value, igTypeRegistry: $registry),
+            new FHIRResourceXmlNormalizer($metadataExtractor, $typeResolver, fhirVersion: $version->value, igTypeRegistry: $registry),
+            new FHIRComplexTypeJsonNormalizer($metadataExtractor, $typeResolver, fhirVersion: $version->value, igTypeRegistry: $registry),
+            new FHIRComplexTypeXmlNormalizer($metadataExtractor, $typeResolver, fhirVersion: $version->value, igTypeRegistry: $registry),
+            new FHIRPrimitiveTypeJsonNormalizer($metadataExtractor, fhirVersion: $version->value, igTypeRegistry: $registry),
+            new FHIRPrimitiveTypeXmlNormalizer($metadataExtractor, fhirVersion: $version->value, igTypeRegistry: $registry),
+            new FHIRBackboneElementJsonNormalizer($metadataExtractor, fhirVersion: $version->value, igTypeRegistry: $registry),
+            new FHIRBackboneElementXmlNormalizer($metadataExtractor, $typeResolver, fhirVersion: $version->value, igTypeRegistry: $registry),
         ];
 
         $serializer = new Serializer($normalizers, [new JsonEncoder(), new XmlEncoder()]);
 
-        return new self($serializer, new FHIRSerializationContextFactory(), new FHIRSerializationDebugInfo('initial', 'json'));
+        return new self($serializer, new FHIRSerializationContextFactory(), new FHIRSerializationDebugInfo('initial', 'json'), $metadataExtractor);
     }
 
     /**
@@ -126,23 +135,9 @@ class FHIRSerializationService
         }
     }
 
-    /**
-     * Extract the FHIR resource type string from a resource object by reading its FhirResource attribute.
-     */
     private function extractResourceTypeFromObject(object $fhirObject): ?string
     {
-        $reflection = new \ReflectionClass($fhirObject);
-
-        do {
-            $attributes = $reflection->getAttributes(FhirResource::class);
-            if (!empty($attributes)) {
-                return $attributes[0]->newInstance()->getResourceType();
-            }
-
-            $reflection = $reflection->getParentClass();
-        } while ($reflection !== false);
-
-        return null;
+        return $this->metadataExtractor->extractResourceType($fhirObject);
     }
 
     /**
