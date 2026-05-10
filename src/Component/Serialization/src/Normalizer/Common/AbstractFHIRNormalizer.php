@@ -543,8 +543,11 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
             }
 
             $targetClass = $this->baseExtensionClass;
-            if ($this->igTypeRegistry !== null && isset($extension['url']) && is_string($extension['url'])) {
-                $targetClass = $this->igTypeRegistry->resolveExtensionClass($extension['url'], $this->fhirVersion) ?? $this->baseExtensionClass;
+            // XmlEncoder decodes XML attributes with an '@' prefix, so 'url' becomes '@url'.
+            // Check both so JSON and XML resolve typed extensions consistently.
+            $url = $extension['url'] ?? $extension['@url'] ?? null;
+            if ($this->igTypeRegistry !== null && is_string($url)) {
+                $targetClass = $this->igTypeRegistry->resolveExtensionClass($url, $this->fhirVersion) ?? $this->baseExtensionClass;
             }
 
             $denormalizedExtensions[] = $this->denormalizer->denormalize($extension, $targetClass, $format, $context);
