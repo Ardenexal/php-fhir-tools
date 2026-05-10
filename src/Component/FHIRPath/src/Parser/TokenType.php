@@ -85,7 +85,7 @@ enum TokenType: string
             self::AND, self::OR, self::XOR, self::IMPLIES,
             self::AS, self::IS, self::IN, self::CONTAINS,
             self::DIV, self::MOD => true,
-            default => false,
+            default              => false,
         };
     }
 
@@ -99,7 +99,7 @@ enum TokenType: string
             self::GREATER_THAN, self::LESS_THAN, self::GREATER_EQUAL, self::LESS_EQUAL,
             self::PLUS, self::MINUS, self::MULTIPLY, self::DIVIDE,
             self::PIPE, self::AMPERSAND => true,
-            default => false,
+            default                     => false,
         };
     }
 
@@ -111,7 +111,7 @@ enum TokenType: string
         return match ($this) {
             self::STRING, self::NUMBER, self::BOOLEAN, self::NULL,
             self::DATETIME, self::TIME, self::QUANTITY => true,
-            default => false,
+            default                                    => false,
         };
     }
 
@@ -123,7 +123,7 @@ enum TokenType: string
         return match ($this) {
             self::DOT, self::COMMA, self::LPAREN, self::RPAREN,
             self::LBRACKET, self::RBRACKET, self::LBRACE, self::RBRACE => true,
-            default => false,
+            default                                                    => false,
         };
     }
 }

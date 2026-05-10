@@ -254,7 +254,7 @@ class FHIRIGGeneratorCommand extends Command
         // Phase 2 — For each FHIR version, load base types into context and generate
         foreach ($affectedVersions as $fhirVersion) {
             $supported = match ($fhirVersion) {
-                'R4', 'R4B', 'R5' => true,
+                'R4', 'R4B', 'R5'  => true,
                 default            => false,
             };
 
