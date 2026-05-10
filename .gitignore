@@ -9,6 +9,7 @@ Thumbs.db
 # Internal tool configs
 .kiro/
 .claude/
+.goat-flow/
 
 ###> symfony/framework-bundle ###
 /config/secrets/prod/prod.decrypt.private.php

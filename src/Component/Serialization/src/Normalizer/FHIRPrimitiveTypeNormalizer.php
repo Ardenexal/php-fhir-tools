@@ -385,15 +385,15 @@ class FHIRPrimitiveTypeNormalizer extends AbstractFHIRNormalizer
         return match ($primitiveType) {
             'string', 'code', 'uri', 'url', 'canonical', 'base64Binary',
             'oid', 'id', 'uuid',
-            'markdown', 'xhtml' => $this->validateString($value),
-            'date'     => $this->parseTemporalValue($value, FHIRDate::class),
-            'time'     => $this->parseTemporalValue($value, FHIRTime::class),
-            'dateTime' => $this->parseTemporalValue($value, FHIRDateTime::class),
-            'instant'  => $this->parseTemporalValue($value, FHIRInstant::class),
+            'markdown', 'xhtml'                     => $this->validateString($value),
+            'date'                                  => $this->parseTemporalValue($value, FHIRDate::class),
+            'time'                                  => $this->parseTemporalValue($value, FHIRTime::class),
+            'dateTime'                              => $this->parseTemporalValue($value, FHIRDateTime::class),
+            'instant'                               => $this->parseTemporalValue($value, FHIRInstant::class),
             'integer', 'positiveInt', 'unsignedInt' => $this->validateInteger($value),
-            'decimal' => $this->validateDecimal($value),
-            'boolean' => $this->validateBoolean($value),
-            default   => $value, // Unknown type, return as-is
+            'decimal'                               => $this->validateDecimal($value),
+            'boolean'                               => $this->validateBoolean($value),
+            default                                 => $value, // Unknown type, return as-is
         };
     }
 

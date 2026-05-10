@@ -295,19 +295,19 @@ final class FHIRPathSpecificationTest extends TestCase
     private function castOutputValue(string $value, string $type): mixed
     {
         return match ($type) {
-            'boolean'          => $value === 'true',
-            'integer'          => (int) $value,
-            'decimal'          => (float) $value,
-            'string'           => $value,
-            'code'             => $value,
-            'id'               => $value,
-            'uri'              => $value,
-            'url'              => $value,
-            'canonical'        => $value,
-            'uuid'             => $value,
-            'oid'              => $value,
+            'boolean'                  => $value === 'true',
+            'integer'                  => (int) $value,
+            'decimal'                  => (float) $value,
+            'string'                   => $value,
+            'code'                     => $value,
+            'id'                       => $value,
+            'uri'                      => $value,
+            'url'                      => $value,
+            'canonical'                => $value,
+            'uuid'                     => $value,
+            'oid'                      => $value,
             'date', 'dateTime', 'time' => ltrim($value, '@'), // strip FHIRPath date/time literal prefix
-            default            => $this->markTestSkipped("Unsupported output type: {$type}"),
+            default                    => $this->markTestSkipped("Unsupported output type: {$type}"),
         };
     }
 }
