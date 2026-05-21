@@ -1,0 +1,42 @@
+{
+    "name": "ardenexal/fhir-validation",
+    "description": "Symfony Validator constraint attributes and validation services for FHIR model classes",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "FHIR Tools Contributors",
+            "email": "contributors@fhirtools.dev"
+        }
+    ],
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=8.2",
+        "symfony/validator": "^6.4|^7.4",
+        "ardenexal/fhir-metadata": "^0.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ardenexal\\FHIRTools\\Component\\Validation\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ardenexal\\FHIRTools\\Component\\Validation\\Tests\\": "tests/"
+        }
+    },
+    "keywords": [
+        "fhir",
+        "healthcare",
+        "hl7",
+        "validation",
+        "symfony",
+        "constraints"
+    ],
+    "homepage": "https://github.com/ardenexal/fhir-tools",
+    "support": {
+        "issues": "https://github.com/ardenexal/fhir-tools/issues",
+        "source": "https://github.com/ardenexal/fhir-tools"
+    }
+}

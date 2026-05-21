@@ -81,7 +81,8 @@
             "Ardenexal\\FHIRTools\\Component\\Serialization\\": "src/Component/Serialization/src/",
             "Ardenexal\\FHIRTools\\Component\\Models\\": "src/Component/Models/src/",
             "Ardenexal\\FHIRTools\\Component\\Metadata\\": "src/Component/Metadata/src/",
-            "Ardenexal\\FHIRTools\\Component\\FHIRPath\\": "src/Component/FHIRPath/src/"
+            "Ardenexal\\FHIRTools\\Component\\FHIRPath\\": "src/Component/FHIRPath/src/",
+            "Ardenexal\\FHIRTools\\Component\\Validation\\": "src/Component/Validation/src/"
         }
     },
     "autoload-dev": {
@@ -90,6 +91,7 @@
             "Ardenexal\\FHIRTools\\Bundle\\FHIRBundle\\Tests\\": "src/Bundle/FHIRBundle/tests/",
             "Ardenexal\\FHIRTools\\Component\\FHIRPath\\Tests\\": "src/Component/FHIRPath/tests/",
             "Ardenexal\\FHIRTools\\Component\\Serialization\\Tests\\": "src/Component/Serialization/tests/",
+            "Ardenexal\\FHIRTools\\Component\\Validation\\Tests\\": "src/Component/Validation/tests/",
             "Ardenexal\\FHIRTools\\Benchmarks\\": "bench/",
             "App\\Mate\\": "mate/src/"
         }
@@ -110,17 +112,20 @@
         "phpstan:codegen": "php ./vendor/bin/phpstan.phar analyse src/Component/CodeGeneration/ --configuration=phpstan.neon --memory-limit=-1 -v",
         "phpstan:serialization": "php ./vendor/bin/phpstan.phar analyse src/Component/Serialization/ --configuration=phpstan.neon --memory-limit=-1 -v",
         "phpstan:fhir-path": "php ./vendor/bin/phpstan.phar analyse src/Component/FHIRPath/ --configuration=phpstan.neon --memory-limit=-1 -v",
+        "phpstan:validation": "php ./vendor/bin/phpstan.phar analyse src/Component/Validation/ --configuration=phpstan.neon --memory-limit=-1 -v",
         "phpstan-ai": "php scripts/ai-phpstan-runner.php",
         "phpstan-ai:bundle": "php scripts/ai-phpstan-runner.php src/Bundle/",
         "phpstan-ai:codegen": "php scripts/ai-phpstan-runner.php src/Component/CodeGeneration/",
         "phpstan-ai:serialization": "php scripts/ai-phpstan-runner.php src/Component/Serialization/",
         "phpstan-ai:fhir-path": "php scripts/ai-phpstan-runner.php src/Component/FHIRPath/",
+        "phpstan-ai:validation": "php scripts/ai-phpstan-runner.php src/Component/Validation/",
         "lint": "php ./vendor/bin/pint -v --parallel --max-processes=4",
         "lint:bundle": "php ./vendor/bin/pint src/Bundle/ -v --parallel --max-processes=4",
         "lint:models": "php ./vendor/bin/pint src/Component/Models -v",
         "lint:codegen": "php ./vendor/bin/pint src/Component/CodeGeneration/ -v --parallel --max-processes=4",
         "lint:serialization": "php ./vendor/bin/pint src/Component/Serialization/ -v --parallel --max-processes=4",
         "lint:fhir-path": "php ./vendor/bin/pint src/Component/FHIRPath/ -v --parallel --max-processes=4",
+        "lint:validation": "php ./vendor/bin/pint src/Component/Validation/ -v --parallel --max-processes=4",
         "test-ai": "php scripts/ai-test-runner.php",
         "test-ai-unit": "php scripts/ai-test-runner.php --testsuite=unit",
         "test-ai-integration": "php scripts/ai-test-runner.php --testsuite=integration",
@@ -135,11 +140,13 @@
         "test:codegen": "php ./vendor/phpunit/phpunit/phpunit src/Component/CodeGeneration/tests/ --no-coverage",
         "test:serialization": "php ./vendor/phpunit/phpunit/phpunit src/Component/Serialization/tests/ --no-coverage",
         "test:fhir-path": "php ./vendor/phpunit/phpunit/phpunit src/Component/FHIRPath/tests/ --no-coverage",
+        "test:validation": "php ./vendor/phpunit/phpunit/phpunit src/Component/Validation/tests/ --no-coverage",
         "test:components": [
             "@test:bundle",
             "@test:codegen",
             "@test:serialization",
-            "@test:fhir-path"
+            "@test:fhir-path",
+            "@test:validation"
         ],
         "quality:all": [
             "@lint",
@@ -166,11 +173,17 @@
             "@phpstan:fhir-path",
             "@test:fhir-path"
         ],
+        "quality:validation": [
+            "@lint:validation",
+            "@phpstan:validation",
+            "@test:validation"
+        ],
         "quality:components": [
             "@quality:bundle",
             "@quality:codegen",
             "@quality:serialization",
-            "@quality:fhir-path"
+            "@quality:fhir-path",
+            "@quality:validation"
         ],
         "generate-ig-au-base": "php ./demo/bin/console fhir:generate-ig --package=hl7.fhir.au.base -vvv",
         "generate-ig-au-core": "php ./demo/bin/console fhir:generate-ig --package=hl7.fhir.au.base --package=hl7.fhir.au.core -vvv",

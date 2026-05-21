@@ -26,6 +26,7 @@
             <directory>src/Component/Metadata/tests/Unit</directory>
             <directory>src/Component/Serialization/tests/Unit</directory>
             <directory>src/Component/FHIRPath/tests/Unit</directory>
+ho            <directory>src/Component/Validation/tests/Unit</directory>
         </testsuite>
         <testsuite name="integration">
             <directory>tests/Integration</directory>
