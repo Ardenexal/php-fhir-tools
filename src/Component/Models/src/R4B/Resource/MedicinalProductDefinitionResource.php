@@ -11,7 +11,6 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableReference;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\MarketingStatus;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
@@ -24,6 +23,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicinalProductDefinition
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicinalProductDefinition\MedicinalProductDefinitionCrossReference;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicinalProductDefinition\MedicinalProductDefinitionName;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicinalProductDefinition\MedicinalProductDefinitionOperation;
+use Symfony\Component\Validator\Constraints\Count;
 
 /**
  * @author Health Level Seven International (Biomedical Research and Regulation)
@@ -135,7 +135,7 @@ class MedicinalProductDefinitionResource extends DomainResourceResource
             fhirType: 'MarketingStatus',
             propertyKind: 'complex',
             isArray: true,
-            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\MarketingStatus',
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MarketingStatus',
         )]
         public array $marketingStatus = [],
         /** @var array<CodeableConcept> packagedMedicinalProduct Package type for the product */
@@ -210,6 +210,7 @@ class MedicinalProductDefinitionResource extends DomainResourceResource
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicinalProductDefinition\MedicinalProductDefinitionName',
         )]
+        #[Count(min: 1)]
         public array $name = [],
         /** @var array<MedicinalProductDefinitionCrossReference> crossReference Reference to another product, e.g. for linking authorised to investigational product */
         #[FhirProperty(

@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\ConceptMap;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\ConceptMapGroupUnmappedModeType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -18,6 +20,18 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description What to do when there is no mapping for the source concept. "Unmapped" does not include codes that are unmatched, and the unmapped element is ignored in a code is specified to have equivalence = unmatched.
  */
 #[FHIRBackboneElement(parentResource: 'ConceptMap', elementPath: 'ConceptMap.group.unmapped', fhirVersion: 'R4')]
+#[FHIRPathInvariant(
+    key: 'cmd-2',
+    severity: 'error',
+    expression: '(mode = \'fixed\') implies code.exists()',
+    human: 'If the mode is \'fixed\', a code must be provided',
+)]
+#[FHIRPathInvariant(
+    key: 'cmd-3',
+    severity: 'error',
+    expression: '(mode = \'other-map\') implies url.exists()',
+    human: 'If the mode is \'other-map\', a url must be provided',
+)]
 class ConceptMapGroupUnmapped extends BackboneElement
 {
     public function __construct(
@@ -31,7 +45,7 @@ class ConceptMapGroupUnmapped extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
         /** @var ConceptMapGroupUnmappedModeType|null mode provided | fixed | other-map */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/conceptmap-unmapped-mode|4.0.1', strength: 'required')]
         public ?ConceptMapGroupUnmappedModeType $mode = null,
         /** @var CodePrimitive|null code Fixed code when mode = fixed */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]

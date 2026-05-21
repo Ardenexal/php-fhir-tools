@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\Procedure;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -17,6 +18,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description Indicates who or what performed the procedure and how they were involved.
  */
 #[FHIRBackboneElement(parentResource: 'Procedure', elementPath: 'Procedure.performer', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'prc-1',
+    severity: 'error',
+    expression: 'onBehalfOf.exists() and actor.resolve().exists() implies actor.resolve().where($this is Practitioner or $this is PractitionerRole).empty()',
+    human: 'Procedure.performer.onBehalfOf can only be populated when performer.actor isn\'t Practitioner or PractitionerRole',
+)]
 class ProcedurePerformer extends BackboneElement
 {
     public function __construct(

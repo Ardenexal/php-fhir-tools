@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
  *
  * @see http://hl7.org/fhir/StructureDefinition/synchronicity-control
  *
- * @description Indicates that an operation or interaction must always be handled as synchronous or asynchronous, or that the server must or does provide both, and clients can choose
+ * @description Indicates that an operation or interaction must always be handled as synchronous or asynchronous, or that the server must or does provide both, and clients can choose. In R6, use OperationDefinition.synchronicity
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/synchronicity-control', fhirVersion: 'R5')]
 class OperationSynchronicityControlExtension extends Extension

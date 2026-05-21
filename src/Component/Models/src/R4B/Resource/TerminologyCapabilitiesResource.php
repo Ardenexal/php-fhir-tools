@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CapabilityStatementKindType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeSearchSupportType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
@@ -40,6 +42,36 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     version: '4.3.0',
     url: 'http://hl7.org/fhir/StructureDefinition/TerminologyCapabilities',
     fhirVersion: 'R4B',
+)]
+#[FHIRPathInvariant(
+    key: 'tcp-0',
+    severity: 'warning',
+    expression: 'name.exists() implies name.matches(\'[A-Z]([A-Za-z0-9_]){0,254}\')',
+    human: 'Name should be usable as an identifier for the module by machine processing applications such as code generation',
+)]
+#[FHIRPathInvariant(
+    key: 'tcp-2',
+    severity: 'error',
+    expression: '(description.count() + software.count() + implementation.count()) > 0',
+    human: 'A Capability Statement SHALL have at least one of description, software, or implementation element.',
+)]
+#[FHIRPathInvariant(
+    key: 'tcp-3',
+    severity: 'error',
+    expression: '(kind != \'instance\') or implementation.exists()',
+    human: 'If kind = instance, implementation must be present and software may be present',
+)]
+#[FHIRPathInvariant(
+    key: 'tcp-4',
+    severity: 'error',
+    expression: '(kind != \'capability\') or (implementation.exists().not() and software.exists())',
+    human: 'If kind = capability, implementation must be absent, software must be present',
+)]
+#[FHIRPathInvariant(
+    key: 'tcp-5',
+    severity: 'error',
+    expression: '(kind!=\'requirements\') or (implementation.exists().not() and software.exists().not())',
+    human: 'If kind = requirements, implementation and software must be absent',
 )]
 class TerminologyCapabilitiesResource extends DomainResourceResource
 {
@@ -81,7 +113,7 @@ class TerminologyCapabilitiesResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $title = null,
         /** @var PublicationStatusType|null status draft | active | retired | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|4.3.0', strength: 'required')]
         public ?PublicationStatusType $status = null,
         /** @var bool|null experimental For testing purposes, not real usage */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
@@ -126,7 +158,7 @@ class TerminologyCapabilitiesResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $copyright = null,
         /** @var CapabilityStatementKindType|null kind instance | capability | requirements */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/capability-statement-kind|4.3.0', strength: 'required')]
         public ?CapabilityStatementKindType $kind = null,
         /** @var TerminologyCapabilitiesSoftware|null software Software that is covered by this terminology capability statement */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
@@ -149,7 +181,7 @@ class TerminologyCapabilitiesResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
         public ?TerminologyCapabilitiesExpansion $expansion = null,
         /** @var CodeSearchSupportType|null codeSearch explicit | all */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/code-search-support|4.3.0', strength: 'required')]
         public ?CodeSearchSupportType $codeSearch = null,
         /** @var TerminologyCapabilitiesValidateCode|null validateCode Information about the [ValueSet/$validate-code](valueset-operation-validate-code.html) operation */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]

@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\ContactDetail;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
@@ -37,6 +39,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     version: '4.3.0',
     url: 'http://hl7.org/fhir/StructureDefinition/OperationDefinition',
     fhirVersion: 'R4B',
+)]
+#[FHIRPathInvariant(
+    key: 'opd-0',
+    severity: 'warning',
+    expression: 'name.exists() implies name.matches(\'[A-Z]([A-Za-z0-9_]){0,254}\')',
+    human: 'Name should be usable as an identifier for the module by machine processing applications such as code generation',
 )]
 class OperationDefinitionResource extends DomainResourceResource
 {
@@ -78,10 +86,10 @@ class OperationDefinitionResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $title = null,
         /** @var PublicationStatusType|null status draft | active | retired | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|4.3.0', strength: 'required')]
         public ?PublicationStatusType $status = null,
         /** @var OperationKindType|null kind operation | query */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/operation-kind|4.3.0', strength: 'required')]
         public ?OperationKindType $kind = null,
         /** @var bool|null experimental For testing purposes, not real usage */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
@@ -135,7 +143,7 @@ class OperationDefinitionResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
         public ?CanonicalPrimitive $base = null,
         /** @var array<ResourceTypeType> resource Types this operation applies to */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/resource-types|4.3.0', strength: 'required')]
         public array $resource = [],
         /** @var bool|null system Invoke at the system level? */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotBlank]

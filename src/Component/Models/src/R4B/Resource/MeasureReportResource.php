@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier;
@@ -33,6 +35,18 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     version: '4.3.0',
     url: 'http://hl7.org/fhir/StructureDefinition/MeasureReport',
     fhirVersion: 'R4B',
+)]
+#[FHIRPathInvariant(
+    key: 'mrp-1',
+    severity: 'error',
+    expression: '(type != \'data-collection\') or group.exists().not()',
+    human: 'Measure Reports used for data collection SHALL NOT communicate group and score information',
+)]
+#[FHIRPathInvariant(
+    key: 'mrp-2',
+    severity: 'error',
+    expression: 'group.stratifier.stratum.all(value.exists() xor component.exists())',
+    human: 'Stratifiers SHALL be either a single criteria or a set of criteria components',
 )]
 class MeasureReportResource extends DomainResourceResource
 {
@@ -70,10 +84,10 @@ class MeasureReportResource extends DomainResourceResource
         )]
         public array $identifier = [],
         /** @var MeasureReportStatusType|null status complete | pending | error */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/measure-report-status|4.3.0', strength: 'required')]
         public ?MeasureReportStatusType $status = null,
         /** @var MeasureReportTypeType|null type individual | subject-list | summary | data-collection */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/measure-report-type|4.3.0', strength: 'required')]
         public ?MeasureReportTypeType $type = null,
         /** @var CanonicalPrimitive|null measure What measure was calculated */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isRequired: true), NotBlank]
@@ -91,7 +105,7 @@ class MeasureReportResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Period', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?Period $period = null,
         /** @var CodeableConcept|null improvementNotation increase | decrease */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/measure-improvement-notation|4.3.0', strength: 'required')]
         public ?CodeableConcept $improvementNotation = null,
         /** @var array<MeasureReportGroup> group Measure results for each group */
         #[FhirProperty(

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 
@@ -17,6 +18,12 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
  * @description A reference from one resource to another.
  */
 #[FHIRComplexType(typeName: 'Reference', fhirVersion: 'R4')]
+#[FHIRPathInvariant(
+    key: 'ref-1',
+    severity: 'error',
+    expression: 'reference.startsWith(\'#\').not() or (reference.substring(1).trace(\'url\') in %rootResource.contained.id.trace(\'ids\'))',
+    human: 'SHALL have a contained resource if a local reference is provided',
+)]
 class Reference extends Element
 {
     public function __construct(

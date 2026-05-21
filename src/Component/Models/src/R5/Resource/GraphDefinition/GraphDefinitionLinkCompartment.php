@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\GraphDefinition;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CompartmentTypeType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -31,13 +32,13 @@ class GraphDefinitionLinkCompartment extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
         /** @var GraphCompartmentUseType|null use where | requires */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/graph-compartment-use|5.0.0', strength: 'required')]
         public ?GraphCompartmentUseType $use = null,
         /** @var GraphCompartmentRuleType|null rule identical | matching | different | custom */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/graph-compartment-rule|5.0.0', strength: 'required')]
         public ?GraphCompartmentRuleType $rule = null,
         /** @var CompartmentTypeType|null code Patient | Encounter | RelatedPerson | Practitioner | Device | EpisodeOfCare */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/compartment-type|5.0.0', strength: 'required')]
         public ?CompartmentTypeType $code = null,
         /** @var StringPrimitive|string|null expression Custom rule, as a FHIRPath expression */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

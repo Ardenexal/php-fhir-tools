@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\Condition;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -15,6 +16,12 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
  * @description Clinical stage or grade of a condition. May include formal severity assessments.
  */
 #[FHIRBackboneElement(parentResource: 'Condition', elementPath: 'Condition.stage', fhirVersion: 'R4')]
+#[FHIRPathInvariant(
+    key: 'con-1',
+    severity: 'error',
+    expression: 'summary.exists() or assessment.exists()',
+    human: 'Stage SHALL have summary or assessment',
+)]
 class ConditionStage extends BackboneElement
 {
     public function __construct(

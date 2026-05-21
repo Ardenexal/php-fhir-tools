@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\StructureDefinition;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IdPrimitive;
@@ -17,6 +18,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description An external specification that the content is mapped to.
  */
 #[FHIRBackboneElement(parentResource: 'StructureDefinition', elementPath: 'StructureDefinition.mapping', fhirVersion: 'R4')]
+#[FHIRPathInvariant(
+    key: 'sdf-2',
+    severity: 'error',
+    expression: 'name.exists() or uri.exists()',
+    human: 'Must have at least a name or a uri (or both)',
+)]
 class StructureDefinitionMapping extends BackboneElement
 {
     public function __construct(

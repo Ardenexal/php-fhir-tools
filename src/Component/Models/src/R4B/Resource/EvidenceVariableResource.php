@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CharacteristicCombinationType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\ContactDetail;
@@ -37,6 +39,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     version: '4.3.0',
     url: 'http://hl7.org/fhir/StructureDefinition/EvidenceVariable',
     fhirVersion: 'R4B',
+)]
+#[FHIRPathInvariant(
+    key: 'cnl-0',
+    severity: 'warning',
+    expression: 'name.exists() implies name.matches(\'[A-Z]([A-Za-z0-9_]){0,254}\')',
+    human: 'Name should be usable as an identifier for the module by machine processing applications such as code generation',
 )]
 class EvidenceVariableResource extends DomainResourceResource
 {
@@ -92,7 +100,7 @@ class EvidenceVariableResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $subtitle = null,
         /** @var PublicationStatusType|null status draft | active | retired | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|4.3.0', strength: 'required')]
         public ?PublicationStatusType $status = null,
         /** @var DateTimePrimitive|null date Date last changed */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
@@ -171,7 +179,7 @@ class EvidenceVariableResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $actual = null,
         /** @var CharacteristicCombinationType|null characteristicCombination intersection | union */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/characteristic-combination|4.3.0', strength: 'required')]
         public ?CharacteristicCombinationType $characteristicCombination = null,
         /** @var array<EvidenceVariableCharacteristic> characteristic What defines the members of the evidence element */
         #[FhirProperty(
@@ -182,7 +190,7 @@ class EvidenceVariableResource extends DomainResourceResource
         )]
         public array $characteristic = [],
         /** @var EvidenceVariableHandlingType|null handling continuous | dichotomous | ordinal | polychotomous */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/variable-handling|4.3.0', strength: 'required')]
         public ?EvidenceVariableHandlingType $handling = null,
         /** @var array<EvidenceVariableCategory> category A grouping for ordinal or polychotomous variables */
         #[FhirProperty(

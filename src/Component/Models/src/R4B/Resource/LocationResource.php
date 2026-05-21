@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Address;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding;
@@ -66,7 +67,7 @@ class LocationResource extends DomainResourceResource
         )]
         public array $identifier = [],
         /** @var LocationStatusType|null status active | suspended | inactive */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/location-status|4.3.0', strength: 'required')]
         public ?LocationStatusType $status = null,
         /** @var Coding|null operationalStatus The operational status of the location (typically only for a bed/room) */
         #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
@@ -81,7 +82,7 @@ class LocationResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $description = null,
         /** @var LocationModeType|null mode instance | kind */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/location-mode|4.3.0', strength: 'required')]
         public ?LocationModeType $mode = null,
         /** @var array<CodeableConcept> type Type of function performed */
         #[FhirProperty(

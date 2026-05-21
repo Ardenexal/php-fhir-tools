@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
  *
  * @see http://hl7.org/fhir/StructureDefinition/endpoint-fhir-version
  *
- * @description The Patient Access Endpoint's FHIR Version. This Extension is a denormalization to help clients focus on supported endpoints.
+ * @description The Endpoint's FHIR Version. This Extension is a denormalization to help clients focus on supported endpoints.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/endpoint-fhir-version', fhirVersion: 'R5')]
 class EndpointFhirVersionExtension extends Extension

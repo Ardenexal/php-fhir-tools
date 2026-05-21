@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Metadata\Traits\FHIRExtensionsTrait;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -26,6 +28,36 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
     url: 'http://hl7.org/fhir/StructureDefinition/DomainResource',
     fhirVersion: 'R5',
 )]
+#[FHIRPathInvariant(
+    key: 'dom-2',
+    severity: 'error',
+    expression: 'contained.contained.empty()',
+    human: 'If the resource is contained in another resource, it SHALL NOT contain nested Resources',
+)]
+#[FHIRPathInvariant(
+    key: 'dom-3',
+    severity: 'error',
+    expression: 'contained.where(((\'#\'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = \'#\').exists() or descendants().where(ofType(canonical) = \'#\').exists() or descendants().where(ofType(canonical) = \'#\').exists()).not()).trace(\'unmatched\', id).empty()',
+    human: 'If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource',
+)]
+#[FHIRPathInvariant(
+    key: 'dom-4',
+    severity: 'error',
+    expression: 'contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()',
+    human: 'If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated',
+)]
+#[FHIRPathInvariant(
+    key: 'dom-5',
+    severity: 'error',
+    expression: 'contained.meta.security.empty()',
+    human: 'If a resource is contained in another resource, it SHALL NOT have a security label',
+)]
+#[FHIRPathInvariant(
+    key: 'dom-6',
+    severity: 'warning',
+    expression: 'text.`div`.exists()',
+    human: 'A resource should have narrative for robust management',
+)]
 abstract class DomainResourceResource extends ResourceResource
 {
     use FHIRExtensionsTrait;
@@ -41,7 +73,7 @@ abstract class DomainResourceResource extends ResourceResource
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]

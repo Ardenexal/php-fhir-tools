@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\Composition;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -17,6 +18,18 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  * @description The root of the sections that make up the composition.
  */
 #[FHIRBackboneElement(parentResource: 'Composition', elementPath: 'Composition.section', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'cmp-1',
+    severity: 'error',
+    expression: 'text.exists() or entry.exists() or section.exists()',
+    human: 'A section must contain at least one of text, entries, or sub-sections',
+)]
+#[FHIRPathInvariant(
+    key: 'cmp-2',
+    severity: 'error',
+    expression: 'emptyReason.empty() or entry.empty()',
+    human: 'A section can only have an emptyReason if it is empty',
+)]
 class CompositionSection extends BackboneElement
 {
     public function __construct(

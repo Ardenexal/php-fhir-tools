@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CompositionStatusType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -21,6 +22,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\Composition\CompositionAtte
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\Composition\CompositionEvent;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\Composition\CompositionRelatesTo;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\Composition\CompositionSection;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -62,7 +64,7 @@ class CompositionResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
         public ?Identifier $identifier = null,
         /** @var CompositionStatusType|null status preliminary | final | amended | entered-in-error */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/composition-status|4.0.1', strength: 'required')]
         public ?CompositionStatusType $status = null,
         /** @var CodeableConcept|null type Kind of composition (LOINC if possible) */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
@@ -92,12 +94,13 @@ class CompositionResource extends DomainResourceResource
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[Count(min: 1)]
         public array $author = [],
         /** @var StringPrimitive|string|null title Human Readable name/title */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $title = null,
         /** @var V3ConfidentialityClassificationType|null confidentiality As defined by affinity domain */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/v3-ConfidentialityClassification|2014-03-26', strength: 'required')]
         public ?V3ConfidentialityClassificationType $confidentiality = null,
         /** @var array<CompositionAttester> attester Attests to accuracy of composition */
         #[FhirProperty(

@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  *
  * @see http://hl7.org/fhir/StructureDefinition/codesystem-keyWord
  *
- * @description Word or words used in an information retrieval system to indicate the content of the code system.
+ * @description Word or words used in an information retrieval system to indicate the content of the code system. From R5, use CodeSystem.topic
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/codesystem-keyWord', fhirVersion: 'R5')]
 class CSKeyWordExtension extends Extension

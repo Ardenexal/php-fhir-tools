@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\ExampleScenario;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -17,6 +18,18 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description The step represents a single operation invoked on receiver by sender.
  */
 #[FHIRBackboneElement(parentResource: 'ExampleScenario', elementPath: 'ExampleScenario.process.step.operation', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'exs-17',
+    severity: 'error',
+    expression: 'initiator.exists() implies initiator = \'OTHER\' or %resource.actor.where(key=%context.initiator).exists()',
+    human: 'If specified, initiator must be a key of an actor within the ExampleScenario',
+)]
+#[FHIRPathInvariant(
+    key: 'exs-18',
+    severity: 'error',
+    expression: 'receiver.exists() implies receiver = \'OTHER\' or %resource.actor.where(key=%context.receiver).exists()',
+    human: 'If specified, receiver must be a key of an actor within the ExampleScenario',
+)]
 class ExampleScenarioProcessStepOperation extends BackboneElement
 {
     public function __construct(

@@ -8,6 +8,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Symfony\Component\Validator\Constraints\Count;
 
 /**
  * @description The results of the series of operations required to clean up after all the tests were executed (successfully or otherwise).
@@ -33,6 +34,7 @@ class TestReportTeardown extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\TestReport\TestReportTeardownAction',
         )]
+        #[Count(min: 1)]
         public array $action = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

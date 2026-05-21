@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive;
  *
  * @see http://hl7.org/fhir/StructureDefinition/patient-contactPriority
  *
- * @description The order in which contacts for a patient should be used.  For example, if a patient has multiple people listed as an emergency contact, which of those should be called first in an emergency.
+ * @description The order in which contacts would be used for the purpose of the contact.  For example, if a patient has multiple people listed as an emergency contact, which of those should be called first in an emergency. Or an Organization might have multiple contacts, one for press inquiries and two for patient inquires (one for scheduling, and one for billing questions).  All three of those contacts may have a rank=1, since they all have different purposes.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-contactPriority', fhirVersion: 'R4')]
 class PatContactPriorityExtension extends Extension

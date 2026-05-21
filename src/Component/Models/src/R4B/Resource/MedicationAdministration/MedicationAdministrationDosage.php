@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicationAdministra
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
@@ -17,6 +18,12 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  * @description Describes the medication dosage information details e.g. dose, rate, site, route, etc.
  */
 #[FHIRBackboneElement(parentResource: 'MedicationAdministration', elementPath: 'MedicationAdministration.dosage', fhirVersion: 'R4B')]
+#[FHIRPathInvariant(
+    key: 'mad-1',
+    severity: 'error',
+    expression: 'dose.exists() or rate.exists()',
+    human: 'SHALL have at least one of dosage.dose or dosage.rate[x]',
+)]
 class MedicationAdministrationDosage extends BackboneElement
 {
     public function __construct(

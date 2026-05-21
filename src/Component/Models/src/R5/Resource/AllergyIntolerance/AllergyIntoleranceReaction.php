@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\AllergyIntolerance;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllergyIntoleranceSeverityType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
@@ -14,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Count;
 
 /**
  * @description Details about each adverse reaction event linked to exposure to the identified substance.
@@ -42,6 +44,7 @@ class AllergyIntoleranceReaction extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
         )]
+        #[Count(min: 1)]
         public array $manifestation = [],
         /** @var StringPrimitive|string|null description Description of the event as a whole */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -50,7 +53,7 @@ class AllergyIntoleranceReaction extends BackboneElement
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $onset = null,
         /** @var AllergyIntoleranceSeverityType|null severity mild | moderate | severe (of event as a whole) */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/reaction-event-severity|5.0.0', strength: 'required')]
         public ?AllergyIntoleranceSeverityType $severity = null,
         /** @var CodeableConcept|null exposureRoute How the subject was exposed to the substance */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]

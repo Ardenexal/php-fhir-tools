@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\Condition;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -15,6 +16,12 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
  * @description Supporting evidence / manifestations that are the basis of the Condition's verification status, such as evidence that confirmed or refuted the condition.
  */
 #[FHIRBackboneElement(parentResource: 'Condition', elementPath: 'Condition.evidence', fhirVersion: 'R4')]
+#[FHIRPathInvariant(
+    key: 'con-2',
+    severity: 'error',
+    expression: 'code.exists() or detail.exists()',
+    human: 'evidence SHALL have code or details',
+)]
 class ConditionEvidence extends BackboneElement
 {
     public function __construct(

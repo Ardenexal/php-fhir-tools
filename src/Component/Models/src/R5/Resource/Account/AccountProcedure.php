@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\Account;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference;
@@ -19,6 +20,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description When using an account for billing a specific Encounter the set of procedures that are relevant for billing are stored here on the account where they are able to be sequenced appropriately prior to processing to produce claim(s).
  */
 #[FHIRBackboneElement(parentResource: 'Account', elementPath: 'Account.procedure', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'act-2',
+    severity: 'error',
+    expression: 'code.reference.empty().not() implies dateOfService.empty()',
+    human: 'The dateOfService is not valid when using a reference to a procedure',
+)]
 class AccountProcedure extends BackboneElement
 {
     public function __construct(

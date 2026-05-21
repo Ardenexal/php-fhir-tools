@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\RequestOrchestration;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\DataRequirement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -15,6 +16,12 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  * @description Defines the outputs of the action, if any.
  */
 #[FHIRBackboneElement(parentResource: 'RequestOrchestration', elementPath: 'RequestOrchestration.action.output', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'pld-1',
+    severity: 'error',
+    expression: 'requirement.exists() xor relatedData.exists()',
+    human: 'Output data element must have a requirement or a relatedData, but not both',
+)]
 class RequestOrchestrationActionOutput extends BackboneElement
 {
     public function __construct(

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 
@@ -13,6 +14,12 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  * @description Code filters specify additional constraints on the data, specifying the value set of interest for a particular element of the data. Each code filter defines an additional constraint on the data, i.e. code filters are AND'ed, not OR'ed.
  */
 #[FHIRComplexType(typeName: 'DataRequirement.codeFilter', fhirVersion: 'R4B')]
+#[FHIRPathInvariant(
+    key: 'drq-1',
+    severity: 'error',
+    expression: 'path.exists() xor searchParam.exists()',
+    human: 'Either a path or a searchParam must be provided, but not both',
+)]
 class DataRequirementCodeFilter extends Element
 {
     public function __construct(

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\Encounter;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\EncounterLocationStatusType;
@@ -34,7 +35,7 @@ class EncounterLocation extends BackboneElement
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?Reference $location = null,
         /** @var EncounterLocationStatusType|null status planned | active | reserved | completed */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/encounter-location-status|4.3.0', strength: 'required')]
         public ?EncounterLocationStatusType $status = null,
         /** @var CodeableConcept|null physicalType The physical type of the location (usually the level in the location hierachy - bed room ward etc.) */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]

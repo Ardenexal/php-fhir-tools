@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference;
@@ -24,6 +26,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\DocumentReference\DocumentReferenceAttester;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\DocumentReference\DocumentReferenceContent;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\DocumentReference\DocumentReferenceRelatesTo;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -39,6 +42,18 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     url: 'http://hl7.org/fhir/StructureDefinition/DocumentReference',
     fhirVersion: 'R5',
 )]
+#[FHIRPathInvariant(
+    key: 'docRef-1',
+    severity: 'warning',
+    expression: 'facilityType.empty() or context.where(resolve() is Encounter).empty()',
+    human: 'facilityType SHALL only be present if context is not an encounter',
+)]
+#[FHIRPathInvariant(
+    key: 'docRef-2',
+    severity: 'warning',
+    expression: 'practiceSetting.empty() or context.where(resolve() is Encounter).empty()',
+    human: 'practiceSetting SHALL only be present if context is not present',
+)]
 class DocumentReferenceResource extends DomainResourceResource
 {
     public function __construct(
@@ -52,7 +67,7 @@ class DocumentReferenceResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -86,10 +101,10 @@ class DocumentReferenceResource extends DomainResourceResource
         )]
         public array $basedOn = [],
         /** @var DocumentReferenceStatusType|null status current | superseded | entered-in-error */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/document-reference-status|5.0.0', strength: 'required')]
         public ?DocumentReferenceStatusType $status = null,
         /** @var CompositionStatusType|null docStatus registered | partial | preliminary | final | amended | corrected | appended | cancelled | entered-in-error | deprecated | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/composition-status|5.0.0', strength: 'required')]
         public ?CompositionStatusType $docStatus = null,
         /** @var array<CodeableConcept> modality Imaging modality used */
         #[FhirProperty(
@@ -195,6 +210,7 @@ class DocumentReferenceResource extends DomainResourceResource
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\DocumentReference\DocumentReferenceContent',
         )]
+        #[Count(min: 1)]
         public array $content = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

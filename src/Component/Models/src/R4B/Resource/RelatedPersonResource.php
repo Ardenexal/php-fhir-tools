@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Address;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\AdministrativeGenderType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Attachment;
@@ -102,7 +103,7 @@ class RelatedPersonResource extends DomainResourceResource
         )]
         public array $telecom = [],
         /** @var AdministrativeGenderType|null gender male | female | other | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/administrative-gender|4.3.0', strength: 'required')]
         public ?AdministrativeGenderType $gender = null,
         /** @var DatePrimitive|null birthDate The date on which the related person was born */
         #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]

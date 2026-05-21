@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\ExampleScenario;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\ExampleScenarioActorTypeType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -17,6 +19,13 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A system or person who shares or receives an instance within the scenario.
  */
 #[FHIRBackboneElement(parentResource: 'ExampleScenario', elementPath: 'ExampleScenario.actor', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'exs-19',
+    severity: 'warning',
+    expression: '%resource.process.descendants().select(operation).where(initiator=%context.key or receiver=%context.key).exists()',
+    human: 'Actor should be referenced in at least one operation',
+)]
+#[FHIRPathInvariant(key: 'exs-23', severity: 'error', expression: 'key != \'OTHER\'', human: 'actor.key canot be \'OTHER\'')]
 class ExampleScenarioActor extends BackboneElement
 {
     public function __construct(
@@ -33,7 +42,7 @@ class ExampleScenarioActor extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $key = null,
         /** @var ExampleScenarioActorTypeType|null type person | system */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/examplescenario-actor-type|5.0.0', strength: 'required')]
         public ?ExampleScenarioActorTypeType $type = null,
         /** @var StringPrimitive|string|null title Label for actor when rendering */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]

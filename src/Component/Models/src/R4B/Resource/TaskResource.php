@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
@@ -34,6 +36,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A task to be performed.
  */
 #[FhirResource(type: 'Task', version: '4.3.0', url: 'http://hl7.org/fhir/StructureDefinition/Task', fhirVersion: 'R4B')]
+#[FHIRPathInvariant(
+    key: 'inv-1',
+    severity: 'error',
+    expression: 'lastModified.exists().not() or authoredOn.exists().not() or lastModified >= authoredOn',
+    human: 'Last modified date must be greater than or equal to authored-on date.',
+)]
 class TaskResource extends DomainResourceResource
 {
     public function __construct(
@@ -95,7 +103,7 @@ class TaskResource extends DomainResourceResource
         )]
         public array $partOf = [],
         /** @var TaskStatusType|null status draft | requested | received | accepted | + */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/task-status|4.3.0', strength: 'required')]
         public ?TaskStatusType $status = null,
         /** @var CodeableConcept|null statusReason Reason for current status */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
@@ -104,10 +112,10 @@ class TaskResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $businessStatus = null,
         /** @var TaskIntentType|null intent unknown | proposal | plan | order | original-order | reflex-order | filler-order | instance-order | option */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/task-intent|4.3.0', strength: 'required')]
         public ?TaskIntentType $intent = null,
         /** @var RequestPriorityType|null priority routine | urgent | asap | stat */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/request-priority|4.3.0', strength: 'required')]
         public ?RequestPriorityType $priority = null,
         /** @var CodeableConcept|null code Task Type */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]

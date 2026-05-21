@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BundleTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta;
@@ -25,6 +27,60 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A container for a collection of resources.
  */
 #[FhirResource(type: 'Bundle', version: '4.0.1', url: 'http://hl7.org/fhir/StructureDefinition/Bundle', fhirVersion: 'R4')]
+#[FHIRPathInvariant(
+    key: 'bdl-1',
+    severity: 'error',
+    expression: 'total.empty() or (type = \'searchset\') or (type = \'history\')',
+    human: 'total only when a search or history',
+)]
+#[FHIRPathInvariant(
+    key: 'bdl-2',
+    severity: 'error',
+    expression: 'entry.search.empty() or (type = \'searchset\')',
+    human: 'entry.search only when a search',
+)]
+#[FHIRPathInvariant(
+    key: 'bdl-3',
+    severity: 'error',
+    expression: 'entry.all(request.exists() = (%resource.type = \'batch\' or %resource.type = \'transaction\' or %resource.type = \'history\'))',
+    human: 'entry.request mandatory for batch/transaction/history, otherwise prohibited',
+)]
+#[FHIRPathInvariant(
+    key: 'bdl-4',
+    severity: 'error',
+    expression: 'entry.all(response.exists() = (%resource.type = \'batch-response\' or %resource.type = \'transaction-response\' or %resource.type = \'history\'))',
+    human: 'entry.response mandatory for batch-response/transaction-response/history, otherwise prohibited',
+)]
+#[FHIRPathInvariant(
+    key: 'bdl-7',
+    severity: 'error',
+    expression: '(type = \'history\') or entry.where(fullUrl.exists()).select(fullUrl&resource.meta.versionId).isDistinct()',
+    human: 'FullUrl must be unique in a bundle, or else entries with the same fullUrl must have different meta.versionId (except in history bundles)',
+)]
+#[FHIRPathInvariant(
+    key: 'bdl-9',
+    severity: 'error',
+    expression: 'type = \'document\' implies (identifier.system.exists() and identifier.value.exists())',
+    human: 'A document must have an identifier with a system and a value',
+)]
+#[FHIRPathInvariant(
+    key: 'bdl-10',
+    severity: 'error',
+    expression: 'type = \'document\' implies (timestamp.hasValue())',
+    human: 'A document must have a date',
+)]
+#[FHIRPathInvariant(
+    key: 'bdl-11',
+    severity: 'error',
+    expression: 'type = \'document\' implies entry.first().resource.is(Composition)',
+    human: 'A document must have a Composition as the first resource',
+)]
+#[FHIRPathInvariant(
+    key: 'bdl-12',
+    severity: 'error',
+    expression: 'type = \'message\' implies entry.first().resource.is(MessageHeader)',
+    human: 'A message must have a MessageHeader as the first resource',
+)]
 class BundleResource extends ResourceResource
 {
     public function __construct(
@@ -44,7 +100,7 @@ class BundleResource extends ResourceResource
         #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
         public ?Identifier $identifier = null,
         /** @var BundleTypeType|null type document | message | transaction | transaction-response | batch | batch-response | history | searchset | collection */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/bundle-type|4.0.1', strength: 'required')]
         public ?BundleTypeType $type = null,
         /** @var InstantPrimitive|null timestamp When the bundle was assembled */
         #[FhirProperty(fhirType: 'instant', propertyKind: 'primitive')]

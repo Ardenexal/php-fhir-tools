@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @see http://hl7.org/fhir/StructureDefinition/cqf-criteriaReference
  *
- * @description Specifies which criteria is the input for calculations. Specifies which criteria a resource was considered for.
+ * @description Specifies which criteria is used as the input for calculations when there are multiple populations of the same type (such as continuous variable and ratio measures). The extension can also appear on evaluated resources and supplemental data to indicate which criteria the resource is associated with (i.e. which criteria was responsible for the reference to the resource). The reference SHALL be to the linkId of a criteria within the referenced measure. For backwards-compatibility, systems MAY support references to the id element of the criteria.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-criteriaReference', fhirVersion: 'R4')]
 class CriteriaReferenceExtensionExtension extends Extension

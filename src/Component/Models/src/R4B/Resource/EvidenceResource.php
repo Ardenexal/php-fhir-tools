@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\ContactDetail;
@@ -25,6 +27,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Evidence\EvidenceCertainty;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Evidence\EvidenceStatistic;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Evidence\EvidenceVariableDefinition;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -35,6 +38,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description The Evidence Resource provides a machine-interpretable expression of an evidence concept including the evidence variables (eg population, exposures/interventions, comparators, outcomes, measured variables, confounding variables), the statistics, and the certainty of this evidence.
  */
 #[FhirResource(type: 'Evidence', version: '4.3.0', url: 'http://hl7.org/fhir/StructureDefinition/Evidence', fhirVersion: 'R4B')]
+#[FHIRPathInvariant(
+    key: 'cnl-0',
+    severity: 'warning',
+    expression: 'name.exists() implies name.matches(\'[A-Z]([A-Za-z0-9_]){0,254}\')',
+    human: 'Name should be usable as an identifier for the module by machine processing applications such as code generation',
+)]
 class EvidenceResource extends DomainResourceResource
 {
     public function __construct(
@@ -101,7 +110,7 @@ class EvidenceResource extends DomainResourceResource
         )]
         public Reference|MarkdownPrimitive|null $citeAs = null,
         /** @var PublicationStatusType|null status draft | active | retired | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|4.3.0', strength: 'required')]
         public ?PublicationStatusType $status = null,
         /** @var DateTimePrimitive|null date Date last changed */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
@@ -193,6 +202,7 @@ class EvidenceResource extends DomainResourceResource
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Evidence\EvidenceVariableDefinition',
         )]
+        #[Count(min: 1)]
         public array $variableDefinition = [],
         /** @var CodeableConcept|null synthesisType The method to combine studies */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]

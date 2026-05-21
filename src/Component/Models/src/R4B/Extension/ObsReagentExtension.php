@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
  *
  * @see http://hl7.org/fhir/StructureDefinition/observation-reagent
  *
- * @description Reference to reagents used to generate this observation.  This is intended for this for in-lab transactions between instruments and Laboratory Information Systems (LIS).
+ * @description Reference to reagents used to generate this observation.  This is intended for in-lab transactions between instruments and Laboratory Information Systems (LIS).
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/observation-reagent', fhirVersion: 'R4B')]
 class ObsReagentExtension extends Extension

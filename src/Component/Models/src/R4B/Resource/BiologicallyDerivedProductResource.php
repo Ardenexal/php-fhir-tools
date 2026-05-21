@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BiologicallyDerivedProductCategoryType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BiologicallyDerivedProductStatusType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
@@ -70,13 +71,13 @@ class BiologicallyDerivedProductResource extends DomainResourceResource
         )]
         public array $identifier = [],
         /** @var BiologicallyDerivedProductCategoryType|null productCategory organ | tissue | fluid | cells | biologicalAgent */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/product-category|4.3.0', strength: 'required')]
         public ?BiologicallyDerivedProductCategoryType $productCategory = null,
         /** @var CodeableConcept|null productCode What this biologically derived product is */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $productCode = null,
         /** @var BiologicallyDerivedProductStatusType|null status available | unavailable */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/product-status|4.3.0', strength: 'required')]
         public ?BiologicallyDerivedProductStatusType $status = null,
         /** @var array<Reference> request Procedure request */
         #[FhirProperty(

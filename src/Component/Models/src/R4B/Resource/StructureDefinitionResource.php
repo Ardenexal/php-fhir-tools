@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\ContactDetail;
@@ -41,6 +43,108 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     version: '4.3.0',
     url: 'http://hl7.org/fhir/StructureDefinition/StructureDefinition',
     fhirVersion: 'R4B',
+)]
+#[FHIRPathInvariant(
+    key: 'sdf-0',
+    severity: 'warning',
+    expression: 'name.exists() implies name.matches(\'[A-Z]([A-Za-z0-9_]){0,254}\')',
+    human: 'Name should be usable as an identifier for the module by machine processing applications such as code generation',
+)]
+#[FHIRPathInvariant(
+    key: 'sdf-1',
+    severity: 'error',
+    expression: 'derivation = \'constraint\' or snapshot.element.select(path).isDistinct()',
+    human: 'Element paths must be unique unless the structure is a constraint',
+)]
+#[FHIRPathInvariant(
+    key: 'sdf-15a',
+    severity: 'error',
+    expression: '(kind!=\'logical\'  and differential.element.first().path.contains(\'.\').not()) implies differential.element.first().type.empty()',
+    human: 'If the first element in a differential has no "." in the path and it\'s not a logical model, it has no type',
+)]
+#[FHIRPathInvariant(
+    key: 'sdf-4',
+    severity: 'error',
+    expression: 'abstract = true or baseDefinition.exists()',
+    human: 'If the structure is not abstract, then there SHALL be a baseDefinition',
+)]
+#[FHIRPathInvariant(
+    key: 'sdf-5',
+    severity: 'error',
+    expression: 'type != \'Extension\' or derivation = \'specialization\' or (context.exists())',
+    human: 'If the structure defines an extension then the structure must have context information',
+)]
+#[FHIRPathInvariant(
+    key: 'sdf-6',
+    severity: 'error',
+    expression: 'snapshot.exists() or differential.exists()',
+    human: 'A structure must have either a differential, or a snapshot (or both)',
+)]
+#[FHIRPathInvariant(
+    key: 'sdf-9',
+    severity: 'error',
+    expression: 'children().element.where(path.contains(\'.\').not()).label.empty() and children().element.where(path.contains(\'.\').not()).code.empty() and children().element.where(path.contains(\'.\').not()).requirements.empty()',
+    human: 'In any snapshot or differential, no label, code or requirements on an element without a "." in the path (e.g. the first element)',
+)]
+#[FHIRPathInvariant(
+    key: 'sdf-11',
+    severity: 'error',
+    expression: 'kind != \'logical\' implies snapshot.empty() or snapshot.element.first().path = type',
+    human: 'If there\'s a type, its content must match the path name in the first element of a snapshot',
+)]
+#[FHIRPathInvariant(
+    key: 'sdf-14',
+    severity: 'error',
+    expression: 'snapshot.element.all(id.exists()) and differential.element.all(id.exists())',
+    human: 'All element definitions must have an id',
+)]
+#[FHIRPathInvariant(
+    key: 'sdf-15',
+    severity: 'error',
+    expression: 'kind!=\'logical\' implies snapshot.element.first().type.empty()',
+    human: 'The first element in a snapshot has no type unless model is a logical model.',
+)]
+#[FHIRPathInvariant(
+    key: 'sdf-16',
+    severity: 'error',
+    expression: 'snapshot.element.all(id.exists()) and snapshot.element.id.trace(\'ids\').isDistinct()',
+    human: 'All element definitions must have unique ids (snapshot)',
+)]
+#[FHIRPathInvariant(
+    key: 'sdf-17',
+    severity: 'error',
+    expression: 'differential.element.all(id.exists()) and differential.element.id.trace(\'ids\').isDistinct()',
+    human: 'All element definitions must have unique ids (diff)',
+)]
+#[FHIRPathInvariant(
+    key: 'sdf-18',
+    severity: 'error',
+    expression: 'contextInvariant.exists() implies type = \'Extension\'',
+    human: 'Context Invariants can only be used for extensions',
+)]
+#[FHIRPathInvariant(
+    key: 'sdf-19',
+    severity: 'error',
+    expression: 'url.startsWith(\'http://hl7.org/fhir/StructureDefinition\') implies (differential.element.type.code.all(matches(\'^[a-zA-Z0-9]+$\') or matches(\'^http:\\\/\\\/hl7\\\.org\\\/fhirpath\\\/System\\\.[A-Z][A-Za-z]+$\')) and snapshot.element.type.code.all(matches(\'^[a-zA-Z0-9\\\.]+$\') or matches(\'^http:\\\/\\\/hl7\\\.org\\\/fhirpath\\\/System\\\.[A-Z][A-Za-z]+$\')))',
+    human: 'FHIR Specification models only use FHIR defined types',
+)]
+#[FHIRPathInvariant(
+    key: 'sdf-21',
+    severity: 'error',
+    expression: 'differential.element.defaultValue.exists() implies (derivation = \'specialization\')',
+    human: 'Default values can only be specified on specializations',
+)]
+#[FHIRPathInvariant(
+    key: 'sdf-22',
+    severity: 'error',
+    expression: 'url.startsWith(\'http://hl7.org/fhir/StructureDefinition\') implies (snapshot.element.defaultValue.empty() and differential.element.defaultValue.empty())',
+    human: 'FHIR Specification models never have default values',
+)]
+#[FHIRPathInvariant(
+    key: 'sdf-23',
+    severity: 'error',
+    expression: '(snapshot | differential).element.all(path.contains(\'.\').not() implies sliceName.empty())',
+    human: 'No slice name on root',
 )]
 class StructureDefinitionResource extends DomainResourceResource
 {
@@ -90,7 +194,7 @@ class StructureDefinitionResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $title = null,
         /** @var PublicationStatusType|null status draft | active | retired | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|4.3.0', strength: 'required')]
         public ?PublicationStatusType $status = null,
         /** @var bool|null experimental For testing purposes, not real usage */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
@@ -143,7 +247,7 @@ class StructureDefinitionResource extends DomainResourceResource
         )]
         public array $keyword = [],
         /** @var FHIRVersionType|null fhirVersion FHIR Version this StructureDefinition targets */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/FHIR-version|4.3.0', strength: 'required')]
         public ?FHIRVersionType $fhirVersion = null,
         /** @var array<StructureDefinitionMapping> mapping External specification that the content is mapped to */
         #[FhirProperty(
@@ -154,7 +258,7 @@ class StructureDefinitionResource extends DomainResourceResource
         )]
         public array $mapping = [],
         /** @var StructureDefinitionKindType|null kind primitive-type | complex-type | resource | logical */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/structure-definition-kind|4.3.0', strength: 'required')]
         public ?StructureDefinitionKindType $kind = null,
         /** @var bool|null abstract Whether the structure is abstract */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotBlank]
@@ -177,7 +281,7 @@ class StructureDefinitionResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
         public ?CanonicalPrimitive $baseDefinition = null,
         /** @var TypeDerivationRuleType|null derivation specialization | constraint - How relates to base definition */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/type-derivation-rule|4.3.0', strength: 'required')]
         public ?TypeDerivationRuleType $derivation = null,
         /** @var StructureDefinitionSnapshot|null snapshot Snapshot view of the structure */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
@@ -83,13 +84,13 @@ class SupplyDeliveryResource extends DomainResourceResource
         )]
         public array $partOf = [],
         /** @var SupplyDeliveryStatusType|null status in-progress | completed | abandoned | entered-in-error */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/supplydelivery-status|4.0.1', strength: 'required')]
         public ?SupplyDeliveryStatusType $status = null,
         /** @var Reference|null patient Patient for whom the item is supplied */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $patient = null,
         /** @var CodeableConcept|null type Category of dispense event */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/supplydelivery-type|4.0.1', strength: 'required')]
         public ?CodeableConcept $type = null,
         /** @var SupplyDeliverySuppliedItem|null suppliedItem The item that is delivered or supplied */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]

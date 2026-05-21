@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -33,6 +35,18 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     url: 'http://hl7.org/fhir/StructureDefinition/SubscriptionStatus',
     fhirVersion: 'R5',
 )]
+#[FHIRPathInvariant(
+    key: 'sst-1',
+    severity: 'error',
+    expression: '(type = \'event-notification\' or type = \'query-event\') implies notificationEvent.exists()',
+    human: 'Event notifications must contain events',
+)]
+#[FHIRPathInvariant(
+    key: 'sst-2',
+    severity: 'error',
+    expression: 'type = \'query-status\' implies status.exists()',
+    human: 'Status messages must contain status',
+)]
 class SubscriptionStatusResource extends DomainResourceResource
 {
     public function __construct(
@@ -46,7 +60,7 @@ class SubscriptionStatusResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -61,10 +75,10 @@ class SubscriptionStatusResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
         /** @var SubscriptionStatusCodesType|null status requested | active | error | off | entered-in-error */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/subscription-status|5.0.0', strength: 'required')]
         public ?SubscriptionStatusCodesType $status = null,
         /** @var SubscriptionNotificationTypeType|null type handshake | heartbeat | event-notification | query-status | query-event */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/subscription-notification-type|5.0.0', strength: 'required')]
         public ?SubscriptionNotificationTypeType $type = null,
         /** @var Integer64Primitive|null eventsSinceSubscriptionStart Events since the Subscription was created */
         #[FhirProperty(fhirType: 'integer64', propertyKind: 'primitive')]

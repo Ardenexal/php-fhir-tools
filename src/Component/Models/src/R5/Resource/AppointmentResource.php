@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AppointmentStatusType;
@@ -25,6 +27,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\Appointment\AppointmentParticipant;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\Appointment\AppointmentRecurrenceTemplate;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -35,6 +38,42 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A booking of a healthcare event among patient(s), practitioner(s), related person(s) and/or device(s) for a specific date/time. This may result in one or more Encounter(s).
  */
 #[FhirResource(type: 'Appointment', version: '5.0.0', url: 'http://hl7.org/fhir/StructureDefinition/Appointment', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'app-2',
+    severity: 'error',
+    expression: 'start.exists() = end.exists()',
+    human: 'Either start and end are specified, or neither',
+)]
+#[FHIRPathInvariant(
+    key: 'app-3',
+    severity: 'error',
+    expression: '(start.exists() and end.exists()) or (status in (\'proposed\' | \'cancelled\' | \'waitlist\'))',
+    human: 'Only proposed or cancelled appointments can be missing start/end dates',
+)]
+#[FHIRPathInvariant(
+    key: 'app-4',
+    severity: 'error',
+    expression: 'cancellationReason.exists() implies (status=\'noshow\' or status=\'cancelled\')',
+    human: 'Cancellation reason is only used for appointments that have been cancelled, or noshow',
+)]
+#[FHIRPathInvariant(
+    key: 'app-5',
+    severity: 'error',
+    expression: 'start.exists() implies start <= end',
+    human: 'The start must be less than or equal to the end',
+)]
+#[FHIRPathInvariant(
+    key: 'app-6',
+    severity: 'warning',
+    expression: 'originatingAppointment.exists().not() or recurrenceTemplate.exists().not()',
+    human: 'An appointment may have an originatingAppointment or recurrenceTemplate, but not both',
+)]
+#[FHIRPathInvariant(
+    key: 'app-7',
+    severity: 'error',
+    expression: 'cancellationDate.exists() implies (status=\'noshow\' or status=\'cancelled\')',
+    human: 'Cancellation date is only used for appointments that have been cancelled, or noshow',
+)]
 class AppointmentResource extends DomainResourceResource
 {
     public function __construct(
@@ -48,7 +87,7 @@ class AppointmentResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -71,7 +110,7 @@ class AppointmentResource extends DomainResourceResource
         )]
         public array $identifier = [],
         /** @var AppointmentStatusType|null status proposed | pending | booked | arrived | fulfilled | cancelled | noshow | entered-in-error | checked-in | waitlist */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/appointmentstatus|5.0.0', strength: 'required')]
         public ?AppointmentStatusType $status = null,
         /** @var CodeableConcept|null cancellationReason The coded reason for the appointment being cancelled */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
@@ -229,6 +268,7 @@ class AppointmentResource extends DomainResourceResource
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\Appointment\AppointmentParticipant',
         )]
+        #[Count(min: 1)]
         public array $participant = [],
         /** @var PositiveIntPrimitive|null recurrenceId The sequence number in the recurrence */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]

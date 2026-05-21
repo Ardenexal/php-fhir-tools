@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Address;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactPoint;
@@ -26,6 +27,12 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\Organization\OrganizationCo
  * @description A formally or informally recognized grouping of people or organizations formed for the purpose of achieving some form of collective action.  Includes companies, institutions, corporations, departments, community groups, healthcare practice groups, payer/insurer, etc.
  */
 #[FhirResource(type: 'Organization', version: '4.0.1', url: 'http://hl7.org/fhir/StructureDefinition/Organization', fhirVersion: 'R4')]
+#[FHIRPathInvariant(
+    key: 'org-1',
+    severity: 'error',
+    expression: '(identifier.count() + name.count()) > 0',
+    human: 'The organization SHALL at least have a name or an identifier, and possibly more than one',
+)]
 class OrganizationResource extends DomainResourceResource
 {
     public function __construct(

@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\Base64BinaryPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
@@ -22,6 +24,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UnsignedIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UrlPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UuidPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\Dosage;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\Timing;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -33,6 +36,85 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description Captures constraints on each element within the resource, profile, or extension.
  */
 #[FHIRBackboneElement(parentResource: 'ElementDefinition', elementPath: 'ElementDefinition', fhirVersion: 'R4')]
+#[FHIRPathInvariant(
+    key: 'eld-2',
+    severity: 'error',
+    expression: 'min.empty() or max.empty() or (max = \'*\') or iif(max != \'*\', min <= max.toInteger())',
+    human: 'Min <= Max',
+)]
+#[FHIRPathInvariant(
+    key: 'eld-5',
+    severity: 'error',
+    expression: 'contentReference.empty() or (type.empty() and defaultValue.empty() and fixed.empty() and pattern.empty() and example.empty() and minValue.empty() and maxValue.empty() and maxLength.empty() and binding.empty())',
+    human: 'if the element definition has a contentReference, it cannot have type, defaultValue, fixed, pattern, example, minValue, maxValue, maxLength, or binding',
+)]
+#[FHIRPathInvariant(
+    key: 'eld-6',
+    severity: 'error',
+    expression: 'fixed.empty() or (type.count()  <= 1)',
+    human: 'Fixed value may only be specified if there is one type',
+)]
+#[FHIRPathInvariant(
+    key: 'eld-7',
+    severity: 'error',
+    expression: 'pattern.empty() or (type.count() <= 1)',
+    human: 'Pattern may only be specified if there is one type',
+)]
+#[FHIRPathInvariant(
+    key: 'eld-8',
+    severity: 'error',
+    expression: 'pattern.empty() or fixed.empty()',
+    human: 'Pattern and fixed are mutually exclusive',
+)]
+#[FHIRPathInvariant(
+    key: 'eld-11',
+    severity: 'error',
+    expression: 'binding.empty() or type.code.empty() or type.select((code = \'code\') or (code = \'Coding\') or (code=\'CodeableConcept\') or (code = \'Quantity\') or (code = \'string\') or (code = \'uri\')).exists()',
+    human: 'Binding can only be present for coded elements, string, and uri',
+)]
+#[FHIRPathInvariant(key: 'eld-13', severity: 'error', expression: 'type.select(code).isDistinct()', human: 'Types must be unique by code')]
+#[FHIRPathInvariant(
+    key: 'eld-14',
+    severity: 'error',
+    expression: 'constraint.select(key).isDistinct()',
+    human: 'Constraints must be unique by key',
+)]
+#[FHIRPathInvariant(
+    key: 'eld-15',
+    severity: 'error',
+    expression: 'defaultValue.empty() or meaningWhenMissing.empty()',
+    human: 'default value and meaningWhenMissing are mutually exclusive',
+)]
+#[FHIRPathInvariant(
+    key: 'eld-16',
+    severity: 'error',
+    expression: 'sliceName.empty() or sliceName.matches(\'^[a-zA-Z0-9\\\/\\\-_\\\[\\\]\\\@]+$\')',
+    human: 'sliceName must be composed of proper tokens separated by "/"',
+)]
+#[FHIRPathInvariant(
+    key: 'eld-18',
+    severity: 'error',
+    expression: '(isModifier.exists() and isModifier) implies isModifierReason.exists()',
+    human: 'Must have a modifier reason if isModifier = true',
+)]
+#[FHIRPathInvariant(
+    key: 'eld-19',
+    severity: 'error',
+    expression: 'path.matches(\'[^\\\s\\\.,:;\\\\\\\'"\\\/|?!@#$%&*()\\\[\\\]{}]{1,64}(\\\.[^\\\s\\\.,:;\\\\\\\'"\\\/|?!@#$%&*()\\\[\\\]{}]{1,64}(\\\[x\\\])?(\\\:[^\\\s\\\.]+)?)*\')',
+    human: 'Element names cannot include some special characters',
+)]
+#[FHIRPathInvariant(
+    key: 'eld-20',
+    severity: 'warning',
+    expression: 'path.matches(\'[A-Za-z][A-Za-z0-9]*(\\\.[a-z][A-Za-z0-9]*(\\\[x])?)*\')',
+    human: 'Element names should be simple alphanumerics with a max of 64 characters, or code generation tools may be broken',
+)]
+#[FHIRPathInvariant(
+    key: 'eld-22',
+    severity: 'error',
+    expression: 'sliceIsConstraining.exists() implies sliceName.exists()',
+    human: 'sliceIsConstraining can only appear if slicename is present',
+)]
 class ElementDefinition extends BackboneElement
 {
     public function __construct(
@@ -49,7 +131,7 @@ class ElementDefinition extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $path = null,
         /** @var array<PropertyRepresentationType> representation xmlAttr | xmlText | typeAttr | cdaText | xhtml */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/property-representation|4.0.1', strength: 'required')]
         public array $representation = [],
         /** @var StringPrimitive|string|null sliceName Name for this particular element (in a set of slices) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -388,7 +470,7 @@ class ElementDefinition extends BackboneElement
                 [
                     'fhirType'     => 'Dosage',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Dosage',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Dosage',
                     'jsonKey'      => 'defaultValueDosage',
                 ],
                 [
@@ -688,7 +770,7 @@ class ElementDefinition extends BackboneElement
                 [
                     'fhirType'     => 'Dosage',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Dosage',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Dosage',
                     'jsonKey'      => 'fixedDosage',
                 ],
                 [
@@ -982,7 +1064,7 @@ class ElementDefinition extends BackboneElement
                 [
                     'fhirType'     => 'Dosage',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Dosage',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Dosage',
                     'jsonKey'      => 'patternDosage',
                 ],
                 [

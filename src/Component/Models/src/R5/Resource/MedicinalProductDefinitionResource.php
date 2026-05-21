@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference;
@@ -25,6 +26,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\MedicinalProductDefinition\
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\MedicinalProductDefinition\MedicinalProductDefinitionCrossReference;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\MedicinalProductDefinition\MedicinalProductDefinitionName;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\MedicinalProductDefinition\MedicinalProductDefinitionOperation;
+use Symfony\Component\Validator\Constraints\Count;
 
 /**
  * @author Health Level Seven International (Biomedical Research and Regulation)
@@ -52,7 +54,7 @@ class MedicinalProductDefinitionResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -219,6 +221,7 @@ class MedicinalProductDefinitionResource extends DomainResourceResource
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\MedicinalProductDefinition\MedicinalProductDefinitionName',
         )]
+        #[Count(min: 1)]
         public array $name = [],
         /** @var array<MedicinalProductDefinitionCrossReference> crossReference Reference to another product, e.g. for linking authorised to investigational product */
         #[FhirProperty(

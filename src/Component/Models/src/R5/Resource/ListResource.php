@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
@@ -30,6 +32,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A List is a curated collection of resources, for things such as problem lists, allergy lists, facility list, organization list, etc.
  */
 #[FhirResource(type: 'List', version: '5.0.0', url: 'http://hl7.org/fhir/StructureDefinition/List', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'lst-1',
+    severity: 'error',
+    expression: 'emptyReason.empty() or entry.empty()',
+    human: 'A list can only have an emptyReason if it is empty',
+)]
 class ListResource extends DomainResourceResource
 {
     public function __construct(
@@ -43,7 +51,7 @@ class ListResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -66,10 +74,10 @@ class ListResource extends DomainResourceResource
         )]
         public array $identifier = [],
         /** @var ListStatusType|null status current | retired | entered-in-error */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/list-status|5.0.0', strength: 'required')]
         public ?ListStatusType $status = null,
         /** @var ListModeType|null mode working | snapshot | changes */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/list-mode|5.0.0', strength: 'required')]
         public ?ListModeType $mode = null,
         /** @var StringPrimitive|string|null title Descriptive name for the list */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\Subscription;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\SearchComparatorType;
@@ -18,6 +20,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description The filter properties to be applied to narrow the subscription topic stream.  When multiple filters are applied, evaluates to true if all the conditions applicable to that resource are met; otherwise it returns false (i.e., logical AND).
  */
 #[FHIRBackboneElement(parentResource: 'Subscription', elementPath: 'Subscription.filterBy', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'scr-1',
+    severity: 'error',
+    expression: '(comparator.exists() and modifier.exists()).not()',
+    human: 'Subscription filters may only contain a modifier or a comparator',
+)]
 class SubscriptionFilterBy extends BackboneElement
 {
     public function __construct(
@@ -37,10 +45,10 @@ class SubscriptionFilterBy extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $filterParameter = null,
         /** @var SearchComparatorType|null comparator eq | ne | gt | lt | ge | le | sa | eb | ap */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/search-comparator|5.0.0', strength: 'required')]
         public ?SearchComparatorType $comparator = null,
         /** @var SearchModifierCodeType|null modifier missing | exact | contains | not | text | in | not-in | below | above | type | identifier | of-type | code-text | text-advanced | iterate */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/search-modifier-code|5.0.0', strength: 'required')]
         public ?SearchModifierCodeType $modifier = null,
         /** @var StringPrimitive|string|null value Literal value or resource path */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]

@@ -14,7 +14,13 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * @see http://hl7.org/fhir/StructureDefinition/medication-type
  *
- * @description This extension indicates what kind of medicine is being represented. Generally, medications can refer to Generic Medications/Formulations, Commercial Medications, and Compounded Medication/Preparations, though other categories are used. TODO: see task FHIR-46901.
+ * @description Identifies the type or classification of a medication entry. When used on the
+ * Medication resource, it indicates the overall nature of the medication record
+ * (e.g., whether it represents a branded product, a generic product, or an
+ * extemporaneous preparation). When used on Medication.code.coding, it classifies
+ * the specific coding within the codeable concept, distinguishing whether that
+ * particular code refers to a medicinal product, a medicinal product package, or
+ * an extemporaneous preparation.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/medication-type', fhirVersion: 'R5')]
 class MedicationTypeExtension extends Extension

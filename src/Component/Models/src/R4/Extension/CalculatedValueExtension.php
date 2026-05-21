@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  *
  * @see http://hl7.org/fhir/StructureDefinition/cqf-calculatedValue
  *
- * @description An expression that determines a calculated value. The expression may be simply the name of a expression in a referenced library, or it may be a complete inline expression.
+ * @description DEPRECATED: Use cqf-expression instead. An expression that determines a calculated value. The expression may be simply the name of a expression in a referenced library, or it may be a complete inline expression.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-calculatedValue', fhirVersion: 'R4')]
 class CalculatedValueExtension extends Extension

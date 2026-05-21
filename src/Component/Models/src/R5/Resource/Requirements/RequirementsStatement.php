@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\Requirements;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\ConformanceExpectationType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -39,7 +40,7 @@ class RequirementsStatement extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $label = null,
         /** @var array<ConformanceExpectationType> conformance SHALL | SHOULD | MAY | SHOULD-NOT */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/conformance-expectation|5.0.0', strength: 'required')]
         public array $conformance = [],
         /** @var bool|null conditionality Set to true if requirements statement is conditional */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]

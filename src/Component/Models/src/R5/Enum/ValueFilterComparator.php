@@ -7,7 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Enum;
 /**
  * ValueSet: Value Filter Comparator
  * URL: http://hl7.org/fhir/ValueSet/value-filter-comparator
- * Version: 5.3.0-ballot
+ * Version: 5.3.0
  * Description: The type of comparator operator to use
  */
 enum ValueFilterComparator: string

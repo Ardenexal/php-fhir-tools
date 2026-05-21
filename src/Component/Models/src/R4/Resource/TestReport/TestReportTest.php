@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Count;
 
 /**
  * @description A test executed from the test script.
@@ -40,6 +41,7 @@ class TestReportTest extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\TestReport\TestReportTestAction',
         )]
+        #[Count(min: 1)]
         public array $action = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

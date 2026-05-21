@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\OperationDefinition;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\FHIRAllTypesType;
@@ -20,6 +22,24 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description The parameters for the operation/query.
  */
 #[FHIRBackboneElement(parentResource: 'OperationDefinition', elementPath: 'OperationDefinition.parameter', fhirVersion: 'R4B')]
+#[FHIRPathInvariant(
+    key: 'opd-1',
+    severity: 'error',
+    expression: 'type.exists() or part.exists()',
+    human: 'Either a type must be provided, or parts',
+)]
+#[FHIRPathInvariant(
+    key: 'opd-2',
+    severity: 'error',
+    expression: 'searchType.exists() implies type = \'string\'',
+    human: 'A search type can only be specified for parameters of type string',
+)]
+#[FHIRPathInvariant(
+    key: 'opd-3',
+    severity: 'error',
+    expression: 'targetProfile.exists() implies (type = \'Reference\' or type = \'canonical\')',
+    human: 'A targetProfile can only be specified for parameters of type Reference or Canonical',
+)]
 class OperationDefinitionParameter extends BackboneElement
 {
     public function __construct(
@@ -36,7 +56,7 @@ class OperationDefinitionParameter extends BackboneElement
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?CodePrimitive $name = null,
         /** @var OperationParameterUseType|null use in | out */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/operation-parameter-use|4.3.0', strength: 'required')]
         public ?OperationParameterUseType $use = null,
         /** @var int|null min Minimum Cardinality */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar', isRequired: true), NotBlank]
@@ -48,13 +68,13 @@ class OperationDefinitionParameter extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $documentation = null,
         /** @var FHIRAllTypesType|null type What type this parameter has */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-types|4.3.0', strength: 'required')]
         public ?FHIRAllTypesType $type = null,
         /** @var array<CanonicalPrimitive> targetProfile If type is Reference | canonical, allowed targets */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true)]
         public array $targetProfile = [],
         /** @var SearchParamTypeType|null searchType number | date | string | token | reference | composite | quantity | uri | special */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/search-param-type|4.3.0', strength: 'required')]
         public ?SearchParamTypeType $searchType = null,
         /** @var OperationDefinitionParameterBinding|null binding ValueSet details if this is coded */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]

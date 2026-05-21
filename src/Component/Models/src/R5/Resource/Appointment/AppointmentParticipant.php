@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\Appointment;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -18,6 +20,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description List of participants involved in the appointment.
  */
 #[FHIRBackboneElement(parentResource: 'Appointment', elementPath: 'Appointment.participant', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'app-1',
+    severity: 'error',
+    expression: 'type.exists() or actor.exists()',
+    human: 'Either the type or actor on the participant SHALL be specified',
+)]
 class AppointmentParticipant extends BackboneElement
 {
     public function __construct(
@@ -48,7 +56,7 @@ class AppointmentParticipant extends BackboneElement
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $required = null,
         /** @var ParticipationStatusType|null status accepted | declined | tentative | needs-action */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/participationstatus|5.0.0', strength: 'required')]
         public ?ParticipationStatusType $status = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

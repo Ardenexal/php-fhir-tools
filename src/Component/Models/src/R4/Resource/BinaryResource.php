@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\MimeTypesType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
@@ -37,7 +38,7 @@ class BinaryResource extends ResourceResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
         public ?string $language = null,
         /** @var MimeTypesType|null contentType MimeType of the binary content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/mimetypes|4.0.1', strength: 'required')]
         public ?MimeTypesType $contentType = null,
         /** @var Reference|null securityContext Identifies another resource to use as proxy when enforcing access control */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]

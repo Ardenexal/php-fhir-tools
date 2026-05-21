@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CompositionStatusType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\DocumentReferenceStatusType;
@@ -20,6 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\DocumentReference\DocumentReferenceContent;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\DocumentReference\DocumentReferenceContext;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\DocumentReference\DocumentReferenceRelatesTo;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -74,10 +76,10 @@ class DocumentReferenceResource extends DomainResourceResource
         )]
         public array $identifier = [],
         /** @var DocumentReferenceStatusType|null status current | superseded | entered-in-error */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/document-reference-status|4.0.1', strength: 'required')]
         public ?DocumentReferenceStatusType $status = null,
         /** @var CompositionStatusType|null docStatus preliminary | final | amended | entered-in-error */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/composition-status|4.0.1', strength: 'required')]
         public ?CompositionStatusType $docStatus = null,
         /** @var CodeableConcept|null type Kind of document (LOINC if possible) */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
@@ -137,6 +139,7 @@ class DocumentReferenceResource extends DomainResourceResource
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\DocumentReference\DocumentReferenceContent',
         )]
+        #[Count(min: 1)]
         public array $content = [],
         /** @var DocumentReferenceContext|null context Clinical context of document */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]

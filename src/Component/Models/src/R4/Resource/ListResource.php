@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -29,6 +31,24 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A list is a curated collection of resources.
  */
 #[FhirResource(type: 'List', version: '4.0.1', url: 'http://hl7.org/fhir/StructureDefinition/List', fhirVersion: 'R4')]
+#[FHIRPathInvariant(
+    key: 'lst-1',
+    severity: 'error',
+    expression: 'emptyReason.empty() or entry.empty()',
+    human: 'A list can only have an emptyReason if it is empty',
+)]
+#[FHIRPathInvariant(
+    key: 'lst-2',
+    severity: 'error',
+    expression: 'mode = \'changes\' or entry.deleted.empty()',
+    human: 'The deleted flag can only be used if the mode of the list is "changes"',
+)]
+#[FHIRPathInvariant(
+    key: 'lst-3',
+    severity: 'error',
+    expression: 'mode = \'working\' or entry.date.empty()',
+    human: 'An entry date can only be used if the mode of the list is "working"',
+)]
 class ListResource extends DomainResourceResource
 {
     public function __construct(
@@ -65,10 +85,10 @@ class ListResource extends DomainResourceResource
         )]
         public array $identifier = [],
         /** @var ListStatusType|null status current | retired | entered-in-error */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/list-status|4.0.1', strength: 'required')]
         public ?ListStatusType $status = null,
         /** @var ListModeType|null mode working | snapshot | changes */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/list-mode|4.0.1', strength: 'required')]
         public ?ListModeType $mode = null,
         /** @var StringPrimitive|string|null title Descriptive name for the list */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\ExampleScenario;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
@@ -15,6 +16,24 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description References to other instances that can be found within this instance (e.g. the observations contained in a bundle).
  */
 #[FHIRBackboneElement(parentResource: 'ExampleScenario', elementPath: 'ExampleScenario.instance.containedInstance', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'exs-14',
+    severity: 'error',
+    expression: '%resource.instance.where(key=%context.instanceReference).exists()',
+    human: 'InstanceReference must be a key of an instance defined in the ExampleScenario',
+)]
+#[FHIRPathInvariant(
+    key: 'exs-15',
+    severity: 'error',
+    expression: 'versionReference.empty() implies %resource.instance.where(key=%context.instanceReference).version.empty()',
+    human: 'versionReference must be specified if the referenced instance defines versions',
+)]
+#[FHIRPathInvariant(
+    key: 'exs-16',
+    severity: 'error',
+    expression: 'versionReference.exists() implies %resource.instance.where(key=%context.instanceReference).version.where(key=%context.versionReference).exists()',
+    human: 'versionReference must be a key of a version within the instance pointed to by instanceReference',
+)]
 class ExampleScenarioInstanceContainedInstance extends BackboneElement
 {
     public function __construct(

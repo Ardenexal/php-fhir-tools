@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Age;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
@@ -31,6 +33,24 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A clinical condition, problem, diagnosis, or other event, situation, issue, or clinical concept that has risen to a level of concern.
  */
 #[FhirResource(type: 'Condition', version: '4.0.1', url: 'http://hl7.org/fhir/StructureDefinition/Condition', fhirVersion: 'R4')]
+#[FHIRPathInvariant(
+    key: 'con-3',
+    severity: 'warning',
+    expression: 'clinicalStatus.exists() or verificationStatus.coding.where(system=\'http://terminology.hl7.org/CodeSystem/condition-ver-status\' and code = \'entered-in-error\').exists() or category.select($this=\'problem-list-item\').empty()',
+    human: 'Condition.clinicalStatus SHALL be present if verificationStatus is not entered-in-error and category is problem-list-item',
+)]
+#[FHIRPathInvariant(
+    key: 'con-4',
+    severity: 'error',
+    expression: 'abatement.empty() or clinicalStatus.coding.where(system=\'http://terminology.hl7.org/CodeSystem/condition-clinical\' and (code=\'resolved\' or code=\'remission\' or code=\'inactive\')).exists()',
+    human: 'If condition is abated, then clinicalStatus must be either inactive, resolved, or remission',
+)]
+#[FHIRPathInvariant(
+    key: 'con-5',
+    severity: 'error',
+    expression: 'verificationStatus.coding.where(system=\'http://terminology.hl7.org/CodeSystem/condition-ver-status\' and code=\'entered-in-error\').empty() or clinicalStatus.empty()',
+    human: 'Condition.clinicalStatus SHALL NOT be present if verification Status is entered-in-error',
+)]
 class ConditionResource extends DomainResourceResource
 {
     public function __construct(
@@ -67,10 +87,10 @@ class ConditionResource extends DomainResourceResource
         )]
         public array $identifier = [],
         /** @var CodeableConcept|null clinicalStatus active | recurrence | relapse | inactive | remission | resolved */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/condition-clinical|4.0.1', strength: 'required')]
         public ?CodeableConcept $clinicalStatus = null,
         /** @var CodeableConcept|null verificationStatus unconfirmed | provisional | differential | confirmed | refuted | entered-in-error */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/condition-ver-status|4.0.1', strength: 'required')]
         public ?CodeableConcept $verificationStatus = null,
         /** @var array<CodeableConcept> category problem-list-item | encounter-diagnosis */
         #[FhirProperty(

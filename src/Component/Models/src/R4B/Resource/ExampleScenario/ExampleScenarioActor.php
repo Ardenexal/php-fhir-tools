@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\ExampleScenario;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\ExampleScenarioActorTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
@@ -33,7 +34,7 @@ class ExampleScenarioActor extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $actorId = null,
         /** @var ExampleScenarioActorTypeType|null type person | entity */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/examplescenario-actor-type|4.3.0', strength: 'required')]
         public ?ExampleScenarioActorTypeType $type = null,
         /** @var StringPrimitive|string|null name The name of the actor as shown in the page */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

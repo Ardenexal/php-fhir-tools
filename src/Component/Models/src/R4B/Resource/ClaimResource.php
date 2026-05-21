@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\ClaimUseType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
@@ -27,6 +28,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Claim\ClaimPayee;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Claim\ClaimProcedure;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Claim\ClaimRelated;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Claim\ClaimSupportingInfo;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -73,7 +75,7 @@ class ClaimResource extends DomainResourceResource
         )]
         public array $identifier = [],
         /** @var FinancialResourceStatusCodesType|null status active | cancelled | draft | entered-in-error */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/fm-status|4.3.0', strength: 'required')]
         public ?FinancialResourceStatusCodesType $status = null,
         /** @var CodeableConcept|null type Category or discipline */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
@@ -82,7 +84,7 @@ class ClaimResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $subType = null,
         /** @var ClaimUseType|null use claim | preauthorization | predetermination */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/claim-use|4.3.0', strength: 'required')]
         public ?ClaimUseType $use = null,
         /** @var Reference|null patient The recipient of the products and services */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank]
@@ -171,6 +173,7 @@ class ClaimResource extends DomainResourceResource
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Claim\ClaimInsurance',
         )]
+        #[Count(min: 1)]
         public array $insurance = [],
         /** @var ClaimAccident|null accident Details of the event */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]

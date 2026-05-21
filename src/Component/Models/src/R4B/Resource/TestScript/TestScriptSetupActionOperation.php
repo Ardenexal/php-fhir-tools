@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\TestScript;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
@@ -20,6 +22,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description The operation to perform.
  */
 #[FHIRBackboneElement(parentResource: 'TestScript', elementPath: 'TestScript.setup.action.operation', fhirVersion: 'R4B')]
+#[FHIRPathInvariant(
+    key: 'tst-7',
+    severity: 'error',
+    expression: 'sourceId.exists() or (targetId.count() + url.count() + params.count() = 1) or (type.code in (\'capabilities\' |\'search\' | \'transaction\' | \'history\'))',
+    human: 'Setup operation SHALL contain either sourceId or targetId or params or url.',
+)]
 class TestScriptSetupActionOperation extends BackboneElement
 {
     public function __construct(
@@ -36,7 +44,7 @@ class TestScriptSetupActionOperation extends BackboneElement
         #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
         public ?Coding $type = null,
         /** @var FHIRDefinedTypeType|null resource Resource type */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/defined-types|4.3.0', strength: 'required')]
         public ?FHIRDefinedTypeType $resource = null,
         /** @var StringPrimitive|string|null label Tracking/logging operation label */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -45,10 +53,10 @@ class TestScriptSetupActionOperation extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $description = null,
         /** @var MimeTypesType|null accept Mime type to accept in the payload of the response, with charset etc. */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/mimetypes|4.3.0', strength: 'required')]
         public ?MimeTypesType $accept = null,
         /** @var MimeTypesType|null contentType Mime type of the request payload contents, with charset etc. */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/mimetypes|4.3.0', strength: 'required')]
         public ?MimeTypesType $contentType = null,
         /** @var int|null destination Server responding to the request */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
@@ -57,7 +65,7 @@ class TestScriptSetupActionOperation extends BackboneElement
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotBlank]
         public ?bool $encodeRequestUrl = null,
         /** @var TestScriptRequestMethodCodeType|null method delete | get | options | patch | post | put | head */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/http-operations|4.3.0', strength: 'required')]
         public ?TestScriptRequestMethodCodeType $method = null,
         /** @var int|null origin Server initiating the request */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]

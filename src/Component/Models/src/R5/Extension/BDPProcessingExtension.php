@@ -28,7 +28,7 @@ class BDPProcessingExtension extends Extension implements FHIRComplexExtensionIn
         /** @var StringPrimitive|null description Processing of description */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public ?StringPrimitive $description = null,
-        /** @var CodeableReference|null procedure Procesing procedure */
+        /** @var CodeableReference|null procedure Processing procedure */
         #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex')]
         public ?CodeableReference $procedure = null,
         /** @var Reference|null additive Substance added during processing */

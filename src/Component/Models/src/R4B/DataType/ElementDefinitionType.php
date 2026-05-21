@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -14,6 +16,18 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description The data type or resource that the value of this element is permitted to be.
  */
 #[FHIRComplexType(typeName: 'ElementDefinition.type', fhirVersion: 'R4B')]
+#[FHIRPathInvariant(
+    key: 'eld-4',
+    severity: 'error',
+    expression: 'aggregation.empty() or (code = \'Reference\') or (code = \'canonical\')',
+    human: 'Aggregation may only be specified if one of the allowed types for the element is a reference',
+)]
+#[FHIRPathInvariant(
+    key: 'eld-17',
+    severity: 'error',
+    expression: '(code=\'Reference\' or code = \'canonical\' or code = \'CodeableReference\') or targetProfile.empty()',
+    human: 'targetProfile is only allowed if the type is Reference or canonical',
+)]
 class ElementDefinitionType extends Element
 {
     public function __construct(
@@ -33,10 +47,10 @@ class ElementDefinitionType extends Element
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true)]
         public array $targetProfile = [],
         /** @var array<AggregationModeType> aggregation contained | referenced | bundled - how aggregated */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/resource-aggregation-mode|4.3.0', strength: 'required')]
         public array $aggregation = [],
         /** @var ReferenceVersionRulesType|null versioning either | independent | specific */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/reference-version-rules|4.3.0', strength: 'required')]
         public ?ReferenceVersionRulesType $versioning = null,
     ) {
         parent::__construct($id, $extension);

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -69,7 +70,7 @@ class ImmunizationResource extends DomainResourceResource
         )]
         public array $identifier = [],
         /** @var ImmunizationStatusCodesType|null status completed | entered-in-error | not-done */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/immunization-status|4.0.1', strength: 'required')]
         public ?ImmunizationStatusCodesType $status = null,
         /** @var CodeableConcept|null statusReason Reason not done */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]

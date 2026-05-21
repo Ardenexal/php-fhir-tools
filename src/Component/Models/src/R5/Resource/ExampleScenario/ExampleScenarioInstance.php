@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\ExampleScenario;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -20,6 +21,42 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A single data collection that is shared as part of the scenario.
  */
 #[FHIRBackboneElement(parentResource: 'ExampleScenario', elementPath: 'ExampleScenario.instance', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'exs-1',
+    severity: 'error',
+    expression: 'structureType.exists() and structureType.memberOf(\'http://hl7.org/fhir/ValueSet/resource-types\').not() implies structureVersion.exists()',
+    human: 'StructureVersion is required if structureType is not FHIR (but may still be present even if FHIR)',
+)]
+#[FHIRPathInvariant(
+    key: 'exs-2',
+    severity: 'error',
+    expression: 'content.exists() implies version.empty()',
+    human: 'instance.content is only allowed if there are no instance.versions',
+)]
+#[FHIRPathInvariant(
+    key: 'exs-10',
+    severity: 'error',
+    expression: 'version.key.count() = version.key.distinct().count()',
+    human: 'Version keys must be unique within an instance',
+)]
+#[FHIRPathInvariant(
+    key: 'exs-11',
+    severity: 'error',
+    expression: 'version.title.count() = version.title.distinct().count()',
+    human: 'Version titles must be unique within an instance',
+)]
+#[FHIRPathInvariant(
+    key: 'exs-20',
+    severity: 'warning',
+    expression: '%resource.process.descendants().select(instanceReference).where($this=%context.key).exists()',
+    human: 'Instance should be referenced in at least one location',
+)]
+#[FHIRPathInvariant(
+    key: 'exs-21',
+    severity: 'warning',
+    expression: 'version.exists() implies version.key.intersect(%resource.process.descendants().where(instanceReference = %context.key).versionReference).exists()',
+    human: 'Instance version should be referenced in at least one operation',
+)]
 class ExampleScenarioInstance extends BackboneElement
 {
     public function __construct(

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CareTeamStatusType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
@@ -64,7 +65,7 @@ class CareTeamResource extends DomainResourceResource
         )]
         public array $identifier = [],
         /** @var CareTeamStatusType|null status proposed | active | suspended | inactive | entered-in-error */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/care-team-status|4.0.1', strength: 'required')]
         public ?CareTeamStatusType $status = null,
         /** @var array<CodeableConcept> category Type of team */
         #[FhirProperty(

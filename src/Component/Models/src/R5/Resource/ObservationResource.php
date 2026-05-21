@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Attachment;
@@ -41,6 +43,24 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description Measurements and simple assertions made about a patient, device or other subject.
  */
 #[FhirResource(type: 'Observation', version: '5.0.0', url: 'http://hl7.org/fhir/StructureDefinition/Observation', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'obs-6',
+    severity: 'error',
+    expression: 'dataAbsentReason.empty() or value.empty()',
+    human: 'dataAbsentReason SHALL only be present if Observation.value[x] is not present',
+)]
+#[FHIRPathInvariant(
+    key: 'obs-7',
+    severity: 'error',
+    expression: 'value.empty() or component.code.where(coding.intersect(%resource.code.coding).exists()).empty()',
+    human: 'If Observation.component.code is the same as Observation.code, then Observation.value SHALL NOT be present (the Observation.component.value[x] holds the value).',
+)]
+#[FHIRPathInvariant(
+    key: 'obs-8',
+    severity: 'error',
+    expression: 'bodySite.exists() implies bodyStructure.empty()',
+    human: 'bodyStructure SHALL only be present if Observation.bodySite is not present',
+)]
 class ObservationResource extends DomainResourceResource
 {
     public function __construct(
@@ -54,7 +74,7 @@ class ObservationResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -122,7 +142,7 @@ class ObservationResource extends DomainResourceResource
         )]
         public array $partOf = [],
         /** @var ObservationStatusType|null status registered | preliminary | final | amended + */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/observation-status|5.0.0', strength: 'required')]
         public ?ObservationStatusType $status = null,
         /** @var array<CodeableConcept> category Classification of  type of observation */
         #[FhirProperty(

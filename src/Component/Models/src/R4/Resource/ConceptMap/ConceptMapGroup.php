@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
+use Symfony\Component\Validator\Constraints\Count;
 
 /**
  * @description A group of mappings that all have the same source and target system.
@@ -47,6 +48,7 @@ class ConceptMapGroup extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ConceptMap\ConceptMapGroupElement',
         )]
+        #[Count(min: 1)]
         public array $element = [],
         /** @var ConceptMapGroupUnmapped|null unmapped What to do when there is no mapping for the source concept */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]

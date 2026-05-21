@@ -21,7 +21,21 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  *
  * @see http://hl7.org/fhir/StructureDefinition/obligation
  *
- * @description When appearing on an element, documents obligations that apply to applications implementing that element.  When appearing at the root of a StructureDefinition, indicates obligations that apply to all listed elements within the extension.  When appearing on a type, indicates obligations that apply to the use of that specific type. The obligations relate to application behaviour, not the content of the element itself in the resource instances that contain this element. See the [Obligation](obligations.html) page in the core specification for further detail.
+ * @description When appearing on an element, documents obligations that apply to applications implementing that element.  When appearing at the root of a StructureDefinition, indicates obligations that apply to all listed elements within the extension.  When appearing on a type, indicates obligations that apply to the use of that specific type.
+ *
+ *   The obligations relate to application behaviour, not the content of the element itself in the resource instances that contain this element. See the [Obligation](obligations.html) page in the core specification for further detail.
+ *
+ *   The usage sub-extension allows for specific context dependent rules that link clinical, workflow or implementation context to obligations e.g. this is support for female patients.
+ *
+ *   Obligations apply to only data that 'fits' the semantics of the element and the overall instance. For example, a Composition, List, or other grouper may inherently filter what instances are 'in scope' and, in some cases, might even indicate the included instances themselves should be subsetted (i.e. filtering out elements or certain element repetitions)
+ *
+ *   Once the data that is semantically appropriate to share has been identified, it's subsequently filtered by 'what's allowed to be shared' based on regulation, consent, etc.
+ *
+ *    Obligations might apply to only a subset of the remaining elements based on any specified obligation 'filter'.
+ *
+ *    Of those, there may only be an obligation for a limited number of matching occurrences. Which occurrences are chosen is selected by the system adhering to the obligation.
+ *
+ *    Note that the result of this on elements with repetitions is that a variable number of results will be included based on all of the above rules, which may be zero or more in any given instance.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/obligation', fhirVersion: 'R4B')]
 class ObligationExtension extends Extension implements FHIRComplexExtensionInterface

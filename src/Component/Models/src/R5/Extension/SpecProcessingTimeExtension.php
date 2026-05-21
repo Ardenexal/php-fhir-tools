@@ -15,7 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
  *
  * @see http://hl7.org/fhir/StructureDefinition/specimen-processingTime
  *
- * @description Period or duration of processing. This is no longer relevant for R6 due to a matching element in R6. This extension is now deprecated.
+ * @description Period or duration of processing. In R6, this extension is replaced by Specimen.processing.time[x].
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/specimen-processingTime', fhirVersion: 'R5')]
 class SpecProcessingTimeExtension extends Extension

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\XhtmlPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -27,7 +28,7 @@ class Narrative extends DataType
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var NarrativeStatusType|null status generated | extensions | additional | empty */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/narrative-status|5.0.0', strength: 'required')]
         public ?NarrativeStatusType $status = null,
         /** @var XhtmlPrimitive|null div Limited xhtml content */
         #[FhirProperty(fhirType: 'xhtml', propertyKind: 'primitive', isRequired: true), NotBlank]

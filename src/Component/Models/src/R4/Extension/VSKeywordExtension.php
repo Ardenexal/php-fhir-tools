@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *
  * @see http://hl7.org/fhir/StructureDefinition/valueset-keyWord
  *
- * @description Word or words used in an information retrieval system to indicate the content of the value set.
+ * @description Word or words used in an information retrieval system to indicate the content of the value set. From R5+, use ValueSet.topic
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-keyWord', fhirVersion: 'R4')]
 class VSKeywordExtension extends Extension

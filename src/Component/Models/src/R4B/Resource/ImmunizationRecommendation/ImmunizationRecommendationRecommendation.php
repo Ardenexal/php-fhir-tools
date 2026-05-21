@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\ImmunizationRecommen
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
@@ -21,6 +22,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     parentResource: 'ImmunizationRecommendation',
     elementPath: 'ImmunizationRecommendation.recommendation',
     fhirVersion: 'R4B',
+)]
+#[FHIRPathInvariant(
+    key: 'imr-1',
+    severity: 'error',
+    expression: 'vaccineCode.exists() or targetDisease.exists()',
+    human: 'One of vaccineCode or targetDisease SHALL be present',
 )]
 class ImmunizationRecommendationRecommendation extends BackboneElement
 {

@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier;
@@ -16,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\AdministrableProductDefinition\AdministrableProductDefinitionProperty;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\AdministrableProductDefinition\AdministrableProductDefinitionRouteOfAdministration;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -30,6 +33,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     version: '4.3.0',
     url: 'http://hl7.org/fhir/StructureDefinition/AdministrableProductDefinition',
     fhirVersion: 'R4B',
+)]
+#[FHIRPathInvariant(
+    key: 'apd-1',
+    severity: 'error',
+    expression: '(AdministrableProductDefinition.routeOfAdministration.code.count() + AdministrableProductDefinition.formOf.resolve().route.count())  < 2',
+    human: 'RouteOfAdministration cannot be used when the \'formOf\' product already uses MedicinalProductDefinition.route (and vice versa)',
 )]
 class AdministrableProductDefinitionResource extends DomainResourceResource
 {
@@ -67,7 +76,7 @@ class AdministrableProductDefinitionResource extends DomainResourceResource
         )]
         public array $identifier = [],
         /** @var PublicationStatusType|null status draft | active | retired | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|4.3.0', strength: 'required')]
         public ?PublicationStatusType $status = null,
         /** @var array<Reference> formOf References a product from which one or more of the constituent parts of that product can be prepared and used as described by this administrable product */
         #[FhirProperty(
@@ -118,6 +127,7 @@ class AdministrableProductDefinitionResource extends DomainResourceResource
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\AdministrableProductDefinition\AdministrableProductDefinitionRouteOfAdministration',
         )]
+        #[Count(min: 1)]
         public array $routeOfAdministration = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

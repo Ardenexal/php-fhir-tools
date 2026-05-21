@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Age;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\AllergyIntoleranceCategoryType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\AllergyIntoleranceCriticalityType;
@@ -37,6 +39,18 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     version: '4.3.0',
     url: 'http://hl7.org/fhir/StructureDefinition/AllergyIntolerance',
     fhirVersion: 'R4B',
+)]
+#[FHIRPathInvariant(
+    key: 'ait-1',
+    severity: 'error',
+    expression: '(verificationStatus.exists() and verificationStatus.coding.where(system=\'http://terminology.hl7.org/CodeSystem/allergyintolerance-verification\' and code=\'entered-in-error\').exists().not()) implies clinicalStatus.exists()',
+    human: 'AllergyIntolerance.clinicalStatus SHALL be present if verificationStatus is not entered-in-error.',
+)]
+#[FHIRPathInvariant(
+    key: 'ait-2',
+    severity: 'error',
+    expression: '(verificationStatus.coding.where(system=\'http://terminology.hl7.org/CodeSystem/allergyintolerance-verification\' and code=\'entered-in-error\').exists()) implies clinicalStatus.exists().not()',
+    human: 'AllergyIntolerance.clinicalStatus SHALL NOT be present if verification Status is entered-in-error',
 )]
 class AllergyIntoleranceResource extends DomainResourceResource
 {
@@ -74,19 +88,19 @@ class AllergyIntoleranceResource extends DomainResourceResource
         )]
         public array $identifier = [],
         /** @var CodeableConcept|null clinicalStatus active | inactive | resolved */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/allergyintolerance-clinical|4.3.0', strength: 'required')]
         public ?CodeableConcept $clinicalStatus = null,
         /** @var CodeableConcept|null verificationStatus unconfirmed | confirmed | refuted | entered-in-error */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/allergyintolerance-verification|4.3.0', strength: 'required')]
         public ?CodeableConcept $verificationStatus = null,
         /** @var AllergyIntoleranceTypeType|null type allergy | intolerance - Underlying mechanism (if known) */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/allergy-intolerance-type|4.3.0', strength: 'required')]
         public ?AllergyIntoleranceTypeType $type = null,
         /** @var array<AllergyIntoleranceCategoryType> category food | medication | environment | biologic */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/allergy-intolerance-category|4.3.0', strength: 'required')]
         public array $category = [],
         /** @var AllergyIntoleranceCriticalityType|null criticality low | high | unable-to-assess */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/allergy-intolerance-criticality|4.3.0', strength: 'required')]
         public ?AllergyIntoleranceCriticalityType $criticality = null,
         /** @var CodeableConcept|null code Code that identifies the allergy or intolerance */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]

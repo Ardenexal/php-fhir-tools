@@ -20,7 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  *
  * @see http://hl7.org/fhir/StructureDefinition/targetConstraint
  *
- * @description Specifies a constraint that is enforced on instantiated (or target) resources. This extension can be applied to definitional resources (such as ActivityDefinition or Measure) and indicates that the constraint should be enforced on resources that are instantiated from the definition. For example, this extension can be used to define a constraint such as `numerator count must be less than or equal to denominator count`.
+ * @description Specifies a constraint that is enforced on instantiated (or target) resources. This extension can be applied to definitional resources (such as ActivityDefinition or Measure) and indicates that the constraint should be enforced on resources that are instantiated from the definition. Instantiation typically happens as part of an operation, for example, the instantiation of a Measure is the MeasureReport that results from evaluating the Measure using the $evaluate operation; the instantiation of a Library.parameter is the actual argument passed to the $evaluate operation; and the instantiation of an ActivityDefinition is the Request resource that results from applying the definition to a specific context using the $apply operation. As an example use case, this extension can be used to define a constraint such as `numerator count must be less than or equal to denominator count`.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/targetConstraint', fhirVersion: 'R4B')]
 class TargetConstraintExtension extends Extension implements FHIRComplexExtensionInterface

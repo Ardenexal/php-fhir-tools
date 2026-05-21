@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -31,6 +33,18 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description The MeasureReport resource contains the results of the calculation of a measure; and optionally a reference to the resources involved in that calculation.
  */
 #[FhirResource(type: 'MeasureReport', version: '5.0.0', url: 'http://hl7.org/fhir/StructureDefinition/MeasureReport', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'mrp-1',
+    severity: 'error',
+    expression: '(type != \'data-exchange\') or group.exists().not()',
+    human: 'Measure Reports used for data collection SHALL NOT communicate group and score information',
+)]
+#[FHIRPathInvariant(
+    key: 'mrp-2',
+    severity: 'error',
+    expression: 'group.stratifier.stratum.all(value.exists() xor component.exists())',
+    human: 'Stratifiers SHALL be either a single criteria or a set of criteria components',
+)]
 class MeasureReportResource extends DomainResourceResource
 {
     public function __construct(
@@ -44,7 +58,7 @@ class MeasureReportResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -67,13 +81,13 @@ class MeasureReportResource extends DomainResourceResource
         )]
         public array $identifier = [],
         /** @var MeasureReportStatusType|null status complete | pending | error */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/measure-report-status|5.0.0', strength: 'required')]
         public ?MeasureReportStatusType $status = null,
         /** @var MeasureReportTypeType|null type individual | subject-list | summary | data-exchange */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/measure-report-type|5.0.0', strength: 'required')]
         public ?MeasureReportTypeType $type = null,
         /** @var SubmitDataUpdateTypeType|null dataUpdateType incremental | snapshot */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/submit-data-update-type|5.0.0', strength: 'required')]
         public ?SubmitDataUpdateTypeType $dataUpdateType = null,
         /** @var CanonicalPrimitive|null measure What measure was calculated */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
@@ -103,7 +117,7 @@ class MeasureReportResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $scoring = null,
         /** @var CodeableConcept|null improvementNotation increase | decrease */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/measure-improvement-notation|5.0.0', strength: 'required')]
         public ?CodeableConcept $improvementNotation = null,
         /** @var array<MeasureReportGroup> group Measure results for each group */
         #[FhirProperty(

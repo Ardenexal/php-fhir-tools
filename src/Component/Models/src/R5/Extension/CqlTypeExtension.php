@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  *
  * @see http://hl7.org/fhir/StructureDefinition/cqf-cqlType
  *
- * @description Surfaces the CQL type of the parameter definition on which it appears.
+ * @description Surfaces the CQL type of the extension, parameter, or parameter definition on which it appears.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-cqlType', fhirVersion: 'R5')]
 class CqlTypeExtension extends Extension

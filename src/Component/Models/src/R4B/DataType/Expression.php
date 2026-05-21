@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
@@ -19,6 +20,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A expression that is evaluated in a specified context and returns a value. The context of use of the expression must specify the context in which the expression is evaluated, and how the result of the expression is used.
  */
 #[FHIRComplexType(typeName: 'Expression', fhirVersion: 'R4B')]
+#[FHIRPathInvariant(
+    key: 'exp-1',
+    severity: 'error',
+    expression: 'expression.exists() or reference.exists()',
+    human: 'An expression or a reference must be provided',
+)]
 class Expression extends Element
 {
     public function __construct(

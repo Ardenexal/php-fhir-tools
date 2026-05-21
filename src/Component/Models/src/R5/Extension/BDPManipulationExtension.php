@@ -18,7 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  *
  * @see http://hl7.org/fhir/StructureDefinition/biologicallyderivedproduct-manipulation
  *
- * @description Extension for manipulation of a biologically dervied product.
+ * @description Extension for manipulation of a biologically derived product.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/biologicallyderivedproduct-manipulation', fhirVersion: 'R5')]
 class BDPManipulationExtension extends Extension implements FHIRComplexExtensionInterface
@@ -27,7 +27,7 @@ class BDPManipulationExtension extends Extension implements FHIRComplexExtension
         /** @var StringPrimitive|null description Description of manipulation */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public ?StringPrimitive $description = null,
-        /** @var array<CodeableReference> procedure Procesing procedure */
+        /** @var array<CodeableReference> procedure Processing procedure */
         #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex', isArray: true)]
         public array $procedure = [],
         /** @var DateTimePrimitive|null timeX Time of manipulation */

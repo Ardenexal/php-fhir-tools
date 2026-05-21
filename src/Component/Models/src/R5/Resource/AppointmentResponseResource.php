@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AppointmentResponseStatusType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
@@ -34,6 +36,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     url: 'http://hl7.org/fhir/StructureDefinition/AppointmentResponse',
     fhirVersion: 'R5',
 )]
+#[FHIRPathInvariant(
+    key: 'apr-1',
+    severity: 'error',
+    expression: 'participantType.exists() or actor.exists()',
+    human: 'Either the participantType or actor must be specified',
+)]
 class AppointmentResponseResource extends DomainResourceResource
 {
     public function __construct(
@@ -47,7 +55,7 @@ class AppointmentResponseResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -93,7 +101,7 @@ class AppointmentResponseResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $actor = null,
         /** @var AppointmentResponseStatusType|null participantStatus accepted | declined | tentative | needs-action | entered-in-error */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/appointmentresponse-status|5.0.0', strength: 'required')]
         public ?AppointmentResponseStatusType $participantStatus = null,
         /** @var MarkdownPrimitive|null comment Additional comments */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]

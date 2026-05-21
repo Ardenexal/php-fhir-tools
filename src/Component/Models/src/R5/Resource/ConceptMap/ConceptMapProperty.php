@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\ConceptMap;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\ConceptMapPropertyTypeType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -19,6 +21,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A property defines a slot through which additional information can be provided about a map from source -> target.
  */
 #[FHIRBackboneElement(parentResource: 'ConceptMap', elementPath: 'ConceptMap.property', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'cmd-11',
+    severity: 'error',
+    expression: 'type = \'code\' implies system.exists()',
+    human: 'If the property type is code, a system SHALL be specified',
+)]
 class ConceptMapProperty extends BackboneElement
 {
     public function __construct(
@@ -41,7 +49,7 @@ class ConceptMapProperty extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $description = null,
         /** @var ConceptMapPropertyTypeType|null type Coding | string | integer | boolean | dateTime | decimal | code */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/conceptmap-property-type|5.0.0', strength: 'required')]
         public ?ConceptMapPropertyTypeType $type = null,
         /** @var CanonicalPrimitive|null system The CodeSystem from which code values come */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]

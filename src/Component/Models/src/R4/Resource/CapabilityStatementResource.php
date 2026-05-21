@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CapabilityStatementKindType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactDetail;
@@ -26,6 +28,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\CapabilityStatement\Capabil
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\CapabilityStatement\CapabilityStatementMessaging;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\CapabilityStatement\CapabilityStatementRest;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\CapabilityStatement\CapabilityStatementSoftware;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -40,6 +43,54 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     version: '4.0.1',
     url: 'http://hl7.org/fhir/StructureDefinition/CapabilityStatement',
     fhirVersion: 'R4',
+)]
+#[FHIRPathInvariant(
+    key: 'cpb-0',
+    severity: 'warning',
+    expression: 'name.matches(\'[A-Z]([A-Za-z0-9_]){0,254}\')',
+    human: 'Name should be usable as an identifier for the module by machine processing applications such as code generation',
+)]
+#[FHIRPathInvariant(
+    key: 'cpb-1',
+    severity: 'error',
+    expression: 'rest.exists() or messaging.exists() or document.exists()',
+    human: 'A Capability Statement SHALL have at least one of REST, messaging or document element.',
+)]
+#[FHIRPathInvariant(
+    key: 'cpb-2',
+    severity: 'error',
+    expression: '(description.count() + software.count() + implementation.count()) > 0',
+    human: 'A Capability Statement SHALL have at least one of description, software, or implementation element.',
+)]
+#[FHIRPathInvariant(
+    key: 'cpb-3',
+    severity: 'error',
+    expression: 'messaging.endpoint.empty() or kind = \'instance\'',
+    human: 'Messaging end-point is required (and is only permitted) when a statement is for an implementation.',
+)]
+#[FHIRPathInvariant(
+    key: 'cpb-7',
+    severity: 'error',
+    expression: 'document.select(profile&mode).isDistinct()',
+    human: 'The set of documents must be unique by the combination of profile and mode.',
+)]
+#[FHIRPathInvariant(
+    key: 'cpb-14',
+    severity: 'error',
+    expression: '(kind != \'instance\') or implementation.exists()',
+    human: 'If kind = instance, implementation must be present and software may be present',
+)]
+#[FHIRPathInvariant(
+    key: 'cpb-15',
+    severity: 'error',
+    expression: '(kind != \'capability\') or (implementation.exists().not() and software.exists())',
+    human: 'If kind = capability, implementation must be absent, software must be present',
+)]
+#[FHIRPathInvariant(
+    key: 'cpb-16',
+    severity: 'error',
+    expression: '(kind!=\'requirements\') or (implementation.exists().not() and software.exists().not())',
+    human: 'If kind = requirements, implementation and software must be absent',
 )]
 class CapabilityStatementResource extends DomainResourceResource
 {
@@ -81,7 +132,7 @@ class CapabilityStatementResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $title = null,
         /** @var PublicationStatusType|null status draft | active | retired | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|4.0.1', strength: 'required')]
         public ?PublicationStatusType $status = null,
         /** @var bool|null experimental For testing purposes, not real usage */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
@@ -126,7 +177,7 @@ class CapabilityStatementResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $copyright = null,
         /** @var CapabilityStatementKindType|null kind instance | capability | requirements */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/capability-statement-kind|4.0.1', strength: 'required')]
         public ?CapabilityStatementKindType $kind = null,
         /** @var array<CanonicalPrimitive> instantiates Canonical URL of another capability statement this implements */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true)]
@@ -141,13 +192,13 @@ class CapabilityStatementResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
         public ?CapabilityStatementImplementation $implementation = null,
         /** @var FHIRVersionType|null fhirVersion FHIR Version the system supports */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/FHIR-version|4.0.1', strength: 'required')]
         public ?FHIRVersionType $fhirVersion = null,
         /** @var array<MimeTypesType> format formats supported (xml | json | ttl | mime type) */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true, isRequired: true)]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true, isRequired: true), Count(min: 1), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/mimetypes|4.0.1', strength: 'required')]
         public array $format = [],
         /** @var array<MimeTypesType> patchFormat Patch formats supported */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/mimetypes|4.0.1', strength: 'required')]
         public array $patchFormat = [],
         /** @var array<CanonicalPrimitive> implementationGuide Implementation guides supported */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true)]

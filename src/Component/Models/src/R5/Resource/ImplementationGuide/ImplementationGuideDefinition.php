@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\ImplementationGuide;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 
@@ -13,6 +14,12 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * @description The information needed by an IG publisher tool to publish the whole implementation guide.
  */
 #[FHIRBackboneElement(parentResource: 'ImplementationGuide', elementPath: 'ImplementationGuide.definition', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'ig-1',
+    severity: 'error',
+    expression: 'resource.groupingId.all(%context.grouping.id contains $this)',
+    human: 'If a resource has a groupingId, it must refer to a grouping defined in the Implementation Guide',
+)]
 class ImplementationGuideDefinition extends BackboneElement
 {
     public function __construct(

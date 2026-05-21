@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -36,6 +38,18 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description Measurements and simple assertions made about a patient, device or other subject.
  */
 #[FhirResource(type: 'Observation', version: '4.0.1', url: 'http://hl7.org/fhir/StructureDefinition/Observation', fhirVersion: 'R4')]
+#[FHIRPathInvariant(
+    key: 'obs-6',
+    severity: 'error',
+    expression: 'dataAbsentReason.empty() or value.empty()',
+    human: 'dataAbsentReason SHALL only be present if Observation.value[x] is not present',
+)]
+#[FHIRPathInvariant(
+    key: 'obs-7',
+    severity: 'error',
+    expression: 'value.empty() or component.code.where(coding.intersect(%resource.code.coding).exists()).empty()',
+    human: 'If Observation.code is the same as an Observation.component.code then the value element associated with the code SHALL NOT be present',
+)]
 class ObservationResource extends DomainResourceResource
 {
     public function __construct(
@@ -88,7 +102,7 @@ class ObservationResource extends DomainResourceResource
         )]
         public array $partOf = [],
         /** @var ObservationStatusType|null status registered | preliminary | final | amended + */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/observation-status|4.0.1', strength: 'required')]
         public ?ObservationStatusType $status = null,
         /** @var array<CodeableConcept> category Classification of  type of observation */
         #[FhirProperty(

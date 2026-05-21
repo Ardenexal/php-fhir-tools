@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
@@ -18,6 +20,12 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
  * @description A length of time.
  */
 #[FHIRComplexType(typeName: 'Duration', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'drt-1',
+    severity: 'error',
+    expression: 'code.exists() implies ((system = %ucum) and value.exists())',
+    human: 'There SHALL be a code if there is a value and it SHALL be an expression of time.  If system is present, it SHALL be UCUM.',
+)]
 class Duration extends Quantity
 {
     public function __construct(
@@ -31,7 +39,7 @@ class Duration extends Quantity
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
         public ?string $value = null,
         /** @var QuantityComparatorType|null comparator < | <= | >= | > | ad - how to understand the value */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/quantity-comparator|5.0.0', strength: 'required')]
         public ?QuantityComparatorType $comparator = null,
         /** @var StringPrimitive|string|null unit Unit representation */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

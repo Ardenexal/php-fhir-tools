@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\DeviceMetricCategoryType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\DeviceMetricColorType;
@@ -75,13 +76,13 @@ class DeviceMetricResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $parent = null,
         /** @var DeviceMetricOperationalStatusType|null operationalStatus on | off | standby | entered-in-error */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/metric-operational-status|4.3.0', strength: 'required')]
         public ?DeviceMetricOperationalStatusType $operationalStatus = null,
         /** @var DeviceMetricColorType|null color black | red | green | yellow | blue | magenta | cyan | white */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/metric-color|4.3.0', strength: 'required')]
         public ?DeviceMetricColorType $color = null,
         /** @var DeviceMetricCategoryType|null category measurement | setting | calculation | unspecified */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/metric-category|4.3.0', strength: 'required')]
         public ?DeviceMetricCategoryType $category = null,
         /** @var Timing|null measurementPeriod Describes the measurement repetition time */
         #[FhirProperty(fhirType: 'Timing', propertyKind: 'complex')]

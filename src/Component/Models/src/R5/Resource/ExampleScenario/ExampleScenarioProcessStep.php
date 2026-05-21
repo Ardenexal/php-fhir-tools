@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\ExampleScenario;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
@@ -15,6 +16,18 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  * @description A significant action that occurs as part of the process.
  */
 #[FHIRBackboneElement(parentResource: 'ExampleScenario', elementPath: 'ExampleScenario.process.step', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'exs-13',
+    severity: 'error',
+    expression: 'alternative.title.count() = alternative.title.distinct().count()',
+    human: 'Alternative titles must be unique within a step',
+)]
+#[FHIRPathInvariant(
+    key: 'exs-22',
+    severity: 'error',
+    expression: '(process.exists() implies workflow.empty() and operation.empty()) and (workflow.exists() implies operation.empty())',
+    human: 'Can have a process, a workflow, one or more operations or none of these, but cannot have a combination',
+)]
 class ExampleScenarioProcessStep extends BackboneElement
 {
     public function __construct(

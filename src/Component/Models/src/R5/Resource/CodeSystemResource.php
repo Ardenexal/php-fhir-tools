@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeSystemContentModeType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeSystemHierarchyMeaningType;
@@ -40,6 +42,36 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description The CodeSystem resource is used to declare the existence of and describe a code system or code system supplement and its key properties, and optionally define a part or all of its content.
  */
 #[FhirResource(type: 'CodeSystem', version: '5.0.0', url: 'http://hl7.org/fhir/StructureDefinition/CodeSystem', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'cnl-0',
+    severity: 'warning',
+    expression: 'name.exists() implies name.matches(\'^[A-Z]([A-Za-z0-9_]){1,254}$\')',
+    human: 'Name should be usable as an identifier for the module by machine processing applications such as code generation',
+)]
+#[FHIRPathInvariant(
+    key: 'csd-1',
+    severity: 'error',
+    expression: 'concept.exists() implies concept.code.combine(%resource.concept.descendants().concept.code).isDistinct()',
+    human: 'Within a code system definition, all the codes SHALL be unique',
+)]
+#[FHIRPathInvariant(
+    key: 'csd-2',
+    severity: 'warning',
+    expression: 'concept.concept.exists() implies hierarchyMeaning.exists()',
+    human: 'If there is an explicit hierarchy, a hierarchyMeaning should be provided',
+)]
+#[FHIRPathInvariant(
+    key: 'csd-3',
+    severity: 'warning',
+    expression: 'concept.where(property.code = \'parent\' or property.code = \'child\').exists() implies hierarchyMeaning.exists()',
+    human: 'If there is an implicit hierarchy, a hierarchyMeaning should be provided',
+)]
+#[FHIRPathInvariant(
+    key: 'csd-4',
+    severity: 'error',
+    expression: 'CodeSystem.content = \'supplement\' implies CodeSystem.supplements.exists()',
+    human: 'If the code system content = supplement, it must nominate what it\'s a supplement for',
+)]
 class CodeSystemResource extends DomainResourceResource
 {
     public function __construct(
@@ -53,7 +85,7 @@ class CodeSystemResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -109,7 +141,7 @@ class CodeSystemResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $title = null,
         /** @var PublicationStatusType|null status draft | active | retired | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|5.0.0', strength: 'required')]
         public ?PublicationStatusType $status = null,
         /** @var bool|null experimental For testing purposes, not real usage */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
@@ -220,7 +252,7 @@ class CodeSystemResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
         public ?CanonicalPrimitive $valueSet = null,
         /** @var CodeSystemHierarchyMeaningType|null hierarchyMeaning grouped-by | is-a | part-of | classified-with */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/codesystem-hierarchy-meaning|5.0.0', strength: 'required')]
         public ?CodeSystemHierarchyMeaningType $hierarchyMeaning = null,
         /** @var bool|null compositional If code system defines a compositional grammar */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
@@ -229,7 +261,7 @@ class CodeSystemResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $versionNeeded = null,
         /** @var CodeSystemContentModeType|null content not-present | example | fragment | complete | supplement */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/codesystem-content-mode|5.0.0', strength: 'required')]
         public ?CodeSystemContentModeType $content = null,
         /** @var CanonicalPrimitive|null supplements Canonical URL of Code System this adds designations and properties to */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]

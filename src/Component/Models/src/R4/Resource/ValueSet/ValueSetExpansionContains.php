@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\ValueSet;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
@@ -16,6 +17,24 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
  * @description The codes that are contained in the value set expansion.
  */
 #[FHIRBackboneElement(parentResource: 'ValueSet', elementPath: 'ValueSet.expansion.contains', fhirVersion: 'R4')]
+#[FHIRPathInvariant(
+    key: 'vsd-6',
+    severity: 'error',
+    expression: 'code.exists() or display.exists()',
+    human: 'SHALL have a code or a display',
+)]
+#[FHIRPathInvariant(
+    key: 'vsd-9',
+    severity: 'error',
+    expression: 'code.exists() or abstract = true',
+    human: 'Must have a code if not abstract',
+)]
+#[FHIRPathInvariant(
+    key: 'vsd-10',
+    severity: 'error',
+    expression: 'code.empty() or system.exists()',
+    human: 'Must have a system if a code is present',
+)]
 class ValueSetExpansionContains extends BackboneElement
 {
     public function __construct(

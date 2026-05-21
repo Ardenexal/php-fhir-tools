@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Count;
 
 /**
  * @description Actors represent the individuals or groups involved in the execution of the defined set of activities.
@@ -41,6 +42,7 @@ class PlanDefinitionActor extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\PlanDefinition\PlanDefinitionActorOption',
         )]
+        #[Count(min: 1)]
         public array $option = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

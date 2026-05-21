@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\FinancialResourceStatusCodesType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
@@ -64,7 +65,7 @@ class EnrollmentRequestResource extends DomainResourceResource
         )]
         public array $identifier = [],
         /** @var FinancialResourceStatusCodesType|null status active | cancelled | draft | entered-in-error */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/fm-status|4.0.1', strength: 'required')]
         public ?FinancialResourceStatusCodesType $status = null,
         /** @var DateTimePrimitive|null created Creation date */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]

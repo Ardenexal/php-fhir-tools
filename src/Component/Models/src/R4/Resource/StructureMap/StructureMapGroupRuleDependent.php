@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -32,7 +33,7 @@ class StructureMapGroupRuleDependent extends BackboneElement
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?IdPrimitive $name = null,
         /** @var array<StringPrimitive|string> variable Variable to pass to the rule or group */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true, isRequired: true)]
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true, isRequired: true), Count(min: 1)]
         public array $variable = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

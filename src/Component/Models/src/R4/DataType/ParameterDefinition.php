@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
@@ -32,7 +33,7 @@ class ParameterDefinition extends Element
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
         public ?CodePrimitive $name = null,
         /** @var OperationParameterUseType|null use in | out */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/operation-parameter-use|4.0.1', strength: 'required')]
         public ?OperationParameterUseType $use = null,
         /** @var int|null min Minimum cardinality */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
@@ -44,7 +45,7 @@ class ParameterDefinition extends Element
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $documentation = null,
         /** @var FHIRAllTypesType|null type What type of value */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-types|4.0.1', strength: 'required')]
         public ?FHIRAllTypesType $type = null,
         /** @var CanonicalPrimitive|null profile What profile the value is expected to be */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]

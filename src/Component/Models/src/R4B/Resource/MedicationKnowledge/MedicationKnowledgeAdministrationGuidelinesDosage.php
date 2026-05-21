@@ -8,8 +8,9 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Dosage;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Dosage;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -41,8 +42,9 @@ class MedicationKnowledgeAdministrationGuidelinesDosage extends BackboneElement
             propertyKind: 'complex',
             isArray: true,
             isRequired: true,
-            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Dosage',
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Dosage',
         )]
+        #[Count(min: 1)]
         public array $dosage = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

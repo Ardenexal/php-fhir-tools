@@ -6,13 +6,21 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\TestScript;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Symfony\Component\Validator\Constraints\Count;
 
 /**
  * @description The required capability must exist and are assumed to function correctly on the FHIR server being tested.
  */
 #[FHIRBackboneElement(parentResource: 'TestScript', elementPath: 'TestScript.metadata', fhirVersion: 'R4')]
+#[FHIRPathInvariant(
+    key: 'tst-4',
+    severity: 'error',
+    expression: 'capability.required.exists() or capability.validated.exists()',
+    human: 'TestScript metadata capability SHALL contain required or validated or both.',
+)]
 class TestScriptMetadata extends BackboneElement
 {
     public function __construct(
@@ -41,6 +49,7 @@ class TestScriptMetadata extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\TestScript\TestScriptMetadataCapability',
         )]
+        #[Count(min: 1)]
         public array $capability = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

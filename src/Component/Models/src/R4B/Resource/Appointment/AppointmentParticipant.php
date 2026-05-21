@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\Appointment;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
@@ -19,6 +21,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description List of participants involved in the appointment.
  */
 #[FHIRBackboneElement(parentResource: 'Appointment', elementPath: 'Appointment.participant', fhirVersion: 'R4B')]
+#[FHIRPathInvariant(
+    key: 'app-1',
+    severity: 'error',
+    expression: 'type.exists() or actor.exists()',
+    human: 'Either the type or actor on the participant SHALL be specified',
+)]
 class AppointmentParticipant extends BackboneElement
 {
     public function __construct(
@@ -43,10 +51,10 @@ class AppointmentParticipant extends BackboneElement
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $actor = null,
         /** @var ParticipantRequiredType|null required required | optional | information-only */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/participantrequired|4.3.0', strength: 'required')]
         public ?ParticipantRequiredType $required = null,
         /** @var ParticipationStatusType|null status accepted | declined | tentative | needs-action */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/participationstatus|4.3.0', strength: 'required')]
         public ?ParticipationStatusType $status = null,
         /** @var Period|null period Participation period of the actor */
         #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]

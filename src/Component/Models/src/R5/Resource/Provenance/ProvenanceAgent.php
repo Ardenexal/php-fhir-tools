@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\Provenance;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -16,6 +17,24 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description An actor taking a role in an activity  for which it can be assigned some degree of responsibility for the activity taking place.
  */
 #[FHIRBackboneElement(parentResource: 'Provenance', elementPath: 'Provenance.agent', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'prov-1',
+    severity: 'error',
+    expression: 'who.resolve().exists() and onBehalfOf.resolve().exists() implies who.resolve() != onBehalfOf.resolve()',
+    human: 'Who and onBehalfOf cannot be the same',
+)]
+#[FHIRPathInvariant(
+    key: 'prov-2',
+    severity: 'error',
+    expression: 'who.resolve().ofType(PractitionerRole).practitioner.resolve().exists() and onBehalfOf.resolve().ofType(Practitioner).exists() implies who.resolve().practitioner.resolve() != onBehalfOf.resolve()',
+    human: 'If who is a PractitionerRole, onBehalfOf can\'t reference the same Practitioner',
+)]
+#[FHIRPathInvariant(
+    key: 'prov-3',
+    severity: 'error',
+    expression: 'who.resolve().ofType(Organization).exists() and onBehalfOf.resolve().ofType(PractitionerRole).organization.resolve().exists() implies who.resolve() != onBehalfOf.resolve().organization.resolve()',
+    human: 'If who is an organization, onBehalfOf can\'t be a PractitionerRole within that organization',
+)]
 class ProvenanceAgent extends BackboneElement
 {
     public function __construct(

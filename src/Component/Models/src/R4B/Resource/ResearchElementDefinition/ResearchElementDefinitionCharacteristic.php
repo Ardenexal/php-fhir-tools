@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\ResearchElementDefin
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\DataRequirement;
@@ -84,7 +85,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $exclude = null,
         /** @var CodeableConcept|null unitOfMeasure What unit is the outcome described in? */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/ucum-units|4.3.0', strength: 'required')]
         public ?CodeableConcept $unitOfMeasure = null,
         /** @var StringPrimitive|string|null studyEffectiveDescription What time period does the study cover */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -126,7 +127,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
         #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex')]
         public ?Duration $studyEffectiveTimeFromStart = null,
         /** @var GroupMeasureType|null studyEffectiveGroupMeasure mean | median | mean-of-mean | mean-of-median | median-of-mean | median-of-median */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/group-measure|4.3.0', strength: 'required')]
         public ?GroupMeasureType $studyEffectiveGroupMeasure = null,
         /** @var StringPrimitive|string|null participantEffectiveDescription What time period do participants cover */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -168,7 +169,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
         #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex')]
         public ?Duration $participantEffectiveTimeFromStart = null,
         /** @var GroupMeasureType|null participantEffectiveGroupMeasure mean | median | mean-of-mean | mean-of-median | median-of-mean | median-of-median */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/group-measure|4.3.0', strength: 'required')]
         public ?GroupMeasureType $participantEffectiveGroupMeasure = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

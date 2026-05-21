@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
-use Ardenexal\FHIRTools\Component\Models\R5\Resource\ObservationResource;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\DiagnosticReportResource;
 
 /**
  * @author Grahame Grieve
  *
- * @see http://hl7.org/fhir/StructureDefinition/triglyceride
+ * @see http://hl7.org/fhir/StructureDefinition/lipidprofile
  *
- * @description Triglyceride Result
+ * @description Lipid Lab Report
  */
-#[FHIRProfile(profileUrl: 'http://hl7.org/fhir/StructureDefinition/triglyceride', baseType: 'Observation', fhirVersion: 'R5')]
-class ExampleLipidProfile extends ObservationResource
+#[FHIRProfile(profileUrl: 'http://hl7.org/fhir/StructureDefinition/lipidprofile', baseType: 'DiagnosticReport', fhirVersion: 'R5')]
+class ExampleLipidProfile extends DiagnosticReportResource
 {
     /** Canonical URL of this profile's StructureDefinition. */
-    public const string PROFILE_URL = 'http://hl7.org/fhir/StructureDefinition/triglyceride';
+    public const string PROFILE_URL = 'http://hl7.org/fhir/StructureDefinition/lipidprofile';
 }

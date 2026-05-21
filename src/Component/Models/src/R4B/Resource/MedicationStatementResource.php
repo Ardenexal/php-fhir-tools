@@ -6,9 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Dosage;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\MedicationStatementStatusCodesType;
@@ -87,7 +87,7 @@ class MedicationStatementResource extends DomainResourceResource
         )]
         public array $partOf = [],
         /** @var MedicationStatementStatusCodesType|null status active | completed | entered-in-error | intended | stopped | on-hold | unknown | not-taken */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/medication-statement-status|4.3.0', strength: 'required')]
         public ?MedicationStatementStatusCodesType $status = null,
         /** @var array<CodeableConcept> statusReason Reason for current status */
         #[FhirProperty(
@@ -193,7 +193,7 @@ class MedicationStatementResource extends DomainResourceResource
             fhirType: 'Dosage',
             propertyKind: 'complex',
             isArray: true,
-            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Dosage',
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Dosage',
         )]
         public array $dosage = [],
     ) {

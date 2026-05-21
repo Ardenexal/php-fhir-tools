@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\ConceptMap;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
@@ -16,6 +17,18 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  * @description Mappings for an individual concept in the source to one or more concepts in the target.
  */
 #[FHIRBackboneElement(parentResource: 'ConceptMap', elementPath: 'ConceptMap.group.element', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'cmd-4',
+    severity: 'error',
+    expression: '(noMap.exists() and noMap=true) implies target.empty()',
+    human: 'If noMap is present, target SHALL NOT be present',
+)]
+#[FHIRPathInvariant(
+    key: 'cmd-5',
+    severity: 'error',
+    expression: '(code.exists() and valueSet.empty()) or (code.empty() and valueSet.exists())',
+    human: 'Either code or valueSet SHALL be present but not both.',
+)]
 class ConceptMapGroupElement extends BackboneElement
 {
     public function __construct(

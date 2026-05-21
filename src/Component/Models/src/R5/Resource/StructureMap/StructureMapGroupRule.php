@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Count;
 
 /**
  * @description Transform Rule from source to target.
@@ -38,6 +39,7 @@ class StructureMapGroupRule extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\StructureMap\StructureMapGroupRuleSource',
         )]
+        #[Count(min: 1)]
         public array $source = [],
         /** @var array<StructureMapGroupRuleTarget> target Content to create because of this mapping rule */
         #[FhirProperty(

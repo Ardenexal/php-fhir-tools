@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\ClinicalUseDefinitionTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
@@ -33,6 +35,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     version: '4.3.0',
     url: 'http://hl7.org/fhir/StructureDefinition/ClinicalUseDefinition',
     fhirVersion: 'R4B',
+)]
+#[FHIRPathInvariant(
+    key: 'cud-1',
+    severity: 'error',
+    expression: '(ClinicalUseDefinition.indication.count() + ClinicalUseDefinition.contraindication.count() + ClinicalUseDefinition.interaction.count() + ClinicalUseDefinition.undesirableEffect.count() + ClinicalUseDefinition.warning.count())  < 2',
+    human: 'Indication, Contraindication, Interaction, UndesirableEffect and Warning cannot be used in the same instance',
 )]
 class ClinicalUseDefinitionResource extends DomainResourceResource
 {
@@ -70,7 +78,7 @@ class ClinicalUseDefinitionResource extends DomainResourceResource
         )]
         public array $identifier = [],
         /** @var ClinicalUseDefinitionTypeType|null type indication | contraindication | interaction | undesirable-effect | warning */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/clinical-use-definition-type|4.3.0', strength: 'required')]
         public ?ClinicalUseDefinitionTypeType $type = null,
         /** @var array<CodeableConcept> category A categorisation of the issue, primarily for dividing warnings into subject heading areas such as "Pregnancy", "Overdose" */
         #[FhirProperty(

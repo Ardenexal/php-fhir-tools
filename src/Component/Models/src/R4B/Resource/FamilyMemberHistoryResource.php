@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Age;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
@@ -37,6 +39,18 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     version: '4.3.0',
     url: 'http://hl7.org/fhir/StructureDefinition/FamilyMemberHistory',
     fhirVersion: 'R4B',
+)]
+#[FHIRPathInvariant(
+    key: 'fhs-1',
+    severity: 'error',
+    expression: 'age.empty() or born.empty()',
+    human: 'Can have age[x] or born[x], but not both',
+)]
+#[FHIRPathInvariant(
+    key: 'fhs-2',
+    severity: 'error',
+    expression: 'age.exists() or estimatedAge.empty()',
+    human: 'Can only have estimatedAge if age[x] is present',
 )]
 class FamilyMemberHistoryResource extends DomainResourceResource
 {
@@ -80,7 +94,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isArray: true)]
         public array $instantiatesUri = [],
         /** @var FamilyHistoryStatusType|null status partial | completed | entered-in-error | health-unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/history-status|4.3.0', strength: 'required')]
         public ?FamilyHistoryStatusType $status = null,
         /** @var CodeableConcept|null dataAbsentReason subject-unknown | withheld | unable-to-obtain | deferred */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]

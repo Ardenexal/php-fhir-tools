@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\Composition;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -18,6 +20,18 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  * @description The root of the sections that make up the composition.
  */
 #[FHIRBackboneElement(parentResource: 'Composition', elementPath: 'Composition.section', fhirVersion: 'R4')]
+#[FHIRPathInvariant(
+    key: 'cmp-1',
+    severity: 'error',
+    expression: 'text.exists() or entry.exists() or section.exists()',
+    human: 'A section must contain at least one of text, entries, or sub-sections',
+)]
+#[FHIRPathInvariant(
+    key: 'cmp-2',
+    severity: 'error',
+    expression: 'emptyReason.empty() or entry.empty()',
+    human: 'A section can only have an emptyReason if it is empty',
+)]
 class CompositionSection extends BackboneElement
 {
     public function __construct(
@@ -51,7 +65,7 @@ class CompositionSection extends BackboneElement
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
         /** @var ListModeType|null mode working | snapshot | changes */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/list-mode|4.0.1', strength: 'required')]
         public ?ListModeType $mode = null,
         /** @var CodeableConcept|null orderedBy Order of section entries */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]

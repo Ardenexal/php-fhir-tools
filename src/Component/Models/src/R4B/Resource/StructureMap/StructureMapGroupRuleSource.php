@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\StructureMap;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Address;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Age;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation;
@@ -19,7 +20,6 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Contributor;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Count;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\DataRequirement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Distance;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Dosage;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Duration;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Expression;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
@@ -55,6 +55,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UnsignedIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UrlPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UuidPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Dosage;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -368,7 +369,7 @@ class StructureMapGroupRuleSource extends BackboneElement
                 [
                     'fhirType'     => 'Dosage',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Dosage',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Dosage',
                     'jsonKey'      => 'defaultValueDosage',
                 ],
                 [
@@ -384,7 +385,7 @@ class StructureMapGroupRuleSource extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $element = null,
         /** @var StructureMapSourceListModeType|null listMode first | not_first | last | not_last | only_one */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/map-source-list-mode|4.3.0', strength: 'required')]
         public ?StructureMapSourceListModeType $listMode = null,
         /** @var IdPrimitive|null variable Named context for field, if a field is specified */
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive')]

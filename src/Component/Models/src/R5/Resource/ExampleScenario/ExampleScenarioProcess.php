@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\ExampleScenario;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
@@ -16,6 +17,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A group of operations that represents a significant step within a scenario.
  */
 #[FHIRBackboneElement(parentResource: 'ExampleScenario', elementPath: 'ExampleScenario.process', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'exs-5',
+    severity: 'error',
+    expression: '%resource.status=\'active\' or %resource.status=\'retired\' implies step.exists()',
+    human: 'Processes must have steps if ExampleScenario status is active or required',
+)]
 class ExampleScenarioProcess extends BackboneElement
 {
     public function __construct(

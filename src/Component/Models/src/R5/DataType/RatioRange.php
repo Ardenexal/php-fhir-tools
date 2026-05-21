@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 
 /**
  * @author HL7 FHIR Standard
@@ -15,6 +16,18 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
  * @description A range of ratios expressed as a low and high numerator and a denominator.
  */
 #[FHIRComplexType(typeName: 'RatioRange', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'ratrng-1',
+    severity: 'error',
+    expression: '((lowNumerator.exists() or highNumerator.exists()) and denominator.exists()) or (lowNumerator.empty() and highNumerator.empty() and denominator.empty() and extension.exists())',
+    human: 'One of lowNumerator or highNumerator and denominator SHALL be present, or all are absent. If all are absent, there SHALL be some extension present',
+)]
+#[FHIRPathInvariant(
+    key: 'ratrng-2',
+    severity: 'error',
+    expression: 'lowNumerator.hasValue().not() or highNumerator.hasValue().not()  or (lowNumerator.lowBoundary() <= highNumerator.highBoundary())',
+    human: 'If present, lowNumerator SHALL have a lower value than highNumerator',
+)]
 class RatioRange extends DataType
 {
     public function __construct(

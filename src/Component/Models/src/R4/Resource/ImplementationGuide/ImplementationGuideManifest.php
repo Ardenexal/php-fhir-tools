@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UrlPrimitive;
+use Symfony\Component\Validator\Constraints\Count;
 
 /**
  * @description Information about an assembled implementation guide, created by the publication tooling.
@@ -38,6 +39,7 @@ class ImplementationGuideManifest extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ImplementationGuide\ImplementationGuideManifestResource',
         )]
+        #[Count(min: 1)]
         public array $resource = [],
         /** @var array<ImplementationGuideManifestPage> page HTML page within the parent IG */
         #[FhirProperty(

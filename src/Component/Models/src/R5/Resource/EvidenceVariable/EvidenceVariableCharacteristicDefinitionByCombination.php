@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\EvidenceVariable;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CharacteristicCombinationType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -33,7 +34,7 @@ class EvidenceVariableCharacteristicDefinitionByCombination extends BackboneElem
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
         /** @var CharacteristicCombinationType|null code all-of | any-of | at-least | at-most | statistical | net-effect | dataset */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/characteristic-combination|5.0.0', strength: 'required')]
         public ?CharacteristicCombinationType $code = null,
         /** @var PositiveIntPrimitive|null threshold Provides the value of "n" when "at-least" or "at-most" codes are used */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]

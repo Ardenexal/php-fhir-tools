@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\BiologicallyDerivedP
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BiologicallyDerivedProductStorageScaleType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
@@ -35,7 +36,7 @@ class BiologicallyDerivedProductStorage extends BackboneElement
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
         public ?string $temperature = null,
         /** @var BiologicallyDerivedProductStorageScaleType|null scale farenheit | celsius | kelvin */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/product-storage-scale|4.3.0', strength: 'required')]
         public ?BiologicallyDerivedProductStorageScaleType $scale = null,
         /** @var Period|null duration Storage timeperiod */
         #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]

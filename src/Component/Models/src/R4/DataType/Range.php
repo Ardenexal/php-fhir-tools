@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 
 /**
  * @author HL7 FHIR Standard
@@ -15,6 +16,12 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
  * @description A set of ordered Quantities defined by a low and high limit.
  */
 #[FHIRComplexType(typeName: 'Range', fhirVersion: 'R4')]
+#[FHIRPathInvariant(
+    key: 'rng-2',
+    severity: 'error',
+    expression: 'low.empty() or high.empty() or (low <= high)',
+    human: 'If present, low SHALL have a lower value than high',
+)]
 class Range extends Element
 {
     public function __construct(

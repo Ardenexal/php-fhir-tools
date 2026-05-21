@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  *
  * @see http://hl7.org/fhir/StructureDefinition/composition-clinicaldocument-versionNumber
  *
- * @description Version specific identifier for the composition, assigned when each version is created/updated. Note: this extension is deprecated because since R5 Composition has a version element which should be used instead.
+ * @description Version specific identifier for the composition, assigned when each version is created/updated. Note: this extension is only used before R5 because Composition has a version element which should be used instead.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/composition-clinicaldocument-versionNumber', fhirVersion: 'R5')]
 class CDVersionNumberExtension extends Extension

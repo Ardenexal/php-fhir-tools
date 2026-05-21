@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
@@ -18,6 +20,12 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
  * @description A measured amount (or an amount that can potentially be measured). Note that measured amounts include amounts that are not precisely quantified, including amounts involving arbitrary units and floating currencies.
  */
 #[FHIRComplexType(typeName: 'Quantity', fhirVersion: 'R4')]
+#[FHIRPathInvariant(
+    key: 'qty-3',
+    severity: 'error',
+    expression: 'code.empty() or system.exists()',
+    human: 'If a code for the unit is present, the system SHALL also be present',
+)]
 class Quantity extends Element
 {
     public function __construct(
@@ -31,7 +39,7 @@ class Quantity extends Element
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
         public ?string $value = null,
         /** @var QuantityComparatorType|null comparator < | <= | >= | > - how to understand the value */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/quantity-comparator|4.0.1', strength: 'required')]
         public ?QuantityComparatorType $comparator = null,
         /** @var StringPrimitive|string|null unit Unit representation */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

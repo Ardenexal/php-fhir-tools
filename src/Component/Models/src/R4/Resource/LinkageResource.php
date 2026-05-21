@@ -6,12 +6,14 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\Linkage\LinkageItem;
+use Symfony\Component\Validator\Constraints\Count;
 
 /**
  * @author Health Level Seven International (Patient Care)
@@ -21,6 +23,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\Linkage\LinkageItem;
  * @description Identifies two or more records (resource instances) that refer to the same real-world "occurrence".
  */
 #[FhirResource(type: 'Linkage', version: '4.0.1', url: 'http://hl7.org/fhir/StructureDefinition/Linkage', fhirVersion: 'R4')]
+#[FHIRPathInvariant(key: 'lnk-1', severity: 'error', expression: 'item.count()>1', human: 'Must have at least two items')]
 class LinkageResource extends DomainResourceResource
 {
     public function __construct(
@@ -62,6 +65,7 @@ class LinkageResource extends DomainResourceResource
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Linkage\LinkageItem',
         )]
+        #[Count(min: 1)]
         public array $item = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

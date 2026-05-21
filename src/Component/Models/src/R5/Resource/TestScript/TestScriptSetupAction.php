@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\TestScript;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 
@@ -13,6 +14,12 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * @description Action would contain either an operation or an assertion.
  */
 #[FHIRBackboneElement(parentResource: 'TestScript', elementPath: 'TestScript.setup.action', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'tst-1',
+    severity: 'error',
+    expression: 'operation.exists() xor assert.exists()',
+    human: 'Setup action SHALL contain either an operation or assert but not both.',
+)]
 class TestScriptSetupAction extends BackboneElement
 {
     public function __construct(

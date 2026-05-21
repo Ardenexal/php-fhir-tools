@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\Parameters;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Address;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Age;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation;
@@ -36,6 +37,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\RelatedArtifact;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\SampledData;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Signature;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\TriggerDefinition;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\UsageContext;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\Base64BinaryPrimitive;
@@ -55,13 +57,18 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UrlPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UuidPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\ResourceResource;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\Timing;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * @description A parameter passed to or received from the operation.
  */
 #[FHIRBackboneElement(parentResource: 'Parameters', elementPath: 'Parameters.parameter', fhirVersion: 'R4')]
+#[FHIRPathInvariant(
+    key: 'inv-1',
+    severity: 'error',
+    expression: '(part.exists() and value.empty() and resource.empty()) or (part.empty() and (value.exists() xor resource.exists()))',
+    human: 'A parameter must have one and only one of (value, resource, part)',
+)]
 class ParametersParameter extends BackboneElement
 {
     public function __construct(
@@ -305,7 +312,7 @@ class ParametersParameter extends BackboneElement
                 [
                     'fhirType'     => 'Timing',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Timing',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing',
                     'jsonKey'      => 'valueTiming',
                 ],
                 [

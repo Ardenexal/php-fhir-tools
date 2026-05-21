@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 
 /**
@@ -16,6 +17,12 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
  * @description A time period defined by a start and end date and optionally time.
  */
 #[FHIRComplexType(typeName: 'Period', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'per-1',
+    severity: 'error',
+    expression: 'start.hasValue().not() or end.hasValue().not() or (start.lowBoundary() <= end.highBoundary())',
+    human: 'If present, start SHALL have a lower or equal value than end',
+)]
 class Period extends DataType
 {
     public function __construct(

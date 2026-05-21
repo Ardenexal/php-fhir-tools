@@ -7,30 +7,30 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 
 /**
- * @author HL7 International / FHIR Infrastructure
+ * @author HL7 International / Clinical Quality Information
  *
- * @see http://hl7.org/fhir/StructureDefinition/event-partOf
+ * @see http://hl7.org/fhir/StructureDefinition/cqf-partOf
  *
- * @description A larger event of which this particular event is a component or step.
+ * @description Specifies an overall specification artifact that this manifest or release is part of.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/event-partOf', fhirVersion: 'R5')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-partOf', fhirVersion: 'R5')]
 class PartOfExtension extends Extension
 {
     public function __construct(
-        /** @var Reference|null valueReference Value of extension */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
-        public ?Reference $valueReference = null,
+        /** @var CanonicalPrimitive|null valueCanonical Value of extension */
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
+        public ?CanonicalPrimitive $valueCanonical = null,
         ?string $id = null,
         array $extension = [],
     ) {
         parent::__construct(
             id: $id,
             extension: $extension,
-            url: 'http://hl7.org/fhir/StructureDefinition/event-partOf',
-            value: $this->valueReference,
+            url: 'http://hl7.org/fhir/StructureDefinition/cqf-partOf',
+            value: $this->valueCanonical,
         );
     }
 }

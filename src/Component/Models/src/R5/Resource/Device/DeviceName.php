@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\Device;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\DeviceNameTypeType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -32,7 +33,7 @@ class DeviceName extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $value = null,
         /** @var DeviceNameTypeType|null type registered-name | user-friendly-name | patient-reported-name */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/device-nametype|5.0.0', strength: 'required')]
         public ?DeviceNameTypeType $type = null,
         /** @var bool|null display The preferred device name */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]

@@ -11,7 +11,6 @@ use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Range;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 
 /**
@@ -25,15 +24,15 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 class DeviceAlertDetectionExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(
-        /** @var CodePrimitive activationState The activation state of the specified alert (or alerts) */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
-        public CodePrimitive $activationState,
+        /** @var CodeableConcept activationState The activation state of the specified alert (or alerts) */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public CodeableConcept $activationState,
         /** @var CodeableConcept|null alertCode The alert for which the alert detection activation state is described */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $alertCode = null,
-        /** @var CodePrimitive|null priority The alert priority for which the alert detection activation state is described */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
-        public ?CodePrimitive $priority = null,
+        /** @var CodeableConcept|null priority The alert priority for which the alert detection activation state is described */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $priority = null,
         /** @var DateTimePrimitive|null effective The point(s) in time this activation state was in effect */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $effective = null,
@@ -82,13 +81,13 @@ class DeviceAlertDetectionExtension extends Extension implements FHIRComplexExte
             if ($extUrl === 'alertCode' && $ext->value instanceof CodeableConcept) {
                 $alertCode = $ext->value;
             }
-            if ($extUrl === 'priority' && $ext->value instanceof CodePrimitive) {
+            if ($extUrl === 'priority' && $ext->value instanceof CodeableConcept) {
                 $priority = $ext->value;
             }
             if ($extUrl === 'effective' && $ext->value instanceof DateTimePrimitive) {
                 $effective = $ext->value;
             }
-            if ($extUrl === 'activationState' && $ext->value instanceof CodePrimitive) {
+            if ($extUrl === 'activationState' && $ext->value instanceof CodeableConcept) {
                 $activationState = $ext->value;
             }
             if ($extUrl === 'limitRange' && $ext->value instanceof Range) {

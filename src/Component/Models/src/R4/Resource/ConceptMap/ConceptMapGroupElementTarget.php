@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\ConceptMap;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\ConceptMapEquivalenceType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -17,6 +19,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A concept from the target value set that this concept maps to.
  */
 #[FHIRBackboneElement(parentResource: 'ConceptMap', elementPath: 'ConceptMap.group.element.target', fhirVersion: 'R4')]
+#[FHIRPathInvariant(
+    key: 'cmd-1',
+    severity: 'error',
+    expression: 'comment.exists() or equivalence.empty() or ((equivalence != \'narrower\') and (equivalence != \'inexact\'))',
+    human: 'If the map is narrower or inexact, there SHALL be some comments',
+)]
 class ConceptMapGroupElementTarget extends BackboneElement
 {
     public function __construct(
@@ -36,7 +44,7 @@ class ConceptMapGroupElementTarget extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $display = null,
         /** @var ConceptMapEquivalenceType|null equivalence relatedto | equivalent | equal | wider | subsumes | narrower | specializes | inexact | unmatched | disjoint */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/concept-map-equivalence|4.0.1', strength: 'required')]
         public ?ConceptMapEquivalenceType $equivalence = null,
         /** @var StringPrimitive|string|null comment Description of status/issues in mapping */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

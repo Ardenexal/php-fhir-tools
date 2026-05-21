@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
  *
  * @see http://hl7.org/fhir/StructureDefinition/diagnosticReport-risk
  *
- * @description Provides a link to an assessment of prognosis or risk as informed by the diagnostic results (For example, genetic results and possibly by patient genetic family history information).  This extension is used when need RiskAssessment as an alternate choice  for `Observation.hasMember` or `DiagnosticReport.result`.
+ * @description Provides a link to an assessment of prognosis or risk as informed by the diagnostic results (For example, genetic results and possibly by patient genetic family history information).  This extension is used when a `RiskAssessment` is needed as an alternate choice for `Observation.hasMember` or `DiagnosticReport.result`.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/diagnosticReport-risk', fhirVersion: 'R4B')]
 class DRRiskExtension extends Extension

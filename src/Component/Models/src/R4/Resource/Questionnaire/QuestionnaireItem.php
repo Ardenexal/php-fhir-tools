@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\Questionnaire;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\EnableWhenBehaviorType;
@@ -20,6 +22,72 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A particular question, question grouping or display text that is part of the questionnaire.
  */
 #[FHIRBackboneElement(parentResource: 'Questionnaire', elementPath: 'Questionnaire.item', fhirVersion: 'R4')]
+#[FHIRPathInvariant(
+    key: 'que-1',
+    severity: 'error',
+    expression: '(type=\'group\' implies item.empty().not()) and (type.trace(\'type\')=\'display\' implies item.trace(\'item\').empty())',
+    human: 'Group items must have nested items, display items cannot have nested items',
+)]
+#[FHIRPathInvariant(
+    key: 'que-3',
+    severity: 'error',
+    expression: 'type!=\'display\' or code.empty()',
+    human: 'Display items cannot have a "code" asserted',
+)]
+#[FHIRPathInvariant(
+    key: 'que-4',
+    severity: 'error',
+    expression: 'answerOption.empty() or answerValueSet.empty()',
+    human: 'A question cannot have both answerOption and answerValueSet',
+)]
+#[FHIRPathInvariant(
+    key: 'que-5',
+    severity: 'error',
+    expression: '(type =\'choice\' or type = \'open-choice\' or type = \'decimal\' or type = \'integer\' or type = \'date\' or type = \'dateTime\' or type = \'time\' or type = \'string\' or type = \'quantity\') or (answerValueSet.empty() and answerOption.empty())',
+    human: 'Only \'choice\' and \'open-choice\' items can have answerValueSet',
+)]
+#[FHIRPathInvariant(
+    key: 'que-6',
+    severity: 'error',
+    expression: 'type!=\'display\' or (required.empty() and repeats.empty())',
+    human: 'Required and repeat aren\'t permitted for display items',
+)]
+#[FHIRPathInvariant(
+    key: 'que-8',
+    severity: 'error',
+    expression: '(type!=\'group\' and type!=\'display\') or initial.empty()',
+    human: 'Initial values can\'t be specified for groups or display items',
+)]
+#[FHIRPathInvariant(
+    key: 'que-9',
+    severity: 'error',
+    expression: 'type!=\'display\' or readOnly.empty()',
+    human: 'Read-only can\'t be specified for "display" items',
+)]
+#[FHIRPathInvariant(
+    key: 'que-10',
+    severity: 'error',
+    expression: '(type in (\'boolean\' | \'decimal\' | \'integer\' | \'string\' | \'text\' | \'url\' | \'open-choice\')) or maxLength.empty()',
+    human: 'Maximum length can only be declared for simple question types',
+)]
+#[FHIRPathInvariant(
+    key: 'que-11',
+    severity: 'error',
+    expression: 'answerOption.empty() or initial.empty()',
+    human: 'If one or more answerOption is present, initial[x] must be missing',
+)]
+#[FHIRPathInvariant(
+    key: 'que-12',
+    severity: 'error',
+    expression: 'enableWhen.count() > 2 implies enableBehavior.exists()',
+    human: 'If there are more than one enableWhen, enableBehavior must be specified',
+)]
+#[FHIRPathInvariant(
+    key: 'que-13',
+    severity: 'error',
+    expression: 'repeats=true or initial.count() <= 1',
+    human: 'Can only have multiple initial values for repeating items',
+)]
 class QuestionnaireItem extends BackboneElement
 {
     public function __construct(
@@ -53,7 +121,7 @@ class QuestionnaireItem extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $text = null,
         /** @var QuestionnaireItemTypeType|null type group | display | boolean | decimal | integer | date | dateTime + */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/item-type|4.0.1', strength: 'required')]
         public ?QuestionnaireItemTypeType $type = null,
         /** @var array<QuestionnaireItemEnableWhen> enableWhen Only allow data when */
         #[FhirProperty(
@@ -64,7 +132,7 @@ class QuestionnaireItem extends BackboneElement
         )]
         public array $enableWhen = [],
         /** @var EnableWhenBehaviorType|null enableBehavior all | any */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/questionnaire-enable-behavior|4.0.1', strength: 'required')]
         public ?EnableWhenBehaviorType $enableBehavior = null,
         /** @var bool|null required Whether the item must be included in data results */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]

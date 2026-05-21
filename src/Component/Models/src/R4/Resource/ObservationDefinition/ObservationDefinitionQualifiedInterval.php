@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\ObservationDefinition
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\AdministrativeGenderType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
@@ -31,7 +32,7 @@ class ObservationDefinitionQualifiedInterval extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
         /** @var ObservationRangeCategoryType|null category reference | critical | absolute */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/observation-range-category|4.0.1', strength: 'required')]
         public ?ObservationRangeCategoryType $category = null,
         /** @var Range|null range The interval itself, for continuous or ordinal observations */
         #[FhirProperty(fhirType: 'Range', propertyKind: 'complex')]
@@ -48,7 +49,7 @@ class ObservationDefinitionQualifiedInterval extends BackboneElement
         )]
         public array $appliesTo = [],
         /** @var AdministrativeGenderType|null gender male | female | other | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/administrative-gender|4.0.1', strength: 'required')]
         public ?AdministrativeGenderType $gender = null,
         /** @var Range|null age Applicable age range, if relevant */
         #[FhirProperty(fhirType: 'Range', propertyKind: 'complex')]

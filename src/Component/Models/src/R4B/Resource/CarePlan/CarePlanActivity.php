@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\CarePlan;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
@@ -16,6 +17,12 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
  * @description Identifies a planned action to occur as part of the plan.  For example, a medication to be used, lab tests to perform, self-monitoring, education, etc.
  */
 #[FHIRBackboneElement(parentResource: 'CarePlan', elementPath: 'CarePlan.activity', fhirVersion: 'R4B')]
+#[FHIRPathInvariant(
+    key: 'cpl-3',
+    severity: 'error',
+    expression: 'detail.empty() or reference.empty()',
+    human: 'Provide a reference or detail, not both',
+)]
 class CarePlanActivity extends BackboneElement
 {
     public function __construct(

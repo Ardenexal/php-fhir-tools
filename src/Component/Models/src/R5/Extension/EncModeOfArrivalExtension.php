@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  *
  * @see http://hl7.org/fhir/StructureDefinition/encounter-modeOfArrival
  *
- * @description Identifies whether a patient arrives at the reporting facility via ambulance and the type of ambulance that was used.
+ * @description Identifies how the patient arrives at the reporting facility, for example via an ambulance or other mode of transport.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/encounter-modeOfArrival', fhirVersion: 'R5')]
 class EncModeOfArrivalExtension extends Extension

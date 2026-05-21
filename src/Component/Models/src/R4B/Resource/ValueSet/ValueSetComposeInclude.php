@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\ValueSet;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
@@ -16,6 +17,24 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
  * @description Include one or more codes from a code system or other value set(s).
  */
 #[FHIRBackboneElement(parentResource: 'ValueSet', elementPath: 'ValueSet.compose.include', fhirVersion: 'R4B')]
+#[FHIRPathInvariant(
+    key: 'vsd-1',
+    severity: 'error',
+    expression: 'valueSet.exists() or system.exists()',
+    human: 'A value set include/exclude SHALL have a value set or a system',
+)]
+#[FHIRPathInvariant(
+    key: 'vsd-2',
+    severity: 'error',
+    expression: '(concept.exists() or filter.exists()) implies system.exists()',
+    human: 'A value set with concepts or filters SHALL include a system',
+)]
+#[FHIRPathInvariant(
+    key: 'vsd-3',
+    severity: 'error',
+    expression: 'concept.empty() or filter.empty()',
+    human: 'Cannot have both concept and filter',
+)]
 class ValueSetComposeInclude extends BackboneElement
 {
     public function __construct(

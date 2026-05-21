@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\Immunization;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
@@ -16,6 +17,12 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
  * @description Educational material presented to the patient (or guardian) at the time of vaccine administration.
  */
 #[FHIRBackboneElement(parentResource: 'Immunization', elementPath: 'Immunization.education', fhirVersion: 'R4B')]
+#[FHIRPathInvariant(
+    key: 'imm-1',
+    severity: 'error',
+    expression: 'documentType.exists() or reference.exists()',
+    human: 'One of documentType or reference SHALL be present',
+)]
 class ImmunizationEducation extends BackboneElement
 {
     public function __construct(

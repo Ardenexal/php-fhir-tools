@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\Patient;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Address;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\AdministrativeGenderType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
@@ -20,6 +22,12 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
  * @description A contact party (e.g. guardian, partner, friend) for the patient.
  */
 #[FHIRBackboneElement(parentResource: 'Patient', elementPath: 'Patient.contact', fhirVersion: 'R4')]
+#[FHIRPathInvariant(
+    key: 'pat-1',
+    severity: 'error',
+    expression: 'name.exists() or telecom.exists() or address.exists() or organization.exists()',
+    human: 'SHALL at least contain a contact\'s details or a reference to an organization',
+)]
 class PatientContact extends BackboneElement
 {
     public function __construct(
@@ -55,7 +63,7 @@ class PatientContact extends BackboneElement
         #[FhirProperty(fhirType: 'Address', propertyKind: 'complex')]
         public ?Address $address = null,
         /** @var AdministrativeGenderType|null gender male | female | other | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/administrative-gender|4.0.1', strength: 'required')]
         public ?AdministrativeGenderType $gender = null,
         /** @var Reference|null organization Organization that is associated with the contact */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]

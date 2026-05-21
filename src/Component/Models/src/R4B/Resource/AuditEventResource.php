@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\AuditEventActionType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\AuditEventOutcomeType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
@@ -20,6 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\AuditEvent\AuditEventAgent;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\AuditEvent\AuditEventEntity;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\AuditEvent\AuditEventSource;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -69,7 +71,7 @@ class AuditEventResource extends DomainResourceResource
         )]
         public array $subtype = [],
         /** @var AuditEventActionType|null action Type of action performed during the event */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/audit-event-action|4.3.0', strength: 'required')]
         public ?AuditEventActionType $action = null,
         /** @var Period|null period When the activity occurred */
         #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
@@ -78,7 +80,7 @@ class AuditEventResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'instant', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?InstantPrimitive $recorded = null,
         /** @var AuditEventOutcomeType|null outcome Whether the event succeeded or failed */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/audit-event-outcome|4.3.0', strength: 'required')]
         public ?AuditEventOutcomeType $outcome = null,
         /** @var StringPrimitive|string|null outcomeDesc Description of the event outcome */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -99,6 +101,7 @@ class AuditEventResource extends DomainResourceResource
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\AuditEvent\AuditEventAgent',
         )]
+        #[Count(min: 1)]
         public array $agent = [],
         /** @var AuditEventSource|null source Audit Event Reporter */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isRequired: true), NotBlank]

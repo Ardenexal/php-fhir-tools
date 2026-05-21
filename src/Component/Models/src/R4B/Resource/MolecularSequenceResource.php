@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Meta;
@@ -34,6 +36,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     version: '4.3.0',
     url: 'http://hl7.org/fhir/StructureDefinition/MolecularSequence',
     fhirVersion: 'R4B',
+)]
+#[FHIRPathInvariant(
+    key: 'msq-3',
+    severity: 'error',
+    expression: 'coordinateSystem = 1 or coordinateSystem = 0',
+    human: 'Only 0 and 1 are valid for coordinateSystem',
 )]
 class MolecularSequenceResource extends DomainResourceResource
 {
@@ -71,7 +79,7 @@ class MolecularSequenceResource extends DomainResourceResource
         )]
         public array $identifier = [],
         /** @var SequenceTypeType|null type aa | dna | rna */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/sequence-type|4.3.0', strength: 'required')]
         public ?SequenceTypeType $type = null,
         /** @var int|null coordinateSystem Base number of coordinate system (0 for 0-based numbering or coordinates, inclusive start, exclusive end, 1 for 1-based numbering, inclusive start, inclusive end) */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar', isRequired: true), NotBlank]

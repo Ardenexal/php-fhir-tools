@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 
 /**
@@ -16,6 +17,12 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  * @description Indicates how the medication is/was taken or should be taken by the patient.
  */
 #[FHIRComplexType(typeName: 'Dosage', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'dos-1',
+    severity: 'error',
+    expression: 'asNeededFor.empty() or asNeeded.empty() or asNeeded',
+    human: 'AsNeededFor can only be set if AsNeeded is empty or true',
+)]
 class Dosage extends BackboneType
 {
     public function __construct(

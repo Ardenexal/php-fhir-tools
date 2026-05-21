@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\MolecularSequence;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
@@ -18,6 +20,18 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  * @description A sequence that is used as a reference to describe variants that are present in a sequence analyzed.
  */
 #[FHIRBackboneElement(parentResource: 'MolecularSequence', elementPath: 'MolecularSequence.referenceSeq', fhirVersion: 'R4B')]
+#[FHIRPathInvariant(
+    key: 'msq-5',
+    severity: 'error',
+    expression: '(chromosome.empty() and genomeBuild.empty()) or (chromosome.exists() and genomeBuild.exists())',
+    human: 'GenomeBuild and chromosome must be both contained if either one of them is contained',
+)]
+#[FHIRPathInvariant(
+    key: 'msq-6',
+    severity: 'error',
+    expression: '(genomeBuild.count()+referenceSeqId.count()+ referenceSeqPointer.count()+ referenceSeqString.count()) = 1',
+    human: 'Have and only have one of the following elements in referenceSeq : 1. genomeBuild ; 2 referenceSeqId; 3. referenceSeqPointer;  4. referenceSeqString;',
+)]
 class MolecularSequenceReferenceSeq extends BackboneElement
 {
     public function __construct(
@@ -37,7 +51,7 @@ class MolecularSequenceReferenceSeq extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $genomeBuild = null,
         /** @var OrientationTypeType|null orientation sense | antisense */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/orientation-type|4.3.0', strength: 'required')]
         public ?OrientationTypeType $orientation = null,
         /** @var CodeableConcept|null referenceSeqId Reference identifier */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
@@ -49,7 +63,7 @@ class MolecularSequenceReferenceSeq extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $referenceSeqString = null,
         /** @var StrandTypeType|null strand watson | crick */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/strand-type|4.3.0', strength: 'required')]
         public ?StrandTypeType $strand = null,
         /** @var int|null windowStart Start position of the window on the  reference sequence */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]

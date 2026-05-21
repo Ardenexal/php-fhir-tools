@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Age;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation;
@@ -42,6 +44,24 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     url: 'http://hl7.org/fhir/StructureDefinition/FamilyMemberHistory',
     fhirVersion: 'R5',
 )]
+#[FHIRPathInvariant(
+    key: 'fhs-1',
+    severity: 'error',
+    expression: 'age.empty() or born.empty()',
+    human: 'Can have age[x] or born[x], but not both',
+)]
+#[FHIRPathInvariant(
+    key: 'fhs-2',
+    severity: 'error',
+    expression: 'age.exists() or estimatedAge.empty()',
+    human: 'Can only have estimatedAge if age[x] is present',
+)]
+#[FHIRPathInvariant(
+    key: 'fhs-3',
+    severity: 'error',
+    expression: 'age.empty() or deceased.empty()',
+    human: 'Can have age[x] or deceased[x], but not both',
+)]
 class FamilyMemberHistoryResource extends DomainResourceResource
 {
     public function __construct(
@@ -55,7 +75,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -84,7 +104,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isArray: true)]
         public array $instantiatesUri = [],
         /** @var FamilyHistoryStatusType|null status partial | completed | entered-in-error | health-unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/history-status|5.0.0', strength: 'required')]
         public ?FamilyHistoryStatusType $status = null,
         /** @var CodeableConcept|null dataAbsentReason subject-unknown | withheld | unable-to-obtain | deferred */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]

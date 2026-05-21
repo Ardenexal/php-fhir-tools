@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\QuestionnaireResponse
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
@@ -16,6 +17,18 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A group or question item from the original questionnaire for which answers are provided.
  */
 #[FHIRBackboneElement(parentResource: 'QuestionnaireResponse', elementPath: 'QuestionnaireResponse.item', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'qrs-1',
+    severity: 'error',
+    expression: '(answer.exists() and item.exists()).not()',
+    human: 'Item cannot contain both item and answer',
+)]
+#[FHIRPathInvariant(
+    key: 'qrs-2',
+    severity: 'error',
+    expression: 'repeat(answer|item).select(item.where(answer.value.exists()).linkId.isDistinct()).allTrue()',
+    human: 'Repeated answers are combined in the answers array of a single item',
+)]
 class QuestionnaireResponseItem extends BackboneElement
 {
     public function __construct(

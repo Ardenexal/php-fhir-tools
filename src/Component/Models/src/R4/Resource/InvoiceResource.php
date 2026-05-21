@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -68,7 +69,7 @@ class InvoiceResource extends DomainResourceResource
         )]
         public array $identifier = [],
         /** @var InvoiceStatusType|null status draft | issued | balanced | cancelled | entered-in-error */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/invoice-status|4.0.1', strength: 'required')]
         public ?InvoiceStatusType $status = null,
         /** @var StringPrimitive|string|null cancelledReason Reason for cancellation of this Invoice */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

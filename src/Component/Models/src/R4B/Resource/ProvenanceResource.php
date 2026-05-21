@@ -18,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\InstantPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Provenance\ProvenanceAgent;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Provenance\ProvenanceEntity;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -63,6 +64,7 @@ class ProvenanceResource extends DomainResourceResource
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[Count(min: 1)]
         public array $target = [],
         /** @var Period|DateTimePrimitive|null occurred When the activity occurred */
         #[FhirProperty(
@@ -113,6 +115,7 @@ class ProvenanceResource extends DomainResourceResource
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Provenance\ProvenanceAgent',
         )]
+        #[Count(min: 1)]
         public array $agent = [],
         /** @var array<ProvenanceEntity> entity An entity used in this activity */
         #[FhirProperty(

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\TestReport;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
@@ -13,6 +14,12 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  * @description Action would contain either an operation or an assertion.
  */
 #[FHIRBackboneElement(parentResource: 'TestReport', elementPath: 'TestReport.test.action', fhirVersion: 'R4B')]
+#[FHIRPathInvariant(
+    key: 'inv-2',
+    severity: 'error',
+    expression: 'operation.exists() xor assert.exists()',
+    human: 'Test action SHALL contain either an operation or assert but not both.',
+)]
 class TestReportTestAction extends BackboneElement
 {
     public function __construct(

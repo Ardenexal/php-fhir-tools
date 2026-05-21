@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Attachment;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\ConsentStateType;
@@ -19,6 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Consent\ConsentPolicy;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Consent\ConsentProvision;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Consent\ConsentVerification;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -29,6 +32,36 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A record of a healthcare consumer’s  choices, which permits or denies identified recipient(s) or recipient role(s) to perform one or more actions within a given policy context, for specific purposes and periods of time.
  */
 #[FhirResource(type: 'Consent', version: '4.3.0', url: 'http://hl7.org/fhir/StructureDefinition/Consent', fhirVersion: 'R4B')]
+#[FHIRPathInvariant(
+    key: 'ppc-1',
+    severity: 'error',
+    expression: 'policy.exists() or policyRule.exists()',
+    human: 'Either a Policy or PolicyRule',
+)]
+#[FHIRPathInvariant(
+    key: 'ppc-2',
+    severity: 'error',
+    expression: 'patient.exists() or scope.coding.where(system=\'something\' and code=\'patient-privacy\').exists().not()',
+    human: 'IF Scope=privacy, there must be a patient',
+)]
+#[FHIRPathInvariant(
+    key: 'ppc-3',
+    severity: 'error',
+    expression: 'patient.exists() or scope.coding.where(system=\'something\' and code=\'research\').exists().not()',
+    human: 'IF Scope=research, there must be a patient',
+)]
+#[FHIRPathInvariant(
+    key: 'ppc-4',
+    severity: 'error',
+    expression: 'patient.exists() or scope.coding.where(system=\'something\' and code=\'adr\').exists().not()',
+    human: 'IF Scope=adr, there must be a patient',
+)]
+#[FHIRPathInvariant(
+    key: 'ppc-5',
+    severity: 'error',
+    expression: 'patient.exists() or scope.coding.where(system=\'something\' and code=\'treatment\').exists().not()',
+    human: 'IF Scope=treatment, there must be a patient',
+)]
 class ConsentResource extends DomainResourceResource
 {
     public function __construct(
@@ -65,7 +98,7 @@ class ConsentResource extends DomainResourceResource
         )]
         public array $identifier = [],
         /** @var ConsentStateType|null status draft | proposed | active | rejected | inactive | entered-in-error */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/consent-state-codes|4.3.0', strength: 'required')]
         public ?ConsentStateType $status = null,
         /** @var CodeableConcept|null scope Which of the four areas this resource covers (extensible) */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
@@ -78,6 +111,7 @@ class ConsentResource extends DomainResourceResource
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Count(min: 1)]
         public array $category = [],
         /** @var Reference|null patient Who the consent applies to */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]

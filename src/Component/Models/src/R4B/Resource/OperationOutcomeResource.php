@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\OperationOutcome\OperationOutcomeIssue;
+use Symfony\Component\Validator\Constraints\Count;
 
 /**
  * @author Health Level Seven International (FHIR Infrastructure)
@@ -60,6 +61,7 @@ class OperationOutcomeResource extends DomainResourceResource
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\OperationOutcome\OperationOutcomeIssue',
         )]
+        #[Count(min: 1)]
         public array $issue = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

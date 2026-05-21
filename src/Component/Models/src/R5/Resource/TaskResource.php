@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
@@ -37,6 +39,18 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A task to be performed.
  */
 #[FhirResource(type: 'Task', version: '5.0.0', url: 'http://hl7.org/fhir/StructureDefinition/Task', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'inv-1',
+    severity: 'error',
+    expression: 'lastModified.exists().not() or authoredOn.exists().not() or lastModified >= authoredOn',
+    human: 'Last modified date must be greater than or equal to authored-on date.',
+)]
+#[FHIRPathInvariant(
+    key: 'tsk-1',
+    severity: 'error',
+    expression: 'restriction.exists() implies code.coding.where(code=\'fulfill\' and system=\'http://hl7.org/fhir/CodeSystem/task-code\').exists() and focus.exists()',
+    human: 'Task.restriction is only allowed if the Task is seeking fulfillment and a focus is specified.',
+)]
 class TaskResource extends DomainResourceResource
 {
     public function __construct(
@@ -50,7 +64,7 @@ class TaskResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -98,7 +112,7 @@ class TaskResource extends DomainResourceResource
         )]
         public array $partOf = [],
         /** @var TaskStatusType|null status draft | requested | received | accepted | + */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/task-status|5.0.0', strength: 'required')]
         public ?TaskStatusType $status = null,
         /** @var CodeableReference|null statusReason Reason for current status */
         #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex')]
@@ -107,10 +121,10 @@ class TaskResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $businessStatus = null,
         /** @var TaskIntentType|null intent unknown | proposal | plan | order | original-order | reflex-order | filler-order | instance-order | option */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/task-intent|5.0.0', strength: 'required')]
         public ?TaskIntentType $intent = null,
         /** @var RequestPriorityType|null priority routine | urgent | asap | stat */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/request-priority|5.0.0', strength: 'required')]
         public ?RequestPriorityType $priority = null,
         /** @var bool|null doNotPerform True if Task is prohibiting action */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]

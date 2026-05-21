@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\Parameters;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Address;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Age;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation;
@@ -66,6 +67,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A parameter passed to or received from the operation.
  */
 #[FHIRBackboneElement(parentResource: 'Parameters', elementPath: 'Parameters.parameter', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'inv-1',
+    severity: 'error',
+    expression: '(part.exists() and value.empty() and resource.empty()) or (part.empty() and (value.exists() xor resource.exists()))',
+    human: 'A parameter must have one and only one of (value, resource, part)',
+)]
 class ParametersParameter extends BackboneElement
 {
     public function __construct(

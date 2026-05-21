@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\ImplementationGuide;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\GuidePageGenerationType;
@@ -18,6 +20,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A page / section in the implementation guide. The root page is the implementation guide home page.
  */
 #[FHIRBackboneElement(parentResource: 'ImplementationGuide', elementPath: 'ImplementationGuide.definition.page', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'ig-3',
+    severity: 'error',
+    expression: 'generation=\'generated\' implies source.empty()',
+    human: 'Source must be absent if \'generated\' is generated',
+)]
 class ImplementationGuideDefinitionPage extends BackboneElement
 {
     public function __construct(
@@ -64,7 +72,7 @@ class ImplementationGuideDefinitionPage extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $title = null,
         /** @var GuidePageGenerationType|null generation html | markdown | xml | generated */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/guide-page-generation|5.0.0', strength: 'required')]
         public ?GuidePageGenerationType $generation = null,
         /** @var array<ImplementationGuideDefinitionPage> page Nested Pages / Sections */
         #[FhirProperty(

@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier;
@@ -26,6 +28,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description An ingredient of a manufactured item or pharmaceutical product.
  */
 #[FhirResource(type: 'Ingredient', version: '4.3.0', url: 'http://hl7.org/fhir/StructureDefinition/Ingredient', fhirVersion: 'R4B')]
+#[FHIRPathInvariant(
+    key: 'ing-1',
+    severity: 'error',
+    expression: '(Ingredient.allergenicIndicator.where(value=\'true\').count() + Ingredient.substance.code.reference.count())  < 2',
+    human: 'If an ingredient is noted as an allergen (allergenicIndicator) then its substance should be a code. If the substance is a SubstanceDefinition, then the allegen information should be documented in that resource',
+)]
 class IngredientResource extends DomainResourceResource
 {
     public function __construct(
@@ -57,7 +65,7 @@ class IngredientResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
         public ?Identifier $identifier = null,
         /** @var PublicationStatusType|null status draft | active | retired | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|4.3.0', strength: 'required')]
         public ?PublicationStatusType $status = null,
         /** @var array<Reference> for The product which this ingredient is a constituent part of */
         #[FhirProperty(

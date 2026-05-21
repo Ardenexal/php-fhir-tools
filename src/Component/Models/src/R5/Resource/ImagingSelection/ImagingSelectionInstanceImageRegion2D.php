@@ -6,9 +6,11 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\ImagingSelection;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\ImagingSelection2DGraphicTypeType;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -29,10 +31,10 @@ class ImagingSelectionInstanceImageRegion2D extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
         /** @var ImagingSelection2DGraphicTypeType|null regionType point | polyline | interpolated | circle | ellipse */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/imagingselection-2dgraphictype|5.0.0', strength: 'required')]
         public ?ImagingSelection2DGraphicTypeType $regionType = null,
         /** @var array<numeric-string> coordinate Specifies the coordinates that define the image region */
-        #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar', isArray: true, isRequired: true)]
+        #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar', isArray: true, isRequired: true), Count(min: 1)]
         public array $coordinate = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

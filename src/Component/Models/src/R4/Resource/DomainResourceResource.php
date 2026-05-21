@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Traits\FHIRExtensionsTrait;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta;
@@ -24,6 +25,36 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
     version: '4.0.1',
     url: 'http://hl7.org/fhir/StructureDefinition/DomainResource',
     fhirVersion: 'R4',
+)]
+#[FHIRPathInvariant(
+    key: 'dom-2',
+    severity: 'error',
+    expression: 'contained.contained.empty()',
+    human: 'If the resource is contained in another resource, it SHALL NOT contain nested Resources',
+)]
+#[FHIRPathInvariant(
+    key: 'dom-3',
+    severity: 'error',
+    expression: 'contained.where(((\'#\'+id in (%resource.descendants().reference | %resource.descendants().as(canonical) | %resource.descendants().as(uri) | %resource.descendants().as(url))) or descendants().where(reference = \'#\').exists() or descendants().where(as(canonical) = \'#\').exists() or descendants().where(as(canonical) = \'#\').exists()).not()).trace(\'unmatched\', id).empty()',
+    human: 'If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource',
+)]
+#[FHIRPathInvariant(
+    key: 'dom-4',
+    severity: 'error',
+    expression: 'contained.meta.versionId.empty() and contained.meta.lastUpdated.empty()',
+    human: 'If a resource is contained in another resource, it SHALL NOT have a meta.versionId or a meta.lastUpdated',
+)]
+#[FHIRPathInvariant(
+    key: 'dom-5',
+    severity: 'error',
+    expression: 'contained.meta.security.empty()',
+    human: 'If a resource is contained in another resource, it SHALL NOT have a security label',
+)]
+#[FHIRPathInvariant(
+    key: 'dom-6',
+    severity: 'warning',
+    expression: 'text.`div`.exists()',
+    human: 'A resource should have narrative for robust management',
 )]
 abstract class DomainResourceResource extends ResourceResource
 {

@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
@@ -16,6 +18,18 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description Formal constraints such as co-occurrence and other constraints that can be computationally evaluated within the context of the instance.
  */
 #[FHIRComplexType(typeName: 'ElementDefinition.constraint', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'eld-21',
+    severity: 'warning',
+    expression: 'expression.exists()',
+    human: 'Constraints should have an expression or else validators will not be able to enforce them',
+)]
+#[FHIRPathInvariant(
+    key: 'eld-26',
+    severity: 'error',
+    expression: '(severity = \'error\') implies suppress.empty()',
+    human: 'Errors cannot be suppressed',
+)]
 class ElementDefinitionConstraint extends Element
 {
     public function __construct(
@@ -32,7 +46,7 @@ class ElementDefinitionConstraint extends Element
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $requirements = null,
         /** @var ConstraintSeverityType|null severity error | warning */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/constraint-severity|5.0.0', strength: 'required')]
         public ?ConstraintSeverityType $severity = null,
         /** @var bool|null suppress Suppress warning or hint in profile */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\DeviceMetric;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\DeviceMetricCalibrationStateType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\DeviceMetricCalibrationTypeType;
@@ -29,10 +30,10 @@ class DeviceMetricCalibration extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
         /** @var DeviceMetricCalibrationTypeType|null type unspecified | offset | gain | two-point */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/metric-calibration-type|5.0.0', strength: 'required')]
         public ?DeviceMetricCalibrationTypeType $type = null,
         /** @var DeviceMetricCalibrationStateType|null state not-calibrated | calibration-required | calibrated | unspecified */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/metric-calibration-state|5.0.0', strength: 'required')]
         public ?DeviceMetricCalibrationStateType $state = null,
         /** @var InstantPrimitive|null time Describes the time last calibration has been performed */
         #[FhirProperty(fhirType: 'instant', propertyKind: 'primitive')]

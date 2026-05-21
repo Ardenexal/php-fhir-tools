@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\ConceptMap;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -19,6 +20,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A set of additional dependencies for this mapping to hold. This mapping is only applicable if the specified data attribute can be resolved, and it has the specified value.
  */
 #[FHIRBackboneElement(parentResource: 'ConceptMap', elementPath: 'ConceptMap.group.element.target.dependsOn', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'cmd-6',
+    severity: 'error',
+    expression: '(value.exists() and valueSet.empty()) or (value.empty() and valueSet.exists())',
+    human: 'One of value[x] or valueSet must exist, but not both.',
+)]
 class ConceptMapGroupElementTargetDependsOn extends BackboneElement
 {
     public function __construct(

@@ -9,17 +9,17 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 
 /**
- * @author HL7 International / FHIR Infrastructure
+ * @author HL7 International / Patient Administration
  *
- * @see http://hl7.org/fhir/StructureDefinition/no-fixed-address
+ * @see http://hl7.org/fhir/StructureDefinition/healthcareservice-schedulable
  *
- * @description This extension applies to the Address data type and is used to indicate that a location address is not a fixed address for an individual.
+ * @description Indicates whether the service is directly schedulable or not. For example, a generic "Radiology" service is not schedulable, but a CT Scan is schedulable.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/no-fixed-address', fhirVersion: 'R5')]
-class PatNoFixedAddressExtension extends Extension
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/healthcareservice-schedulable', fhirVersion: 'R5')]
+class HealthcareServiceSchedulableExtension extends Extension
 {
     public function __construct(
-        /** @var bool|null valueBoolean Value of extension */
+        /** @var bool|null valueBoolean Whether the service is schedulable */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $valueBoolean = null,
         ?string $id = null,
@@ -28,7 +28,7 @@ class PatNoFixedAddressExtension extends Extension
         parent::__construct(
             id: $id,
             extension: $extension,
-            url: 'http://hl7.org/fhir/StructureDefinition/no-fixed-address',
+            url: 'http://hl7.org/fhir/StructureDefinition/healthcareservice-schedulable',
             value: $this->valueBoolean,
         );
     }

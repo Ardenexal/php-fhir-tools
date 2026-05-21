@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\Bundle;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
@@ -15,6 +16,18 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\ResourceResource;
  * @description An entry in a bundle resource - will either contain a resource or information about a resource (transactions and history only).
  */
 #[FHIRBackboneElement(parentResource: 'Bundle', elementPath: 'Bundle.entry', fhirVersion: 'R4')]
+#[FHIRPathInvariant(
+    key: 'bdl-5',
+    severity: 'error',
+    expression: 'resource.exists() or request.exists() or response.exists()',
+    human: 'must be a resource unless there\'s a request or response',
+)]
+#[FHIRPathInvariant(
+    key: 'bdl-8',
+    severity: 'error',
+    expression: 'fullUrl.contains(\'/_history/\').not()',
+    human: 'fullUrl cannot be a version specific reference',
+)]
 class BundleEntry extends BackboneElement
 {
     public function __construct(

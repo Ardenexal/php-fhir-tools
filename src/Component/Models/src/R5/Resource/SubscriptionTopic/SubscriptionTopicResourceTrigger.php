@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\SubscriptionTopic;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\InteractionTriggerType;
@@ -37,7 +38,7 @@ class SubscriptionTopicResourceTrigger extends BackboneElement
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?UriPrimitive $resource = null,
         /** @var array<InteractionTriggerType> supportedInteraction create | update | delete */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/interaction-trigger|5.0.0', strength: 'required')]
         public array $supportedInteraction = [],
         /** @var SubscriptionTopicResourceTriggerQueryCriteria|null queryCriteria Query based trigger rule */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]

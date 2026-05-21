@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\Encounter;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -16,6 +17,18 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  * @description The list of people responsible for providing the service.
  */
 #[FHIRBackboneElement(parentResource: 'Encounter', elementPath: 'Encounter.participant', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'enc-1',
+    severity: 'error',
+    expression: 'actor.exists() or type.exists()',
+    human: 'A type must be provided when no explicit actor is specified',
+)]
+#[FHIRPathInvariant(
+    key: 'enc-2',
+    severity: 'error',
+    expression: 'actor.exists(resolve() is Patient or resolve() is Group) implies type.exists().not()',
+    human: 'A type cannot be provided for a patient or group participant',
+)]
 class EncounterParticipant extends BackboneElement
 {
     public function __construct(

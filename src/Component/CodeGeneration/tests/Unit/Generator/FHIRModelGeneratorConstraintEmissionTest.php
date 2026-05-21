@@ -18,6 +18,7 @@ use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Regex;
+use Nette\PhpGenerator\Attribute;
 
 class FHIRModelGeneratorConstraintEmissionTest extends TestCase
 {
@@ -486,7 +487,7 @@ class FHIRModelGeneratorConstraintEmissionTest extends TestCase
         $childClass = $info->asClassType();
         $attrs      = $childClass->getAttributes();
 
-        $invariantAttrs = array_filter($attrs, static fn (\Nette\PhpGenerator\Attribute $a) => $a->getName() === FHIRPathInvariant::class);
+        $invariantAttrs = array_filter($attrs, static fn (Attribute $a) => $a->getName() === FHIRPathInvariant::class);
         self::assertNotEmpty($invariantAttrs, '#[FHIRPathInvariant] must be emitted on backbone child class');
 
         $first = array_values($invariantAttrs)[0];

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Traits\FHIRExtensionsTrait;
 
 /**
@@ -16,6 +17,12 @@ use Ardenexal\FHIRTools\Component\Metadata\Traits\FHIRExtensionsTrait;
  * @description Base definition for all elements in a resource.
  */
 #[FHIRComplexType(typeName: 'Element', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'ele-1',
+    severity: 'error',
+    expression: 'hasValue() or (children().count() > id.count())',
+    human: 'All FHIR elements must have a @value or children',
+)]
 abstract class Element extends Base
 {
     use FHIRExtensionsTrait;

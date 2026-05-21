@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Dosage;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -43,6 +44,7 @@ class MedicationKnowledgeIndicationGuidelineDosingGuidelineDosage extends Backbo
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Dosage',
         )]
+        #[Count(min: 1)]
         public array $dosage = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

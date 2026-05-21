@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\Questionnaire;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -22,6 +24,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A constraint indicating that this item should only be enabled (displayed/allow answers to be captured) when the specified condition is true.
  */
 #[FHIRBackboneElement(parentResource: 'Questionnaire', elementPath: 'Questionnaire.item.enableWhen', fhirVersion: 'R4')]
+#[FHIRPathInvariant(
+    key: 'que-7',
+    severity: 'error',
+    expression: 'operator = \'exists\' implies (answer is Boolean)',
+    human: 'If the operator is \'exists\', the value must be a boolean',
+)]
 class QuestionnaireItemEnableWhen extends BackboneElement
 {
     public function __construct(
@@ -38,7 +46,7 @@ class QuestionnaireItemEnableWhen extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $question = null,
         /** @var QuestionnaireItemOperatorType|null operator exists | = | != | > | < | >= | <= */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/questionnaire-enable-operator|4.0.1', strength: 'required')]
         public ?QuestionnaireItemOperatorType $operator = null,
         /** @var bool|string|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|Coding|Quantity|Reference|null answer Value for question comparison based on operator */
         #[FhirProperty(

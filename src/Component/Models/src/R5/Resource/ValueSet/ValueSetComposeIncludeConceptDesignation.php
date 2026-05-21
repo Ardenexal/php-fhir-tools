@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\ValueSet;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding;
@@ -17,6 +19,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description Additional representations for this concept when used in this value set - other languages, aliases, specialized purposes, used for particular purposes, etc.
  */
 #[FHIRBackboneElement(parentResource: 'ValueSet', elementPath: 'ValueSet.compose.include.concept.designation', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'vsd-11',
+    severity: 'error',
+    expression: 'additionalUse.exists() implies use.exists()',
+    human: 'Must have a value for concept.designation.use if concept.designation.additionalUse is present',
+)]
 class ValueSetComposeIncludeConceptDesignation extends BackboneElement
 {
     public function __construct(
@@ -30,7 +38,7 @@ class ValueSetComposeIncludeConceptDesignation extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
         /** @var AllLanguagesType|null language Human language of the designation */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Coding|null use Types of uses of designations */
         #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]

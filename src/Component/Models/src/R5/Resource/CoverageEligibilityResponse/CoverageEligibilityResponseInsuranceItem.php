@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\CoverageEligibilityRe
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -20,6 +21,12 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
     parentResource: 'CoverageEligibilityResponse',
     elementPath: 'CoverageEligibilityResponse.insurance.item',
     fhirVersion: 'R5',
+)]
+#[FHIRPathInvariant(
+    key: 'ces-1',
+    severity: 'error',
+    expression: 'category.exists() xor productOrService.exists()',
+    human: 'SHALL contain a category or a billcode but not both.',
 )]
 class CoverageEligibilityResponseInsuranceItem extends BackboneElement
 {

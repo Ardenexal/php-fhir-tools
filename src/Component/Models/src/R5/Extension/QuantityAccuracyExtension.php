@@ -16,7 +16,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
  *
  * @description The absolute of the maximum deviation of the actual value from the reported value.
  *
- * Accuracy is particularly applicable to measured or observed values, and represents the maximum deviation over the entire range of measurement. When applied to a DeviceMetric, it expresses the maximum deviation of values reported by the metric. The reported observed value should be precise enough to reflect this accuracy, for example an observed value of 3.2 kg with an accuracy of 0.04 kg would be nonsensical. On the other hand, an observed value of 3.02 kg with an accuracy of 0.04 kg would indicate that the actual value is in the range of 3.02±0.04 kg or [2.98, 3.06] kg.
+ * Accuracy is particularly applicable to measured or observed values. The reported observed value should be precise enough to reflect this accuracy, for example an observed value of 3.2 kg with an accuracy of 0.04 kg would be nonsensical. On the other hand, an observed value of 3.02 kg with an accuracy of 0.04 kg would indicate that the actual value is in the range of 3.02±0.04 kg or [2.98, 3.06] kg.
+ *
+ * When applied to a DeviceMetric, it expresses the maximum deviation of values reported by the metric over the entire range of measurement.
  *
  * Accuracy is usually in the same units as the reported value. Accuracy valueQuantity units SHOULD be provided for clarity; if omitted, they are implied to be the same as the reported value's units (or the DeviceMetric units).
  */

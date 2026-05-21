@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\Evidence;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\EvidenceVariableHandlingType;
@@ -35,7 +36,7 @@ class EvidenceStatisticModelCharacteristicVariable extends BackboneElement
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?Reference $variableDefinition = null,
         /** @var EvidenceVariableHandlingType|null handling continuous | dichotomous | ordinal | polychotomous */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/variable-handling|4.3.0', strength: 'required')]
         public ?EvidenceVariableHandlingType $handling = null,
         /** @var array<CodeableConcept> valueCategory Description for grouping of ordinal or polychotomous variables */
         #[FhirProperty(

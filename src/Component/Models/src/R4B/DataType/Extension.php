@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\Base64BinaryPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
@@ -35,6 +36,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description Optional Extension Element - found in all resources.
  */
 #[FHIRComplexType(typeName: 'Extension', fhirVersion: 'R4B')]
+#[FHIRPathInvariant(
+    key: 'ext-1',
+    severity: 'error',
+    expression: 'extension.exists() != value.exists()',
+    human: 'Must have either extensions or value[x], not both',
+)]
 class Extension extends Element implements FHIRExtensionInterface
 {
     public function getExtensionUrl(): ?string

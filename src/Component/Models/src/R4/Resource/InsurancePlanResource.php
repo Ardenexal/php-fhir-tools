@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
@@ -28,6 +30,12 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\InsurancePlan\InsurancePlan
  * @description Details of a Health Insurance product/plan provided by an organization.
  */
 #[FhirResource(type: 'InsurancePlan', version: '4.0.1', url: 'http://hl7.org/fhir/StructureDefinition/InsurancePlan', fhirVersion: 'R4')]
+#[FHIRPathInvariant(
+    key: 'ipn-1',
+    severity: 'error',
+    expression: '(identifier.count() + name.count()) > 0',
+    human: 'The organization SHALL at least have a name or an idendtifier, and possibly more than one',
+)]
 class InsurancePlanResource extends DomainResourceResource
 {
     public function __construct(
@@ -64,7 +72,7 @@ class InsurancePlanResource extends DomainResourceResource
         )]
         public array $identifier = [],
         /** @var PublicationStatusType|null status draft | active | retired | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|4.0.1', strength: 'required')]
         public ?PublicationStatusType $status = null,
         /** @var array<CodeableConcept> type Kind of product */
         #[FhirProperty(

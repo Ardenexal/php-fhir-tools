@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\PositiveIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
@@ -19,6 +21,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A series of measurements taken by a device, with upper and lower limits. There may be more than one dimension in the data.
  */
 #[FHIRComplexType(typeName: 'SampledData', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'sdd-1',
+    severity: 'error',
+    expression: 'interval.exists().not() xor offsets.exists().not()',
+    human: 'A SampledData SAHLL have either an interval and offsets but not both',
+)]
 class SampledData extends DataType
 {
     public function __construct(
@@ -35,7 +43,7 @@ class SampledData extends DataType
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
         public ?string $interval = null,
         /** @var UCUMCodesType|null intervalUnit The measurement unit of the interval between samples */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/ucum-units|5.0.0', strength: 'required')]
         public ?UCUMCodesType $intervalUnit = null,
         /** @var numeric-string|null factor Multiply data by this before adding to origin */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]

@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Dosage;
@@ -34,6 +36,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     version: '4.3.0',
     url: 'http://hl7.org/fhir/StructureDefinition/MedicationDispense',
     fhirVersion: 'R4B',
+)]
+#[FHIRPathInvariant(
+    key: 'mdd-1',
+    severity: 'error',
+    expression: 'whenHandedOver.empty() or whenPrepared.empty() or whenHandedOver >= whenPrepared',
+    human: 'whenHandedOver cannot be before whenPrepared',
 )]
 class MedicationDispenseResource extends DomainResourceResource
 {
@@ -79,7 +87,7 @@ class MedicationDispenseResource extends DomainResourceResource
         )]
         public array $partOf = [],
         /** @var MedicationDispenseStatusCodesType|null status preparation | in-progress | cancelled | on-hold | completed | entered-in-error | stopped | declined | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/medicationdispense-status|4.3.0', strength: 'required')]
         public ?MedicationDispenseStatusCodesType $status = null,
         /** @var CodeableConcept|Reference|null statusReason Why a dispense was not performed */
         #[FhirProperty(

@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier;
@@ -30,6 +32,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     version: '4.3.0',
     url: 'http://hl7.org/fhir/StructureDefinition/AppointmentResponse',
     fhirVersion: 'R4B',
+)]
+#[FHIRPathInvariant(
+    key: 'apr-1',
+    severity: 'error',
+    expression: 'participantType.exists() or actor.exists()',
+    human: 'Either the participantType or actor must be specified',
 )]
 class AppointmentResponseResource extends DomainResourceResource
 {
@@ -87,7 +95,7 @@ class AppointmentResponseResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $actor = null,
         /** @var ParticipationStatusType|null participantStatus accepted | declined | tentative | needs-action */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/participationstatus|4.3.0', strength: 'required')]
         public ?ParticipationStatusType $participantStatus = null,
         /** @var StringPrimitive|string|null comment Additional comments */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

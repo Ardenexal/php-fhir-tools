@@ -6,11 +6,13 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\StructureMap;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\StructureMapGroupTypeModeType;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -36,7 +38,7 @@ class StructureMapGroup extends BackboneElement
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive')]
         public ?IdPrimitive $extends = null,
         /** @var StructureMapGroupTypeModeType|null typeMode none | types | type-and-types */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/map-group-type-mode|4.3.0', strength: 'required')]
         public ?StructureMapGroupTypeModeType $typeMode = null,
         /** @var StringPrimitive|string|null documentation Additional description/explanation for group */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -49,6 +51,7 @@ class StructureMapGroup extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\StructureMap\StructureMapGroupInput',
         )]
+        #[Count(min: 1)]
         public array $input = [],
         /** @var array<StructureMapGroupRule> rule Transform Rule from source to target */
         #[FhirProperty(
@@ -58,6 +61,7 @@ class StructureMapGroup extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\StructureMap\StructureMapGroupRule',
         )]
+        #[Count(min: 1)]
         public array $rule = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

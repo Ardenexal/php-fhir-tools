@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\ArtifactAssessment;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\ArtifactAssessmentInformationTypeType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
@@ -33,7 +34,7 @@ class ArtifactAssessmentContent extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
         /** @var ArtifactAssessmentInformationTypeType|null informationType comment | classifier | rating | container | response | change-request */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/artifactassessment-information-type|5.0.0', strength: 'required')]
         public ?ArtifactAssessmentInformationTypeType $informationType = null,
         /** @var MarkdownPrimitive|null summary Brief summary of the content */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]

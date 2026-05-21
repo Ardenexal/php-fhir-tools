@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\ObservationDefinition
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AdministrativeGenderType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
@@ -43,7 +44,7 @@ class ObservationDefinitionQualifiedValue extends BackboneElement
         )]
         public array $appliesTo = [],
         /** @var AdministrativeGenderType|null gender male | female | other | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/administrative-gender|5.0.0', strength: 'required')]
         public ?AdministrativeGenderType $gender = null,
         /** @var Range|null age Applicable age range for the set of qualified values */
         #[FhirProperty(fhirType: 'Range', propertyKind: 'complex')]
@@ -55,7 +56,7 @@ class ObservationDefinitionQualifiedValue extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $condition = null,
         /** @var ObservationRangeCategoryType|null rangeCategory reference | critical | absolute */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/observation-range-category|5.0.0', strength: 'required')]
         public ?ObservationRangeCategoryType $rangeCategory = null,
         /** @var Range|null range The range for continuous or ordinal observations */
         #[FhirProperty(fhirType: 'Range', propertyKind: 'complex')]

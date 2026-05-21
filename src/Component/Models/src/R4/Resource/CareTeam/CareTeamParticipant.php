@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\CareTeam;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -16,6 +17,12 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
  * @description Identifies all people and organizations who are expected to be involved in the care team.
  */
 #[FHIRBackboneElement(parentResource: 'CareTeam', elementPath: 'CareTeam.participant', fhirVersion: 'R4')]
+#[FHIRPathInvariant(
+    key: 'ctm-1',
+    severity: 'error',
+    expression: 'onBehalfOf.exists() implies (member.resolve().iif(empty(), true, ofType(Practitioner).exists()))',
+    human: 'CareTeam.participant.onBehalfOf can only be populated when CareTeam.participant.member is a Practitioner',
+)]
 class CareTeamParticipant extends BackboneElement
 {
     public function __construct(
