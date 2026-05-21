@@ -6,8 +6,12 @@ namespace Ardenexal\FHIRTools\Component\CodeGeneration\Generator;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;
+use Symfony\Component\Validator\Constraints\Count;
 
 use function Symfony\Component\String\u;
 
@@ -97,7 +101,98 @@ class FHIRProfileGenerator
             ->setType('string')
             ->addComment('Canonical URL of this profile\'s StructureDefinition.');
 
+        $this->emitDifferentialConstraints($structureDefinition, $url, $class, $namespace);
+
         return $class;
+    }
+
+    /**
+     * Emits #[FHIRProfileConstraint] attributes on the class for each differential element that
+     * carries a cardinality (min/max), fixed[x], or pattern[x] constraint. The profile URL is
+     * used as the Symfony validation group so these constraints are only active when that profile
+     * is requested.
+     *
+     * Skipped elements:
+     *  - Root element (path has no '.' — it's the resource or type itself, not a property)
+     *  - Elements with contentReference (constraint lives on the referenced type)
+     *
+     * @param array<string, mixed> $structureDefinition
+     */
+    private function emitDifferentialConstraints(
+        array $structureDefinition,
+        string $profileUrl,
+        ClassType $class,
+        PhpNamespace $namespace,
+    ): void {
+        /** @var array<int, array<string, mixed>> $elements */
+        $elements = $structureDefinition['differential']['element'] ?? [];
+
+        foreach ($elements as $element) {
+            $path = (string) ($element['path'] ?? '');
+
+            // Skip root element (e.g. "Patient") — no property path to map
+            if (!str_contains($path, '.')) {
+                continue;
+            }
+
+            // Skip contentReference elements — constraints live on the referenced type
+            if (ElementDefinitionHelper::hasContentReference($element)) {
+                continue;
+            }
+
+            // Extract the property path: strip the resource/type prefix ("Patient.name" → "name")
+            $dotPos        = strpos($path, '.');
+            $propertyPath  = $dotPos !== false ? substr($path, $dotPos + 1) : $path;
+
+            // Cardinality constraint (Count) — emitted when min > 0 or max is a bounded number
+            $min = (int) ($element['min'] ?? 0);
+            $max = (string) ($element['max'] ?? '*');
+
+            $countOptions = [];
+            if ($min > 0) {
+                $countOptions['min'] = $min;
+            }
+            if (is_numeric($max)) {
+                $countOptions['max'] = (int) $max;
+            }
+
+            if ($countOptions !== []) {
+                $namespace->addUse(Count::class);
+                $namespace->addUse(FHIRProfileConstraint::class);
+                $class->addAttribute(FHIRProfileConstraint::class, [
+                    'path'       => $propertyPath,
+                    'constraint' => Count::class,
+                    'options'    => $countOptions,
+                    'groups'     => [$profileUrl],
+                ]);
+            }
+
+            // Fixed value constraint
+            $fixedField = ElementDefinitionHelper::extractPolymorphicField($element, 'fixed');
+            if ($fixedField !== null) {
+                $namespace->addUse(FHIRFixedValue::class);
+                $namespace->addUse(FHIRProfileConstraint::class);
+                $class->addAttribute(FHIRProfileConstraint::class, [
+                    'path'       => $propertyPath,
+                    'constraint' => FHIRFixedValue::class,
+                    'options'    => ['value' => $fixedField['value']],
+                    'groups'     => [$profileUrl],
+                ]);
+            }
+
+            // Pattern value constraint
+            $patternField = ElementDefinitionHelper::extractPolymorphicField($element, 'pattern');
+            if ($patternField !== null) {
+                $namespace->addUse(FHIRPatternValue::class);
+                $namespace->addUse(FHIRProfileConstraint::class);
+                $class->addAttribute(FHIRProfileConstraint::class, [
+                    'path'       => $propertyPath,
+                    'constraint' => FHIRPatternValue::class,
+                    'options'    => ['pattern' => $patternField['value']],
+                    'groups'     => [$profileUrl],
+                ]);
+            }
+        }
     }
 
     /**

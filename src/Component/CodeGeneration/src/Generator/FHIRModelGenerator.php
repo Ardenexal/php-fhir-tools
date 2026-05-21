@@ -788,7 +788,7 @@ class FHIRModelGenerator implements GeneratorInterface
 
             // contentReference elements have their value constraints on the referenced type —
             // skip all value constraint emission here.
-            if (isset($element['contentReference'])) {
+            if (ElementDefinitionHelper::hasContentReference($element)) {
                 return;
             }
 

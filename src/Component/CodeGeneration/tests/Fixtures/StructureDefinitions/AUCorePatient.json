@@ -33,5 +33,30 @@
         "type": [{"code": "HumanName"}]
       }
     ]
+  },
+  "differential": {
+    "element": [
+      {
+        "id": "Patient",
+        "path": "Patient",
+        "short": "AU Core Patient — differential root",
+        "min": 0,
+        "max": "*"
+      },
+      {
+        "id": "Patient.name",
+        "path": "Patient.name",
+        "short": "A name associated with the patient (required in AU Core)",
+        "min": 1,
+        "max": "*"
+      },
+      {
+        "id": "Patient.identifier",
+        "path": "Patient.identifier",
+        "short": "An identifier for this patient (at least one required)",
+        "min": 1,
+        "max": "*"
+      }
+    ]
   }
 }

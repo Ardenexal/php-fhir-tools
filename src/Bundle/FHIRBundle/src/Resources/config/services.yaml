@@ -131,6 +131,9 @@ services:
             $messageRegistry: '@Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry'
         tags: ['validator.constraint_validator']
 
+    Ardenexal\FHIRTools\Component\Validation\Validator\FHIRProfileConstraintValidator:
+        tags: ['validator.constraint_validator']
+
     # Named service aliases
     fhir.model_generator:
         alias: 'Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator'

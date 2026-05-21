@@ -74,7 +74,7 @@ class FHIRProfileGeneratorTest extends TestCase
 
         $found = false;
         foreach ($attributes as $attribute) {
-            if (str_contains($attribute->getName(), 'FHIRProfile')) {
+            if ($attribute->getName() === FHIRProfile::class) {
                 $found = true;
                 $args  = $attribute->getArguments();
                 self::assertSame(
@@ -167,7 +167,7 @@ class FHIRProfileGeneratorTest extends TestCase
 
         $found = false;
         foreach ($class->getAttributes() as $attribute) {
-            if (str_contains($attribute->getName(), 'FHIRProfile')) {
+            if ($attribute->getName() === FHIRProfile::class) {
                 $found = true;
                 $args  = $attribute->getArguments();
                 self::assertSame(
