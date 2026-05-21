@@ -237,7 +237,8 @@ class FHIRModelGeneratorConstraintEmissionTest extends TestCase
         self::assertSame('required', $instance->strength);
     }
 
-    public function testValueSetBindingNotEmittedForExtensibleBinding(): void
+    // M06: extensible bindings now emit the attribute for optional terminology-server validation (ADR-004).
+    public function testValueSetBindingEmittedForExtensibleBinding(): void
     {
         $class = $this->generator->generateModelClass(
             $this->buildSD('ExtensibleBindingType', 'complex-type', [
@@ -256,7 +257,8 @@ class FHIRModelGeneratorConstraintEmissionTest extends TestCase
 
         $fqcn  = $this->evalClass($class, self::TEST_NS . '\\DataType');
         $attrs = (new \ReflectionClass($fqcn))->getProperty('status')->getAttributes(FHIRValueSetBinding::class);
-        self::assertEmpty($attrs, '#[FHIRValueSetBinding] must NOT be emitted for extensible binding');
+        self::assertNotEmpty($attrs, '#[FHIRValueSetBinding] must be emitted for extensible binding (M06)');
+        self::assertSame('extensible', $attrs[0]->newInstance()->strength);
     }
 
     // -------------------------------------------------------------------------

@@ -834,10 +834,10 @@ class FHIRModelGenerator implements GeneratorInterface
                 $param->addAttribute(Regex::class, ['pattern' => $regexPattern]);
             }
 
-            // FHIRValueSetBinding for required-strength bindings.
+            // FHIRValueSetBinding for required/extensible/preferred-strength bindings.
             if (isset($element['binding'])) {
                 $bindingStrength = $element['binding']['strength'] ?? 'extensible';
-                if ($this->shouldGenerateEnumForBinding($bindingStrength)) {
+                if ($this->shouldEmitBindingAttribute($bindingStrength)) {
                     $param->addAttribute(FHIRValueSetBinding::class, [
                         'valueSetUrl' => $element['binding']['valueSet'] ?? '',
                         'strength'    => $bindingStrength,
@@ -1278,6 +1278,21 @@ class FHIRModelGenerator implements GeneratorInterface
     private function shouldGenerateEnumForBinding(string $bindingStrength): bool
     {
         return $bindingStrength === 'required';
+    }
+
+    /**
+     * Determine if binding strength warrants emitting a #[FHIRValueSetBinding] attribute.
+     *
+     * Required bindings get an enum-backed attribute; extensible and preferred bindings
+     * get a weaker attribute for optional terminology-server validation. Example bindings
+     * are documentation-only and produce no attribute.
+     */
+    private function shouldEmitBindingAttribute(string $bindingStrength): bool
+    {
+        return match ($bindingStrength) {
+            'required', 'extensible', 'preferred' => true,
+            default                               => false,
+        };
     }
 
     /**

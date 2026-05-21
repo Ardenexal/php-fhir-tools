@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Validation\Validator;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
+use Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyClientInterface;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
 use Ardenexal\FHIRTools\Component\Validation\FHIRViolationCode;
 use Symfony\Component\Validator\Constraint;
@@ -18,12 +19,14 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
     public const string DEFAULT_INVALID_VALUE_MESSAGE = 'The value {{ value }} is not a valid case of value set {{ url }}.';
 
     /**
-     * @param string[] $enumNamespaceRoots Namespace roots to probe for generated enum classes,
-     *                                     e.g. ['Ardenexal\FHIRTools\Component\Models\R4\Enum']
+     * @param string[]                            $enumNamespaceRoots Namespace roots to probe for generated enum classes,
+     *                                                                e.g. ['Ardenexal\FHIRTools\Component\Models\R4\Enum']
+     * @param FHIRTerminologyClientInterface|null $terminologyClient  Null → skip extensible/preferred checks (graceful degradation)
      */
     public function __construct(
         private readonly FHIRValidationMessageRegistry $messageRegistry,
         private readonly array $enumNamespaceRoots = [],
+        private readonly ?FHIRTerminologyClientInterface $terminologyClient = null,
     ) {
     }
 
@@ -37,17 +40,26 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
             return;
         }
 
+        if ($constraint->strength === 'required') {
+            $this->validateRequired($value, $constraint);
+
+            return;
+        }
+
+        $this->validateNonRequired($value, $constraint);
+    }
+
+    private function validateRequired(mixed $value, FHIRValueSetBinding $constraint): void
+    {
         $className = $this->classNameFromUrl($constraint->valueSetUrl);
         $enumFqcn  = $this->resolveEnumFqcn($className);
 
         if ($enumFqcn === null) {
-            if ($constraint->strength === 'required') {
-                $override = $this->messageRegistry->getOverride('FHIRValueSetBinding');
-                $this->context->buildViolation($override ?? self::DEFAULT_MISSING_ENUM_MESSAGE)
-                    ->setParameters(['{{ url }}' => $constraint->valueSetUrl])
-                    ->setCode(FHIRViolationCode::ERROR)
-                    ->addViolation();
-            }
+            $override = $this->messageRegistry->getOverride('FHIRValueSetBinding');
+            $this->context->buildViolation($override ?? self::DEFAULT_MISSING_ENUM_MESSAGE)
+                ->setParameters(['{{ url }}' => $constraint->valueSetUrl])
+                ->setCode(FHIRViolationCode::ERROR)
+                ->addViolation();
 
             return;
         }
@@ -61,6 +73,29 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
                 ->setCode(FHIRViolationCode::ERROR)
                 ->addViolation();
         }
+    }
+
+    /**
+     * Validates extensible/preferred bindings via the terminology client.
+     * When no client is configured, validation is skipped (graceful degradation).
+     * Violations produced here are warnings, not errors.
+     */
+    private function validateNonRequired(mixed $value, FHIRValueSetBinding $constraint): void
+    {
+        if ($this->terminologyClient === null) {
+            return;
+        }
+
+        if ($this->terminologyClient->validateCode($constraint->valueSetUrl, $value)) {
+            return;
+        }
+
+        $override = $this->messageRegistry->getOverride('FHIRValueSetBinding');
+        $this->context->buildViolation($override ?? self::DEFAULT_INVALID_VALUE_MESSAGE)
+            ->setParameters(['{{ value }}' => (string) $value, '{{ url }}' => $constraint->valueSetUrl])
+            ->setInvalidValue($value)
+            ->setCode(FHIRViolationCode::WARNING)
+            ->addViolation();
     }
 
     /**

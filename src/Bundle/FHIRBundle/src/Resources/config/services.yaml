@@ -112,6 +112,11 @@ services:
         tags: ['validator.constraint_validator']
         public: true
 
+    Ardenexal\FHIRTools\Component\Validation\NullFHIRTerminologyClient: ~
+
+    Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyClientInterface:
+        alias: 'Ardenexal\FHIRTools\Component\Validation\NullFHIRTerminologyClient'
+
     Ardenexal\FHIRTools\Component\Validation\Validator\FHIRValueSetBindingValidator:
         arguments:
             $messageRegistry: '@Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry'
@@ -119,6 +124,7 @@ services:
                 - 'Ardenexal\FHIRTools\Component\Models\R4\Enum'
                 - 'Ardenexal\FHIRTools\Component\Models\R4B\Enum'
                 - 'Ardenexal\FHIRTools\Component\Models\R5\Enum'
+            $terminologyClient: '@Ardenexal\FHIRTools\Component\Validation\NullFHIRTerminologyClient'
         tags: ['validator.constraint_validator']
 
     Ardenexal\FHIRTools\Component\Validation\Validator\FHIRFixedValueValidator:
