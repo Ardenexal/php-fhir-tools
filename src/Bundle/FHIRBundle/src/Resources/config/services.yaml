@@ -105,6 +105,32 @@ services:
         alias: 'Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry'
         public: true
 
+    Ardenexal\FHIRTools\Component\Validation\Validator\FHIRPathInvariantValidator:
+        arguments:
+            $pathService: '@Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService'
+            $messageRegistry: '@Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry'
+        tags: ['validator.constraint_validator']
+        public: true
+
+    Ardenexal\FHIRTools\Component\Validation\Validator\FHIRValueSetBindingValidator:
+        arguments:
+            $messageRegistry: '@Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry'
+            $enumNamespaceRoots:
+                - 'Ardenexal\FHIRTools\Component\Models\R4\Enum'
+                - 'Ardenexal\FHIRTools\Component\Models\R4B\Enum'
+                - 'Ardenexal\FHIRTools\Component\Models\R5\Enum'
+        tags: ['validator.constraint_validator']
+
+    Ardenexal\FHIRTools\Component\Validation\Validator\FHIRFixedValueValidator:
+        arguments:
+            $messageRegistry: '@Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry'
+        tags: ['validator.constraint_validator']
+
+    Ardenexal\FHIRTools\Component\Validation\Validator\FHIRPatternValueValidator:
+        arguments:
+            $messageRegistry: '@Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry'
+        tags: ['validator.constraint_validator']
+
     # Named service aliases
     fhir.model_generator:
         alias: 'Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator'

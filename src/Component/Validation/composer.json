@@ -12,9 +12,10 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.3",
         "symfony/validator": "^6.4|^7.4",
-        "ardenexal/fhir-metadata": "^0.3"
+        "ardenexal/fhir-metadata": "^0.3",
+        "ardenexal/fhir-path": "^0.3"
     },
     "autoload": {
         "psr-4": {

@@ -5,11 +5,11 @@
     "prefer-stable": true,
     "require": {
         "php": ">=8.3",
-        "brick/date-time": "^0.9.0",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "phpdocumentor/reflection-docblock": "^5.6.7",
+        "brick/date-time": "^0.9.0",
         "nette/php-generator": "^4.2.2",
+        "phpdocumentor/reflection-docblock": "^5.6.7",
         "phpstan/phpdoc-parser": "^2.3.2",
         "symfony/asset": "7.4.*",
         "symfony/asset-mapper": "7.4.*",
@@ -28,6 +28,7 @@
         "symfony/translation": "7.4.*",
         "symfony/twig-bundle": "7.4.*",
         "symfony/ux-turbo": "^2.34",
+        "symfony/validator": "7.4.*",
         "symfony/yaml": "7.4.*",
         "twig/extra-bundle": "^2.12|^3.24",
         "twig/twig": "^2.12|^3.24"
@@ -53,7 +54,8 @@
             "Ardenexal\\FHIRTools\\Component\\Serialization\\": "../src/Component/Serialization/src/",
             "Ardenexal\\FHIRTools\\Component\\Models\\": "../src/Component/Models/src/",
             "Ardenexal\\FHIRTools\\Component\\Metadata\\": "../src/Component/Metadata/src/",
-            "Ardenexal\\FHIRTools\\Component\\FHIRPath\\": "../src/Component/FHIRPath/src/"
+            "Ardenexal\\FHIRTools\\Component\\FHIRPath\\": "../src/Component/FHIRPath/src/",
+            "Ardenexal\\FHIRTools\\Component\\Validation\\": "../src/Component/Validation/src/"
         }
     },
     "autoload-dev": {

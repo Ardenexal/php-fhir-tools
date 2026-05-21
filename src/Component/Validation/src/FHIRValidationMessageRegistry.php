@@ -7,24 +7,24 @@ namespace Ardenexal\FHIRTools\Component\Validation;
 /**
  * In-memory registry for overriding validation message templates per constraint class.
  *
- * Consumers can override the default violation message for any constraint class before
- * validation runs. Validators in M02+ inject this registry and call getOverride() to
- * substitute a custom message when one is registered.
+ * Keys are simple class names without namespace (e.g. 'FHIRFixedValue'), matching the
+ * class names in this package which are globally unique. This keeps fhir.yaml config
+ * readable without requiring fully-qualified class names.
  */
 final class FHIRValidationMessageRegistry
 {
-    /** @var array<class-string, string> */
+    /** @var array<string, string> */
     private array $overrides = [];
 
-    /** @param class-string $constraintClass */
-    public function setOverride(string $constraintClass, string $messageTemplate): void
+    /** @param string $constraintKey Simple class name, e.g. 'FHIRFixedValue' */
+    public function setOverride(string $constraintKey, string $messageTemplate): void
     {
-        $this->overrides[$constraintClass] = $messageTemplate;
+        $this->overrides[$constraintKey] = $messageTemplate;
     }
 
-    /** @param class-string $constraintClass */
-    public function getOverride(string $constraintClass): ?string
+    /** @param string $constraintKey Simple class name, e.g. 'FHIRFixedValue' */
+    public function getOverride(string $constraintKey): ?string
     {
-        return $this->overrides[$constraintClass] ?? null;
+        return $this->overrides[$constraintKey] ?? null;
     }
 }
