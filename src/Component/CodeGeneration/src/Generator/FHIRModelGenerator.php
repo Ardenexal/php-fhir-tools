@@ -23,6 +23,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRMustSupport;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
@@ -854,6 +855,10 @@ class FHIRModelGenerator implements GeneratorInterface
             $patternField = $this->extractPolymorphicField($element, 'pattern');
             if ($patternField !== null && is_array($patternField['value'])) {
                 $param->addAttribute(FHIRPatternValue::class, ['pattern' => $patternField['value']]);
+            }
+
+            if (($element['mustSupport'] ?? false) === true) {
+                $param->addAttribute(FHIRMustSupport::class);
             }
         }
     }

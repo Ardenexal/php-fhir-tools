@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustSupport;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;
 use Symfony\Component\Validator\Constraints\Count;
@@ -102,6 +103,7 @@ class FHIRProfileGenerator
             ->addComment('Canonical URL of this profile\'s StructureDefinition.');
 
         $this->emitDifferentialConstraints($structureDefinition, $url, $class, $namespace);
+        $this->emitDifferentialMustSupport($structureDefinition, $url, $class, $namespace);
 
         return $class;
     }
@@ -192,6 +194,46 @@ class FHIRProfileGenerator
                     'groups'     => [$profileUrl],
                 ]);
             }
+        }
+    }
+
+    /**
+     * Emits #[FHIRProfileMustSupport] class-level attributes for each differential element that
+     * declares mustSupport=true. Profile classes cannot re-declare inherited properties, so the
+     * must-support information is carried at the class level as a pure metadata attribute
+     * (no Symfony Validator involvement).
+     *
+     * @param array<string, mixed> $structureDefinition
+     */
+    private function emitDifferentialMustSupport(
+        array $structureDefinition,
+        string $profileUrl,
+        ClassType $class,
+        PhpNamespace $namespace,
+    ): void {
+        /** @var array<int, array<string, mixed>> $elements */
+        $elements = $structureDefinition['differential']['element'] ?? [];
+
+        foreach ($elements as $element) {
+            if (($element['mustSupport'] ?? false) !== true) {
+                continue;
+            }
+
+            $path = (string) ($element['path'] ?? '');
+
+            // Skip root element (e.g. "Patient") — no property path to map
+            if (!str_contains($path, '.')) {
+                continue;
+            }
+
+            $dotPos       = strpos($path, '.');
+            $propertyPath = $dotPos !== false ? substr($path, $dotPos + 1) : $path;
+
+            $namespace->addUse(FHIRProfileMustSupport::class);
+            $class->addAttribute(FHIRProfileMustSupport::class, [
+                'path'   => $propertyPath,
+                'groups' => [$profileUrl],
+            ]);
         }
     }
 
