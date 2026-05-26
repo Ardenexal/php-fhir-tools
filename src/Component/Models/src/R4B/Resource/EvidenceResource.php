@@ -57,7 +57,7 @@ class EvidenceResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
         public ?UriPrimitive $implicitRules = null,
         /** @var string|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages', strength: 'preferred')]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -205,10 +205,10 @@ class EvidenceResource extends DomainResourceResource
         #[Count(min: 1)]
         public array $variableDefinition = [],
         /** @var CodeableConcept|null synthesisType The method to combine studies */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/synthesis-type', strength: 'extensible')]
         public ?CodeableConcept $synthesisType = null,
         /** @var CodeableConcept|null studyType The type of study that produced this evidence */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/study-type', strength: 'extensible')]
         public ?CodeableConcept $studyType = null,
         /** @var array<EvidenceStatistic> statistic Values and parameters for a single statistic */
         #[FhirProperty(

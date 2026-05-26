@@ -149,6 +149,7 @@ class ExampleScenarioResource extends DomainResourceResource
                 ],
             ],
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/version-algorithm', strength: 'extensible')]
         public StringPrimitive|string|Coding|null $versionAlgorithm = null,
         /** @var StringPrimitive|string|null name To be removed? */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -194,6 +195,7 @@ class ExampleScenarioResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/jurisdiction', strength: 'extensible')]
         public array $jurisdiction = [],
         /** @var MarkdownPrimitive|null purpose The purpose of the example, e.g. to illustrate a scenario */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]

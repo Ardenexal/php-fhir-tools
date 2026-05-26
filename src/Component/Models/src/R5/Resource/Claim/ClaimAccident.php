@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\Claim;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Address;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
@@ -34,7 +35,7 @@ class ClaimAccident extends BackboneElement
         #[FhirProperty(fhirType: 'date', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?DatePrimitive $date = null,
         /** @var CodeableConcept|null type The nature of the accident */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/v3-ActIncidentCode', strength: 'extensible')]
         public ?CodeableConcept $type = null,
         /** @var Address|Reference|null location Where the event occurred */
         #[FhirProperty(

@@ -44,7 +44,7 @@ class ImagingStudyResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
         public ?UriPrimitive $implicitRules = null,
         /** @var string|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages', strength: 'preferred')]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -76,6 +76,7 @@ class ImagingStudyResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_29.html', strength: 'extensible')]
         public array $modality = [],
         /** @var Reference|null subject Who or what is the subject of the study */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank]
@@ -129,6 +130,7 @@ class ImagingStudyResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://www.rsna.org/RadLex_Playbook.aspx', strength: 'extensible')]
         public array $procedureCode = [],
         /** @var Reference|null location Where ImagingStudy occurred */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]

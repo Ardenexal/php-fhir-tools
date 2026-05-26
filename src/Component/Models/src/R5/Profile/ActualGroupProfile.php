@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\GroupResource;
 
 /**
@@ -15,6 +16,18 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\GroupResource;
  * @description Enforces an enumerated group, rather than a definitional group
  */
 #[FHIRProfile(profileUrl: 'http://hl7.org/fhir/StructureDefinition/actualgroup', baseType: 'Group', fhirVersion: 'R5')]
+#[FHIRProfileConstraint(
+    path: 'membership',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['min' => 1, 'max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/actualgroup'],
+)]
+#[FHIRProfileConstraint(
+    path: 'membership',
+    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
+    options: ['value' => 'enumerated'],
+    groups: ['http://hl7.org/fhir/StructureDefinition/actualgroup'],
+)]
 class ActualGroupProfile extends GroupResource
 {
     /** Canonical URL of this profile's StructureDefinition. */

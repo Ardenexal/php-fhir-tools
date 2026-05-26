@@ -41,7 +41,7 @@ class CodeSystemConceptDesignation extends BackboneElement
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Coding|null use Details how this designation would be used */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/designation-use', strength: 'extensible')]
         public ?Coding $use = null,
         /** @var array<Coding> additionalUse Additional ways how this designation would be used */
         #[FhirProperty(
@@ -50,6 +50,7 @@ class CodeSystemConceptDesignation extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/designation-use', strength: 'extensible')]
         public array $additionalUse = [],
         /** @var StringPrimitive|string|null value The text value for this designation */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]

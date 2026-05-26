@@ -77,9 +77,10 @@ class DetectedIssueResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/detectedissue-category', strength: 'preferred')]
         public array $category = [],
         /** @var CodeableConcept|null code Specific type of detected issue, e.g. drug-drug, duplicate therapy, etc */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/detectedissue-category', strength: 'preferred')]
         public ?CodeableConcept $code = null,
         /** @var DetectedIssueSeverityType|null severity high | moderate | low */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/detectedissue-severity|5.0.0', strength: 'required')]

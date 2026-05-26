@@ -1,0 +1,56 @@
+{
+  "resourceType": "StructureDefinition",
+  "url": "http://example.org/StructureDefinition/patient-with-identifier-slicing",
+  "name": "PatientWithIdentifierSlicing",
+  "type": "Patient",
+  "kind": "resource",
+  "abstract": false,
+  "derivation": "constraint",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
+  "differential": {
+    "element": [
+      {
+        "id": "Patient",
+        "path": "Patient",
+        "min": 0,
+        "max": "*"
+      },
+      {
+        "id": "Patient.identifier",
+        "path": "Patient.identifier",
+        "slicing": {
+          "discriminator": [{"type": "value", "path": "system"}],
+          "rules": "open"
+        },
+        "min": 0,
+        "max": "*"
+      },
+      {
+        "id": "Patient.identifier:ihiNumber",
+        "path": "Patient.identifier",
+        "sliceName": "ihiNumber",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Patient.identifier:ihiNumber.system",
+        "path": "Patient.identifier.system",
+        "sliceName": "ihiNumber",
+        "fixedUri": "http://ns.electronichealth.net.au/id/hi/ihi/1.0"
+      },
+      {
+        "id": "Patient.identifier:medicareNumber",
+        "path": "Patient.identifier",
+        "sliceName": "medicareNumber",
+        "min": 0,
+        "max": "1"
+      },
+      {
+        "id": "Patient.identifier:medicareNumber.system",
+        "path": "Patient.identifier.system",
+        "sliceName": "medicareNumber",
+        "fixedUri": "http://ns.electronichealth.net.au/id/medicare-number"
+      }
+    ]
+  }
+}

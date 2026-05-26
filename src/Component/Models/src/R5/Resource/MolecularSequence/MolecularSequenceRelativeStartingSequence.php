@@ -45,7 +45,7 @@ class MolecularSequenceRelativeStartingSequence extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null genomeAssembly The genome assembly used for starting sequence, e.g. GRCh38 */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://loinc.org/LL1040-6/', strength: 'extensible')]
         public ?CodeableConcept $genomeAssembly = null,
         /** @var CodeableConcept|null chromosome Chromosome Identifier */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://loinc.org/LL2938-0/|5.0.0', strength: 'required')]

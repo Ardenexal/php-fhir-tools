@@ -44,6 +44,7 @@ class CitationCitedArtifactRelatesTo extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/citation-artifact-classifier', strength: 'extensible')]
         public array $classifier = [],
         /** @var StringPrimitive|string|null label Short label */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\DocumentReference;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Attachment;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding;
@@ -32,7 +33,7 @@ class DocumentReferenceContent extends BackboneElement
         #[FhirProperty(fhirType: 'Attachment', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?Attachment $attachment = null,
         /** @var Coding|null format Format/content rules for the document */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/formatcodes', strength: 'preferred')]
         public ?Coding $format = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

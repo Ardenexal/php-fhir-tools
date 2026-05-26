@@ -122,6 +122,7 @@ class AppointmentResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/EncounterClass', strength: 'preferred')]
         public array $class = [],
         /** @var array<CodeableConcept> serviceCategory A broad categorization of the service that is to be performed during this appointment */
         #[FhirProperty(
@@ -146,9 +147,10 @@ class AppointmentResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/c80-practice-codes', strength: 'preferred')]
         public array $specialty = [],
         /** @var CodeableConcept|null appointmentType The style of appointment or patient that has been booked in the slot (not service type) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/v2-0276', strength: 'preferred')]
         public ?CodeableConcept $appointmentType = null,
         /** @var array<CodeableReference> reason Reason this appointment is scheduled */
         #[FhirProperty(
@@ -157,6 +159,7 @@ class AppointmentResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/encounter-reason', strength: 'preferred')]
         public array $reason = [],
         /** @var CodeableConcept|null priority Used to make informed decisions if needing to re-prioritize */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]

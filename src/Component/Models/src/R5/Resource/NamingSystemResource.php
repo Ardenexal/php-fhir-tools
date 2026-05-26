@@ -123,6 +123,7 @@ class NamingSystemResource extends DomainResourceResource
                 ],
             ],
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/version-algorithm', strength: 'extensible')]
         public StringPrimitive|string|Coding|null $versionAlgorithm = null,
         /** @var StringPrimitive|string|null name Name for this naming system (computer friendly) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
@@ -157,7 +158,7 @@ class NamingSystemResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $responsible = null,
         /** @var CodeableConcept|null type e.g. driver,  provider,  patient, bank etc */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/namingsystem-identifier-system-type', strength: 'preferred')]
         public ?CodeableConcept $type = null,
         /** @var MarkdownPrimitive|null description Natural language description of the naming system */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -177,6 +178,7 @@ class NamingSystemResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/jurisdiction', strength: 'extensible')]
         public array $jurisdiction = [],
         /** @var MarkdownPrimitive|null purpose Why this naming system is defined */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]

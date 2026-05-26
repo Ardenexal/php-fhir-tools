@@ -102,7 +102,7 @@ class ExplanationOfBenefitResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/explanationofbenefit-status|5.0.0', strength: 'required')]
         public ?ExplanationOfBenefitStatusType $status = null,
         /** @var CodeableConcept|null type Category or discipline */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/claim-type', strength: 'extensible')]
         public ?CodeableConcept $type = null,
         /** @var CodeableConcept|null subType More granular claim type */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]

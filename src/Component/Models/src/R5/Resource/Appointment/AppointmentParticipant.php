@@ -45,6 +45,7 @@ class AppointmentParticipant extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/encounter-participant-type', strength: 'extensible')]
         public array $type = [],
         /** @var Period|null period Participation period of the actor */
         #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]

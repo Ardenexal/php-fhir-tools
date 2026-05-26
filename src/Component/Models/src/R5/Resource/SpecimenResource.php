@@ -108,6 +108,7 @@ class SpecimenResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/specimen-role', strength: 'preferred')]
         public array $role = [],
         /** @var array<SpecimenFeature> feature The physical feature of a specimen */
         #[FhirProperty(
@@ -143,6 +144,7 @@ class SpecimenResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/v2-0493', strength: 'extensible')]
         public array $condition = [],
         /** @var array<Annotation> note Comments */
         #[FhirProperty(

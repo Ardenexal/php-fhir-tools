@@ -95,9 +95,10 @@ class ConditionResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/condition-category', strength: 'preferred')]
         public array $category = [],
         /** @var CodeableConcept|null severity Subjective severity of condition */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/condition-severity', strength: 'preferred')]
         public ?CodeableConcept $severity = null,
         /** @var CodeableConcept|null code Identification of the condition, problem or diagnosis */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]

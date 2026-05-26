@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\DiagnosticReportResource;
 
 /**
@@ -15,6 +16,24 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\DiagnosticReportResource;
  * @description Describes how the HLA genotyping results
  */
 #[FHIRProfile(profileUrl: 'http://hl7.org/fhir/StructureDefinition/hlaresult', baseType: 'DiagnosticReport', fhirVersion: 'R4')]
+#[FHIRProfileConstraint(
+    path: 'extension',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/hlaresult'],
+)]
+#[FHIRProfileConstraint(
+    path: 'extension',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/hlaresult'],
+)]
+#[FHIRProfileConstraint(
+    path: 'extension',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/hlaresult'],
+)]
 class ProfileForHLAGenotypingResultsProfile extends DiagnosticReportResource
 {
     /** Canonical URL of this profile's StructureDefinition. */

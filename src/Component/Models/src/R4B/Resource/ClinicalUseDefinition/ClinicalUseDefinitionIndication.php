@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\ClinicalUseDefinitio
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableReference;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
@@ -44,7 +45,7 @@ class ClinicalUseDefinitionIndication extends BackboneElement
         )]
         public array $comorbidity = [],
         /** @var CodeableReference|null intendedEffect The intended effect, aim or strategy to be achieved */
-        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/product-intended-use', strength: 'preferred')]
         public ?CodeableReference $intendedEffect = null,
         /** @var Range|StringPrimitive|string|null duration Timing or duration information */
         #[FhirProperty(

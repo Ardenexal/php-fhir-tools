@@ -48,7 +48,7 @@ class VerificationResultResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
         public ?UriPrimitive $implicitRules = null,
         /** @var string|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages', strength: 'preferred')]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -74,7 +74,7 @@ class VerificationResultResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
         public array $targetLocation = [],
         /** @var CodeableConcept|null need none | initial | periodic */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/verificationresult-need', strength: 'preferred')]
         public ?CodeableConcept $need = null,
         /** @var StatusType|null status attested | validated | in-process | req-revalid | val-fail | reval-fail */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/verificationresult-status|4.0.1', strength: 'required')]
@@ -83,7 +83,7 @@ class VerificationResultResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $statusDate = null,
         /** @var CodeableConcept|null validationType nothing | primary | multiple */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/verificationresult-validation-type', strength: 'preferred')]
         public ?CodeableConcept $validationType = null,
         /** @var array<CodeableConcept> validationProcess The primary process by which the target is validated (edit check; value set; primary source; multiple sources; standalone; in context) */
         #[FhirProperty(
@@ -103,7 +103,7 @@ class VerificationResultResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
         public ?DatePrimitive $nextScheduled = null,
         /** @var CodeableConcept|null failureAction fatal | warn | rec-only | none */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/verificationresult-failure-action', strength: 'preferred')]
         public ?CodeableConcept $failureAction = null,
         /** @var array<VerificationResultPrimarySource> primarySource Information about the primary source(s) involved in validation */
         #[FhirProperty(

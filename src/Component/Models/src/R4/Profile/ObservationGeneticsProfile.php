@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\ObservationResource;
 
 /**
@@ -15,6 +16,60 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\ObservationResource;
  * @description Describes how the observation resource is used to report structured genetic test results
  */
 #[FHIRProfile(profileUrl: 'http://hl7.org/fhir/StructureDefinition/observation-genetics', baseType: 'Observation', fhirVersion: 'R4')]
+#[FHIRProfileConstraint(
+    path: 'extension',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/observation-genetics'],
+)]
+#[FHIRProfileConstraint(
+    path: 'extension',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/observation-genetics'],
+)]
+#[FHIRProfileConstraint(
+    path: 'extension',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/observation-genetics'],
+)]
+#[FHIRProfileConstraint(
+    path: 'extension',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/observation-genetics'],
+)]
+#[FHIRProfileConstraint(
+    path: 'extension',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/observation-genetics'],
+)]
+#[FHIRProfileConstraint(
+    path: 'extension',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/observation-genetics'],
+)]
+#[FHIRProfileConstraint(
+    path: 'extension',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/observation-genetics'],
+)]
+#[FHIRProfileConstraint(
+    path: 'extension',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/observation-genetics'],
+)]
+#[FHIRProfileConstraint(
+    path: 'extension',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/observation-genetics'],
+)]
 class ObservationGeneticsProfile extends ObservationResource
 {
     /** Canonical URL of this profile's StructureDefinition. */

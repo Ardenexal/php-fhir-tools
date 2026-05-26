@@ -48,6 +48,7 @@ class MeasureGroup extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/measure-type', strength: 'extensible')]
         public array $type = [],
         /** @var CodeableConcept|Reference|null subject E.g. Patient, Practitioner, RelatedPerson, Organization, Location, Device */
         #[FhirProperty(
@@ -69,12 +70,13 @@ class MeasureGroup extends BackboneElement
                 ],
             ],
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/participant-resource-types', strength: 'extensible')]
         public CodeableConcept|Reference|null $subject = null,
         /** @var FHIRTypesType|null basis Population basis */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/fhir-types|5.0.0', strength: 'required')]
         public ?FHIRTypesType $basis = null,
         /** @var CodeableConcept|null scoring proportion | ratio | continuous-variable | cohort */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/measure-scoring', strength: 'extensible')]
         public ?CodeableConcept $scoring = null,
         /** @var CodeableConcept|null scoringUnit What units? */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]

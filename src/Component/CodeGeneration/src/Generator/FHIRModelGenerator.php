@@ -845,9 +845,9 @@ class FHIRModelGenerator implements GeneratorInterface
                 }
             }
 
-            // FHIRFixedValue from fixed[x] polymorphic field.
+            // FHIRFixedValue from fixed[x] polymorphic field (scalar values only).
             $fixedField = $this->extractPolymorphicField($element, 'fixed');
-            if ($fixedField !== null) {
+            if ($fixedField !== null && is_scalar($fixedField['value'])) {
                 $param->addAttribute(FHIRFixedValue::class, ['value' => $fixedField['value']]);
             }
 

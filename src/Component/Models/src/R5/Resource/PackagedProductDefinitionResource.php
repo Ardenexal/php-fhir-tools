@@ -87,7 +87,7 @@ class PackagedProductDefinitionResource extends DomainResourceResource
         )]
         public array $packageFor = [],
         /** @var CodeableConcept|null status The status within the lifecycle of this item. High level - not intended to duplicate details elsewhere e.g. legal status, or authorization/marketing status */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status', strength: 'preferred')]
         public ?CodeableConcept $status = null,
         /** @var DateTimePrimitive|null statusDate The date at which the given status became applicable */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]

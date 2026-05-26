@@ -80,7 +80,7 @@ class CompositionResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/composition-status|5.0.0', strength: 'required')]
         public ?CompositionStatusType $status = null,
         /** @var CodeableConcept|null type Kind of composition (LOINC if possible) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/doc-typecodes', strength: 'preferred')]
         public ?CodeableConcept $type = null,
         /** @var array<CodeableConcept> category Categorization of Composition */
         #[FhirProperty(

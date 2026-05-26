@@ -31,7 +31,7 @@ class InventoryItemName extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
         /** @var Coding|null nameType The type of name e.g. 'brand-name', 'functional-name', 'common-name' */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/inventoryitem-nametype', strength: 'preferred')]
         public ?Coding $nameType = null,
         /** @var CommonLanguagesType|null language The language used to express the item name */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages|5.0.0', strength: 'required')]

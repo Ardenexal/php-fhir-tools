@@ -41,7 +41,7 @@ class DeviceMetricResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
         public ?UriPrimitive $implicitRules = null,
         /** @var string|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages', strength: 'preferred')]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -64,10 +64,10 @@ class DeviceMetricResource extends DomainResourceResource
         )]
         public array $identifier = [],
         /** @var CodeableConcept|null type Identity of metric, for example Heart Rate or PEEP Setting */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/devicemetric-type', strength: 'preferred')]
         public ?CodeableConcept $type = null,
         /** @var CodeableConcept|null unit Unit of Measure for the Metric */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/devicemetric-type', strength: 'preferred')]
         public ?CodeableConcept $unit = null,
         /** @var Reference|null source Describes the link to the source Device */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]

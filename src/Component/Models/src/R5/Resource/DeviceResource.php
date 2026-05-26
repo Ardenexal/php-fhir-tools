@@ -97,7 +97,7 @@ class DeviceResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/device-status|5.0.0', strength: 'required')]
         public ?FHIRDeviceStatusType $status = null,
         /** @var CodeableConcept|null availabilityStatus lost | damaged | destroyed | available */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/device-availability-status', strength: 'extensible')]
         public ?CodeableConcept $availabilityStatus = null,
         /** @var Identifier|null biologicalSourceEvent An identifier that supports traceability to the event during which material in this product from one or more biological entities was obtained or pooled */
         #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]

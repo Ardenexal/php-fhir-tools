@@ -35,7 +35,7 @@ class SubscriptionTopicResourceTrigger extends BackboneElement
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $description = null,
         /** @var UriPrimitive|null resource Data Type or Resource (reference to definition) for this trigger definition */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/subscription-types', strength: 'extensible')]
         public ?UriPrimitive $resource = null,
         /** @var array<InteractionTriggerType> supportedInteraction create | update | delete */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/interaction-trigger|5.0.0', strength: 'required')]

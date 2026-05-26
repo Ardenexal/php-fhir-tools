@@ -62,7 +62,7 @@ class MeasureResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
         public ?UriPrimitive $implicitRules = null,
         /** @var string|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages', strength: 'preferred')]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -125,6 +125,7 @@ class MeasureResource extends DomainResourceResource
                 ],
             ],
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/subject-type', strength: 'extensible')]
         public CodeableConcept|Reference|null $subject = null,
         /** @var DateTimePrimitive|null date Date last changed */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
@@ -158,6 +159,7 @@ class MeasureResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/jurisdiction', strength: 'extensible')]
         public array $jurisdiction = [],
         /** @var MarkdownPrimitive|null purpose Why this measure is defined */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -232,10 +234,10 @@ class MeasureResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $disclaimer = null,
         /** @var CodeableConcept|null scoring proportion | ratio | continuous-variable | cohort */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/measure-scoring', strength: 'extensible')]
         public ?CodeableConcept $scoring = null,
         /** @var CodeableConcept|null compositeScoring opportunity | all-or-nothing | linear | weighted */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/composite-measure-scoring', strength: 'extensible')]
         public ?CodeableConcept $compositeScoring = null,
         /** @var array<CodeableConcept> type process | outcome | structure | patient-reported-outcome | composite */
         #[FhirProperty(
@@ -244,6 +246,7 @@ class MeasureResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/measure-type', strength: 'extensible')]
         public array $type = [],
         /** @var StringPrimitive|string|null riskAdjustment How risk adjustment is applied for this measure */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

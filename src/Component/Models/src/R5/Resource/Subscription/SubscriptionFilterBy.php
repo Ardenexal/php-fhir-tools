@@ -39,7 +39,7 @@ class SubscriptionFilterBy extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
         /** @var UriPrimitive|null resourceType Allowed Resource (reference to definition) for this Subscription filter */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/subscription-types', strength: 'extensible')]
         public ?UriPrimitive $resourceType = null,
         /** @var StringPrimitive|string|null filterParameter Filter label defined in SubscriptionTopic */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]

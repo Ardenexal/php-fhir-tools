@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 
@@ -37,7 +38,7 @@ class Reference extends Element
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $reference = null,
         /** @var UriPrimitive|null type Type the reference refers to (e.g. "Patient") */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/resource-types', strength: 'extensible')]
         public ?UriPrimitive $type = null,
         /** @var Identifier|null identifier Logical reference, when literal reference is not known */
         #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]

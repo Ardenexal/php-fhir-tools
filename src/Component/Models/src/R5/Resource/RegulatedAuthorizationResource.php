@@ -92,7 +92,7 @@ class RegulatedAuthorizationResource extends DomainResourceResource
         )]
         public array $region = [],
         /** @var CodeableConcept|null status The status that is authorised e.g. approved. Intermediate states can be tracked with cases and applications */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status', strength: 'preferred')]
         public ?CodeableConcept $status = null,
         /** @var DateTimePrimitive|null statusDate The date at which the current status was assigned */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
@@ -109,7 +109,7 @@ class RegulatedAuthorizationResource extends DomainResourceResource
         )]
         public array $indication = [],
         /** @var CodeableConcept|null intendedUse The intended use of the product, e.g. prevention, treatment */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/product-intended-use', strength: 'preferred')]
         public ?CodeableConcept $intendedUse = null,
         /** @var array<CodeableConcept> basis The legal/regulatory framework or reasons under which this authorization is granted */
         #[FhirProperty(

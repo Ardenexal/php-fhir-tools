@@ -41,10 +41,10 @@ class TestScriptSetupActionOperation extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
         /** @var Coding|null type The operation code type that will be executed */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/testscript-operation-codes', strength: 'extensible')]
         public ?Coding $type = null,
         /** @var UriPrimitive|null resource Resource type */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/concrete-fhir-types', strength: 'extensible')]
         public ?UriPrimitive $resource = null,
         /** @var StringPrimitive|string|null label Tracking/logging operation label */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

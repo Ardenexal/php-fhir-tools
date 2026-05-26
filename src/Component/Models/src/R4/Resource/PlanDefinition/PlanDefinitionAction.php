@@ -109,6 +109,7 @@ class PlanDefinitionAction extends BackboneElement
                 ],
             ],
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/subject-type', strength: 'extensible')]
         public CodeableConcept|Reference|null $subject = null,
         /** @var array<TriggerDefinition> trigger When the action should be triggered */
         #[FhirProperty(
@@ -204,7 +205,7 @@ class PlanDefinitionAction extends BackboneElement
         )]
         public array $participant = [],
         /** @var CodeableConcept|null type create | update | remove | fire-event */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-type', strength: 'extensible')]
         public ?CodeableConcept $type = null,
         /** @var ActionGroupingBehaviorType|null groupingBehavior visual-group | logical-group | sentence-group */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-grouping-behavior|4.0.1', strength: 'required')]

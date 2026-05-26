@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\AuditEvent;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -40,13 +41,13 @@ class AuditEventEntity extends BackboneElement
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $what = null,
         /** @var Coding|null type Type of entity involved */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/audit-entity-type', strength: 'extensible')]
         public ?Coding $type = null,
         /** @var Coding|null role What role the entity played */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/object-role', strength: 'extensible')]
         public ?Coding $role = null,
         /** @var Coding|null lifecycle Life-cycle stage for the entity */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/object-lifecycle-events', strength: 'extensible')]
         public ?Coding $lifecycle = null,
         /** @var array<Coding> securityLabel Security labels on the entity */
         #[FhirProperty(
@@ -55,6 +56,7 @@ class AuditEventEntity extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/security-labels', strength: 'extensible')]
         public array $securityLabel = [],
         /** @var StringPrimitive|string|null name Descriptor for entity */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

@@ -38,7 +38,7 @@ class ObservationDefinitionQualifiedInterval extends BackboneElement
         #[FhirProperty(fhirType: 'Range', propertyKind: 'complex')]
         public ?Range $range = null,
         /** @var CodeableConcept|null context Range context qualifier */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/referencerange-meaning', strength: 'extensible')]
         public ?CodeableConcept $context = null,
         /** @var array<CodeableConcept> appliesTo Targetted population of the range */
         #[FhirProperty(

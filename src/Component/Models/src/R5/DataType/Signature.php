@@ -34,6 +34,7 @@ class Signature extends DataType
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/signature-type', strength: 'preferred')]
         public array $type = [],
         /** @var InstantPrimitive|null when When the signature was created */
         #[FhirProperty(fhirType: 'instant', propertyKind: 'primitive')]

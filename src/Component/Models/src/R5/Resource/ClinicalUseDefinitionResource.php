@@ -89,6 +89,7 @@ class ClinicalUseDefinitionResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/clinical-use-definition-category', strength: 'preferred')]
         public array $category = [],
         /** @var array<Reference> subject The medication, product, substance, device, procedure etc. for which this is an indication */
         #[FhirProperty(
@@ -99,7 +100,7 @@ class ClinicalUseDefinitionResource extends DomainResourceResource
         )]
         public array $subject = [],
         /** @var CodeableConcept|null status Whether this is a current issue or one that has been retired etc */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status', strength: 'preferred')]
         public ?CodeableConcept $status = null,
         /** @var ClinicalUseDefinitionContraindication|null contraindication Specifics for when this is a contraindication */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]

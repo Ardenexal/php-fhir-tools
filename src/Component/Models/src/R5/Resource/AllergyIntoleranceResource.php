@@ -82,7 +82,7 @@ class AllergyIntoleranceResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/allergyintolerance-verification|5.0.0', strength: 'required')]
         public ?CodeableConcept $verificationStatus = null,
         /** @var CodeableConcept|null type allergy | intolerance - Underlying mechanism (if known) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/allergy-intolerance-type', strength: 'preferred')]
         public ?CodeableConcept $type = null,
         /** @var array<AllergyIntoleranceCategoryType> category food | medication | environment | biologic */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/allergy-intolerance-category|5.0.0', strength: 'required')]

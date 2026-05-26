@@ -96,6 +96,7 @@ class AppointmentResponseResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/encounter-participant-type', strength: 'extensible')]
         public array $participantType = [],
         /** @var Reference|null actor Person(s), Location, HealthcareService, or Device */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]

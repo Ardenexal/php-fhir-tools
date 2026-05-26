@@ -130,7 +130,7 @@ class FamilyMemberHistoryResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?CodeableConcept $relationship = null,
         /** @var CodeableConcept|null sex male | female | other | unknown */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/administrative-gender', strength: 'extensible')]
         public ?CodeableConcept $sex = null,
         /** @var Period|DatePrimitive|StringPrimitive|string|null born (approximate) date of birth */
         #[FhirProperty(

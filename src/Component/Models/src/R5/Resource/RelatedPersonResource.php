@@ -81,6 +81,7 @@ class RelatedPersonResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype', strength: 'preferred')]
         public array $relationship = [],
         /** @var array<HumanName> name A name associated with the person */
         #[FhirProperty(

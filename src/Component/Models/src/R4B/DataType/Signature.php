@@ -38,6 +38,7 @@ class Signature extends Element
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding',
         )]
         #[Count(min: 1)]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/signature-type', strength: 'preferred')]
         public array $type = [],
         /** @var InstantPrimitive|null when When the signature was created */
         #[FhirProperty(fhirType: 'instant', propertyKind: 'primitive', isRequired: true), NotBlank]

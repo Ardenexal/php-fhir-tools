@@ -151,6 +151,7 @@ class ObservationResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/observation-category', strength: 'preferred')]
         public array $category = [],
         /** @var CodeableConcept|null code Type of observation (code / type) */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
@@ -291,7 +292,7 @@ class ObservationResource extends DomainResourceResource
         )]
         public Quantity|CodeableConcept|StringPrimitive|string|bool|int|Range|Ratio|SampledData|TimePrimitive|DateTimePrimitive|Period|Attachment|Reference|null $value = null,
         /** @var CodeableConcept|null dataAbsentReason Why the result is missing */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/data-absent-reason', strength: 'extensible')]
         public ?CodeableConcept $dataAbsentReason = null,
         /** @var array<CodeableConcept> interpretation High, low, normal, etc */
         #[FhirProperty(
@@ -300,6 +301,7 @@ class ObservationResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/observation-interpretation', strength: 'extensible')]
         public array $interpretation = [],
         /** @var array<Annotation> note Comments about the observation */
         #[FhirProperty(

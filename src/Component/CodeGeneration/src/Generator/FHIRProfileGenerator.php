@@ -10,6 +10,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustSupport;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;
 use Symfony\Component\Validator\Constraints\Count;
@@ -104,6 +106,7 @@ class FHIRProfileGenerator
 
         $this->emitDifferentialConstraints($structureDefinition, $url, $class, $namespace);
         $this->emitDifferentialMustSupport($structureDefinition, $url, $class, $namespace);
+        $this->emitDifferentialSliceConstraints($structureDefinition, $url, $class, $namespace);
 
         return $class;
     }
@@ -169,9 +172,9 @@ class FHIRProfileGenerator
                 ]);
             }
 
-            // Fixed value constraint
+            // Fixed value constraint (scalar values only — complex fixed[x] require profile resolution)
             $fixedField = ElementDefinitionHelper::extractPolymorphicField($element, 'fixed');
-            if ($fixedField !== null) {
+            if ($fixedField !== null && is_scalar($fixedField['value'])) {
                 $namespace->addUse(FHIRFixedValue::class);
                 $namespace->addUse(FHIRProfileConstraint::class);
                 $class->addAttribute(FHIRProfileConstraint::class, [
@@ -182,9 +185,9 @@ class FHIRProfileGenerator
                 ]);
             }
 
-            // Pattern value constraint
+            // Pattern value constraint (array values only — scalar patterns use value matching)
             $patternField = ElementDefinitionHelper::extractPolymorphicField($element, 'pattern');
-            if ($patternField !== null) {
+            if ($patternField !== null && is_array($patternField['value'])) {
                 $namespace->addUse(FHIRPatternValue::class);
                 $namespace->addUse(FHIRProfileConstraint::class);
                 $class->addAttribute(FHIRProfileConstraint::class, [
@@ -235,6 +238,238 @@ class FHIRProfileGenerator
                 'groups' => [$profileUrl],
             ]);
         }
+    }
+
+    /**
+     * Emits #[FHIRSliceConstraint] and #[FHIRSlicingRules] attributes on the class for each
+     * property that carries FHIR slicing in the profile differential.
+     *
+     * Slice detection algorithm:
+     *   1. Collect all elements with a `slicing` key → these are the sliced properties.
+     *   2. For each sliced property, collect sibling elements with a matching `sliceName` →
+     *      these are the individual slices.
+     *   3. For each slice, extract the discriminator value by walking child elements:
+     *      find the element whose path tail matches the discriminator path and extract
+     *      its fixed[x] or pattern[x] value.
+     *   4. Emit one #[FHIRSliceConstraint] per slice and one #[FHIRSlicingRules] per property.
+     *
+     * Limitations:
+     *   - Only the first discriminator is used when a slicing entry declares multiple
+     *     discriminators (composite discriminators are not yet supported).
+     *   - Discriminator types 'type' and 'profile' are recorded but the matcher will emit
+     *     a warning and return false for them (they require full profile resolution).
+     *   - Slicing on root elements (no '.') is skipped.
+     *   - Elements with contentReference are skipped.
+     *
+     * @param array<string, mixed> $structureDefinition
+     */
+    private function emitDifferentialSliceConstraints(
+        array $structureDefinition,
+        string $profileUrl,
+        ClassType $class,
+        PhpNamespace $namespace,
+    ): void {
+        /** @var array<int, array<string, mixed>> $elements */
+        $elements = $structureDefinition['differential']['element'] ?? [];
+
+        // Index all elements by their element id (or path+sliceName) for child lookups
+        // Build a map: basePropertyPath → slicingDefinition
+        /** @var array<string, array<string, mixed>> $slicingByProperty propertyPath → slicing def */
+        $slicingByProperty = [];
+        /** @var array<string, array<int, array<string, mixed>>> $slicesByProperty propertyPath → slice elements */
+        $slicesByProperty  = [];
+
+        $resourceType = $structureDefinition['type'] ?? '';
+
+        foreach ($elements as $element) {
+            $path = (string) ($element['path'] ?? '');
+
+            // Skip root element
+            if (!str_contains($path, '.')) {
+                continue;
+            }
+
+            // Skip contentReference elements
+            if (ElementDefinitionHelper::hasContentReference($element)) {
+                continue;
+            }
+
+            // Strip resource-type prefix ("Patient.identifier" → "identifier")
+            $dotPos       = strpos($path, '.');
+            $propertyPath = $dotPos !== false ? substr($path, $dotPos + 1) : $path;
+
+            if (isset($element['slicing'])) {
+                // Base element of a sliced property (e.g. "Patient.identifier")
+                $slicingByProperty[$propertyPath] = $element['slicing'];
+            }
+
+            $sliceName = $element['sliceName'] ?? null;
+            if ($sliceName !== null && $sliceName !== '') {
+                // A named slice definition (e.g. "Patient.identifier" with sliceName "ihiNumber")
+                // The path equals the parent path (e.g. both are "Patient.identifier")
+                // Use the base property path (without slice name suffix if any)
+                $basePath                      = $this->resolveBasePropertyPath($propertyPath);
+                $slicesByProperty[$basePath][] = $element;
+            }
+        }
+
+        // For each sliced property, emit attributes
+        foreach ($slicingByProperty as $propertyPath => $slicingDef) {
+            $discriminators = $slicingDef['discriminator'] ?? [];
+            $rules          = (string) ($slicingDef['rules'] ?? 'open');
+            $slices         = $slicesByProperty[$propertyPath] ?? [];
+
+            if ($slices === []) {
+                continue;
+            }
+
+            // Log a warning for composite discriminators (only first is used)
+            if (count($discriminators) > 1) {
+                // Composite discriminators are not yet supported — use only the first
+                $discriminators = [$discriminators[0]];
+            }
+
+            $discriminator = $discriminators[0] ?? null;
+            $discType      = (string) ($discriminator['type'] ?? 'value');
+            $discPath      = (string) ($discriminator['path'] ?? '');
+
+            // Emit #[FHIRSlicingRules] for this property
+            $namespace->addUse(FHIRSlicingRules::class);
+            $class->addAttribute(FHIRSlicingRules::class, [
+                'property' => $propertyPath,
+                'rules'    => $rules,
+                'groups'   => [$profileUrl],
+            ]);
+
+            // Emit one #[FHIRSliceConstraint] per slice
+            foreach ($slices as $orderedIndex => $sliceElement) {
+                $sliceName = (string) ($sliceElement['sliceName'] ?? '');
+                $min       = (int) ($sliceElement['min'] ?? 0);
+                $max       = (string) ($sliceElement['max'] ?? '*');
+                $isDefault = $sliceName === '@default';
+
+                // Extract discriminator value from child elements
+                $discValue = $this->extractDiscriminatorValue(
+                    $elements,
+                    $resourceType,
+                    $propertyPath,
+                    $sliceName,
+                    $discType,
+                    $discPath,
+                    $sliceElement,
+                );
+
+                $namespace->addUse(FHIRSliceConstraint::class);
+                $attrArgs = [
+                    'property'          => $propertyPath,
+                    'sliceName'         => $sliceName,
+                    'min'               => $min,
+                    'max'               => is_numeric($max) ? (int) $max : $max,
+                    'discriminatorType' => $discType,
+                    'discriminatorPath' => $discPath,
+                    'groups'            => [$profileUrl],
+                    'orderedIndex'      => $orderedIndex,
+                ];
+
+                if ($discValue !== null) {
+                    $attrArgs['discriminatorValue'] = $discValue;
+                }
+
+                if ($isDefault) {
+                    $attrArgs['isDefault'] = true;
+                }
+
+                $class->addAttribute(FHIRSliceConstraint::class, $attrArgs);
+            }
+        }
+    }
+
+    /**
+     * Extract the discriminator value for a given slice by scanning child elements.
+     *
+     * For 'value' and 'pattern' discriminators, the value lives in a child element whose
+     * path tail matches the discriminator path, e.g.:
+     *   Parent: "Patient.identifier" discriminator path="system"
+     *   Slice header: "Patient.identifier" sliceName="ihiNumber"
+     *   Child: "Patient.identifier.system" (sliceName="ihiNumber") with fixedUri
+     *
+     * For 'value' discriminator on 'url' (extension slicing), the value is usually the
+     * extension profile URL from the slice element's type[0].profile[0].
+     *
+     * Returns null if the value cannot be determined without full profile resolution.
+     *
+     * @param array<int, array<string, mixed>> $allElements  All differential elements
+     * @param string                           $resourceType Resource or complex type (e.g. 'Patient')
+     * @param string                           $propertyPath Sliced property path (e.g. 'identifier')
+     * @param string                           $sliceName    Named slice (e.g. 'ihiNumber')
+     * @param string                           $discType     Discriminator type
+     * @param string                           $discPath     Discriminator path (e.g. 'system', 'url')
+     * @param array<string, mixed>             $sliceElement The slice header element
+     */
+    private function extractDiscriminatorValue(
+        array $allElements,
+        string $resourceType,
+        string $propertyPath,
+        string $sliceName,
+        string $discType,
+        string $discPath,
+        array $sliceElement,
+    ): mixed {
+        // For 'value' or 'pattern' discriminators: look for a child element at the discriminator path
+        if (in_array($discType, ['value', 'pattern'], true) && $discPath !== '' && $discPath !== '$this') {
+            $targetPath = "{$resourceType}.{$propertyPath}.{$discPath}";
+
+            foreach ($allElements as $element) {
+                $path      = (string) ($element['path'] ?? '');
+                $elemSlice = (string) ($element['sliceName'] ?? '');
+
+                if ($path !== $targetPath) {
+                    continue;
+                }
+
+                // Must belong to the same slice
+                if ($elemSlice !== $sliceName && $elemSlice !== '') {
+                    continue;
+                }
+
+                // Extract fixed[x] value
+                $fixed = ElementDefinitionHelper::extractPolymorphicField($element, 'fixed');
+                if ($fixed !== null) {
+                    return $fixed['value'];
+                }
+
+                // Extract pattern[x] value
+                $pattern = ElementDefinitionHelper::extractPolymorphicField($element, 'pattern');
+                if ($pattern !== null) {
+                    return $pattern['value'];
+                }
+            }
+
+            // Special case: value discriminator on 'url' (extension slicing)
+            // The URL is the extension profile URL from the slice element itself
+            if ($discPath === 'url') {
+                $profile = $sliceElement['type'][0]['profile'][0] ?? null;
+                if ($profile !== null) {
+                    return $profile;
+                }
+            }
+        }
+
+        // For 'exists' discriminator: the boolean value comes from the slicing definition
+        // (not standard practice to put it in the differential, so return null for resolution)
+
+        return null;
+    }
+
+    /**
+     * Resolve the base property path from a possibly slice-name-qualified path.
+     * e.g. "identifier" stays "identifier" (sliceName is in the element, not the path)
+     */
+    private function resolveBasePropertyPath(string $propertyPath): string
+    {
+        // In FHIR differential, sliced elements share the same path (e.g. "Patient.identifier")
+        // and differ only by sliceName. No transformation needed here.
+        return $propertyPath;
     }
 
     /**

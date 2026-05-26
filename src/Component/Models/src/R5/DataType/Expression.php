@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
@@ -47,7 +48,7 @@ class Expression extends DataType
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
         public ?CodePrimitive $name = null,
         /** @var string|null language text/cql | text/fhirpath | application/x-fhir-query | etc. */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/expression-language', strength: 'extensible')]
         public ?string $language = null,
         /** @var StringPrimitive|string|null expression Expression in specified language */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

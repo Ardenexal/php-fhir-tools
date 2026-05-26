@@ -107,6 +107,7 @@ class EvidenceResource extends DomainResourceResource
                 ],
             ],
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/version-algorithm', strength: 'extensible')]
         public StringPrimitive|string|Coding|null $versionAlgorithm = null,
         /** @var StringPrimitive|string|null name Name for this summary (machine friendly) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -243,7 +244,7 @@ class EvidenceResource extends DomainResourceResource
         #[Count(min: 1)]
         public array $variableDefinition = [],
         /** @var CodeableConcept|null synthesisType The method to combine studies */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/synthesis-type', strength: 'extensible')]
         public ?CodeableConcept $synthesisType = null,
         /** @var array<CodeableConcept> studyDesign The design of the study that produced this evidence */
         #[FhirProperty(
@@ -252,6 +253,7 @@ class EvidenceResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/study-design', strength: 'extensible')]
         public array $studyDesign = [],
         /** @var array<EvidenceStatistic> statistic Values and parameters for a single statistic */
         #[FhirProperty(

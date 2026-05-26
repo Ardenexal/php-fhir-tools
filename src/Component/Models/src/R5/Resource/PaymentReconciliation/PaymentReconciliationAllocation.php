@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\PaymentReconciliation
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -75,7 +76,7 @@ class PaymentReconciliationAllocation extends BackboneElement
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $account = null,
         /** @var CodeableConcept|null type Category of payment */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/payment-type', strength: 'extensible')]
         public ?CodeableConcept $type = null,
         /** @var Reference|null submitter Submitter of the request */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]

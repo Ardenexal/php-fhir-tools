@@ -38,7 +38,7 @@ class ElementDefinitionType extends Element
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var UriPrimitive|null code Data type or Resource (reference to definition) */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/fhir-element-types', strength: 'extensible')]
         public ?UriPrimitive $code = null,
         /** @var array<CanonicalPrimitive> profile Profiles (StructureDefinition or IG) - one must apply */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true)]

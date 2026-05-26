@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\EpisodeOfCare;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
@@ -33,7 +34,7 @@ class EpisodeOfCareDiagnosis extends BackboneElement
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?Reference $condition = null,
         /** @var CodeableConcept|null role Role that this diagnosis has within the episode of care (e.g. admission, billing, discharge …) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/diagnosis-role', strength: 'preferred')]
         public ?CodeableConcept $role = null,
         /** @var PositiveIntPrimitive|null rank Ranking of the diagnosis (for each role type) */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]

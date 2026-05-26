@@ -109,7 +109,8 @@ services:
         arguments:
             $pathService: '@Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService'
             $messageRegistry: '@Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry'
-        tags: ['validator.constraint_validator']
+        tags:
+            - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariantValidator' }
         public: true
 
     Ardenexal\FHIRTools\Component\Validation\NullFHIRTerminologyClient: ~
@@ -124,21 +125,31 @@ services:
                 - 'Ardenexal\FHIRTools\Component\Models\R4\Enum'
                 - 'Ardenexal\FHIRTools\Component\Models\R4B\Enum'
                 - 'Ardenexal\FHIRTools\Component\Models\R5\Enum'
-            $terminologyClient: '@Ardenexal\FHIRTools\Component\Validation\NullFHIRTerminologyClient'
-        tags: ['validator.constraint_validator']
+            $terminologyClient: '@Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyClientInterface'
+        tags:
+            - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBindingValidator' }
 
     Ardenexal\FHIRTools\Component\Validation\Validator\FHIRFixedValueValidator:
         arguments:
             $messageRegistry: '@Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry'
-        tags: ['validator.constraint_validator']
+        tags:
+            - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValueValidator' }
 
     Ardenexal\FHIRTools\Component\Validation\Validator\FHIRPatternValueValidator:
         arguments:
             $messageRegistry: '@Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry'
-        tags: ['validator.constraint_validator']
+        tags:
+            - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValueValidator' }
 
     Ardenexal\FHIRTools\Component\Validation\Validator\FHIRProfileConstraintValidator:
-        tags: ['validator.constraint_validator']
+        tags:
+            - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraintValidator' }
+
+    Ardenexal\FHIRTools\Component\Validation\SliceDiscriminatorMatcher: ~
+
+    Ardenexal\FHIRTools\Component\Validation\Validator\FHIRSliceConstraintValidator:
+        tags:
+            - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraintValidator' }
 
     # Named service aliases
     fhir.model_generator:

@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\ExampleScenario;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -73,7 +74,7 @@ class ExampleScenarioInstance extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $key = null,
         /** @var Coding|null structureType Data structure for example */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/examplescenario-instance-type', strength: 'extensible')]
         public ?Coding $structureType = null,
         /** @var StringPrimitive|string|null structureVersion E.g. 4.0.1 */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

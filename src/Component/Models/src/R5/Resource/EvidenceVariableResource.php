@@ -110,6 +110,7 @@ class EvidenceVariableResource extends DomainResourceResource
                 ],
             ],
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/version-algorithm', strength: 'extensible')]
         public StringPrimitive|string|Coding|null $versionAlgorithm = null,
         /** @var StringPrimitive|string|null name Name for this evidence variable (computer friendly) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

@@ -75,13 +75,13 @@ class PaymentReconciliationResource extends DomainResourceResource
         )]
         public array $identifier = [],
         /** @var CodeableConcept|null type Category of payment */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/payment-type', strength: 'extensible')]
         public ?CodeableConcept $type = null,
         /** @var FinancialResourceStatusCodesType|null status active | cancelled | draft | entered-in-error */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/fm-status|5.0.0', strength: 'required')]
         public ?FinancialResourceStatusCodesType $status = null,
         /** @var CodeableConcept|null kind Workflow originating payment */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/payment-kind', strength: 'extensible')]
         public ?CodeableConcept $kind = null,
         /** @var Period|null period Period covered */
         #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
@@ -93,7 +93,7 @@ class PaymentReconciliationResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $enterer = null,
         /** @var CodeableConcept|null issuerType Nature of the source */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/payment-issuertype', strength: 'extensible')]
         public ?CodeableConcept $issuerType = null,
         /** @var Reference|null paymentIssuer Party generating payment */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
@@ -117,7 +117,7 @@ class PaymentReconciliationResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $location = null,
         /** @var CodeableConcept|null method Payment instrument */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/v2-0570', strength: 'extensible')]
         public ?CodeableConcept $method = null,
         /** @var StringPrimitive|string|null cardBrand Type of card */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

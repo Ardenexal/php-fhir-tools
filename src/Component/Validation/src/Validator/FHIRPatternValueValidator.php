@@ -56,10 +56,27 @@ final class FHIRPatternValueValidator extends ConstraintValidator
             }
 
             if (is_array($expected)) {
-                if (!is_array($value[$key]) || !$this->isSubset($expected, $value[$key])) {
+                if (!is_array($value[$key])) {
                     return false;
                 }
-            } elseif ($value[$key] !== $expected) {
+
+                if (array_is_list($expected)) {
+                    foreach ($expected as $expectedItem) {
+                        $found = false;
+                        foreach ($value[$key] as $actualItem) {
+                            if ($this->isSubset((array) $expectedItem, (array) $actualItem)) {
+                                $found = true;
+                                break;
+                            }
+                        }
+                        if (!$found) {
+                            return false;
+                        }
+                    }
+                } elseif (!$this->isSubset($expected, $value[$key])) {
+                    return false;
+                }
+            } elseif ((string) $value[$key] !== (string) $expected) {
                 return false;
             }
         }

@@ -59,6 +59,7 @@ class ConsentProvision extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/security-labels', strength: 'extensible')]
         public array $securityLabel = [],
         /** @var array<Coding> purpose Context of activities covered by this rule */
         #[FhirProperty(
@@ -67,6 +68,7 @@ class ConsentProvision extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/v3-PurposeOfUse', strength: 'extensible')]
         public array $purpose = [],
         /** @var array<Coding> class e.g. Resource Type, Profile, CDA, etc. */
         #[FhirProperty(
@@ -75,6 +77,7 @@ class ConsentProvision extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/consent-content-class', strength: 'extensible')]
         public array $class = [],
         /** @var array<CodeableConcept> code e.g. LOINC or SNOMED CT code, etc. in the content */
         #[FhirProperty(

@@ -70,7 +70,7 @@ class GoalResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/goal-status|5.0.0', strength: 'required')]
         public ?GoalLifecycleStatusType $lifecycleStatus = null,
         /** @var CodeableConcept|null achievementStatus in-progress | improving | worsening | no-change | achieved | sustaining | not-achieved | no-progress | not-attainable */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/goal-achievement', strength: 'preferred')]
         public ?CodeableConcept $achievementStatus = null,
         /** @var array<CodeableConcept> category E.g. Treatment, dietary, behavioral, etc */
         #[FhirProperty(
@@ -84,7 +84,7 @@ class GoalResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $continuous = null,
         /** @var CodeableConcept|null priority high-priority | medium-priority | low-priority */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/goal-priority', strength: 'preferred')]
         public ?CodeableConcept $priority = null,
         /** @var CodeableConcept|null description Code or text describing goal */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]

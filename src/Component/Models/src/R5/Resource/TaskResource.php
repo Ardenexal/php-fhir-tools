@@ -166,6 +166,7 @@ class TaskResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/performer-role', strength: 'preferred')]
         public array $requestedPerformer = [],
         /** @var Reference|null owner Responsible individual */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]

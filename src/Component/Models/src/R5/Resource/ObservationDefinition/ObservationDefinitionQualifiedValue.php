@@ -33,7 +33,7 @@ class ObservationDefinitionQualifiedValue extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null context Context qualifier for the set of qualified values */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/referencerange-meaning', strength: 'extensible')]
         public ?CodeableConcept $context = null,
         /** @var array<CodeableConcept> appliesTo Targetted population for the set of qualified values */
         #[FhirProperty(

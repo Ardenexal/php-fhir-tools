@@ -80,7 +80,7 @@ class ContractResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/contract-status|5.0.0', strength: 'required')]
         public ?ContractResourceStatusCodesType $status = null,
         /** @var CodeableConcept|null legalState Negotiation status */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/contract-legalstate', strength: 'extensible')]
         public ?CodeableConcept $legalState = null,
         /** @var Reference|null instantiatesCanonical Source Contract Definition */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]

@@ -38,7 +38,7 @@ class EffectEvidenceSynthesisResultsByExposure extends BackboneElement
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/exposure-state|4.0.1', strength: 'required')]
         public ?ExposureStateType $exposureState = null,
         /** @var CodeableConcept|null variantState Variant exposure states */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/evidence-variant-state', strength: 'extensible')]
         public ?CodeableConcept $variantState = null,
         /** @var Reference|null riskEvidenceSynthesis Risk evidence synthesis */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank]

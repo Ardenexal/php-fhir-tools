@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\MedicationRequest;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -44,6 +45,7 @@ class MedicationRequestSubstitution extends BackboneElement
             ],
         )]
         #[NotBlank]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/v3-ActSubstanceAdminSubstitutionCode', strength: 'preferred')]
         public bool|CodeableConcept|null $allowed = null,
         /** @var CodeableConcept|null reason Why should (not) substitution be made */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]

@@ -41,7 +41,7 @@ class Attachment extends Element
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/mimetypes|4.0.1', strength: 'required')]
         public ?MimeTypesType $contentType = null,
         /** @var string|null language Human language of the content (BCP-47) */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages', strength: 'preferred')]
         public ?string $language = null,
         /** @var Base64BinaryPrimitive|null data Data inline, base64ed */
         #[FhirProperty(fhirType: 'base64Binary', propertyKind: 'primitive')]

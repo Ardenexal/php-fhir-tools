@@ -78,6 +78,7 @@ class SubstanceResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/substance-category', strength: 'extensible')]
         public array $category = [],
         /** @var CodeableReference|null code What substance this is */
         #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex', isRequired: true), NotBlank]

@@ -55,7 +55,7 @@ class ClinicalUseDefinitionResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
         public ?UriPrimitive $implicitRules = null,
         /** @var string|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages', strength: 'preferred')]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -87,6 +87,7 @@ class ClinicalUseDefinitionResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/clinical-use-definition-category', strength: 'preferred')]
         public array $category = [],
         /** @var array<Reference> subject The medication or procedure for which this is an indication */
         #[FhirProperty(
@@ -97,7 +98,7 @@ class ClinicalUseDefinitionResource extends DomainResourceResource
         )]
         public array $subject = [],
         /** @var CodeableConcept|null status Whether this is a current issue or one that has been retired etc */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status', strength: 'preferred')]
         public ?CodeableConcept $status = null,
         /** @var ClinicalUseDefinitionContraindication|null contraindication Specifics for when this is a contraindication */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]

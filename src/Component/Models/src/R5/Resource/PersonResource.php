@@ -118,7 +118,7 @@ class PersonResource extends DomainResourceResource
         )]
         public array $address = [],
         /** @var CodeableConcept|null maritalStatus Marital (civil) status of a person */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/marital-status', strength: 'extensible')]
         public ?CodeableConcept $maritalStatus = null,
         /** @var array<Attachment> photo Image of the person */
         #[FhirProperty(

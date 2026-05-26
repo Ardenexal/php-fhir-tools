@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\GenomicStudy;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
@@ -58,7 +59,7 @@ class GenomicStudyAnalysis extends BackboneElement
         )]
         public array $changeType = [],
         /** @var CodeableConcept|null genomeBuild Genome build that is used in this analysis */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://loinc.org/vs/LL1040-6', strength: 'extensible')]
         public ?CodeableConcept $genomeBuild = null,
         /** @var CanonicalPrimitive|null instantiatesCanonical The defined protocol that describes the analysis */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]

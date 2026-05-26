@@ -151,7 +151,7 @@ class MedicationRequestResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $reported = null,
         /** @var CodeableConcept|null performerType Desired kind of performer of the medication administration */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/medication-intended-performer-role', strength: 'extensible')]
         public ?CodeableConcept $performerType = null,
         /** @var array<Reference> performer Intended performer of administration */
         #[FhirProperty(
@@ -181,7 +181,7 @@ class MedicationRequestResource extends DomainResourceResource
         )]
         public array $reason = [],
         /** @var CodeableConcept|null courseOfTherapyType Overall pattern of medication administration */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/medicationrequest-course-of-therapy', strength: 'extensible')]
         public ?CodeableConcept $courseOfTherapyType = null,
         /** @var array<Reference> insurance Associated insurance coverage */
         #[FhirProperty(

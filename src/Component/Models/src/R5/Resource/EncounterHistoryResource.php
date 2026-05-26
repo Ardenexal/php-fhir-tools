@@ -78,7 +78,7 @@ class EncounterHistoryResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/encounter-status|5.0.0', strength: 'required')]
         public ?EncounterStatusType $status = null,
         /** @var CodeableConcept|null class Classification of patient encounter */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/v3-ActEncounterCode', strength: 'extensible')]
         public ?CodeableConcept $class = null,
         /** @var array<CodeableConcept> type Specific type of encounter */
         #[FhirProperty(

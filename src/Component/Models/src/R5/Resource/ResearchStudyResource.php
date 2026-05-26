@@ -126,7 +126,7 @@ class ResearchStudyResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|5.0.0', strength: 'required')]
         public ?PublicationStatusType $status = null,
         /** @var CodeableConcept|null primaryPurposeType treatment | prevention | diagnostic | supportive-care | screening | health-services-research | basic-science | device-feasibility */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/research-study-prim-purp-type', strength: 'preferred')]
         public ?CodeableConcept $primaryPurposeType = null,
         /** @var CodeableConcept|null phase n-a | early-phase-1 | phase-1 | phase-1-phase-2 | phase-2 | phase-2-phase-3 | phase-3 | phase-4 */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
@@ -138,6 +138,7 @@ class ResearchStudyResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/study-design', strength: 'preferred')]
         public array $studyDesign = [],
         /** @var array<CodeableReference> focus Drugs, devices, etc. under study */
         #[FhirProperty(
@@ -170,6 +171,7 @@ class ResearchStudyResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/jurisdiction', strength: 'extensible')]
         public array $region = [],
         /** @var MarkdownPrimitive|null descriptionSummary Brief text explaining the study */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]

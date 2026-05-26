@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\EffectEvidenceSynthes
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
@@ -32,7 +33,7 @@ class EffectEvidenceSynthesisCertaintyCertaintySubcomponent extends BackboneElem
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null type Type of subcomponent of certainty rating */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/certainty-subcomponent-type', strength: 'extensible')]
         public ?CodeableConcept $type = null,
         /** @var array<CodeableConcept> rating Subcomponent certainty rating */
         #[FhirProperty(
@@ -41,6 +42,7 @@ class EffectEvidenceSynthesisCertaintyCertaintySubcomponent extends BackboneElem
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/certainty-subcomponent-rating', strength: 'extensible')]
         public array $rating = [],
         /** @var array<Annotation> note Used for footnotes or explanatory notes */
         #[FhirProperty(

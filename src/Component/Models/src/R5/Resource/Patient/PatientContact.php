@@ -47,6 +47,7 @@ class PatientContact extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/patient-contactrelationship', strength: 'extensible')]
         public array $relationship = [],
         /** @var HumanName|null name A name associated with the contact person */
         #[FhirProperty(fhirType: 'HumanName', propertyKind: 'complex')]

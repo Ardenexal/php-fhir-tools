@@ -90,6 +90,7 @@ class ScheduleResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/c80-practice-codes', strength: 'preferred')]
         public array $specialty = [],
         /** @var StringPrimitive|string|null name Human-readable label */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

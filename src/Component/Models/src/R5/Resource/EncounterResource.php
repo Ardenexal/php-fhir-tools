@@ -81,6 +81,7 @@ class EncounterResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/encounter-class', strength: 'preferred')]
         public array $class = [],
         /** @var CodeableConcept|null priority Indicates the urgency of the encounter */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
@@ -212,6 +213,7 @@ class EncounterResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/encounter-special-arrangements', strength: 'preferred')]
         public array $specialArrangement = [],
         /** @var array<CodeableConcept> specialCourtesy Special courtesies (VIP, board member) */
         #[FhirProperty(
@@ -220,6 +222,7 @@ class EncounterResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/encounter-special-courtesy', strength: 'preferred')]
         public array $specialCourtesy = [],
         /** @var EncounterAdmission|null admission Details about the admission to a healthcare service */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]

@@ -107,7 +107,7 @@ class SubscriptionResource extends DomainResourceResource
         )]
         public array $filterBy = [],
         /** @var Coding|null channelType Channel type for notifications */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/subscription-channel-type', strength: 'extensible')]
         public ?Coding $channelType = null,
         /** @var UrlPrimitive|null endpoint Where the channel points to */
         #[FhirProperty(fhirType: 'url', propertyKind: 'primitive')]

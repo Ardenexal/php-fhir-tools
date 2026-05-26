@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\Encounter;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -35,7 +36,7 @@ class EncounterHospitalization extends BackboneElement
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
         public ?Reference $origin = null,
         /** @var CodeableConcept|null admitSource From where patient was admitted (physician referral, transfer) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/encounter-admit-source', strength: 'preferred')]
         public ?CodeableConcept $admitSource = null,
         /** @var CodeableConcept|null reAdmission The type of hospital re-admission that has occurred (if any). If the value is absent, then this is not identified as a readmission */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
@@ -55,6 +56,7 @@ class EncounterHospitalization extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/encounter-special-courtesy', strength: 'preferred')]
         public array $specialCourtesy = [],
         /** @var array<CodeableConcept> specialArrangement Wheelchair, translator, stretcher, etc. */
         #[FhirProperty(
@@ -63,6 +65,7 @@ class EncounterHospitalization extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/encounter-special-arrangements', strength: 'preferred')]
         public array $specialArrangement = [],
         /** @var Reference|null destination Location/organization to which the patient is discharged */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]

@@ -93,6 +93,7 @@ class EndpointResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/endpoint-environment', strength: 'extensible')]
         public array $environmentType = [],
         /** @var Reference|null managingOrganization Organization that manages this endpoint (might not be the organization that exposes the endpoint) */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]

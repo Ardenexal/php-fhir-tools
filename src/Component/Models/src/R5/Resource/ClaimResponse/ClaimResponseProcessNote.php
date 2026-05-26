@@ -34,7 +34,7 @@ class ClaimResponseProcessNote extends BackboneElement
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]
         public ?PositiveIntPrimitive $number = null,
         /** @var CodeableConcept|null type Note purpose */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/note-type', strength: 'extensible')]
         public ?CodeableConcept $type = null,
         /** @var StringPrimitive|string|null text Note explanatory text */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]

@@ -31,7 +31,7 @@ class Identifier extends Element
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/identifier-use|4.3.0', strength: 'required')]
         public ?IdentifierUseType $use = null,
         /** @var CodeableConcept|null type Description of identifier */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/identifier-type', strength: 'extensible')]
         public ?CodeableConcept $type = null,
         /** @var UriPrimitive|null system The namespace for the identifier value */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]

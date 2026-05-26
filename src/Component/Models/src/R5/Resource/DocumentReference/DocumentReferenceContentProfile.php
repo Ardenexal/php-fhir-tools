@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\DocumentReference;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -57,6 +58,7 @@ class DocumentReferenceContentProfile extends BackboneElement
             ],
         )]
         #[NotBlank]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/v3-HL7FormatCodes', strength: 'preferred')]
         public Coding|UriPrimitive|CanonicalPrimitive|null $value = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

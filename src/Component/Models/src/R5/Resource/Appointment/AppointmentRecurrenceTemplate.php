@@ -34,7 +34,7 @@ class AppointmentRecurrenceTemplate extends BackboneElement
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/timezones|5.0.0', strength: 'required')]
         public ?CodeableConcept $timezone = null,
         /** @var CodeableConcept|null recurrenceType The frequency of the recurrence */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/appointment-recurrrence-type', strength: 'preferred')]
         public ?CodeableConcept $recurrenceType = null,
         /** @var DatePrimitive|null lastOccurrenceDate The date when the recurrence should end */
         #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]

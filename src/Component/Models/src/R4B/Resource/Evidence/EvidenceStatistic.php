@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\Evidence;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
@@ -42,7 +43,7 @@ class EvidenceStatistic extends BackboneElement
         )]
         public array $note = [],
         /** @var CodeableConcept|null statisticType Type of statistic, eg relative risk */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/statistic-type', strength: 'extensible')]
         public ?CodeableConcept $statisticType = null,
         /** @var CodeableConcept|null category Associated category for categorical variable */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]

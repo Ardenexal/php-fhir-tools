@@ -119,7 +119,7 @@ class PatientResource extends DomainResourceResource
         )]
         public array $address = [],
         /** @var CodeableConcept|null maritalStatus Marital (civil) status of a patient */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/marital-status', strength: 'extensible')]
         public ?CodeableConcept $maritalStatus = null,
         /** @var bool|int|null multipleBirth Whether patient is part of a multiple birth */
         #[FhirProperty(

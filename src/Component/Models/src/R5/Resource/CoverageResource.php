@@ -83,7 +83,7 @@ class CoverageResource extends DomainResourceResource
         )]
         public array $paymentBy = [],
         /** @var CodeableConcept|null type Coverage category such as medical or accident */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/coverage-type', strength: 'preferred')]
         public ?CodeableConcept $type = null,
         /** @var Reference|null policyHolder Owner of the policy */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
@@ -106,7 +106,7 @@ class CoverageResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $dependent = null,
         /** @var CodeableConcept|null relationship Beneficiary relationship to the subscriber */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/subscriber-relationship', strength: 'extensible')]
         public ?CodeableConcept $relationship = null,
         /** @var Period|null period Coverage start and end dates */
         #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]

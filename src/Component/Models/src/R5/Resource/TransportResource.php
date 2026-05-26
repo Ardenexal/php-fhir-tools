@@ -142,6 +142,7 @@ class TransportResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/performer-role', strength: 'preferred')]
         public array $performerType = [],
         /** @var Reference|null owner Responsible individual */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]

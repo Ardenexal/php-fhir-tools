@@ -50,6 +50,7 @@ class ObservationDefinitionComponent extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/ucum-units', strength: 'preferred')]
         public array $permittedUnit = [],
         /** @var array<ObservationDefinitionQualifiedValue> qualifiedValue Set of qualified values for observation results */
         #[FhirProperty(

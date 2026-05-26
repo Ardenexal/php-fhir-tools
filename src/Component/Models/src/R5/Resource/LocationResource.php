@@ -73,7 +73,7 @@ class LocationResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/location-status|5.0.0', strength: 'required')]
         public ?LocationStatusType $status = null,
         /** @var Coding|null operationalStatus The operational status of the location (typically only for a bed/room) */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/v2-0116', strength: 'preferred')]
         public ?Coding $operationalStatus = null,
         /** @var StringPrimitive|string|null name Name of the location as used by humans */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -94,6 +94,7 @@ class LocationResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/v3-ServiceDeliveryLocationRoleType', strength: 'extensible')]
         public array $type = [],
         /** @var array<ExtendedContactDetail> contact Official contact details for the location */
         #[FhirProperty(

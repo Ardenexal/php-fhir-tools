@@ -60,6 +60,8 @@ if ($tmpFile === false) {
 }
 
 // Build PHPUnit command parts - inject our output suppression flags
+// --no-coverage prevents the "No code coverage driver available" runner warning from
+// triggering failOnWarning=true in phpunit.dist.xml and aborting before any tests run.
 $commandParts = array_merge(
     ['php', $phpunitBin],
     $userArgs,
@@ -67,6 +69,7 @@ $commandParts = array_merge(
         '--no-output',
         '--log-junit', $tmpFile,
         '--colors=never',
+        '--no-coverage',
         '--configuration', $configFile,
     ],
 );

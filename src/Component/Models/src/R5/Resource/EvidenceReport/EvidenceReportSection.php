@@ -36,7 +36,7 @@ class EvidenceReportSection extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $title = null,
         /** @var CodeableConcept|null focus Classification of section (recommended) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/evidence-report-section', strength: 'extensible')]
         public ?CodeableConcept $focus = null,
         /** @var Reference|null focusReference Classification of section by Resource */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
@@ -56,7 +56,7 @@ class EvidenceReportSection extends BackboneElement
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/list-mode|5.0.0', strength: 'required')]
         public ?ListModeType $mode = null,
         /** @var CodeableConcept|null orderedBy Order of section entries */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/list-order', strength: 'preferred')]
         public ?CodeableConcept $orderedBy = null,
         /** @var array<CodeableConcept> entryClassifier Extensible classifiers as content */
         #[FhirProperty(
@@ -65,6 +65,7 @@ class EvidenceReportSection extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/evidence-classifier-code', strength: 'extensible')]
         public array $entryClassifier = [],
         /** @var array<Reference> entryReference Reference to resources as content */
         #[FhirProperty(
@@ -83,7 +84,7 @@ class EvidenceReportSection extends BackboneElement
         )]
         public array $entryQuantity = [],
         /** @var CodeableConcept|null emptyReason Why the section is empty */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/list-empty-reason', strength: 'preferred')]
         public ?CodeableConcept $emptyReason = null,
         /** @var array<EvidenceReportSection> section Nested Section */
         #[FhirProperty(

@@ -55,6 +55,7 @@ class DataRequirement extends Element
                 ],
             ],
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/subject-type', strength: 'extensible')]
         public CodeableConcept|Reference|null $subject = null,
         /** @var array<StringPrimitive|string> mustSupport Indicates specific structure elements that are referenced by the knowledge module */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\ImagingSelection;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -38,6 +39,10 @@ class ImagingSelectionInstance extends BackboneElement
         public ?UnsignedIntPrimitive $number = null,
         /** @var Coding|null sopClass DICOM SOP Class UID */
         #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://dicom.nema.org/medical/dicom/current/output/chtml/part04/sect_B.5.html#table_B.5-1',
+            strength: 'extensible',
+        )]
         public ?Coding $sopClass = null,
         /** @var array<StringPrimitive|string> subset The selected subset of the SOP Instance */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]

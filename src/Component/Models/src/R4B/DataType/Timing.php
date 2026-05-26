@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
 
 /**
@@ -35,7 +36,7 @@ class Timing extends BackboneElement
         #[FhirProperty(fhirType: 'Element', propertyKind: 'complex')]
         public ?TimingRepeat $repeat = null,
         /** @var CodeableConcept|null code BID | TID | QID | AM | PM | QD | QOD | + */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/timing-abbreviation', strength: 'preferred')]
         public ?CodeableConcept $code = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

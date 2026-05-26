@@ -101,7 +101,7 @@ class DiagnosticReportResource extends DomainResourceResource
         )]
         public array $category = [],
         /** @var CodeableConcept|null code Name/Code for this diagnostic report */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/report-codes', strength: 'preferred')]
         public ?CodeableConcept $code = null,
         /** @var Reference|null subject The subject of the report - usually, but not always, the patient */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]

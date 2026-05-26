@@ -81,6 +81,58 @@ final class FHIRPatternValueValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    public function testListPatternMatchesWhenOneElementSatisfiesPattern(): void
+    {
+        // patternCodeableConcept.coding is a list — at least one coding must match
+        $value = [
+            'coding' => [
+                ['system' => 'http://other.com', 'code' => 'X'],
+                ['system' => 'http://snomed.info/sct', 'code' => '123', 'display' => 'extra'],
+            ],
+        ];
+        $this->validator->validate($value, new FHIRPatternValue([
+            'coding' => [['system' => 'http://snomed.info/sct', 'code' => '123']],
+        ]));
+
+        $this->assertNoViolation();
+    }
+
+    public function testListPatternFailsWhenNoElementSatisfiesPattern(): void
+    {
+        $value = [
+            'coding' => [
+                ['system' => 'http://other.com', 'code' => 'X'],
+                ['system' => 'http://snomed.info/sct', 'code' => 'WRONG'],
+            ],
+        ];
+        $this->validator->validate($value, new FHIRPatternValue([
+            'coding' => [['system' => 'http://snomed.info/sct', 'code' => '123']],
+        ]));
+
+        $this->buildViolation(FHIRPatternValueValidator::DEFAULT_MESSAGE)
+            ->setCode(FHIRViolationCode::ERROR)
+            ->assertRaised();
+    }
+
+    public function testStringableObjectComparedByStringValue(): void
+    {
+        $uri = new class ('http://example.com') implements \Stringable {
+            public function __construct(private readonly string $value)
+            {
+            }
+
+            public function __toString(): string
+            {
+                return $this->value;
+            }
+        };
+
+        $value = ['system' => $uri, 'code' => 'abc'];
+        $this->validator->validate($value, new FHIRPatternValue(['system' => 'http://example.com']));
+
+        $this->assertNoViolation();
+    }
+
     public function testRegistryOverrideIsUsedInViolationMessage(): void
     {
         $registry = new FHIRValidationMessageRegistry();

@@ -77,6 +77,7 @@ class ImagingStudyResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_33.html', strength: 'extensible')]
         public array $modality = [],
         /** @var Reference|null subject Who or what is the subject of the study */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank]
@@ -127,6 +128,7 @@ class ImagingStudyResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://loinc.org/vs/loinc-rsna-radiology-playbook', strength: 'preferred')]
         public array $procedure = [],
         /** @var Reference|null location Where ImagingStudy occurred */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
