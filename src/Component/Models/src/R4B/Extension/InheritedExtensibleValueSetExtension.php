@@ -11,7 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 
 /**
- * @author HL7 International / FHIR Infrastructure
+ * @author Health Level Seven, Inc. - FHIR Core WG
  *
  * @see http://hl7.org/fhir/StructureDefinition/elementdefinition-inheritedExtensibleValueSet
  *

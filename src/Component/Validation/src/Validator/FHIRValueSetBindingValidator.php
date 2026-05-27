@@ -78,7 +78,8 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
     /**
      * Validates extensible/preferred bindings via the terminology client.
      * When no client is configured, validation is skipped (graceful degradation).
-     * Violations produced here are warnings, not errors.
+     * Violations use WARNING by default; strict=true escalates to ERROR.
+     * When maxValueSetUrl is set, values outside it always produce ERROR regardless of strict.
      */
     private function validateNonRequired(mixed $value, FHIRValueSetBinding $constraint): void
     {
@@ -86,16 +87,24 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
             return;
         }
 
-        if ($this->terminologyClient->validateCode($constraint->valueSetUrl, $value)) {
-            return;
+        $override    = $this->messageRegistry->getOverride('FHIRValueSetBinding');
+        $bindingCode = $constraint->strict ? FHIRViolationCode::ERROR : FHIRViolationCode::WARNING;
+
+        if (!$this->terminologyClient->validateCode($constraint->valueSetUrl, $value)) {
+            $this->context->buildViolation($override ?? self::DEFAULT_INVALID_VALUE_MESSAGE)
+                ->setParameters(['{{ value }}' => (string) $value, '{{ url }}' => $constraint->valueSetUrl])
+                ->setInvalidValue($value)
+                ->setCode($bindingCode)
+                ->addViolation();
         }
 
-        $override = $this->messageRegistry->getOverride('FHIRValueSetBinding');
-        $this->context->buildViolation($override ?? self::DEFAULT_INVALID_VALUE_MESSAGE)
-            ->setParameters(['{{ value }}' => (string) $value, '{{ url }}' => $constraint->valueSetUrl])
-            ->setInvalidValue($value)
-            ->setCode(FHIRViolationCode::WARNING)
-            ->addViolation();
+        if ($constraint->maxValueSetUrl !== null && !$this->terminologyClient->validateCode($constraint->maxValueSetUrl, $value)) {
+            $this->context->buildViolation($override ?? self::DEFAULT_INVALID_VALUE_MESSAGE)
+                ->setParameters(['{{ value }}' => (string) $value, '{{ url }}' => $constraint->maxValueSetUrl])
+                ->setInvalidValue($value)
+                ->setCode(FHIRViolationCode::ERROR)
+                ->addViolation();
+        }
     }
 
     /**

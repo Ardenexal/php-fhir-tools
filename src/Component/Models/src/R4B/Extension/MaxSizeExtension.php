@@ -9,11 +9,11 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
 /**
- * @author HL7 International / FHIR Infrastructure
+ * @author Health Level Seven International (FHIR Infrastructure)
  *
  * @see http://hl7.org/fhir/StructureDefinition/maxSize
  *
- * @description For attachment answers, indicates the maximum size in bytes an attachment can be.
+ * @description For attachment answers, indicates the maximum size an attachment can be.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/maxSize', fhirVersion: 'R4B')]
 class MaxSizeExtension extends Extension

@@ -10,11 +10,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 
 /**
- * @author HL7 International / FHIR Infrastructure
+ * @author Health Level Seven, Inc. - [WG Name] WG
  *
  * @see http://hl7.org/fhir/StructureDefinition/operationdefinition-allowed-type
  *
- * @description When the base type is an abstract type (e.g. Resource or Element) then this extension defines which concrete types are allowed to be used for a parameter. In the absence of this extension, any type is allowed. Replaced by OperationDefinition.parameter.allowedType in R5+
+ * @description When the base type is an abstract type (e.g. Resource or Element) then this extension defines which concrete types are allowed to be used for a parameter. In the absence of this extension, any type is allowed.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/operationdefinition-allowed-type', fhirVersion: 'R4B')]
 class AllowedTypeExtension extends Extension

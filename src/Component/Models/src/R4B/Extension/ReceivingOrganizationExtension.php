@@ -10,11 +10,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 
 /**
- * @author HL7 International / Clinical Decision Support
+ * @author Health Level Seven, Inc. - CDS WG
  *
  * @see http://hl7.org/fhir/StructureDefinition/cqf-receivingOrganization
  *
- * @description The organization that will receive the response. DEPRECATED: This extension was initially used to model decision support context. This information is now handled as part of CDS Hooks and Clinical Reasoning.
+ * @description The organization that will receive the response.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-receivingOrganization', fhirVersion: 'R4B')]
 class ReceivingOrganizationExtension extends Extension

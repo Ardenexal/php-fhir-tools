@@ -12,6 +12,8 @@ final class FHIRValueSetBinding extends Constraint
     public function __construct(
         public readonly string $valueSetUrl,
         public readonly string $strength = 'required',
+        public readonly bool $strict = false,
+        public readonly ?string $maxValueSetUrl = null,
         ?array $groups = null,
         mixed $payload = null,
     ) {

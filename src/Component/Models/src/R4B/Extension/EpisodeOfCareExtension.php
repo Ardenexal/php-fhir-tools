@@ -10,11 +10,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 
 /**
- * @author HL7 International / FHIR Infrastructure
+ * @author Health Level Seven, Inc. - FHIR WG
  *
  * @see http://hl7.org/fhir/StructureDefinition/workflow-episodeOfCare
  *
- * @description Identifies the episode(s) of care that this resource is relevant to.  Establishes the EpisodeOfCare as a 'grouper' of resources that are relevant to that episode.
+ * @description The episode(s) of care that establishes the context for this {{title}}.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-episodeOfCare', fhirVersion: 'R4B')]
 class EpisodeOfCareExtension extends Extension

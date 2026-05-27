@@ -9,11 +9,11 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
 /**
- * @author HL7 International / Patient Administration
+ * @author HL7
  *
  * @see http://hl7.org/fhir/StructureDefinition/patient-interpreterRequired
  *
- * @description Indicates whether an interpreter is required to facilitate communication in a healthcare setting. While this extension is named patient-interpreterRequired for backwards compatibility, it may also be used on RelatedPerson, Practitioner, Encounter, Appointment and ServiceRequest.
+ * @description This Patient requires an interpreter to communicate healthcare information to the practitioner.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-interpreterRequired', fhirVersion: 'R4B')]
 class InterpreterRequiredExtension extends Extension

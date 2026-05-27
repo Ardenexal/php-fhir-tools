@@ -6,23 +6,23 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Expression;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 
 /**
- * @author HL7 International / Clinical Decision Support
+ * @author Health Level Seven, Inc. - CDS WG
  *
  * @see http://hl7.org/fhir/StructureDefinition/cqf-initialValue
  *
- * @description An expression that determines an initial value for the element on which it appears. The expression may be simply the name of a expression in a referenced library, or it may be a complete inline expression.
+ * @description The name of an expression in a referenced library that determines an initial value.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-initialValue', fhirVersion: 'R4B')]
 class InitialValueExtension extends Extension
 {
     public function __construct(
-        /** @var Expression|null valueExpression Value of extension */
-        #[FhirProperty(fhirType: 'Expression', propertyKind: 'complex')]
-        public ?Expression $valueExpression = null,
+        /** @var StringPrimitive|null valueString Value of extension */
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
+        public ?StringPrimitive $valueString = null,
         ?string $id = null,
         array $extension = [],
     ) {
@@ -30,7 +30,7 @@ class InitialValueExtension extends Extension
             id: $id,
             extension: $extension,
             url: 'http://hl7.org/fhir/StructureDefinition/cqf-initialValue',
-            value: $this->valueExpression,
+            value: $this->valueString,
         );
     }
 }

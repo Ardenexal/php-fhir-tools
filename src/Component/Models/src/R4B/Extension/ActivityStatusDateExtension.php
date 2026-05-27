@@ -10,7 +10,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DatePrimitive;
 
 /**
- * @author HL7 International / Terminology Infrastructure
+ * @author HL7
  *
  * @see http://hl7.org/fhir/StructureDefinition/valueset-activityStatusDate
  *

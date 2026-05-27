@@ -10,11 +10,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 
 /**
- * @author HL7 International / Orders and Observations
+ * @author Health Level Seven, Inc. - FHIR I WG
  *
  * @see http://hl7.org/fhir/StructureDefinition/task-candidateList
  *
- * @description Identifies the individuals who are candidates for being the owner of the task. The list of candidates that perform a task is now achieved by using Task.requestedPerformer and this element can be implemented using the cross version extension mechanism (i.e., the extension is no longer needed).
+ * @description Identifies the individuals who are candidates for being the owner of the task.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/task-candidateList', fhirVersion: 'R4B')]
 class CandidateListExtension extends Extension

@@ -10,7 +10,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
 /**
- * @author HL7 International / Clinical Decision Support
+ * @author Health Level Seven, Inc. - CDS WG
  *
  * @see http://hl7.org/fhir/StructureDefinition/cqf-qualityOfEvidence
  *

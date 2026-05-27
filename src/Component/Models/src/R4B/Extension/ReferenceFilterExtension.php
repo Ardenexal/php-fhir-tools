@@ -10,11 +10,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 
 /**
- * @author HL7 International / FHIR Infrastructure
+ * @author HL7
  *
  * @see http://hl7.org/fhir/StructureDefinition/questionnaire-referenceFilter
  *
- * @description Identifies a filter to apply when looking up candidate answers for the question.  DEPRECATED: This extension has been replaced by the Structured Data Capture candidateExpression extension.
+ * @description Identifies a filter to apply when looking up candidate answers for the question.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaire-referenceFilter', fhirVersion: 'R4B')]
 class ReferenceFilterExtension extends Extension

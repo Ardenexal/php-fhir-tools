@@ -11,7 +11,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
 /**
- * @author HL7 International / FHIR Infrastructure
+ * @author Health Level Seven, Inc. - MnM WG
  *
  * @see http://hl7.org/fhir/StructureDefinition/timing-daysOfCycle
  *

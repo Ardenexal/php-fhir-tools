@@ -10,7 +10,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 
 /**
- * @author HL7 International / FHIR Infrastructure
+ * @author Health Level Seven, Inc. - FHIR WG
  *
  * @see http://hl7.org/fhir/StructureDefinition/request-relevantHistory
  *

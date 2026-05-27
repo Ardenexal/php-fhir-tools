@@ -9,11 +9,11 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
 /**
- * @author HL7 International / FHIR Infrastructure
+ * @author Health Level Seven, Inc. - FHIR Core WG
  *
  * @see http://hl7.org/fhir/StructureDefinition/elementdefinition-translatable
  *
- * @description If true, it is reasonable for this element to have language translations, and this extension is a prompt for the tooling to recognize it.
+ * @description Whether translations might be expected for this element in resource instances.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-translatable', fhirVersion: 'R4B')]
 class TranslatableExtension extends Extension

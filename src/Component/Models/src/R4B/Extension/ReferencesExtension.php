@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 
 /**
- * @author HL7 International / Orders and Observations
+ * @author Health Level Seven International (Clinical Genomics)
  *
  * @see http://hl7.org/fhir/StructureDefinition/DiagnosticReport-geneticsReferences
  *

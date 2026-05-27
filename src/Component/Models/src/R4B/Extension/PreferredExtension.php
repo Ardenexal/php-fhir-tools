@@ -9,11 +9,11 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
 /**
- * @author HL7 International / FHIR Infrastructure
+ * @author Health Level Seven International (Modeling and Methodology)
  *
  * @see http://hl7.org/fhir/StructureDefinition/iso21090-preferred
  *
- * @description Flag denoting whether parent item is preferred - e.g., a preferred address or telephone number.  DEPRECATED: Use rank element or extension instead
+ * @description Flag denoting whether parent item is preferred - e.g., a preferred address or telephone number.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/iso21090-preferred', fhirVersion: 'R4B')]
 class PreferredExtension extends Extension

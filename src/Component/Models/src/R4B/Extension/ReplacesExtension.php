@@ -7,30 +7,30 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 
 /**
- * @author HL7 International / FHIR Infrastructure
+ * @author Health Level Seven, Inc. - OO WG
  *
- * @see http://hl7.org/fhir/StructureDefinition/replaces
+ * @see http://hl7.org/fhir/StructureDefinition/observation-replaces
  *
- * @description This indicates a separate conformance resource instance that is superseded by the current instance.
+ * @description This observation replaces a previous observation (i.e. a revised value).
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/replaces', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/observation-replaces', fhirVersion: 'R4B')]
 class ReplacesExtension extends Extension
 {
     public function __construct(
-        /** @var CanonicalPrimitive|null valueCanonical Value of extension */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
-        public ?CanonicalPrimitive $valueCanonical = null,
+        /** @var Reference|null valueReference Value of extension */
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        public ?Reference $valueReference = null,
         ?string $id = null,
         array $extension = [],
     ) {
         parent::__construct(
             id: $id,
             extension: $extension,
-            url: 'http://hl7.org/fhir/StructureDefinition/replaces',
-            value: $this->valueCanonical,
+            url: 'http://hl7.org/fhir/StructureDefinition/observation-replaces',
+            value: $this->valueReference,
         );
     }
 }

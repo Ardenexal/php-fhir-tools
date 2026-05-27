@@ -842,10 +842,14 @@ class FHIRModelGenerator implements GeneratorInterface
                 $bindingStrength = $element['binding']['strength'] ?? 'extensible';
                 $valueSetUrl     = $element['binding']['valueSet'] ?? '';
                 if ($valueSetUrl !== '' && $this->shouldEmitBindingAttribute($bindingStrength)) {
-                    $param->addAttribute(FHIRValueSetBinding::class, [
-                        'valueSetUrl' => $valueSetUrl,
-                        'strength'    => $bindingStrength,
-                    ]);
+                    $args = ['valueSetUrl' => $valueSetUrl, 'strength' => $bindingStrength];
+
+                    $maxValueSetUrl = $this->extractMaxValueSetUrl($element['binding']['extension'] ?? []);
+                    if ($maxValueSetUrl !== null) {
+                        $args['maxValueSetUrl'] = $maxValueSetUrl;
+                    }
+
+                    $param->addAttribute(FHIRValueSetBinding::class, $args);
                 }
             }
 
@@ -878,6 +882,25 @@ class FHIRModelGenerator implements GeneratorInterface
                 $param->addAttribute(FHIRTargetProfile::class, ['targetProfiles' => array_values(array_unique($targetProfiles))]);
             }
         }
+    }
+
+    /**
+     * Extract the maxValueSet URL from a binding's extension array.
+     *
+     * Looks for `elementdefinition-maxValueSet` with a `valueCanonical` field.
+     * Returns null when the extension is absent.
+     *
+     * @param array<int, array<string, mixed>> $extensions The binding.extension array
+     */
+    private function extractMaxValueSetUrl(array $extensions): ?string
+    {
+        foreach ($extensions as $ext) {
+            if (($ext['url'] ?? '') === 'http://hl7.org/fhir/StructureDefinition/elementdefinition-maxValueSet') {
+                return isset($ext['valueCanonical']) && is_string($ext['valueCanonical']) ? $ext['valueCanonical'] : null;
+            }
+        }
+
+        return null;
     }
 
     /**

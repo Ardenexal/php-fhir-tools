@@ -9,7 +9,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
 /**
- * @author HL7 International / FHIR Infrastructure
+ * @author Health Level Seven, Inc. - [WG Name] WG
  *
  * @see http://hl7.org/fhir/StructureDefinition/structuredefinition-xml-no-order
  *

@@ -115,6 +115,14 @@ services:
 
     Ardenexal\FHIRTools\Component\Validation\NullFHIRTerminologyClient: ~
 
+    # To use a real terminology server, override the FHIRTerminologyClientInterface alias in your
+    # application's services.yaml and register HttpFHIRTerminologyClient with your server URL:
+    #
+    #   Ardenexal\FHIRTools\Component\Validation\HttpFHIRTerminologyClient:
+    #       arguments:
+    #           $serverUrl: '%env(FHIR_TERMINOLOGY_SERVER_URL)%'
+    #   Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyClientInterface:
+    #       alias: 'Ardenexal\FHIRTools\Component\Validation\HttpFHIRTerminologyClient'
     Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyClientInterface:
         alias: 'Ardenexal\FHIRTools\Component\Validation\NullFHIRTerminologyClient'
 

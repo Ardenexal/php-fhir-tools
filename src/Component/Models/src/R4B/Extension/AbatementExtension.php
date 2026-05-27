@@ -8,32 +8,29 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Age;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Period;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Range;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DatePrimitive;
 
 /**
- * @author HL7 International / Patient Care
+ * @author Health Level Seven, Inc. - FHIR WG
  *
- * @see http://hl7.org/fhir/StructureDefinition/allergyintolerance-abatement
+ * @see http://hl7.org/fhir/StructureDefinition/familymemberhistory-abatement
  *
- * @description The date or estimated date that the allergy or intolerance resolved. This is called abatement because of the many overloaded connotations associated with resolution.
+ * @description The approximate date, age, or flag indicating that the condition of the family member resolved. The abatement should only be specified if the condition is stated in the positive sense, i.e., the didNotHave flag is false.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/allergyintolerance-abatement', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/familymemberhistory-abatement', fhirVersion: 'R4B')]
 class AbatementExtension extends Extension
 {
     public function __construct(
-        /** @var DateTimePrimitive|Age|Period|Range|StringPrimitive|null value Value of extension */
+        /** @var DatePrimitive|Age|bool|null value Value of extension */
         #[FhirProperty(fhirType: 'choice', propertyKind: 'choice', isChoice: true)]
-        DateTimePrimitive|Age|Period|Range|StringPrimitive|null $value = null,
+        DatePrimitive|Age|bool|null $value = null,
         ?string $id = null,
         array $extension = [],
     ) {
         parent::__construct(
             id: $id,
             extension: $extension,
-            url: 'http://hl7.org/fhir/StructureDefinition/allergyintolerance-abatement',
+            url: 'http://hl7.org/fhir/StructureDefinition/familymemberhistory-abatement',
             value: $value,
         );
     }

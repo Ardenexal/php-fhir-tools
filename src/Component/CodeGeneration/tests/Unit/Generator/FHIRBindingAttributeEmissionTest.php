@@ -92,6 +92,34 @@ class FHIRBindingAttributeEmissionTest extends TestCase
         self::assertSame(self::VS_URL, $attrs[0]->newInstance()->valueSetUrl);
     }
 
+    public function testMaxValueSetUrlStoredWhenExtensionPresent(): void
+    {
+        $maxUrl                                               = 'http://hl7.org/fhir/ValueSet/all-languages';
+        $sd                                                   = $this->buildSD('BindingMaxValueSet', 'complex-type', 'extensible');
+        $sd['snapshot']['element'][1]['binding']['extension'] = [
+            [
+                'url'            => 'http://hl7.org/fhir/StructureDefinition/elementdefinition-maxValueSet',
+                'valueCanonical' => $maxUrl,
+            ],
+        ];
+
+        $class = $this->generator->generateModelClass($sd, 'R4', $this->context);
+        $fqcn  = $this->evalClass($class, self::TEST_NS . '\\DataType');
+        $attrs = (new \ReflectionClass($fqcn))->getProperty('language')->getAttributes(FHIRValueSetBinding::class);
+
+        self::assertNotEmpty($attrs);
+        self::assertSame($maxUrl, $attrs[0]->newInstance()->maxValueSetUrl);
+    }
+
+    public function testMaxValueSetUrlNullWhenExtensionAbsent(): void
+    {
+        $fqcn  = $this->generateAndEval('BindingNoMax', 'extensible');
+        $attrs = (new \ReflectionClass($fqcn))->getProperty('language')->getAttributes(FHIRValueSetBinding::class);
+
+        self::assertNotEmpty($attrs);
+        self::assertNull($attrs[0]->newInstance()->maxValueSetUrl);
+    }
+
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------

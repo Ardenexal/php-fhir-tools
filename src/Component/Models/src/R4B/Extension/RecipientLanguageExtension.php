@@ -10,11 +10,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
 /**
- * @author HL7 International / Clinical Decision Support
+ * @author Health Level Seven, Inc. - CDS WG
  *
  * @see http://hl7.org/fhir/StructureDefinition/cqf-recipientLanguage
  *
- * @description Preferred language of the person that will consume the content. DEPRECATED: This extension was initially used to model decision support context. This information is now handled as part of CDS Hooks and Clinical Reasoning.
+ * @description Preferred language of the person that will consume the content.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-recipientLanguage', fhirVersion: 'R4B')]
 class RecipientLanguageExtension extends Extension

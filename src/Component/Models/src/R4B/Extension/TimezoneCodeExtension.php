@@ -10,14 +10,13 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
 
 /**
- * @author HL7 International / FHIR Infrastructure
+ * @author Health Level Seven International (FHIR Infrastructure)
  *
- * @see http://hl7.org/fhir/StructureDefinition/timezone
+ * @see http://hl7.org/fhir/StructureDefinition/tz-code
  *
- * @description An IANA timezone code for the timezone offset per BCP 175.
- * For data types allowing the offset (all except date and time), this extension SHALL agree with the offset if provided and cannot be used in place of the offset if the precision expressed requires an offset.  Where an offset is provided, this extension provides a more legible display of the zone associated with the offset.  Where an offset is not present, this extension can be used to provide zone information not otherwise available.
+ * @description An IANA timezone code for  the timezone offset per [BCP 175](https://www.iana.org/go/rfc6557). The offset is specified as part of a dateTime/instant (or using the tzOffset extension on a date if necessary). The timezone code may also be provided to allow for human display of the location associated with the offset.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/timezone', fhirVersion: 'R4B')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/tz-code', fhirVersion: 'R4B')]
 class TimezoneCodeExtension extends Extension
 {
     public function __construct(
@@ -30,7 +29,7 @@ class TimezoneCodeExtension extends Extension
         parent::__construct(
             id: $id,
             extension: $extension,
-            url: 'http://hl7.org/fhir/StructureDefinition/timezone',
+            url: 'http://hl7.org/fhir/StructureDefinition/tz-code',
             value: $this->valueCode,
         );
     }

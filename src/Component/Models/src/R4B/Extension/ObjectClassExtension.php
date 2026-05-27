@@ -10,7 +10,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
 /**
- * @author HL7 International / FHIR Infrastructure
+ * @author Health Level Seven International (Orders and Observations)
  *
  * @see http://hl7.org/fhir/StructureDefinition/11179-objectClass
  *

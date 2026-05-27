@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
 
 /**
- * @author HL7 International / Orders and Observations
+ * @author Health Level Seven International (Clinical Genomics)
  *
  * @see http://hl7.org/fhir/StructureDefinition/servicerequest-geneticsItem
  *

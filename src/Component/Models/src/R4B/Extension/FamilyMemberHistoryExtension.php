@@ -10,7 +10,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 
 /**
- * @author HL7 International / Orders and Observations
+ * @author Health Level Seven International (Clinical Genomics)
  *
  * @see http://hl7.org/fhir/StructureDefinition/DiagnosticReport-geneticsFamilyMemberHistory
  *

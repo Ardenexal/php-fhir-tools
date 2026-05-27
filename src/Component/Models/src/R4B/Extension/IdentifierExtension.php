@@ -10,11 +10,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier;
 
 /**
- * @author HL7 International / FHIR Infrastructure
+ * @author Health Level Seven, Inc. - FHIR Core WG
  *
  * @see http://hl7.org/fhir/StructureDefinition/elementdefinition-identifier
  *
- * @description External Identifiers associated with this element - these are identifiers that are associated with the concept this element represents. DEPRECATED: Use either ElementDefinition.code or ElementDefinition.mapping to provide the mapping instead
+ * @description External Identifiers associated with this element - these are identifiers that are associated with the concept this element represents.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-identifier', fhirVersion: 'R4B')]
 class IdentifierExtension extends Extension
