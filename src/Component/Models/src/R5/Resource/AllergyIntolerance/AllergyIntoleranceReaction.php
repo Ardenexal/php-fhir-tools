@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\AllergyIntolerance;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllergyIntoleranceSeverityType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation;
@@ -45,6 +46,7 @@ class AllergyIntoleranceReaction extends BackboneElement
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
         )]
         #[Count(min: 1)]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Observation'])]
         public array $manifestation = [],
         /** @var StringPrimitive|string|null description Description of the event as a whole */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

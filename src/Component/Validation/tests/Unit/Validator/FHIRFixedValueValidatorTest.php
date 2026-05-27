@@ -63,6 +63,46 @@ final class FHIRFixedValueValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    public function testStringableObjectMatchingConstraintValuePassesWithNoViolation(): void
+    {
+        $wrapper = new class ('http://ns.example.org') implements \Stringable {
+            public function __construct(private readonly string $value)
+            {
+            }
+
+            public function __toString(): string
+            {
+                return $this->value;
+            }
+        };
+
+        $this->validator->validate($wrapper, new FHIRFixedValue('http://ns.example.org'));
+
+        $this->assertNoViolation();
+    }
+
+    public function testStringableObjectNotMatchingConstraintValueEmitsErrorViolation(): void
+    {
+        $wrapper = new class ('http://wrong.org') implements \Stringable {
+            public function __construct(private readonly string $value)
+            {
+            }
+
+            public function __toString(): string
+            {
+                return $this->value;
+            }
+        };
+
+        $this->validator->validate($wrapper, new FHIRFixedValue('http://ns.example.org'));
+
+        $this->buildViolation(FHIRFixedValueValidator::DEFAULT_MESSAGE)
+            ->setParameters(['{{ value }}' => 'http://wrong.org', '{{ fixed }}' => 'http://ns.example.org'])
+            ->setInvalidValue($wrapper)
+            ->setCode(FHIRViolationCode::ERROR)
+            ->assertRaised();
+    }
+
     public function testRegistryOverrideIsUsedInViolationMessage(): void
     {
         $registry = new FHIRValidationMessageRegistry();

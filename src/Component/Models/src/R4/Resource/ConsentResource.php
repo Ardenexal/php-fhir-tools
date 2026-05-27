@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Attachment;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
@@ -115,7 +116,7 @@ class ConsentResource extends DomainResourceResource
         #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/consent-category', strength: 'extensible')]
         public array $category = [],
         /** @var Reference|null patient Who the consent applies to */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Patient'])]
         public ?Reference $patient = null,
         /** @var DateTimePrimitive|null dateTime When this Consent was created or indexed */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
@@ -127,6 +128,13 @@ class ConsentResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Organization',
+            'http://hl7.org/fhir/StructureDefinition/Patient',
+            'http://hl7.org/fhir/StructureDefinition/Practitioner',
+            'http://hl7.org/fhir/StructureDefinition/RelatedPerson',
+            'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
+        ])]
         public array $performer = [],
         /** @var array<Reference> organization Custodian of the consent */
         #[FhirProperty(
@@ -135,6 +143,7 @@ class ConsentResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public array $organization = [],
         /** @var Attachment|Reference|null source Source from which this consent is taken */
         #[FhirProperty(
@@ -156,6 +165,12 @@ class ConsentResource extends DomainResourceResource
                 ],
             ],
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Consent',
+            'http://hl7.org/fhir/StructureDefinition/DocumentReference',
+            'http://hl7.org/fhir/StructureDefinition/Contract',
+            'http://hl7.org/fhir/StructureDefinition/QuestionnaireResponse',
+        ])]
         public Attachment|Reference|null $source = null,
         /** @var array<ConsentPolicy> policy Policies covered by this consent */
         #[FhirProperty(

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
@@ -76,7 +77,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/medicationknowledge-status|4.3.0', strength: 'required')]
         public ?MedicationKnowledgeStatusCodesType $status = null,
         /** @var Reference|null manufacturer Manufacturer of the item */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $manufacturer = null,
         /** @var CodeableConcept|null doseForm powder | tablets | capsule + */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
@@ -102,6 +103,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Medication'])]
         public array $associatedMedication = [],
         /** @var array<CodeableConcept> productType Category of the medication or product */
         #[FhirProperty(
@@ -188,6 +190,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/DetectedIssue'])]
         public array $contraindication = [],
         /** @var array<MedicationKnowledgeRegulatory> regulatory Regulatory information about a medication */
         #[FhirProperty(

@@ -26,6 +26,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRMustSupport;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Traits\FHIRExtensionsTrait;
@@ -815,8 +816,8 @@ class FHIRModelGenerator implements GeneratorInterface
             }
 
             // Range constraint from minValue[x] / maxValue[x] polymorphic fields.
-            $rangeMin  = $this->extractPolymorphicField($element, 'minValue');
-            $rangeMax  = $this->extractPolymorphicField($element, 'maxValue');
+            $rangeMin  = ElementDefinitionHelper::extractPolymorphicField($element, 'minValue');
+            $rangeMax  = ElementDefinitionHelper::extractPolymorphicField($element, 'maxValue');
             if ($rangeMin !== null || $rangeMax !== null) {
                 $rangeArgs = [];
                 if ($rangeMin !== null) {
@@ -835,24 +836,27 @@ class FHIRModelGenerator implements GeneratorInterface
             }
 
             // FHIRValueSetBinding for required/extensible/preferred-strength bindings.
+            // Skip when valueSet is absent — an empty URL causes the validator to emit a
+            // misleading "no enum class found" violation for every non-null property value.
             if (isset($element['binding'])) {
                 $bindingStrength = $element['binding']['strength'] ?? 'extensible';
-                if ($this->shouldEmitBindingAttribute($bindingStrength)) {
+                $valueSetUrl     = $element['binding']['valueSet'] ?? '';
+                if ($valueSetUrl !== '' && $this->shouldEmitBindingAttribute($bindingStrength)) {
                     $param->addAttribute(FHIRValueSetBinding::class, [
-                        'valueSetUrl' => $element['binding']['valueSet'] ?? '',
+                        'valueSetUrl' => $valueSetUrl,
                         'strength'    => $bindingStrength,
                     ]);
                 }
             }
 
             // FHIRFixedValue from fixed[x] polymorphic field (scalar values only).
-            $fixedField = $this->extractPolymorphicField($element, 'fixed');
+            $fixedField = ElementDefinitionHelper::extractPolymorphicField($element, 'fixed');
             if ($fixedField !== null && is_scalar($fixedField['value'])) {
                 $param->addAttribute(FHIRFixedValue::class, ['value' => $fixedField['value']]);
             }
 
             // FHIRPatternValue from pattern[x] polymorphic field (array values only).
-            $patternField = $this->extractPolymorphicField($element, 'pattern');
+            $patternField = ElementDefinitionHelper::extractPolymorphicField($element, 'pattern');
             if ($patternField !== null && is_array($patternField['value'])) {
                 $param->addAttribute(FHIRPatternValue::class, ['pattern' => $patternField['value']]);
             }
@@ -860,29 +864,20 @@ class FHIRModelGenerator implements GeneratorInterface
             if (($element['mustSupport'] ?? false) === true) {
                 $param->addAttribute(FHIRMustSupport::class);
             }
-        }
-    }
 
-    /**
-     * Extract a polymorphic FHIR field (e.g. fixedString, patternCodeableConcept) from an element.
-     *
-     * Returns an array with 'type' (the suffix after the prefix, e.g. 'String') and 'value'
-     * (the raw value from the StructureDefinition), or null when no matching key exists.
-     *
-     * @param array<string, mixed> $element The FHIR element definition
-     * @param string               $prefix  The polymorphic field prefix (e.g. 'fixed', 'pattern', 'minValue', 'maxValue')
-     *
-     * @return array{type: string, value: mixed}|null
-     */
-    private function extractPolymorphicField(array $element, string $prefix): ?array
-    {
-        foreach ($element as $key => $value) {
-            if ($key !== $prefix && str_starts_with($key, $prefix)) {
-                return ['type' => substr($key, strlen($prefix)), 'value' => $value];
+            // FHIRTargetProfile from type[].targetProfile arrays (Reference and canonical properties).
+            $targetProfiles = [];
+            foreach ($element['type'] ?? [] as $type) {
+                foreach ($type['targetProfile'] ?? [] as $profileUrl) {
+                    if (is_string($profileUrl) && $profileUrl !== '') {
+                        $targetProfiles[] = $profileUrl;
+                    }
+                }
+            }
+            if ($targetProfiles !== []) {
+                $param->addAttribute(FHIRTargetProfile::class, ['targetProfiles' => array_values(array_unique($targetProfiles))]);
             }
         }
-
-        return null;
     }
 
     /**

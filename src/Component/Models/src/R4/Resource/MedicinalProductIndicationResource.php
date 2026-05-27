@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -64,6 +65,10 @@ class MedicinalProductIndicationResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/MedicinalProduct',
+            'http://hl7.org/fhir/StructureDefinition/Medication',
+        ])]
         public array $subject = [],
         /** @var CodeableConcept|null diseaseSymptomProcedure The disease, symptom or procedure that is the indication for treatment */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
@@ -100,6 +105,7 @@ class MedicinalProductIndicationResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/MedicinalProductUndesirableEffect'])]
         public array $undesirableEffect = [],
         /** @var array<Population> population The population group to which this applies */
         #[FhirProperty(

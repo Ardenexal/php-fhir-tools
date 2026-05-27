@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\MedicationKnowledge;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -41,6 +42,7 @@ class MedicationKnowledgeRelatedMedicationKnowledge extends BackboneElement
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
         #[Count(min: 1)]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/MedicationKnowledge'])]
         public array $reference = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

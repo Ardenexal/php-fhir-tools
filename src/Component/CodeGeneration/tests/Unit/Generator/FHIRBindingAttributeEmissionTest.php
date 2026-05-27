@@ -72,6 +72,18 @@ class FHIRBindingAttributeEmissionTest extends TestCase
         self::assertEmpty($attrs, '#[FHIRValueSetBinding] must NOT be emitted for example binding');
     }
 
+    public function testAbsentValueSetUrlDoesNotEmitAttribute(): void
+    {
+        $sd = $this->buildSD('BindingNoValueSet', 'complex-type', 'required');
+        unset($sd['snapshot']['element'][1]['binding']['valueSet']);
+
+        $class = $this->generator->generateModelClass($sd, 'R4', $this->context);
+        $fqcn  = $this->evalClass($class, self::TEST_NS . '\\DataType');
+        $attrs = (new \ReflectionClass($fqcn))->getProperty('language')->getAttributes(FHIRValueSetBinding::class);
+
+        self::assertEmpty($attrs, '#[FHIRValueSetBinding] must NOT be emitted when binding.valueSet is absent');
+    }
+
     public function testAttributeValueSetUrlMatchesBindingElement(): void
     {
         $fqcn  = $this->generateAndEval('BindingUrl', 'extensible');

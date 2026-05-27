@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\GenomicStudy;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
@@ -63,6 +64,10 @@ class GenomicStudyAnalysis extends BackboneElement
         public ?CodeableConcept $genomeBuild = null,
         /** @var CanonicalPrimitive|null instantiatesCanonical The defined protocol that describes the analysis */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/PlanDefinition',
+            'http://hl7.org/fhir/StructureDefinition/ActivityDefinition',
+        ])]
         public ?CanonicalPrimitive $instantiatesCanonical = null,
         /** @var UriPrimitive|null instantiatesUri The URL pointing to an externally maintained protocol that describes the analysis */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
@@ -77,6 +82,7 @@ class GenomicStudyAnalysis extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public array $focus = [],
         /** @var array<Reference> specimen The specimen used in the analysis event */
         #[FhirProperty(
@@ -85,6 +91,7 @@ class GenomicStudyAnalysis extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Specimen'])]
         public array $specimen = [],
         /** @var DateTimePrimitive|null date The date of the analysis event */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
@@ -98,7 +105,7 @@ class GenomicStudyAnalysis extends BackboneElement
         )]
         public array $note = [],
         /** @var Reference|null protocolPerformed The protocol that was performed for the analysis event */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Procedure', 'http://hl7.org/fhir/StructureDefinition/Task'])]
         public ?Reference $protocolPerformed = null,
         /** @var array<Reference> regionsStudied The genomic regions to be studied in the analysis (BED file) */
         #[FhirProperty(
@@ -107,6 +114,10 @@ class GenomicStudyAnalysis extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/DocumentReference',
+            'http://hl7.org/fhir/StructureDefinition/Observation',
+        ])]
         public array $regionsStudied = [],
         /** @var array<Reference> regionsCalled Genomic regions actually called in the analysis event (BED file) */
         #[FhirProperty(
@@ -115,6 +126,10 @@ class GenomicStudyAnalysis extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/DocumentReference',
+            'http://hl7.org/fhir/StructureDefinition/Observation',
+        ])]
         public array $regionsCalled = [],
         /** @var array<GenomicStudyAnalysisInput> input Inputs for the analysis event */
         #[FhirProperty(

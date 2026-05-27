@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -74,6 +75,7 @@ class MedicinalProductPackagedResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/MedicinalProduct'])]
         public array $subject = [],
         /** @var StringPrimitive|string|null description Textual description */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -90,7 +92,7 @@ class MedicinalProductPackagedResource extends DomainResourceResource
         )]
         public array $marketingStatus = [],
         /** @var Reference|null marketingAuthorization Manufacturer of this Package Item */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/MedicinalProductAuthorization'])]
         public ?Reference $marketingAuthorization = null,
         /** @var array<Reference> manufacturer Manufacturer of this Package Item */
         #[FhirProperty(
@@ -99,6 +101,7 @@ class MedicinalProductPackagedResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public array $manufacturer = [],
         /** @var array<MedicinalProductPackagedBatchIdentifier> batchIdentifier Batch numbering */
         #[FhirProperty(

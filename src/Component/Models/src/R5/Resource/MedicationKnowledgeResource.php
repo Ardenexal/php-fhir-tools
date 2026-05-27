@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
@@ -84,7 +85,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/medicationknowledge-status|5.0.0', strength: 'required')]
         public ?MedicationKnowledgeStatusCodesType $status = null,
         /** @var Reference|null author Creator or owner of the knowledge or information about the medication */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $author = null,
         /** @var array<CodeableConcept> intendedJurisdiction Codes that identify the different jurisdictions for which the information of this resource was created */
         #[FhirProperty(
@@ -112,6 +113,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Medication'])]
         public array $associatedMedication = [],
         /** @var array<CodeableConcept> productType Category of the medication or product */
         #[FhirProperty(
@@ -179,6 +181,7 @@ class MedicationKnowledgeResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ClinicalUseDefinition'])]
         public array $clinicalUseIssue = [],
         /** @var array<MedicationKnowledgeStorageGuideline> storageGuideline How the medication should be stored */
         #[FhirProperty(

@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Validation\SliceDiscriminatorMatcher;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
@@ -22,18 +23,22 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  * complete validation pass: reads all slices for that property, counts item matches,
  * checks min/max cardinality, and (for closed slicing) rejects items matching no slice.
  *
- * Subsequent invocations for the same (property, active-group, object) are no-ops; a
- * WeakMap prevents duplicate violations when multiple slice attributes exist for one property.
+ * Subsequent invocations for the same (property, active-group, object) within a single
+ * $validator->validate() call are no-ops; a WeakMap keyed on the ExecutionContext prevents
+ * duplicate violations when multiple slice attributes exist for one property.
+ * Keying on the context (not the validated object) means re-validation of the same object
+ * in a later call — with a fresh context — always runs a full pass.
  *
  * @author Ardenexal
  */
 final class FHIRSliceConstraintValidator extends ConstraintValidator
 {
     /**
-     * Tracks already-validated (property, group) pairs per object instance.
-     * WeakMap ensures no memory leak when validated objects are garbage-collected.
+     * Tracks already-validated (property, group) pairs per ExecutionContext.
+     * The ExecutionContext is a new object per $validator->validate() call, so dedup
+     * naturally resets between separate validation passes on the same object.
      *
-     * @var \WeakMap<object, array<string, true>>
+     * @var \WeakMap<ExecutionContextInterface, array<string, true>>
      */
     private \WeakMap $processedKeys;
 
@@ -41,7 +46,7 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
         private readonly PropertyAccessorInterface $propertyAccessor,
         private readonly SliceDiscriminatorMatcher $matcher,
     ) {
-        /** @var \WeakMap<object, array<string, true>> $processedKeys */
+        /** @var \WeakMap<ExecutionContextInterface, array<string, true>> $processedKeys */
         $processedKeys       = new \WeakMap();
         $this->processedKeys = $processedKeys;
     }
@@ -64,13 +69,15 @@ final class FHIRSliceConstraintValidator extends ConstraintValidator
         $activeGroup = $this->context->getGroup() ?? 'Default';
         $dedupKey    = "{$property}|{$activeGroup}";
 
-        // Only process each (property, group) combination once per object instance
-        $processed = $this->processedKeys[$value] ?? [];
+        // Only process each (property, group) combination once per $validator->validate() call.
+        // Keyed on the ExecutionContext so the dedup resets when a new call creates a fresh context.
+        $ctx       = $this->context;
+        $processed = $this->processedKeys[$ctx] ?? [];
         if (isset($processed[$dedupKey])) {
             return;
         }
-        $processed[$dedupKey]        = true;
-        $this->processedKeys[$value] = $processed;
+        $processed[$dedupKey]      = true;
+        $this->processedKeys[$ctx] = $processed;
 
         // Read the property value (must be an array for sliced properties)
         if (!$this->propertyAccessor->isReadable($value, $property)) {

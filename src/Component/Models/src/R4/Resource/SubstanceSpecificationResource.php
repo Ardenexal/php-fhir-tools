@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -85,6 +86,7 @@ class SubstanceSpecificationResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/DocumentReference'])]
         public array $source = [],
         /** @var StringPrimitive|string|null comment Textual comment about this record of a substance */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -106,7 +108,7 @@ class SubstanceSpecificationResource extends DomainResourceResource
         )]
         public array $property = [],
         /** @var Reference|null referenceInformation General information detailing this substance */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/SubstanceReferenceInformation'])]
         public ?Reference $referenceInformation = null,
         /** @var SubstanceSpecificationStructure|null structure Structural information */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
@@ -144,16 +146,16 @@ class SubstanceSpecificationResource extends DomainResourceResource
         )]
         public array $relationship = [],
         /** @var Reference|null nucleicAcid Data items specific to nucleic acids */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/SubstanceNucleicAcid'])]
         public ?Reference $nucleicAcid = null,
         /** @var Reference|null polymer Data items specific to polymers */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/SubstancePolymer'])]
         public ?Reference $polymer = null,
         /** @var Reference|null protein Data items specific to proteins */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/SubstanceProtein'])]
         public ?Reference $protein = null,
         /** @var Reference|null sourceMaterial Material or taxonomic/anatomical source for the substance */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/SubstanceSourceMaterial'])]
         public ?Reference $sourceMaterial = null,
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

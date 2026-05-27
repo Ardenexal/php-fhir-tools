@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\CarePlan;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
@@ -50,6 +51,7 @@ class CarePlanActivity extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public array $outcomeReference = [],
         /** @var array<Annotation> progress Comments about the activity status/progress */
         #[FhirProperty(
@@ -61,6 +63,17 @@ class CarePlanActivity extends BackboneElement
         public array $progress = [],
         /** @var Reference|null reference Activity details defined in specific resource */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Appointment',
+            'http://hl7.org/fhir/StructureDefinition/CommunicationRequest',
+            'http://hl7.org/fhir/StructureDefinition/DeviceRequest',
+            'http://hl7.org/fhir/StructureDefinition/MedicationRequest',
+            'http://hl7.org/fhir/StructureDefinition/NutritionOrder',
+            'http://hl7.org/fhir/StructureDefinition/Task',
+            'http://hl7.org/fhir/StructureDefinition/ServiceRequest',
+            'http://hl7.org/fhir/StructureDefinition/VisionPrescription',
+            'http://hl7.org/fhir/StructureDefinition/RequestGroup',
+        ])]
         public ?Reference $reference = null,
         /** @var CarePlanActivityDetail|null detail In-line definition of activity */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]

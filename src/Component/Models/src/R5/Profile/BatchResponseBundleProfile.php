@@ -15,12 +15,6 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
  */
 #[FHIRProfile(profileUrl: 'http://hl7.org/fhir/StructureDefinition/batch-response-bundle', baseType: 'Bundle', fhirVersion: 'R5')]
 #[FHIRProfileConstraint(
-    path: 'type',
-    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue',
-    options: ['pattern' => 'batch-response'],
-    groups: ['http://hl7.org/fhir/StructureDefinition/batch-response-bundle'],
-)]
-#[FHIRProfileConstraint(
     path: 'total',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['max' => 0],

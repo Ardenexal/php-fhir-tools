@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\ArtifactAssessment;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\ArtifactAssessmentInformationTypeType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
@@ -55,6 +56,13 @@ class ArtifactAssessmentContent extends BackboneElement
         public ?Quantity $quantity = null,
         /** @var Reference|null author Who authored the content */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Patient',
+            'http://hl7.org/fhir/StructureDefinition/Practitioner',
+            'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
+            'http://hl7.org/fhir/StructureDefinition/Organization',
+            'http://hl7.org/fhir/StructureDefinition/Device',
+        ])]
         public ?Reference $author = null,
         /** @var array<UriPrimitive> path What the comment is directed to */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isArray: true)]

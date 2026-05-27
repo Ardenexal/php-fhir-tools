@@ -17,12 +17,6 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
  */
 #[FHIRProfile(profileUrl: 'http://hl7.org/fhir/StructureDefinition/transaction-bundle', baseType: 'Bundle', fhirVersion: 'R5')]
 #[FHIRProfileConstraint(
-    path: 'type',
-    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue',
-    options: ['pattern' => 'transaction'],
-    groups: ['http://hl7.org/fhir/StructureDefinition/transaction-bundle'],
-)]
-#[FHIRProfileConstraint(
     path: 'total',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['max' => 0],
@@ -53,12 +47,6 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     groups: ['http://hl7.org/fhir/StructureDefinition/transaction-bundle'],
 )]
 #[FHIRProfileConstraint(
-    path: 'entry.request.method',
-    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue',
-    options: ['pattern' => 'PUT'],
-    groups: ['http://hl7.org/fhir/StructureDefinition/transaction-bundle'],
-)]
-#[FHIRProfileConstraint(
     path: 'entry.response',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['max' => 0],
@@ -80,12 +68,6 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     path: 'entry.request',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['min' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/transaction-bundle'],
-)]
-#[FHIRProfileConstraint(
-    path: 'entry.request.method',
-    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue',
-    options: ['pattern' => 'POST'],
     groups: ['http://hl7.org/fhir/StructureDefinition/transaction-bundle'],
 )]
 #[FHIRProfileConstraint(
@@ -119,12 +101,6 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     groups: ['http://hl7.org/fhir/StructureDefinition/transaction-bundle'],
 )]
 #[FHIRProfileConstraint(
-    path: 'entry.request.method',
-    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue',
-    options: ['pattern' => 'GET'],
-    groups: ['http://hl7.org/fhir/StructureDefinition/transaction-bundle'],
-)]
-#[FHIRProfileConstraint(
     path: 'entry.response',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['max' => 0],
@@ -155,12 +131,6 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     groups: ['http://hl7.org/fhir/StructureDefinition/transaction-bundle'],
 )]
 #[FHIRProfileConstraint(
-    path: 'entry.request.method',
-    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue',
-    options: ['pattern' => 'DELETE'],
-    groups: ['http://hl7.org/fhir/StructureDefinition/transaction-bundle'],
-)]
-#[FHIRProfileConstraint(
     path: 'entry.response',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['max' => 0],
@@ -191,12 +161,6 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     groups: ['http://hl7.org/fhir/StructureDefinition/transaction-bundle'],
 )]
 #[FHIRProfileConstraint(
-    path: 'entry.request.method',
-    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue',
-    options: ['pattern' => 'PATCH'],
-    groups: ['http://hl7.org/fhir/StructureDefinition/transaction-bundle'],
-)]
-#[FHIRProfileConstraint(
     path: 'entry.response',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['max' => 0],
@@ -224,12 +188,6 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     path: 'entry.request',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['min' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/transaction-bundle'],
-)]
-#[FHIRProfileConstraint(
-    path: 'entry.request.method',
-    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue',
-    options: ['pattern' => 'HEAD'],
     groups: ['http://hl7.org/fhir/StructureDefinition/transaction-bundle'],
 )]
 #[FHIRProfileConstraint(

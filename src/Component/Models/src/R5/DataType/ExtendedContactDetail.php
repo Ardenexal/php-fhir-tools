@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 
 /**
@@ -48,7 +49,7 @@ class ExtendedContactDetail extends DataType
         #[FhirProperty(fhirType: 'Address', propertyKind: 'complex')]
         public ?Address $address = null,
         /** @var Reference|null organization This contact detail is handled/monitored by a specific organization */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $organization = null,
         /** @var Period|null period Period that this contact was valid for usage */
         #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]

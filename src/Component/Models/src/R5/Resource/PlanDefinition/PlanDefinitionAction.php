@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\PlanDefinition;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\ActionCardinalityBehaviorType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\ActionGroupingBehaviorType;
@@ -113,6 +114,7 @@ class PlanDefinitionAction extends BackboneElement
             ],
         )]
         #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/participant-resource-types', strength: 'extensible')]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Group'])]
         public CodeableConcept|Reference|CanonicalPrimitive|null $subject = null,
         /** @var array<TriggerDefinition> trigger When the action should be triggered */
         #[FhirProperty(
@@ -188,7 +190,7 @@ class PlanDefinitionAction extends BackboneElement
         )]
         public Age|Duration|Range|Timing|null $timing = null,
         /** @var CodeableReference|null location Where it should happen */
-        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
         public ?CodeableReference $location = null,
         /** @var array<PlanDefinitionActionParticipant> participant Who should participate in the action */
         #[FhirProperty(
@@ -236,9 +238,17 @@ class PlanDefinitionAction extends BackboneElement
                 ],
             ],
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/ActivityDefinition',
+            'http://hl7.org/fhir/StructureDefinition/MessageDefinition',
+            'http://hl7.org/fhir/StructureDefinition/ObservationDefinition',
+            'http://hl7.org/fhir/StructureDefinition/PlanDefinition',
+            'http://hl7.org/fhir/StructureDefinition/Questionnaire',
+            'http://hl7.org/fhir/StructureDefinition/SpecimenDefinition',
+        ])]
         public CanonicalPrimitive|UriPrimitive|null $definition = null,
         /** @var CanonicalPrimitive|null transform Transform to apply the template */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/StructureMap'])]
         public ?CanonicalPrimitive $transform = null,
         /** @var array<PlanDefinitionActionDynamicValue> dynamicValue Dynamic aspects of the definition */
         #[FhirProperty(

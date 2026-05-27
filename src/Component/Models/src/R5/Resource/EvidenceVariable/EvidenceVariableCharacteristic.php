@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\EvidenceVariable;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
@@ -60,9 +61,18 @@ class EvidenceVariableCharacteristic extends BackboneElement
         public ?bool $exclude = null,
         /** @var Reference|null definitionReference Defines the characteristic (without using type and value) by a Reference */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/EvidenceVariable',
+            'http://hl7.org/fhir/StructureDefinition/Group',
+            'http://hl7.org/fhir/StructureDefinition/Evidence',
+        ])]
         public ?Reference $definitionReference = null,
         /** @var CanonicalPrimitive|null definitionCanonical Defines the characteristic (without using type and value) by a Canonical */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/EvidenceVariable',
+            'http://hl7.org/fhir/StructureDefinition/Evidence',
+        ])]
         public ?CanonicalPrimitive $definitionCanonical = null,
         /** @var CodeableConcept|null definitionCodeableConcept Defines the characteristic (without using type and value) by a CodeableConcept */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]

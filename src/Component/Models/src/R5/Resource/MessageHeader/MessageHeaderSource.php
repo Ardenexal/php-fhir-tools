@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\MessageHeader;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactPoint;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -49,6 +50,7 @@ class MessageHeaderSource extends BackboneElement
                 ],
             ],
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Endpoint'])]
         public UrlPrimitive|Reference|null $endpoint = null,
         /** @var StringPrimitive|string|null name Name of system */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

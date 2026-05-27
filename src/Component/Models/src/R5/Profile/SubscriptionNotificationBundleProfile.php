@@ -21,12 +21,6 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     fhirVersion: 'R5',
 )]
 #[FHIRProfileConstraint(
-    path: 'type',
-    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue',
-    options: ['pattern' => 'subscription-notification'],
-    groups: ['http://hl7.org/fhir/StructureDefinition/subscription-notification-bundle'],
-)]
-#[FHIRProfileConstraint(
     path: 'total',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['max' => 0],

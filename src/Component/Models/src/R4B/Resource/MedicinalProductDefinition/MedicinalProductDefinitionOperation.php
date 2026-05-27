@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\MedicinalProductDefi
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableReference;
@@ -31,6 +32,10 @@ class MedicinalProductDefinitionOperation extends BackboneElement
         public array $modifierExtension = [],
         /** @var CodeableReference|null type The type of manufacturing operation e.g. manufacturing itself, re-packaging */
         #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex')]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/ActivityDefinition',
+            'http://hl7.org/fhir/StructureDefinition/PlanDefinition',
+        ])]
         public ?CodeableReference $type = null,
         /** @var Period|null effectiveDate Date range of applicability */
         #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
@@ -42,6 +47,7 @@ class MedicinalProductDefinitionOperation extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public array $organization = [],
         /** @var CodeableConcept|null confidentialityIndicator Specifies whether this process is considered proprietary or confidential */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]

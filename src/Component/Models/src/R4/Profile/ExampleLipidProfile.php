@@ -26,22 +26,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\DiagnosticReportResource;
     groups: ['http://hl7.org/fhir/StructureDefinition/lipidprofile'],
 )]
 #[FHIRProfileConstraint(
-    path: 'code',
-    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
-    options: [
-        'value' => [
-            'coding' => [
-                [
-                    'system'  => 'http://loinc.org',
-                    'code'    => '57698-3',
-                    'display' => 'Lipid panel with direct LDL - Serum or Plasma',
-                ],
-            ],
-        ],
-    ],
-    groups: ['http://hl7.org/fhir/StructureDefinition/lipidprofile'],
-)]
-#[FHIRProfileConstraint(
     path: 'result',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['min' => 3, 'max' => 4],

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Attachment;
@@ -83,7 +84,7 @@ class ContractResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/contract-legalstate', strength: 'extensible')]
         public ?CodeableConcept $legalState = null,
         /** @var Reference|null instantiatesCanonical Source Contract Definition */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Contract'])]
         public ?Reference $instantiatesCanonical = null,
         /** @var UriPrimitive|null instantiatesUri External Contract Definition */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
@@ -107,6 +108,7 @@ class ContractResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public array $subject = [],
         /** @var array<Reference> authority Authority under which this Contract has standing */
         #[FhirProperty(
@@ -115,6 +117,7 @@ class ContractResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public array $authority = [],
         /** @var array<Reference> domain A sphere of control governed by an authoritative jurisdiction, organization, or person */
         #[FhirProperty(
@@ -123,6 +126,7 @@ class ContractResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
         public array $domain = [],
         /** @var array<Reference> site Specific Location */
         #[FhirProperty(
@@ -131,6 +135,7 @@ class ContractResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
         public array $site = [],
         /** @var StringPrimitive|string|null name Computer friendly designation */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -146,6 +151,12 @@ class ContractResource extends DomainResourceResource
         public array $alias = [],
         /** @var Reference|null author Source of Contract */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Patient',
+            'http://hl7.org/fhir/StructureDefinition/Practitioner',
+            'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
+            'http://hl7.org/fhir/StructureDefinition/Organization',
+        ])]
         public ?Reference $author = null,
         /** @var CodeableConcept|null scope Range of Legal Concerns */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
@@ -170,6 +181,7 @@ class ContractResource extends DomainResourceResource
                 ],
             ],
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public CodeableConcept|Reference|null $topic = null,
         /** @var CodeableConcept|null type Legal instrument category */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
@@ -200,6 +212,7 @@ class ContractResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public array $supportingInfo = [],
         /** @var array<Reference> relevantHistory Key event in Contract History */
         #[FhirProperty(
@@ -208,6 +221,7 @@ class ContractResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Provenance'])]
         public array $relevantHistory = [],
         /** @var array<ContractSigner> signer Contract Signatory */
         #[FhirProperty(
@@ -261,6 +275,12 @@ class ContractResource extends DomainResourceResource
                 ],
             ],
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Composition',
+            'http://hl7.org/fhir/StructureDefinition/DocumentReference',
+            'http://hl7.org/fhir/StructureDefinition/QuestionnaireResponse',
+            'http://hl7.org/fhir/StructureDefinition/Contract',
+        ])]
         public Attachment|Reference|null $legallyBinding = null,
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

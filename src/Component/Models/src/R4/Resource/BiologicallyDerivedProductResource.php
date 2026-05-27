@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BiologicallyDerivedProductCategoryType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BiologicallyDerivedProductStatusType;
@@ -86,6 +87,7 @@ class BiologicallyDerivedProductResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ServiceRequest'])]
         public array $request = [],
         /** @var int|null quantity The amount of this biologically derived product */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
@@ -97,6 +99,7 @@ class BiologicallyDerivedProductResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/BiologicallyDerivedProduct'])]
         public array $parent = [],
         /** @var BiologicallyDerivedProductCollection|null collection How this product was collected */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]

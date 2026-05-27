@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -69,6 +70,10 @@ class MedicinalProductAuthorizationResource extends DomainResourceResource
         public array $identifier = [],
         /** @var Reference|null subject The medicinal product that is being authorized */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/MedicinalProduct',
+            'http://hl7.org/fhir/StructureDefinition/MedicinalProductPackaged',
+        ])]
         public ?Reference $subject = null,
         /** @var array<CodeableConcept> country The country in which the marketing authorization has been granted */
         #[FhirProperty(
@@ -119,10 +124,10 @@ class MedicinalProductAuthorizationResource extends DomainResourceResource
         )]
         public array $jurisdictionalAuthorization = [],
         /** @var Reference|null holder Marketing Authorization Holder */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $holder = null,
         /** @var Reference|null regulator Medicines Regulatory Agency */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $regulator = null,
         /** @var MedicinalProductAuthorizationProcedure|null procedure The regulatory procedure for granting or amending a marketing authorization */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]

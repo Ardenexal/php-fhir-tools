@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\ObservationDefinition
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AdministrativeGenderType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
@@ -62,16 +63,16 @@ class ObservationDefinitionQualifiedValue extends BackboneElement
         #[FhirProperty(fhirType: 'Range', propertyKind: 'complex')]
         public ?Range $range = null,
         /** @var CanonicalPrimitive|null validCodedValueSet Value set of valid coded values as part of this set of qualified values */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ValueSet'])]
         public ?CanonicalPrimitive $validCodedValueSet = null,
         /** @var CanonicalPrimitive|null normalCodedValueSet Value set of normal coded values as part of this set of qualified values */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ValueSet'])]
         public ?CanonicalPrimitive $normalCodedValueSet = null,
         /** @var CanonicalPrimitive|null abnormalCodedValueSet Value set of abnormal coded values as part of this set of qualified values */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ValueSet'])]
         public ?CanonicalPrimitive $abnormalCodedValueSet = null,
         /** @var CanonicalPrimitive|null criticalCodedValueSet Value set of critical coded values as part of this set of qualified values */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ValueSet'])]
         public ?CanonicalPrimitive $criticalCodedValueSet = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\ClinicalUseDefinition
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference;
@@ -32,10 +33,10 @@ class ClinicalUseDefinitionIndication extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
         /** @var CodeableReference|null diseaseSymptomProcedure The situation that is being documented as an indicaton for this item */
-        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ObservationDefinition'])]
         public ?CodeableReference $diseaseSymptomProcedure = null,
         /** @var CodeableReference|null diseaseStatus The status of the disease or symptom for the indication */
-        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ObservationDefinition'])]
         public ?CodeableReference $diseaseStatus = null,
         /** @var array<CodeableReference> comorbidity A comorbidity or coinfection as part of the indication */
         #[FhirProperty(
@@ -44,9 +45,10 @@ class ClinicalUseDefinitionIndication extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ObservationDefinition'])]
         public array $comorbidity = [],
         /** @var CodeableReference|null intendedEffect The intended effect, aim or strategy to be achieved */
-        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/product-intended-use', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/product-intended-use', strength: 'preferred'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ObservationDefinition'])]
         public ?CodeableReference $intendedEffect = null,
         /** @var Range|StringPrimitive|string|null duration Timing or duration information */
         #[FhirProperty(
@@ -76,6 +78,7 @@ class ClinicalUseDefinitionIndication extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ClinicalUseDefinition'])]
         public array $undesirableEffect = [],
         /** @var Expression|null applicability An expression that returns true or false, indicating whether the indication is applicable or not, after having applied its other elements */
         #[FhirProperty(fhirType: 'Expression', propertyKind: 'complex')]

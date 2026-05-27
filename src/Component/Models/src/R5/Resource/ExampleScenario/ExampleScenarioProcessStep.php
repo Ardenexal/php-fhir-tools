@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\ExampleScenario;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
@@ -47,7 +48,7 @@ class ExampleScenarioProcessStep extends BackboneElement
         #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex')]
         public ?ExampleScenarioProcess $process = null,
         /** @var CanonicalPrimitive|null workflow Step is nested workflow */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ExampleScenario'])]
         public ?CanonicalPrimitive $workflow = null,
         /** @var ExampleScenarioProcessStepOperation|null operation Step is simple action */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]

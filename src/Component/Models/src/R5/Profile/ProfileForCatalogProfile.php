@@ -29,12 +29,6 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\CompositionResource;
     groups: ['http://hl7.org/fhir/StructureDefinition/catalog'],
 )]
 #[FHIRProfileConstraint(
-    path: 'type',
-    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue',
-    options: ['value' => ['text' => 'Catalog']],
-    groups: ['http://hl7.org/fhir/StructureDefinition/catalog'],
-)]
-#[FHIRProfileConstraint(
     path: 'category',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['min' => 1, 'max' => 1],

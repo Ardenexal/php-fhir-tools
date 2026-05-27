@@ -151,6 +151,18 @@ services:
         tags:
             - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraintValidator' }
 
+    Ardenexal\FHIRTools\Component\Validation\NullFHIRReferenceResolver: ~
+
+    Ardenexal\FHIRTools\Component\Validation\FHIRReferenceResolverInterface:
+        alias: 'Ardenexal\FHIRTools\Component\Validation\NullFHIRReferenceResolver'
+
+    Ardenexal\FHIRTools\Component\Validation\Validator\FHIRTargetProfileValidator:
+        arguments:
+            $resolver: '@Ardenexal\FHIRTools\Component\Validation\FHIRReferenceResolverInterface'
+            $messageRegistry: '@Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry'
+        tags:
+            - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfileValidator' }
+
     # Named service aliases
     fhir.model_generator:
         alias: 'Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator'

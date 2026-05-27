@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
@@ -87,6 +88,7 @@ class AdministrableProductDefinitionResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/MedicinalProductDefinition'])]
         public array $formOf = [],
         /** @var CodeableConcept|null administrableDoseForm The dose form of the final product after necessary reconstitution or processing */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
@@ -101,6 +103,7 @@ class AdministrableProductDefinitionResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ManufacturedItemDefinition'])]
         public array $producedFrom = [],
         /** @var array<CodeableConcept> ingredient The ingredients of this administrable medicinal product. This is only needed if the ingredients are not specified either using ManufacturedItemDefiniton, or using by incoming references from the Ingredient resource */
         #[FhirProperty(
@@ -111,7 +114,7 @@ class AdministrableProductDefinitionResource extends DomainResourceResource
         )]
         public array $ingredient = [],
         /** @var Reference|null device A device that is integral to the medicinal product, in effect being considered as an "ingredient" of the medicinal product */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/DeviceDefinition'])]
         public ?Reference $device = null,
         /** @var MarkdownPrimitive|null description A general description of the product, when in its final form, suitable for administration e.g. effervescent blue liquid, to be swallowed */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]

@@ -360,4 +360,28 @@ final class FHIRSliceConstraintValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($obj, $secondConstraint);
         $this->assertNoViolation();
     }
+
+    public function testRevalidatingSameObjectWithFreshContextProducesViolations(): void
+    {
+        // SliceTestPatientOpen requires ihiNumber (min:1). An empty identifiers array violates this.
+        $obj = new SliceTestPatientOpen();
+
+        $constraint = $this->firstConstraintOf($obj);
+
+        // First call — records dedup key in the current context
+        $this->validator->validate($obj, $constraint);
+        $firstCount = count($this->context->getViolations());
+        self::assertGreaterThan(0, $firstCount, 'First validation must find the min:1 violation');
+
+        // Simulate a new $validator->validate() call by re-initializing with a fresh context.
+        // With the WeakMap keyed on ExecutionContext, the dedup state does not carry over.
+        $freshContext = $this->createContext();
+        $this->validator->initialize($freshContext);
+        $this->validator->validate($obj, $constraint);
+        self::assertGreaterThan(
+            0,
+            count($freshContext->getViolations()),
+            'Re-validation with a fresh context must also find violations — WeakMap dedup must not persist across $validator->validate() calls',
+        );
+    }
 }

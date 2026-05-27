@@ -17,12 +17,6 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
  */
 #[FHIRProfile(profileUrl: 'http://hl7.org/fhir/StructureDefinition/search-set-bundle', baseType: 'Bundle', fhirVersion: 'R5')]
 #[FHIRProfileConstraint(
-    path: 'type',
-    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue',
-    options: ['pattern' => 'searchset'],
-    groups: ['http://hl7.org/fhir/StructureDefinition/search-set-bundle'],
-)]
-#[FHIRProfileConstraint(
     path: 'entry',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['max' => 1],
@@ -44,12 +38,6 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
     path: 'entry.search.mode',
     constraint: 'Symfony\Component\Validator\Constraints\Count',
     options: ['min' => 1],
-    groups: ['http://hl7.org/fhir/StructureDefinition/search-set-bundle'],
-)]
-#[FHIRProfileConstraint(
-    path: 'entry.search.mode',
-    constraint: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue',
-    options: ['pattern' => 'outcome'],
     groups: ['http://hl7.org/fhir/StructureDefinition/search-set-bundle'],
 )]
 #[FHIRProfileConstraint(
