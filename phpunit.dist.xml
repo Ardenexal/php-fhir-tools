@@ -33,6 +33,7 @@
             <directory>src/Component/Serialization/tests/Integration</directory>
             <directory>src/Component/CodeGeneration/tests/Integration</directory>
             <directory>src/Component/FHIRPath/tests/Integration</directory>
+            <directory>src/Component/Validation/tests/Integration</directory>
         </testsuite>
         <testsuite name="fhirpath-spec">
             <directory>src/Component/FHIRPath/tests/Integration</directory>

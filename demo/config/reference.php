@@ -811,6 +811,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     validation?: array{
  *         enabled?: bool|Param, // Enable FHIR validation during code generation // Default: true
  *         strict_mode?: bool|Param, // Enable strict validation mode (fail on warnings) // Default: false
+ *         message_overrides?: array<string, scalar|Param|null>,
  *     },
  *     packages?: array<string, array{ // Default: []
  *         version?: scalar|Param|null, // Package version to use

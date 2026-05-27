@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Validation\Validator;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
+use Ardenexal\FHIRTools\Component\Validation\FHIRViolationCode;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -46,13 +47,24 @@ final class FHIRProfileConstraintValidator extends ConstraintValidator
 
         $innerConstraint = new ($constraint->constraint)(...$constraint->options);
 
-        // Inner constraints belong to the Default group; the current context group is the profile
-        // URL (the group that activated this class-level constraint). Pass Default explicitly so
-        // Symfony does not skip the inner constraint for group-mismatch.
-        $this->context
-            ->getValidator()
-            ->inContext($this->context)
-            ->atPath($constraint->path)
-            ->validate($propertyValue, $innerConstraint, ['Default']);
+        // Validate the property value against the inner constraint in a fresh context so we can
+        // re-emit each violation via $this->context->buildViolation(). This keeps the outer
+        // FHIRProfileConstraint as the violation's constraint, enabling profile-group attribution
+        // in FHIRValidationService (getConstraint() returns FHIRProfileConstraint, not Count etc.).
+        $innerViolations = $this->context->getValidator()->validate($propertyValue, $innerConstraint, ['Default']);
+
+        foreach ($innerViolations as $v) {
+            $innerPath = $v->getPropertyPath();
+            $path      = match (true) {
+                $innerPath    === ''         => $constraint->path,
+                $innerPath[0] === '['     => $constraint->path . $innerPath,
+                default                   => $constraint->path . '.' . $innerPath,
+            };
+
+            $this->context->buildViolation($v->getMessageTemplate(), $v->getParameters())
+                ->atPath($path)
+                ->setCode($v->getCode() ?? FHIRViolationCode::ERROR)
+                ->addViolation();
+        }
     }
 }

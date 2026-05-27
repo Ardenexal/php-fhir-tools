@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\DependencyInjection;
 use Ardenexal\FHIRTools\Bundle\FHIRBundle\CacheWarmer\FHIRMetadataCacheWarmer;
 use Ardenexal\FHIRTools\Bundle\FHIRBundle\Compatibility\SymfonyVersionHelper;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider;
+use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -84,6 +85,16 @@ class FHIRExtension extends Extension
         if ($cachePool !== null) {
             $container->getDefinition(PropertyMetadataProvider::class)
                 ->setArgument('$psrCache', new Reference('fhir.metadata_cache'));
+        }
+
+        // Wire validation message overrides into FHIRValidationMessageRegistry
+        /** @var array<string, scalar> $messageOverrides */
+        $messageOverrides = $config['validation']['message_overrides'];
+        if ($messageOverrides !== []) {
+            $registryDef = $container->getDefinition(FHIRValidationMessageRegistry::class);
+            foreach ($messageOverrides as $key => $template) {
+                $registryDef->addMethodCall('setOverride', [$key, (string) $template]);
+            }
         }
     }
 

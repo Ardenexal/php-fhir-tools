@@ -171,6 +171,18 @@ services:
         tags:
             - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfileValidator' }
 
+    # Validation Service
+    Ardenexal\FHIRTools\Component\Validation\FHIRValidationService:
+        public: true
+
+    Ardenexal\FHIRTools\Component\Validation\FHIRValidationServiceInterface:
+        alias: 'Ardenexal\FHIRTools\Component\Validation\FHIRValidationService'
+        public: true
+
+    fhir.validation_service:
+        alias: 'Ardenexal\FHIRTools\Component\Validation\FHIRValidationService'
+        public: true
+
     # Named service aliases
     fhir.model_generator:
         alias: 'Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator'

@@ -12,7 +12,9 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
+use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\Count;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -122,6 +124,32 @@ final class FHIRProfileConstraintValidatorTest extends TestCase
 
         self::assertContains('name', $paths);
         self::assertContains('identifier', $paths);
+    }
+
+    public function testArrayIndexedInnerViolationPathHasNoDotBeforeBracket(): void
+    {
+        $profileConstraint = new FHIRProfileConstraint(
+            path: 'items',
+            constraint: All::class,
+            options: ['constraints' => [new NotBlank()]],
+            groups: [self::PROFILE_URL],
+        );
+
+        $subject = new FakeItemsSubject(items: [null]);
+
+        $violations = $this->validator->validate($subject, [$profileConstraint], ['Default', self::PROFILE_URL]);
+
+        self::assertCount(1, $violations);
+        self::assertSame('items[0]', $violations[0]->getPropertyPath());
+    }
+}
+
+final class FakeItemsSubject
+{
+    /** @param list<mixed> $items */
+    public function __construct(
+        public readonly array $items,
+    ) {
     }
 }
 
