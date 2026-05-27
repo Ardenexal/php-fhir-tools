@@ -1,0 +1,186 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}FHIR Resource Validator{% endblock %}
+
+{% block body %}
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">FHIR Resource Validator</h1>
+    <p class="mt-1 text-gray-500 text-sm">Validate FHIR resources using the PHP-native constraint engine.</p>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <turbo-frame id="validator" class="lg:col-span-2 space-y-4">
+
+        <form action="{{ path('app_validate_run') }}" method="POST"
+              class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
+
+            <div>
+                <label for="fhirJson" class="block text-sm font-medium text-gray-700 mb-1">
+                    FHIR JSON <span class="text-red-500">*</span>
+                </label>
+                <textarea id="fhirJson"
+                          name="fhirJson"
+                          rows="16"
+                          placeholder='{&#10;  "resourceType": "Patient",&#10;  "id": "example"&#10;}'
+                          class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ fhirJson }}</textarea>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label for="fhirVersion" class="block text-sm font-medium text-gray-700 mb-1">
+                        FHIR Version
+                    </label>
+                    <select id="fhirVersion"
+                            name="fhirVersion"
+                            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="r4"{% if fhirVersion == 'r4' %} selected{% endif %}>R4</option>
+                        <option value="r4b"{% if fhirVersion == 'r4b' %} selected{% endif %}>R4B</option>
+                        <option value="r5"{% if fhirVersion == 'r5' %} selected{% endif %}>R5</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label for="profileUrls" class="block text-sm font-medium text-gray-700 mb-1">
+                    Profile URLs <span class="text-gray-400 font-normal">(one per line, optional)</span>
+                </label>
+                <textarea id="profileUrls"
+                          name="profileUrls"
+                          rows="3"
+                          placeholder="https://hl7.org/fhir/StructureDefinition/Patient"
+                          class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ profileUrls }}</textarea>
+            </div>
+
+            <div class="space-y-2">
+                <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                    <input type="checkbox"
+                           name="mustSupport"
+                           value="1"
+                           {% if mustSupport %}checked{% endif %}
+                           class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                    Include must-support info
+                </label>
+                <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                    <input type="checkbox"
+                           name="hideExtensibleWarnings"
+                           value="1"
+                           {% if hideExtensibleWarnings %}checked{% endif %}
+                           class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                    Hide extensible binding warnings
+                </label>
+            </div>
+
+            <button type="submit"
+                    class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                Validate
+            </button>
+        </form>
+
+        {# ---- Error ---- #}
+        {% if error is not null %}
+        <div data-error-panel class="bg-red-50 border border-red-200 rounded-xl p-4">
+            <h3 class="text-sm font-semibold text-red-700 mb-1">Error</h3>
+            <p class="text-sm text-red-600 font-mono">{{ error }}</p>
+        </div>
+        {% endif %}
+
+        {# ---- Result ---- #}
+        {% if result is not null %}
+        <div data-result-panel class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 space-y-4">
+
+            {# Summary bar #}
+            <div class="flex flex-wrap items-center gap-3 text-sm">
+                {% if result.isValid %}
+                <span class="font-semibold text-green-700">✓ No violations</span>
+                {% else %}
+                <span class="font-semibold text-red-700">✗ Validation failed</span>
+                {% endif %}
+
+                {% if result.errors|length > 0 %}
+                <span class="bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-xs font-medium">
+                    {{ result.errors|length }} error{% if result.errors|length != 1 %}s{% endif %}
+                </span>
+                {% endif %}
+
+                {% if result.warnings|length > 0 %}
+                <span class="bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full text-xs font-medium">
+                    {{ result.warnings|length }} warning{% if result.warnings|length != 1 %}s{% endif %}
+                </span>
+                {% endif %}
+
+                {% if result.info|length > 0 %}
+                <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-xs font-medium">
+                    {{ result.info|length }} info
+                </span>
+                {% endif %}
+
+                {% if elapsedMs is not null %}
+                <span class="ml-auto text-xs text-gray-400">{{ elapsedMs }}ms</span>
+                {% endif %}
+            </div>
+
+            {# Errors #}
+            {% if result.errors is not empty %}
+            <div>
+                <h3 class="text-sm font-semibold text-red-700 mb-2">Errors</h3>
+                {{ include('validation/_violations.html.twig', {violations: result.errors, severity: 'error'}) }}
+            </div>
+            {% endif %}
+
+            {# Warnings #}
+            {% if result.warnings is not empty %}
+            <div>
+                <h3 class="text-sm font-semibold text-amber-700 mb-2">Warnings</h3>
+                {{ include('validation/_violations.html.twig', {violations: result.warnings, severity: 'warning'}) }}
+            </div>
+            {% endif %}
+
+            {# Info #}
+            {% if result.info is not empty %}
+            <div>
+                <h3 class="text-sm font-semibold text-blue-700 mb-2">Info</h3>
+                {{ include('validation/_violations.html.twig', {violations: result.info, severity: 'info'}) }}
+            </div>
+            {% endif %}
+
+            {% if result.errors is empty and result.warnings is empty and result.info is empty %}
+            <p class="text-sm text-gray-500 italic">No violations found.</p>
+            {% endif %}
+
+        </div>
+        {% endif %}
+
+    </turbo-frame>
+
+    {# ---- Reference sidebar ---- #}
+    <div class="space-y-4">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+            <h3 class="text-sm font-semibold text-gray-700 mb-3">Example Patient JSON</h3>
+            <pre class="text-xs font-mono bg-gray-50 rounded p-3 overflow-x-auto">{
+  "resourceType": "Patient",
+  "id": "example",
+  "name": [
+    {
+      "use": "official",
+      "family": "Chalmers",
+      "given": ["Peter", "James"]
+    }
+  ],
+  "gender": "male",
+  "birthDate": "1974-12-25",
+  "active": true
+}</pre>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+            <h3 class="text-sm font-semibold text-gray-700 mb-2">Resources</h3>
+            <ul class="text-xs text-gray-500 space-y-1">
+                <li><a href="https://hl7.org/fhir/R4/resourcelist.html" class="text-indigo-600 hover:underline" target="_blank">FHIR R4 resource list</a></li>
+                <li><a href="https://hl7.org/fhir/R4/patient.html" class="text-indigo-600 hover:underline" target="_blank">Patient resource spec</a></li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
