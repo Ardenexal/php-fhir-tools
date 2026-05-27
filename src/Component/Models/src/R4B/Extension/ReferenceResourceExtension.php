@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRContextInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
 
@@ -17,6 +19,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
  * @description Where the type for a question is "Reference", indicates a type of resource that is permitted.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaire-referenceResource', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item')]
+#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item.item')]
+#[FHIRContextInvariant(expression: 'type=\'reference\'')]
 class ReferenceResourceExtension extends Extension
 {
     public function __construct(

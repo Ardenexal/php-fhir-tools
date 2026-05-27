@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation;
 
+use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRContextInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRMustSupport;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
@@ -14,6 +18,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
 {
     public function __construct(
         private readonly ValidatorInterface $validator,
+        private readonly FHIRPathService $pathService,
     ) {
     }
 
@@ -35,6 +40,10 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             foreach ($this->collectMustSupportInfo($resource) as $infoViolation) {
                 $violations[] = $infoViolation;
             }
+        }
+
+        foreach ($this->validateExtensionContexts($resource) as $contextViolation) {
+            $violations[] = $contextViolation;
         }
 
         return new FHIRValidationReport($violations);
@@ -104,5 +113,127 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         }
 
         return $violations;
+    }
+
+    /**
+     * Pass 2 (v1: top-level walk only): check extension context and contextInvariant
+     * constraints for all extensions attached directly to $resource.
+     *
+     * Recursive sub-element walking and FHIR type-hierarchy resolution are deferred to v2.
+     *
+     * @return list<FHIRValidationViolation>
+     */
+    private function validateExtensionContexts(object $resource): array
+    {
+        if (!method_exists($resource, 'getExtensions')) {
+            return [];
+        }
+
+        $elementPath = $this->getResourceFhirType($resource);
+        $violations  = [];
+
+        /** @var list<object> $extensions */
+        $extensions = $resource->getExtensions();
+
+        foreach ($extensions as $extension) {
+            $ref          = new \ReflectionClass($extension);
+            $contextAttrs = array_map(
+                static fn (\ReflectionAttribute $a): FHIRExtensionContext => $a->newInstance(),
+                $ref->getAttributes(FHIRExtensionContext::class),
+            );
+
+            if ($contextAttrs !== [] && !$this->contextPermitsPath($contextAttrs, $elementPath)) {
+                $url          = method_exists($extension, 'getExtensionUrl') ? ($extension->getExtensionUrl() ?? '') : '';
+                $violations[] = new FHIRValidationViolation(
+                    severity: 'error',
+                    path: 'extension',
+                    message: sprintf(
+                        'Extension "%s" is not permitted on element "%s".',
+                        $url,
+                        $elementPath,
+                    ),
+                    constraintClass: FHIRExtensionContext::class,
+                    profileGroup: null,
+                    invariantKey: null,
+                );
+            }
+
+            $invariantAttrs = array_map(
+                static fn (\ReflectionAttribute $a): FHIRContextInvariant => $a->newInstance(),
+                $ref->getAttributes(FHIRContextInvariant::class),
+            );
+
+            foreach ($invariantAttrs as $invariant) {
+                try {
+                    $result = $this->pathService->evaluate($invariant->expression, $resource);
+                    $passed = $result->count() === 1 && $result->first() === true;
+                } catch (\Throwable) {
+                    $passed = false;
+                }
+
+                if (!$passed) {
+                    $url          = method_exists($extension, 'getExtensionUrl') ? ($extension->getExtensionUrl() ?? '') : '';
+                    $violations[] = new FHIRValidationViolation(
+                        severity: 'error',
+                        path: 'extension',
+                        message: sprintf(
+                            'Extension "%s" contextInvariant failed: %s',
+                            $url,
+                            $invariant->expression,
+                        ),
+                        constraintClass: FHIRContextInvariant::class,
+                        profileGroup: null,
+                        invariantKey: null,
+                    );
+                }
+            }
+        }
+
+        return $violations;
+    }
+
+    /**
+     * Returns true if at least one context entry permits the given element path.
+     *
+     * For type=element: permits if $elementPath equals the expression, or if $elementPath
+     * is a sub-element path of the expression (starts with expression + '.').
+     * For type=fhirpath and type=extension: deferred in v1, treated as permitted.
+     *
+     * @param list<FHIRExtensionContext> $contexts
+     */
+    private function contextPermitsPath(array $contexts, string $elementPath): bool
+    {
+        foreach ($contexts as $ctx) {
+            if ($ctx->type !== 'element') {
+                return true; // fhirpath and extension types deferred in v1
+            }
+
+            if ($elementPath === $ctx->expression) {
+                return true;
+            }
+
+            if (str_starts_with($elementPath, $ctx->expression . '.')) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function getResourceFhirType(object $resource): string
+    {
+        $ref   = new \ReflectionClass($resource);
+        $attrs = $ref->getAttributes(FhirResource::class);
+
+        if ($attrs !== []) {
+            /** @var FhirResource $attr */
+            $attr = $attrs[0]->newInstance();
+
+            return $attr->type;
+        }
+
+        $name = $ref->getShortName();
+
+        return str_ends_with($name, 'Resource') ? substr($name, 0, -8) : $name;
     }
 }

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 
@@ -17,6 +18,8 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
  * @description A URL that resolves to additional supporting information or guidance related to the question.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaire-supportLink', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item')]
+#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item.item')]
 class SupportLinkExtension extends Extension
 {
     public function __construct(

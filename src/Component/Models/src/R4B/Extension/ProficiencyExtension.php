@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding;
@@ -19,6 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  * @description Proficiency level of the communication.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-proficiency', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'Patient.communication')]
 class ProficiencyExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

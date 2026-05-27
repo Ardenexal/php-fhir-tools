@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit;
 
+use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
@@ -27,7 +28,7 @@ final class FHIRValidationServiceTest extends TestCase
     {
         // createStub() — no expectation verification needed; suppress "no expectations" notice
         $this->validator = $this->createStub(ValidatorInterface::class);
-        $this->service   = new FHIRValidationService($this->validator);
+        $this->service   = new FHIRValidationService($this->validator, new FHIRPathService());
     }
 
     // --- groups wiring ---
@@ -41,7 +42,7 @@ final class FHIRValidationServiceTest extends TestCase
             ->with($resource, null, ['Default'])
             ->willReturn(new ConstraintViolationList());
 
-        $report = (new FHIRValidationService($mock))->validate($resource);
+        $report = (new FHIRValidationService($mock, new FHIRPathService()))->validate($resource);
 
         self::assertTrue($report->isValid());
     }
@@ -55,7 +56,7 @@ final class FHIRValidationServiceTest extends TestCase
             ->with($resource, null, ['Default', 'http://profile.url/A', 'http://profile.url/B'])
             ->willReturn(new ConstraintViolationList());
 
-        (new FHIRValidationService($mock))->validate($resource, ['http://profile.url/A', 'http://profile.url/B']);
+        (new FHIRValidationService($mock, new FHIRPathService()))->validate($resource, ['http://profile.url/A', 'http://profile.url/B']);
     }
 
     // --- severity mapping ---

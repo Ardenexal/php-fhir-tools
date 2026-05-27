@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier;
  * @description A Study Instance ID, which may be used when the Entity type is not (110180, DCM, "Study Instance UID").
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/auditevent-ParticipantObjectContainsStudy', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'AuditEvent.entity')]
 class ParticipantObjectContainsStudyExtension extends Extension
 {
     public function __construct(

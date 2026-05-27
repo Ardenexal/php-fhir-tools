@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Distance;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  * @description A calculated distance between the resource and a provided location.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/location-distance', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'Bundle.entry.search')]
 class LocationDistanceExtension extends Extension
 {
     public function __construct(

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
@@ -19,6 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\TimePrimitive;
  * @description The inclusive lower bound on the range of allowed values for the data element.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/minValue', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item')]
 class MinValueExtension extends Extension
 {
     public function __construct(

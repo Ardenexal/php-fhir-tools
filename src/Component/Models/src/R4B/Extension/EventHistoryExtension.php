@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 
@@ -17,6 +18,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
  * @description Links to *Provenance* records for past versions of this resource that document  key state transitions or updates that are deemed “relevant” or important to a user looking at the current version of the resource. E.g, when an observation was verified or corrected.  This extension does not point to the Provenance associated with the current version of the resource - as it would be created after this version existed. The *Provenance* for the current version can be retrieved with a [` _revinclude`](search.html#revinclude).
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/event-eventHistory', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'Observation')]
+#[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport')]
+#[FHIRExtensionContext(type: 'element', expression: 'Task')]
+#[FHIRExtensionContext(type: 'element', expression: 'SupplyDelivery')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceUseStatement')]
 class EventHistoryExtension extends Extension
 {
     public function __construct(

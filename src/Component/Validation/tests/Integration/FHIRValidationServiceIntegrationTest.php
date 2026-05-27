@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Integration;
 
+use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Integration\Fixture\CountConstraintFixture;
@@ -48,7 +49,7 @@ final class FHIRValidationServiceIntegrationTest extends TestCase
             ->enableAttributeMapping()
             ->setConstraintValidatorFactory($factory)
             ->getValidator();
-        $this->service = new FHIRValidationService($validator);
+        $this->service = new FHIRValidationService($validator, new FHIRPathService());
     }
 
     public function testBuiltInCountViolationLandsInErrorBucket(): void

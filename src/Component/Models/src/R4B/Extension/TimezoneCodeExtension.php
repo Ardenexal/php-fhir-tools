@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
 
@@ -17,6 +18,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
  * @description An IANA timezone code for  the timezone offset per [BCP 175](https://www.iana.org/go/rfc6557). The offset is specified as part of a dateTime/instant (or using the tzOffset extension on a date if necessary). The timezone code may also be provided to allow for human display of the location associated with the offset.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/tz-code', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'date')]
+#[FHIRExtensionContext(type: 'element', expression: 'dateTime')]
+#[FHIRExtensionContext(type: 'element', expression: 'instant')]
 class TimezoneCodeExtension extends Extension
 {
     public function __construct(

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 
@@ -15,6 +16,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  * @description The business version associated with the Naming System
  */
 #[FHIRExtensionDefinition(url: 'http://terminology.hl7.org/StructureDefinition/ext-namingsystem-version', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'NamingSystem')]
 class NamingSystemVersionExtension extends Extension
 {
     public function __construct(

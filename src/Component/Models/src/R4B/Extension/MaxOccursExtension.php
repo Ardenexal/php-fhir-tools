@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRContextInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
 /**
@@ -16,6 +18,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  * @description The maximum number of times the group must appear, or the maximum number of answers for a question - when greater than 1 and not unlimited.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaire-maxOccurs', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item')]
+#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item.item')]
+#[FHIRContextInvariant(expression: 'type!=\'display\' and (repeats=true or %extension.valueInteger=1)')]
 class MaxOccursExtension extends Extension
 {
     public function __construct(

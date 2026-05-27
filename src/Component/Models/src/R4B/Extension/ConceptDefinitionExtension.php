@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 
@@ -17,6 +18,8 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  * @description A definition that describes the meaning of this code when used as part of this value set.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-concept-definition', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'ValueSet.compose.include.concept')]
+#[FHIRExtensionContext(type: 'element', expression: 'ValueSet.expansion.contains')]
 class ConceptDefinitionExtension extends Extension
 {
     public function __construct(

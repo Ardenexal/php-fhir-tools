@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
 /**
@@ -18,6 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  * There can be multiple contacts on an Organizations record with this value set to true, but these should all have different purpose values.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/organization-preferredContact', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'Organization.contact')]
 class PreferredContactExtension extends Extension
 {
     public function __construct(

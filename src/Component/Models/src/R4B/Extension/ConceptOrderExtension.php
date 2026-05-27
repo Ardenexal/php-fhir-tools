@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
 /**
@@ -16,6 +17,8 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  * @description Identifies the relative order in which concepts within the value set should be presented to a user.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-conceptOrder', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'ValueSet.compose.include.concept')]
+#[FHIRExtensionContext(type: 'element', expression: 'ValueSet.expansion.contains')]
 class ConceptOrderExtension extends Extension
 {
     public function __construct(

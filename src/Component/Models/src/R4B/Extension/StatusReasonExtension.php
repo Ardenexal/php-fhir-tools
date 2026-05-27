@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
@@ -17,6 +18,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  * @description Captures the reason for the current state of the resource.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/event-statusReason', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'Observation')]
+#[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport')]
+#[FHIRExtensionContext(type: 'element', expression: 'Media')]
+#[FHIRExtensionContext(type: 'element', expression: 'SupplyDelivery')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceUseStatement')]
 class StatusReasonExtension extends Extension
 {
     public function __construct(

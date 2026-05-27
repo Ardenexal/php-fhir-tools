@@ -124,4 +124,14 @@ trait FHIRExtensionsTrait
 
         return $found;
     }
+
+    /**
+     * Return all extensions attached to this element.
+     *
+     * @return list<FHIRExtensionInterface>
+     */
+    public function getExtensions(): array
+    {
+        return $this->extension;
+    }
 }

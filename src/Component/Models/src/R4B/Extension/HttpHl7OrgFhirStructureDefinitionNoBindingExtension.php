@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
 /**
@@ -16,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  * @description Marks that a particular element definition is one that is not expected/allowed to have a binding, even though it has types that may be bound to value sets.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/no-binding', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition.binding')]
 class HttpHl7OrgFhirStructureDefinitionNoBindingExtension extends Extension
 {
     public function __construct(

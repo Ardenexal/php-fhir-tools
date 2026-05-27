@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
@@ -20,6 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Period;
  * @description The nationality of the patient.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'Patient')]
 class NationalityExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(
