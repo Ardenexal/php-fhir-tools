@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
  * @description In some cases a Patient.contact will also be populated as a RelatedPerson resource. This linkage permits the linkage between the 2 resources to be able to accurately indicate a representation of the same individual, and updating details between could be appropriate.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-relatedPerson', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'Patient.contact')]
 class PatRelatedPersonExtension extends Extension
 {
     public function __construct(

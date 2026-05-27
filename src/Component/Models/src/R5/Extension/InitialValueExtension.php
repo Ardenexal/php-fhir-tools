@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Expression;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * @description An expression that determines an initial value for the element on which it appears. The expression may be simply the name of a expression in a referenced library, or it may be a complete inline expression.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-initialValue', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Element')]
 class InitialValueExtension extends Extension
 {
     public function __construct(

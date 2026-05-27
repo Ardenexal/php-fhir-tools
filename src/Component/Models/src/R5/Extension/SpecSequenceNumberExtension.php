@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 
 /**
@@ -16,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * @description An assigned number on the specimen denoting the order of collection.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/specimen-sequenceNumber', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Specimen.container')]
 class SpecSequenceNumberExtension extends Extension
 {
     public function __construct(

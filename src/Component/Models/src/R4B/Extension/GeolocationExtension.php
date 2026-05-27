@@ -12,11 +12,11 @@ use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
 /**
- * @author Health Level Seven International (FHIR Infrastructure)
+ * @author HL7 International / FHIR Infrastructure
  *
  * @see http://hl7.org/fhir/StructureDefinition/geolocation
  *
- * @description The absolute geographic location of the Location, expressed using the WGS84 datum (This is the same co-ordinate system used in KML).
+ * @description An absolute geographic location for the address, expressed using the WGS84 datum (This is the same co-ordinate system used in KML).
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/geolocation', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'Address')]

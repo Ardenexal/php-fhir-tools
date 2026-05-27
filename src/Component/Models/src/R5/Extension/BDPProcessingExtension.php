@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference;
@@ -22,6 +23,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  * @description Extension for processing of a biologically derived product.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/biologicallyderivedproduct-processing', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'BiologicallyDerivedProduct')]
 class BDPProcessingExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

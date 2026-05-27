@@ -11,7 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 
 /**
- * @author Health Level Seven, Inc. - FHIR WG
+ * @author HL7 International / FHIR Infrastructure
  *
  * @see http://hl7.org/fhir/StructureDefinition/workflow-supportingInfo
  *
@@ -19,6 +19,8 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-supportingInfo', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport')]
+#[FHIRExtensionContext(type: 'element', expression: 'DocumentReference')]
+#[FHIRExtensionContext(type: 'element', expression: 'Encounter')]
 #[FHIRExtensionContext(type: 'element', expression: 'Observation')]
 #[FHIRExtensionContext(type: 'element', expression: 'CommunicationRequest')]
 class SupportingInfoExtension extends Extension

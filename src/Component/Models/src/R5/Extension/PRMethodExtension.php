@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * @description The method used to perform this procedure.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/procedure-method', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Procedure')]
 class PRMethodExtension extends Extension
 {
     public function __construct(

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  * @description The clinical course of the disease (how the disease behaves over time), such as acute versus chronic.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/condition-diseaseCourse', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'Condition')]
 class ConditionDiseaseCourseExtension extends Extension
 {
     public function __construct(

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
  * @description Th SOP Instance UID values.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/auditevent-Instance', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'AuditEvent.entity')]
 class AEInstanceExtension extends Extension
 {
     public function __construct(

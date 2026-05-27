@@ -43,7 +43,13 @@ class Expression extends Element
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive')]
         public ?IdPrimitive $name = null,
         /** @var string|null language text/cql | text/fhirpath | application/x-fhir-query | etc. */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/expression-language', strength: 'extensible')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/expression-language',
+            strength: 'extensible',
+            maxValueSetUrl: 'http://www.rfc-editor.org/bcp/bcp13.txt',
+        )]
         public ?string $language = null,
         /** @var StringPrimitive|string|null expression Expression in specified language */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

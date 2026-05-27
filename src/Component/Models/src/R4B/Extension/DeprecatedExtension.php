@@ -10,11 +10,11 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionCon
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
 /**
- * @author HL7
+ * @author HL7 International / Terminology Infrastructure
  *
  * @see http://hl7.org/fhir/StructureDefinition/valueset-deprecated
  *
- * @description if ture, indicates that the concept is deprecated from the value set - that is, it should not be used, and is planned to be withdrawn.
+ * @description If true, indicates that the concept is deprecated from the value set - that is, it should not be used, and is planned to be withdrawn.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-deprecated', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet.compose.include.concept')]

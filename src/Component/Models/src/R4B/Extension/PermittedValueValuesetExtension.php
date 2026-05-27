@@ -11,7 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
 
 /**
- * @author Health Level Seven International (Orders and Observations)
+ * @author HL7 International / Orders and Observations
  *
  * @see http://hl7.org/fhir/StructureDefinition/11179-permitted-value-valueset
  *

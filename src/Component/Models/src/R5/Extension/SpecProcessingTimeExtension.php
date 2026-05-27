@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Duration;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
@@ -18,6 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
  * @description Period or duration of processing. In R6, this extension is replaced by Specimen.processing.time[x].
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/specimen-processingTime', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Specimen.processing')]
 class SpecProcessingTimeExtension extends Extension
 {
     public function __construct(

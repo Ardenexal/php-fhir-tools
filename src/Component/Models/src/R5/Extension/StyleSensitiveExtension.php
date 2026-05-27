@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 
 /**
@@ -16,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * @description Indicates that the style extensions (style, markdown and xhtml) in this resource instance are essential to the interpretation of the instance and that systems that are not capable of rendering using those extensions should not be used to render the resource.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/rendering-styleSensitive', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Element')]
 class StyleSensitiveExtension extends Extension
 {
     public function __construct(

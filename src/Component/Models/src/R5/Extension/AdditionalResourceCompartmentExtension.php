@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -20,6 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  * @description Allows the definition of an additional resource to indicate the resource is a candidate for inclusion in a compartment by the implementing server.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/additional-resource-compartment', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition')]
 class AdditionalResourceCompartmentExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

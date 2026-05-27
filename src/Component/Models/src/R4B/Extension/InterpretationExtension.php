@@ -11,11 +11,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 
 /**
- * @author Health Level Seven International (Clinical Genomics)
+ * @author HL7 International / Orders and Observations
  *
  * @see http://hl7.org/fhir/StructureDefinition/observation-geneticsInterpretation
  *
- * @description The material on this page will be removed in a future release. This content is deprecated and SHOULD NOT be used. Implementers are instead directed to the ([Genomics Reporting Implementation Guide](http://hl7.org/fhir/uv/genomics-reporting/index.html)) for guidance. Clinical Interpretations for variant. It's a reference to an Observation resource.
+ * @description Clinical Interpretations for variant. It's a reference to an Observation resource.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/observation-geneticsInterpretation', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'Observation')]

@@ -16,11 +16,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 
 /**
- * @author Health Level Seven, Inc. - CDS WG
+ * @author HL7 International / Clinical Decision Support
  *
  * @see http://hl7.org/fhir/StructureDefinition/cqf-relativeDateTime
  *
- * @description A date/time value that is determined based on a duration offset from a target event.
+ * @description A date/time value that is determined based on a duration offset from a target event. DEPRECATED: This extension has been deprecated in favor of the new relative-time extension.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-relativeDateTime', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'Element')]

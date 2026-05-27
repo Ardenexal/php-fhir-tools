@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -18,6 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * @description This extension defines if a search parameter is only allowed in certain contexts
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/capabilitystatement-search-parameter-use', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.resource')]
 class CSSearchParameterUseExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

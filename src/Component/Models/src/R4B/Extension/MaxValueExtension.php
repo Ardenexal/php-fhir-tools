@@ -8,13 +8,13 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\InstantPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\TimePrimitive;
 
 /**
- * @author Health Level Seven International (FHIR Infrastructure)
+ * @author HL7 International / FHIR Infrastructure
  *
  * @see http://hl7.org/fhir/StructureDefinition/maxValue
  *
@@ -25,9 +25,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\TimePrimitive;
 class MaxValueExtension extends Extension
 {
     public function __construct(
-        /** @var DatePrimitive|DateTimePrimitive|TimePrimitive|InstantPrimitive|string|int|null value Value of extension */
+        /** @var DatePrimitive|DateTimePrimitive|TimePrimitive|string|int|Quantity|null value Value of extension */
         #[FhirProperty(fhirType: 'choice', propertyKind: 'choice', isChoice: true)]
-        DatePrimitive|DateTimePrimitive|TimePrimitive|InstantPrimitive|string|int|null $value = null,
+        DatePrimitive|DateTimePrimitive|TimePrimitive|string|int|Quantity|null $value = null,
         ?string $id = null,
         array $extension = [],
     ) {

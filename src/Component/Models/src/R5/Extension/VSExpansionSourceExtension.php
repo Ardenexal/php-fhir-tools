@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
  * @description The logical URL of the ValueSet definition that was used to generate this expansion. ValueSet.url should be used instead of this extension.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-expansionSource', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'ValueSet.expansion')]
 class VSExpansionSourceExtension extends Extension
 {
     public function __construct(

@@ -11,7 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 
 /**
- * @author Health Level Seven International (FHIR Infrastructure)
+ * @author HL7 International / FHIR Infrastructure
  *
  * @see http://hl7.org/fhir/StructureDefinition/rendered-value
  *
@@ -27,7 +27,6 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'decimal')]
 #[FHIRExtensionContext(type: 'element', expression: 'string')]
 #[FHIRExtensionContext(type: 'element', expression: 'code')]
-#[FHIRExtensionContext(type: 'element', expression: 'canonical')]
 class RenderedValueExtension extends Extension
 {
     public function __construct(

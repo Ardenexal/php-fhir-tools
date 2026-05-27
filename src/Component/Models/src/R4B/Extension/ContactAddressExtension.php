@@ -11,7 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Address;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
 /**
- * @author Health Level Seven, Inc. - CDS WG
+ * @author HL7 International / Clinical Decision Support
  *
  * @see http://hl7.org/fhir/StructureDefinition/cqf-contactAddress
  *

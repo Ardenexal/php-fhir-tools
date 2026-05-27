@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRContextInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Expression;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 
@@ -17,6 +19,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * @description A condition on whether to perform the ServiceRequest, which applies when .doNotPerform is false or absent.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/perform-condition', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest')]
+#[FHIRContextInvariant(expression: '(%resource is ServiceRequest) implies (%resource.doNotPerform.empty() or %resource.doNotPerform = false)')]
 class PerformConditionExtension extends Extension
 {
     public function __construct(

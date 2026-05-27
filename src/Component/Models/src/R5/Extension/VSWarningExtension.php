@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
  * @description A warning about how to interpret and/or correctly use the value set.  This is intended for anyone engaging with the value set definition or its expansion.  For example, a warning advising of licensing requirements for code systems the value set relies upon.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-warning', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'ValueSet')]
 class VSWarningExtension extends Extension
 {
     public function __construct(

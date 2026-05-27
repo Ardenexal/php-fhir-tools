@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
  * @description The date range that this organization should be considered available.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/organization-period', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Organization')]
 class OrgPeriodExtension extends Extension
 {
     public function __construct(

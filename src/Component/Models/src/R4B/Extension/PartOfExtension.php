@@ -8,32 +8,31 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
 
 /**
- * @author Health Level Seven, Inc. - FHIR WG
+ * @author HL7 International / Clinical Quality Information
  *
- * @see http://hl7.org/fhir/StructureDefinition/event-partOf
+ * @see http://hl7.org/fhir/StructureDefinition/cqf-partOf
  *
- * @description A larger event of which this particular event is a component or step.
+ * @description Specifies an overall specification artifact that this manifest or release is part of.
  */
-#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/event-partOf', fhirVersion: 'R4B')]
-#[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport')]
-#[FHIRExtensionContext(type: 'element', expression: 'Condition')]
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-partOf', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'Library')]
 class PartOfExtension extends Extension
 {
     public function __construct(
-        /** @var Reference|null valueReference Value of extension */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
-        public ?Reference $valueReference = null,
+        /** @var CanonicalPrimitive|null valueCanonical Value of extension */
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
+        public ?CanonicalPrimitive $valueCanonical = null,
         ?string $id = null,
         array $extension = [],
     ) {
         parent::__construct(
             id: $id,
             extension: $extension,
-            url: 'http://hl7.org/fhir/StructureDefinition/event-partOf',
-            value: $this->valueReference,
+            url: 'http://hl7.org/fhir/StructureDefinition/cqf-partOf',
+            value: $this->valueCanonical,
         );
     }
 }

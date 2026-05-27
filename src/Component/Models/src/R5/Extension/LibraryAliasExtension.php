@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 
@@ -17,6 +18,10 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  * @description Specifies the alias to be used for the library on which it appears. This is useful when multiple libraries have the same unqualified name, and allows in-line CQL expressions to refer to the libraries via their alias, rather than the default of the unqualified name of the library.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-libraryAlias', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition.library')]
+#[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.library')]
+#[FHIRExtensionContext(type: 'element', expression: 'Measure.library')]
+#[FHIRExtensionContext(type: 'extension', expression: 'http://hl7.org/fhir/StructureDefinition/cqf-library')]
 class LibraryAliasExtension extends Extension
 {
     public function __construct(

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 
@@ -17,6 +18,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * @description The job title may be independent of the role.  For example, a surgeon (role) may have a title of Head of Surgery.  Some titles may overlap with roles and could be represented as discrete PractitionerRoles, but some titles may be independent of role.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/practitioner-job-title', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Practitioner')]
+#[FHIRExtensionContext(type: 'element', expression: 'PractitionerRole')]
 class PRJobTitleExtension extends Extension
 {
     public function __construct(

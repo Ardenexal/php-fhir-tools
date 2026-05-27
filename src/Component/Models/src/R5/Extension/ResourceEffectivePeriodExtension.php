@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
 
@@ -17,6 +18,18 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
  * @description The period during which the resource content was or is planned to be effective.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/resource-effectivePeriod', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'StructureMap')]
+#[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement')]
+#[FHIRExtensionContext(type: 'element', expression: 'OperationDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'SearchParameter')]
+#[FHIRExtensionContext(type: 'element', expression: 'CompartmentDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'ImplementationGuide')]
+#[FHIRExtensionContext(type: 'element', expression: 'CodeSystem')]
+#[FHIRExtensionContext(type: 'element', expression: 'ValueSet')]
+#[FHIRExtensionContext(type: 'element', expression: 'ConceptMap')]
+#[FHIRExtensionContext(type: 'element', expression: 'NamingSystem')]
+#[FHIRExtensionContext(type: 'element', expression: 'Group')]
 class ResourceEffectivePeriodExtension extends Extension
 {
     public function __construct(

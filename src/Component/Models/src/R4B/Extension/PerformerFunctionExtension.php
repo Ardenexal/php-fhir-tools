@@ -11,7 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
 /**
- * @author Health Level Seven, Inc. - FHIR WG
+ * @author HL7 International / FHIR Infrastructure
  *
  * @see http://hl7.org/fhir/StructureDefinition/event-performerFunction
  *
@@ -20,7 +20,8 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/event-performerFunction', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'Observation.performer')]
 #[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport.performer')]
-#[FHIRExtensionContext(type: 'element', expression: 'Media.operator')]
+#[FHIRExtensionContext(type: 'element', expression: 'DocumentReference.author')]
+#[FHIRExtensionContext(type: 'element', expression: 'Consent.grantee')]
 class PerformerFunctionExtension extends Extension
 {
     public function __construct(

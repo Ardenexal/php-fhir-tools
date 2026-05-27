@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation;
@@ -21,6 +22,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  * @description An assessment of certainty, confidence, or quality of the item on which it appears.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-certainty', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Element')]
 class CQFCertaintyExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

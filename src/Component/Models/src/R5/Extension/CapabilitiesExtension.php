@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
  * @description A set of codes that defines what the server is capable of.
  */
 #[FHIRExtensionDefinition(url: 'http://fhir-registry.smarthealthit.org/StructureDefinition/capabilities', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.security')]
 class CapabilitiesExtension extends Extension
 {
     public function __construct(

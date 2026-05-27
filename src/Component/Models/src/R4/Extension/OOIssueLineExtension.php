@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 
 /**
@@ -16,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  * @description Identifies the source line of the issue.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-line', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'OperationOutcome.issue')]
 class OOIssueLineExtension extends Extension
 {
     public function __construct(

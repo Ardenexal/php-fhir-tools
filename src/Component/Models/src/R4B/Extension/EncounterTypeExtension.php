@@ -11,11 +11,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
 /**
- * @author Health Level Seven, Inc. - CDS WG
+ * @author HL7 International / Clinical Decision Support
  *
  * @see http://hl7.org/fhir/StructureDefinition/cqf-encounterType
  *
- * @description The type of the encounter.
+ * @description The type of the encounter. DEPRECATED: This extension was initially used to model decision support context. This information is now handled as part of CDS Hooks and Clinical Reasoning.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-encounterType', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'Basic')]

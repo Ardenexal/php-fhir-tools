@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  * @description Represents the routing information such as a letter carrier route number. It is the identifying number of the designator (the box number or rural route number).
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-deliveryModeIdentifier', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Address.line')]
 class ADXPDeliveryModeIdentifierExtension extends Extension
 {
     public function __construct(

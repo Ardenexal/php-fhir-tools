@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
  * @description Reference to reagents used to generate this observation.  This is intended for in-lab transactions between instruments and Laboratory Information Systems (LIS).
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/observation-reagent', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'Observation')]
 class ObsReagentExtension extends Extension
 {
     public function __construct(

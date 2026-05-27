@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
  * @description Indicates the access modifier (i.e. public or private) of a CQL declaration. When CQL library declarations are represented in FHIR structures such as ParameterDefinition, this extension represents the access modifier of the declaration.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-cqlAccessModifier', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'ParameterDefinition')]
 class CqlAccessModifierExtension extends Extension
 {
     public function __construct(

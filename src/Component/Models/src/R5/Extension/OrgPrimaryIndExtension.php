@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 
 /**
@@ -16,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * @description Flag indicating if the specialty is the primary specialty of the provider. Normally, a practitioner will have one primary specialty, but in some cases more than one can be primary.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/organizationaffiliation-primaryInd', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'OrganizationAffiliation.specialty')]
 class OrgPrimaryIndExtension extends Extension
 {
     public function __construct(

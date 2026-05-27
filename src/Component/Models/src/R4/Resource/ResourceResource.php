@@ -31,7 +31,12 @@ abstract class ResourceResource
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
         public ?UriPrimitive $implicitRules = null,
         /** @var string|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
+            strength: 'preferred',
+            maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+        )]
         public ?string $language = null,
     ) {
     }

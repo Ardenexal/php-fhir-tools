@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  * @description Any witness to the consent.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/consent-Witness', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Consent')]
 class ConsentWitnessExtension extends Extension
 {
     public function __construct(

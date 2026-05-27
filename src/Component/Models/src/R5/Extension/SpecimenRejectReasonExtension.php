@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 
@@ -17,6 +18,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * @description Provides a code or text that specifies the reason a specimen is not usable for testing.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/specimen-reject-reason', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Specimen')]
+#[FHIRExtensionContext(type: 'element', expression: 'Specimen.container')]
 class SpecimenRejectReasonExtension extends Extension
 {
     public function __construct(

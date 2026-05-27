@@ -14,7 +14,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 
 /**
- * @author Health Level Seven International (Clinical Genomics)
+ * @author HL7 International / Orders and Observations
  *
  * @see http://hl7.org/fhir/StructureDefinition/observation-geneticsPhaseSet
  *

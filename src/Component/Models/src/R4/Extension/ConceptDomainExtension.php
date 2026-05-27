@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  * @description Denotes that the binding is associated with the code in this extension. ValueSets can be connected to concept domains (if desired) in two different fashions: a CodeSystem supplement that defines a property that indicates the value set for the concept, or using ValueSet.topic to associate themselves with the concept
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/binding-concept-domain', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition')]
 class ConceptDomainExtension extends Extension
 {
     public function __construct(

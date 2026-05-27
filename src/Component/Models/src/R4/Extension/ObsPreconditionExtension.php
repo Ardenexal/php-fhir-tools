@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
  * @description Other preceding or concurrent observations that must be known to understand the context and significance of the observation.  For example, an fiO2 measure taken alongside of a SpO2 measurement.  See the FHIR specification [Observation notes](http://hl7.org/fhir/observation.html#notes) section for additional guidance. Use Observation.intpretationContext after R5.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/observation-precondition', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'Observation')]
 class ObsPreconditionExtension extends Extension
 {
     public function __construct(

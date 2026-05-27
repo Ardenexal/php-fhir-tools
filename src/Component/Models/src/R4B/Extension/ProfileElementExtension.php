@@ -11,11 +11,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 
 /**
- * @author Health Level Seven, Inc. - FHIR Core WG
+ * @author HL7 International / FHIR Infrastructure
  *
  * @see http://hl7.org/fhir/StructureDefinition/elementdefinition-profile-element
  *
- * @description The specific element to use in the referenced profile. This is used when a backbone element is being profiled, rather than an established type.
+ * @description Provides the snapshot.element.id of the element within the profile containing this extension to use as the starting point for validation of the element on which the profile is declared. This is used when a backbone element is being profiled, rather than an established type.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-profile-element', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition.type.profile')]

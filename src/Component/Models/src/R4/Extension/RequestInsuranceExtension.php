@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 
@@ -17,6 +18,8 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
  * @description The relevant insurance Coverage for this request to perform Eligibility checking, authorization, pre-determination or claiming for goods and/or services renderable or rendered, etc..\n\nResponses from insurers (ClaimResponse) containing responses to prior authorization or pre-determination requests to guide in the choosing of goods and services informed by reimbursement guidance, and to provide authorization numbers which may need to be quoted on future claims for reimbursement.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/request-insurance', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'NutritionOrder')]
+#[FHIRExtensionContext(type: 'element', expression: 'CarePlan')]
 class RequestInsuranceExtension extends Extension
 {
     public function __construct(

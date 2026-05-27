@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  * @description Provides the snapshot.element.id of the element within the profile containing this extension to use as the starting point for validation of the element on which the profile is declared. This is used when a backbone element is being profiled, rather than an established type.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-profile-element', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition.type.profile')]
 class ProfileElementExtension extends Extension
 {
     public function __construct(

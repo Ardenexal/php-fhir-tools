@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 
@@ -21,6 +22,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * `Resource.meta.security` with codes such as `VIP`. These might be used by actual data level security controls within the system, potentially requiring specific user permissions to access the data.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-importance', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Patient')]
 class PatImportanceExtension extends Extension
 {
     public function __construct(

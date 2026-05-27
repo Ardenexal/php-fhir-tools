@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * @description The entity that is responsible for the content of the Value Set Definition. This is a textual description of the organizational entity responsible for the content and maintenance.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/valueset-steward', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'ValueSet')]
 class ValueSetStewardExtension extends Extension
 {
     public function __construct(

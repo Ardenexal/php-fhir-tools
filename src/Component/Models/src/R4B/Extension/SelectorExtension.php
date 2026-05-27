@@ -11,11 +11,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 
 /**
- * @author Health Level Seven, Inc. - FHIR Core WG
+ * @author HL7 International / FHIR Infrastructure
  *
  * @see http://hl7.org/fhir/StructureDefinition/elementdefinition-selector
  *
- * @description A FHIRPath statement that defines whether an element is in the slice.
+ * @description A FHIRPath statement that defines whether an element is in the slice.  DEPRECATED: This was never used.  The relevant FHIRPath is automatically calculated by the tooling.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-selector', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]

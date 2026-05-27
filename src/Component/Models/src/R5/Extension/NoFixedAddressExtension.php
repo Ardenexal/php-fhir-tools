@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 
 /**
@@ -16,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * @description This extension applies to the Address data type and is used to indicate that a location address is not a fixed address for an individual.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/no-fixed-address', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Address')]
 class NoFixedAddressExtension extends Extension
 {
     public function __construct(

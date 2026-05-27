@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
 
@@ -17,6 +18,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
  * @description Indicates the relative preference of an element within a collection of repeating elements.  Lower numbers indicate a stronger degree of preference.  Equal number indicate equal preference.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/rank', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'Address')]
+#[FHIRExtensionContext(type: 'element', expression: 'Patient.contact')]
+#[FHIRExtensionContext(type: 'element', expression: 'Organization.contact')]
 class RankExtension extends Extension
 {
     public function __construct(

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -20,6 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
  * @description This attribute enables the requester of this service to indicate they would like a certain specimen to be used, but if that is not available/appropriate to be used whether to have another specimen drawn, or that this test is not performed. When a specimen is referenced it is expected to be used. If it cannot be used, the decision to collect another specimen or not perform the test must be based on established policies or determined in some other agreed to way with the requester.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/servicerequest-specimenSuggestion', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest')]
 class SRSpecimenSuggestionExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

@@ -40,7 +40,12 @@ class ExplanationOfBenefitProcessNote extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $text = null,
         /** @var CodeableConcept|null language Language of the text */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
+            strength: 'preferred',
+            maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+        )]
         public ?CodeableConcept $language = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  * @description A natural language name for non-conformance and non-terminology resource instances that is represented in the resource for publication use. Note that this extension only used as part of the IG publication tooling process. Use the [Artifact Title extension](StructureDefinition-artifact-title.html) extension for use outside the IG publishing framework.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/resource-instance-name', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Resource')]
 class ResourceInstanceNameExtension extends Extension
 {
     public function __construct(

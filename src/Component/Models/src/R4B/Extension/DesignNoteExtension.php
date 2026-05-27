@@ -11,7 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\MarkdownPrimitive;
 
 /**
- * @author Health Level Seven International (FHIR Infrastructure)
+ * @author HL7 International / FHIR Infrastructure
  *
  * @see http://hl7.org/fhir/StructureDefinition/designNote
  *
@@ -20,7 +20,6 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\MarkdownPrimitive;
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/designNote', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire')]
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item')]
-#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item.item')]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]
 class DesignNoteExtension extends Extension
 {

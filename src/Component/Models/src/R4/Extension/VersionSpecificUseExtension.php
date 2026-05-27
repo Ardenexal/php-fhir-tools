@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -19,6 +20,8 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
  * @description Identifies that the element carrying this extension is only a correct value for a particular range of FHIR versions. This extension is found in contexts where a definition is applying to more than one version, usually defining extensions, and should only be used in context that clearly document how a cross-version definition is used. While there are no limitations to where this extension can be used, known uses are: StructureDefinition.context, ElementDefinition.type, ElementDefinition.additionalBinding and ...
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/version-specific-use', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'Element')]
+#[FHIRExtensionContext(type: 'element', expression: 'Resource')]
 class VersionSpecificUseExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

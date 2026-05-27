@@ -12,11 +12,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 
 /**
- * @author Health Level Seven, Inc. - FHIR Core WG
+ * @author HL7 International / FHIR Infrastructure
  *
  * @see http://hl7.org/fhir/StructureDefinition/elementdefinition-maxValueSet
  *
- * @description The maximum allowable value set, for use when the binding strength is 'extensible' or 'preferred'. This value set is the value set from which additional codes can be taken from. This defines a 'required' binding over the top of the extensible binding.
+ * @description This acts as an overall 'required' binding for an element that already has a less restrictive binding.  It is used when there is a desire to have a 'small' enumerable binding that meets most needs and where the overall value set that the codes must be drawn from is 'infinite'.  The the base less restrictive binding SHALL be a proper subset of the max binding valueset.  In most cases, this extension is used where the base binding is 'extensible'.  DEPRECATED: Use additionalBinding extension or element instead
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-maxValueSet', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition.binding')]

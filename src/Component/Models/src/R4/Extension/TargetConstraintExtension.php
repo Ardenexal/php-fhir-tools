@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Expression;
@@ -23,6 +24,22 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  * @description Specifies a constraint that is enforced on instantiated (or target) resources. This extension can be applied to definitional resources (such as ActivityDefinition or Measure) and indicates that the constraint should be enforced on resources that are instantiated from the definition. Instantiation typically happens as part of an operation, for example, the instantiation of a Measure is the MeasureReport that results from evaluating the Measure using the $evaluate operation; the instantiation of a Library.parameter is the actual argument passed to the $evaluate operation; and the instantiation of an ActivityDefinition is the Request resource that results from applying the definition to a specific context using the $apply operation. As an example use case, this extension can be used to define a constraint such as `numerator count must be less than or equal to denominator count`.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/targetConstraint', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition.participant')]
+#[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition.dosage')]
+#[FHIRExtensionContext(type: 'element', expression: 'Library.parameter')]
+#[FHIRExtensionContext(type: 'element', expression: 'Measure')]
+#[FHIRExtensionContext(type: 'element', expression: 'Measure.group')]
+#[FHIRExtensionContext(type: 'element', expression: 'Measure.group.population')]
+#[FHIRExtensionContext(type: 'element', expression: 'Measure.group.stratifier')]
+#[FHIRExtensionContext(type: 'element', expression: 'Measure.supplementalData')]
+#[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.goal')]
+#[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.goal.target')]
+#[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.actor')]
+#[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.action')]
+#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire')]
+#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item')]
 class TargetConstraintExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
@@ -21,6 +22,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
  * @description Alert detection activation state describes whether a device is set to annunciate when a [DeviceAlert](http://hl7.org/fhir/StructureDefinition/DeviceAlert) condition occurs. This extension describes the reported alert detection activation state for the indicated combination of alert code and priority at the indicated point in time. The extension may be used on a [Device](http://hl7.org/fhir/StructureDefinition/Device), or on the specific [DeviceMetric](http://hl7.org/fhir/StructureDefinition/DeviceMetric) that could detect the condition or annunciate the alert.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/device-alertDetection', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceMetric')]
+#[FHIRExtensionContext(type: 'element', expression: 'Device')]
 class DeviceAlertDetectionExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

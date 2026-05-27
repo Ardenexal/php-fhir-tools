@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
@@ -18,6 +19,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
  * @description Expresses the access policy associated with the element.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/confidential', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Address')]
+#[FHIRExtensionContext(type: 'element', expression: 'ContactPoint')]
 class ConfidentialExtension extends Extension
 {
     public function __construct(

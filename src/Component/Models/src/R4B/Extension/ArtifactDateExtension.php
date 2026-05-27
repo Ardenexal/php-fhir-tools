@@ -1,0 +1,49 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
+
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
+
+/**
+ * @author HL7 International / Clinical Decision Support
+ *
+ * @see http://hl7.org/fhir/StructureDefinition/artifact-date
+ *
+ * @description The date  (and optionally time) when the artifact was last significantly changed. The date must change when the business version changes and it must change if the status code changes. In addition, it should change when the substantive content of the artifact changes.
+ */
+#[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-date', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'ClinicalUseDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'ConditionDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'Group')]
+#[FHIRExtensionContext(type: 'element', expression: 'Medication')]
+#[FHIRExtensionContext(type: 'element', expression: 'MedicationKnowledge')]
+#[FHIRExtensionContext(type: 'element', expression: 'ObservationDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'ResearchStudy')]
+#[FHIRExtensionContext(type: 'element', expression: 'SpecimenDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'Substance')]
+#[FHIRExtensionContext(type: 'element', expression: 'SubstanceDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'SubscriptionTopic')]
+class ArtifactDateExtension extends Extension
+{
+    public function __construct(
+        /** @var DateTimePrimitive|null valueDateTime Value of extension */
+        #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
+        public ?DateTimePrimitive $valueDateTime = null,
+        ?string $id = null,
+        array $extension = [],
+    ) {
+        parent::__construct(
+            id: $id,
+            extension: $extension,
+            url: 'http://hl7.org/fhir/StructureDefinition/artifact-date',
+            value: $this->valueDateTime,
+        );
+    }
+}

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
 
@@ -23,6 +24,8 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
  * Accuracy is usually in the same units as the reported value. Accuracy valueQuantity units SHOULD be provided for clarity; if omitted, they are implied to be the same as the reported value's units (or the DeviceMetric units).
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/quantity-accuracy', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'Quantity')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceMetric')]
 class QuantityAccuracyExtension extends Extension
 {
     public function __construct(

@@ -11,7 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
 
 /**
- * @author Health Level Seven International (FHIR Infrastructure)
+ * @author HL7 International / FHIR Infrastructure
  *
  * @see http://hl7.org/fhir/StructureDefinition/language
  *
@@ -21,6 +21,8 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'HumanName')]
 #[FHIRExtensionContext(type: 'element', expression: 'Address')]
 #[FHIRExtensionContext(type: 'element', expression: 'Annotation')]
+#[FHIRExtensionContext(type: 'element', expression: 'string')]
+#[FHIRExtensionContext(type: 'element', expression: 'markdown')]
 class HumanLanguageExtension extends Extension
 {
     public function __construct(

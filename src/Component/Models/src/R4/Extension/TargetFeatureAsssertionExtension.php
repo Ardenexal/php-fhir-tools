@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -30,6 +31,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
  *   A more complex alternative to this profile is to use the [[[http://hl7.org/fhir/StructureDefinition/obligations-profile]]] extension.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/target-feature-assertion', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'Provenance')]
 class TargetFeatureAsssertionExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

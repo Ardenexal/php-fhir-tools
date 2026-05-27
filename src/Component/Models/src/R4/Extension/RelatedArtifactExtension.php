@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\RelatedArtifact;
 
@@ -17,6 +18,10 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\RelatedArtifact;
  * @description Documents the 'knowledge artifacts' relevant to the base resource such as citations, supporting evidence, documentation of processes, caveats around testing methodology.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-relatedArtifact', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'ConceptMap')]
+#[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport')]
+#[FHIRExtensionContext(type: 'element', expression: 'Observation')]
+#[FHIRExtensionContext(type: 'element', expression: 'Observation.component')]
 class RelatedArtifactExtension extends Extension
 {
     public function __construct(

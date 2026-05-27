@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
@@ -18,6 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  * @description Further conditions, problems, diagnoses, procedures or events or the substance that preceded this Condition.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/condition-occurredFollowing', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Condition')]
 class ConditionOccurredFollowingExtension extends Extension
 {
     public function __construct(

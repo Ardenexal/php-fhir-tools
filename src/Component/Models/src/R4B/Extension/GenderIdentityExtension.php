@@ -11,7 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
 /**
- * @author HL7
+ * @author HL7 International / Patient Administration
  *
  * @see http://hl7.org/fhir/StructureDefinition/patient-genderIdentity
  *

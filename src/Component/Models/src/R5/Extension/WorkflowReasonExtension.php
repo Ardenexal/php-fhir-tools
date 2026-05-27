@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 
@@ -17,6 +18,11 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * @description References a resource or provides a code or text that explains why this event occurred or request was created.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-reason', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Observation')]
+#[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport')]
+#[FHIRExtensionContext(type: 'element', expression: 'DocumentReference')]
+#[FHIRExtensionContext(type: 'element', expression: 'Flag')]
+#[FHIRExtensionContext(type: 'element', expression: 'NutritionOrder')]
 class WorkflowReasonExtension extends Extension
 {
     public function __construct(

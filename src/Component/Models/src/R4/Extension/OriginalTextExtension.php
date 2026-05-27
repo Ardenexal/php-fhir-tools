@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UrlPrimitive;
@@ -18,6 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UrlPrimitive;
  * @description A human language representation of the concept (resource/element) as seen/selected/uttered by the user who entered the data and/or which represents the full intended meaning of the user. This can be provided either directly as text, or as a url that is a reference to a portion of the narrative of a resource ([DomainResource.text](narrative.html) or [Composition.section.text](composition-definitions.html#Composition.section.text)). When it's a url, the value should end with a #{id} where the id identifies a specific portion of the referenced content (via an XHTML id attribute).  To provide human language maintained as part of the narrative, use [narrativeLink](StructureDefinition-narrativeLink.html). To cross-link narrative and data, use the [textLink extension](StructureDefinition-textLink.html).
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/originalText', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'Element')]
 class OriginalTextExtension extends Extension
 {
     public function __construct(

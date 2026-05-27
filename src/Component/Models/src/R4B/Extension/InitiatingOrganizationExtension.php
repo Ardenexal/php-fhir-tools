@@ -11,11 +11,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 
 /**
- * @author Health Level Seven, Inc. - CDS WG
+ * @author HL7 International / Clinical Decision Support
  *
  * @see http://hl7.org/fhir/StructureDefinition/cqf-initiatingOrganization
  *
- * @description The organization initiating the request.
+ * @description The organization initiating the request. DEPRECATED: This extension was initially used to model decision support context. This information is now handled as part of CDS Hooks and Clinical Reasoning.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-initiatingOrganization', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'Basic')]

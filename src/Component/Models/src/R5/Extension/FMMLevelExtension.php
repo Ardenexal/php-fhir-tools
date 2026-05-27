@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 
 /**
@@ -16,6 +17,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * @description The FMM level assigned to the artifact. For further information about FMM levels, see [FHIR Maturity Model](https://confluence.hl7.org/spaces/FHIR/pages/35718679/FHIR+Maturity+Model).
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/structuredefinition-fmm', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'DomainResource')]
+#[FHIRExtensionContext(type: 'element', expression: 'Element')]
 class FMMLevelExtension extends Extension
 {
     public function __construct(

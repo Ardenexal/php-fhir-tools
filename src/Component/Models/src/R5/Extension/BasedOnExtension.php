@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 
@@ -17,6 +18,20 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  * @description A plan, proposal or order that is fulfilled in whole or in part by this event.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/event-basedOn', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Condition')]
+#[FHIRExtensionContext(type: 'element', expression: 'ChargeItem')]
+#[FHIRExtensionContext(type: 'element', expression: 'ClinicalImpression')]
+#[FHIRExtensionContext(type: 'element', expression: 'Composition')]
+#[FHIRExtensionContext(type: 'element', expression: 'Consent')]
+#[FHIRExtensionContext(type: 'element', expression: 'Coverage')]
+#[FHIRExtensionContext(type: 'element', expression: 'EpisodeOfCare')]
+#[FHIRExtensionContext(type: 'element', expression: 'ExplanationOfBenefit')]
+#[FHIRExtensionContext(type: 'element', expression: 'FamilyMemberHistory')]
+#[FHIRExtensionContext(type: 'element', expression: 'ImmunizationEvaluation')]
+#[FHIRExtensionContext(type: 'element', expression: 'InventoryReport')]
+#[FHIRExtensionContext(type: 'element', expression: 'MedicationStatement')]
+#[FHIRExtensionContext(type: 'element', expression: 'PaymentNotice')]
+#[FHIRExtensionContext(type: 'element', expression: 'PaymentReconciliation')]
 class BasedOnExtension extends Extension
 {
     public function __construct(

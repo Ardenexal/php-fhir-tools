@@ -10,14 +10,16 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionCon
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
 /**
- * @author Health Level Seven International (Modeling and Methodology)
+ * @author HL7 International / FHIR Infrastructure
  *
  * @see http://hl7.org/fhir/StructureDefinition/iso21090-preferred
  *
- * @description Flag denoting whether parent item is preferred - e.g., a preferred address or telephone number.
+ * @description Flag denoting whether parent item is preferred - e.g., a preferred address or telephone number.  DEPRECATED: Use rank element or extension instead
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/iso21090-preferred', fhirVersion: 'R4B')]
-#[FHIRExtensionContext(type: 'element', expression: 'Element')]
+#[FHIRExtensionContext(type: 'element', expression: 'Address')]
+#[FHIRExtensionContext(type: 'element', expression: 'ContactPoint')]
+#[FHIRExtensionContext(type: 'element', expression: 'ExtendedContactDetail')]
 class PreferredExtension extends Extension
 {
     public function __construct(

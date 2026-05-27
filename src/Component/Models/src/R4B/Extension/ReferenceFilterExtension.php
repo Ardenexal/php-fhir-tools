@@ -12,16 +12,16 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 
 /**
- * @author HL7
+ * @author HL7 International / FHIR Infrastructure
  *
  * @see http://hl7.org/fhir/StructureDefinition/questionnaire-referenceFilter
  *
- * @description Identifies a filter to apply when looking up candidate answers for the question.
+ * @description Identifies a filter to apply when looking up candidate answers for the question.  DEPRECATED: This extension has been replaced by the Structured Data Capture candidateExpression extension.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaire-referenceFilter', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item')]
-#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item.item')]
-#[FHIRContextInvariant(expression: 'type=\'reference\'')]
+#[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]
+#[FHIRContextInvariant(expression: 'ofType(ElementDefinition).type.exists(code=\'Reference\') or where(%resource.is(Questionnaire)).exists(type.first()=\'reference\')')]
 class ReferenceFilterExtension extends Extension
 {
     public function __construct(

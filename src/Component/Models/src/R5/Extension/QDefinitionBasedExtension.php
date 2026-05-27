@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 
 /**
@@ -16,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * @description If true, indicates that the Questionnaire relies on metadata from the ElementDefinitions referenced by item.definition and that rendering or validating the Questionnaire is likely to be unsafe if the system isn't capable of resolving the definition and using the metadata found there.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaire-definitionBased', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire')]
 class QDefinitionBasedExtension extends Extension
 {
     public function __construct(

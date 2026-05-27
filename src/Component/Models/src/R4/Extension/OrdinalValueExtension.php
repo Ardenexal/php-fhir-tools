@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 
 /**
@@ -17,6 +18,10 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  * manipulation of a concept (e.g. Adding up components of a score). Scores are usually a whole number, but occasionally decimals are encountered in scores.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/ordinalValue', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'Coding')]
+#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item.answerOption')]
+#[FHIRExtensionContext(type: 'element', expression: 'CodeSystem.concept')]
+#[FHIRExtensionContext(type: 'element', expression: 'ValueSet.compose.include.concept')]
 class OrdinalValueExtension extends Extension
 {
     public function __construct(

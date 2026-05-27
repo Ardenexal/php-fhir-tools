@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 
 /**
@@ -16,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  * @description Specifies whether the class constructed for the profile should be marked as retrievable in the model info (meaning whether or not it can appear as the target of a retrieve expression). If this value is not specified, retrievable is true for resources and false for data types.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-modelInfo-isRetrievable', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition')]
 class ModelInfoIsRetrievableExtension extends Extension
 {
     public function __construct(

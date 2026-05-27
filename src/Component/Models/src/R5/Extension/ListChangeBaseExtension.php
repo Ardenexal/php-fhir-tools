@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRContextInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 
@@ -17,6 +19,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  * @description Reference to the List that a "change" list is asserting changes with respect to.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/list-changeBase', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'List')]
+#[FHIRContextInvariant(expression: 'mode = \'changes\'')]
 class ListChangeBaseExtension extends Extension
 {
     public function __construct(

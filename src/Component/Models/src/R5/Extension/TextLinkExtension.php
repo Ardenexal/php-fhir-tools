@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -20,6 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
  * @description Used to denote which portions of the narrative are linked to (usually, generated from) structured data in resources. This information might be used in several different ways, including translating and regenerating narrative in applications that are using/presenting the narrative. Note that there are two related extensions for linking data and narrative: [originalText](StructureDefinition-originalText.html) and [narrativeLink](StructureDefinition-narrativeLink.html).
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/textLink', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Narrative')]
 class TextLinkExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

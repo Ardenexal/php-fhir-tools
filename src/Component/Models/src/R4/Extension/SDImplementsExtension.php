@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
@@ -18,6 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
  * @description Marks that the resource definition implements an [interface](uml.html#interface) in its definition.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/structuredefinition-implements', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition')]
 class SDImplementsExtension extends Extension
 {
     public function __construct(

@@ -11,16 +11,25 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Expression;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
 /**
- * @author Health Level Seven International (FHIR Infrastructure)
+ * @author HL7 International / FHIR Infrastructure
  *
  * @see http://hl7.org/fhir/StructureDefinition/variable
  *
- * @description Variable specifying a logic to generate a variable for use in subsequent logic.  The name of the variable will be added to FHIRPath's context when processing descendants of the element that contains this extension.
+ * @description Variable specifying a logic to generate a variable for use in subsequent logic.  The name of the variable will be added to FHIRPath's context when processing descendants of the element that contains this extension as well as extensions within the same element.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/variable', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire')]
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item')]
-#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item.item')]
+#[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.action')]
+#[FHIRExtensionContext(type: 'element', expression: 'RequestOrchestration')]
+#[FHIRExtensionContext(type: 'element', expression: 'RequestOrchestration.action')]
+#[FHIRExtensionContext(type: 'element', expression: 'RequestGroup')]
+#[FHIRExtensionContext(type: 'element', expression: 'RequestGroup.action')]
+#[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'Measure')]
+#[FHIRExtensionContext(type: 'element', expression: 'Measure.group')]
+#[FHIRExtensionContext(type: 'element', expression: 'Measure.group.population')]
 class VariableExtension extends Extension
 {
     public function __construct(

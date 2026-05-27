@@ -29,7 +29,13 @@ class RelatedPersonCommunication extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null language The language which can be used to communicate with the patient about his or her health */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages', strength: 'preferred')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
+            strength: 'preferred',
+            maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+        )]
         public ?CodeableConcept $language = null,
         /** @var bool|null preferred Language preference indicator */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]

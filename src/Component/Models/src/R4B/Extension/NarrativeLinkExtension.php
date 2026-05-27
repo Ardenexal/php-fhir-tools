@@ -11,11 +11,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UrlPrimitive;
 
 /**
- * @author Health Level Seven International (FHIR Infrastructure)
+ * @author HL7 International / FHIR Infrastructure
  *
  * @see http://hl7.org/fhir/StructureDefinition/narrativeLink
  *
- * @description A human language representation of the concept (resource/element), as a url that is a reference to a portion of the narrative of a resource ([DomainResource.text](narrative.html)).
+ * @description A human language representation of the concept (resource/element), as a url that is a reference to a portion of the narrative of a resource ([DomainResource.text](narrative.html) or [Composition.section.text](composition-definitions.html#Composition.section.text)).  To provide human language maintained separately from the narrative, use [originalText](StructureDefinition-originalText.html). To cross-link narrative and data, use the [textLink extension](StructureDefinition-textLink.html).
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/narrativeLink', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'Element')]

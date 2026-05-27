@@ -11,14 +11,14 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
 /**
- * @author Health Level Seven, Inc. - CDS WG
+ * @author HL7 International / Clinical Decision Support
  *
  * @see http://hl7.org/fhir/StructureDefinition/cqf-qualityOfEvidence
  *
  * @description The quality of the evidence described. The code system used specifies the quality scale used to grade this evidence source while the code specifies the actual quality score (represented as a coded value) associated with the evidence.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-qualityOfEvidence', fhirVersion: 'R4B')]
-#[FHIRExtensionContext(type: 'element', expression: 'Element')]
+#[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.action')]
 class QualityOfEvidenceExtension extends Extension
 {
     public function __construct(

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 
@@ -17,6 +18,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  * @description Completed or terminated request(s) whose function is taken by this new request.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/request-replaces', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'NutritionOrder')]
+#[FHIRExtensionContext(type: 'element', expression: 'SupplyRequest')]
+#[FHIRExtensionContext(type: 'element', expression: 'Task')]
 class RequestReplacesExtension extends Extension
 {
     public function __construct(

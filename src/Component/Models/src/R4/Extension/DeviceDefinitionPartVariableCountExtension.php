@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRContextInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -21,6 +23,8 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UnsignedIntPrimitive;
  * For example, a device may have connectors for up to three sensors of different types. Each sensor type definition would be referenced in `hasPart.reference`; it would have no `hasPart.count` value, but instead use this extension on `hasPart.count` and setting a minimum count of zero, and maximum of one.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/DeviceDefinition-partVariableCount', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceDefinition.hasPart.count')]
+#[FHIRContextInvariant(expression: '$this.hasValue().not()')]
 class DeviceDefinitionPartVariableCountExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

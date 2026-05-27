@@ -7,6 +7,8 @@ namespace Ardenexal\FHIRTools\Component\CodeGeneration\Tests\Unit\Generator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRObligation;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRObligationConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
@@ -533,6 +535,173 @@ class FHIRModelGeneratorConstraintEmissionTest extends TestCase
     }
 
     // -------------------------------------------------------------------------
+    // FHIRObligation and FHIRObligationConstraint (M11 obligation emission)
+    // -------------------------------------------------------------------------
+
+    public function testObligationEmittedOnPropertyWithObligationExtension(): void
+    {
+        $class = $this->generator->generateModelClass(
+            $this->buildSD('ObligationType', 'complex-type', [
+                [
+                    'path'      => 'ObligationType.status',
+                    'min'       => 0,
+                    'max'       => '1',
+                    'type'      => [['code' => 'http://hl7.org/fhirpath/System.String']],
+                    'base'      => ['path' => 'ObligationType.status'],
+                    'extension' => [$this->obligationExt('SHALL:populate', null, null, null)],
+                ],
+            ]),
+            'R4',
+            $this->context,
+        );
+
+        $fqcn  = $this->evalClass($class, self::TEST_NS . '\\DataType');
+        $attrs = (new \ReflectionClass($fqcn))->getProperty('status')->getAttributes(FHIRObligation::class);
+        self::assertNotEmpty($attrs, '#[FHIRObligation] must be emitted when obligation extension is present');
+        $instance = $attrs[0]->newInstance();
+        self::assertSame('SHALL:populate', $instance->code, 'Obligation code must match the valueCode');
+        self::assertNull($instance->actor, 'Actor must be null when not present in obligation extension');
+    }
+
+    public function testObligationNotEmittedWhenAbsent(): void
+    {
+        $class = $this->generator->generateModelClass(
+            $this->buildSD('NoObligationType', 'complex-type', [
+                ['path' => 'NoObligationType.status', 'min' => 0, 'max' => '1', 'type' => [['code' => 'http://hl7.org/fhirpath/System.String']], 'base' => ['path' => 'NoObligationType.status']],
+            ]),
+            'R4',
+            $this->context,
+        );
+
+        $fqcn  = $this->evalClass($class, self::TEST_NS . '\\DataType');
+        $attrs = (new \ReflectionClass($fqcn))->getProperty('status')->getAttributes(FHIRObligation::class);
+        self::assertEmpty($attrs, '#[FHIRObligation] must NOT be emitted when no obligation extension is present');
+    }
+
+    public function testMultipleObligationsOnOnePropertyAllEmitted(): void
+    {
+        $class = $this->generator->generateModelClass(
+            $this->buildSD('MultiObligationType', 'complex-type', [
+                [
+                    'path'      => 'MultiObligationType.status',
+                    'min'       => 0,
+                    'max'       => '1',
+                    'type'      => [['code' => 'http://hl7.org/fhirpath/System.String']],
+                    'base'      => ['path' => 'MultiObligationType.status'],
+                    'extension' => [
+                        $this->obligationExt('SHALL:populate', 'http://example.org/actor/sender', null, null),
+                        $this->obligationExt('SHOULD:display', null, null, null),
+                    ],
+                ],
+            ]),
+            'R4',
+            $this->context,
+        );
+
+        $fqcn  = $this->evalClass($class, self::TEST_NS . '\\DataType');
+        $attrs = (new \ReflectionClass($fqcn))->getProperty('status')->getAttributes(FHIRObligation::class);
+        self::assertCount(2, $attrs, 'Both obligation codes must produce a repeatable #[FHIRObligation] attribute');
+
+        $codes = array_map(static fn (\ReflectionAttribute $a) => $a->newInstance()->code, $attrs);
+        self::assertContains('SHALL:populate', $codes);
+        self::assertContains('SHOULD:display', $codes);
+    }
+
+    public function testObligationWithActorAndFilterEmitted(): void
+    {
+        $class = $this->generator->generateModelClass(
+            $this->buildSD('ObligationActorType', 'complex-type', [
+                [
+                    'path'      => 'ObligationActorType.status',
+                    'min'       => 0,
+                    'max'       => '1',
+                    'type'      => [['code' => 'http://hl7.org/fhirpath/System.String']],
+                    'base'      => ['path' => 'ObligationActorType.status'],
+                    'extension' => [$this->obligationExt('SHALL:populate', 'http://example.org/actor/sender', 'status = active', null)],
+                ],
+            ]),
+            'R4',
+            $this->context,
+        );
+
+        $fqcn     = $this->evalClass($class, self::TEST_NS . '\\DataType');
+        $attrs    = (new \ReflectionClass($fqcn))->getProperty('status')->getAttributes(FHIRObligation::class);
+        self::assertNotEmpty($attrs, '#[FHIRObligation] must be emitted with actor and filter');
+        $instance = $attrs[0]->newInstance();
+        self::assertSame('http://example.org/actor/sender', $instance->actor);
+        self::assertSame('status = active', $instance->filter);
+    }
+
+    public function testObligationConstraintEmittedForPopulationObligation(): void
+    {
+        $class = $this->generator->generateModelClass(
+            $this->buildSD('PopulationObligationType', 'complex-type', [
+                [
+                    'path'      => 'PopulationObligationType.status',
+                    'min'       => 0,
+                    'max'       => '1',
+                    'type'      => [['code' => 'http://hl7.org/fhirpath/System.String']],
+                    'base'      => ['path' => 'PopulationObligationType.status'],
+                    'extension' => [$this->obligationExt('SHALL:populate', null, null, null)],
+                ],
+            ]),
+            'R4',
+            $this->context,
+        );
+
+        $fqcn  = $this->evalClass($class, self::TEST_NS . '\\DataType');
+        $attrs = (new \ReflectionClass($fqcn))->getProperty('status')->getAttributes(FHIRObligationConstraint::class);
+        self::assertNotEmpty($attrs, '#[FHIRObligationConstraint] must be emitted when obligation code is a population obligation');
+    }
+
+    public function testObligationConstraintNotEmittedForBehaviourOnlyObligation(): void
+    {
+        $class = $this->generator->generateModelClass(
+            $this->buildSD('BehaviourObligationType', 'complex-type', [
+                [
+                    'path'      => 'BehaviourObligationType.status',
+                    'min'       => 0,
+                    'max'       => '1',
+                    'type'      => [['code' => 'http://hl7.org/fhirpath/System.String']],
+                    'base'      => ['path' => 'BehaviourObligationType.status'],
+                    'extension' => [$this->obligationExt('SHOULD:display', null, null, null)],
+                ],
+            ]),
+            'R4',
+            $this->context,
+        );
+
+        $fqcn  = $this->evalClass($class, self::TEST_NS . '\\DataType');
+        $attrs = (new \ReflectionClass($fqcn))->getProperty('status')->getAttributes(FHIRObligationConstraint::class);
+        self::assertEmpty($attrs, '#[FHIRObligationConstraint] must NOT be emitted for behaviour-only obligation codes');
+    }
+
+    public function testObligationConstraintEmittedOnceWhenMixedPopulationAndBehaviourObligations(): void
+    {
+        $class = $this->generator->generateModelClass(
+            $this->buildSD('MixedObligationType', 'complex-type', [
+                [
+                    'path'      => 'MixedObligationType.status',
+                    'min'       => 0,
+                    'max'       => '1',
+                    'type'      => [['code' => 'http://hl7.org/fhirpath/System.String']],
+                    'base'      => ['path' => 'MixedObligationType.status'],
+                    'extension' => [
+                        $this->obligationExt('SHOULD:display', null, null, null),
+                        $this->obligationExt('SHALL:populate', null, null, null),
+                    ],
+                ],
+            ]),
+            'R4',
+            $this->context,
+        );
+
+        $fqcn  = $this->evalClass($class, self::TEST_NS . '\\DataType');
+        $attrs = (new \ReflectionClass($fqcn))->getProperty('status')->getAttributes(FHIRObligationConstraint::class);
+        self::assertCount(1, $attrs, '#[FHIRObligationConstraint] must be emitted exactly once even when mixed obligation types are present');
+    }
+
+    // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
 
@@ -592,6 +761,35 @@ class FHIRModelGeneratorConstraintEmissionTest extends TestCase
                     ],
                 ],
             ],
+        ];
+    }
+
+    /**
+     * Build a single obligation extension sub-structure for use in a snapshot element's `extension[]`.
+     *
+     * @return array<string, mixed>
+     */
+    private function obligationExt(string $code, ?string $actor, ?string $filter, ?string $documentation): array
+    {
+        $inner = [
+            ['url' => 'code', 'valueCode' => $code],
+        ];
+
+        if ($actor !== null) {
+            $inner[] = ['url' => 'actor', 'valueCanonical' => $actor];
+        }
+
+        if ($filter !== null) {
+            $inner[] = ['url' => 'filter', 'valueString' => $filter];
+        }
+
+        if ($documentation !== null) {
+            $inner[] = ['url' => 'documentation', 'valueMarkdown' => $documentation];
+        }
+
+        return [
+            'url'       => 'http://hl7.org/fhir/StructureDefinition/obligation',
+            'extension' => $inner,
         ];
     }
 

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
@@ -23,6 +24,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  * @description Specifies that a date is relative to some event. The event happens [Duration] after [Event].
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/relative-date', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'date')]
+#[FHIRExtensionContext(type: 'element', expression: 'dateTime')]
 class RelativeDateCriteriaExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

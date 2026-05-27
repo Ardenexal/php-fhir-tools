@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\PositiveIntPrimitive;
 
@@ -17,6 +18,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\PositiveIntPrimitive;
  * @description The order in which contacts would be used for the purpose of the contact.  For example, if a patient has multiple people listed as an emergency contact, which of those should be called first in an emergency. Or an Organization might have multiple contacts, one for press inquiries and two for patient inquires (one for scheduling, and one for billing questions).  All three of those contacts may have a rank=1, since they all have different purposes.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-contactPriority', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Patient.contact')]
+#[FHIRExtensionContext(type: 'element', expression: 'Organization.contact')]
+#[FHIRExtensionContext(type: 'fhirpath', expression: 'ofType(ExtendedContactDetail)')]
 class PatContactPriorityExtension extends Extension
 {
     public function __construct(

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  * @description Indicates the laterality of the body structure. Only for use when laterality is needed to augment the Observation.bodySite in cases where the laterality is not expressed in the Observation.code and/or the use of  BodyStructure will duplicate information for the anatomical structure.  We are seeking feedback from implementers regarding the use of this extension.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/observation-structureLaterality', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'Observation.bodySite')]
 class StructureLateralityExtension extends Extension
 {
     public function __construct(

@@ -11,7 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 
 /**
- * @author Health Level Seven, Inc. - FHIR WG
+ * @author HL7 International / FHIR Infrastructure
  *
  * @see http://hl7.org/fhir/StructureDefinition/workflow-researchStudy
  *
@@ -20,12 +20,13 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-researchStudy', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'Composition')]
 #[FHIRExtensionContext(type: 'element', expression: 'Consent')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceUsage')]
 #[FHIRExtensionContext(type: 'element', expression: 'DeviceUseStatement')]
 #[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport')]
 #[FHIRExtensionContext(type: 'element', expression: 'Encounter')]
 #[FHIRExtensionContext(type: 'element', expression: 'FamilyMemberHistory')]
 #[FHIRExtensionContext(type: 'element', expression: 'Immunization')]
-#[FHIRExtensionContext(type: 'element', expression: 'Media')]
+#[FHIRExtensionContext(type: 'element', expression: 'DocumentReference')]
 #[FHIRExtensionContext(type: 'element', expression: 'MedicationAdministration')]
 #[FHIRExtensionContext(type: 'element', expression: 'MedicationDispense')]
 #[FHIRExtensionContext(type: 'element', expression: 'MedicationStatement')]
@@ -33,8 +34,10 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 #[FHIRExtensionContext(type: 'element', expression: 'Procedure')]
 #[FHIRExtensionContext(type: 'element', expression: 'QuestionnaireResponse')]
 #[FHIRExtensionContext(type: 'element', expression: 'RiskAssessment')]
+#[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest')]
 #[FHIRExtensionContext(type: 'element', expression: 'SupplyDelivery')]
 #[FHIRExtensionContext(type: 'element', expression: 'Task')]
+#[FHIRExtensionContext(type: 'element', expression: 'ObservationDefinition')]
 class ResearchStudyExtension extends Extension
 {
     public function __construct(

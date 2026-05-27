@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * @description A code that replaces this - use this code instead.  This extension is not used in R6 because identification of replacement codes should be captured using the concept properties replacedByCode and replacedByCoding.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/codesystem-replacedby', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'CodeSystem.concept')]
 class CSReplacedbyExtension extends Extension
 {
     public function __construct(

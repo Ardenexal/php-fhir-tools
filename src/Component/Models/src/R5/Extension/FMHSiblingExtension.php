@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
@@ -20,6 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  * @description Identifies a sibling of the relative.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/family-member-history-genetics-sibling', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'FamilyMemberHistory')]
 class FMHSiblingExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

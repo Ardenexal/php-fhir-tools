@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
@@ -21,6 +22,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
  * @description Information about the acceptance and relative priority assigned to the goal by the patient, practitioners and other stake-holders. In R6, this acceptance extension was elevated to the base Goal resource.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/goal-acceptance', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Goal')]
 class GoalAcceptanceExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -20,6 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
  * @description This extension can be used to link two encounters that are related. This extension may be used when you want to provide a directional relationship between two encounters. If you just want to just list a set of related encounters without directional relationship, use the Linkage resource instead.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/encounter-recordLinkage', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Encounter')]
 class EncRecordLinkageExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

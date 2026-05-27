@@ -12,7 +12,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
 /**
- * @author Health Level Seven, Inc. - MnM WG
+ * @author HL7 International / FHIR Infrastructure
  *
  * @see http://hl7.org/fhir/StructureDefinition/timing-daysOfCycle
  *
@@ -20,6 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/timing-daysOfCycle', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.action')]
+#[FHIRExtensionContext(type: 'element', expression: 'RequestOrchestration.action')]
 #[FHIRExtensionContext(type: 'element', expression: 'RequestGroup.action')]
 class DaysOfCycleExtension extends Extension implements FHIRComplexExtensionInterface
 {

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
  * @description When present, this extension indicates that the date of a period start or end is uncertain and falls within its own period.  DEPRECATED: use [uncertainPeriod](StructureDefinition-uncertainPeriod.html) instead.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/timing-uncertainDate', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'dateTime')]
 class UncertainDateExtension extends Extension
 {
     public function __construct(

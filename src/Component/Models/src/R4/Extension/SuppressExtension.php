@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 
 /**
@@ -16,6 +17,13 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  * @description If the extension is present on one of the named properties in a differential, the element property should be removed from the the corresponding snapshot.element during snapshot generation.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-suppress', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition.comment')]
+#[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition.requirements')]
+#[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition.alias')]
+#[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition.example')]
+#[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition.mapping')]
+#[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition.label')]
+#[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition.code')]
 class SuppressExtension extends Extension
 {
     public function __construct(

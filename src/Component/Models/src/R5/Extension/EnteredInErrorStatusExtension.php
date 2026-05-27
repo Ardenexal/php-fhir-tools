@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UrlPrimitive;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UrlPrimitive;
  * @description This extension is for canonical resources to indicate how a erroneous resource is recorded. In many cases, erroneous records are simply deleted, but in some circumstances in clinical records, once an erroneous record has been created, it must be retained but marked as an having been created in error.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/entered-in-error-status', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'CanonicalResource')]
 class EnteredInErrorStatusExtension extends Extension
 {
     public function __construct(

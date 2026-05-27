@@ -7,24 +7,24 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Expression;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 
 /**
- * @author Health Level Seven, Inc. - CDS WG
+ * @author HL7 International / Clinical Decision Support
  *
  * @see http://hl7.org/fhir/StructureDefinition/cqf-calculatedValue
  *
- * @description The name of an expression in a referenced library that determines a calculated value.
+ * @description DEPRECATED: Use cqf-expression instead. An expression that determines a calculated value. The expression may be simply the name of a expression in a referenced library, or it may be a complete inline expression.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-calculatedValue', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'Element')]
 class CalculatedValueExtension extends Extension
 {
     public function __construct(
-        /** @var StringPrimitive|null valueString Value of extension */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
-        public ?StringPrimitive $valueString = null,
+        /** @var Expression|null valueExpression Value of extension */
+        #[FhirProperty(fhirType: 'Expression', propertyKind: 'complex')]
+        public ?Expression $valueExpression = null,
         ?string $id = null,
         array $extension = [],
     ) {
@@ -32,7 +32,7 @@ class CalculatedValueExtension extends Extension
             id: $id,
             extension: $extension,
             url: 'http://hl7.org/fhir/StructureDefinition/cqf-calculatedValue',
-            value: $this->valueString,
+            value: $this->valueExpression,
         );
     }
 }

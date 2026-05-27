@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRContextInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 
@@ -17,6 +19,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
  * @description Where the type for a question is "Reference", indicates a profile that the resource instances pointed to in answers to this question must be valid against.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaire-referenceProfile', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item')]
+#[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]
+#[FHIRContextInvariant(expression: 'ofType(ElementDefinition).type.exists(code=\'Reference\') or where(%resource.is(Questionnaire)).exists(type.first()=\'reference\')')]
 class QReferenceProfileExtension extends Extension
 {
     public function __construct(

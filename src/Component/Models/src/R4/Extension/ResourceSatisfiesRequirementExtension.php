@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -20,6 +21,8 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IdPrimitive;
  * @description References a requirement that this element satisfies. This might be referenced at the resource level by a profile, operation definition, etc.  However, it could also point from a specific code in a value set, an interaction or search parameter in a CapabilityStatement, an action in a PlanDefinition, etc. to the requirement satisfied by that specific portion of the resource. Note that this extension is only used as part of the IG publication tooling process. Use the [Requirements extension](StructureDefinition-satisfies-requirement.html) extension for use outside the IG publishing framework.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/satisfies-requirement', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'Resource')]
+#[FHIRExtensionContext(type: 'element', expression: 'Element')]
 class ResourceSatisfiesRequirementExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

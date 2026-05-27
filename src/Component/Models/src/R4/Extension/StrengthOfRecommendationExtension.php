@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  * @description The strength of the recommendation assigned to this reference. The code system used specifies the rating scale used to rate this recommendation while the code specifies the actual recommendation rating (represented as a coded value) associated with this recommendation.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-strengthOfRecommendation', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.action')]
 class StrengthOfRecommendationExtension extends Extension
 {
     public function __construct(

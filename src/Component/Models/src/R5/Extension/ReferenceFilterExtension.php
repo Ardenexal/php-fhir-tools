@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRContextInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 
@@ -17,6 +19,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  * @description Identifies a filter to apply when looking up candidate answers for the question.  DEPRECATED: This extension has been replaced by the Structured Data Capture candidateExpression extension.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaire-referenceFilter', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item')]
+#[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]
+#[FHIRContextInvariant(expression: 'ofType(ElementDefinition).type.exists(code=\'Reference\') or where(%resource.is(Questionnaire)).exists(type.first()=\'reference\')')]
 class ReferenceFilterExtension extends Extension
 {
     public function __construct(

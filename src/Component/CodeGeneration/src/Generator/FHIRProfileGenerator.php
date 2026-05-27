@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\CodeGeneration\Generator;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Parser\ObligationExtensionParser;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustSupport;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileObligation;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSlicingRules;
 use Nette\PhpGenerator\ClassType;
@@ -107,6 +109,7 @@ class FHIRProfileGenerator
         $this->emitDifferentialConstraints($structureDefinition, $url, $class, $namespace);
         $this->emitDifferentialMustSupport($structureDefinition, $url, $class, $namespace);
         $this->emitDifferentialSliceConstraints($structureDefinition, $url, $class, $namespace);
+        $this->emitSnapshotObligations($structureDefinition, $url, $class, $namespace);
 
         return $class;
     }
@@ -470,6 +473,75 @@ class FHIRProfileGenerator
         // In FHIR differential, sliced elements share the same path (e.g. "Patient.identifier")
         // and differ only by sliceName. No transformation needed here.
         return $propertyPath;
+    }
+
+    /**
+     * Emits #[FHIRProfileObligation] class-level attributes for each snapshot element that carries
+     * obligation extensions (http://hl7.org/fhir/StructureDefinition/obligation).
+     *
+     * Obligations appear in snapshot (not differential) elements per the FHIR specification.
+     * Profile classes cannot re-declare inherited constructor parameters, so all obligation
+     * metadata is carried at the class level as repeatable marker attributes.
+     *
+     * @param array<string, mixed> $structureDefinition
+     */
+    private function emitSnapshotObligations(
+        array $structureDefinition,
+        string $profileUrl,
+        ClassType $class,
+        PhpNamespace $namespace,
+    ): void {
+        /** @var array<int, array<string, mixed>> $elements */
+        $elements = $structureDefinition['snapshot']['element'] ?? [];
+
+        if ($elements === []) {
+            return;
+        }
+
+        $parser = new ObligationExtensionParser();
+
+        foreach ($elements as $element) {
+            $path = (string) ($element['path'] ?? '');
+
+            // Skip root element (e.g. "Patient") — no property path to map
+            if (!str_contains($path, '.')) {
+                continue;
+            }
+
+            // Skip contentReference elements — obligations live on the referenced type
+            if (ElementDefinitionHelper::hasContentReference($element)) {
+                continue;
+            }
+
+            $obligations = $parser->parse($element['extension'] ?? []);
+
+            if ($obligations === []) {
+                continue;
+            }
+
+            $dotPos       = strpos($path, '.');
+            $propertyPath = $dotPos !== false ? substr($path, $dotPos + 1) : $path;
+
+            $namespace->addUse(FHIRProfileObligation::class);
+
+            foreach ($obligations as $obligation) {
+                $args = [
+                    'path'   => $propertyPath,
+                    'code'   => $obligation['code'],
+                    'groups' => [$profileUrl],
+                ];
+
+                if ($obligation['actor'] !== null) {
+                    $args['actor'] = $obligation['actor'];
+                }
+
+                if ($obligation['filter'] !== null) {
+                    $args['filter'] = $obligation['filter'];
+                }
+
+                $class->addAttribute(FHIRProfileObligation::class, $args);
+            }
+        }
     }
 
     /**

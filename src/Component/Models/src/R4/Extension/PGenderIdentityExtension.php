@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
@@ -22,6 +23,12 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  *  In the case where the gender identity is communicated by a third party, for example, if a spouse indicates the gender identity of their partner on an intake form, a Provenance resource can be used with a Provenance.target referring to the Patient, with a targetElement extension identifying the gender identity extension as the target element within the Patient resource.  When exchanging this concept, refer to the guidance in the [Gender Harmony Implementation Guide](http://hl7.org/xprod/ig/uv/gender-harmony/).
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/individual-genderIdentity', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'Patient')]
+#[FHIRExtensionContext(type: 'element', expression: 'RelatedPerson')]
+#[FHIRExtensionContext(type: 'element', expression: 'Person')]
+#[FHIRExtensionContext(type: 'element', expression: 'Practitioner')]
+#[FHIRExtensionContext(type: 'element', expression: 'PractitionerRole')]
+#[FHIRExtensionContext(type: 'element', expression: 'FamilyMemberHistory')]
 class PGenderIdentityExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

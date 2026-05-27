@@ -11,7 +11,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 
 /**
- * @author Health Level Seven, Inc. - FHIR WG
+ * @author HL7 International / FHIR Infrastructure
  *
  * @see http://hl7.org/fhir/StructureDefinition/request-relevantHistory
  *
@@ -20,6 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/request-relevantHistory', fhirVersion: 'R4B')]
 #[FHIRExtensionContext(type: 'element', expression: 'NutritionOrder')]
 #[FHIRExtensionContext(type: 'element', expression: 'CommunicationRequest')]
+#[FHIRExtensionContext(type: 'element', expression: 'CarePlan')]
 class RelevantHistoryExtension extends Extension
 {
     public function __construct(

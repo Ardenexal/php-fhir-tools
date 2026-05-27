@@ -10,13 +10,14 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionCon
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
 /**
- * @author Health Level Seven, Inc. - FHIR Core WG
+ * @author HL7 International / FHIR Infrastructure
  *
  * @see http://hl7.org/fhir/StructureDefinition/quantity-precision
  *
  * @description Explicit precision of the number. This is the number of significant decimal places after the decimal point, irrespective of how many are actually present in the explicitly represented decimal.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/quantity-precision', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'Quantity')]
 #[FHIRExtensionContext(type: 'element', expression: 'decimal')]
 class PrecisionExtension extends Extension
 {

@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Regex;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Parser\ObligationExtensionParser;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
@@ -24,10 +25,13 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRMustSupport;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRObligation;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRObligationConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
+use Ardenexal\FHIRTools\Component\Metadata\ObligationCode;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Traits\FHIRExtensionsTrait;
 
@@ -867,6 +871,31 @@ class FHIRModelGenerator implements GeneratorInterface
 
             if (($element['mustSupport'] ?? false) === true) {
                 $param->addAttribute(FHIRMustSupport::class);
+            }
+
+            // FHIRObligation from obligation extensions on snapshot elements.
+            $obligations             = (new ObligationExtensionParser())->parse($element['extension'] ?? []);
+            $hasPopulationObligation = false;
+            foreach ($obligations as $obligation) {
+                $args = ['code' => $obligation['code']];
+                if ($obligation['actor'] !== null) {
+                    $args['actor'] = $obligation['actor'];
+                }
+                if ($obligation['filter'] !== null) {
+                    $args['filter'] = $obligation['filter'];
+                }
+                if ($obligation['documentation'] !== null) {
+                    $args['documentation'] = $obligation['documentation'];
+                }
+                $param->addAttribute(FHIRObligation::class, $args);
+
+                $obligationCode = ObligationCode::tryFrom($obligation['code']);
+                if ($obligationCode !== null && $obligationCode->isPopulationObligation()) {
+                    $hasPopulationObligation = true;
+                }
+            }
+            if ($hasPopulationObligation) {
+                $param->addAttribute(FHIRObligationConstraint::class);
             }
 
             // FHIRTargetProfile from type[].targetProfile arrays (Reference and canonical properties).

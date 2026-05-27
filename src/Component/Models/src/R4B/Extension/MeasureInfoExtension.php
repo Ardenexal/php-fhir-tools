@@ -14,14 +14,15 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 
 /**
- * @author Health Level Seven, Inc. - CDS WG
+ * @author HL7 International / Clinical Decision Support
  *
  * @see http://hl7.org/fhir/StructureDefinition/cqf-measureInfo
  *
- * @description The measure criteria that resulted in the resource being included in a particular evaluatedResources bundle.
+ * @description The measure criteria that resulted in the resource being included in the result of a measure evaluation. The extension can be used on the resource directly, or it can be used on a Reference element such as MeasureReport.evaluatedResource to identify the measure criteria in the reference (i.e. without requiring the referenced resource to be changed by adding an extension).
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-measureInfo', fhirVersion: 'R4B')]
-#[FHIRExtensionContext(type: 'element', expression: 'Element')]
+#[FHIRExtensionContext(type: 'element', expression: 'Resource')]
+#[FHIRExtensionContext(type: 'element', expression: 'Reference')]
 class MeasureInfoExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

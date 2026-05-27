@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Expression;
@@ -22,6 +23,32 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  * @description DEPRECATED: Use the `targetConstraint` extension instead. Specifies an invariant that is enforced on instantiated resources. This extension can be applied to any element of a definitional resource (such as ActivityDefinition or Measure) and indicates that the invariant should be enforced on resources that are instantiated from the definition. For example, this extension can be used to define a constraint such as `numerator count must be less than or equal to denominator count`.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-targetInvariant', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition.code')]
+#[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition.intent')]
+#[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition.priority')]
+#[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition.doNotPerform')]
+#[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition.timing[x]')]
+#[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition.asNeeded[x]')]
+#[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition.location')]
+#[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition.participant')]
+#[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition.product[x]')]
+#[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition.quantity')]
+#[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition.dosage')]
+#[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition.bodySite')]
+#[FHIRExtensionContext(type: 'element', expression: 'ActivityDefinition.dynamicValue')]
+#[FHIRExtensionContext(type: 'element', expression: 'Measure')]
+#[FHIRExtensionContext(type: 'element', expression: 'Measure.group')]
+#[FHIRExtensionContext(type: 'element', expression: 'Measure.group.population')]
+#[FHIRExtensionContext(type: 'element', expression: 'Measure.group.stratifier')]
+#[FHIRExtensionContext(type: 'element', expression: 'Measure.supplementalData')]
+#[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.goal')]
+#[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.goal.target')]
+#[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.actor')]
+#[FHIRExtensionContext(type: 'element', expression: 'PlanDefinition.action')]
+#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire')]
+#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item')]
 class TargetInvariantExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(
