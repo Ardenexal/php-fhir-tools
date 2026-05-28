@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\CodeGeneration\Tests\Unit\Generator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTemporalRange;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRObligation;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRObligationConstraint;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
@@ -161,6 +162,101 @@ class FHIRModelGeneratorConstraintEmissionTest extends TestCase
         $fqcn  = $this->evalClass($class, self::TEST_NS . '\\DataType');
         $attrs = (new \ReflectionClass($fqcn))->getProperty('score')->getAttributes(Range::class);
         self::assertEmpty($attrs, '#[Range] must NOT be emitted when minValue/maxValue are absent');
+    }
+
+    // -------------------------------------------------------------------------
+    // FHIRTemporalRange constraint (temporal minValue[x] / maxValue[x])
+    // -------------------------------------------------------------------------
+
+    public function testTemporalRangeEmittedForDateBounds(): void
+    {
+        $class = $this->generator->generateModelClass(
+            $this->buildSD('DateRangeType', 'complex-type', [
+                ['path' => 'DateRangeType.birthDate', 'min' => 0, 'max' => '1', 'minValueDate' => '2000-01-01', 'maxValueDate' => '2099-12-31', 'type' => [['code' => 'date']], 'base' => ['path' => 'DateRangeType.birthDate']],
+            ]),
+            'R4',
+            $this->context,
+        );
+
+        $fqcn  = $this->evalClass($class, self::TEST_NS . '\\DataType');
+        $attrs = (new \ReflectionClass($fqcn))->getProperty('birthDate')->getAttributes(FHIRTemporalRange::class);
+        self::assertNotEmpty($attrs, '#[FHIRTemporalRange] must be emitted for date minValue/maxValue');
+
+        $instance = $attrs[0]->newInstance();
+        self::assertSame('2000-01-01', $instance->minValue);
+        self::assertSame('2099-12-31', $instance->maxValue);
+        self::assertSame('date', $instance->temporalType);
+    }
+
+    public function testTemporalRangeEmittedForDateTimeBounds(): void
+    {
+        $class = $this->generator->generateModelClass(
+            $this->buildSD('DateTimeRangeType', 'complex-type', [
+                ['path' => 'DateTimeRangeType.onset', 'min' => 0, 'max' => '1', 'minValueDateTime' => '2000-01-01T00:00:00+00:00', 'type' => [['code' => 'dateTime']], 'base' => ['path' => 'DateTimeRangeType.onset']],
+            ]),
+            'R4',
+            $this->context,
+        );
+
+        $fqcn  = $this->evalClass($class, self::TEST_NS . '\\DataType');
+        $attrs = (new \ReflectionClass($fqcn))->getProperty('onset')->getAttributes(FHIRTemporalRange::class);
+        self::assertNotEmpty($attrs, '#[FHIRTemporalRange] must be emitted for dateTime minValue');
+
+        $instance = $attrs[0]->newInstance();
+        self::assertSame('2000-01-01T00:00:00+00:00', $instance->minValue);
+        self::assertNull($instance->maxValue);
+        self::assertSame('dateTime', $instance->temporalType);
+    }
+
+    public function testTemporalRangeEmittedForInstantBounds(): void
+    {
+        $class = $this->generator->generateModelClass(
+            $this->buildSD('InstantRangeType', 'complex-type', [
+                ['path' => 'InstantRangeType.issued', 'min' => 0, 'max' => '1', 'minValueInstant' => '2000-01-01T00:00:00Z', 'type' => [['code' => 'instant']], 'base' => ['path' => 'InstantRangeType.issued']],
+            ]),
+            'R4',
+            $this->context,
+        );
+
+        $fqcn     = $this->evalClass($class, self::TEST_NS . '\\DataType');
+        $attrs    = (new \ReflectionClass($fqcn))->getProperty('issued')->getAttributes(FHIRTemporalRange::class);
+        $instance = $attrs[0]->newInstance();
+        self::assertSame('instant', $instance->temporalType);
+    }
+
+    public function testTemporalRangeEmittedForTimeBounds(): void
+    {
+        $class = $this->generator->generateModelClass(
+            $this->buildSD('TimeRangeType', 'complex-type', [
+                ['path' => 'TimeRangeType.start', 'min' => 0, 'max' => '1', 'minValueTime' => '09:00:00', 'maxValueTime' => '17:00:00', 'type' => [['code' => 'time']], 'base' => ['path' => 'TimeRangeType.start']],
+            ]),
+            'R4',
+            $this->context,
+        );
+
+        $fqcn     = $this->evalClass($class, self::TEST_NS . '\\DataType');
+        $attrs    = (new \ReflectionClass($fqcn))->getProperty('start')->getAttributes(FHIRTemporalRange::class);
+        $instance = $attrs[0]->newInstance();
+        self::assertSame('09:00:00', $instance->minValue);
+        self::assertSame('17:00:00', $instance->maxValue);
+        self::assertSame('time', $instance->temporalType);
+    }
+
+    public function testNumericRangeStillEmitsSymfonyRange(): void
+    {
+        // Decimal bounds must still produce Symfony Range, not FHIRTemporalRange
+        $class = $this->generator->generateModelClass(
+            $this->buildSD('NumericRangeType', 'complex-type', [
+                ['path' => 'NumericRangeType.score', 'min' => 0, 'max' => '1', 'minValueDecimal' => '0', 'maxValueDecimal' => '100', 'type' => [['code' => 'decimal']], 'base' => ['path' => 'NumericRangeType.score']],
+            ]),
+            'R4',
+            $this->context,
+        );
+
+        $fqcn = $this->evalClass($class, self::TEST_NS . '\\DataType');
+        $ref  = new \ReflectionClass($fqcn);
+        self::assertNotEmpty($ref->getProperty('score')->getAttributes(Range::class), '#[Range] must still be emitted for decimal bounds');
+        self::assertEmpty($ref->getProperty('score')->getAttributes(FHIRTemporalRange::class), '#[FHIRTemporalRange] must NOT be emitted for decimal bounds');
     }
 
     // -------------------------------------------------------------------------

@@ -30,6 +30,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRObligationCo
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTemporalRange;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Metadata\ObligationCode;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
@@ -820,17 +821,38 @@ class FHIRModelGenerator implements GeneratorInterface
             }
 
             // Range constraint from minValue[x] / maxValue[x] polymorphic fields.
+            // Temporal types (date, dateTime, instant, time) use FHIRTemporalRange;
+            // numeric types (decimal, integer, etc.) use Symfony's built-in Range.
             $rangeMin  = ElementDefinitionHelper::extractPolymorphicField($element, 'minValue');
             $rangeMax  = ElementDefinitionHelper::extractPolymorphicField($element, 'maxValue');
             if ($rangeMin !== null || $rangeMax !== null) {
-                $rangeArgs = [];
-                if ($rangeMin !== null) {
-                    $rangeArgs['min'] = (string) $rangeMin['value'];
+                $temporalSuffixes = ['Date', 'DateTime', 'Instant', 'Time'];
+                $minSuffix        = $rangeMin !== null ? $rangeMin['type'] : null;
+                $maxSuffix        = $rangeMax !== null ? $rangeMax['type'] : null;
+                $suffix           = $minSuffix ?? $maxSuffix;
+
+                if ($suffix !== null && in_array($suffix, $temporalSuffixes, true)) {
+                    $temporalTypeMap = [
+                        'Date'     => 'date',
+                        'DateTime' => 'dateTime',
+                        'Instant'  => 'instant',
+                        'Time'     => 'time',
+                    ];
+                    $param->addAttribute(FHIRTemporalRange::class, [
+                        'minValue'     => $rangeMin !== null ? (string) $rangeMin['value'] : null,
+                        'maxValue'     => $rangeMax !== null ? (string) $rangeMax['value'] : null,
+                        'temporalType' => $temporalTypeMap[$suffix],
+                    ]);
+                } else {
+                    $rangeArgs = [];
+                    if ($rangeMin !== null) {
+                        $rangeArgs['min'] = (string) $rangeMin['value'];
+                    }
+                    if ($rangeMax !== null) {
+                        $rangeArgs['max'] = (string) $rangeMax['value'];
+                    }
+                    $param->addAttribute(Range::class, $rangeArgs);
                 }
-                if ($rangeMax !== null) {
-                    $rangeArgs['max'] = (string) $rangeMax['value'];
-                }
-                $param->addAttribute(Range::class, $rangeArgs);
             }
 
             // Regex pattern from primitive type extension.
