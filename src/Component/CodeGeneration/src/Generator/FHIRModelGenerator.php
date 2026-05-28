@@ -30,6 +30,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRObligationCo
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRQuantityRange;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTemporalRange;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Metadata\ObligationCode;
@@ -822,6 +823,7 @@ class FHIRModelGenerator implements GeneratorInterface
 
             // Range constraint from minValue[x] / maxValue[x] polymorphic fields.
             // Temporal types (date, dateTime, instant, time) use FHIRTemporalRange;
+            // Quantity types use FHIRQuantityRange;
             // numeric types (decimal, integer, etc.) use Symfony's built-in Range.
             $rangeMin  = ElementDefinitionHelper::extractPolymorphicField($element, 'minValue');
             $rangeMax  = ElementDefinitionHelper::extractPolymorphicField($element, 'maxValue');
@@ -843,6 +845,29 @@ class FHIRModelGenerator implements GeneratorInterface
                         'maxValue'     => $rangeMax !== null ? (string) $rangeMax['value'] : null,
                         'temporalType' => $temporalTypeMap[$suffix],
                     ]);
+                } elseif ($suffix === 'Quantity') {
+                    $minBound = null;
+                    if ($rangeMin !== null && is_array($rangeMin['value'])) {
+                        $minBound = [
+                            'value'  => (float) ($rangeMin['value']['value'] ?? 0.0),
+                            'system' => $rangeMin['value']['system'] ?? null,
+                            'code'   => $rangeMin['value']['code']   ?? null,
+                        ];
+                    }
+                    $maxBound = null;
+                    if ($rangeMax !== null && is_array($rangeMax['value'])) {
+                        $maxBound = [
+                            'value'  => (float) ($rangeMax['value']['value'] ?? 0.0),
+                            'system' => $rangeMax['value']['system'] ?? null,
+                            'code'   => $rangeMax['value']['code']   ?? null,
+                        ];
+                    }
+                    if ($minBound !== null || $maxBound !== null) {
+                        $param->addAttribute(FHIRQuantityRange::class, [
+                            'minValue' => $minBound,
+                            'maxValue' => $maxBound,
+                        ]);
+                    }
                 } else {
                     $rangeArgs = [];
                     if ($rangeMin !== null) {

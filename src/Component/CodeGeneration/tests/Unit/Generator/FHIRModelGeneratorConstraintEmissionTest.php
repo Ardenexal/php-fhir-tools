@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\CodeGeneration\Tests\Unit\Generator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRQuantityRange;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTemporalRange;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRObligation;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRObligationConstraint;
@@ -898,5 +899,115 @@ class FHIRModelGeneratorConstraintEmissionTest extends TestCase
         eval(substr($code, 5));
 
         return $namespace . '\\' . $class->getName();
+    }
+
+    // -------------------------------------------------------------------------
+    // FHIRQuantityRange constraint (minValueQuantity / maxValueQuantity) — M14
+    // -------------------------------------------------------------------------
+
+    public function testQuantityRangeEmittedForMinAndMaxBounds(): void
+    {
+        $class = $this->generator->generateModelClass(
+            $this->buildSD('QuantityRangeType', 'complex-type', [
+                [
+                    'path'              => 'QuantityRangeType.dose',
+                    'min'               => 0,
+                    'max'               => '1',
+                    'minValueQuantity'  => ['value' => 0.0, 'system' => 'http://unitsofmeasure.org', 'code' => 'mg'],
+                    'maxValueQuantity'  => ['value' => 1000.0, 'system' => 'http://unitsofmeasure.org', 'code' => 'mg'],
+                    'type'              => [['code' => 'Quantity']],
+                    'base'              => ['path' => 'QuantityRangeType.dose'],
+                ],
+            ]),
+            'R4',
+            $this->context,
+        );
+
+        $fqcn  = $this->evalClass($class, self::TEST_NS . '\\DataType');
+        $attrs = (new \ReflectionClass($fqcn))->getProperty('dose')->getAttributes(FHIRQuantityRange::class);
+        self::assertNotEmpty($attrs, '#[FHIRQuantityRange] must be emitted for minValueQuantity/maxValueQuantity');
+
+        $instance = $attrs[0]->newInstance();
+        self::assertNotNull($instance->minValue);
+        self::assertSame(0.0, $instance->minValue['value']);
+        self::assertSame('http://unitsofmeasure.org', $instance->minValue['system']);
+        self::assertSame('mg', $instance->minValue['code']);
+        self::assertNotNull($instance->maxValue);
+        self::assertSame(1000.0, $instance->maxValue['value']);
+        self::assertSame('mg', $instance->maxValue['code']);
+    }
+
+    public function testQuantityRangeEmittedForMinBoundOnly(): void
+    {
+        $class = $this->generator->generateModelClass(
+            $this->buildSD('QuantityMinType', 'complex-type', [
+                [
+                    'path'             => 'QuantityMinType.dose',
+                    'min'              => 0,
+                    'max'              => '1',
+                    'minValueQuantity' => ['value' => 0.0, 'system' => 'http://unitsofmeasure.org', 'code' => 'mg'],
+                    'type'             => [['code' => 'Quantity']],
+                    'base'             => ['path' => 'QuantityMinType.dose'],
+                ],
+            ]),
+            'R4',
+            $this->context,
+        );
+
+        $fqcn     = $this->evalClass($class, self::TEST_NS . '\\DataType');
+        $attrs    = (new \ReflectionClass($fqcn))->getProperty('dose')->getAttributes(FHIRQuantityRange::class);
+        $instance = $attrs[0]->newInstance();
+        self::assertNotNull($instance->minValue, 'minValue must be set');
+        self::assertNull($instance->maxValue, 'maxValue must be null when absent');
+    }
+
+    public function testQuantityRangeNotEmittedForDecimalBounds(): void
+    {
+        $class = $this->generator->generateModelClass(
+            $this->buildSD('DecimalRangeType', 'complex-type', [
+                [
+                    'path'            => 'DecimalRangeType.score',
+                    'min'             => 0,
+                    'max'             => '1',
+                    'minValueDecimal' => '0',
+                    'maxValueDecimal' => '100',
+                    'type'            => [['code' => 'decimal']],
+                    'base'            => ['path' => 'DecimalRangeType.score'],
+                ],
+            ]),
+            'R4',
+            $this->context,
+        );
+
+        $fqcn = $this->evalClass($class, self::TEST_NS . '\\DataType');
+        self::assertEmpty(
+            (new \ReflectionClass($fqcn))->getProperty('score')->getAttributes(FHIRQuantityRange::class),
+            '#[FHIRQuantityRange] must NOT be emitted for decimal bounds',
+        );
+    }
+
+    public function testQuantityRangeNotEmittedWhenBoundIsScalar(): void
+    {
+        // Guard: if minValueQuantity is a scalar (malformed StructureDefinition), no attribute must be emitted.
+        $class = $this->generator->generateModelClass(
+            $this->buildSD('MalformedQuantityType', 'complex-type', [
+                [
+                    'path'             => 'MalformedQuantityType.dose',
+                    'min'              => 0,
+                    'max'              => '1',
+                    'minValueQuantity' => 5,
+                    'type'             => [['code' => 'Quantity']],
+                    'base'             => ['path' => 'MalformedQuantityType.dose'],
+                ],
+            ]),
+            'R4',
+            $this->context,
+        );
+
+        $fqcn = $this->evalClass($class, self::TEST_NS . '\\DataType');
+        self::assertEmpty(
+            (new \ReflectionClass($fqcn))->getProperty('dose')->getAttributes(FHIRQuantityRange::class),
+            '#[FHIRQuantityRange] must NOT be emitted when bound value is not an array',
+        );
     }
 }
