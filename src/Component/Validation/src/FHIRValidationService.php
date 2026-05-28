@@ -9,8 +9,10 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRContextInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRMustSupport;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRObligation;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
+use Ardenexal\FHIRTools\Component\Metadata\ObligationCode;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -26,6 +28,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         object $resource,
         array $profileUrls = [],
         bool $includeMustSupportInfo = false,
+        ?FHIRObligationContext $obligationContext = null,
     ): FHIRValidationReport {
         $groups = ['Default', ...$profileUrls];
 
@@ -46,7 +49,110 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             $violations[] = $contextViolation;
         }
 
+        if ($obligationContext !== null) {
+            foreach ($this->collectObligationViolations($resource, $obligationContext) as $obligationViolation) {
+                $violations[] = $obligationViolation;
+            }
+            $violations = $this->applyNoErrorSuppression($resource, $violations, $obligationContext);
+        }
+
         return new FHIRValidationReport($violations);
+    }
+
+    /** @return list<FHIRValidationViolation> */
+    private function collectObligationViolations(object $resource, FHIRObligationContext $context): array
+    {
+        $violations = [];
+        $ref        = new \ReflectionClass($resource);
+
+        foreach ($ref->getProperties() as $property) {
+            $attrs = $property->getAttributes(FHIRObligation::class);
+
+            if ($attrs === []) {
+                continue;
+            }
+
+            $value   = $property->getValue($resource);
+            $isEmpty = $value === null || $value === [];
+
+            foreach ($attrs as $attr) {
+                /** @var FHIRObligation $obligation */
+                $obligation = $attr->newInstance();
+
+                if (!$context->matchesObligation($obligation)) {
+                    continue;
+                }
+
+                if ($obligation->filter !== null) {
+                    continue; // FHIRPath filter evaluation deferred to backlog
+                }
+
+                $code = ObligationCode::tryFrom($obligation->code);
+
+                if ($code === null || !$isEmpty) {
+                    continue;
+                }
+
+                $severity = match ($code) {
+                    ObligationCode::SHALL_POPULATE          => 'error',
+                    ObligationCode::SHOULD_POPULATE         => 'warning',
+                    ObligationCode::SHALL_POPULATE_IF_KNOWN => 'info',
+                    default                                 => null,
+                };
+
+                if ($severity === null) {
+                    continue;
+                }
+
+                $violations[] = new FHIRValidationViolation(
+                    severity: $severity,
+                    path: $property->getName(),
+                    message: sprintf('Obligation %s: property "%s" must be populated.', $obligation->code, $property->getName()),
+                    constraintClass: FHIRObligation::class,
+                    profileGroup: null,
+                    invariantKey: null,
+                );
+            }
+        }
+
+        return $violations;
+    }
+
+    /**
+     * Removes fhir:error violations for properties where a matching SHALL:no-error obligation applies.
+     *
+     * @param list<FHIRValidationViolation> $violations
+     *
+     * @return list<FHIRValidationViolation>
+     */
+    private function applyNoErrorSuppression(object $resource, array $violations, FHIRObligationContext $context): array
+    {
+        $suppressedPaths = [];
+        $ref             = new \ReflectionClass($resource);
+
+        foreach ($ref->getProperties() as $property) {
+            foreach ($property->getAttributes(FHIRObligation::class) as $attr) {
+                /** @var FHIRObligation $obligation */
+                $obligation = $attr->newInstance();
+
+                if ($context->matchesObligation($obligation)
+                    && ObligationCode::tryFrom($obligation->code) === ObligationCode::SHALL_NO_ERROR
+                ) {
+                    $suppressedPaths[] = $property->getName();
+                }
+            }
+        }
+
+        if ($suppressedPaths === []) {
+            return $violations;
+        }
+
+        return array_values(array_filter(
+            $violations,
+            static fn (FHIRValidationViolation $v): bool => !(
+                $v->severity === 'error' && in_array($v->path, $suppressedPaths, true)
+            ),
+        ));
     }
 
     private function mapViolation(ConstraintViolationInterface $violation): FHIRValidationViolation
