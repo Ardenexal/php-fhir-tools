@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Validation;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRContextInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRMustSupport;
@@ -21,6 +22,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
     public function __construct(
         private readonly ValidatorInterface $validator,
         private readonly FHIRPathService $pathService,
+        private readonly ?FHIRIGTypeRegistry $registry = null,
     ) {
     }
 
@@ -47,6 +49,13 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
 
         foreach ($this->validateExtensionContexts($resource) as $contextViolation) {
             $violations[] = $contextViolation;
+        }
+
+        if ($this->registry !== null) {
+            $visited = [];
+            foreach ($this->validateModifierExtensions($resource, '', $visited) as $modifierViolation) {
+                $violations[] = $modifierViolation;
+            }
         }
 
         if ($obligationContext !== null) {
@@ -216,6 +225,87 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                 profileGroup: null,
                 invariantKey: null,
             );
+        }
+
+        return $violations;
+    }
+
+    /**
+     * Walk $resource and all nested complex-type objects, raising fhir:error for each
+     * modifier extension whose URL is not resolvable via the IG type registry.
+     *
+     * Non-modifier (regular) extensions with unknown URLs produce no violation per the FHIR spec
+     * ("Systems SHOULD ignore extensions they do not recognise"). Only modifier extensions are
+     * enforced, because they change the meaning of the containing resource in an unknown way.
+     *
+     * @param array<int, true> $visited spl_object_id keys of already-visited objects (cycle guard)
+     *
+     * @return list<FHIRValidationViolation>
+     */
+    private function validateModifierExtensions(object $resource, string $path, array &$visited): array
+    {
+        $id = spl_object_id($resource);
+
+        if (isset($visited[$id])) {
+            return [];
+        }
+
+        $visited[$id] = true;
+        $violations   = [];
+
+        if (property_exists($resource, 'modifierExtension') && is_array($resource->modifierExtension)) {
+            $extPath = $path !== '' ? $path . '.modifierExtension' : 'modifierExtension';
+
+            foreach ($resource->modifierExtension as $ext) {
+                if (!is_object($ext)) {
+                    continue;
+                }
+
+                $url = method_exists($ext, 'getExtensionUrl') ? $ext->getExtensionUrl() : null;
+
+                if ($url === null) {
+                    continue;
+                }
+
+                /** @var FHIRIGTypeRegistry $registry */
+                $registry = $this->registry;
+
+                if ($registry->resolveExtensionClass($url) === null) {
+                    $violations[] = new FHIRValidationViolation(
+                        severity: 'error',
+                        path: $extPath,
+                        message: sprintf('Unknown modifier extension: %s — resource cannot be safely processed', $url),
+                        constraintClass: FHIRIGTypeRegistry::class,
+                        profileGroup: null,
+                        invariantKey: null,
+                    );
+                }
+            }
+        }
+
+        $ref = new \ReflectionClass($resource);
+
+        foreach ($ref->getProperties(\ReflectionProperty::IS_PUBLIC) as $prop) {
+            if ($prop->getName() === 'modifierExtension') {
+                continue;
+            }
+
+            $value    = $prop->getValue($resource);
+            $propPath = $path !== '' ? $path . '.' . $prop->getName() : $prop->getName();
+
+            if (is_object($value)) {
+                foreach ($this->validateModifierExtensions($value, $propPath, $visited) as $v) {
+                    $violations[] = $v;
+                }
+            } elseif (is_array($value)) {
+                foreach ($value as $i => $item) {
+                    if (is_object($item)) {
+                        foreach ($this->validateModifierExtensions($item, $propPath . '[' . $i . ']', $visited) as $v) {
+                            $violations[] = $v;
+                        }
+                    }
+                }
+            }
         }
 
         return $violations;

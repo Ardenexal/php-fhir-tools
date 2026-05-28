@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\ImmunizationRecommen
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
@@ -40,7 +41,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var array<CodeableConcept> vaccineCode Vaccine  or vaccine group recommendation applies to */
         #[FhirProperty(
@@ -62,7 +63,7 @@ class ImmunizationRecommendationRecommendation extends BackboneElement
         )]
         public array $contraindicatedVaccineCode = [],
         /** @var CodeableConcept|null forecastStatus Vaccine recommendation status */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank, FHIRIsModifier(reason: 'This element is labeled as a modifier because the forecastStatus indicates whether a patient needs additional doses (due, overdue, etc) or not  (contraindicated, complete, etc).')]
         public ?CodeableConcept $forecastStatus = null,
         /** @var array<CodeableConcept> forecastReason Vaccine administration status reason */
         #[FhirProperty(

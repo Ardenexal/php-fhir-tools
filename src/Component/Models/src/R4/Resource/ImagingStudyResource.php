@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation;
@@ -42,7 +43,7 @@ class ImagingStudyResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies it\'s meaning or interpretation')]
         public ?UriPrimitive $implicitRules = null,
         /** @var string|null language Language of the resource content */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
@@ -62,7 +63,7 @@ class ImagingStudyResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the resource that contains them')]
         public array $modifierExtension = [],
         /** @var array<Identifier> identifier Identifiers for the whole study */
         #[FhirProperty(
@@ -73,7 +74,7 @@ class ImagingStudyResource extends DomainResourceResource
         )]
         public array $identifier = [],
         /** @var ImagingStudyStatusType|null status registered | available | cancelled | entered-in-error | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/imagingstudy-status|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/imagingstudy-status|4.0.1', strength: 'required'), FHIRIsModifier(reason: 'This element is labelled as a modifier because it is a status element that contains status entered-in-error which means that the resource should not be treated as valid')]
         public ?ImagingStudyStatusType $status = null,
         /** @var array<Coding> modality All series modality if actual acquisition modalities */
         #[FhirProperty(

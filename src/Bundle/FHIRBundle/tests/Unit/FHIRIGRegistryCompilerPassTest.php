@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Tests\Unit;
 
 use Ardenexal\FHIRTools\Bundle\FHIRBundle\DependencyInjection\Compiler\FHIRIGRegistryCompilerPass;
-use Ardenexal\FHIRTools\Component\Serialization\FHIRIGTypeRegistry;
+use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\ConceptMap;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
@@ -35,7 +36,7 @@ class ConceptMapGroupElementTarget extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodePrimitive|null code Code that identifies the target element */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
@@ -44,7 +45,7 @@ class ConceptMapGroupElementTarget extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $display = null,
         /** @var ConceptMapEquivalenceType|null equivalence relatedto | equivalent | equal | wider | subsumes | narrower | specializes | inexact | unmatched | disjoint */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/concept-map-equivalence|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/concept-map-equivalence|4.3.0', strength: 'required'), FHIRIsModifier(reason: 'Some of the values mean that there is no mapping from the source to the target, particularly \'disjoint\', and the mapping cannot be interpreted without knowing this value as it could mean the elements are equivalent, totally mismatched or anything in between')]
         public ?ConceptMapEquivalenceType $equivalence = null,
         /** @var StringPrimitive|string|null comment Description of status/issues in mapping */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

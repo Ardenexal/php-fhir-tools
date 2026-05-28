@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\PositiveIntPrimitive;
@@ -41,7 +42,7 @@ class ContactPoint extends Element
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $value = null,
         /** @var ContactPointUseType|null use home | work | temp | old | mobile - purpose of this contact point */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/contact-point-use|4.3.0', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/contact-point-use|4.3.0', strength: 'required'), FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because applications should not mistake a temporary or old contact etc.for a current/permanent one')]
         public ?ContactPointUseType $use = null,
         /** @var PositiveIntPrimitive|null rank Specify preferred order of use (1 = highest) */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]

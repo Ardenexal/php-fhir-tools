@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization;
 
+use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
+
 /**
  * Comprehensive FHIR discriminator map resolver for polymorphic type resolution.
  *

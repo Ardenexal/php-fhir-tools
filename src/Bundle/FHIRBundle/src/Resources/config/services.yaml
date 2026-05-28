@@ -62,7 +62,7 @@ services:
         public: true
 
     # Serialization - IG Type Registry (maps populated by FHIRIGRegistryCompilerPass at container build time)
-    Ardenexal\FHIRTools\Component\Serialization\FHIRIGTypeRegistry: ~
+    Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry: ~
 
     # Serialization - Type Resolver
     Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolver: ~

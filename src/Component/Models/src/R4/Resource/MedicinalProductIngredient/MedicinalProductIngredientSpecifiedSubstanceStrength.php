@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\MedicinalProductIngre
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -31,19 +32,19 @@ class MedicinalProductIngredientSpecifiedSubstanceStrength extends BackboneEleme
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var Ratio|null presentation The quantity of substance in the unit of presentation, or in the volume (or mass) of the single pharmaceutical product or manufactured item */
         #[FhirProperty(fhirType: 'Ratio', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?Ratio $presentation = null,
         /** @var Ratio|null presentationLowLimit A lower limit for the quantity of substance in the unit of presentation. For use when there is a range of strengths, this is the lower limit, with the presentation attribute becoming the upper limit */
-        #[FhirProperty(fhirType: 'Ratio', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Ratio', propertyKind: 'complex'), FHIRIsModifier(reason: 'If this is present it implies that the whole strength is expressed as a range, due to uncertainty or variation')]
         public ?Ratio $presentationLowLimit = null,
         /** @var Ratio|null concentration The strength per unitary volume (or mass) */
         #[FhirProperty(fhirType: 'Ratio', propertyKind: 'complex')]
         public ?Ratio $concentration = null,
         /** @var Ratio|null concentrationLowLimit A lower limit for the strength per unitary volume (or mass), for when there is a range. The concentration attribute then becomes the upper limit */
-        #[FhirProperty(fhirType: 'Ratio', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Ratio', propertyKind: 'complex'), FHIRIsModifier(reason: 'If this is present it implies that the whole strength is expressed as a range, due to uncertainty or variation')]
         public ?Ratio $concentrationLowLimit = null,
         /** @var StringPrimitive|string|null measurementPoint For when strength is measured at a particular point or distance */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

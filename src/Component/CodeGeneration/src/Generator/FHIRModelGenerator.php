@@ -24,6 +24,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRMustSupport;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRObligation;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRObligationConstraint;
@@ -918,6 +919,12 @@ class FHIRModelGenerator implements GeneratorInterface
 
             if (($element['mustSupport'] ?? false) === true) {
                 $param->addAttribute(FHIRMustSupport::class);
+            }
+
+            if (($element['isModifier'] ?? false) === true) {
+                $reason = $element['isModifierReason'] ?? null;
+                $args   = $reason !== null ? ['reason' => $reason] : [];
+                $param->addAttribute(FHIRIsModifier::class, $args);
             }
 
             // FHIRObligation from obligation extensions on snapshot elements.

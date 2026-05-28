@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Serialization;
+namespace Ardenexal\FHIRTools\Component\Metadata;
 
 /**
  * Registry mapping IG extension URLs, profile URLs, and slice discriminators to their

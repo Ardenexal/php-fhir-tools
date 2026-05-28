@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization\Tests\Unit;
 
-use Ardenexal\FHIRTools\Component\Serialization\FHIRIGTypeRegistry;
+use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolver;
 use Ardenexal\FHIRTools\Tests\Utilities\TestCase;
 

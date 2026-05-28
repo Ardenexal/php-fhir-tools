@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\CodeGeneration\Tests\Unit\Generator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRQuantityRange;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTemporalRange;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRObligation;
@@ -1009,5 +1010,83 @@ class FHIRModelGeneratorConstraintEmissionTest extends TestCase
             (new \ReflectionClass($fqcn))->getProperty('dose')->getAttributes(FHIRQuantityRange::class),
             '#[FHIRQuantityRange] must NOT be emitted when bound value is not an array',
         );
+    }
+
+    // -------------------------------------------------------------------------
+    // FHIRIsModifier emission
+    // -------------------------------------------------------------------------
+
+    public function testIsModifierEmittedWithReason(): void
+    {
+        $class = $this->generator->generateModelClass(
+            $this->buildSD('ModifierType', 'complex-type', [
+                [
+                    'path'              => 'ModifierType.status',
+                    'min'               => 0,
+                    'max'               => '1',
+                    'isModifier'        => true,
+                    'isModifierReason'  => 'This status changes the meaning of the resource',
+                    'type'              => [['code' => 'http://hl7.org/fhirpath/System.String']],
+                    'base'              => ['path' => 'ModifierType.status'],
+                ],
+            ]),
+            'R4',
+            $this->context,
+        );
+
+        $fqcn     = $this->evalClass($class, self::TEST_NS . '\\DataType');
+        $attrs    = (new \ReflectionClass($fqcn))->getProperty('status')->getAttributes(FHIRIsModifier::class);
+        self::assertNotEmpty($attrs, '#[FHIRIsModifier] must be emitted when isModifier is true');
+        self::assertSame(
+            'This status changes the meaning of the resource',
+            $attrs[0]->newInstance()->reason,
+            'reason must be passed from isModifierReason',
+        );
+    }
+
+    public function testIsModifierNotEmittedWhenAbsent(): void
+    {
+        $class = $this->generator->generateModelClass(
+            $this->buildSD('NonModifierType', 'complex-type', [
+                [
+                    'path'  => 'NonModifierType.value',
+                    'min'   => 0,
+                    'max'   => '1',
+                    'type'  => [['code' => 'http://hl7.org/fhirpath/System.String']],
+                    'base'  => ['path' => 'NonModifierType.value'],
+                ],
+            ]),
+            'R4',
+            $this->context,
+        );
+
+        $fqcn = $this->evalClass($class, self::TEST_NS . '\\DataType');
+        self::assertEmpty(
+            (new \ReflectionClass($fqcn))->getProperty('value')->getAttributes(FHIRIsModifier::class),
+            '#[FHIRIsModifier] must NOT be emitted when isModifier is absent',
+        );
+    }
+
+    public function testIsModifierEmittedWithNullReasonWhenReasonAbsent(): void
+    {
+        $class = $this->generator->generateModelClass(
+            $this->buildSD('ModifierNoReasonType', 'complex-type', [
+                [
+                    'path'        => 'ModifierNoReasonType.active',
+                    'min'         => 0,
+                    'max'         => '1',
+                    'isModifier'  => true,
+                    'type'        => [['code' => 'http://hl7.org/fhirpath/System.String']],
+                    'base'        => ['path' => 'ModifierNoReasonType.active'],
+                ],
+            ]),
+            'R4',
+            $this->context,
+        );
+
+        $fqcn     = $this->evalClass($class, self::TEST_NS . '\\DataType');
+        $attrs    = (new \ReflectionClass($fqcn))->getProperty('active')->getAttributes(FHIRIsModifier::class);
+        self::assertNotEmpty($attrs, '#[FHIRIsModifier] must be emitted even when isModifierReason is absent');
+        self::assertNull($attrs[0]->newInstance()->reason, 'reason must be null when isModifierReason is absent');
     }
 }

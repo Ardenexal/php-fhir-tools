@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
@@ -39,7 +40,7 @@ class Distance extends Quantity
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
         public ?string $value = null,
         /** @var QuantityComparatorType|null comparator < | <= | >= | > - how to understand the value */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/quantity-comparator|4.0.1', strength: 'required')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/quantity-comparator|4.0.1', strength: 'required'), FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because the comparator modifies the interpretation of the value significantly. If there is no comparator, then there is no modification of the value')]
         public ?QuantityComparatorType $comparator = null,
         /** @var StringPrimitive|string|null unit Unit representation */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

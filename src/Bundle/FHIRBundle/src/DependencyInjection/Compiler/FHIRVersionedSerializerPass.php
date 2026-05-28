@@ -6,7 +6,7 @@ namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\DependencyInjection\Compiler;
 
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContextFactory;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationDebugInfo;
-use Ardenexal\FHIRTools\Component\Serialization\FHIRIGTypeRegistry;
+use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRVersionedSerializationServiceLocator;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
