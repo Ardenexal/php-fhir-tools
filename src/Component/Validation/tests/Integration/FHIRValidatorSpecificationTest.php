@@ -35,6 +35,7 @@ use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Validation;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Official FHIR validator specification conformance test for R4 resources.
@@ -81,7 +82,7 @@ final class FHIRValidatorSpecificationTest extends TestCase
      */
     public static function provideValidatorTestCases(): iterable
     {
-        $vendorDir   = dirname(__DIR__, 5) . '/vendor';
+        $vendorDir    = dirname(__DIR__, 5) . '/vendor';
         $manifestPath = $vendorDir . '/fhir/fhir-test-cases/validator/manifest.json';
 
         if (!file_exists($manifestPath)) {
@@ -182,19 +183,19 @@ final class FHIRValidatorSpecificationTest extends TestCase
             $this->markTestSkipped("Validation threw Error for '{$name}': {$e->getMessage()}");
         }
 
-        $realErrors   = array_values(array_filter($report->errors(),   fn ($v) => !$this->isKnownGap($v, $resource)));
+        $realErrors   = array_values(array_filter($report->errors(), fn ($v) => !$this->isKnownGap($v, $resource)));
         $realWarnings = array_values(array_filter($report->warnings(), fn ($v) => !$this->isKnownGap($v, $resource)));
 
         self::assertSame(
             $expected['errorCount'],
             count($realErrors),
             "Unexpected error count for '{$name}': "
-            . implode(', ', array_map(static fn (FHIRValidationViolation $v) => $v->message, $realErrors))
+            . implode(', ', array_map(static fn (FHIRValidationViolation $v) => $v->message, $realErrors)),
         );
         self::assertSame(
             $expected['warningCount'],
             count($realWarnings),
-            "Unexpected warning count for '{$name}'"
+            "Unexpected warning count for '{$name}'",
         );
     }
 
@@ -256,7 +257,7 @@ final class FHIRValidatorSpecificationTest extends TestCase
             $defaultFactory,
         ) implements ConstraintValidatorFactoryInterface {
             public function __construct(
-                private readonly \Symfony\Component\PropertyAccess\PropertyAccessorInterface $accessor,
+                private readonly PropertyAccessorInterface $accessor,
                 private readonly FHIRValidationMessageRegistry $registry,
                 private readonly FHIRPathService $pathSvc,
                 private readonly SliceDiscriminatorMatcher $matcher,
@@ -268,7 +269,7 @@ final class FHIRValidatorSpecificationTest extends TestCase
             public function getInstance(Constraint $constraint): ConstraintValidatorInterface
             {
                 return match (true) {
-                    $constraint instanceof FHIRProfileConstraint => new FHIRProfileConstraintValidator($this->accessor),
+                    $constraint instanceof FHIRProfileConstraint  => new FHIRProfileConstraintValidator($this->accessor),
                     $constraint instanceof FHIRPathInvariant      => new FHIRPathInvariantValidator($this->pathSvc, $this->registry),
                     $constraint instanceof FHIRValueSetBinding    => new FHIRValueSetBindingValidator(
                         $this->registry,

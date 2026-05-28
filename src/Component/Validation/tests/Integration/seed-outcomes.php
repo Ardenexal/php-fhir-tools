@@ -45,6 +45,8 @@ use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Validation;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 const SKIP_MODULES = ['tx', 'cda', 'cdshooks', 'shc'];
 const OUTCOMES_DIR = __DIR__ . '/outcomes/ardenexal';
@@ -88,7 +90,7 @@ foreach ($cases as $name => $case) {
 
     try {
         $resource = $serial->deserialize($data);
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
         echo "  SKIP (deserialize) {$name}: {$e->getMessage()}\n";
         ++$skipped;
         continue;
@@ -96,13 +98,13 @@ foreach ($cases as $name => $case) {
 
     try {
         $report = $service->validate($resource);
-    } catch (\Error $e) {
+    } catch (Error $e) {
         echo "  SKIP (validate error) {$name}: {$e->getMessage()}\n";
         ++$skipped;
         continue;
     }
 
-    $errorCount   = count(array_filter($report->errors(),   fn ($v) => !isKnownGap($v, $resource)));
+    $errorCount   = count(array_filter($report->errors(), fn ($v) => !isKnownGap($v, $resource)));
     $warningCount = count(array_filter($report->warnings(), fn ($v) => !isKnownGap($v, $resource)));
     $infoCount    = count($report->info());
 
@@ -152,7 +154,7 @@ function deduplicateCases(array $testCases): array
         if (!isset($case['java'])) {
             continue;
         }
-        $name      = (string) ($case['name'] ?? '');
+        $name       = (string) ($case['name'] ?? '');
         $out[$name] = $case;
     }
 
@@ -170,7 +172,7 @@ function isKnownGap(FHIRValidationViolation $v, object $resource): bool
     if ($v->invariantKey === 'sdf-19') {
         return true;
     }
-    if ($v->constraintClass === \Symfony\Component\Validator\Constraints\NotBlank::class
+    if ($v->constraintClass === NotBlank::class
         && $v->path !== ''
         && property_exists($resource, $v->path)
         && isset($resource->{$v->path})
@@ -199,7 +201,7 @@ function createValidationService(): FHIRValidationService
         $defaultFactory,
     ) implements ConstraintValidatorFactoryInterface {
         public function __construct(
-            private readonly \Symfony\Component\PropertyAccess\PropertyAccessorInterface $accessor,
+            private readonly PropertyAccessorInterface $accessor,
             private readonly FHIRValidationMessageRegistry $registry,
             private readonly FHIRPathService $pathSvc,
             private readonly SliceDiscriminatorMatcher $matcher,
@@ -211,7 +213,7 @@ function createValidationService(): FHIRValidationService
         public function getInstance(Constraint $constraint): ConstraintValidatorInterface
         {
             return match (true) {
-                $constraint instanceof FHIRProfileConstraint => new FHIRProfileConstraintValidator($this->accessor),
+                $constraint instanceof FHIRProfileConstraint  => new FHIRProfileConstraintValidator($this->accessor),
                 $constraint instanceof FHIRPathInvariant      => new FHIRPathInvariantValidator($this->pathSvc, $this->registry),
                 $constraint instanceof FHIRValueSetBinding    => new FHIRValueSetBindingValidator(
                     $this->registry,
