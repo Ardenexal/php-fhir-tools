@@ -40,6 +40,13 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
             return;
         }
 
+        // FHIR primitives that carry only extensions (e.g. `_status`) have no
+        // underlying value. Cast-to-string yields "" — treat as absent so that
+        // NotBlank handles the required-field check rather than this validator.
+        if ($value instanceof \Stringable && (string) $value === '') {
+            return;
+        }
+
         if ($constraint->strength === 'required') {
             $this->validateRequired($value, $constraint);
 
@@ -116,6 +123,22 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
             return true;
         }
 
+        // Array properties (isArray: true) pass the whole PHP array here;
+        // validate each element individually.
+        if (is_array($value)) {
+            foreach ($value as $item) {
+                if (!$this->isValidEnumCase($enumFqcn, $item)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        if ($value instanceof \Stringable) {
+            $value = (string) $value;
+        }
+
         if (is_string($value) || is_int($value)) {
             return $enumFqcn::tryFrom($value) !== null;
         }
@@ -141,6 +164,7 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
     {
         $urlPath = parse_url($valueSetUrl, PHP_URL_PATH) ?? $valueSetUrl;
         $name    = basename((string) $urlPath);
+        $name    = (string) strstr($name, '|', true) ?: $name;
 
         return str_replace(' ', '', ucwords(str_replace(['-', '_'], ' ', $name)));
     }

@@ -73,7 +73,7 @@ class FHIRSerializationService
     ): self {
         $metadataExtractor = new FHIRMetadataExtractor();
         $registry          = FHIRIGTypeRegistryFactory::create($igOutputDirectory, $igNamespace);
-        $typeResolver      = new FHIRTypeResolver(igTypeRegistry: $registry);
+        $typeResolver      = new FHIRTypeResolver(igTypeRegistry: $registry, fhirVersion: $version->value);
 
         $normalizers = [
             new FHIRResourceJsonNormalizer($metadataExtractor, $typeResolver, fhirVersion: $version->value, igTypeRegistry: $registry),
@@ -88,7 +88,7 @@ class FHIRSerializationService
 
         $serializer = new Serializer($normalizers, [new JsonEncoder(), new XmlEncoder()]);
 
-        return new self($serializer, new FHIRSerializationContextFactory(), new FHIRSerializationDebugInfo('initial', 'json'), $metadataExtractor);
+        return new self($serializer, new FHIRSerializationContextFactory(), new FHIRSerializationDebugInfo('initial', 'json'), $metadataExtractor, $typeResolver);
     }
 
     /**

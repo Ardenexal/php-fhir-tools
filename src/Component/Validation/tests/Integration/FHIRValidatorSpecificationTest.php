@@ -38,7 +38,7 @@ use Symfony\Component\Validator\Validation;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
- * Official FHIR validator specification conformance test for R4 resources.
+ * Official FHIR validator specification conformance test for R4, R4B, and R5 resources.
  *
  * Test cases are driven by vendor/fhir/fhir-test-cases/validator/manifest.json.
  * Each applicable case deserializes its resource file, runs FHIRValidationService,
@@ -52,13 +52,15 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  *    from actual FHIRValidationService output and updated when gaps are fixed.
  *
  * Skip policy (cases yielded as skipped, not failed):
- * - FHIR version is not "4.0" (R4) — R4B/R5 covered in later milestones
  * - use-test === false
  * - File extension is not .json or .xml
- * - Module is one of: tx (requires external terminology server), cda, cdshooks, shc
+ * - Module is one of: tx (requires external terminology server), cda, cdshooks, shc, matchetype
  * - Top-level "supporting" or "profiles" keys present (requires dynamic SD loading)
  * - Deserialization throws or returns a non-object
  * - No ardenexal outcome file exists → markTestIncomplete
+ *
+ * Version routing: R4 (version=4.0), R4B (version=4.3), R5 (no version field, or 5.0/5.0.0).
+ * R5 binding validation uses the R5 enum namespace; R4B binding falls back to R4 enums.
  */
 #[CoversClass(FHIRValidationService::class)]
 final class FHIRValidatorSpecificationTest extends TestCase
@@ -75,11 +77,17 @@ final class FHIRValidatorSpecificationTest extends TestCase
 
     private FHIRSerializationService $serializationR4B;
 
+    private FHIRSerializationService $serializationR5;
+
+    private FHIRValidationService $serviceR5;
+
     protected function setUp(): void
     {
-        $this->service          = self::createValidationService();
+        $this->service          = self::createValidationService(FhirVersion::R4);
+        $this->serviceR5        = self::createValidationService(FhirVersion::R5);
         $this->serialization    = FHIRSerializationService::createDefault(FhirVersion::R4);
         $this->serializationR4B = FHIRSerializationService::createDefault(FhirVersion::R4B);
+        $this->serializationR5  = FHIRSerializationService::createDefault(FhirVersion::R5);
     }
 
     /**
@@ -329,6 +337,122 @@ final class FHIRValidatorSpecificationTest extends TestCase
         );
     }
 
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function provideR5ValidatorTestCases(): iterable
+    {
+        $vendorDir    = dirname(__DIR__, 5) . '/vendor';
+        $manifestPath = $vendorDir . '/fhir/fhir-test-cases/validator/manifest.json';
+
+        if (!file_exists($manifestPath)) {
+            yield '__vendor_not_installed__' => ['__skip__', ''];
+
+            return;
+        }
+
+        $raw = file_get_contents($manifestPath);
+        if ($raw === false) {
+            return;
+        }
+
+        /** @var array{test-cases: list<array<string, mixed>>} $manifest */
+        $manifest = json_decode($raw, true);
+
+        /** @var array<string, array{string, string}> $cases */
+        $cases = [];
+
+        foreach ($manifest['test-cases'] as $case) {
+            $name = (string) ($case['name'] ?? '');
+
+            if (isset($case['use-test']) && $case['use-test'] === false) {
+                continue;
+            }
+
+            // R5: no version field, or explicit 5.0 / 5.0.0
+            $version = $case['version'] ?? null;
+            if ($version !== null && !in_array($version, ['5.0', '5.0.0'], true)) {
+                continue;
+            }
+
+            $file = (string) ($case['file'] ?? '');
+
+            if (!str_ends_with($file, '.json') && !str_ends_with($file, '.xml')) {
+                continue;
+            }
+
+            $module = (string) ($case['module'] ?? '');
+            if (in_array($module, self::SKIP_MODULES, true)) {
+                continue;
+            }
+
+            if (isset($case['supporting']) || isset($case['profiles'])) {
+                continue;
+            }
+
+            $filePath = $vendorDir . '/fhir/fhir-test-cases/validator/' . $file;
+            if (!file_exists($filePath)) {
+                continue;
+            }
+
+            if (self::resolveJavaErrorCount($case, $vendorDir . '/fhir/fhir-test-cases/validator') === null) {
+                continue;
+            }
+
+            $cases[$name] = [$name, $filePath];
+        }
+
+        yield from $cases;
+    }
+
+    #[DataProvider('provideR5ValidatorTestCases')]
+    public function testR5ValidatorSpecificationCase(string $name, string $filePath): void
+    {
+        if ($name === '__skip__') {
+            $this->markTestSkipped('fhir/fhir-test-cases not installed — run: composer update fhir/fhir-test-cases');
+        }
+
+        $outcomeFile = self::OUTCOMES_DIR . '/R5.' . self::sanitizeName($name) . '-base.json';
+        if (!file_exists($outcomeFile)) {
+            $this->markTestIncomplete("No ardenexal outcome defined yet for R5 '{$name}'");
+        }
+
+        /** @var array{errorCount: int, warningCount: int, infoCount: int} $expected */
+        $expected = json_decode((string) file_get_contents($outcomeFile), true);
+
+        $data = file_get_contents($filePath);
+        if ($data === false) {
+            $this->markTestSkipped("Cannot read test case file: {$filePath}");
+        }
+
+        try {
+            $resource = $this->serializationR5->deserialize($data);
+        } catch (\Throwable $e) {
+            $this->markTestSkipped("Deserialization failed for R5 {$name}: {$e->getMessage()}");
+        }
+
+        try {
+            $report = $this->serviceR5->validate($resource);
+        } catch (\Error $e) {
+            $this->markTestSkipped("Validation threw Error for R5 '{$name}': {$e->getMessage()}");
+        }
+
+        $realErrors   = array_values(array_filter($report->errors(), fn ($v) => !$this->isKnownGap($v, $resource)));
+        $realWarnings = array_values(array_filter($report->warnings(), fn ($v) => !$this->isKnownGap($v, $resource)));
+
+        self::assertSame(
+            $expected['errorCount'],
+            count($realErrors),
+            "Unexpected error count for R5 '{$name}': "
+            . implode(', ', array_map(static fn (FHIRValidationViolation $v) => $v->message, $realErrors)),
+        );
+        self::assertSame(
+            $expected['warningCount'],
+            count($realWarnings),
+            "Unexpected warning count for R5 '{$name}'",
+        );
+    }
+
     private static function sanitizeName(string $name): string
     {
         return str_replace(['/', ' '], '-', $name);
@@ -368,7 +492,7 @@ final class FHIRValidatorSpecificationTest extends TestCase
         return false;
     }
 
-    private static function createValidationService(): FHIRValidationService
+    private static function createValidationService(FhirVersion $version = FhirVersion::R4): FHIRValidationService
     {
         $accessor  = PropertyAccess::createPropertyAccessor();
         $registry  = new FHIRValidationMessageRegistry();
@@ -377,6 +501,7 @@ final class FHIRValidatorSpecificationTest extends TestCase
         $resolver  = new NullFHIRReferenceResolver();
 
         $defaultFactory = new ConstraintValidatorFactory();
+        $enumNamespace  = "Ardenexal\\FHIRTools\\Component\\Models\\{$version->value}\\Enum";
 
         $factory = new class (
             $accessor,
@@ -385,6 +510,7 @@ final class FHIRValidatorSpecificationTest extends TestCase
             $matcher,
             $resolver,
             $defaultFactory,
+            $enumNamespace,
         ) implements ConstraintValidatorFactoryInterface {
             public function __construct(
                 private readonly PropertyAccessorInterface $accessor,
@@ -393,6 +519,7 @@ final class FHIRValidatorSpecificationTest extends TestCase
                 private readonly SliceDiscriminatorMatcher $matcher,
                 private readonly NullFHIRReferenceResolver $resolver,
                 private readonly ConstraintValidatorFactory $default,
+                private readonly string $enumNamespace,
             ) {
             }
 
@@ -403,7 +530,7 @@ final class FHIRValidatorSpecificationTest extends TestCase
                     $constraint instanceof FHIRPathInvariant      => new FHIRPathInvariantValidator($this->pathSvc, $this->registry),
                     $constraint instanceof FHIRValueSetBinding    => new FHIRValueSetBindingValidator(
                         $this->registry,
-                        ['Ardenexal\\FHIRTools\\Component\\Models\\R4\\Enum'],
+                        [$this->enumNamespace],
                     ),
                     $constraint instanceof FHIRFixedValue         => new FHIRFixedValueValidator($this->registry),
                     $constraint instanceof FHIRPatternValue       => new FHIRPatternValueValidator($this->registry),

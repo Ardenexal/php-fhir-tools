@@ -23,9 +23,9 @@ class FhirValidationTool
     }
 
     /**
-     * @param string   $data                 FHIR resource as a JSON or XML string. Format is auto-detected.
-     * @param string[] $profileUrls          Optional list of profile canonical URLs to validate against.
-     * @param bool     $includeMustSupportInfo When true, adds info-level violations for unpopulated must-support fields.
+     * @param string   $data                   FHIR resource as a JSON or XML string. Format is auto-detected.
+     * @param string[] $profileUrls            optional list of profile canonical URLs to validate against
+     * @param bool     $includeMustSupportInfo when true, adds info-level violations for unpopulated must-support fields
      */
     #[McpTool('fhir-validate', 'Deserialize a FHIR JSON or XML resource and run validation, returning a structured report of errors, warnings, and informational findings.')]
     public function validate(

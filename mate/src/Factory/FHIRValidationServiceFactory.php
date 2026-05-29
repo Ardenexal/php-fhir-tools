@@ -29,6 +29,7 @@ use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Validation;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 final class FHIRValidationServiceFactory
 {
@@ -49,7 +50,7 @@ final class FHIRValidationServiceFactory
             $defaultFactory,
         ) implements ConstraintValidatorFactoryInterface {
             public function __construct(
-                private readonly \Symfony\Component\PropertyAccess\PropertyAccessorInterface $accessor,
+                private readonly PropertyAccessorInterface $accessor,
                 private readonly FHIRValidationMessageRegistry $registry,
                 private readonly FHIRPathService $pathService,
                 private readonly SliceDiscriminatorMatcher $matcher,

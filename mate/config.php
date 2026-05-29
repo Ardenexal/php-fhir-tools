@@ -8,6 +8,7 @@ use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorIn
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return static function(ContainerConfigurator $container): void {

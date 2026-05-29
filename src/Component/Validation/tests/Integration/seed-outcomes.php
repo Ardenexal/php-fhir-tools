@@ -6,11 +6,11 @@ declare(strict_types=1);
  * Seed ardenexal outcome files from actual FHIRValidationService output.
  *
  * Run from the repository root:
- *   php src/Component/Validation/tests/Integration/seed-outcomes.php
+ *   php src/Component/Validation/tests/Integration/seed-outcomes.php       # seeds R4
+ *   php src/Component/Validation/tests/Integration/seed-outcomes.php r5    # seeds R5
+ *   php src/Component/Validation/tests/Integration/seed-outcomes.php r4b   # seeds R4B
  *
- * Writes one JSON file per qualifying R4 test case to:
- *   src/Component/Validation/tests/Integration/outcomes/ardenexal/R4.<name>-base.json
- *
+ * Writes one JSON file per qualifying test case to outcomes/ardenexal/.
  * Existing files are overwritten. Known-gap violations are excluded from counts,
  * matching the logic in FHIRValidatorSpecificationTest::isKnownGap().
  */
@@ -52,6 +52,20 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 const SKIP_MODULES = ['tx', 'cda', 'cdshooks', 'shc', 'matchetype'];
 const OUTCOMES_DIR = __DIR__ . '/outcomes/ardenexal';
 
+$versionArg  = strtolower($argv[1] ?? 'r4');
+$fhirVersion = match ($versionArg) {
+    'r4b'   => FhirVersion::R4B,
+    'r5'    => FhirVersion::R5,
+    default => FhirVersion::R4,
+};
+$outcomePrefix = match ($fhirVersion) {
+    FhirVersion::R4B => 'R4B',
+    FhirVersion::R5  => 'R5',
+    default          => 'R4',
+};
+
+echo "Seeding {$outcomePrefix} outcomes…\n";
+
 $vendorDir    = __DIR__ . '/../../../../../vendor';
 $manifestPath = $vendorDir . '/fhir/fhir-test-cases/validator/manifest.json';
 
@@ -61,14 +75,14 @@ if (!file_exists($manifestPath)) {
 }
 
 $manifest = json_decode((string) file_get_contents($manifestPath), true);
-$service  = createValidationService();
-$serial   = FHIRSerializationService::createDefault(FhirVersion::R4);
+$service  = createValidationService($fhirVersion);
+$serial   = FHIRSerializationService::createDefault($fhirVersion);
 
 $written  = 0;
 $skipped  = 0;
 $errors   = 0;
 
-$cases = deduplicateCases($manifest['test-cases']);
+$cases = deduplicateCases($manifest['test-cases'], $fhirVersion);
 
 foreach ($cases as $name => $case) {
     $file = (string) ($case['file'] ?? '');
@@ -104,7 +118,7 @@ foreach ($cases as $name => $case) {
         }
 
         $outcome = json_encode(['errorCount' => 1, 'warningCount' => 0, 'infoCount' => 0], JSON_PRETTY_PRINT) . "\n";
-        $outFile = OUTCOMES_DIR . '/R4.' . sanitizeName($name) . '-base.json';
+        $outFile = OUTCOMES_DIR . '/' . $outcomePrefix . '.' . sanitizeName($name) . '-base.json';
         if (file_put_contents($outFile, $outcome) !== false) {
             ++$written;
         } else {
@@ -133,7 +147,7 @@ foreach ($cases as $name => $case) {
         'infoCount'    => $infoCount,
     ], JSON_PRETTY_PRINT) . "\n";
 
-    $outFile = OUTCOMES_DIR . '/R4.' . sanitizeName($name) . '-base.json';
+    $outFile = OUTCOMES_DIR . '/' . $outcomePrefix . '.' . sanitizeName($name) . '-base.json';
     if (file_put_contents($outFile, $outcome) !== false) {
         ++$written;
     } else {
@@ -200,12 +214,11 @@ function resolveJavaErrorCount(array $case, string $outcomesBaseDir): ?int
 }
 
 /** @param list<array<string, mixed>> $testCases @return array<string, array<string, mixed>> */
-function deduplicateCases(array $testCases): array
+function deduplicateCases(array $testCases, FhirVersion $version): array
 {
     $out = [];
     foreach ($testCases as $case) {
-        $v = $case['version'] ?? '';
-        if ($v !== '4.0') {
+        if (!matchesVersion($case, $version)) {
             continue;
         }
         if (($case['use-test'] ?? true) === false) {
@@ -226,6 +239,17 @@ function deduplicateCases(array $testCases): array
     }
 
     return $out;
+}
+
+function matchesVersion(array $case, FhirVersion $version): bool
+{
+    $v = $case['version'] ?? null;
+
+    return match ($version) {
+        FhirVersion::R4  => $v === '4.0',
+        FhirVersion::R4B => $v === '4.3',
+        FhirVersion::R5  => $v === null || in_array($v, ['5.0', '5.0.0'], true),
+    };
 }
 
 function isKnownGap(FHIRValidationViolation $v, object $resource): bool
@@ -250,7 +274,7 @@ function isKnownGap(FHIRValidationViolation $v, object $resource): bool
     return false;
 }
 
-function createValidationService(): FHIRValidationService
+function createValidationService(FhirVersion $version = FhirVersion::R4): FHIRValidationService
 {
     $accessor       = PropertyAccess::createPropertyAccessor();
     $registry       = new FHIRValidationMessageRegistry();
@@ -258,6 +282,7 @@ function createValidationService(): FHIRValidationService
     $matcher        = new SliceDiscriminatorMatcher($accessor);
     $resolver       = new NullFHIRReferenceResolver();
     $defaultFactory = new ConstraintValidatorFactory();
+    $enumNamespace  = "Ardenexal\\FHIRTools\\Component\\Models\\{$version->value}\\Enum";
 
     $factory = new class (
         $accessor,
@@ -266,6 +291,7 @@ function createValidationService(): FHIRValidationService
         $matcher,
         $resolver,
         $defaultFactory,
+        $enumNamespace,
     ) implements ConstraintValidatorFactoryInterface {
         public function __construct(
             private readonly PropertyAccessorInterface $accessor,
@@ -274,6 +300,7 @@ function createValidationService(): FHIRValidationService
             private readonly SliceDiscriminatorMatcher $matcher,
             private readonly NullFHIRReferenceResolver $resolver,
             private readonly ConstraintValidatorFactory $default,
+            private readonly string $enumNamespace,
         ) {
         }
 
@@ -284,7 +311,7 @@ function createValidationService(): FHIRValidationService
                 $constraint instanceof FHIRPathInvariant      => new FHIRPathInvariantValidator($this->pathSvc, $this->registry),
                 $constraint instanceof FHIRValueSetBinding    => new FHIRValueSetBindingValidator(
                     $this->registry,
-                    ['Ardenexal\\FHIRTools\\Component\\Models\\R4\\Enum'],
+                    [$this->enumNamespace],
                 ),
                 $constraint instanceof FHIRFixedValue         => new FHIRFixedValueValidator($this->registry),
                 $constraint instanceof FHIRPatternValue       => new FHIRPatternValueValidator($this->registry),

@@ -41,6 +41,10 @@ class FHIRTypeResolver implements FHIRTypeResolverInterface
      * @param array<string, string> $referenceTypeMapping
      * @param array<string, string> $extensionValueMapping
      * @param array<string, string> $complexTypeMapping
+     * @param string|null           $fhirVersion           When set, resource type resolution is scoped strictly to this
+     *                                                     version's model namespace (e.g. 'R5'). Unscoped (null) falls
+     *                                                     back to the legacy all-versions scan, which returns R4 for any
+     *                                                     type present in multiple versions.
      */
     public function __construct(
         array $resourceTypeMapping = [],
@@ -49,6 +53,7 @@ class FHIRTypeResolver implements FHIRTypeResolverInterface
         array $extensionValueMapping = [],
         array $complexTypeMapping = [],
         private ?FHIRIGTypeRegistry $igTypeRegistry = null,
+        private ?string $fhirVersion = null,
     ) {
         $this->resourceTypeMapping   = $resourceTypeMapping;
         $this->choiceElementMapping  = $choiceElementMapping;
@@ -144,8 +149,16 @@ class FHIRTypeResolver implements FHIRTypeResolverInterface
             return $this->resourceTypeMapping[$resourceType];
         }
 
-        // Convention-based fallback: try Models namespace for each supported FHIR version.
-        // Whichever version's classes are installed will be found automatically.
+        // Version-scoped lookup: when a preferred version is configured, resolve strictly to that
+        // version's model namespace. Returning null on miss produces an honest deserialization
+        // failure rather than silently emitting a wrong-version object.
+        if ($this->fhirVersion !== null) {
+            $candidate = "Ardenexal\\FHIRTools\\Component\\Models\\{$this->fhirVersion}\\Resource\\{$resourceType}Resource";
+
+            return class_exists($candidate) ? $candidate : null;
+        }
+
+        // Unscoped fallback (no version preference): scan all installed versions.
         foreach (['R4', 'R4B', 'R5'] as $version) {
             $candidate = "Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\Resource\\{$resourceType}Resource";
             if (class_exists($candidate)) {

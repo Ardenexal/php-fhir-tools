@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Serialization\Tests\Integration;
 
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Common\AbstractFHIRNormalizer;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Xml\FHIRResourceXmlNormalizer;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -30,7 +31,7 @@ final class XmlPrimitiveWithExtensionTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->service = FHIRSerializationService::createDefault();
+        $this->service = FHIRSerializationService::createDefault(FhirVersion::R4);
     }
 
     /**
