@@ -15,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\StatusType;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;

@@ -39,3 +39,4 @@ phpstan.neon
 /phpunit.phar
 ###< phpunit/phpunit ###
 
+node_modules/

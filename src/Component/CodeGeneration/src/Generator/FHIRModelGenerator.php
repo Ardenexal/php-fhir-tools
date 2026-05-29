@@ -1214,15 +1214,17 @@ class FHIRModelGenerator implements GeneratorInterface
             return $storedType->namespace;
         }
 
-        // Special logical types that changed namespace between FHIR versions
-        // In R4/R4B: These types are in Resource namespace (logical/backbone types)
-        // In R5: Some moved to DataType namespace, others stayed in Resource namespace
-        $typesMovedToDataTypeInR5 = [
-            'Dosage',           // Moved to DataType in R5
-            'Timing',           // Moved to DataType in R5
-            'ElementDefinition', // Moved to DataType in R5
-            'ProductShelfLife',  // Moved to DataType in R5
-            'MarketingStatus',   // Moved to DataType in R5
+        // Complex types that are generated into the DataType namespace in all FHIR versions.
+        // The generator's `kind: complex-type` switch (see generateModelClass) places them
+        // in getDatatypeNamespace, so getNamespaceForFhirType must agree.
+        // (Previously this list was named "typesMovedToDataTypeInR5" with a wrong R4/R4B
+        // special-case that returned getElementNamespace — that produced broken `use` statements.)
+        $typesInDataTypeNamespace = [
+            'Dosage',
+            'Timing',
+            'ElementDefinition',
+            'ProductShelfLife',
+            'MarketingStatus',
         ];
 
         // Types that remain in Resource namespace across all versions
@@ -1232,17 +1234,11 @@ class FHIRModelGenerator implements GeneratorInterface
             'Population',         // Stays in Resource even in R5
         ];
 
-        if (in_array($code, $typesMovedToDataTypeInR5, true)) {
-            // In R4 and R4B, these are logical types (Resource-like structures)
-            // In R5, they moved to DataType namespace
-            if (in_array($version, ['R4', 'R4B'], true)) {
-                return $builderContext->getElementNamespace($version)->getName();
-            }
-            // In R5 and later, they are in DataType namespace
+        if (in_array($code, $typesInDataTypeNamespace, true)) {
+            // These complex types live in DataType namespace in all FHIR versions
             try {
                 return $builderContext->getDatatypeNamespace($version)->getName();
             } catch (GenerationException) {
-                // Fallback to element namespace if datatype namespace is not available
                 return $builderContext->getElementNamespace($version)->getName();
             }
         }

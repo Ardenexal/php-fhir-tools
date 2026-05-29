@@ -22,8 +22,6 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UnsignedIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UrlPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UuidPrimitive;
-use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Dosage;
-use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -283,7 +281,7 @@ class ElementDefinitionExample extends Element
                 [
                     'fhirType'     => 'Timing',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing',
                     'jsonKey'      => 'valueTiming',
                 ],
                 [
@@ -337,7 +335,7 @@ class ElementDefinitionExample extends Element
                 [
                     'fhirType'     => 'Dosage',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Dosage',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Dosage',
                     'jsonKey'      => 'valueDosage',
                 ],
             ],

@@ -18,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -115,7 +116,7 @@ class DeviceUseStatementResource extends DomainResourceResource
                 [
                     'fhirType'     => 'Timing',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing',
                     'jsonKey'      => 'timingTiming',
                 ],
                 [

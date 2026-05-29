@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBind
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Age;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\ContactDetail;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Dosage;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Duration;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
@@ -27,6 +28,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\RelatedArtifact;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\RequestIntentType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\RequestPriorityType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\RequestResourceTypeType;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\UsageContext;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive;
@@ -271,7 +273,7 @@ class ActivityDefinitionResource extends DomainResourceResource
                 [
                     'fhirType'     => 'Timing',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Timing',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing',
                     'jsonKey'      => 'timingTiming',
                 ],
                 [
@@ -351,7 +353,7 @@ class ActivityDefinitionResource extends DomainResourceResource
             fhirType: 'Dosage',
             propertyKind: 'complex',
             isArray: true,
-            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Dosage',
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Dosage',
         )]
         public array $dosage = [],
         /** @var array<CodeableConcept> bodySite What part of body to perform on */

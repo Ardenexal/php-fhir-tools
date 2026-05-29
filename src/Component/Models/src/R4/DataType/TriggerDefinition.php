@@ -12,7 +12,6 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBind
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\Timing;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -65,7 +64,7 @@ class TriggerDefinition extends Element
                 [
                     'fhirType'     => 'Timing',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Timing',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing',
                     'jsonKey'      => 'timingTiming',
                 ],
                 [

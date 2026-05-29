@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfil
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Dosage;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\MedicationStatusCodesType;
@@ -230,7 +231,7 @@ class MedicationStatementResource extends DomainResourceResource
             fhirType: 'Dosage',
             propertyKind: 'complex',
             isArray: true,
-            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Dosage',
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Dosage',
         )]
         public array $dosage = [],
     ) {

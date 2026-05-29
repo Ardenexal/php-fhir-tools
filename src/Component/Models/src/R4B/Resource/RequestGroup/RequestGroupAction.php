@@ -25,9 +25,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\RelatedArtifact;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\RequestPriorityType;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
-use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing;
 
 /**
  * @description The actions, if any, produced by the evaluation of the artifact.
@@ -137,7 +137,7 @@ class RequestGroupAction extends BackboneElement
                 [
                     'fhirType'     => 'Timing',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing',
                     'jsonKey'      => 'timingTiming',
                 ],
             ],

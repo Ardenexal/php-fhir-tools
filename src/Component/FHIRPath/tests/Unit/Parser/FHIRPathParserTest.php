@@ -256,6 +256,41 @@ class FHIRPathParserTest extends TestCase
         self::assertEquals('Patient', $ast->getTypeName());
     }
 
+    public function testParseTypeIsFunctionCallPrimaryPosition(): void
+    {
+        // is(Type) without a leading object — applies to implicit focus ($this)
+        // e.g. where(is(Patient)) inside a predicate
+        $tokens = $this->lexer->tokenize('is(Patient)');
+        $ast    = $this->parser->parse($tokens);
+
+        self::assertInstanceOf(TypeExpressionNode::class, $ast);
+        self::assertEquals(TokenType::IS, $ast->getOperator());
+        self::assertEquals('Patient', $ast->getTypeName());
+    }
+
+    public function testParseTypeAsFunctionCallPrimaryPosition(): void
+    {
+        // as(Type) without a leading object — applies to implicit focus ($this)
+        // e.g. where(as(canonical) = '#') from dom-3 invariant
+        $tokens = $this->lexer->tokenize('as(canonical)');
+        $ast    = $this->parser->parse($tokens);
+
+        self::assertInstanceOf(TypeExpressionNode::class, $ast);
+        self::assertEquals(TokenType::AS, $ast->getOperator());
+        self::assertEquals('canonical', $ast->getTypeName());
+    }
+
+    public function testDom3InvariantExpressionParses(): void
+    {
+        // Regression: dom-3 uses as(canonical) in predicate-start position
+        // which previously threw SyntaxException.
+        $expr   = "descendants().where(as(canonical) = '#').exists()";
+        $tokens = $this->lexer->tokenize($expr);
+        $ast    = $this->parser->parse($tokens);
+
+        self::assertNotNull($ast);
+    }
+
     // External Constant Tests
 
     public function testParseExternalConstant(): void

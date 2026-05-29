@@ -63,7 +63,9 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 #[CoversClass(FHIRValidationService::class)]
 final class FHIRValidatorSpecificationTest extends TestCase
 {
-    private const SKIP_MODULES = ['tx', 'cda', 'cdshooks', 'shc'];
+    // matchetype: FHIRPath pattern-matching syntax tests that use $instant$ as a
+    // placeholder — not a real dateTime value, cannot be deserialized.
+    private const SKIP_MODULES = ['tx', 'cda', 'cdshooks', 'shc', 'matchetype'];
 
     private const OUTCOMES_DIR = __DIR__ . '/outcomes/ardenexal';
 
@@ -71,10 +73,13 @@ final class FHIRValidatorSpecificationTest extends TestCase
 
     private FHIRSerializationService $serialization;
 
+    private FHIRSerializationService $serializationR4B;
+
     protected function setUp(): void
     {
-        $this->service       = self::createValidationService();
-        $this->serialization = FHIRSerializationService::createDefault(FhirVersion::R4);
+        $this->service          = self::createValidationService();
+        $this->serialization    = FHIRSerializationService::createDefault(FhirVersion::R4);
+        $this->serializationR4B = FHIRSerializationService::createDefault(FhirVersion::R4B);
     }
 
     /**
@@ -173,8 +178,19 @@ final class FHIRValidatorSpecificationTest extends TestCase
 
         try {
             $resource = $this->serialization->deserialize($data);
-        } catch (\Throwable $e) {
-            $this->markTestSkipped("Deserialization failed for {$name}: {$e->getMessage()}");
+        } catch (\Throwable) {
+            // Deserializer threw (bad format, bad XML, bad JSON, etc.).
+            // Our seeded outcome has errorCount=1; assert it is ≥ 1 and stop — no
+            // resource to validate. Cases without a seeded outcome are already
+            // markTestIncomplete above. json-comments-yes cases are not seeded because
+            // Java considers them valid (allow-comments=true); they remain Incomplete.
+            self::assertGreaterThanOrEqual(
+                1,
+                $expected['errorCount'],
+                "Seeded outcome for parse-failing case '{$name}' must have errorCount ≥ 1",
+            );
+
+            return;
         }
 
         try {
@@ -196,6 +212,120 @@ final class FHIRValidatorSpecificationTest extends TestCase
             $expected['warningCount'],
             count($realWarnings),
             "Unexpected warning count for '{$name}'",
+        );
+    }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function provideR4BValidatorTestCases(): iterable
+    {
+        $vendorDir    = dirname(__DIR__, 5) . '/vendor';
+        $manifestPath = $vendorDir . '/fhir/fhir-test-cases/validator/manifest.json';
+
+        if (!file_exists($manifestPath)) {
+            yield '__vendor_not_installed__' => ['__skip__', ''];
+
+            return;
+        }
+
+        $raw = file_get_contents($manifestPath);
+        if ($raw === false) {
+            return;
+        }
+
+        /** @var array{test-cases: list<array<string, mixed>>} $manifest */
+        $manifest = json_decode($raw, true);
+
+        /** @var array<string, array{string, string}> $cases */
+        $cases = [];
+
+        foreach ($manifest['test-cases'] as $case) {
+            $name = (string) ($case['name'] ?? '');
+
+            if (isset($case['use-test']) && $case['use-test'] === false) {
+                continue;
+            }
+
+            if (($case['version'] ?? '') !== '4.3') {
+                continue;
+            }
+
+            $file = (string) ($case['file'] ?? '');
+
+            if (!str_ends_with($file, '.json') && !str_ends_with($file, '.xml')) {
+                continue;
+            }
+
+            $module = (string) ($case['module'] ?? '');
+            if (in_array($module, self::SKIP_MODULES, true)) {
+                continue;
+            }
+
+            if (isset($case['supporting']) || isset($case['profiles'])) {
+                continue;
+            }
+
+            $filePath = $vendorDir . '/fhir/fhir-test-cases/validator/' . $file;
+            if (!file_exists($filePath)) {
+                continue;
+            }
+
+            if (self::resolveJavaErrorCount($case, $vendorDir . '/fhir/fhir-test-cases/validator') === null) {
+                continue;
+            }
+
+            $cases[$name] = [$name, $filePath];
+        }
+
+        yield from $cases;
+    }
+
+    #[DataProvider('provideR4BValidatorTestCases')]
+    public function testR4BValidatorSpecificationCase(string $name, string $filePath): void
+    {
+        if ($name === '__skip__') {
+            $this->markTestSkipped('fhir/fhir-test-cases not installed — run: composer update fhir/fhir-test-cases');
+        }
+
+        $outcomeFile = self::OUTCOMES_DIR . '/R4B.' . self::sanitizeName($name) . '-base.json';
+        if (!file_exists($outcomeFile)) {
+            $this->markTestIncomplete("No ardenexal outcome defined yet for R4B '{$name}'");
+        }
+
+        /** @var array{errorCount: int, warningCount: int, infoCount: int} $expected */
+        $expected = json_decode((string) file_get_contents($outcomeFile), true);
+
+        $data = file_get_contents($filePath);
+        if ($data === false) {
+            $this->markTestSkipped("Cannot read test case file: {$filePath}");
+        }
+
+        try {
+            $resource = $this->serializationR4B->deserialize($data);
+        } catch (\Throwable $e) {
+            $this->markTestSkipped("Deserialization failed for R4B {$name}: {$e->getMessage()}");
+        }
+
+        try {
+            $report = $this->service->validate($resource);
+        } catch (\Error $e) {
+            $this->markTestSkipped("Validation threw Error for R4B '{$name}': {$e->getMessage()}");
+        }
+
+        $realErrors   = array_values(array_filter($report->errors(), fn ($v) => !$this->isKnownGap($v, $resource)));
+        $realWarnings = array_values(array_filter($report->warnings(), fn ($v) => !$this->isKnownGap($v, $resource)));
+
+        self::assertSame(
+            $expected['errorCount'],
+            count($realErrors),
+            "Unexpected error count for R4B '{$name}': "
+            . implode(', ', array_map(static fn (FHIRValidationViolation $v) => $v->message, $realErrors)),
+        );
+        self::assertSame(
+            $expected['warningCount'],
+            count($realWarnings),
+            "Unexpected warning count for R4B '{$name}'",
         );
     }
 

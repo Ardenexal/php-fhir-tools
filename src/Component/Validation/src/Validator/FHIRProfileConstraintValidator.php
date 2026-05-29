@@ -57,8 +57,8 @@ final class FHIRProfileConstraintValidator extends ConstraintValidator
             $innerPath = $v->getPropertyPath();
             $path      = match (true) {
                 $innerPath    === ''         => $constraint->path,
-                $innerPath[0] === '['     => $constraint->path . $innerPath,
-                default                   => $constraint->path . '.' . $innerPath,
+                $innerPath[0] === '['        => $constraint->path . $innerPath,
+                default                      => $constraint->path . '.' . $innerPath,
             };
 
             $this->context->buildViolation($v->getMessageTemplate(), $v->getParameters())

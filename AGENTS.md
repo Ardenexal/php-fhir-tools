@@ -207,7 +207,7 @@ Before starting any task, orient with these sources:
 
 - Read `.goat-flow/architecture.md` for system context.
 - Read `.goat-flow/code-map.md` for file layout.
-- Before declaring any tool or capability unavailable, read the matching playbook in `.goat-flow/skill-reference/` (e.g. `browser-use.md`, `page-capture.md`) and run that doc's "Availability Check" section verbatim — project-local CLI tools at `~/.local/bin/` are valid; do not conflate "no harness/MCP tool" with "no tool".
+- Before declaring any tool or capability unavailable, read the matching playbook in `.goat-flow/skill-playbooks/` (e.g. `browser-use.md`, `page-capture.md`) and run that doc's "Availability Check" section verbatim — project-local CLI tools at `~/.local/bin/` are valid; do not conflate "no harness/MCP tool" with "no tool".
 
 ### SCOPE
 
@@ -231,7 +231,7 @@ Edit minimal files. Run `phpunit-run` (MCP) after each logical unit; fall back t
 | Known traps and footguns | `.goat-flow/footguns/` |
 | Lessons from past incidents | `.goat-flow/lessons/` |
 | Architecture decisions | `.goat-flow/decisions/` |
-| Tool playbooks (CLI/MCP availability checks: browser-use, page-capture, skill-* references) | `.goat-flow/skill-reference/` — read BEFORE declaring a tool unavailable |
+| Skill playbooks (tools) | `.goat-flow/skill-playbooks/` (README.md index; read BEFORE declaring a tool unavailable) |
 
 ---
 

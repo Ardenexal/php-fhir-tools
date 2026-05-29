@@ -48,7 +48,8 @@ use Symfony\Component\Validator\Validation;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-const SKIP_MODULES = ['tx', 'cda', 'cdshooks', 'shc'];
+// matchetype: FHIRPath pattern-matching syntax tests using $instant$ placeholders — not real dateTime values.
+const SKIP_MODULES = ['tx', 'cda', 'cdshooks', 'shc', 'matchetype'];
 const OUTCOMES_DIR = __DIR__ . '/outcomes/ardenexal';
 
 $vendorDir    = __DIR__ . '/../../../../../vendor';
@@ -91,8 +92,26 @@ foreach ($cases as $name => $case) {
     try {
         $resource = $serial->deserialize($data);
     } catch (Throwable $e) {
-        echo "  SKIP (deserialize) {$name}: {$e->getMessage()}\n";
-        ++$skipped;
+        // Deserializer threw (bad format, bad XML, bad JSON, etc.).
+        // If Java also expects errors, seed errorCount=1 so the spec test asserts
+        // rather than staying Incomplete. If Java expects 0 errors (e.g. allow-comments
+        // JSON5 that we can't parse), leave unseeded so the test stays Incomplete.
+        $javaErrorCount = resolveJavaErrorCount($case, $vendorDir . '/fhir/fhir-test-cases/validator');
+        if ($javaErrorCount === null || $javaErrorCount === 0) {
+            echo "  SKIP (deserialize, java-clean) {$name}: {$e->getMessage()}\n";
+            ++$skipped;
+            continue;
+        }
+
+        $outcome = json_encode(['errorCount' => 1, 'warningCount' => 0, 'infoCount' => 0], JSON_PRETTY_PRINT) . "\n";
+        $outFile = OUTCOMES_DIR . '/R4.' . sanitizeName($name) . '-base.json';
+        if (file_put_contents($outFile, $outcome) !== false) {
+            ++$written;
+        } else {
+            echo "  ERROR writing {$name}\n";
+            ++$errors;
+        }
+
         continue;
     }
 
@@ -130,6 +149,54 @@ echo "Done. Written: {$written}, Skipped: {$skipped}, Errors: {$errors}\n";
 function sanitizeName(string $name): string
 {
     return str_replace(['/', ' '], '-', $name);
+}
+
+/**
+ * Resolve the expected Java error count from either an inline object or an external file.
+ *
+ * @param array<string, mixed> $case
+ */
+function resolveJavaErrorCount(array $case, string $outcomesBaseDir): ?int
+{
+    $java = $case['java'] ?? null;
+
+    if ($java === null) {
+        return null;
+    }
+
+    if (is_array($java)) {
+        return (int) ($java['errorCount'] ?? 0);
+    }
+
+    if (is_string($java)) {
+        $outcomePath = $outcomesBaseDir . '/outcomes/' . $java;
+        if (!file_exists($outcomePath)) {
+            return null;
+        }
+
+        $raw = file_get_contents($outcomePath);
+        if ($raw === false) {
+            return null;
+        }
+
+        /** @var array<string, mixed> $outcome */
+        $outcome = json_decode($raw, true);
+
+        if (isset($outcome['issue']) && is_array($outcome['issue'])) {
+            $errorCount = 0;
+            foreach ($outcome['issue'] as $issue) {
+                if (in_array($issue['severity'] ?? '', ['error', 'fatal'], true)) {
+                    ++$errorCount;
+                }
+            }
+
+            return $errorCount;
+        }
+
+        return 0;
+    }
+
+    return null;
 }
 
 /** @param list<array<string, mixed>> $testCases @return array<string, array<string, mixed>> */

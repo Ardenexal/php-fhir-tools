@@ -253,7 +253,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         $visited[$id] = true;
         $violations   = [];
 
-        if (property_exists($resource, 'modifierExtension') && is_array($resource->modifierExtension)) {
+        if (property_exists($resource, 'modifierExtension') && isset($resource->modifierExtension) && is_array($resource->modifierExtension)) {
             $extPath = $path !== '' ? $path . '.modifierExtension' : 'modifierExtension';
 
             foreach ($resource->modifierExtension as $ext) {
@@ -287,6 +287,9 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
 
         foreach ($ref->getProperties(\ReflectionProperty::IS_PUBLIC) as $prop) {
             if ($prop->getName() === 'modifierExtension') {
+                continue;
+            }
+            if ($prop->isInitialized($resource) === false) {
                 continue;
             }
 
