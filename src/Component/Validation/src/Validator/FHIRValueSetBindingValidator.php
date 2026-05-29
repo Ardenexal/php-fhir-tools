@@ -72,6 +72,21 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
         }
 
         /** @var class-string<\BackedEnum> $enumFqcn */
+        if (is_array($value)) {
+            $override = $this->messageRegistry->getOverride('FHIRValueSetBinding');
+            foreach ($value as $item) {
+                if (!$this->isValidEnumCase($enumFqcn, $item)) {
+                    $this->context->buildViolation($override ?? self::DEFAULT_INVALID_VALUE_MESSAGE)
+                        ->setParameters(['{{ value }}' => (string) $item, '{{ url }}' => $constraint->valueSetUrl])
+                        ->setInvalidValue($item)
+                        ->setCode(FHIRViolationCode::ERROR)
+                        ->addViolation();
+                }
+            }
+
+            return;
+        }
+
         if (!$this->isValidEnumCase($enumFqcn, $value)) {
             $override = $this->messageRegistry->getOverride('FHIRValueSetBinding');
             $this->context->buildViolation($override ?? self::DEFAULT_INVALID_VALUE_MESSAGE)
