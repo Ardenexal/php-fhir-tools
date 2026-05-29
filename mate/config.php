@@ -1,11 +1,14 @@
 <?php
 
+use App\Mate\Factory\FHIRValidationServiceFactory;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider;
+use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return static function(ContainerConfigurator $container): void {
     $services = $container->services()
@@ -29,4 +32,9 @@ return static function(ContainerConfigurator $container): void {
     $services->set(PropertyMetadataProvider::class);
     $services->set(FHIRMetadataExtractor::class);
     $services->alias(FHIRMetadataExtractorInterface::class, FHIRMetadataExtractor::class);
+
+    // Validation — bootstrap the Symfony Validator with all FHIR-specific constraint validators.
+    $services->set(FHIRValidationService::class)
+        ->factory([FHIRValidationServiceFactory::class, 'create'])
+        ->args([service(FHIRPathService::class)]);
 };
