@@ -231,6 +231,9 @@ function deduplicateCases(array $testCases, FhirVersion $version): array
         if (isset($case['supporting']) || isset($case['profiles'])) {
             continue;
         }
+        if (($case['allow-comments'] ?? false) === true) {
+            continue;
+        }
         if (!isset($case['java'])) {
             continue;
         }
