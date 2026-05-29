@@ -12,10 +12,10 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\ProductShelfLife;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\ProdCharacteristic;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\ProductShelfLife;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -106,7 +106,7 @@ class MedicinalProductPackagedPackageItem extends BackboneElement
             fhirType: 'ProductShelfLife',
             propertyKind: 'complex',
             isArray: true,
-            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ProductShelfLife',
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\ProductShelfLife',
         )]
         public array $shelfLifeStorage = [],
         /** @var array<Reference> manufacturer Manufacturer of this Package Item */

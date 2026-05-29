@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Benchmarks\Serialization;
 
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\BundleResource;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use PhpBench\Attributes as Bench;
 
 /**
@@ -25,7 +26,7 @@ class SerializationXmlBench
 
     public function setUp(): void
     {
-        $this->service = FHIRSerializationService::createDefault();
+        $this->service = FHIRSerializationService::createDefault(FhirVersion::R4);
 
         $fixturePath     = __DIR__ . '/../../src/Component/Serialization/Fixtures/bundle-response-medsallergies.xml';
         $this->bundleXml = (string) file_get_contents($fixturePath);

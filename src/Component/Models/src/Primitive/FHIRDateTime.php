@@ -38,7 +38,15 @@ final readonly class FHIRDateTime implements FHIRTemporalValue
             return new self(LocalDate::parse($raw), $raw);
         }
 
-        return new self(ZonedDateTime::parse($raw), $raw);
+        try {
+            return new self(ZonedDateTime::parse($raw), $raw);
+        } catch (\Throwable) {
+            // Leniently handle dateTime strings that omit the timezone offset
+            // (e.g. "2020-11-11T10:58:14.768528"). FHIR R4 requires a timezone for
+            // full dateTime, but some real-world data omits it; treat as UTC and
+            // preserve the original string for round-trip fidelity.
+            return new self(ZonedDateTime::parse($raw . 'Z'), $raw);
+        }
     }
 
     public function getValue(): Year|YearMonth|LocalDate|ZonedDateTime

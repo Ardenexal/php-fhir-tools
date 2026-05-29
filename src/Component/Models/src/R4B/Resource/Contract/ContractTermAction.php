@@ -14,10 +14,10 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UnsignedIntPrimitive;
-use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -90,7 +90,7 @@ class ContractTermAction extends BackboneElement
                 [
                     'fhirType'     => 'Timing',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing',
                     'jsonKey'      => 'occurrenceTiming',
                 ],
             ],

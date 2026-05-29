@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBind
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Age;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\ContactDetail;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Dosage;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Duration;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier;
@@ -27,6 +28,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\RelatedArtifact;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\RequestIntentType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\RequestPriorityType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\RequestResourceTypeType;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\UsageContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DatePrimitive;
@@ -277,7 +279,7 @@ class ActivityDefinitionResource extends DomainResourceResource
                 [
                     'fhirType'     => 'Timing',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing',
                     'jsonKey'      => 'timingTiming',
                 ],
                 [
@@ -358,7 +360,7 @@ class ActivityDefinitionResource extends DomainResourceResource
             fhirType: 'Dosage',
             propertyKind: 'complex',
             isArray: true,
-            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Dosage',
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Dosage',
         )]
         public array $dosage = [],
         /** @var array<CodeableConcept> bodySite What part of body to perform on */

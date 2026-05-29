@@ -210,7 +210,7 @@
         "validate-recipe": "php scripts/validate-recipe.php",
         "test-recipe": "php ./vendor/phpunit/phpunit/phpunit tests/Integration/FlexRecipeTest.php",
         "test-package-installation": "php scripts/test-package-installation.php",
-        "start-demo": "cd demo && symfony server:start",
+        "start-demo": "cd demo && symfony server:stop && symfony server:start",
         "bench": "php ./vendor/bin/phpbench run bench/ --report=aggregate",
         "bench:serialization": "php ./vendor/bin/phpbench run bench/Serialization/ --report=aggregate",
         "bench:fhirpath": "php ./vendor/bin/phpbench run bench/FHIRPath/ --report=aggregate",

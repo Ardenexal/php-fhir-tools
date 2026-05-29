@@ -20,6 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Contributor;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Count;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\DataRequirement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Distance;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Dosage;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Duration;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Expression;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
@@ -36,6 +37,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\RelatedArtifact;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\SampledData;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Signature;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\TriggerDefinition;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\UsageContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\Base64BinaryPrimitive;
@@ -54,8 +56,6 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UnsignedIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UrlPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UuidPrimitive;
-use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Dosage;
-use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -306,7 +306,7 @@ class TaskInput extends BackboneElement
                 [
                     'fhirType'     => 'Timing',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing',
                     'jsonKey'      => 'valueTiming',
                 ],
                 [
@@ -360,7 +360,7 @@ class TaskInput extends BackboneElement
                 [
                     'fhirType'     => 'Dosage',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Dosage',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Dosage',
                     'jsonKey'      => 'valueDosage',
                 ],
                 [

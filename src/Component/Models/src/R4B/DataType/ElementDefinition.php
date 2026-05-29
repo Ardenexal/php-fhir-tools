@@ -25,8 +25,6 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UnsignedIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UrlPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UuidPrimitive;
-use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Dosage;
-use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -429,7 +427,7 @@ class ElementDefinition extends BackboneElement
                 [
                     'fhirType'     => 'Timing',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing',
                     'jsonKey'      => 'defaultValueTiming',
                 ],
                 [
@@ -483,7 +481,7 @@ class ElementDefinition extends BackboneElement
                 [
                     'fhirType'     => 'Dosage',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Dosage',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Dosage',
                     'jsonKey'      => 'defaultValueDosage',
                 ],
             ],
@@ -735,7 +733,7 @@ class ElementDefinition extends BackboneElement
                 [
                     'fhirType'     => 'Timing',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing',
                     'jsonKey'      => 'fixedTiming',
                 ],
                 [
@@ -789,7 +787,7 @@ class ElementDefinition extends BackboneElement
                 [
                     'fhirType'     => 'Dosage',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Dosage',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Dosage',
                     'jsonKey'      => 'fixedDosage',
                 ],
             ],
@@ -1035,7 +1033,7 @@ class ElementDefinition extends BackboneElement
                 [
                     'fhirType'     => 'Timing',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing',
                     'jsonKey'      => 'patternTiming',
                 ],
                 [
@@ -1089,7 +1087,7 @@ class ElementDefinition extends BackboneElement
                 [
                     'fhirType'     => 'Dosage',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Dosage',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Dosage',
                     'jsonKey'      => 'patternDosage',
                 ],
             ],

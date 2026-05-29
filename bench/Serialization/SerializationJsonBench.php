@@ -8,6 +8,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\HumanName;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\BundleResource;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use PhpBench\Attributes as Bench;
 
 /**
@@ -31,7 +32,7 @@ class SerializationJsonBench
 
     public function setUp(): void
     {
-        $this->service = FHIRSerializationService::createDefault();
+        $this->service = FHIRSerializationService::createDefault(FhirVersion::R4);
 
         // Build a Patient with enough data to exercise most property kinds.
         $this->patient = new PatientResource(

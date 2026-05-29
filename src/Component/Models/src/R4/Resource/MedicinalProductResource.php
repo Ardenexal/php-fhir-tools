@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Identifier;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\MarketingStatus;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
@@ -110,7 +111,7 @@ class MedicinalProductResource extends DomainResourceResource
             fhirType: 'MarketingStatus',
             propertyKind: 'complex',
             isArray: true,
-            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\MarketingStatus',
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\MarketingStatus',
         )]
         public array $marketingStatus = [],
         /** @var array<Reference> pharmaceuticalProduct Pharmaceutical aspects of product */
