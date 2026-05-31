@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation;
 
+use Ardenexal\FHIRTools\Component\FHIRPath\Exception\FHIRPathException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
@@ -260,8 +261,10 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                 foreach ($invariantAttrs as $invariant) {
                     try {
                         $result = $this->pathService->evaluate($invariant->expression, $resource);
-                    } catch (\Throwable) {
+                    } catch (FHIRPathException) {
                         // Engine limitation, not non-conformance: surface as INFO eval-error.
+                        // Only FHIRPath engine exceptions are downgraded here; any other throwable
+                        // (a genuine bug) propagates rather than being masked as an info result.
                         $url          = method_exists($extension, 'getExtensionUrl') ? ($extension->getExtensionUrl() ?? '') : '';
                         $violations[] = new FHIRValidationViolation(
                             severity: 'info',

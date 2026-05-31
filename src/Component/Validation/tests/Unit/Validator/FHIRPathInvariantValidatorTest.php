@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Validator;
 
+use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
@@ -55,10 +56,10 @@ final class FHIRPathInvariantValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testEvaluationExceptionEmitsEvalErrorNotFailure(): void
+    public function testEngineExceptionEmitsEvalErrorNotFailure(): void
     {
         $stub = $this->createStub(FHIRPathService::class);
-        $stub->method('evaluate')->willThrowException(new \RuntimeException('parse error'));
+        $stub->method('evaluate')->willThrowException(new EvaluationException('unsupported function'));
 
         $validator = new FHIRPathInvariantValidator($stub, new FHIRValidationMessageRegistry());
         $validator->initialize($this->context);
@@ -70,6 +71,21 @@ final class FHIRPathInvariantValidatorTest extends ConstraintValidatorTestCase
         $this->buildViolation('FHIRPath invariant `inv-3` could not be evaluated: bad-expr')
             ->setCode(FHIRViolationCode::EVAL_ERROR)
             ->assertRaised();
+    }
+
+    public function testNonEngineThrowablePropagatesInsteadOfBeingMasked(): void
+    {
+        $stub = $this->createStub(FHIRPathService::class);
+        $stub->method('evaluate')->willThrowException(new \TypeError('genuine bug'));
+
+        $validator = new FHIRPathInvariantValidator($stub, new FHIRValidationMessageRegistry());
+        $validator->initialize($this->context);
+
+        // A non-FHIRPath throwable is a real bug, not a tooling limitation: it must surface
+        // loudly rather than be downgraded to an info eval-error that hides the failure.
+        $this->expectException(\TypeError::class);
+
+        $validator->validate(new \stdClass(), $this->makeConstraint('bad-expr', 'error', 'inv-4', 'Invariant failed.'));
     }
 
     public function testRegistryOverrideIsUsedInViolationMessage(): void

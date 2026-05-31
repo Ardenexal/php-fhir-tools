@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation\Validator;
 
+use Ardenexal\FHIRTools\Component\FHIRPath\Exception\FHIRPathException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
@@ -32,10 +33,12 @@ final class FHIRPathInvariantValidator extends ConstraintValidator
 
         try {
             $result = $this->pathService->evaluate($constraint->expression, $value);
-        } catch (\Throwable) {
+        } catch (FHIRPathException) {
             // The engine could not evaluate the expression (e.g. an unsupported function).
             // Per the FHIR conformance spec this is a tooling limitation, not instance
             // non-conformance, so surface it distinctly instead of as a failed constraint.
+            // Only FHIRPath engine exceptions are downgraded; any other throwable (a genuine
+            // bug) propagates rather than being masked as a passing/info result.
             $this->context->buildViolation(sprintf(
                 'FHIRPath invariant `%s` could not be evaluated: %s',
                 $constraint->key,
