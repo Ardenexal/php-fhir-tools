@@ -95,24 +95,18 @@ final class FHIRExtensionContextNestedValidationTest extends TestCase
         self::assertCount(0, $report->errors());
     }
 
-    public function testForeignRootOnlyContextDeniesExtensionOnDifferentRootSubElement(): void
+    public function testForeignRootOnlyContextIsDeferredWithoutResolver(): void
     {
-        // ForeignRootOnlyExtensionFixture context is "Observation.component" only.
-        // Placed on Patient.contact (different root) it must be denied — foreign-root
-        // paths are not deferred; contextPermitsPath() returns false for them.
+        // ForeignRootOnlyExtensionFixture context is "Observation.component" only (foreign root).
+        // Foreign-root contexts require type-path resolution to evaluate correctly — the context
+        // "Observation.component" could be valid if the current element is typed as Observation.component.
+        // Without a resolver, this cannot be determined, so the check is deferred (no violation).
         $contact  = new NestedContactWithExtensionsFixture([new ForeignRootOnlyExtensionFixture()]);
         $resource = new PatientWithContactResourceFixture(contact: [$contact]);
 
         $report = $this->service->validate($resource);
 
-        self::assertCount(1, $report->errors(), 'Extension with only foreign-root context must fail on a different-root sub-element');
-
-        $violation = $report->errors()[0];
-        self::assertSame('error', $violation->severity);
-        self::assertSame('contact[0].extension', $violation->path);
-        self::assertSame(FHIRExtensionContext::class, $violation->constraintClass);
-        self::assertStringContainsString('Patient.contact', $violation->message);
-        self::assertStringContainsString('http://example.org/ext/foreign-root-only', $violation->message);
+        self::assertCount(0, $report->errors(), 'Foreign-root contexts without a resolver must be deferred (no violation)');
     }
 
     public function testDeferredContextExtensionWithFailingInvariantProducesErrorAtNestedLevel(): void

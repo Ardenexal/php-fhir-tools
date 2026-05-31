@@ -69,7 +69,11 @@ $validator = Validation::createValidatorBuilder()
     ->setConstraintValidatorFactory($factory)
     ->getValidator();
 
-$service = new FHIRValidationService($validator, $pathService);
+$service = new FHIRValidationService(
+    $validator,
+    $pathService,
+    typeResolver: new \Ardenexal\FHIRTools\Component\Validation\FhirPropertyTypeHierarchyResolver(),
+);
 
 // 2. Validate a resource
 $patient = new \Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource();
@@ -159,7 +163,7 @@ categories. Coverage as of the current release:
 | **Slicing** (closed/open/openAtEnd) | ✅ | ✅ | ✅ | `FHIRSliceConstraintValidator` |
 | **Profile constraints** (generated) | ✅ | ✅ | ✅ | `FHIRProfileConstraintValidator`; requires pre-generated models |
 | **Profile constraints** (dynamic/runtime) | ❌ | ❌ | ❌ | Dynamic StructureDefinition loading not yet supported |
-| **Extension contexts** (`type=element`) | ⚠️ | ⚠️ | ⚠️ | Recursive walk; foreign-root paths evaluated; bare-type contexts deferred (require type-hierarchy resolution) |
+| **Extension contexts** (`type=element`) | ✅ | ✅ | ✅ | Recursive walk; path and bare-type contexts resolved via `FhirProperty` reflection; wire `FhirPropertyTypeHierarchyResolver` to enable bare-type resolution |
 | **Extension contexts** (`type=fhirpath/extension`) | ❌ | ❌ | ❌ | Always permitted in v1 |
 | **Modifier extensions** (unknown URL) | ✅ | ✅ | ✅ | Recursive walk via `FHIRIGTypeRegistry` |
 | **Modifier element impact** | ⚠️ | ⚠️ | ⚠️ | `#[FHIRIsModifier]` marks properties; no active enforcement |
@@ -191,11 +195,11 @@ against extensible/preferred value sets will not be detected. Wire
 `HttpFHIRTerminologyClient` (or a custom implementation) to enable terminology checking.
 
 **Extension context validation** walks all nested sub-elements recursively. Extensions
-on BackboneElements and complex-type properties are context-checked. At sub-element
-level, `type=element` contexts are evaluated as follows: contexts whose dotted expression
-matches the root resource type are checked by path; foreign-root paths (different root
-resource type) are checked by path and denied if they do not match; bare type-name
-contexts (e.g. `"HumanName"`) require FHIR type-hierarchy resolution and are deferred.
+on BackboneElements and complex-type properties are context-checked. Bare-type contexts
+(e.g. `"HumanName"`) are resolved by reading `#[FhirProperty(fhirType: ...)]` from the
+parent element's property when `FhirPropertyTypeHierarchyResolver` is wired. Without a
+resolver, bare-type contexts are deferred (no violation emitted). FHIR type inheritance
+(e.g. `"Element"` permitting all typed elements) is not evaluated.
 
 **Extension context types `fhirpath` and `extension`** are not evaluated. Any extension
 with a `type=fhirpath` or `type=extension` context is treated as permitted regardless
@@ -287,6 +291,40 @@ $resolver = new class($bundle) implements FHIRReferenceResolverInterface {
     }
 };
 ```
+
+---
+
+### FHIRTypeHierarchyResolverInterface — bare-type extension context resolution
+
+Controls whether bare-type extension contexts (e.g. `"HumanName"`) are evaluated against
+the FHIR type of the element they are applied to. Without a resolver, bare-type contexts
+are deferred and never produce violations.
+
+```php
+use Ardenexal\FHIRTools\Component\Validation\FHIRTypeHierarchyResolverInterface;
+use Ardenexal\FHIRTools\Component\Validation\FhirPropertyTypeHierarchyResolver;
+use Ardenexal\FHIRTools\Component\Validation\NullFHIRTypeHierarchyResolver;
+
+// Null: silently defer all bare-type context checks (default)
+$typeResolver = new NullFHIRTypeHierarchyResolver();
+
+// FhirProperty-based: resolves types from #[FhirProperty(fhirType: ...)] on generated models
+$typeResolver = new FhirPropertyTypeHierarchyResolver();
+```
+
+Pass `$typeResolver` as the `typeResolver` parameter of `FHIRValidationService`:
+
+```php
+$service = new FHIRValidationService($validator, $pathService, typeResolver: $typeResolver);
+```
+
+`FhirPropertyTypeHierarchyResolver` reads the `fhirType` field of `#[FhirProperty]` attributes
+on generated model class properties. It requires no codegen changes — all generated R4, R4B,
+and R5 model classes already carry this attribute on every property. Results are cached per
+class+property pair to avoid repeated reflection.
+
+> **Note:** FHIR type inheritance (e.g., a context of `"Element"` permitting all typed elements)
+> is not evaluated. Only exact type name matches are checked.
 
 ---
 

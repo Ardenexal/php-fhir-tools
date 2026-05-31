@@ -23,6 +23,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         private readonly ValidatorInterface $validator,
         private readonly FHIRPathService $pathService,
         private readonly ?FHIRIGTypeRegistry $registry = null,
+        private readonly FHIRTypeHierarchyResolverInterface $typeResolver = new NullFHIRTypeHierarchyResolver(),
     ) {
     }
 
@@ -328,7 +329,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
      *
      * @return list<FHIRValidationViolation>
      */
-    private function validateExtensionContexts(object $resource, string $fhirPath, string $relPath, array &$visited): array
+    private function validateExtensionContexts(object $resource, string $fhirPath, string $relPath, array &$visited, ?string $resolvedFhirType = null): array
     {
         $id = spl_object_id($resource);
 
@@ -360,29 +361,41 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                     $ref->getAttributes(FHIRExtensionContext::class),
                 );
 
-                // Sub-element filter: bare-type contexts (no dot, e.g. "HumanName") cannot be
-                // evaluated without FHIR type-hierarchy resolution and are deferred.
-                // Foreign-root paths (different root type) are NOT deferred — contextPermitsPath()
-                // correctly denies them. contextInvariant evaluation always runs regardless.
+                // Sub-element filter: contexts that cannot be evaluated without type-hierarchy
+                // resolution are deferred when no resolved type is available.
+                //
+                // Bare-type contexts (no dot, e.g. "HumanName") require knowing the FHIR type
+                // of the current element's property.
+                // Foreign-root paths (dotted, different root, e.g. "ElementDefinition.binding")
+                // also require type resolution: in FHIR, "ElementDefinition.binding" means
+                // "the binding property of any ElementDefinition element wherever it appears",
+                // not just in the ElementDefinition resource. Evaluating this correctly requires
+                // walking the type path (e.g. knowing that Patient.name is typed HumanName),
+                // which is the same resolution problem as bare-type contexts.
+                //
+                // When $resolvedFhirType is provided, the skip is lifted and contextPermitsPath()
+                // evaluates what it can (bare-type match + path match).
+                // contextInvariant evaluation always runs regardless.
                 $skipContextCheck = false;
                 if ($rootType !== null && $contextAttrs !== []) {
-                    $hasCheckable     = false;
-                    $hasBareTypeCtx   = false;
+                    $hasCheckable = false;
                     foreach ($contextAttrs as $ctx) {
-                        if ($ctx->type !== 'element') {
-                            continue;
-                        }
-                        if (!str_contains($ctx->expression, '.')) {
-                            $hasBareTypeCtx = true;
-                        } elseif (str_starts_with($ctx->expression, $rootType . '.')) {
+                        if ($ctx->type === 'element'
+                            && str_contains($ctx->expression, '.')
+                            && str_starts_with($ctx->expression, $rootType . '.')
+                        ) {
                             $hasCheckable = true;
+                            break;
                         }
                     }
-                    // Defer only when bare-type contexts exist and no same-root context is checkable.
-                    $skipContextCheck = !$hasCheckable && $hasBareTypeCtx;
+                    // Skip when no same-root context is checkable and no resolved type is available.
+                    // This covers both bare-type (e.g. "HumanName") and foreign-root (e.g.
+                    // "ElementDefinition.binding") contexts, which both require type-hierarchy
+                    // resolution to evaluate correctly. A resolved type lifts the skip.
+                    $skipContextCheck = !$hasCheckable && $resolvedFhirType === null;
                 }
 
-                if (!$skipContextCheck && $contextAttrs !== [] && !$this->contextPermitsPath($contextAttrs, $fhirPath)) {
+                if (!$skipContextCheck && $contextAttrs !== [] && !$this->contextPermitsPath($contextAttrs, $fhirPath, $resolvedFhirType)) {
                     $url          = method_exists($extension, 'getExtensionUrl') ? ($extension->getExtensionUrl() ?? '') : '';
                     $violations[] = new FHIRValidationViolation(
                         severity: 'error',
@@ -440,18 +453,19 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                 continue;
             }
 
-            $value       = $prop->getValue($resource);
-            $subFhirPath = $fhirPath . '.' . $prop->getName();
-            $subRelPath  = $relPath !== '' ? $relPath . '.' . $prop->getName() : $prop->getName();
+            $value           = $prop->getValue($resource);
+            $subFhirPath     = $fhirPath . '.' . $prop->getName();
+            $subRelPath      = $relPath !== '' ? $relPath . '.' . $prop->getName() : $prop->getName();
+            $subResolvedType = $this->typeResolver->resolvePropertyType($resource, $prop->getName());
 
             if (is_object($value)) {
-                foreach ($this->validateExtensionContexts($value, $subFhirPath, $subRelPath, $visited) as $v) {
+                foreach ($this->validateExtensionContexts($value, $subFhirPath, $subRelPath, $visited, $subResolvedType) as $v) {
                     $violations[] = $v;
                 }
             } elseif (is_array($value)) {
                 foreach ($value as $i => $item) {
                     if (is_object($item)) {
-                        foreach ($this->validateExtensionContexts($item, $subFhirPath, $subRelPath . '[' . $i . ']', $visited) as $v) {
+                        foreach ($this->validateExtensionContexts($item, $subFhirPath, $subRelPath . '[' . $i . ']', $visited, $subResolvedType) as $v) {
                             $violations[] = $v;
                         }
                     }
@@ -465,24 +479,34 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
     /**
      * Returns true if at least one context entry permits the given element path.
      *
-     * For type=element: permits if $elementPath equals the expression, or if $elementPath
-     * is a sub-element path of the expression (starts with expression + '.').
+     * For type=element with a dotted expression: permits by exact or prefix path match.
+     * For type=element with a bare type name: permits when $resolvedFhirType matches.
      * For type=fhirpath and type=extension: deferred in v1, treated as permitted.
      *
      * @param list<FHIRExtensionContext> $contexts
      */
-    private function contextPermitsPath(array $contexts, string $elementPath): bool
+    private function contextPermitsPath(array $contexts, string $elementPath, ?string $resolvedFhirType = null): bool
     {
         foreach ($contexts as $ctx) {
             if ($ctx->type !== 'element') {
                 return true; // fhirpath and extension types deferred in v1
             }
 
+            // Path equality covers both root-level paths ("Patient") and dotted paths.
             if ($elementPath === $ctx->expression) {
                 return true;
             }
 
-            if (str_starts_with($elementPath, $ctx->expression . '.')) {
+            if (str_contains($ctx->expression, '.')) {
+                if (str_starts_with($elementPath, $ctx->expression . '.')) {
+                    return true;
+                }
+                continue;
+            }
+
+            // No dot and no path match: treat as a bare FHIR type name — match against
+            // the resolved type of this element (e.g. "HumanName" on Patient.name).
+            if ($resolvedFhirType !== null && $ctx->expression === $resolvedFhirType) {
                 return true;
             }
         }
