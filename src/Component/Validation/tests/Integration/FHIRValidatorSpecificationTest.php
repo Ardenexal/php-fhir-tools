@@ -17,6 +17,7 @@ use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationViolation;
+use Ardenexal\FHIRTools\Component\Validation\FhirPropertyTypeHierarchyResolver;
 use Ardenexal\FHIRTools\Component\Validation\NullFHIRReferenceResolver;
 use Ardenexal\FHIRTools\Component\Validation\SliceDiscriminatorMatcher;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRFixedValueValidator;
@@ -551,7 +552,7 @@ final class FHIRValidatorSpecificationTest extends TestCase
             ->setConstraintValidatorFactory($factory)
             ->getValidator();
 
-        return new FHIRValidationService($validator, $pathSvc);
+        return new FHIRValidationService($validator, $pathSvc, typeResolver: new FhirPropertyTypeHierarchyResolver());
     }
 
     /**

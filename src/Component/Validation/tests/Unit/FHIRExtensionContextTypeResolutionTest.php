@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
-use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Validation\FhirPropertyTypeHierarchyResolver;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
 use Ardenexal\FHIRTools\Component\Validation\NullFHIRTypeHierarchyResolver;
@@ -16,6 +15,8 @@ use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\ResourceWithType
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 
 final class FHIRExtensionContextTypeResolutionTest extends TestCase
 {
@@ -43,21 +44,19 @@ final class FHIRExtensionContextTypeResolutionTest extends TestCase
         self::assertCount(0, $report->errors(), 'Bare-type "HumanName" context must permit an extension on a HumanName-typed property');
     }
 
-    public function testBareTypeNoMatchDeniesExtension(): void
+    public function testForeignRootNonMatchDefersNotDenies(): void
     {
-        // PatientContactOnlyExtensionFixture context is "Patient.contact" (dotted path, different root).
-        // ForeignRootOnlyExtensionFixture context is "Observation.component" (dotted path, foreign root).
-        // BareTypeHumanNameExtensionFixture context is "HumanName" — but $name type is 'HumanName',
-        // so only the bare-type one is the relevant denial case.
-        // Here we use ForeignRootOnlyExtensionFixture on a HumanName-typed property: its context
-        // "Observation.component" does not match "Patient.name" → 1 error.
+        // ForeignRootOnlyExtensionFixture context is "Observation.component" (foreign root) placed
+        // on a HumanName-typed sub-element at "Patient.name". Type resolution is monotonic: a
+        // foreign-root context that does not match a type-rooted path candidate is DEFERRED, never
+        // denied — confirming foreign type-paths cannot be confirmed needs full path-segment
+        // resolution. So no violation is produced.
         $name     = new NestedContactWithExtensionsFixture([new ForeignRootOnlyExtensionFixture()]);
         $resource = new ResourceWithTypedNamePropertyFixture(name: [$name]);
 
         $report = $this->makeService(withResolver: true)->validate($resource);
 
-        self::assertCount(1, $report->errors(), 'Extension with foreign-root context must be denied on a differently-typed sub-element');
-        self::assertSame(FHIRExtensionContext::class, $report->errors()[0]->constraintClass);
+        self::assertCount(0, $report->errors(), 'Foreign-root context that cannot be confirmed must defer, not deny');
     }
 
     public function testBareTypeNullResolverDefers(): void
@@ -76,9 +75,9 @@ final class FHIRExtensionContextTypeResolutionTest extends TestCase
     {
         // Extension has contexts ["HumanName" (bare type), "Observation.component" (foreign root)].
         // On a HumanName-typed element, the bare-type context matches → permitted → 0 violations.
-        $ext = new class implements \Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface {
-            #[\Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext(type: 'element', expression: 'HumanName')]
-            #[\Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext(type: 'element', expression: 'Observation.component')]
+        $ext = new class () implements FHIRExtensionInterface {
+            #[FHIRExtensionContext(type: 'element', expression: 'HumanName')]
+            #[FHIRExtensionContext(type: 'element', expression: 'Observation.component')]
             public function getExtensionUrl(): ?string
             {
                 return 'http://example.org/ext/mixed-contexts';

@@ -171,6 +171,13 @@ services:
         tags:
             - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfileValidator' }
 
+    # Type hierarchy resolver — enables inheritance-aware extension context validation
+    # (supertype and foreign-root type-path contexts). Monotonic: only removes false positives.
+    Ardenexal\FHIRTools\Component\Validation\FhirPropertyTypeHierarchyResolver: ~
+
+    Ardenexal\FHIRTools\Component\Validation\FHIRTypeHierarchyResolverInterface:
+        alias: 'Ardenexal\FHIRTools\Component\Validation\FhirPropertyTypeHierarchyResolver'
+
     # Validation Service
     Ardenexal\FHIRTools\Component\Validation\FHIRValidationService:
         public: true

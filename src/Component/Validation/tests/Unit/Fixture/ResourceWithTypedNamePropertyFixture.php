@@ -19,7 +19,7 @@ final class ResourceWithTypedNamePropertyFixture
     use FHIRExtensionsTrait;
 
     /**
-     * @param list<FHIRExtensionInterface>         $extension
+     * @param list<FHIRExtensionInterface>             $extension
      * @param list<NestedContactWithExtensionsFixture> $name
      */
     public function __construct(
