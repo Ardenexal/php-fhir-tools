@@ -27,8 +27,9 @@ final class FhirPropertyTypeHierarchyResolver implements FHIRTypeHierarchyResolv
     /**
      * Resolves the FHIR type of a property by reading its #[FhirProperty] attribute.
      *
-     * @param object $element The FHIR element (model object) to inspect
+     * @param object $element      The FHIR element (model object) to inspect
      * @param string $propertyName The property name to resolve the type for
+     *
      * @return string|null The FHIR type name, or null if the property has no FhirProperty attribute or is a 'choice' polymorphic element
      */
     public function resolvePropertyType(object $element, string $propertyName): ?string
@@ -46,7 +47,8 @@ final class FhirPropertyTypeHierarchyResolver implements FHIRTypeHierarchyResolv
      * Resolves the FHIR type hierarchy of an element by walking its class inheritance chain.
      *
      * @param object $element The FHIR element (model object) to inspect
-     * @return array List of FHIR type names from the element up through its parent classes
+     *
+     * @return list<string> List of FHIR type names from the element up through its parent classes
      */
     public function resolveTypeHierarchy(object $element): array
     {
@@ -72,8 +74,9 @@ final class FhirPropertyTypeHierarchyResolver implements FHIRTypeHierarchyResolv
     /**
      * Helper method that performs uncached property type resolution by reading the FhirProperty attribute.
      *
-     * @param object $element The FHIR element to inspect
+     * @param object $element      The FHIR element to inspect
      * @param string $propertyName The property name to resolve
+     *
      * @return string|null The FHIR type from the attribute, or null if not found or if the type is 'choice'
      */
     private function resolve(object $element, string $propertyName): ?string

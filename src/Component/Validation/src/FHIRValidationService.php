@@ -27,7 +27,9 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 final class FHIRValidationService implements FHIRValidationServiceInterface
 {
     private const CONTEXT_PERMIT = 1;
+
     private const CONTEXT_DEFER  = 0;
+
     private const CONTEXT_DENY   = -1;
 
     public function __construct(
@@ -41,10 +43,11 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
     /**
      * Validates a FHIR resource against constraints, extension contexts, and optional profiles.
      *
-     * @param object $resource The FHIR resource to validate
-     * @param array $profileUrls FHIR profile canonical URLs to validate against (empty array uses default constraints only)
-     * @param bool $includeMustSupportInfo When true, includes info-level violations for unpopulated must-support properties
-     * @param FHIRObligationContext|null $obligationContext When provided, applies obligation codes (SHALL_POPULATE, SHOULD_POPULATE, etc.)
+     * @param object                     $resource               The FHIR resource to validate
+     * @param list<string>               $profileUrls            FHIR profile canonical URLs to validate against (empty array uses default constraints only)
+     * @param bool                       $includeMustSupportInfo When true, includes info-level violations for unpopulated must-support properties
+     * @param FHIRObligationContext|null $obligationContext      When provided, applies obligation codes (SHALL_POPULATE, SHOULD_POPULATE, etc.)
+     *
      * @return FHIRValidationReport A structured report containing all violations found at all severity levels
      */
     public function validate(
@@ -97,6 +100,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
      * path and message. Handles FHIRPath invariants and FHIRProfile constraints specially.
      *
      * @param ConstraintViolationInterface $violation The Symfony constraint violation to convert
+     *
      * @return FHIRValidationViolation A structured FHIR validation violation
      */
     private function mapViolation(ConstraintViolationInterface $violation): FHIRValidationViolation
@@ -142,6 +146,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
      * and generates info-level violations for properties that are empty or not set.
      *
      * @param object $resource The FHIR resource to inspect
+     *
      * @return list<FHIRValidationViolation> Info-level violations for empty must-support properties
      */
     private function collectMustSupportInfo(object $resource): array
@@ -434,6 +439,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
      * "Resource" suffix removed (e.g., "PatientResource" becomes "Patient").
      *
      * @param object $resource The FHIR resource object to inspect
+     *
      * @return string The FHIR type name (e.g., "Patient", "Observation", "Bundle")
      */
     private function getResourceFhirType(object $resource): string
@@ -543,8 +549,9 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
      * Reflects over the resource's properties, finds those with #[FHIRObligation] attributes matching
      * the provided context, and generates violations when required fields are empty.
      *
-     * @param object $resource The FHIR resource to inspect
-     * @param FHIRObligationContext $context The obligation context to match against
+     * @param object                $resource The FHIR resource to inspect
+     * @param FHIRObligationContext $context  The obligation context to match against
+     *
      * @return list<FHIRValidationViolation> Violations for empty or missing obligated properties
      */
     private function collectObligationViolations(object $resource, FHIRObligationContext $context): array
