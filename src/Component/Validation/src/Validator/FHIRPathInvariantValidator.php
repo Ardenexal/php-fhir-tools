@@ -32,10 +32,22 @@ final class FHIRPathInvariantValidator extends ConstraintValidator
 
         try {
             $result = $this->pathService->evaluate($constraint->expression, $value);
-            $passed = $result->count() === 1 && $result->first() === true;
         } catch (\Throwable) {
-            $passed = false;
+            // The engine could not evaluate the expression (e.g. an unsupported function).
+            // Per the FHIR conformance spec this is a tooling limitation, not instance
+            // non-conformance, so surface it distinctly instead of as a failed constraint.
+            $this->context->buildViolation(sprintf(
+                'FHIRPath invariant `%s` could not be evaluated: %s',
+                $constraint->key,
+                $constraint->expression,
+            ))
+                ->setCode(FHIRViolationCode::EVAL_ERROR)
+                ->addViolation();
+
+            return;
         }
+
+        $passed = $result->count() === 1 && $result->first() === true;
 
         if ($passed) {
             return;

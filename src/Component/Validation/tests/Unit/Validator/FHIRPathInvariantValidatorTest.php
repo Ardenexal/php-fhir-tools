@@ -55,7 +55,7 @@ final class FHIRPathInvariantValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testEvaluationExceptionTreatedAsFailure(): void
+    public function testEvaluationExceptionEmitsEvalErrorNotFailure(): void
     {
         $stub = $this->createStub(FHIRPathService::class);
         $stub->method('evaluate')->willThrowException(new \RuntimeException('parse error'));
@@ -65,8 +65,10 @@ final class FHIRPathInvariantValidatorTest extends ConstraintValidatorTestCase
 
         $validator->validate(new \stdClass(), $this->makeConstraint('bad-expr', 'error', 'inv-3', 'Invariant failed.'));
 
-        $this->buildViolation('Invariant failed.')
-            ->setCode(FHIRViolationCode::ERROR)
+        // An engine limitation must not be asserted as instance non-conformance:
+        // it is reported with the distinct eval-error code, not the constraint's human message.
+        $this->buildViolation('FHIRPath invariant `inv-3` could not be evaluated: bad-expr')
+            ->setCode(FHIRViolationCode::EVAL_ERROR)
             ->assertRaised();
     }
 

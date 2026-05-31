@@ -436,9 +436,17 @@ Violation codes are set on Symfony constraint violations and used to derive seve
 | `FHIRViolationCode::ERROR` | `'fhir:error'` | `error` |
 | `FHIRViolationCode::WARNING` | `'fhir:warning'` | `warning` |
 | `FHIRViolationCode::INFO` | `'fhir:info'` | `info` |
+| `FHIRViolationCode::EVAL_ERROR` | `'fhir:eval-error'` | `info` |
 
 Built-in Symfony constraint codes (from `#[NotBlank]`, `#[Count]`, etc.) map to
 `error` by default.
+
+`FHIRViolationCode::EVAL_ERROR` denotes a FHIRPath invariant (or extension `contextInvariant`)
+that the engine could not evaluate — for example, an invariant using a function the evaluator
+does not yet support. Per the FHIR conformance spec, a tooling limitation must not be asserted as
+instance non-conformance, so these surface at `info` severity rather than `error`. The raw code is
+preserved on `FHIRValidationViolation::$code` so consumers can distinguish "could not evaluate" from
+"genuinely failed".
 
 ---
 
