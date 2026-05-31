@@ -67,6 +67,46 @@ jobs:
             -   name: Validate composer files
                 run: composer validate --strict
 
+            -   name: Check code style (Pint)
+                run: composer run lint -- --test
+
+    static-analysis:
+        runs-on: ubuntu-latest
+        env:
+            XDEBUG_MODE: off
+            COMPOSER_NO_INTERACTION: 1
+        strategy:
+            fail-fast: false
+            matrix:
+                component: [ bundle, codegen, fhir-path, validation ]
+
+        steps:
+            -   uses: actions/checkout@v4
+                with:
+                    # Fetch full history for better diff analysis
+                    fetch-depth: 0
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: '8.3'
+                    extensions: ctype, iconv, zip
+
+            -   name: Cache Composer packages
+                id: composer-cache
+                uses: actions/cache@v4
+                with:
+                    path: vendor
+                    key: ${{ runner.os }}-php-8.3-${{ hashFiles('**/composer.lock') }}
+                    restore-keys: |
+                        ${{ runner.os }}-php-8.3-
+
+            -   name: Install dependencies
+                run: composer install --prefer-dist --no-progress --no-suggest
+
+            -   name: Run PHPStan static analysis
+                run: composer run phpstan:${{ matrix.component }}
+
     unit-tests:
         runs-on: ubuntu-latest
         env:

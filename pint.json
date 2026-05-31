@@ -3,7 +3,8 @@
     "exclude": [
         "var",
         "src/Component/*/output",
-        "src/Component/*/tests/fixtures"
+        "src/Component/*/tests/fixtures",
+        "mate/extensions.php"
     ],
     "rules": {
         "@PSR12": true,

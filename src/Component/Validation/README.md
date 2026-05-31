@@ -69,6 +69,7 @@ $validator = Validation::createValidatorBuilder()
     ->setConstraintValidatorFactory($factory)
     ->getValidator();
 
+// Type-aware extension context resolution (FhirPropertyTypeHierarchyResolver) is on by default.
 $service = new FHIRValidationService($validator, $pathService);
 
 // 2. Validate a resource
@@ -135,7 +136,7 @@ FHIRValidationService::validate($resource, $profileUrls, $includeMustSupportInfo
   │       and built-in Symfony constraints (#[NotBlank], #[Count], etc.)
   │
   ├─ collectMustSupportInfo()    (only when $includeMustSupportInfo=true)
-  ├─ validateExtensionContexts() (always; top-level extensions only — see Limitations)
+  ├─ validateExtensionContexts() (always; recursive walk across full resource tree)
   ├─ validateModifierExtensions() (only when FHIRIGTypeRegistry is provided)
   └─ collectObligationViolations() (only when FHIRObligationContext is provided)
        └─ applyNoErrorSuppression() (suppress errors for SHALL:no-error obligations)
@@ -159,7 +160,7 @@ categories. Coverage as of the current release:
 | **Slicing** (closed/open/openAtEnd) | ✅ | ✅ | ✅ | `FHIRSliceConstraintValidator` |
 | **Profile constraints** (generated) | ✅ | ✅ | ✅ | `FHIRProfileConstraintValidator`; requires pre-generated models |
 | **Profile constraints** (dynamic/runtime) | ❌ | ❌ | ❌ | Dynamic StructureDefinition loading not yet supported |
-| **Extension contexts** (`type=element`) | ⚠️ | ⚠️ | ⚠️ | Checked on root resource extensions only (top-level) |
+| **Extension contexts** (`type=element`) | ✅ | ✅ | ✅ | Recursive walk; path, bare-type, supertype (e.g. `DomainResource`/`Element`) and foreign-root type-path contexts resolved via `FhirPropertyTypeHierarchyResolver` (reflection, no codegen); deferred without a resolver |
 | **Extension contexts** (`type=fhirpath/extension`) | ❌ | ❌ | ❌ | Always permitted in v1 |
 | **Modifier extensions** (unknown URL) | ✅ | ✅ | ✅ | Recursive walk via `FHIRIGTypeRegistry` |
 | **Modifier element impact** | ⚠️ | ⚠️ | ⚠️ | `#[FHIRIsModifier]` marks properties; no active enforcement |
@@ -190,10 +191,15 @@ StructureDefinitions, INFO violations of this kind will not appear.
 against extensible/preferred value sets will not be detected. Wire
 `HttpFHIRTerminologyClient` (or a custom implementation) to enable terminology checking.
 
-**Extension context validation** currently only checks extensions attached directly to
-the root resource object. Extensions on nested BackboneElements or complex-type
-properties are not context-checked. An extension applied to the wrong nested element
-will not produce a violation in this release. Recursive sub-element walking is planned.
+**Extension context validation** walks all nested sub-elements recursively. Extensions
+on BackboneElements and complex-type properties are context-checked. When
+`FhirPropertyTypeHierarchyResolver` is wired, contexts are resolved by reflection over the
+generated model class hierarchy (no codegen): bare-type contexts match the element's
+resolved supertype set, so a supertype such as `"DomainResource"` or `"Element"` permits its
+subtypes; foreign-root type-paths such as `"ElementDefinition.binding"` match when a path
+segment is typed with the context root. Type resolution is monotonic — it only ever permits
+more, never introduces a denial — so enabling the resolver cannot create a false positive.
+Without a resolver, bare-type and foreign-root contexts are deferred (no violation emitted).
 
 **Extension context types `fhirpath` and `extension`** are not evaluated. Any extension
 with a `type=fhirpath` or `type=extension` context is treated as permitted regardless
@@ -285,6 +291,48 @@ $resolver = new class($bundle) implements FHIRReferenceResolverInterface {
     }
 };
 ```
+
+---
+
+### FHIRTypeHierarchyResolverInterface — type-aware extension context resolution
+
+Controls whether bare-type (e.g. `"HumanName"`, `"DomainResource"`) and foreign-root type-path
+(e.g. `"ElementDefinition.binding"`) extension contexts are evaluated against the FHIR type of
+the element they are applied to.
+
+`FhirPropertyTypeHierarchyResolver` is the **default** (constructor default, and wired by
+`FHIRBundle`). It is safe to leave on: resolution is monotonic — it only ever clears false
+positives, never introduces a denial. Inject `NullFHIRTypeHierarchyResolver` to turn type
+resolution off, in which case these contexts are deferred (never produce violations).
+
+```php
+use Ardenexal\FHIRTools\Component\Validation\FhirPropertyTypeHierarchyResolver;
+use Ardenexal\FHIRTools\Component\Validation\NullFHIRTypeHierarchyResolver;
+
+// Default: resolves types from generated models (reflection, no codegen)
+$typeResolver = new FhirPropertyTypeHierarchyResolver();
+
+// Opt out: defer all bare-type / foreign-root context checks
+$typeResolver = new NullFHIRTypeHierarchyResolver();
+```
+
+Pass `$typeResolver` as the `typeResolver` parameter of `FHIRValidationService` (omit to use
+the default):
+
+```php
+$service = new FHIRValidationService($validator, $pathService, typeResolver: $typeResolver);
+```
+
+`FhirPropertyTypeHierarchyResolver` reads the `fhirType` field of `#[FhirProperty]` attributes
+for declared element types, and walks the generated PHP class inheritance chain (reading
+`#[FhirResource]`/`#[FHIRComplexType]`) for FHIR type hierarchies. It requires no codegen
+changes — all generated R4, R4B, and R5 models already carry these attributes. Results are
+cached per class to avoid repeated reflection.
+
+> **Note:** FHIR type inheritance is evaluated — a context naming a supertype (e.g.
+> `"DomainResource"`, `"Element"`) permits its subtypes. Resolution is monotonic: wiring the
+> resolver only ever permits more, never introduces a denial, so it cannot create a false
+> positive against an already-valid resource.
 
 ---
 
