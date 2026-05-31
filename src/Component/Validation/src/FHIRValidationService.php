@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation;
 
+use Ardenexal\FHIRTools\Component\FHIRPath\Exception\FHIRPathException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
@@ -108,9 +109,10 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         $code = $violation->getCode();
 
         $severity = match ($code) {
-            FHIRViolationCode::WARNING => 'warning',
-            FHIRViolationCode::INFO    => 'info',
-            default                    => 'error',
+            FHIRViolationCode::WARNING    => 'warning',
+            FHIRViolationCode::INFO       => 'info',
+            FHIRViolationCode::EVAL_ERROR => 'info',
+            default                       => 'error',
         };
 
         $constraint      = $violation->getConstraint();
@@ -136,6 +138,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             profileGroup: $profileGroup,
             invariantKey: $invariantKey,
             parameters: $violation->getParameters(),
+            code: $code,
         );
     }
 
@@ -258,10 +261,29 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                 foreach ($invariantAttrs as $invariant) {
                     try {
                         $result = $this->pathService->evaluate($invariant->expression, $resource);
-                        $passed = $result->count() === 1 && $result->first() === true;
-                    } catch (\Throwable) {
-                        $passed = false;
+                    } catch (FHIRPathException) {
+                        // Engine limitation, not non-conformance: surface as INFO eval-error.
+                        // Only FHIRPath engine exceptions are downgraded here; any other throwable
+                        // (a genuine bug) propagates rather than being masked as an info result.
+                        $url          = method_exists($extension, 'getExtensionUrl') ? ($extension->getExtensionUrl() ?? '') : '';
+                        $violations[] = new FHIRValidationViolation(
+                            severity: 'info',
+                            path: $extViolationPath,
+                            message: sprintf(
+                                'Extension "%s" contextInvariant could not be evaluated: %s',
+                                $url,
+                                $invariant->expression,
+                            ),
+                            constraintClass: FHIRContextInvariant::class,
+                            profileGroup: null,
+                            invariantKey: null,
+                            code: FHIRViolationCode::EVAL_ERROR,
+                        );
+
+                        continue;
                     }
+
+                    $passed = $result->count() === 1 && $result->first() === true;
 
                     if (!$passed) {
                         $url          = method_exists($extension, 'getExtensionUrl') ? ($extension->getExtensionUrl() ?? '') : '';

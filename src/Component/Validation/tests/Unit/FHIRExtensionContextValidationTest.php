@@ -8,6 +8,8 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRContextInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
+use Ardenexal\FHIRTools\Component\Validation\FHIRViolationCode;
+use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\EvalErrorInvariantExtensionFixture;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\FailingInvariantExtensionFixture;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\FhirpathContextExtensionFixture;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\NoContextExtensionFixture;
@@ -121,6 +123,23 @@ final class FHIRExtensionContextValidationTest extends TestCase
         self::assertSame('extension', $violation->path);
         self::assertSame(FHIRContextInvariant::class, $violation->constraintClass);
         self::assertStringContainsString('1 = 2', $violation->message);
+    }
+
+    public function testUnevaluatableContextInvariantProducesEvalErrorNotError(): void
+    {
+        $resource = new PatientExtensionResourceFixture([new EvalErrorInvariantExtensionFixture()]);
+
+        $report = $this->service->validate($resource);
+
+        // An engine limitation must not be asserted as instance non-conformance.
+        self::assertCount(0, $report->errors(), 'Unevaluatable contextInvariant must not produce an error');
+
+        $info = $report->info();
+        self::assertCount(1, $info, 'Unevaluatable contextInvariant must produce a single INFO violation');
+        self::assertSame('info', $info[0]->severity);
+        self::assertSame(FHIRViolationCode::EVAL_ERROR, $info[0]->code);
+        self::assertSame(FHIRContextInvariant::class, $info[0]->constraintClass);
+        self::assertStringContainsString('could not be evaluated', $info[0]->message);
     }
 
     // --- extension context violations flow into errors() ---
