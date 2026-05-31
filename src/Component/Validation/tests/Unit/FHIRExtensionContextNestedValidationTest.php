@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRContextInvar
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\DeferredContextFailingInvariantExtensionFixture;
+use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\ForeignRootOnlyExtensionFixture;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\NestedContactWithExtensionsFixture;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\PatientContactOnlyExtensionFixture;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\PatientNameOnlyExtensionFixture;
@@ -92,6 +93,26 @@ final class FHIRExtensionContextNestedValidationTest extends TestCase
         $report = $this->service->validate($resource);
 
         self::assertCount(0, $report->errors());
+    }
+
+    public function testForeignRootOnlyContextDeniesExtensionOnDifferentRootSubElement(): void
+    {
+        // ForeignRootOnlyExtensionFixture context is "Observation.component" only.
+        // Placed on Patient.contact (different root) it must be denied — foreign-root
+        // paths are not deferred; contextPermitsPath() returns false for them.
+        $contact  = new NestedContactWithExtensionsFixture([new ForeignRootOnlyExtensionFixture()]);
+        $resource = new PatientWithContactResourceFixture(contact: [$contact]);
+
+        $report = $this->service->validate($resource);
+
+        self::assertCount(1, $report->errors(), 'Extension with only foreign-root context must fail on a different-root sub-element');
+
+        $violation = $report->errors()[0];
+        self::assertSame('error', $violation->severity);
+        self::assertSame('contact[0].extension', $violation->path);
+        self::assertSame(FHIRExtensionContext::class, $violation->constraintClass);
+        self::assertStringContainsString('Patient.contact', $violation->message);
+        self::assertStringContainsString('http://example.org/ext/foreign-root-only', $violation->message);
     }
 
     public function testDeferredContextExtensionWithFailingInvariantProducesErrorAtNestedLevel(): void

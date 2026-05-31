@@ -159,7 +159,7 @@ categories. Coverage as of the current release:
 | **Slicing** (closed/open/openAtEnd) | ✅ | ✅ | ✅ | `FHIRSliceConstraintValidator` |
 | **Profile constraints** (generated) | ✅ | ✅ | ✅ | `FHIRProfileConstraintValidator`; requires pre-generated models |
 | **Profile constraints** (dynamic/runtime) | ❌ | ❌ | ❌ | Dynamic StructureDefinition loading not yet supported |
-| **Extension contexts** (`type=element`) | ⚠️ | ⚠️ | ⚠️ | Recursive walk; bare-type and foreign-root contexts deferred (require type-hierarchy resolution) |
+| **Extension contexts** (`type=element`) | ⚠️ | ⚠️ | ⚠️ | Recursive walk; foreign-root paths evaluated; bare-type contexts deferred (require type-hierarchy resolution) |
 | **Extension contexts** (`type=fhirpath/extension`) | ❌ | ❌ | ❌ | Always permitted in v1 |
 | **Modifier extensions** (unknown URL) | ✅ | ✅ | ✅ | Recursive walk via `FHIRIGTypeRegistry` |
 | **Modifier element impact** | ⚠️ | ⚠️ | ⚠️ | `#[FHIRIsModifier]` marks properties; no active enforcement |
@@ -192,9 +192,10 @@ against extensible/preferred value sets will not be detected. Wire
 
 **Extension context validation** walks all nested sub-elements recursively. Extensions
 on BackboneElements and complex-type properties are context-checked. At sub-element
-level, only `type=element` contexts whose dotted expression shares the root resource
-type are evaluated — bare type-name contexts (e.g. `"HumanName"`) and foreign-root
-paths require FHIR type-hierarchy resolution and are deferred.
+level, `type=element` contexts are evaluated as follows: contexts whose dotted expression
+matches the root resource type are checked by path; foreign-root paths (different root
+resource type) are checked by path and denied if they do not match; bare type-name
+contexts (e.g. `"HumanName"`) require FHIR type-hierarchy resolution and are deferred.
 
 **Extension context types `fhirpath` and `extension`** are not evaluated. Any extension
 with a `type=fhirpath` or `type=extension` context is treated as permitted regardless

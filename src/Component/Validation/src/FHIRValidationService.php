@@ -360,24 +360,26 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                     $ref->getAttributes(FHIRExtensionContext::class),
                 );
 
-                // Sub-element filter: context expressions that cannot be evaluated without
-                // FHIR type-hierarchy resolution (bare type-names, foreign-root paths) are
-                // deferred for the context-permission check only. contextInvariant evaluation
-                // always runs regardless, because invariants must be checked whenever the
-                // extension is present, independently of context resolvability.
+                // Sub-element filter: bare-type contexts (no dot, e.g. "HumanName") cannot be
+                // evaluated without FHIR type-hierarchy resolution and are deferred.
+                // Foreign-root paths (different root type) are NOT deferred — contextPermitsPath()
+                // correctly denies them. contextInvariant evaluation always runs regardless.
                 $skipContextCheck = false;
                 if ($rootType !== null && $contextAttrs !== []) {
-                    $hasCheckable = false;
+                    $hasCheckable     = false;
+                    $hasBareTypeCtx   = false;
                     foreach ($contextAttrs as $ctx) {
-                        if ($ctx->type === 'element'
-                            && str_contains($ctx->expression, '.')
-                            && str_starts_with($ctx->expression, $rootType . '.')
-                        ) {
+                        if ($ctx->type !== 'element') {
+                            continue;
+                        }
+                        if (!str_contains($ctx->expression, '.')) {
+                            $hasBareTypeCtx = true;
+                        } elseif (str_starts_with($ctx->expression, $rootType . '.')) {
                             $hasCheckable = true;
-                            break;
                         }
                     }
-                    $skipContextCheck = !$hasCheckable;
+                    // Defer only when bare-type contexts exist and no same-root context is checkable.
+                    $skipContextCheck = !$hasCheckable && $hasBareTypeCtx;
                 }
 
                 if (!$skipContextCheck && $contextAttrs !== [] && !$this->contextPermitsPath($contextAttrs, $fhirPath)) {
