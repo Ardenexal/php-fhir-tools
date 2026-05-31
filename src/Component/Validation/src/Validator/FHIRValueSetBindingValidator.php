@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 final class FHIRValueSetBindingValidator extends ConstraintValidator
 {
-    public const string DEFAULT_MISSING_ENUM_MESSAGE = 'Value set {{ url }} has no generated enum class; required-strength binding cannot be validated.';
+    public const string DEFAULT_MISSING_ENUM_MESSAGE = 'Required binding for value set {{ url }} could not be validated: no enum class generated.';
 
     public const string DEFAULT_INVALID_VALUE_MESSAGE = 'The value {{ value }} is not a valid case of value set {{ url }}.';
 
@@ -62,10 +62,25 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
         $enumFqcn  = $this->resolveEnumFqcn($className);
 
         if ($enumFqcn === null) {
+            if ($this->terminologyClient !== null) {
+                $override = $this->messageRegistry->getOverride('FHIRValueSetBinding');
+                foreach (is_array($value) ? $value : [$value] as $item) {
+                    if (!$this->terminologyClient->validateCode($constraint->valueSetUrl, $item)) {
+                        $this->context->buildViolation($override ?? self::DEFAULT_INVALID_VALUE_MESSAGE)
+                            ->setParameters(['{{ value }}' => (string) $item, '{{ url }}' => $constraint->valueSetUrl])
+                            ->setInvalidValue($item)
+                            ->setCode(FHIRViolationCode::ERROR)
+                            ->addViolation();
+                    }
+                }
+
+                return;
+            }
+
             $override = $this->messageRegistry->getOverride('FHIRValueSetBinding');
             $this->context->buildViolation($override ?? self::DEFAULT_MISSING_ENUM_MESSAGE)
                 ->setParameters(['{{ url }}' => $constraint->valueSetUrl])
-                ->setCode(FHIRViolationCode::ERROR)
+                ->setCode(FHIRViolationCode::WARNING)
                 ->addViolation();
 
             return;
