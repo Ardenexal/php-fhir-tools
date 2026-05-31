@@ -18,7 +18,8 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  * - null client → no violation (graceful degradation)
  * - real client returning true → no violation
  * - real client returning false → WARNING violation
- * - required strength is unaffected by the client
+ * - required + no enum + real client → falls back to terminology server
+ * - required + no enum + no client → WARNING (tooling gap)
  *
  * @extends ConstraintValidatorTestCase<FHIRValueSetBindingValidator>
  */
@@ -138,24 +139,66 @@ final class FHIRValueSetBindingValidatorExtensibleTest extends ConstraintValidat
     }
 
     // -------------------------------------------------------------------------
-    // Required strength is unaffected by the client
+    // Required + no enum → terminology server fallback
     // -------------------------------------------------------------------------
 
-    public function testRequiredBindingWithRealClientStillUsesEnumPath(): void
+    public function testRequiredBindingNoEnumWithClientValidCodeProducesNoViolation(): void
     {
-        // Client should NOT be called for required — enum class lookup governs required
-        $this->mockClient->expects(self::never())->method('validateCode');
+        $this->mockClient->method('validateCode')->willReturn(true);
 
         $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry(), [], $this->mockClient);
         $validator->initialize($this->context);
 
-        // No enum class found → DEFAULT_MISSING_ENUM_MESSAGE (existing required behavior)
+        $validator->validate('valid-code', new FHIRValueSetBinding(self::VS_URL, 'required'));
+
+        $this->assertNoViolation();
+    }
+
+    public function testRequiredBindingNoEnumWithClientInvalidCodeProducesErrorViolation(): void
+    {
+        $this->mockClient->method('validateCode')->willReturn(false);
+
+        $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry(), [], $this->mockClient);
+        $validator->initialize($this->context);
+
+        $validator->validate('bad-code', new FHIRValueSetBinding(self::VS_URL, 'required'));
+
+        $this->buildViolation(FHIRValueSetBindingValidator::DEFAULT_INVALID_VALUE_MESSAGE)
+            ->setParameters(['{{ value }}' => 'bad-code', '{{ url }}' => self::VS_URL])
+            ->setInvalidValue('bad-code')
+            ->setCode(FHIRViolationCode::ERROR)
+            ->assertRaised();
+    }
+
+    public function testRequiredBindingNoEnumWithClientValidatesEachArrayItem(): void
+    {
+        $this->mockClient
+            ->method('validateCode')
+            ->willReturnMap([[self::VS_URL, 'good', true], [self::VS_URL, 'bad', false]]);
+
+        $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry(), [], $this->mockClient);
+        $validator->initialize($this->context);
+
+        $validator->validate(['good', 'bad'], new FHIRValueSetBinding(self::VS_URL, 'required'));
+
+        $this->buildViolation(FHIRValueSetBindingValidator::DEFAULT_INVALID_VALUE_MESSAGE)
+            ->setParameters(['{{ value }}' => 'bad', '{{ url }}' => self::VS_URL])
+            ->setInvalidValue('bad')
+            ->setCode(FHIRViolationCode::ERROR)
+            ->assertRaised();
+    }
+
+    public function testRequiredBindingNoEnumWithoutClientProducesWarning(): void
+    {
+        $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry());
+        $validator->initialize($this->context);
+
         $url = 'http://hl7.org/fhir/ValueSet/unknown-required-vs';
         $validator->validate('anything', new FHIRValueSetBinding($url, 'required'));
 
         $this->buildViolation(FHIRValueSetBindingValidator::DEFAULT_MISSING_ENUM_MESSAGE)
             ->setParameters(['{{ url }}' => $url])
-            ->setCode(FHIRViolationCode::ERROR)
+            ->setCode(FHIRViolationCode::WARNING)
             ->assertRaised();
     }
 }

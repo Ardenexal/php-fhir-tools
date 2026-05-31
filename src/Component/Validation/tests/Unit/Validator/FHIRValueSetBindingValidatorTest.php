@@ -63,7 +63,7 @@ final class FHIRValueSetBindingValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testMissingEnumClassWithRequiredStrengthEmitsError(): void
+    public function testMissingEnumClassWithRequiredStrengthEmitsWarning(): void
     {
         $url        = 'http://test.example/ValueSet/no-such-enum';
         $constraint = new FHIRValueSetBinding($url, 'required');
@@ -71,7 +71,7 @@ final class FHIRValueSetBindingValidatorTest extends ConstraintValidatorTestCase
 
         $this->buildViolation(FHIRValueSetBindingValidator::DEFAULT_MISSING_ENUM_MESSAGE)
             ->setParameters(['{{ url }}' => $url])
-            ->setCode(FHIRViolationCode::ERROR)
+            ->setCode(FHIRViolationCode::WARNING)
             ->assertRaised();
     }
 
