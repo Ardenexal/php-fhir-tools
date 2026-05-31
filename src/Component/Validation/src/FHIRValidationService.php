@@ -47,7 +47,8 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
             }
         }
 
-        foreach ($this->validateExtensionContexts($resource) as $contextViolation) {
+        $contextVisited = [];
+        foreach ($this->validateExtensionContexts($resource, $this->getResourceFhirType($resource), '', $contextVisited) as $contextViolation) {
             $violations[] = $contextViolation;
         }
 
@@ -315,75 +316,141 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
     }
 
     /**
-     * Pass 2 (v1: top-level walk only): check extension context and contextInvariant
-     * constraints for all extensions attached directly to $resource.
+     * Pass 2: check extension context and contextInvariant constraints for all extensions
+     * throughout the resource tree. Walks nested sub-elements recursively.
      *
-     * Recursive sub-element walking and FHIR type-hierarchy resolution are deferred to v2.
+     * At sub-element level (path contains a dot), only extensions whose context expression
+     * is a dotted path sharing the current root resource type are checked. Bare type-name
+     * contexts (e.g. "HumanName") and foreign-root paths (e.g. "ElementDefinition.binding"
+     * inside StructureDefinition) require FHIR type-hierarchy resolution — deferred.
+     *
+     * @param array<int, true> $visited spl_object_id keys of already-visited objects (cycle guard)
      *
      * @return list<FHIRValidationViolation>
      */
-    private function validateExtensionContexts(object $resource): array
+    private function validateExtensionContexts(object $resource, string $fhirPath, string $relPath, array &$visited): array
     {
-        if (!method_exists($resource, 'getExtensions')) {
+        $id = spl_object_id($resource);
+
+        if (isset($visited[$id])) {
             return [];
         }
 
-        $elementPath = $this->getResourceFhirType($resource);
-        $violations  = [];
+        $visited[$id] = true;
+        $violations   = [];
 
-        /** @var list<object> $extensions */
-        $extensions = $resource->getExtensions();
+        if (method_exists($resource, 'getExtensions')) {
+            $extViolationPath = $relPath !== '' ? $relPath . '.extension' : 'extension';
 
-        foreach ($extensions as $extension) {
-            $ref          = new \ReflectionClass($extension);
-            $contextAttrs = array_map(
-                static fn (\ReflectionAttribute $a): FHIRExtensionContext => $a->newInstance(),
-                $ref->getAttributes(FHIRExtensionContext::class),
-            );
+            // At sub-element level, determine the root resource type so that only context
+            // expressions explicitly targeting this resource's path hierarchy are evaluated.
+            // Contexts without a dot or with a different root type require type-hierarchy
+            // resolution and are deferred. At root level ($rootType === null) all
+            // expressions are checked as before.
+            $dotPos   = strpos($fhirPath, '.');
+            $rootType = $dotPos !== false ? substr($fhirPath, 0, $dotPos) : null;
 
-            if ($contextAttrs !== [] && !$this->contextPermitsPath($contextAttrs, $elementPath)) {
-                $url          = method_exists($extension, 'getExtensionUrl') ? ($extension->getExtensionUrl() ?? '') : '';
-                $violations[] = new FHIRValidationViolation(
-                    severity: 'error',
-                    path: 'extension',
-                    message: sprintf(
-                        'Extension "%s" is not permitted on element "%s".',
-                        $url,
-                        $elementPath,
-                    ),
-                    constraintClass: FHIRExtensionContext::class,
-                    profileGroup: null,
-                    invariantKey: null,
+            /** @var list<object> $extensions */
+            $extensions = $resource->getExtensions();
+
+            foreach ($extensions as $extension) {
+                $ref          = new \ReflectionClass($extension);
+                $contextAttrs = array_map(
+                    static fn (\ReflectionAttribute $a): FHIRExtensionContext => $a->newInstance(),
+                    $ref->getAttributes(FHIRExtensionContext::class),
                 );
-            }
 
-            $invariantAttrs = array_map(
-                static fn (\ReflectionAttribute $a): FHIRContextInvariant => $a->newInstance(),
-                $ref->getAttributes(FHIRContextInvariant::class),
-            );
-
-            foreach ($invariantAttrs as $invariant) {
-                try {
-                    $result = $this->pathService->evaluate($invariant->expression, $resource);
-                    $passed = $result->count() === 1 && $result->first() === true;
-                } catch (\Throwable) {
-                    $passed = false;
+                // Sub-element filter: skip extensions whose context expressions cannot be
+                // evaluated against a structural path without FHIR type-hierarchy resolution.
+                if ($rootType !== null && $contextAttrs !== []) {
+                    $hasCheckable = false;
+                    foreach ($contextAttrs as $ctx) {
+                        if ($ctx->type === 'element'
+                            && str_contains($ctx->expression, '.')
+                            && str_starts_with($ctx->expression, $rootType . '.')
+                        ) {
+                            $hasCheckable = true;
+                            break;
+                        }
+                    }
+                    if (!$hasCheckable) {
+                        continue;
+                    }
                 }
 
-                if (!$passed) {
+                if ($contextAttrs !== [] && !$this->contextPermitsPath($contextAttrs, $fhirPath)) {
                     $url          = method_exists($extension, 'getExtensionUrl') ? ($extension->getExtensionUrl() ?? '') : '';
                     $violations[] = new FHIRValidationViolation(
                         severity: 'error',
-                        path: 'extension',
+                        path: $extViolationPath,
                         message: sprintf(
-                            'Extension "%s" contextInvariant failed: %s',
+                            'Extension "%s" is not permitted on element "%s".',
                             $url,
-                            $invariant->expression,
+                            $fhirPath,
                         ),
-                        constraintClass: FHIRContextInvariant::class,
+                        constraintClass: FHIRExtensionContext::class,
                         profileGroup: null,
                         invariantKey: null,
                     );
+                }
+
+                $invariantAttrs = array_map(
+                    static fn (\ReflectionAttribute $a): FHIRContextInvariant => $a->newInstance(),
+                    $ref->getAttributes(FHIRContextInvariant::class),
+                );
+
+                foreach ($invariantAttrs as $invariant) {
+                    try {
+                        $result = $this->pathService->evaluate($invariant->expression, $resource);
+                        $passed = $result->count() === 1 && $result->first() === true;
+                    } catch (\Throwable) {
+                        $passed = false;
+                    }
+
+                    if (!$passed) {
+                        $url          = method_exists($extension, 'getExtensionUrl') ? ($extension->getExtensionUrl() ?? '') : '';
+                        $violations[] = new FHIRValidationViolation(
+                            severity: 'error',
+                            path: $extViolationPath,
+                            message: sprintf(
+                                'Extension "%s" contextInvariant failed: %s',
+                                $url,
+                                $invariant->expression,
+                            ),
+                            constraintClass: FHIRContextInvariant::class,
+                            profileGroup: null,
+                            invariantKey: null,
+                        );
+                    }
+                }
+            }
+        }
+
+        $ref = new \ReflectionClass($resource);
+
+        foreach ($ref->getProperties(\ReflectionProperty::IS_PUBLIC) as $prop) {
+            if (in_array($prop->getName(), ['extension', 'modifierExtension'], true)) {
+                continue;
+            }
+            if ($prop->isInitialized($resource) === false) {
+                continue;
+            }
+
+            $value       = $prop->getValue($resource);
+            $subFhirPath = $fhirPath . '.' . $prop->getName();
+            $subRelPath  = $relPath !== '' ? $relPath . '.' . $prop->getName() : $prop->getName();
+
+            if (is_object($value)) {
+                foreach ($this->validateExtensionContexts($value, $subFhirPath, $subRelPath, $visited) as $v) {
+                    $violations[] = $v;
+                }
+            } elseif (is_array($value)) {
+                foreach ($value as $i => $item) {
+                    if (is_object($item)) {
+                        foreach ($this->validateExtensionContexts($item, $subFhirPath, $subRelPath . '[' . $i . ']', $visited) as $v) {
+                            $violations[] = $v;
+                        }
+                    }
                 }
             }
         }
