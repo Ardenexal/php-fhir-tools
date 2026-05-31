@@ -360,8 +360,12 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                     $ref->getAttributes(FHIRExtensionContext::class),
                 );
 
-                // Sub-element filter: skip extensions whose context expressions cannot be
-                // evaluated against a structural path without FHIR type-hierarchy resolution.
+                // Sub-element filter: context expressions that cannot be evaluated without
+                // FHIR type-hierarchy resolution (bare type-names, foreign-root paths) are
+                // deferred for the context-permission check only. contextInvariant evaluation
+                // always runs regardless, because invariants must be checked whenever the
+                // extension is present, independently of context resolvability.
+                $skipContextCheck = false;
                 if ($rootType !== null && $contextAttrs !== []) {
                     $hasCheckable = false;
                     foreach ($contextAttrs as $ctx) {
@@ -373,12 +377,10 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                             break;
                         }
                     }
-                    if (!$hasCheckable) {
-                        continue;
-                    }
+                    $skipContextCheck = !$hasCheckable;
                 }
 
-                if ($contextAttrs !== [] && !$this->contextPermitsPath($contextAttrs, $fhirPath)) {
+                if (!$skipContextCheck && $contextAttrs !== [] && !$this->contextPermitsPath($contextAttrs, $fhirPath)) {
                     $url          = method_exists($extension, 'getExtensionUrl') ? ($extension->getExtensionUrl() ?? '') : '';
                     $violations[] = new FHIRValidationViolation(
                         severity: 'error',

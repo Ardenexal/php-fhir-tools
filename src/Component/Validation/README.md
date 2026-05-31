@@ -135,7 +135,7 @@ FHIRValidationService::validate($resource, $profileUrls, $includeMustSupportInfo
   │       and built-in Symfony constraints (#[NotBlank], #[Count], etc.)
   │
   ├─ collectMustSupportInfo()    (only when $includeMustSupportInfo=true)
-  ├─ validateExtensionContexts() (always; top-level extensions only — see Limitations)
+  ├─ validateExtensionContexts() (always; recursive walk across full resource tree)
   ├─ validateModifierExtensions() (only when FHIRIGTypeRegistry is provided)
   └─ collectObligationViolations() (only when FHIRObligationContext is provided)
        └─ applyNoErrorSuppression() (suppress errors for SHALL:no-error obligations)
@@ -159,7 +159,7 @@ categories. Coverage as of the current release:
 | **Slicing** (closed/open/openAtEnd) | ✅ | ✅ | ✅ | `FHIRSliceConstraintValidator` |
 | **Profile constraints** (generated) | ✅ | ✅ | ✅ | `FHIRProfileConstraintValidator`; requires pre-generated models |
 | **Profile constraints** (dynamic/runtime) | ❌ | ❌ | ❌ | Dynamic StructureDefinition loading not yet supported |
-| **Extension contexts** (`type=element`) | ⚠️ | ⚠️ | ⚠️ | Checked on root resource extensions only (top-level) |
+| **Extension contexts** (`type=element`) | ⚠️ | ⚠️ | ⚠️ | Recursive walk; bare-type and foreign-root contexts deferred (require type-hierarchy resolution) |
 | **Extension contexts** (`type=fhirpath/extension`) | ❌ | ❌ | ❌ | Always permitted in v1 |
 | **Modifier extensions** (unknown URL) | ✅ | ✅ | ✅ | Recursive walk via `FHIRIGTypeRegistry` |
 | **Modifier element impact** | ⚠️ | ⚠️ | ⚠️ | `#[FHIRIsModifier]` marks properties; no active enforcement |
@@ -190,10 +190,11 @@ StructureDefinitions, INFO violations of this kind will not appear.
 against extensible/preferred value sets will not be detected. Wire
 `HttpFHIRTerminologyClient` (or a custom implementation) to enable terminology checking.
 
-**Extension context validation** currently only checks extensions attached directly to
-the root resource object. Extensions on nested BackboneElements or complex-type
-properties are not context-checked. An extension applied to the wrong nested element
-will not produce a violation in this release. Recursive sub-element walking is planned.
+**Extension context validation** walks all nested sub-elements recursively. Extensions
+on BackboneElements and complex-type properties are context-checked. At sub-element
+level, only `type=element` contexts whose dotted expression shares the root resource
+type are evaluated — bare type-name contexts (e.g. `"HumanName"`) and foreign-root
+paths require FHIR type-hierarchy resolution and are deferred.
 
 **Extension context types `fhirpath` and `extension`** are not evaluated. Any extension
 with a `type=fhirpath` or `type=extension` context is treated as permitted regardless

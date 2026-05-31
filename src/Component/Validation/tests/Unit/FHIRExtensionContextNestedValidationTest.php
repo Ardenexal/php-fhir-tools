@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRContextInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
+use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\DeferredContextFailingInvariantExtensionFixture;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\NestedContactWithExtensionsFixture;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\PatientContactOnlyExtensionFixture;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\PatientNameOnlyExtensionFixture;
@@ -90,5 +92,23 @@ final class FHIRExtensionContextNestedValidationTest extends TestCase
         $report = $this->service->validate($resource);
 
         self::assertCount(0, $report->errors());
+    }
+
+    public function testDeferredContextExtensionWithFailingInvariantProducesErrorAtNestedLevel(): void
+    {
+        // Extension context is "Patient" (bare type, deferred at sub-element level).
+        // contextInvariant "1 = 2" must still be evaluated and must produce a violation.
+        $contact  = new NestedContactWithExtensionsFixture([new DeferredContextFailingInvariantExtensionFixture()]);
+        $resource = new PatientWithContactResourceFixture(contact: [$contact]);
+
+        $report = $this->service->validate($resource);
+
+        self::assertCount(1, $report->errors(), 'Failing contextInvariant must fire even when context check is deferred');
+
+        $violation = $report->errors()[0];
+        self::assertSame('error', $violation->severity);
+        self::assertSame('contact[0].extension', $violation->path);
+        self::assertSame(FHIRContextInvariant::class, $violation->constraintClass);
+        self::assertStringContainsString('1 = 2', $violation->message);
     }
 }
