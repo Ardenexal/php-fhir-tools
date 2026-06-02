@@ -56,4 +56,27 @@ final class FHIRValidationReport
             array_filter($this->violations, static fn (FHIRValidationViolation $v) => $v->severity === 'info'),
         );
     }
+
+    /**
+     * Whether extensible/preferred binding checks were skipped because no real terminology
+     * client was configured. A true result means terminology coverage is incomplete — it does
+     * not affect isValid().
+     */
+    public function hasUncheckedBindings(): bool
+    {
+        return $this->uncheckedBindings() !== [];
+    }
+
+    /**
+     * Violations representing skipped extensible/preferred binding checks (one per binding),
+     * identified by the fhir:unchecked-binding code.
+     *
+     * @return list<FHIRValidationViolation>
+     */
+    public function uncheckedBindings(): array
+    {
+        return array_values(
+            array_filter($this->violations, static fn (FHIRValidationViolation $v) => $v->code === FHIRViolationCode::UNCHECKED_BINDING),
+        );
+    }
 }

@@ -8,6 +8,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBind
 use Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyClientInterface;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
 use Ardenexal\FHIRTools\Component\Validation\FHIRViolationCode;
+use Ardenexal\FHIRTools\Component\Validation\NullFHIRTerminologyClient;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -18,10 +19,13 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
 
     public const string DEFAULT_INVALID_VALUE_MESSAGE = 'The value {{ value }} is not a valid case of value set {{ url }}.';
 
+    public const string DEFAULT_UNCHECKED_BINDING_MESSAGE = 'Terminology validation for value set {{ url }} was skipped: no terminology client is configured.';
+
     /**
      * @param string[]                            $enumNamespaceRoots Namespace roots to probe for generated enum classes,
      *                                                                e.g. ['Ardenexal\FHIRTools\Component\Models\R4\Enum']
-     * @param FHIRTerminologyClientInterface|null $terminologyClient  Null → skip extensible/preferred checks (graceful degradation)
+     * @param FHIRTerminologyClientInterface|null $terminologyClient  Null or NullFHIRTerminologyClient → extensible/preferred checks
+     *                                                                are skipped and surfaced as fhir:unchecked-binding INFO violations
      */
     public function __construct(
         private readonly FHIRValidationMessageRegistry $messageRegistry,
@@ -114,13 +118,29 @@ final class FHIRValueSetBindingValidator extends ConstraintValidator
 
     /**
      * Validates extensible/preferred bindings via the terminology client.
-     * When no client is configured, validation is skipped (graceful degradation).
+     * When no real client is configured (null or NullFHIRTerminologyClient), the check is
+     * skipped and a single fhir:unchecked-binding INFO violation surfaces the coverage gap
+     * (issue #71); it does not affect FHIRValidationReport::isValid().
      * Violations use WARNING by default; strict=true escalates to ERROR.
      * When maxValueSetUrl is set, values outside it always produce ERROR regardless of strict.
      */
     private function validateNonRequired(mixed $value, FHIRValueSetBinding $constraint): void
     {
-        if ($this->terminologyClient === null) {
+        // Example-strength bindings are documentation only (ADR-004): never validated,
+        // never surfaced as unchecked. The generator does not emit the attribute for them
+        // (FHIRModelGenerator::shouldEmitBindingAttribute), so this guards hand-written
+        // constraints and future generator changes.
+        if ($constraint->strength === 'example') {
+            return;
+        }
+
+        if ($this->terminologyClient === null || $this->terminologyClient instanceof NullFHIRTerminologyClient) {
+            $override = $this->messageRegistry->getOverride('FHIRValueSetBindingUnchecked');
+            $this->context->buildViolation($override ?? self::DEFAULT_UNCHECKED_BINDING_MESSAGE)
+                ->setParameters(['{{ url }}' => $constraint->valueSetUrl])
+                ->setCode(FHIRViolationCode::UNCHECKED_BINDING)
+                ->addViolation();
+
             return;
         }
 

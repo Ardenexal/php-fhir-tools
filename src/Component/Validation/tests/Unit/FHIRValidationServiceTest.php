@@ -101,6 +101,22 @@ final class FHIRValidationServiceTest extends TestCase
         self::assertTrue($report->isValid());
     }
 
+    public function testUncheckedBindingCodeMapsToInfoBucketAndIsQueryable(): void
+    {
+        $this->stubViolations([
+            $this->makeViolation('status', 'Terminology validation skipped', FHIRViolationCode::UNCHECKED_BINDING),
+        ]);
+
+        $report = $this->service->validate(new \stdClass());
+
+        self::assertCount(0, $report->errors());
+        self::assertCount(0, $report->warnings());
+        self::assertCount(1, $report->info());
+        self::assertTrue($report->isValid());
+        self::assertTrue($report->hasUncheckedBindings());
+        self::assertSame(FHIRViolationCode::UNCHECKED_BINDING, $report->uncheckedBindings()[0]->code);
+    }
+
     public function testNullCodeMapsToErrorBucket(): void
     {
         $this->stubViolations([

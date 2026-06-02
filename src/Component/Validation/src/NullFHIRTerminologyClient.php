@@ -6,7 +6,11 @@ namespace Ardenexal\FHIRTools\Component\Validation;
 
 /**
  * Null-object implementation used when no real terminology server is configured.
- * Always returns true so extensible/preferred bindings produce no violations.
+ *
+ * FHIRValueSetBindingValidator treats this client the same as having no client at all:
+ * extensible/preferred binding checks are skipped and each skip is surfaced as a
+ * fhir:unchecked-binding INFO violation (issue #71). To suppress those, wire a real
+ * client (e.g. HttpFHIRTerminologyClient) or filter the code at the application layer.
  */
 final class NullFHIRTerminologyClient implements FHIRTerminologyClientInterface
 {

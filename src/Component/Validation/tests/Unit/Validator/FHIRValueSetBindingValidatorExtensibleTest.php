@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
  * Verifies extensible/preferred binding validation behaviour:
- * - null client → no violation (graceful degradation)
+ * - null client or NullFHIRTerminologyClient → fhir:unchecked-binding INFO violation (issue #71)
  * - real client returning true → no violation
  * - real client returning false → WARNING violation
  * - required + no enum + real client → falls back to terminology server
@@ -45,24 +45,91 @@ final class FHIRValueSetBindingValidatorExtensibleTest extends ConstraintValidat
     // Null client (no terminology server configured)
     // -------------------------------------------------------------------------
 
-    public function testExtensibleBindingWithNullClientProducesNoViolation(): void
+    public function testExtensibleBindingWithNullClientProducesUncheckedBindingInfoViolation(): void
     {
         $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry());
         $validator->initialize($this->context);
 
         $validator->validate('anything', new FHIRValueSetBinding(self::VS_URL, 'extensible'));
 
-        $this->assertNoViolation();
+        $this->buildViolation(FHIRValueSetBindingValidator::DEFAULT_UNCHECKED_BINDING_MESSAGE)
+            ->setParameters(['{{ url }}' => self::VS_URL])
+            ->setCode(FHIRViolationCode::UNCHECKED_BINDING)
+            ->assertRaised();
     }
 
-    public function testPreferredBindingWithNullClientProducesNoViolation(): void
+    public function testPreferredBindingWithNullClientProducesUncheckedBindingInfoViolation(): void
     {
         $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry());
         $validator->initialize($this->context);
 
         $validator->validate('anything', new FHIRValueSetBinding(self::VS_URL, 'preferred'));
 
+        $this->buildViolation(FHIRValueSetBindingValidator::DEFAULT_UNCHECKED_BINDING_MESSAGE)
+            ->setParameters(['{{ url }}' => self::VS_URL])
+            ->setCode(FHIRViolationCode::UNCHECKED_BINDING)
+            ->assertRaised();
+    }
+
+    public function testExtensibleBindingWithNullObjectClientProducesUncheckedBindingInfoViolation(): void
+    {
+        $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry(), [], new NullFHIRTerminologyClient());
+        $validator->initialize($this->context);
+
+        $validator->validate('anything', new FHIRValueSetBinding(self::VS_URL, 'extensible'));
+
+        $this->buildViolation(FHIRValueSetBindingValidator::DEFAULT_UNCHECKED_BINDING_MESSAGE)
+            ->setParameters(['{{ url }}' => self::VS_URL])
+            ->setCode(FHIRViolationCode::UNCHECKED_BINDING)
+            ->assertRaised();
+    }
+
+    public function testExampleBindingWithNullClientProducesNoViolation(): void
+    {
+        $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry());
+        $validator->initialize($this->context);
+
+        $validator->validate('anything', new FHIRValueSetBinding(self::VS_URL, 'example'));
+
         $this->assertNoViolation();
+    }
+
+    public function testExampleBindingWithRealClientIsNeverValidated(): void
+    {
+        $this->mockClient->expects(self::never())->method('validateCode');
+
+        $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry(), [], $this->mockClient);
+        $validator->initialize($this->context);
+
+        $validator->validate('anything', new FHIRValueSetBinding(self::VS_URL, 'example'));
+
+        $this->assertNoViolation();
+    }
+
+    public function testExtensibleBindingWithNullClientAndNullValueProducesNoViolation(): void
+    {
+        $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry());
+        $validator->initialize($this->context);
+
+        $validator->validate(null, new FHIRValueSetBinding(self::VS_URL, 'extensible'));
+
+        $this->assertNoViolation();
+    }
+
+    public function testUncheckedBindingMessageHonoursRegistryOverride(): void
+    {
+        $registry = new FHIRValidationMessageRegistry();
+        $registry->setOverride('FHIRValueSetBindingUnchecked', 'Custom skip notice for {{ url }}');
+
+        $validator = new FHIRValueSetBindingValidator($registry);
+        $validator->initialize($this->context);
+
+        $validator->validate('anything', new FHIRValueSetBinding(self::VS_URL, 'extensible'));
+
+        $this->buildViolation('Custom skip notice for {{ url }}')
+            ->setParameters(['{{ url }}' => self::VS_URL])
+            ->setCode(FHIRViolationCode::UNCHECKED_BINDING)
+            ->assertRaised();
     }
 
     public function testNullTerminologyClientAlwaysReturnsTrue(): void

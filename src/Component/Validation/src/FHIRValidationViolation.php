@@ -8,11 +8,12 @@ namespace Ardenexal\FHIRTools\Component\Validation;
  * Immutable representation of a single FHIR validation violation.
  *
  * Severity is mapped from the violation code:
- *   'fhir:error'      → 'error'
- *   'fhir:warning'    → 'warning'
- *   'fhir:info'       → 'info'
- *   'fhir:eval-error' → 'info' (invariant could not be evaluated; a tooling limitation, not non-conformance)
- *   any other code    → 'error' (covers built-in Symfony constraints like Count, NotBlank)
+ *   'fhir:error'             → 'error'
+ *   'fhir:warning'           → 'warning'
+ *   'fhir:info'              → 'info'
+ *   'fhir:eval-error'        → 'info' (invariant could not be evaluated; a tooling limitation, not non-conformance)
+ *   'fhir:unchecked-binding' → 'info' (extensible/preferred binding skipped; no terminology client configured)
+ *   any other code           → 'error' (covers built-in Symfony constraints like Count, NotBlank)
  */
 final class FHIRValidationViolation
 {

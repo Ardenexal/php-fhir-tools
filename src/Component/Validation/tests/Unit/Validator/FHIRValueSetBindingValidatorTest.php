@@ -75,12 +75,16 @@ final class FHIRValueSetBindingValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testMissingEnumClassWithNonRequiredStrengthPassesSilently(): void
+    public function testMissingEnumClassWithNonRequiredStrengthEmitsUncheckedBindingInfo(): void
     {
-        $constraint = new FHIRValueSetBinding('http://test.example/ValueSet/no-such-enum', 'preferred');
+        $url        = 'http://test.example/ValueSet/no-such-enum';
+        $constraint = new FHIRValueSetBinding($url, 'preferred');
         $this->validator->validate('anything', $constraint);
 
-        $this->assertNoViolation();
+        $this->buildViolation(FHIRValueSetBindingValidator::DEFAULT_UNCHECKED_BINDING_MESSAGE)
+            ->setParameters(['{{ url }}' => $url])
+            ->setCode(FHIRViolationCode::UNCHECKED_BINDING)
+            ->assertRaised();
     }
 
     public function testRegistryOverrideIsUsedInViolationMessage(): void

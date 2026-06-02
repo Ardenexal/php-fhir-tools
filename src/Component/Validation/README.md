@@ -164,7 +164,7 @@ categories. Coverage as of the current release:
 | **Extension contexts** (`type=fhirpath/extension`) | ❌ | ❌ | ❌ | Always permitted in v1 |
 | **Modifier extensions** (unknown URL) | ✅ | ✅ | ✅ | Recursive walk via `FHIRIGTypeRegistry` |
 | **Modifier element impact** | ⚠️ | ⚠️ | ⚠️ | `#[FHIRIsModifier]` marks properties; no active enforcement |
-| **Extensible/preferred bindings** | ⚠️ | ⚠️ | ⚠️ | Requires `FHIRTerminologyClientInterface` implementation; `NullFHIRTerminologyClient` skips silently |
+| **Extensible/preferred bindings** | ⚠️ | ⚠️ | ⚠️ | Requires a real `FHIRTerminologyClientInterface` implementation; without one (null or `NullFHIRTerminologyClient`) each skipped check emits a `fhir:unchecked-binding` INFO violation — see `FHIRValidationReport::hasUncheckedBindings()` |
 | **Target profile references** | ⚠️ | ⚠️ | ⚠️ | Requires `FHIRReferenceResolverInterface` implementation; `NullFHIRReferenceResolver` skips silently |
 | **Quantity range** (`minValue`/`maxValue`) | ✅ | ✅ | ✅ | `FHIRQuantityRangeValidator` |
 | **Temporal range** (date/dateTime/instant) | ✅ | ✅ | ✅ | `FHIRTemporalRangeValidator`; handles partial dates (YYYY, YYYY-MM) |
@@ -186,10 +186,13 @@ FHIRPath expression. If your FHIRPath engine covers all invariant expressions in
 StructureDefinitions, INFO violations of this kind will not appear.
 
 **Extensible and preferred bindings** are only validated when a real
-`FHIRTerminologyClientInterface` implementation is provided. The default
-`NullFHIRTerminologyClient` returns `true` unconditionally, meaning invalid codes
-against extensible/preferred value sets will not be detected. Wire
-`HttpFHIRTerminologyClient` (or a custom implementation) to enable terminology checking.
+`FHIRTerminologyClientInterface` implementation is provided. Without one — the client is
+`null` or the default `NullFHIRTerminologyClient` — invalid codes against
+extensible/preferred value sets will not be detected. The gap is not silent: each skipped
+check emits a `fhir:unchecked-binding` INFO violation naming the unchecked value set, and
+`FHIRValidationReport::hasUncheckedBindings()` reports it programmatically. These INFO
+violations never affect `isValid()`. Wire `HttpFHIRTerminologyClient` (or a custom
+implementation) to enable terminology checking and remove them.
 
 **Extension context validation** walks all nested sub-elements recursively. Extensions
 on BackboneElements and complex-type properties are context-checked. When
@@ -249,13 +252,31 @@ $terminologyClient = new HttpFHIRTerminologyClient(
     httpClient: $psr18HttpClient,
 );
 
-// Development / offline: skip extensible/preferred checks entirely
+// Development / offline: skip extensible/preferred checks
 $terminologyClient = new NullFHIRTerminologyClient();
 ```
 
 Pass `$terminologyClient` to `FHIRValueSetBindingValidator` in the constraint
-validator factory (see Quick Start). When using `NullFHIRTerminologyClient`, no
-violation is raised for invalid codes against extensible or preferred value sets.
+validator factory (see Quick Start). When the client is `null` or a
+`NullFHIRTerminologyClient`, no violation is raised for invalid codes against
+extensible or preferred value sets — instead each skipped check emits a single
+`fhir:unchecked-binding` INFO violation surfacing the coverage gap:
+
+```php
+$report = $service->validate($patient);
+
+if ($report->hasUncheckedBindings()) {
+    foreach ($report->uncheckedBindings() as $unchecked) {
+        echo $unchecked->message . "\n";
+        // "Terminology validation for value set http://… was skipped: no terminology client is configured."
+    }
+}
+```
+
+The message template can be overridden via the registry key
+`FHIRValueSetBindingUnchecked`. To suppress the INFO violations, wire a real
+terminology client or filter the `fhir:unchecked-binding` code in your
+application layer.
 
 ---
 
@@ -410,6 +431,8 @@ foreach ($report->info() as $info) {
 | `errors()` | `list<FHIRValidationViolation>` | All error-severity violations |
 | `warnings()` | `list<FHIRValidationViolation>` | All warning-severity violations |
 | `info()` | `list<FHIRValidationViolation>` | All info-severity violations |
+| `hasUncheckedBindings()` | `bool` | `true` when extensible/preferred binding checks were skipped (no terminology client) |
+| `uncheckedBindings()` | `list<FHIRValidationViolation>` | The `fhir:unchecked-binding` violations, one per skipped binding check |
 | `violations` | `list<FHIRValidationViolation>` | All violations (all severities) |
 
 `isValid()` returns `true` when there are zero ERROR violations. Warnings and INFO
@@ -426,6 +449,7 @@ violations do not affect validity per the FHIR specification.
 | `profileGroup` | `?string` | Profile canonical URL if from a profile group, else `null` |
 | `invariantKey` | `?string` | FHIRPath invariant key (e.g. `obs-7`), else `null` |
 | `parameters` | `array` | Raw message template parameters |
+| `code` | `?string` | Raw violation code (e.g. `fhir:eval-error`, `fhir:unchecked-binding`), else the Symfony constraint code |
 
 ### FHIRViolationCode
 
@@ -437,6 +461,7 @@ Violation codes are set on Symfony constraint violations and used to derive seve
 | `FHIRViolationCode::WARNING` | `'fhir:warning'` | `warning` |
 | `FHIRViolationCode::INFO` | `'fhir:info'` | `info` |
 | `FHIRViolationCode::EVAL_ERROR` | `'fhir:eval-error'` | `info` |
+| `FHIRViolationCode::UNCHECKED_BINDING` | `'fhir:unchecked-binding'` | `info` |
 
 Built-in Symfony constraint codes (from `#[NotBlank]`, `#[Count]`, etc.) map to
 `error` by default.
@@ -447,6 +472,11 @@ does not yet support. Per the FHIR conformance spec, a tooling limitation must n
 instance non-conformance, so these surface at `info` severity rather than `error`. The raw code is
 preserved on `FHIRValidationViolation::$code` so consumers can distinguish "could not evaluate" from
 "genuinely failed".
+
+`FHIRViolationCode::UNCHECKED_BINDING` denotes an extensible/preferred binding check that was
+skipped because no real terminology client is configured (see Known Limitations). Like
+`EVAL_ERROR`, it marks a coverage gap rather than non-conformance, surfaces at `info` severity,
+and is queryable via `FHIRValidationReport::hasUncheckedBindings()` / `uncheckedBindings()`.
 
 ---
 

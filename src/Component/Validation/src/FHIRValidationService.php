@@ -109,10 +109,11 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         $code = $violation->getCode();
 
         $severity = match ($code) {
-            FHIRViolationCode::WARNING    => 'warning',
-            FHIRViolationCode::INFO       => 'info',
-            FHIRViolationCode::EVAL_ERROR => 'info',
-            default                       => 'error',
+            FHIRViolationCode::WARNING           => 'warning',
+            FHIRViolationCode::INFO              => 'info',
+            FHIRViolationCode::EVAL_ERROR        => 'info',
+            FHIRViolationCode::UNCHECKED_BINDING => 'info',
+            default                              => 'error',
         };
 
         $constraint      = $violation->getConstraint();
