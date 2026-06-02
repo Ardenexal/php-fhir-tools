@@ -21,7 +21,7 @@ namespace Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation;
  *                   an unreadable enclosing URL defers.
  *   - `fhirpath`  — A FHIRPath expression evaluated against the element bearing the
  *                   extension. Only a confident single boolean `false` denies; empty
- *                   results and evaluation errors defer.
+ *                   results and FHIRPath engine errors (FHIRPathException) defer.
  *
  * @see https://www.hl7.org/fhir/structuredefinition-definitions.html#StructureDefinition.context
  *
