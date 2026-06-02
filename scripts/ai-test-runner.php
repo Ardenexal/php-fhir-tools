@@ -5,11 +5,13 @@ declare(strict_types=1);
 /**
  * AI-optimized PHPUnit test runner.
  *
- * Runs PHPUnit with --no-output --log-junit to suppress verbose output,
- * parses the JUnit XML, and emits a compact token-efficient summary.
+ * Runs the suite in parallel via ParaTest with --log-junit, parses the merged
+ * JUnit XML, and emits a compact token-efficient summary. Pass --ai-serial to
+ * fall back to plain (sequential) PHPUnit, e.g. when isolating order-dependent
+ * failures.
  *
  * Usage (direct):
- *   php scripts/ai-test-runner.php [phpunit args...]
+ *   php scripts/ai-test-runner.php [phpunit/paratest args...]
  *   php scripts/ai-test-runner.php --testsuite=unit
  *   php scripts/ai-test-runner.php --filter=FooTest
  *
@@ -18,28 +20,27 @@ declare(strict_types=1);
  *   composer test-ai-unit
  *   composer test-ai -- --filter=FooTest
  *
- * AI output control (stripped before passing to PHPUnit):
+ * AI output control (stripped before passing to PHPUnit/ParaTest):
  *   --ai-limit=N    Max failures to show (default 50; 0 = unlimited)
  *   --ai-offset=N   Skip first N failures (for pagination, default 0)
+ *   --ai-serial     Run sequentially with plain PHPUnit instead of ParaTest
  *
  * Examples:
  *   composer test-ai-fhirpath-spec -- --ai-limit=0           (show all)
  *   composer test-ai-fhirpath-spec -- --ai-limit=100 --ai-offset=100
+ *   composer test-ai-unit -- --ai-serial                     (sequential run)
  */
 
 // Resolve project root (two levels up from scripts/)
 $projectRoot = dirname(__DIR__);
 $phpunitBin  = $projectRoot . '/vendor/phpunit/phpunit/phpunit';
+$paratestBin = $projectRoot . '/vendor/bin/paratest';
 $configFile  = $projectRoot . '/phpunit.dist.xml';
 
-if (!file_exists($phpunitBin)) {
-    fwrite(STDERR, "PHPUnit not found at: {$phpunitBin}\n");
-    exit(1);
-}
-
 // Separate our custom --ai-* flags from PHPUnit args
-$aiLimit  = 50;   // default: cap at 50
-$aiOffset = 0;    // default: start from beginning
+$aiLimit  = 50;     // default: cap at 50
+$aiOffset = 0;      // default: start from beginning
+$aiSerial = false;  // default: parallel via ParaTest
 $userArgs = [];
 
 foreach (array_slice($argv, 1) as $arg) {
@@ -47,9 +48,26 @@ foreach (array_slice($argv, 1) as $arg) {
         $aiLimit = (int) $m[1];
     } elseif (preg_match('/^--ai-offset=(\d+)$/', $arg, $m)) {
         $aiOffset = (int) $m[1];
+    } elseif ($arg === '--ai-serial') {
+        $aiSerial = true;
     } else {
         $userArgs[] = $arg;
     }
+}
+
+if ($aiSerial) {
+    // ParaTest-only flags would be rejected by plain PHPUnit - drop them
+    $userArgs = array_values(array_filter(
+        $userArgs,
+        static fn (string $arg): bool => !preg_match('/^(--functional|--max-batch-size=\d+|--processes=\d+|-p\d+)$/', $arg),
+    ));
+}
+
+$testBin = $aiSerial ? $phpunitBin : $paratestBin;
+
+if (!file_exists($testBin)) {
+    fwrite(STDERR, "Test binary not found at: {$testBin}\n");
+    exit(1);
 }
 
 // Create a temp file for JUnit XML output
@@ -59,14 +77,16 @@ if ($tmpFile === false) {
     exit(1);
 }
 
-// Build PHPUnit command parts - inject our output suppression flags
+// Build command parts - inject our output suppression flags.
 // --no-coverage prevents the "No code coverage driver available" runner warning from
 // triggering failOnWarning=true in phpunit.dist.xml and aborting before any tests run.
+// ParaTest has no --no-output flag; its progress output goes to stdout, which we drain
+// below. Plain PHPUnit (--ai-serial) keeps --no-output.
 $commandParts = array_merge(
-    ['php', $phpunitBin],
+    ['php', $testBin],
     $userArgs,
+    $aiSerial ? ['--no-output'] : [],
     [
-        '--no-output',
         '--log-junit', $tmpFile,
         '--colors=never',
         '--no-coverage',
@@ -76,24 +96,24 @@ $commandParts = array_merge(
 
 $command = implode(' ', array_map('escapeshellarg', $commandParts));
 
-// Execute PHPUnit - capture all pipes to avoid stdout contamination on Windows
+// Execute the test binary - capture all pipes to avoid stdout contamination on Windows
 $descriptors = [
     0 => ['pipe', 'r'],  // closed immediately (no stdin needed)
-    1 => ['pipe', 'w'],  // capture stdout (empty with --no-output)
+    1 => ['pipe', 'w'],  // capture stdout (ParaTest progress / empty with --no-output)
     2 => ['pipe', 'w'],  // capture stderr; we'll re-emit it after
 ];
 
 $process = proc_open($command, $descriptors, $pipes, $projectRoot);
 
 if (!is_resource($process)) {
-    fwrite(STDERR, "Failed to start PHPUnit process\n");
+    fwrite(STDERR, "Failed to start test process\n");
     @unlink($tmpFile);
     exit(1);
 }
 
 fclose($pipes[0]); // child doesn't need stdin
 
-// Drain stdout (empty with --no-output) and capture stderr
+// Drain stdout (ParaTest progress output / empty with --no-output) and capture stderr
 stream_get_contents($pipes[1]);
 $phpunitStderr = stream_get_contents($pipes[2]);
 fclose($pipes[1]);
@@ -164,6 +184,18 @@ function formatResults(string $junitFile, int $exitCode, int $aiLimit = 50, int 
         }
     }
 
+    // ParaTest --functional merges data-provider rows into batch-level <testcase>
+    // elements, so counting elements undercounts. The root <testsuite> attributes
+    // carry the true aggregates - prefer them when they exceed the per-testcase tally.
+    $rootSuite = $xml->testsuite[0] ?? null;
+    if ($rootSuite !== null && (int) $rootSuite['tests'] > $total) {
+        $total    = (int) $rootSuite['tests'];
+        $failures = max($failures, (int) $rootSuite['failures']);
+        $errors   = max($errors, (int) $rootSuite['errors']);
+        $skipped  = max($skipped, (int) ($rootSuite['skipped'] ?? 0));
+        $time     = max($time, (float) ($rootSuite['time'] ?? 0.0));
+    }
+
     $timeStr    = number_format($time, 2) . 's';
     $passed     = $total - $failures - $errors - $skipped;
     $issueCount = $failures + $errors;
@@ -221,6 +253,13 @@ function formatResults(string $junitFile, int $exitCode, int $aiLimit = 50, int 
     $remaining = count($issues) - $aiOffset - $shown;
     if ($remaining > 0) {
         $lines[] = "... and {$remaining} more failures (use --ai-offset=" . ($aiOffset + $shown) . ' to continue)';
+    }
+
+    // ParaTest --functional merges data-provider rows, so failure details can be
+    // lost from the JUnit XML even though the aggregate counts are correct.
+    $unlisted = $issueCount - count($issues);
+    if ($unlisted > 0) {
+        $lines[] = "{$unlisted} failure(s) have no detail in the merged JUnit XML (ParaTest --functional) - rerun with --ai-serial for full output.";
     }
 
     return implode("\n", $lines);

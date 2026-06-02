@@ -34,9 +34,11 @@
             <directory>src/Component/CodeGeneration/tests/Integration</directory>
             <directory>src/Component/FHIRPath/tests/Integration</directory>
             <directory>src/Component/Validation/tests/Integration</directory>
+            <!-- The FHIRPath specification cases run via the dedicated fhirpath-spec suite -->
+            <exclude>src/Component/FHIRPath/tests/Integration/FHIRPathSpecificationTest.php</exclude>
         </testsuite>
         <testsuite name="fhirpath-spec">
-            <directory>src/Component/FHIRPath/tests/Integration</directory>
+            <file>src/Component/FHIRPath/tests/Integration/FHIRPathSpecificationTest.php</file>
         </testsuite>
     </testsuites>
 
