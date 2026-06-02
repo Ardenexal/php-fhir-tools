@@ -4,6 +4,8 @@
         "var",
         "src/Component/*/output",
         "src/Component/*/tests/fixtures",
+    ],
+    "notPath": [
         "mate/extensions.php"
     ],
     "rules": {
