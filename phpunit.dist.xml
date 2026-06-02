@@ -32,9 +32,7 @@
             <directory>tests/Integration</directory>
             <directory>src/Component/Serialization/tests/Integration</directory>
             <directory>src/Component/CodeGeneration/tests/Integration</directory>
-            <!-- FHIRPath integration tests live exclusively in the fhirpath-spec suite
-                 (see .goat-flow/skill-reference/testing.md); listing the directory in both
-                 suites made PHPUnit emit runner warnings and exit non-zero on green runs. -->
+            <directory>src/Component/FHIRPath/tests/Integration</directory>
             <directory>src/Component/Validation/tests/Integration</directory>
             <!-- The FHIRPath specification cases run via the dedicated fhirpath-spec suite -->
             <exclude>src/Component/FHIRPath/tests/Integration/FHIRPathSpecificationTest.php</exclude>
