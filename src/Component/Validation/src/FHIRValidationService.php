@@ -236,7 +236,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                 );
 
                 if ($contextAttrs !== []
-                    && $this->classifyExtensionContexts($contextAttrs, $fhirPath, $resourceRoot, $typeCandidates, $ownSupertypes) === self::CONTEXT_DENY
+                    && $this->classifyExtensionContexts($contextAttrs, $resource, $fhirPath, $resourceRoot, $typeCandidates, $ownSupertypes) === self::CONTEXT_DENY
                 ) {
                     $url          = method_exists($extension, 'getExtensionUrl') ? ($extension->getExtensionUrl() ?? '') : '';
                     $violations[] = new FHIRValidationViolation(
@@ -345,17 +345,18 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
      * confidently evaluated; otherwise denied (all contexts were evaluable and none matched).
      *
      * @param list<FHIRExtensionContext> $contexts
+     * @param object                     $bearingElement the element the extension appears on
      * @param list<string>               $typeCandidates
      * @param list<string>               $ownSupertypes
      *
      * @return self::CONTEXT_*
      */
-    private function classifyExtensionContexts(array $contexts, string $fhirPath, string $resourceRoot, array $typeCandidates, array $ownSupertypes): int
+    private function classifyExtensionContexts(array $contexts, object $bearingElement, string $fhirPath, string $resourceRoot, array $typeCandidates, array $ownSupertypes): int
     {
         $anyDeferred = false;
 
         foreach ($contexts as $ctx) {
-            $verdict = $this->classifyContext($ctx, $fhirPath, $resourceRoot, $typeCandidates, $ownSupertypes);
+            $verdict = $this->classifyContext($ctx, $bearingElement, $fhirPath, $resourceRoot, $typeCandidates, $ownSupertypes);
 
             if ($verdict === self::CONTEXT_PERMIT) {
                 return self::CONTEXT_PERMIT;
@@ -373,19 +374,24 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
      *
      * Type resolution is monotonic: it may only turn a would-be denial into a PERMIT, never
      * introduce a new denial. Denials therefore arise only from information that needs no type
-     * inference — the resource type at the root, and same-resource-root path strings. Bare and
-     * foreign-root contexts that do not match are deferred (never denied), so wiring a resolver
-     * cannot create a false positive; it can only clear one.
+     * inference — the resource type at the root, same-resource-root path strings, and a fhirpath
+     * expression that confidently evaluates to boolean false against the bearing element. Bare
+     * and foreign-root contexts that do not match are deferred (never denied), so wiring a
+     * resolver cannot create a false positive; it can only clear one.
      *
      * @param list<string> $typeCandidates type-rooted dotted addresses for this element
      * @param list<string> $ownSupertypes  FHIR type name of this element plus its supertypes
      *
      * @return self::CONTEXT_*
      */
-    private function classifyContext(FHIRExtensionContext $ctx, string $fhirPath, string $resourceRoot, array $typeCandidates, array $ownSupertypes): int
+    private function classifyContext(FHIRExtensionContext $ctx, object $bearingElement, string $fhirPath, string $resourceRoot, array $typeCandidates, array $ownSupertypes): int
     {
+        if ($ctx->type === 'fhirpath') {
+            return $this->classifyFhirpathContext($ctx, $bearingElement);
+        }
+
         if ($ctx->type !== 'element') {
-            return self::CONTEXT_PERMIT; // fhirpath / extension contexts are permitted in v1
+            return self::CONTEXT_PERMIT; // extension contexts are permitted in v1
         }
 
         $expr   = $ctx->expression;
@@ -424,6 +430,37 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         }
 
         return self::CONTEXT_DEFER;
+    }
+
+    /**
+     * Classify a fhirpath context by evaluating its expression against the bearing element.
+     *
+     * Denial requires confident evaluation: only a single boolean `false` denies. An empty
+     * result is indistinguishable from an engine resolution gap (the engine returns empty even
+     * for a type-matching `ofType(...)`), and a FHIRPathException is an engine limitation, not
+     * non-conformance — both defer, preserving the defer-not-deny safety property. Only
+     * FHIRPath engine exceptions are downgraded; any other throwable (a genuine bug)
+     * propagates rather than being masked as a deferral.
+     *
+     * @return self::CONTEXT_*
+     */
+    private function classifyFhirpathContext(FHIRExtensionContext $ctx, object $bearingElement): int
+    {
+        try {
+            $result = $this->pathService->evaluate($ctx->expression, $bearingElement);
+        } catch (FHIRPathException) {
+            return self::CONTEXT_DEFER;
+        }
+
+        if ($result->count() === 0) {
+            return self::CONTEXT_DEFER;
+        }
+
+        if ($result->count() === 1 && $result->first() === false) {
+            return self::CONTEXT_DENY;
+        }
+
+        return self::CONTEXT_PERMIT;
     }
 
     /**
