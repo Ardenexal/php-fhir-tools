@@ -481,8 +481,10 @@ Implemented rules and severities:
 | Rule | Severity |
 |---|---|
 | Response item `linkId` must exist in the source Questionnaire | `error` |
-| Required, enabled items must be answered when status is `completed`/`amended` | `error` |
-| Non-repeating items: at most one occurrence and one answer | `error` |
+| Response items must sit at the position their `linkId` is declared at in the Questionnaire hierarchy | `error` |
+| Required, enabled items must be answered when status is `completed`/`amended`, checked **per parent instance**: each instance of a repeating parent is checked independently, and an absent optional parent exempts its children | `error` |
+| A required group needs at least one answered descendant question (presence alone is not enough) | `error` |
+| Non-repeating items: at most one occurrence per parent and one answer | `error` |
 | Answer value type must match the declared item type | `warning` |
 | Items present while their `enableWhen` conditions are unsatisfied | `warning` |
 | `enableWhen.question` must reference a known `linkId` | `warning` |
@@ -492,8 +494,11 @@ status (useful for drafts). The validator never resolves
 `QuestionnaireResponse.questionnaire` canonical URLs — callers supply the source
 `Questionnaire` object. SDC extensions (`enableWhenExpression`, `answerExpression`,
 calculated expressions, regex constraints) and R5 `answerConstraint` are not yet
-covered. Violations carry `FHIRQuestionnaireConstraint::class` in
-`constraintClass` so they can be distinguished after merging.
+covered. enableWhen answers are looked up response-globally — a documented
+approximation of the spec's nearest-occurrence resolution that is exact whenever the
+referenced question occurs once; see the ADR-007 addendum for the conformance plan.
+Violations carry `FHIRQuestionnaireConstraint::class` in `constraintClass` so they
+can be distinguished after merging.
 
 ---
 

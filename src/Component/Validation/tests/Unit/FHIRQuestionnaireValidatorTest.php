@@ -357,6 +357,7 @@ final class FHIRQuestionnaireValidatorTest extends TestCase
 
         self::assertCount(1, $report->warnings());
         self::assertStringContainsString("enableWhen.question 'missing'", $report->warnings()[0]->message);
+        self::assertSame('Questionnaire.item[linkId=q1].enableWhen[0].question', $report->warnings()[0]->path);
     }
 
     public function testNestedGroupItemsRecurse(): void
@@ -425,7 +426,7 @@ final class FHIRQuestionnaireValidatorTest extends TestCase
         self::assertStringContainsString("'q1' does not repeat but appears 2 times", $report->errors()[0]->message);
     }
 
-    public function testRequiredGroupIsSatisfiedByPresence(): void
+    public function testRequiredGroupWithAnsweredDescendantIsValid(): void
     {
         $questionnaire = new QuestionnaireResource(item: [new QuestionnaireItem(
             linkId: 'group1',
@@ -433,11 +434,159 @@ final class FHIRQuestionnaireValidatorTest extends TestCase
             required: true,
             item: [self::stringItem('q1')],
         )]);
-        $response = self::response('completed', new QuestionnaireResponseItem(linkId: 'group1'));
+        $response = self::response('completed', new QuestionnaireResponseItem(
+            linkId: 'group1',
+            item: [new QuestionnaireResponseItem(linkId: 'q1', answer: [self::stringAnswer('answered')])],
+        ));
 
         $report = $this->validator->validate($questionnaire, $response);
 
         self::assertSame([], $report->violations);
+    }
+
+    public function testRequiredGroupWithoutAnsweredDescendantProducesError(): void
+    {
+        $questionnaire = new QuestionnaireResource(item: [new QuestionnaireItem(
+            linkId: 'group1',
+            type: new QuestionnaireItemTypeType('group'),
+            required: true,
+            item: [self::stringItem('q1')],
+        )]);
+        // Group present but empty — the spec requires at least one answered descendant question.
+        $response = self::response('completed', new QuestionnaireResponseItem(linkId: 'group1'));
+
+        $report = $this->validator->validate($questionnaire, $response);
+
+        self::assertCount(1, $report->errors());
+        self::assertStringContainsString("Required group 'group1' has no answered descendant question", $report->errors()[0]->message);
+    }
+
+    public function testRequiredGroupMissingEntirelyProducesError(): void
+    {
+        $questionnaire = new QuestionnaireResource(item: [new QuestionnaireItem(
+            linkId: 'group1',
+            type: new QuestionnaireItemTypeType('group'),
+            required: true,
+            item: [self::stringItem('q1')],
+        )]);
+        $response = self::response('completed');
+
+        $report = $this->validator->validate($questionnaire, $response);
+
+        self::assertCount(1, $report->errors());
+        self::assertStringContainsString("Required group 'group1' is missing", $report->errors()[0]->message);
+    }
+
+    public function testRequiredChildMissingInOneRepeatingGroupInstanceProducesError(): void
+    {
+        $questionnaire = new QuestionnaireResource(item: [new QuestionnaireItem(
+            linkId: 'group1',
+            type: new QuestionnaireItemTypeType('group'),
+            repeats: true,
+            item: [self::stringItem('q1', required: true)],
+        )]);
+        // Instance [0] answers the required child; instance [1] omits it.
+        $response = self::response(
+            'completed',
+            new QuestionnaireResponseItem(
+                linkId: 'group1',
+                item: [new QuestionnaireResponseItem(linkId: 'q1', answer: [self::stringAnswer('present')])],
+            ),
+            new QuestionnaireResponseItem(linkId: 'group1'),
+        );
+
+        $report = $this->validator->validate($questionnaire, $response);
+
+        self::assertCount(1, $report->errors());
+        self::assertSame('item[1]', $report->errors()[0]->path);
+        self::assertStringContainsString("Required item 'q1' has no answer", $report->errors()[0]->message);
+    }
+
+    public function testRequiredChildAnsweredInAllRepeatingGroupInstancesIsValid(): void
+    {
+        $questionnaire = new QuestionnaireResource(item: [new QuestionnaireItem(
+            linkId: 'group1',
+            type: new QuestionnaireItemTypeType('group'),
+            repeats: true,
+            item: [self::stringItem('q1', required: true)],
+        )]);
+        $response = self::response(
+            'completed',
+            new QuestionnaireResponseItem(
+                linkId: 'group1',
+                item: [new QuestionnaireResponseItem(linkId: 'q1', answer: [self::stringAnswer('first')])],
+            ),
+            new QuestionnaireResponseItem(
+                linkId: 'group1',
+                item: [new QuestionnaireResponseItem(linkId: 'q1', answer: [self::stringAnswer('second')])],
+            ),
+        );
+
+        $report = $this->validator->validate($questionnaire, $response);
+
+        self::assertSame([], $report->violations);
+    }
+
+    public function testRequiredChildOfAbsentOptionalGroupIsNotFlagged(): void
+    {
+        // Spec: required "only has meaning if the parent element is present. If a non-required
+        // 'group' item contains a 'required' question item, it's completely fine to omit the group."
+        $questionnaire = new QuestionnaireResource(item: [new QuestionnaireItem(
+            linkId: 'group1',
+            type: new QuestionnaireItemTypeType('group'),
+            item: [self::stringItem('q1', required: true)],
+        )]);
+        $response = self::response('completed');
+
+        $report = $this->validator->validate($questionnaire, $response);
+
+        self::assertSame([], $report->violations);
+    }
+
+    public function testMisplacedChildItemProducesPlacementError(): void
+    {
+        $questionnaire = new QuestionnaireResource(item: [new QuestionnaireItem(
+            linkId: 'group1',
+            type: new QuestionnaireItemTypeType('group'),
+            item: [self::stringItem('q1')],
+        )]);
+        // q1 is declared under group1 but answered at the response root.
+        $response = self::response('completed', new QuestionnaireResponseItem(
+            linkId: 'q1',
+            answer: [self::stringAnswer('misplaced')],
+        ));
+
+        $report = $this->validator->validate($questionnaire, $response);
+
+        self::assertCount(1, $report->errors());
+        self::assertSame('item[0]', $report->errors()[0]->path);
+        self::assertStringContainsString("Item 'q1' is not declared at this position in the Questionnaire; expected under item 'group1'", $report->errors()[0]->message);
+    }
+
+    public function testTopLevelItemNestedInsideGroupProducesPlacementError(): void
+    {
+        $questionnaire = new QuestionnaireResource(item: [
+            new QuestionnaireItem(
+                linkId: 'group1',
+                type: new QuestionnaireItemTypeType('group'),
+                item: [self::stringItem('q1')],
+            ),
+            self::stringItem('q2'),
+        ]);
+        // q2 is declared at the root but answered inside group1.
+        $response = self::response('completed', new QuestionnaireResponseItem(
+            linkId: 'group1',
+            item: [
+                new QuestionnaireResponseItem(linkId: 'q1', answer: [self::stringAnswer('fine')]),
+                new QuestionnaireResponseItem(linkId: 'q2', answer: [self::stringAnswer('misplaced')]),
+            ],
+        ));
+
+        $report = $this->validator->validate($questionnaire, $response);
+
+        self::assertCount(1, $report->errors());
+        self::assertSame('item[0].item[1]', $report->errors()[0]->path);
+        self::assertStringContainsString("Item 'q2' is not declared at this position in the Questionnaire; expected at the response root", $report->errors()[0]->message);
     }
 
     public function testChoiceItemAcceptsCodingAnswer(): void

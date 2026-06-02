@@ -35,16 +35,24 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\QuestionnaireResponseResour
 /**
  * Validates a QuestionnaireResponse against its source Questionnaire (R4, R4B, and R5).
  *
- * Implements the five core structural rules from the FHIR specification:
+ * Implements the core structural rules from the FHIR specification:
  *  1. linkId match — every response item linkId must exist in the source Questionnaire (error)
- *  2. required items — items with required=true must be answered when the response status is
- *     completed or amended and the item is enabled (error)
- *  3. repeats — non-repeating items must occur at most once and carry at most one answer (error)
- *  4. answer type — the answer value type must match the declared item type (warning)
- *  5. enableWhen — items present while their enableWhen conditions are unsatisfied (warning)
+ *  2. placement — a response item must sit at the position its linkId is declared at in the
+ *     Questionnaire hierarchy (error)
+ *  3. required items — required, enabled items must be answered when the response status is
+ *     completed or amended, checked per parent instance: an absent optional parent exempts its
+ *     children, and a required group needs at least one answered descendant question (error)
+ *  4. repeats — non-repeating items must occur at most once per parent and carry at most one
+ *     answer (error)
+ *  5. answer type — the answer value type must match the declared item type (warning)
+ *  6. enableWhen — items present while their enableWhen conditions are unsatisfied (warning)
  *
  * Type dispatch uses raw code strings, never the generated QuestionnaireItemType enum — the
  * enum only contains the three hierarchy-root codes (see footgun generated-enum-hierarchy-gap).
+ *
+ * enableWhen answer lookup is response-global: a documented approximation of the spec's
+ * nearest-occurrence resolution, exact whenever the referenced question occurs once (see
+ * ADR-007 addendum "enableWhen answer-lookup scoping").
  *
  * @phpstan-type AnyQuestionnaire R4Questionnaire|R4BQuestionnaire|R5Questionnaire
  * @phpstan-type AnyResponse R4Response|R4BResponse|R5Response
@@ -54,6 +62,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\QuestionnaireResponseResour
  * @phpstan-type AnyEnableWhen R4EnableWhen|R4BEnableWhen|R5EnableWhen
  * @phpstan-type ResponseIndex array<string, list<array{item: R4ResponseItem|R4BResponseItem|R5ResponseItem, path: string}>>
  * @phpstan-type ItemIndex array<string, R4Item|R4BItem|R5Item>
+ * @phpstan-type ParentIndex array<string, string|null>
  */
 final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInterface
 {
@@ -105,40 +114,61 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         }
 
         $itemIndex = [];
-        $this->indexQuestionnaireItems($questionnaire->item, $itemIndex);
+        $parentOf  = [];
+        $this->indexQuestionnaireItems($questionnaire->item, $itemIndex, $parentOf, null);
 
         $responseIndex = [];
         $this->indexResponseItems($response->item, 'item', $responseIndex);
 
         $violations = [];
 
-        $this->walkResponseItems($response->item, 'item', $itemIndex, $responseIndex, $violations);
+        $checkRequired = $strictStatus && \in_array((string) ($response->status ?? ''), self::ANSWERABLE_STATUSES, true);
+
+        $this->walkResponseItems(
+            $response->item,
+            'item',
+            null,
+            true,
+            $checkRequired,
+            $itemIndex,
+            $parentOf,
+            $responseIndex,
+            $violations,
+        );
         $this->checkEnableWhenReferences($itemIndex, $violations);
 
-        if ($strictStatus && \in_array((string) ($response->status ?? ''), self::ANSWERABLE_STATUSES, true)) {
-            $this->checkRequiredItems($questionnaire->item, $itemIndex, $responseIndex, $violations);
+        if ($checkRequired) {
+            // The response root is the single instance for top-level questionnaire items.
+            $this->checkRequiredChildren($questionnaire->item, array_values($response->item), 'item', $itemIndex, $responseIndex, $violations);
         }
 
         return new FHIRValidationReport($violations);
     }
 
     /**
-     * Builds a flat linkId → item index by walking the questionnaire item tree.
+     * Builds a flat linkId → item index and a linkId → parent-linkId index by walking the
+     * questionnaire item tree.
      *
-     * linkIds are spec-unique within a Questionnaire (invariant que-2), so a flat map suffices.
+     * linkIds are spec-unique within a Questionnaire (invariant que-2), so flat maps suffice.
      * Items with a null linkId are skipped; base validation reports the missing required field.
+     * Children of a linkId-less item are attributed to the nearest linkId-bearing ancestor so
+     * placement checking degrades gracefully on invalid questionnaires.
      *
      * @param array<R4Item|R4BItem|R5Item>         $items
      * @param array<string, R4Item|R4BItem|R5Item> $index
+     * @param ParentIndex                          $parentOf
      */
-    private function indexQuestionnaireItems(array $items, array &$index): void
+    private function indexQuestionnaireItems(array $items, array &$index, array &$parentOf, ?string $parentLinkId): void
     {
         foreach ($items as $item) {
-            if ($item->linkId !== null && (string) $item->linkId !== '') {
-                $index[(string) $item->linkId] = $item;
+            $linkId = $item->linkId !== null ? (string) $item->linkId : '';
+
+            if ($linkId !== '') {
+                $index[$linkId]    = $item;
+                $parentOf[$linkId] = $parentLinkId;
             }
 
-            $this->indexQuestionnaireItems($item->item, $index);
+            $this->indexQuestionnaireItems($item->item, $index, $parentOf, $linkId !== '' ? $linkId : $parentLinkId);
         }
     }
 
@@ -168,18 +198,29 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
     }
 
     /**
-     * Walks the response item tree applying rules 1 (linkId match), 3b (answer cardinality),
-     * 4 (answer type), and 5 (item present while disabled).
+     * Walks the response item tree applying rules 1 (linkId match), 2 (placement),
+     * 3 (per-instance required children), 4b (answer cardinality), 5 (answer type), and
+     * 6 (item present while disabled).
+     *
+     * $parentLinkId is the linkId of the enclosing matched item (null at the response root);
+     * $parentKnown is false when the enclosing item was unmatched or linkId-less, which
+     * suspends placement checking for this level. $checkRequired carries the status gate and
+     * the disabled-subtree exemption: children of a disabled item are never required.
      *
      * @param array<R4ResponseItem|R4BResponseItem|R5ResponseItem> $items
      * @param ItemIndex                                            $itemIndex
+     * @param ParentIndex                                          $parentOf
      * @param ResponseIndex                                        $responseIndex
      * @param list<FHIRValidationViolation>                        $violations
      */
     private function walkResponseItems(
         array $items,
         string $pathPrefix,
+        ?string $parentLinkId,
+        bool $parentKnown,
+        bool $checkRequired,
         array $itemIndex,
+        array $parentOf,
         array $responseIndex,
         array &$violations,
     ): void {
@@ -188,6 +229,12 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         foreach (array_values($items) as $i => $item) {
             $path   = sprintf('%s[%d]', $pathPrefix, $i);
             $linkId = $item->linkId !== null ? (string) $item->linkId : '';
+
+            // Context for this item's children; unmatched or linkId-less items suspend
+            // placement checking below them but pass the required gate through unchanged.
+            $childParentLinkId  = $parentLinkId;
+            $childParentKnown   = false;
+            $childCheckRequired = $checkRequired;
 
             if ($linkId !== '') {
                 $questionnaireItem = $itemIndex[$linkId] ?? null;
@@ -199,27 +246,69 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
                         sprintf("Response item linkId '%s' does not exist in the source Questionnaire.", $linkId),
                     );
                 } else {
+                    if ($parentKnown && ($parentOf[$linkId] ?? null) !== $parentLinkId) {
+                        $expected     = $parentOf[$linkId] ?? null;
+                        $violations[] = $this->violation(
+                            'error',
+                            $path,
+                            $expected === null
+                                ? sprintf("Item '%s' is not declared at this position in the Questionnaire; expected at the response root.", $linkId)
+                                : sprintf("Item '%s' is not declared at this position in the Questionnaire; expected under item '%s'.", $linkId, $expected),
+                        );
+                    }
+
                     $this->checkAnswerCardinality($item, $questionnaireItem, $linkId, $path, $violations);
                     $this->checkAnswerTypes($item, $questionnaireItem, $linkId, $path, $violations);
 
                     $evaluating = [];
-                    if (!$this->isItemEnabled($questionnaireItem, $itemIndex, $responseIndex, $evaluating)) {
+                    $enabled    = $this->isItemEnabled($questionnaireItem, $itemIndex, $responseIndex, $evaluating);
+
+                    if (!$enabled) {
                         $violations[] = $this->violation(
                             'warning',
                             $path,
                             sprintf("Item '%s' is present but its enableWhen conditions are not satisfied.", $linkId),
                         );
                     }
+
+                    if ($checkRequired && $enabled && $questionnaireItem->item !== []) {
+                        $this->checkRequiredChildren(
+                            $questionnaireItem->item,
+                            $this->collectChildResponseItems($item),
+                            $path,
+                            $itemIndex,
+                            $responseIndex,
+                            $violations,
+                        );
+                    }
+
+                    $childParentLinkId  = $linkId;
+                    $childParentKnown   = true;
+                    $childCheckRequired = $checkRequired && $enabled;
                 }
             }
 
-            $this->walkResponseItems($item->item, $path . '.item', $itemIndex, $responseIndex, $violations);
+            $this->walkResponseItems(
+                $item->item,
+                $path . '.item',
+                $childParentLinkId,
+                $childParentKnown,
+                $childCheckRequired,
+                $itemIndex,
+                $parentOf,
+                $responseIndex,
+                $violations,
+            );
 
             foreach (array_values($item->answer) as $j => $answer) {
                 $this->walkResponseItems(
                     $answer->item,
                     sprintf('%s.answer[%d].item', $path, $j),
+                    $childParentLinkId,
+                    $childParentKnown,
+                    $childCheckRequired,
                     $itemIndex,
+                    $parentOf,
                     $responseIndex,
                     $violations,
                 );
@@ -356,13 +445,13 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
     private function checkEnableWhenReferences(array $itemIndex, array &$violations): void
     {
         foreach ($itemIndex as $linkId => $item) {
-            foreach ($item->enableWhen as $condition) {
+            foreach (array_values($item->enableWhen) as $c => $condition) {
                 $question = $condition->question !== null ? (string) $condition->question : '';
 
                 if ($question !== '' && !isset($itemIndex[$question])) {
                     $violations[] = $this->violation(
                         'warning',
-                        'item',
+                        sprintf('Questionnaire.item[linkId=%s].enableWhen[%d].question', $linkId, $c),
                         sprintf(
                             "enableWhen.question '%s' on item '%s' does not reference a known linkId.",
                             $question,
@@ -375,57 +464,124 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
     }
 
     /**
-     * Rule 2 — required, enabled items must be answered. Walks the questionnaire tree so that
-     * entire subtrees under a disabled parent are exempt. Groups are satisfied by presence;
-     * questions require at least one answer.
+     * Rule 3 — required, enabled children of one parent instance must be satisfied within
+     * that instance. Per the specification, required "only has meaning if the parent element
+     * is present": absent optional parents exempt their children, and each instance of a
+     * repeating parent is checked independently. A required question needs a direct answer;
+     * a required group needs at least one answered descendant question.
      *
-     * @param array<R4Item|R4BItem|R5Item>  $items
-     * @param ItemIndex                     $itemIndex
-     * @param ResponseIndex                 $responseIndex
-     * @param list<FHIRValidationViolation> $violations
+     * Grandchildren are NOT recursed into here — they are checked when their own parent
+     * instance is walked, which is what makes the check instance-scoped.
+     *
+     * @param array<R4Item|R4BItem|R5Item>                        $questionnaireChildren
+     * @param list<R4ResponseItem|R4BResponseItem|R5ResponseItem> $responseChildItems
+     * @param ItemIndex                                           $itemIndex
+     * @param ResponseIndex                                       $responseIndex
+     * @param list<FHIRValidationViolation>                       $violations
      */
-    private function checkRequiredItems(
-        array $items,
+    private function checkRequiredChildren(
+        array $questionnaireChildren,
+        array $responseChildItems,
+        string $instancePath,
         array $itemIndex,
         array $responseIndex,
         array &$violations,
     ): void {
-        foreach ($items as $item) {
-            $evaluating = [];
-            if (!$this->isItemEnabled($item, $itemIndex, $responseIndex, $evaluating)) {
-                continue; // disabled subtree: neither this item nor its children are required
+        $byLinkId = [];
+
+        foreach ($responseChildItems as $child) {
+            $childLinkId = $child->linkId !== null ? (string) $child->linkId : '';
+
+            if ($childLinkId !== '') {
+                $byLinkId[$childLinkId][] = $child;
+            }
+        }
+
+        foreach ($questionnaireChildren as $child) {
+            $linkId = $child->linkId !== null ? (string) $child->linkId : '';
+
+            if ($linkId === '' || $child->required !== true) {
+                continue;
             }
 
-            $linkId = $item->linkId !== null ? (string) $item->linkId : '';
+            $evaluating = [];
+            if (!$this->isItemEnabled($child, $itemIndex, $responseIndex, $evaluating)) {
+                continue;
+            }
 
-            if ($item->required === true && $linkId !== '') {
-                $entries = $responseIndex[$linkId] ?? [];
-                $type    = $item->type !== null ? (string) $item->type : '';
+            $occurrences = $byLinkId[$linkId] ?? [];
 
-                $satisfied = $type === 'group'
-                    ? $entries !== []
-                    : $this->hasAnyAnswer($entries);
+            if (($child->type !== null ? (string) $child->type : '') === 'group') {
+                $satisfied = false;
+
+                foreach ($occurrences as $occurrence) {
+                    if ($this->hasAnsweredDescendant($occurrence)) {
+                        $satisfied = true;
+                        break;
+                    }
+                }
 
                 if (!$satisfied) {
                     $violations[] = $this->violation(
                         'error',
-                        'item',
+                        $instancePath,
+                        $occurrences === []
+                            ? sprintf("Required group '%s' is missing.", $linkId)
+                            : sprintf("Required group '%s' has no answered descendant question.", $linkId),
+                    );
+                }
+            } else {
+                $satisfied = false;
+
+                foreach ($occurrences as $occurrence) {
+                    if ($occurrence->answer !== []) {
+                        $satisfied = true;
+                        break;
+                    }
+                }
+
+                if (!$satisfied) {
+                    $violations[] = $this->violation(
+                        'error',
+                        $instancePath,
                         sprintf("Required item '%s' has no answer.", $linkId),
                     );
                 }
             }
-
-            $this->checkRequiredItems($item->item, $itemIndex, $responseIndex, $violations);
         }
     }
 
     /**
-     * @param list<array{item: R4ResponseItem|R4BResponseItem|R5ResponseItem, path: string}> $entries
+     * Collects one response item's direct children from both nesting forms: item.item and
+     * item.answer[*].item (the latter carries children of answered question items).
+     *
+     * @param R4ResponseItem|R4BResponseItem|R5ResponseItem $item
+     *
+     * @return list<R4ResponseItem|R4BResponseItem|R5ResponseItem>
      */
-    private function hasAnyAnswer(array $entries): bool
+    private function collectChildResponseItems(object $item): array
     {
-        foreach ($entries as $entry) {
-            if ($entry['item']->answer !== []) {
+        $children = array_values($item->item);
+
+        foreach ($item->answer as $answer) {
+            foreach ($answer->item as $child) {
+                $children[] = $child;
+            }
+        }
+
+        return $children;
+    }
+
+    /**
+     * Whether any descendant of this response item carries an answer — the spec's
+     * satisfaction criterion for a required group.
+     *
+     * @param R4ResponseItem|R4BResponseItem|R5ResponseItem $item
+     */
+    private function hasAnsweredDescendant(object $item): bool
+    {
+        foreach ($this->collectChildResponseItems($item) as $child) {
+            if ($child->answer !== [] || $this->hasAnsweredDescendant($child)) {
                 return true;
             }
         }
