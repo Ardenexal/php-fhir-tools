@@ -16,9 +16,12 @@ namespace Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation;
  *   - `element`   — The extension is permitted on the element at the given path
  *                   (e.g. `Patient.name`) or any of its sub-elements.
  *   - `extension` — The extension must be nested inside another named extension
- *                   identified by its canonical URL.
- *   - `fhirpath`  — A FHIRPath expression that evaluates to a list of permitted
- *                   elements. Stored for reference; runtime evaluation is deferred.
+ *                   identified by its canonical URL. Evaluated against the chain of
+ *                   enclosing extension URLs; denial requires a fully-known chain,
+ *                   an unreadable enclosing URL defers.
+ *   - `fhirpath`  — A FHIRPath expression evaluated against the element bearing the
+ *                   extension. Only a confident single boolean `false` denies; empty
+ *                   results and FHIRPath engine errors (FHIRPathException) defer.
  *
  * @see https://www.hl7.org/fhir/structuredefinition-definitions.html#StructureDefinition.context
  *

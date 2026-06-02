@@ -176,20 +176,23 @@ final class FHIRValueSetBindingValidatorStrictMaxValueSetTest extends Constraint
     }
 
     // -------------------------------------------------------------------------
-    // Null client skips all non-required checks
+    // Null client skips all non-required checks, surfacing the gap as INFO (#71)
     // -------------------------------------------------------------------------
 
-    public function testNullClientSkipsStrictCheck(): void
+    public function testNullClientSkipsStrictCheckWithUncheckedBindingInfo(): void
     {
         $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry());
         $validator->initialize($this->context);
 
         $validator->validate('anything', new FHIRValueSetBinding(self::VS_URL, 'extensible', strict: true));
 
-        $this->assertNoViolation();
+        $this->buildViolation(FHIRValueSetBindingValidator::DEFAULT_UNCHECKED_BINDING_MESSAGE)
+            ->setParameters(['{{ url }}' => self::VS_URL])
+            ->setCode(FHIRViolationCode::UNCHECKED_BINDING)
+            ->assertRaised();
     }
 
-    public function testNullClientSkipsMaxValueSetCheck(): void
+    public function testNullClientSkipsMaxValueSetCheckWithUncheckedBindingInfo(): void
     {
         $validator = new FHIRValueSetBindingValidator(new FHIRValidationMessageRegistry());
         $validator->initialize($this->context);
@@ -197,6 +200,9 @@ final class FHIRValueSetBindingValidatorStrictMaxValueSetTest extends Constraint
         $constraint = new FHIRValueSetBinding(self::VS_URL, 'extensible', maxValueSetUrl: self::MAX_VS_URL);
         $validator->validate('anything', $constraint);
 
-        $this->assertNoViolation();
+        $this->buildViolation(FHIRValueSetBindingValidator::DEFAULT_UNCHECKED_BINDING_MESSAGE)
+            ->setParameters(['{{ url }}' => self::VS_URL])
+            ->setCode(FHIRViolationCode::UNCHECKED_BINDING)
+            ->assertRaised();
     }
 }

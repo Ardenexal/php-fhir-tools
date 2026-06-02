@@ -11,13 +11,17 @@ use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
 use Ardenexal\FHIRTools\Component\Validation\FHIRViolationCode;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\EvalErrorInvariantExtensionFixture;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\FailingInvariantExtensionFixture;
+use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\FhirpathBooleanContextExtensionFixture;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\FhirpathContextExtensionFixture;
+use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\FhirpathNodeContextExtensionFixture;
+use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\FhirpathThrowingContextExtensionFixture;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\NoContextExtensionFixture;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\NoExtensionsTraitFixture;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\ObservationOnlyExtensionFixture;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\PassingInvariantExtensionFixture;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\PatientExtensionResourceFixture;
 use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\PatientPermittedExtensionFixture;
+use Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture\TypeBearingExtensionResourceFixture;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -72,13 +76,68 @@ final class FHIRExtensionContextValidationTest extends TestCase
         self::assertStringContainsString('Patient', $violation->message);
     }
 
-    public function testFhirpathContextTypeIsDeferredAndProducesNoViolation(): void
+    public function testFhirpathContextUsingResourceVariableEvaluatingTrueProducesNoViolation(): void
     {
+        // %resource.is(Patient) evaluates to a single `true` against the Patient fixture
+        // (verified in-process), so this exercises the confident PERMIT branch.
         $resource = new PatientExtensionResourceFixture([new FhirpathContextExtensionFixture()]);
 
         $report = $this->service->validate($resource);
 
-        self::assertCount(0, $report->errors(), 'fhirpath context type must be treated as permitted in v1');
+        self::assertCount(0, $report->errors(), 'fhirpath context using %resource evaluating to true must permit');
+    }
+
+    // --- fhirpath context classification (issue #69) ---
+
+    public function testFhirpathContextEvaluatingTrueOnBearingElementProducesNoViolation(): void
+    {
+        $resource = new TypeBearingExtensionResourceFixture([new FhirpathBooleanContextExtensionFixture()], type: 'composed-of');
+
+        $report = $this->service->validate($resource);
+
+        self::assertCount(0, $report->errors(), 'fhirpath context evaluating to true must permit');
+    }
+
+    public function testFhirpathContextEvaluatingFalseOnBearingElementProducesError(): void
+    {
+        $resource = new TypeBearingExtensionResourceFixture([new FhirpathBooleanContextExtensionFixture()], type: 'depends-on');
+
+        $report = $this->service->validate($resource);
+
+        self::assertCount(1, $report->errors(), 'fhirpath context evaluating to a single false must deny');
+
+        $violation = $report->errors()[0];
+        self::assertSame('error', $violation->severity);
+        self::assertSame('extension', $violation->path);
+        self::assertSame(FHIRExtensionContext::class, $violation->constraintClass);
+        self::assertStringContainsString('http://example.org/ext/fhirpath-boolean-context', $violation->message);
+    }
+
+    public function testFhirpathNodeContextWithNonEmptyResultProducesNoViolation(): void
+    {
+        $resource = new TypeBearingExtensionResourceFixture([new FhirpathNodeContextExtensionFixture()], type: 'anything');
+
+        $report = $this->service->validate($resource);
+
+        self::assertCount(0, $report->errors(), 'fhirpath context with a non-empty node result must permit');
+    }
+
+    public function testFhirpathNodeContextWithEmptyResultIsDeferredAndProducesNoViolation(): void
+    {
+        $resource = new TypeBearingExtensionResourceFixture([new FhirpathNodeContextExtensionFixture()], type: null);
+
+        $report = $this->service->validate($resource);
+
+        self::assertCount(0, $report->errors(), 'fhirpath context with an empty result must defer, never deny');
+    }
+
+    public function testFhirpathContextThatThrowsIsDeferredAndProducesNoViolation(): void
+    {
+        $resource = new TypeBearingExtensionResourceFixture([new FhirpathThrowingContextExtensionFixture()], type: 'composed-of');
+
+        $report = $this->service->validate($resource);
+
+        self::assertCount(0, $report->errors(), 'FHIRPathException during context evaluation must defer, never deny');
     }
 
     public function testExtensionWithNoContextAttributeProducesNoViolation(): void
