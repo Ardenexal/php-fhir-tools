@@ -596,8 +596,7 @@ final class FHIRPathEvaluator implements ExpressionVisitor
         }
 
         // Quantity: negate the numeric value, preserve unit
-        if ($isQuantity) {
-            /** @var array<string, mixed> $value */
+        if (is_array($value)) {
             $result          = $value;
             $result['value'] = match ($node->getOperator()) {
                 TokenType::MINUS => -(float) $value['value'],
