@@ -452,11 +452,17 @@ preserved on `FHIRValidationViolation::$code` so consumers can distinguish "coul
 
 ## Questionnaire Validation
 
-Questionnaire/QuestionnaireResponse validation is handled by a separate
-`FHIRQuestionnaireValidator` service (planned — see GitHub #74). When available,
-use it alongside `FHIRValidationService` for complete QuestionnaireResponse coverage:
+Questionnaire/QuestionnaireResponse validation is handled by the standalone
+`FHIRQuestionnaireValidator` service (GitHub #74, ADR-007). It validates a
+`QuestionnaireResponse` against its source `Questionnaire` (R4, R4B, and R5) and
+needs no constructor arguments. Use it alongside `FHIRValidationService` for
+complete QuestionnaireResponse coverage:
 
 ```php
+use Ardenexal\FHIRTools\Component\Validation\FHIRQuestionnaireValidator;
+
+$questionnaireValidator = new FHIRQuestionnaireValidator();
+
 // Validate the response structure (cardinality, bindings, invariants)
 $structuralReport = $service->validate($response);
 
@@ -464,11 +470,30 @@ $structuralReport = $service->validate($response);
 $questionnaireReport = $questionnaireValidator->validate($questionnaire, $response);
 
 // Combine reports for a unified view
-$allViolations = array_merge(
-    $structuralReport->violations,
-    $questionnaireReport->violations,
-);
+$merged = new FHIRValidationReport([
+    ...$structuralReport->violations,
+    ...$questionnaireReport->violations,
+]);
 ```
+
+Implemented rules and severities:
+
+| Rule | Severity |
+|---|---|
+| Response item `linkId` must exist in the source Questionnaire | `error` |
+| Required, enabled items must be answered when status is `completed`/`amended` | `error` |
+| Non-repeating items: at most one occurrence and one answer | `error` |
+| Answer value type must match the declared item type | `warning` |
+| Items present while their `enableWhen` conditions are unsatisfied | `warning` |
+| `enableWhen.question` must reference a known `linkId` | `warning` |
+
+Pass `strictStatus: false` to skip the required-item check regardless of response
+status (useful for drafts). The validator never resolves
+`QuestionnaireResponse.questionnaire` canonical URLs — callers supply the source
+`Questionnaire` object. SDC extensions (`enableWhenExpression`, `answerExpression`,
+calculated expressions, regex constraints) and R5 `answerConstraint` are not yet
+covered. Violations carry `FHIRQuestionnaireConstraint::class` in
+`constraintClass` so they can be distinguished after merging.
 
 ---
 
@@ -508,4 +533,5 @@ a FHIR server context.
 - [ADR-002: Validator component location](./../../../.goat-flow/decisions/ADR-002-validator-component-location.md)
 - [ADR-004: Extensible/preferred binding strictness](./../../../.goat-flow/decisions/ADR-004-extensible-preferred-binding-strictness.md)
 - [ADR-005: Target profile resolver pattern](./../../../.goat-flow/decisions/ADR-005-targetprofile-resolver-pattern.md)
+- [ADR-007: Questionnaire validator architecture](./../../../.goat-flow/decisions/ADR-007-questionnaire-validator-architecture.md)
 - [GitHub Epic #76](https://github.com/Ardenexal/php-fhir-tools/issues/76)

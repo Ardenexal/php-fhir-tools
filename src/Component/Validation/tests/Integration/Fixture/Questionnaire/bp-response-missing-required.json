@@ -1,0 +1,15 @@
+{
+    "resourceType": "QuestionnaireResponse",
+    "status": "completed",
+    "questionnaire": "http://example.org/Questionnaire/bp",
+    "item": [
+        {
+            "linkId": "diastolic",
+            "answer": [
+                {
+                    "valueDecimal": 80.5
+                }
+            ]
+        }
+    ]
+}
