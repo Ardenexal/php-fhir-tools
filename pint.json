@@ -3,7 +3,7 @@
     "exclude": [
         "var",
         "src/Component/*/output",
-        "src/Component/*/tests/fixtures",
+        "src/Component/*/tests/fixtures"
     ],
     "notPath": [
         "mate/extensions.php"
