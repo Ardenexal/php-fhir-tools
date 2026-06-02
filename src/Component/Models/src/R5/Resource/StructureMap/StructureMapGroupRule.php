@@ -6,10 +6,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\StructureMap;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Count;
 
 /**
  * @description Transform Rule from source to target.
@@ -25,7 +27,7 @@ class StructureMapGroupRule extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var IdPrimitive|null name Name of the rule for internal references */
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive')]
@@ -38,6 +40,7 @@ class StructureMapGroupRule extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\StructureMap\StructureMapGroupRuleSource',
         )]
+        #[Count(min: 1)]
         public array $source = [],
         /** @var array<StructureMapGroupRuleTarget> target Content to create because of this mapping rule */
         #[FhirProperty(

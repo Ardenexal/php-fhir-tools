@@ -6,9 +6,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\ConceptMap;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
+use Symfony\Component\Validator\Constraints\Count;
 
 /**
  * @description A group of mappings that all have the same source and target system.
@@ -24,13 +27,13 @@ class ConceptMapGroup extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CanonicalPrimitive|null source Source system where concepts to be mapped are defined */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/CodeSystem'])]
         public ?CanonicalPrimitive $source = null,
         /** @var CanonicalPrimitive|null target Target system that the concepts are to be mapped to */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/CodeSystem'])]
         public ?CanonicalPrimitive $target = null,
         /** @var array<ConceptMapGroupElement> element Mappings for a concept from the source set */
         #[FhirProperty(
@@ -40,6 +43,7 @@ class ConceptMapGroup extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\ConceptMap\ConceptMapGroupElement',
         )]
+        #[Count(min: 1)]
         public array $element = [],
         /** @var ConceptMapGroupUnmapped|null unmapped What to do when there is no mapping target for the source concept and ConceptMap.group.element.noMap is not true */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]

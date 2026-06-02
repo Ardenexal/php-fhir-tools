@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -35,6 +36,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  * This extension repeats, and order is important - once a match is found, this profile is the one that applies. Todo: If this extension is useful, it will be moved to the core extensions pack
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/profile-mapping', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.resource')]
 class ProfileMappingExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

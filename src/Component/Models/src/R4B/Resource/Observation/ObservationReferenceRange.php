@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\Observation;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
@@ -17,6 +20,12 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  * @description Guidance on how to interpret the value by comparison to a normal or recommended range.  Multiple reference ranges are interpreted as an "OR".   In other words, to represent two distinct target populations, two `referenceRange` elements would be used.
  */
 #[FHIRBackboneElement(parentResource: 'Observation', elementPath: 'Observation.referenceRange', fhirVersion: 'R4B')]
+#[FHIRPathInvariant(
+    key: 'obs-3',
+    severity: 'error',
+    expression: 'low.exists() or high.exists() or text.exists()',
+    human: 'Must have at least a low or a high or text',
+)]
 class ObservationReferenceRange extends BackboneElement
 {
     public function __construct(
@@ -27,7 +36,7 @@ class ObservationReferenceRange extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var Quantity|null low Low Range, if relevant */
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
@@ -36,7 +45,7 @@ class ObservationReferenceRange extends BackboneElement
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
         public ?Quantity $high = null,
         /** @var CodeableConcept|null type Reference range qualifier */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/referencerange-meaning', strength: 'preferred')]
         public ?CodeableConcept $type = null,
         /** @var array<CodeableConcept> appliesTo Reference range population */
         #[FhirProperty(

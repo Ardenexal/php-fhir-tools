@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive;
@@ -20,6 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\TimePrimitive;
  * @description The inclusive upper bound on the range of allowed values for the data element.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/maxValue', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item')]
 class MaxValueExtension extends Extension
 {
     public function __construct(

@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta;
@@ -18,6 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\InstantPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\Provenance\ProvenanceAgent;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\Provenance\ProvenanceEntity;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -38,10 +42,15 @@ class ProvenanceResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies it\'s meaning or interpretation')]
         public ?UriPrimitive $implicitRules = null,
         /** @var string|null language Language of the resource content */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
+            strength: 'preferred',
+            maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+        )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -53,7 +62,7 @@ class ProvenanceResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the resource that contains them')]
         public array $modifierExtension = [],
         /** @var array<Reference> target Target Reference(s) (usually version specific) */
         #[FhirProperty(
@@ -63,6 +72,8 @@ class ProvenanceResource extends DomainResourceResource
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[Count(min: 1)]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public array $target = [],
         /** @var Period|DateTimePrimitive|null occurred When the activity occurred */
         #[FhirProperty(
@@ -92,7 +103,7 @@ class ProvenanceResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isArray: true)]
         public array $policy = [],
         /** @var Reference|null location Where the activity occurred, if relevant */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
         public ?Reference $location = null,
         /** @var array<CodeableConcept> reason Reason the activity is occurring */
         #[FhirProperty(
@@ -101,9 +112,10 @@ class ProvenanceResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/v3-PurposeOfUse', strength: 'extensible')]
         public array $reason = [],
         /** @var CodeableConcept|null activity Activity that occurred */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/provenance-activity-type', strength: 'extensible')]
         public ?CodeableConcept $activity = null,
         /** @var array<ProvenanceAgent> agent Actor involved */
         #[FhirProperty(
@@ -113,6 +125,7 @@ class ProvenanceResource extends DomainResourceResource
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Provenance\ProvenanceAgent',
         )]
+        #[Count(min: 1)]
         public array $agent = [],
         /** @var array<ProvenanceEntity> entity An entity used in this activity */
         #[FhirProperty(

@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\QuestionnaireRespons
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
@@ -16,6 +18,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A group or question item from the original questionnaire for which answers are provided.
  */
 #[FHIRBackboneElement(parentResource: 'QuestionnaireResponse', elementPath: 'QuestionnaireResponse.item', fhirVersion: 'R4B')]
+#[FHIRPathInvariant(
+    key: 'qrs-1',
+    severity: 'error',
+    expression: '(answer.exists() and item.exists()).not()',
+    human: 'Nested item can\'t be beneath both item and answer',
+)]
 class QuestionnaireResponseItem extends BackboneElement
 {
     public function __construct(
@@ -26,7 +34,7 @@ class QuestionnaireResponseItem extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var StringPrimitive|string|null linkId Pointer to specific item from Questionnaire */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]

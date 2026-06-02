@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\AuditEvent;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
@@ -29,10 +32,10 @@ class AuditEventAgent extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null type How agent participated */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/participation-role-type', strength: 'extensible')]
         public ?CodeableConcept $type = null,
         /** @var array<CodeableConcept> role Agent role in the event */
         #[FhirProperty(
@@ -44,6 +47,14 @@ class AuditEventAgent extends BackboneElement
         public array $role = [],
         /** @var Reference|null who Identifier of who */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
+            'http://hl7.org/fhir/StructureDefinition/Practitioner',
+            'http://hl7.org/fhir/StructureDefinition/Organization',
+            'http://hl7.org/fhir/StructureDefinition/Device',
+            'http://hl7.org/fhir/StructureDefinition/Patient',
+            'http://hl7.org/fhir/StructureDefinition/RelatedPerson',
+        ])]
         public ?Reference $who = null,
         /** @var StringPrimitive|string|null altId Alternative User identity */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -55,13 +66,13 @@ class AuditEventAgent extends BackboneElement
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotBlank]
         public ?bool $requestor = null,
         /** @var Reference|null location Where */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
         public ?Reference $location = null,
         /** @var array<UriPrimitive> policy Policy that authorized event */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isArray: true)]
         public array $policy = [],
         /** @var Coding|null media Type of media */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/dicm-405-mediatype', strength: 'extensible')]
         public ?Coding $media = null,
         /** @var AuditEventAgentNetwork|null network Logical network location for application activity */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
@@ -73,6 +84,7 @@ class AuditEventAgent extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/v3-PurposeOfUse', strength: 'extensible')]
         public array $purposeOfUse = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

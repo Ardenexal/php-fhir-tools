@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
  * @description An indicator on the status of a fetal subject. Typically used in maternity where the patient record may be created before birth. This extension would not apply to Patients that have a birthDate.  A Patient.deceased flag cannot be used for fetal subjects because the fetus is not yet born. The status is used to express the vitality of the fetal subject.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-fetalStatus', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Patient')]
 class PatFetalStatusExtension extends Extension
 {
     public function __construct(

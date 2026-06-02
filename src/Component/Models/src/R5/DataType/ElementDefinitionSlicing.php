@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -37,7 +38,7 @@ class ElementDefinitionSlicing extends Element
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $ordered = null,
         /** @var SlicingRulesType|null rules closed | open | openAtEnd */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/resource-slicing-rules|5.0.0', strength: 'required')]
         public ?SlicingRulesType $rules = null,
     ) {
         parent::__construct($id, $extension);

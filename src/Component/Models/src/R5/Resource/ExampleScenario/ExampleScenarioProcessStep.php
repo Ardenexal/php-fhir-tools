@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\ExampleScenario;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
@@ -15,6 +18,18 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  * @description A significant action that occurs as part of the process.
  */
 #[FHIRBackboneElement(parentResource: 'ExampleScenario', elementPath: 'ExampleScenario.process.step', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'exs-13',
+    severity: 'error',
+    expression: 'alternative.title.count() = alternative.title.distinct().count()',
+    human: 'Alternative titles must be unique within a step',
+)]
+#[FHIRPathInvariant(
+    key: 'exs-22',
+    severity: 'error',
+    expression: '(process.exists() implies workflow.empty() and operation.empty()) and (workflow.exists() implies operation.empty())',
+    human: 'Can have a process, a workflow, one or more operations or none of these, but cannot have a combination',
+)]
 class ExampleScenarioProcessStep extends BackboneElement
 {
     public function __construct(
@@ -25,7 +40,7 @@ class ExampleScenarioProcessStep extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var StringPrimitive|string|null number Sequential number of the step */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -34,7 +49,7 @@ class ExampleScenarioProcessStep extends BackboneElement
         #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex')]
         public ?ExampleScenarioProcess $process = null,
         /** @var CanonicalPrimitive|null workflow Step is nested workflow */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ExampleScenario'])]
         public ?CanonicalPrimitive $workflow = null,
         /** @var ExampleScenarioProcessStepOperation|null operation Step is simple action */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]

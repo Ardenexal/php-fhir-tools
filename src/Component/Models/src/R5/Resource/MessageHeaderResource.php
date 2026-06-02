@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding;
@@ -38,10 +41,10 @@ class MessageHeaderResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -53,7 +56,7 @@ class MessageHeaderResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the resource that contains them')]
         public array $modifierExtension = [],
         /** @var Coding|CanonicalPrimitive|null event Event code or link to EventDefinition */
         #[FhirProperty(
@@ -77,6 +80,7 @@ class MessageHeaderResource extends DomainResourceResource
             ],
         )]
         #[NotBlank]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/EventDefinition'])]
         public Coding|CanonicalPrimitive|null $event = null,
         /** @var array<MessageHeaderDestination> destination Message destination application(s) */
         #[FhirProperty(
@@ -88,15 +92,32 @@ class MessageHeaderResource extends DomainResourceResource
         public array $destination = [],
         /** @var Reference|null sender Real world sender of the message */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Practitioner',
+            'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
+            'http://hl7.org/fhir/StructureDefinition/Device',
+            'http://hl7.org/fhir/StructureDefinition/Organization',
+        ])]
         public ?Reference $sender = null,
         /** @var Reference|null author The source of the decision */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Practitioner',
+            'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
+            'http://hl7.org/fhir/StructureDefinition/Device',
+            'http://hl7.org/fhir/StructureDefinition/Organization',
+        ])]
         public ?Reference $author = null,
         /** @var MessageHeaderSource|null source Message source application */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone', isRequired: true), NotBlank]
         public ?MessageHeaderSource $source = null,
         /** @var Reference|null responsible Final responsibility for event */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Practitioner',
+            'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
+            'http://hl7.org/fhir/StructureDefinition/Organization',
+        ])]
         public ?Reference $responsible = null,
         /** @var CodeableConcept|null reason Cause of event */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
@@ -111,9 +132,10 @@ class MessageHeaderResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public array $focus = [],
         /** @var CanonicalPrimitive|null definition Link to the definition for this message */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/MessageDefinition'])]
         public ?CanonicalPrimitive $definition = null,
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

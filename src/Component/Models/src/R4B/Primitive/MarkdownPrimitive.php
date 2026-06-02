@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Primitive;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
+use Symfony\Component\Validator\Constraints\Regex;
 
 /**
  * @author HL7 FHIR Standard
@@ -31,7 +32,7 @@ class MarkdownPrimitive extends StringPrimitive implements \Stringable
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var string|null value Primitive value for markdown */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@value')]
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@value'), Regex(pattern: '[ \r\n\t\S]+')]
         public ?string $value = null,
     ) {
         parent::__construct($id, $extension, $value);

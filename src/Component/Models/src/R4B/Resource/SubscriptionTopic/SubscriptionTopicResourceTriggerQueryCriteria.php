@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\SubscriptionTopic;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CriteriaNotExistsBehaviorType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
@@ -25,19 +27,19 @@ class SubscriptionTopicResourceTriggerQueryCriteria extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var StringPrimitive|string|null previous Rule applied to previous resource state */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $previous = null,
         /** @var CriteriaNotExistsBehaviorType|null resultForCreate test-passes | test-fails */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/subscriptiontopic-cr-behavior|4.3.0', strength: 'required')]
         public ?CriteriaNotExistsBehaviorType $resultForCreate = null,
         /** @var StringPrimitive|string|null current Rule applied to current resource state */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $current = null,
         /** @var CriteriaNotExistsBehaviorType|null resultForDelete test-passes | test-fails */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/subscriptiontopic-cr-behavior|4.3.0', strength: 'required')]
         public ?CriteriaNotExistsBehaviorType $resultForDelete = null,
         /** @var bool|null requireBoth Both must be true flag */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]

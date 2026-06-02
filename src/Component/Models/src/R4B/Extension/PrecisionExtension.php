@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
 /**
@@ -16,6 +17,8 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  * @description Explicit precision of the number. This is the number of significant decimal places after the decimal point, irrespective of how many are actually present in the explicitly represented decimal.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/quantity-precision', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'Quantity')]
+#[FHIRExtensionContext(type: 'element', expression: 'decimal')]
 class PrecisionExtension extends Extension
 {
     public function __construct(

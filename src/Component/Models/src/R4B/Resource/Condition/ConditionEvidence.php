@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\Condition;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
@@ -15,6 +18,12 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
  * @description Supporting evidence / manifestations that are the basis of the Condition's verification status, such as evidence that confirmed or refuted the condition.
  */
 #[FHIRBackboneElement(parentResource: 'Condition', elementPath: 'Condition.evidence', fhirVersion: 'R4B')]
+#[FHIRPathInvariant(
+    key: 'con-2',
+    severity: 'error',
+    expression: 'code.exists() or detail.exists()',
+    human: 'evidence SHALL have code or details',
+)]
 class ConditionEvidence extends BackboneElement
 {
     public function __construct(
@@ -25,7 +34,7 @@ class ConditionEvidence extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var array<CodeableConcept> code Manifestation/symptom */
         #[FhirProperty(
@@ -42,6 +51,7 @@ class ConditionEvidence extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public array $detail = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

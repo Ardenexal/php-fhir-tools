@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
@@ -17,6 +18,10 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  * @description Value(s) identifying physical or mental condition(s) that limits a person's movements, senses, or activities. Deprecated: Use the [[[Flag]]] resource to represent disability information intended for administrative use, and to use [[[Condition]]] for clinical diagnoses that correspond to disabilities
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-disability', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'Patient')]
+#[FHIRExtensionContext(type: 'element', expression: 'RelatedPerson')]
+#[FHIRExtensionContext(type: 'element', expression: 'Practitioner')]
+#[FHIRExtensionContext(type: 'element', expression: 'Person')]
 class PatDisabilityExtension extends Extension
 {
     public function __construct(

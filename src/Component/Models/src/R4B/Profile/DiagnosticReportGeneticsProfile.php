@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\DiagnosticReportResource;
 
 /**
@@ -18,6 +19,12 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\DiagnosticReportResource;
     profileUrl: 'http://hl7.org/fhir/StructureDefinition/diagnosticreport-genetics',
     baseType: 'DiagnosticReport',
     fhirVersion: 'R4B',
+)]
+#[FHIRProfileConstraint(
+    path: 'conclusionCode',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['max' => 0],
+    groups: ['http://hl7.org/fhir/StructureDefinition/diagnosticreport-genetics'],
 )]
 class DiagnosticReportGeneticsProfile extends DiagnosticReportResource
 {

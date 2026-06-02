@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
  * @description Indicates that a ContactPoint has the intended use of the combination of the use and multiple use e.g. Mobile Business, or Temporary Home. Systems SHOULD populate a primary use in ContactPoint.use and then populate all applicable uses in this extension.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/contactpoint-multiple-use', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'ContactPoint')]
 class ContactPointMultipleUseExtension extends Extension
 {
     public function __construct(

@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding;
@@ -38,6 +41,54 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     url: 'http://hl7.org/fhir/StructureDefinition/ExampleScenario',
     fhirVersion: 'R5',
 )]
+#[FHIRPathInvariant(
+    key: 'cnl-0',
+    severity: 'warning',
+    expression: 'name.exists() implies name.matches(\'^[A-Z]([A-Za-z0-9_]){1,254}$\')',
+    human: 'Name should be usable as an identifier for the module by machine processing applications such as code generation',
+)]
+#[FHIRPathInvariant(
+    key: 'exs-3',
+    severity: 'error',
+    expression: 'status=\'active\' or status=\'retired\' implies actor.exists()',
+    human: 'Must have actors if status is active or required',
+)]
+#[FHIRPathInvariant(
+    key: 'exs-4',
+    severity: 'error',
+    expression: 'status=\'active\' or status=\'retired\' implies process.exists()',
+    human: 'Must have processes if status is active or required',
+)]
+#[FHIRPathInvariant(
+    key: 'exs-6',
+    severity: 'error',
+    expression: 'actor.key.count() = actor.key.distinct().count()',
+    human: 'Actor keys must be unique',
+)]
+#[FHIRPathInvariant(
+    key: 'exs-7',
+    severity: 'error',
+    expression: 'actor.title.count() = actor.title.distinct().count()',
+    human: 'Actor titles must be unique',
+)]
+#[FHIRPathInvariant(
+    key: 'exs-8',
+    severity: 'error',
+    expression: 'instance.key.count() = instance.key.distinct().count()',
+    human: 'Instance keys must be unique',
+)]
+#[FHIRPathInvariant(
+    key: 'exs-9',
+    severity: 'error',
+    expression: 'instance.title.count() = instance.title.distinct().count()',
+    human: 'Instance titles must be unique',
+)]
+#[FHIRPathInvariant(
+    key: 'exs-12',
+    severity: 'error',
+    expression: 'process.title.count() = process.title.distinct().count()',
+    human: 'Process titles must be unique',
+)]
 class ExampleScenarioResource extends DomainResourceResource
 {
     public function __construct(
@@ -48,10 +99,10 @@ class ExampleScenarioResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -63,7 +114,7 @@ class ExampleScenarioResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the resource that contains them')]
         public array $modifierExtension = [],
         /** @var UriPrimitive|null url Canonical identifier for this example scenario, represented as a URI (globally unique) */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
@@ -99,6 +150,7 @@ class ExampleScenarioResource extends DomainResourceResource
                 ],
             ],
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/version-algorithm', strength: 'extensible')]
         public StringPrimitive|string|Coding|null $versionAlgorithm = null,
         /** @var StringPrimitive|string|null name To be removed? */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -107,7 +159,7 @@ class ExampleScenarioResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $title = null,
         /** @var PublicationStatusType|null status draft | active | retired | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because applications should not use a retired {{title}} without due consideration')]
         public ?PublicationStatusType $status = null,
         /** @var bool|null experimental For testing purposes, not real usage */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
@@ -144,6 +196,7 @@ class ExampleScenarioResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/jurisdiction', strength: 'extensible')]
         public array $jurisdiction = [],
         /** @var MarkdownPrimitive|null purpose The purpose of the example, e.g. to illustrate a scenario */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
@@ -20,6 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  * @description Allows the definition of an additional resource to indicate the resource is a candidate for inclusion in a compartment by the implementing server.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/additional-resource-compartment', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition')]
 class AdditionalResourceCompartmentExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(
@@ -32,6 +34,12 @@ class AdditionalResourceCompartmentExtension extends Extension implements FHIRCo
         /** @var StringPrimitive|null documentation Additional documentation about the resource and compartment */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public ?StringPrimitive $documentation = null,
+        /** @var CanonicalPrimitive|null startParam Search Parameter for interpreting $everything.start */
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
+        public ?CanonicalPrimitive $startParam = null,
+        /** @var CanonicalPrimitive|null endParam Search Parameter for interpreting $everything.end */
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
+        public ?CanonicalPrimitive $endParam = null,
         ?string $id = null,
     ) {
         $subExtensions   = [];
@@ -41,6 +49,12 @@ class AdditionalResourceCompartmentExtension extends Extension implements FHIRCo
         }
         if ($this->documentation !== null) {
             $subExtensions[] = new Extension(url: 'documentation', value: $this->documentation);
+        }
+        if ($this->startParam !== null) {
+            $subExtensions[] = new Extension(url: 'startParam', value: $this->startParam);
+        }
+        if ($this->endParam !== null) {
+            $subExtensions[] = new Extension(url: 'endParam', value: $this->endParam);
         }
         parent::__construct(
             id: $id,
@@ -60,6 +74,8 @@ class AdditionalResourceCompartmentExtension extends Extension implements FHIRCo
         $compartment   = null;
         $param         = [];
         $documentation = null;
+        $startParam    = null;
+        $endParam      = null;
 
         foreach ($subExtensions as $ext) {
             $extUrl = $ext->getExtensionUrl();
@@ -72,12 +88,18 @@ class AdditionalResourceCompartmentExtension extends Extension implements FHIRCo
             if ($extUrl === 'documentation' && $ext->value instanceof StringPrimitive) {
                 $documentation = $ext->value;
             }
+            if ($extUrl === 'startParam' && $ext->value instanceof CanonicalPrimitive) {
+                $startParam = $ext->value;
+            }
+            if ($extUrl === 'endParam' && $ext->value instanceof CanonicalPrimitive) {
+                $endParam = $ext->value;
+            }
         }
 
         if ($compartment === null) {
             throw new \InvalidArgumentException('Required sub-extension "compartment" not found or type mismatch in ' . static::class . '::fromSubExtensions()');
         }
 
-        return new static($compartment, $param, $documentation, $id);
+        return new static($compartment, $param, $documentation, $startParam, $endParam, $id);
     }
 }

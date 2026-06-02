@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 
@@ -17,6 +18,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * @description The classification of the location of the subject in an Encounter.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/subject-locationClassification', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Encounter.location')]
+#[FHIRExtensionContext(type: 'element', expression: 'EncounterHistory.location')]
 class EncounterSubjectLocationClassificationExtension extends Extension
 {
     public function __construct(

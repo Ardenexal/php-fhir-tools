@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\ExampleScenario;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -17,6 +20,18 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description The step represents a single operation invoked on receiver by sender.
  */
 #[FHIRBackboneElement(parentResource: 'ExampleScenario', elementPath: 'ExampleScenario.process.step.operation', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'exs-17',
+    severity: 'error',
+    expression: 'initiator.exists() implies initiator = \'OTHER\' or %resource.actor.where(key=%context.initiator).exists()',
+    human: 'If specified, initiator must be a key of an actor within the ExampleScenario',
+)]
+#[FHIRPathInvariant(
+    key: 'exs-18',
+    severity: 'error',
+    expression: 'receiver.exists() implies receiver = \'OTHER\' or %resource.actor.where(key=%context.receiver).exists()',
+    human: 'If specified, receiver must be a key of an actor within the ExampleScenario',
+)]
 class ExampleScenarioProcessStepOperation extends BackboneElement
 {
     public function __construct(
@@ -27,10 +42,10 @@ class ExampleScenarioProcessStepOperation extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var Coding|null type Kind of action */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/testscript-operation-codes', strength: 'extensible')]
         public ?Coding $type = null,
         /** @var StringPrimitive|string|null title Label for step */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]

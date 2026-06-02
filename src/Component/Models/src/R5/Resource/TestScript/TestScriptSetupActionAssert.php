@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\TestScript;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AssertionDirectionTypeType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AssertionManualCompletionTypeType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AssertionOperatorTypeType;
@@ -23,6 +26,24 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description Evaluates the results of previous operations to determine if the server under test behaves appropriately.
  */
 #[FHIRBackboneElement(parentResource: 'TestScript', elementPath: 'TestScript.setup.action.assert', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'tst-5',
+    severity: 'error',
+    expression: 'extension.exists() or (contentType.count() + expression.count() + headerField.count() + minimumId.count() + navigationLinks.count() + path.count() + requestMethod.count() + resource.count() + responseCode.count() + response.count() + validateProfileId.count() <=1) or (((expression.count() + minimumId.count() <=2) or (expression.count() + validateProfileId.count() <=2)) and (expression.count() + path.count() <=1) and (minimumId.count() + validateProfileId.count() <=1)) or (((path.count() + minimumId.count() <=2) or (path.count() + validateProfileId.count() <=2)) and (expression.count() + path.count() <=1) and (minimumId.count() + validateProfileId.count() <=1))',
+    human: 'Only a single assertion SHALL be present within setup action assert element.',
+)]
+#[FHIRPathInvariant(
+    key: 'tst-10',
+    severity: 'error',
+    expression: 'compareToSourceId.empty() xor (compareToSourceExpression.exists() or compareToSourcePath.exists())',
+    human: 'Setup action assert SHALL contain either compareToSourceId and compareToSourceExpression, compareToSourceId and compareToSourcePath or neither.',
+)]
+#[FHIRPathInvariant(
+    key: 'tst-12',
+    severity: 'error',
+    expression: '(response.empty() and responseCode.empty() and direction = \'request\') or direction.empty() or direction = \'response\'',
+    human: 'Setup action assert response and responseCode SHALL be empty when direction equals request',
+)]
 class TestScriptSetupActionAssert extends BackboneElement
 {
     public function __construct(
@@ -33,7 +54,7 @@ class TestScriptSetupActionAssert extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var StringPrimitive|string|null label Tracking/logging assertion label */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -42,7 +63,7 @@ class TestScriptSetupActionAssert extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $description = null,
         /** @var AssertionDirectionTypeType|null direction response | request */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/assert-direction-codes|5.0.0', strength: 'required')]
         public ?AssertionDirectionTypeType $direction = null,
         /** @var StringPrimitive|string|null compareToSourceId Id of the source fixture to be evaluated */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -54,10 +75,10 @@ class TestScriptSetupActionAssert extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $compareToSourcePath = null,
         /** @var MimeTypesType|null contentType Mime type to compare against the 'Content-Type' header */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/mimetypes|5.0.0', strength: 'required')]
         public ?MimeTypesType $contentType = null,
         /** @var AssertionManualCompletionTypeType|null defaultManualCompletion fail | pass | skip | stop */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/assert-manual-completion-codes|5.0.0', strength: 'required')]
         public ?AssertionManualCompletionTypeType $defaultManualCompletion = null,
         /** @var StringPrimitive|string|null expression The FHIRPath expression to be evaluated */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -72,22 +93,22 @@ class TestScriptSetupActionAssert extends BackboneElement
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $navigationLinks = null,
         /** @var AssertionOperatorTypeType|null operator equals | notEquals | in | notIn | greaterThan | lessThan | empty | notEmpty | contains | notContains | eval | manualEval */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/assert-operator-codes|5.0.0', strength: 'required')]
         public ?AssertionOperatorTypeType $operator = null,
         /** @var StringPrimitive|string|null path XPath or JSONPath expression */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $path = null,
         /** @var TestScriptRequestMethodCodeType|null requestMethod delete | get | options | patch | post | put | head */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/http-operations|5.0.0', strength: 'required')]
         public ?TestScriptRequestMethodCodeType $requestMethod = null,
         /** @var StringPrimitive|string|null requestURL Request URL comparison value */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $requestURL = null,
         /** @var UriPrimitive|null resource Resource type */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/concrete-fhir-types', strength: 'extensible')]
         public ?UriPrimitive $resource = null,
         /** @var AssertionResponseTypesType|null response continue | switchingProtocols | okay | created | accepted | nonAuthoritativeInformation | noContent | resetContent | partialContent | multipleChoices | movedPermanently | found | seeOther | notModified | useProxy | temporaryRedirect | permanentRedirect | badRequest | unauthorized | paymentRequired | forbidden | notFound | methodNotAllowed | notAcceptable | proxyAuthenticationRequired | requestTimeout | conflict | gone | lengthRequired | preconditionFailed | contentTooLarge | uriTooLong | unsupportedMediaType | rangeNotSatisfiable | expectationFailed | misdirectedRequest | unprocessableContent | upgradeRequired | internalServerError | notImplemented | badGateway | serviceUnavailable | gatewayTimeout | httpVersionNotSupported */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/assert-response-code-types|5.0.0', strength: 'required')]
         public ?AssertionResponseTypesType $response = null,
         /** @var StringPrimitive|string|null responseCode HTTP response code to test */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

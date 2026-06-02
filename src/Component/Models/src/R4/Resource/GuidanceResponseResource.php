@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\DataRequirement;
@@ -43,10 +46,15 @@ class GuidanceResponseResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies it\'s meaning or interpretation')]
         public ?UriPrimitive $implicitRules = null,
         /** @var string|null language Language of the resource content */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
+            strength: 'preferred',
+            maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+        )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -58,7 +66,7 @@ class GuidanceResponseResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the resource that contains them')]
         public array $modifierExtension = [],
         /** @var Identifier|null requestIdentifier The identifier of the request associated with this response, if any */
         #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
@@ -101,19 +109,19 @@ class GuidanceResponseResource extends DomainResourceResource
         #[NotBlank]
         public UriPrimitive|CanonicalPrimitive|CodeableConcept|null $module = null,
         /** @var GuidanceResponseStatusType|null status success | data-requested | data-required | in-progress | failure | entered-in-error */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/guidance-response-status|4.0.1', strength: 'required'), FHIRIsModifier(reason: 'This element is labelled as a modifier because it is a status element that contains status entered-in-error which means that the resource should not be treated as valid')]
         public ?GuidanceResponseStatusType $status = null,
         /** @var Reference|null subject Patient the request was performed for */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Patient', 'http://hl7.org/fhir/StructureDefinition/Group'])]
         public ?Reference $subject = null,
         /** @var Reference|null encounter Encounter during which the response was returned */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Encounter'])]
         public ?Reference $encounter = null,
         /** @var DateTimePrimitive|null occurrenceDateTime When the guidance response was processed */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $occurrenceDateTime = null,
         /** @var Reference|null performer Device returning the guidance */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Device'])]
         public ?Reference $performer = null,
         /** @var array<CodeableConcept> reasonCode Why guidance is needed */
         #[FhirProperty(
@@ -130,6 +138,12 @@ class GuidanceResponseResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Condition',
+            'http://hl7.org/fhir/StructureDefinition/Observation',
+            'http://hl7.org/fhir/StructureDefinition/DiagnosticReport',
+            'http://hl7.org/fhir/StructureDefinition/DocumentReference',
+        ])]
         public array $reasonReference = [],
         /** @var array<Annotation> note Additional notes about the response */
         #[FhirProperty(
@@ -146,12 +160,17 @@ class GuidanceResponseResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/OperationOutcome'])]
         public array $evaluationMessage = [],
         /** @var Reference|null outputParameters The output parameters of the evaluation, if any */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Parameters'])]
         public ?Reference $outputParameters = null,
         /** @var Reference|null result Proposed actions, if any */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/CarePlan',
+            'http://hl7.org/fhir/StructureDefinition/RequestGroup',
+        ])]
         public ?Reference $result = null,
         /** @var array<DataRequirement> dataRequirement Additional required data */
         #[FhirProperty(

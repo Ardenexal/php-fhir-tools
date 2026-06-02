@@ -13,7 +13,7 @@ use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRInstant;
 use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRTime;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
-use Ardenexal\FHIRTools\Component\Serialization\FHIRIGTypeRegistry;
+use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadata;
@@ -410,7 +410,13 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         if (!$meta->isArray) {
             $primitiveClass = $this->getFirstNonBuiltinTypeFromProperty($property);
             if ($primitiveClass === null) {
-                return $value;
+                // XML encodes primitive values as attributes: <lang value="x"/> → ['@value' => 'x'].
+                // Builtin PHP types can't hold extensions, so extract the scalar or return null.
+                if (is_array($value) && isset($value['@value'])) {
+                    return $value['@value'];
+                }
+
+                return is_array($value) ? null : $value;
             }
 
             return $this->denormalizer->denormalize($value, $primitiveClass, $format, $context);

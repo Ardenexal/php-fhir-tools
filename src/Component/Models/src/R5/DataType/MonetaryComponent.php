@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,7 +27,7 @@ class MonetaryComponent extends DataType
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var PriceComponentTypeType|null type base | surcharge | deduction | discount | tax | informational */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/price-component-type|5.0.0', strength: 'required')]
         public ?PriceComponentTypeType $type = null,
         /** @var CodeableConcept|null code Codes may be used to differentiate between kinds of taxes, surcharges, discounts etc. */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]

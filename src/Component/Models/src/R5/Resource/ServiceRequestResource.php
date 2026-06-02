@@ -6,6 +6,10 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
@@ -43,6 +47,18 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     url: 'http://hl7.org/fhir/StructureDefinition/ServiceRequest',
     fhirVersion: 'R5',
 )]
+#[FHIRPathInvariant(
+    key: 'bdystr-1',
+    severity: 'error',
+    expression: 'bodySite.exists() implies bodyStructure.empty()',
+    human: 'bodyStructure SHALL only be present if bodySite is not present',
+)]
+#[FHIRPathInvariant(
+    key: 'prr-1',
+    severity: 'error',
+    expression: 'orderDetail.empty() or code.exists()',
+    human: 'orderDetail SHALL only be present if code is present',
+)]
 class ServiceRequestResource extends DomainResourceResource
 {
     public function __construct(
@@ -53,10 +69,10 @@ class ServiceRequestResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -68,7 +84,7 @@ class ServiceRequestResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the resource that contains them')]
         public array $modifierExtension = [],
         /** @var array<Identifier> identifier Identifiers assigned to this order */
         #[FhirProperty(
@@ -80,6 +96,10 @@ class ServiceRequestResource extends DomainResourceResource
         public array $identifier = [],
         /** @var array<CanonicalPrimitive> instantiatesCanonical Instantiates FHIR protocol or definition */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true)]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/ActivityDefinition',
+            'http://hl7.org/fhir/StructureDefinition/PlanDefinition',
+        ])]
         public array $instantiatesCanonical = [],
         /** @var array<UriPrimitive> instantiatesUri Instantiates external protocol or definition */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isArray: true)]
@@ -91,6 +111,11 @@ class ServiceRequestResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/CarePlan',
+            'http://hl7.org/fhir/StructureDefinition/ServiceRequest',
+            'http://hl7.org/fhir/StructureDefinition/MedicationRequest',
+        ])]
         public array $basedOn = [],
         /** @var array<Reference> replaces What request replaces */
         #[FhirProperty(
@@ -99,15 +124,16 @@ class ServiceRequestResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ServiceRequest'])]
         public array $replaces = [],
         /** @var Identifier|null requisition Composite Request ID */
         #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]
         public ?Identifier $requisition = null,
         /** @var RequestStatusType|null status draft | active | on-hold | revoked | completed | entered-in-error | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/request-status|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'This element is labeled as a modifier because it is a status element that contains status entered-in-error which means that the resource should not be treated as valid')]
         public ?RequestStatusType $status = null,
         /** @var RequestIntentType|null intent proposal | plan | directive | order + */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/request-intent|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'This element changes the interpretation of all descriptive attributes. For example "the time the request is recommended to occur" vs. "the time the request is authorized to occur" or "who is recommended to perform the request" vs. "who is authorized to perform the request')]
         public ?RequestIntentType $intent = null,
         /** @var array<CodeableConcept> category Classification of service */
         #[FhirProperty(
@@ -118,13 +144,17 @@ class ServiceRequestResource extends DomainResourceResource
         )]
         public array $category = [],
         /** @var RequestPriorityType|null priority routine | urgent | asap | stat */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/request-priority|5.0.0', strength: 'required')]
         public ?RequestPriorityType $priority = null,
         /** @var bool|null doNotPerform True if service/procedure should not be performed */
-        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
+        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar'), FHIRIsModifier(reason: 'If true this element negates the specified action. For Example,  instead of a request for a procedure, it is a request for the procedure to not occur.')]
         public ?bool $doNotPerform = null,
         /** @var CodeableReference|null code What is being requested/ordered */
         #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex')]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/ActivityDefinition',
+            'http://hl7.org/fhir/StructureDefinition/PlanDefinition',
+        ])]
         public ?CodeableReference $code = null,
         /** @var array<ServiceRequestOrderDetail> orderDetail Additional order information */
         #[FhirProperty(
@@ -162,7 +192,14 @@ class ServiceRequestResource extends DomainResourceResource
         )]
         public Quantity|Ratio|Range|null $quantity = null,
         /** @var Reference|null subject Individual or Entity the service is ordered for */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true)]
+        #[NotBlank]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Patient',
+            'http://hl7.org/fhir/StructureDefinition/Group',
+            'http://hl7.org/fhir/StructureDefinition/Location',
+            'http://hl7.org/fhir/StructureDefinition/Device',
+        ])]
         public ?Reference $subject = null,
         /** @var array<Reference> focus What the service request is about, when it is not about the subject of record */
         #[FhirProperty(
@@ -171,9 +208,10 @@ class ServiceRequestResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public array $focus = [],
         /** @var Reference|null encounter Encounter in which the request was created */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Encounter'])]
         public ?Reference $encounter = null,
         /** @var DateTimePrimitive|Period|Timing|null occurrence When service should occur */
         #[FhirProperty(
@@ -223,6 +261,14 @@ class ServiceRequestResource extends DomainResourceResource
         public ?DateTimePrimitive $authoredOn = null,
         /** @var Reference|null requester Who/what is requesting service */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Practitioner',
+            'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
+            'http://hl7.org/fhir/StructureDefinition/Organization',
+            'http://hl7.org/fhir/StructureDefinition/Patient',
+            'http://hl7.org/fhir/StructureDefinition/RelatedPerson',
+            'http://hl7.org/fhir/StructureDefinition/Device',
+        ])]
         public ?Reference $requester = null,
         /** @var CodeableConcept|null performerType Performer role */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
@@ -234,6 +280,16 @@ class ServiceRequestResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Practitioner',
+            'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
+            'http://hl7.org/fhir/StructureDefinition/Organization',
+            'http://hl7.org/fhir/StructureDefinition/CareTeam',
+            'http://hl7.org/fhir/StructureDefinition/HealthcareService',
+            'http://hl7.org/fhir/StructureDefinition/Patient',
+            'http://hl7.org/fhir/StructureDefinition/Device',
+            'http://hl7.org/fhir/StructureDefinition/RelatedPerson',
+        ])]
         public array $performer = [],
         /** @var array<CodeableReference> location Requested location */
         #[FhirProperty(
@@ -242,6 +298,7 @@ class ServiceRequestResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
         public array $location = [],
         /** @var array<CodeableReference> reason Explanation/Justification for procedure or service */
         #[FhirProperty(
@@ -250,6 +307,13 @@ class ServiceRequestResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Condition',
+            'http://hl7.org/fhir/StructureDefinition/Observation',
+            'http://hl7.org/fhir/StructureDefinition/DiagnosticReport',
+            'http://hl7.org/fhir/StructureDefinition/DocumentReference',
+            'http://hl7.org/fhir/StructureDefinition/DetectedIssue',
+        ])]
         public array $reason = [],
         /** @var array<Reference> insurance Associated insurance coverage */
         #[FhirProperty(
@@ -258,6 +322,10 @@ class ServiceRequestResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Coverage',
+            'http://hl7.org/fhir/StructureDefinition/ClaimResponse',
+        ])]
         public array $insurance = [],
         /** @var array<CodeableReference> supportingInfo Additional clinical information */
         #[FhirProperty(
@@ -266,6 +334,7 @@ class ServiceRequestResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public array $supportingInfo = [],
         /** @var array<Reference> specimen Procedure Samples */
         #[FhirProperty(
@@ -274,6 +343,7 @@ class ServiceRequestResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Specimen'])]
         public array $specimen = [],
         /** @var array<CodeableConcept> bodySite Coded location on Body */
         #[FhirProperty(
@@ -284,7 +354,7 @@ class ServiceRequestResource extends DomainResourceResource
         )]
         public array $bodySite = [],
         /** @var Reference|null bodyStructure BodyStructure-based location on the body */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/BodyStructure'])]
         public ?Reference $bodyStructure = null,
         /** @var array<Annotation> note Comments */
         #[FhirProperty(
@@ -309,6 +379,7 @@ class ServiceRequestResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Provenance'])]
         public array $relevantHistory = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

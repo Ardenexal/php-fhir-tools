@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
  * @description Defines a knowledge capability afforded by this knowledge artifact: Shareable, Publishable, Computable, and Executable, a scheme for organizing categories of functionality based on the content management lifecycle. See the Canonical Resource Management Infrastructure implementation guide for more information on these capability categories.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-knowledgeCapability', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'DomainResource')]
 class CQFKnowledgeCapabilityExtension extends Extension
 {
     public function __construct(

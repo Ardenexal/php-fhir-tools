@@ -7,6 +7,8 @@ namespace Ardenexal\FHIRTools\Component\CodeGeneration\Generator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRContextInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;
@@ -113,6 +115,25 @@ class FHIRExtensionGenerator
             'url'         => $url,
             'fhirVersion' => $version,
         ]);
+
+        foreach ($structureDefinition['context'] ?? [] as $ctx) {
+            if (!is_array($ctx) || !isset($ctx['type'], $ctx['expression'])) {
+                continue;
+            }
+            $class->addAttribute(FHIRExtensionContext::class, [
+                'type'       => (string) $ctx['type'],
+                'expression' => (string) $ctx['expression'],
+            ]);
+        }
+
+        foreach ($structureDefinition['contextInvariant'] ?? [] as $invariant) {
+            if (!is_string($invariant) || $invariant === '') {
+                continue;
+            }
+            $class->addAttribute(FHIRContextInvariant::class, [
+                'expression' => $invariant,
+            ]);
+        }
 
         if (isset($structureDefinition['publisher'])) {
             $class->addComment('@author ' . $structureDefinition['publisher']);

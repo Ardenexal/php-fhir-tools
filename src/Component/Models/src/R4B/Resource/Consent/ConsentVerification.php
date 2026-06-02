@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\Consent;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
@@ -26,13 +28,17 @@ class ConsentVerification extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var bool|null verified Has been verified */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotBlank]
         public ?bool $verified = null,
         /** @var Reference|null verifiedWith Person who verified */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Patient',
+            'http://hl7.org/fhir/StructureDefinition/RelatedPerson',
+        ])]
         public ?Reference $verifiedWith = null,
         /** @var DateTimePrimitive|null verificationDate When consent verified */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]

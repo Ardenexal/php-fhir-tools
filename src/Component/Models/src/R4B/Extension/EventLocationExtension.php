@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 
@@ -17,6 +18,12 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
  * @description The principal physical location where the event was performed.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/event-location', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'Observation')]
+#[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport')]
+#[FHIRExtensionContext(type: 'element', expression: 'DocumentReference')]
+#[FHIRExtensionContext(type: 'element', expression: 'MedicationDispense')]
+#[FHIRExtensionContext(type: 'element', expression: 'MedicationAdministration')]
+#[FHIRExtensionContext(type: 'element', expression: 'SupplyDelivery')]
 class EventLocationExtension extends Extension
 {
     public function __construct(

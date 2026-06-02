@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\NutritionOrder;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference;
@@ -28,10 +31,10 @@ class NutritionOrderEnteralFormula extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableReference|null baseFormulaType Type of enteral or infant formula */
-        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/NutritionProduct'])]
         public ?CodeableReference $baseFormulaType = null,
         /** @var StringPrimitive|string|null baseFormulaProductName Product or brand name of the enteral or infant formula */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -43,6 +46,7 @@ class NutritionOrderEnteralFormula extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/DeviceDefinition'])]
         public array $deliveryDevice = [],
         /** @var array<NutritionOrderEnteralFormulaAdditive> additive Components to add to the feeding */
         #[FhirProperty(
@@ -56,7 +60,7 @@ class NutritionOrderEnteralFormula extends BackboneElement
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
         public ?Quantity $caloricDensity = null,
         /** @var CodeableConcept|null routeOfAdministration How the formula should enter the patient's gastrointestinal tract */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/enteral-route', strength: 'extensible')]
         public ?CodeableConcept $routeOfAdministration = null,
         /** @var array<NutritionOrderEnteralFormulaAdministration> administration Formula feeding instruction as structured data */
         #[FhirProperty(

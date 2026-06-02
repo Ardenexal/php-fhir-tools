@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 
@@ -17,6 +18,10 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
  * @description The time of day that the Patient/Person/RelatedPerson/Practitioner was born. This includes the date to ensure that the timezone information can be communicated effectively.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-birthTime', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Patient.birthDate')]
+#[FHIRExtensionContext(type: 'element', expression: 'Person.birthDate')]
+#[FHIRExtensionContext(type: 'element', expression: 'RelatedPerson.birthDate')]
+#[FHIRExtensionContext(type: 'element', expression: 'Practitioner.birthDate')]
 class PatBirthTimeExtension extends Extension
 {
     public function __construct(

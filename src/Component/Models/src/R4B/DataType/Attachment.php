@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\Base64BinaryPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
@@ -20,6 +22,12 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UrlPrimitive;
  * @description For referring to data content defined in other formats.
  */
 #[FHIRComplexType(typeName: 'Attachment', fhirVersion: 'R4B')]
+#[FHIRPathInvariant(
+    key: 'att-1',
+    severity: 'error',
+    expression: 'data.empty() or contentType.exists()',
+    human: 'If the Attachment has data, it SHALL have a contentType',
+)]
 class Attachment extends Element
 {
     public function __construct(
@@ -30,10 +38,15 @@ class Attachment extends Element
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var MimeTypesType|null contentType Mime type of the content, with charset etc. */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/mimetypes|4.3.0', strength: 'required')]
         public ?MimeTypesType $contentType = null,
         /** @var string|null language Human language of the content (BCP-47) */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
+            strength: 'preferred',
+            maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+        )]
         public ?string $language = null,
         /** @var Base64BinaryPrimitive|null data Data inline, base64ed */
         #[FhirProperty(fhirType: 'base64Binary', propertyKind: 'primitive')]

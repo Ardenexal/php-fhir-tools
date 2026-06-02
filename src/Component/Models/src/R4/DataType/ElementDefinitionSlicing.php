@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -13,6 +15,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description Indicates that the element is sliced into a set of alternative definitions (i.e. in a structure definition, there are multiple different constraints on a single element in the base resource). Slicing can be used in any resource that has cardinality ..* on the base resource, or any resource with a choice of types. The set of slices is any elements that come after this in the element sequence that have the same path, until a shorter path occurs (the shorter path terminates the set).
  */
 #[FHIRComplexType(typeName: 'ElementDefinition.slicing', fhirVersion: 'R4')]
+#[FHIRPathInvariant(
+    key: 'eld-1',
+    severity: 'error',
+    expression: 'discriminator.exists() or description.exists()',
+    human: 'If there are no discriminators, there must be a definition',
+)]
 class ElementDefinitionSlicing extends Element
 {
     public function __construct(
@@ -37,7 +45,7 @@ class ElementDefinitionSlicing extends Element
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $ordered = null,
         /** @var SlicingRulesType|null rules closed | open | openAtEnd */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/resource-slicing-rules|4.0.1', strength: 'required')]
         public ?SlicingRulesType $rules = null,
     ) {
         parent::__construct($id, $extension);

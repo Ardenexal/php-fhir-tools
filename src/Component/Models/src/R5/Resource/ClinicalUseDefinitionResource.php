@@ -6,6 +6,10 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\ClinicalUseDefinitionTypeType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
@@ -36,6 +40,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     url: 'http://hl7.org/fhir/StructureDefinition/ClinicalUseDefinition',
     fhirVersion: 'R5',
 )]
+#[FHIRPathInvariant(
+    key: 'cud-1',
+    severity: 'error',
+    expression: '(ClinicalUseDefinition.indication.count() + ClinicalUseDefinition.contraindication.count() + ClinicalUseDefinition.interaction.count() + ClinicalUseDefinition.undesirableEffect.count() + ClinicalUseDefinition.warning.count())  < 2',
+    human: 'Indication, Contraindication, Interaction, UndesirableEffect and Warning cannot be used in the same instance',
+)]
 class ClinicalUseDefinitionResource extends DomainResourceResource
 {
     public function __construct(
@@ -46,10 +56,10 @@ class ClinicalUseDefinitionResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -61,7 +71,7 @@ class ClinicalUseDefinitionResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the resource that contains them')]
         public array $modifierExtension = [],
         /** @var array<Identifier> identifier Business identifier for this issue */
         #[FhirProperty(
@@ -72,7 +82,7 @@ class ClinicalUseDefinitionResource extends DomainResourceResource
         )]
         public array $identifier = [],
         /** @var ClinicalUseDefinitionTypeType|null type indication | contraindication | interaction | undesirable-effect | warning */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/clinical-use-definition-type|5.0.0', strength: 'required')]
         public ?ClinicalUseDefinitionTypeType $type = null,
         /** @var array<CodeableConcept> category A categorisation of the issue, primarily for dividing warnings into subject heading areas such as "Pregnancy", "Overdose" */
         #[FhirProperty(
@@ -81,6 +91,7 @@ class ClinicalUseDefinitionResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/clinical-use-definition-category', strength: 'preferred')]
         public array $category = [],
         /** @var array<Reference> subject The medication, product, substance, device, procedure etc. for which this is an indication */
         #[FhirProperty(
@@ -89,9 +100,20 @@ class ClinicalUseDefinitionResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/MedicinalProductDefinition',
+            'http://hl7.org/fhir/StructureDefinition/Medication',
+            'http://hl7.org/fhir/StructureDefinition/ActivityDefinition',
+            'http://hl7.org/fhir/StructureDefinition/PlanDefinition',
+            'http://hl7.org/fhir/StructureDefinition/Device',
+            'http://hl7.org/fhir/StructureDefinition/DeviceDefinition',
+            'http://hl7.org/fhir/StructureDefinition/Substance',
+            'http://hl7.org/fhir/StructureDefinition/NutritionProduct',
+            'http://hl7.org/fhir/StructureDefinition/BiologicallyDerivedProduct',
+        ])]
         public array $subject = [],
         /** @var CodeableConcept|null status Whether this is a current issue or one that has been retired etc */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status', strength: 'preferred')]
         public ?CodeableConcept $status = null,
         /** @var ClinicalUseDefinitionContraindication|null contraindication Specifics for when this is a contraindication */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
@@ -109,9 +131,10 @@ class ClinicalUseDefinitionResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Group'])]
         public array $population = [],
         /** @var array<CanonicalPrimitive> library Logic used by the clinical use definition */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Library'])]
         public array $library = [],
         /** @var ClinicalUseDefinitionUndesirableEffect|null undesirableEffect A possible negative outcome from the use of this treatment */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]

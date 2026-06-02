@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding;
@@ -25,6 +28,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\NamingSystem\NamingSystemUniqueId;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -35,6 +39,30 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A curated namespace that issues unique symbols within that namespace for the identification of concepts, people, devices, etc.  Represents a "System" used within the Identifier and Coding data types.
  */
 #[FhirResource(type: 'NamingSystem', version: '5.0.0', url: 'http://hl7.org/fhir/StructureDefinition/NamingSystem', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'cnl-0',
+    severity: 'warning',
+    expression: 'name.exists() implies name.matches(\'^[A-Z]([A-Za-z0-9_]){1,254}$\')',
+    human: 'Name should be usable as an identifier for the module by machine processing applications such as code generation',
+)]
+#[FHIRPathInvariant(
+    key: 'nsd-1',
+    severity: 'error',
+    expression: 'kind != \'root\' or uniqueId.all(type != \'uuid\')',
+    human: 'Root systems cannot have uuid identifiers',
+)]
+#[FHIRPathInvariant(
+    key: 'nsd-2',
+    severity: 'error',
+    expression: 'uniqueId.where(preferred = true).select(type).isDistinct()',
+    human: 'Can\'t have more than one preferred identifier for a type',
+)]
+#[FHIRPathInvariant(
+    key: 'nsd-3',
+    severity: 'error',
+    expression: 'uniqueId.where(authoritative = \'true\').select(type.toString() & period.start.toString() & period.end.toString()).isDistinct()',
+    human: 'Can\'t have more than one authoritative identifier for a type/period combination (only one authoritative identifier allowed at any given point of time)',
+)]
 class NamingSystemResource extends DomainResourceResource
 {
     public function __construct(
@@ -45,10 +73,10 @@ class NamingSystemResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -60,7 +88,7 @@ class NamingSystemResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the resource that contains them')]
         public array $modifierExtension = [],
         /** @var UriPrimitive|null url Canonical identifier for this naming system, represented as a URI (globally unique) */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
@@ -96,6 +124,7 @@ class NamingSystemResource extends DomainResourceResource
                 ],
             ],
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/version-algorithm', strength: 'extensible')]
         public StringPrimitive|string|Coding|null $versionAlgorithm = null,
         /** @var StringPrimitive|string|null name Name for this naming system (computer friendly) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
@@ -104,10 +133,10 @@ class NamingSystemResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $title = null,
         /** @var PublicationStatusType|null status draft | active | retired | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because applications should not use a retired {{title}} without due consideration')]
         public ?PublicationStatusType $status = null,
         /** @var NamingSystemTypeType|null kind codesystem | identifier | root */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/namingsystem-type|5.0.0', strength: 'required')]
         public ?NamingSystemTypeType $kind = null,
         /** @var bool|null experimental For testing purposes, not real usage */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
@@ -130,7 +159,7 @@ class NamingSystemResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $responsible = null,
         /** @var CodeableConcept|null type e.g. driver,  provider,  patient, bank etc */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/namingsystem-identifier-system-type', strength: 'preferred')]
         public ?CodeableConcept $type = null,
         /** @var MarkdownPrimitive|null description Natural language description of the naming system */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -150,6 +179,7 @@ class NamingSystemResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/jurisdiction', strength: 'extensible')]
         public array $jurisdiction = [],
         /** @var MarkdownPrimitive|null purpose Why this naming system is defined */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -228,6 +258,7 @@ class NamingSystemResource extends DomainResourceResource
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\NamingSystem\NamingSystemUniqueId',
         )]
+        #[Count(min: 1)]
         public array $uniqueId = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

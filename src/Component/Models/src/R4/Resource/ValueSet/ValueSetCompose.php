@@ -6,9 +6,11 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\ValueSet;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive;
+use Symfony\Component\Validator\Constraints\Count;
 
 /**
  * @description A set of criteria that define the contents of the value set by including or excluding codes selected from the specified code system(s) that the value set draws from. This is also known as the Content Logical Definition (CLD).
@@ -24,7 +26,7 @@ class ValueSetCompose extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var DatePrimitive|null lockedDate Fixed date for references with no specified version (transitive) */
         #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
@@ -40,6 +42,7 @@ class ValueSetCompose extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ValueSet\ValueSetComposeInclude',
         )]
+        #[Count(min: 1)]
         public array $include = [],
         /** @var array<ValueSetComposeInclude> exclude Explicitly exclude codes from a code system or other value sets */
         #[FhirProperty(

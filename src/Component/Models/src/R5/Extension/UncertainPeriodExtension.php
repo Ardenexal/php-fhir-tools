@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
 
@@ -17,6 +18,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
  * @description Used to express an uncertain date(+time) value by specifying an allowed or observed upper and lower bound.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/uncertainPeriod', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'date')]
+#[FHIRExtensionContext(type: 'element', expression: 'dateTime')]
 class UncertainPeriodExtension extends Extension
 {
     public function __construct(

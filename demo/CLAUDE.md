@@ -21,8 +21,10 @@ Inject by type hint — all autowired:
 
 - `Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService` — evaluate/validate FHIRPath expressions
 - `Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService` — serialize/deserialize FHIR JSON/XML
+- `Ardenexal\FHIRTools\Component\Serialization\FHIRVersionedSerializationServiceLocator` — get version-specific serializer at runtime
 - `Ardenexal\FHIRTools\Component\Serialization\Validator\FHIRValidator` — validate FHIR objects
 - `Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface` — extract resource metadata
+- `Ardenexal\FHIRTools\Component\Validation\FHIRValidationServiceInterface` — run constraint validation, returns `FHIRValidationReport`
 
 ## FHIR Config
 

@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\MedicationRequest;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
@@ -30,7 +32,7 @@ class MedicationRequestDispenseRequest extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var MedicationRequestDispenseRequestInitialFill|null initialFill First fill details */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
@@ -51,7 +53,7 @@ class MedicationRequestDispenseRequest extends BackboneElement
         #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex')]
         public ?Duration $expectedSupplyDuration = null,
         /** @var Reference|null dispenser Intended performer of dispense */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $dispenser = null,
         /** @var array<Annotation> dispenserInstruction Additional information for the dispenser */
         #[FhirProperty(

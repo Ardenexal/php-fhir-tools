@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\TestReport;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 
@@ -13,6 +15,12 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * @description Action would contain either an operation or an assertion.
  */
 #[FHIRBackboneElement(parentResource: 'TestReport', elementPath: 'TestReport.test.action', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'inv-2',
+    severity: 'error',
+    expression: 'operation.exists() xor assert.exists()',
+    human: 'Test action SHALL contain either an operation or assert but not both.',
+)]
 class TestReportTestAction extends BackboneElement
 {
     public function __construct(
@@ -23,7 +31,7 @@ class TestReportTestAction extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var TestReportSetupActionOperation|null operation The operation performed */
         #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex')]

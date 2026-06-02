@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 
@@ -17,6 +18,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
  * @description Points to a preceding event within a workflow that was a prerequisite for or provides other justification for the current action.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-followOnOf', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'Task')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceRequest')]
+#[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest')]
+#[FHIRExtensionContext(type: 'element', expression: 'Procedure')]
+#[FHIRExtensionContext(type: 'element', expression: 'Encounter')]
 class FollowOnOfExtension extends Extension
 {
     public function __construct(

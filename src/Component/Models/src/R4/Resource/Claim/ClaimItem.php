@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\Claim;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Address;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
@@ -32,7 +34,7 @@ class ClaimItem extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var PositiveIntPrimitive|null sequence Item instance identifier */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isRequired: true), NotBlank]
@@ -121,6 +123,7 @@ class ClaimItem extends BackboneElement
                 ],
             ],
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
         public CodeableConcept|Address|Reference|null $location = null,
         /** @var Quantity|null quantity Count of products or services */
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
@@ -141,6 +144,7 @@ class ClaimItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Device'])]
         public array $udi = [],
         /** @var CodeableConcept|null bodySite Anatomical location */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
@@ -160,6 +164,7 @@ class ClaimItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Encounter'])]
         public array $encounter = [],
         /** @var array<ClaimItemDetail> detail Product or service provided */
         #[FhirProperty(

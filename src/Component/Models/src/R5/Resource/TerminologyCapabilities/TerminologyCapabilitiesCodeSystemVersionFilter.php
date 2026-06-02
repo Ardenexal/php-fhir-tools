@@ -6,9 +6,11 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\TerminologyCapabiliti
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -29,13 +31,13 @@ class TerminologyCapabilitiesCodeSystemVersionFilter extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodePrimitive|null code Code of the property supported */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?CodePrimitive $code = null,
         /** @var array<CodePrimitive> op Operations supported for the property */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true, isRequired: true)]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true, isRequired: true), Count(min: 1)]
         public array $op = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

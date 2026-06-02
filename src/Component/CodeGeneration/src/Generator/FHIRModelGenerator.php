@@ -11,13 +11,30 @@ use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\EnumType;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpNamespace;
+use Symfony\Component\Validator\Constraints\Count;
+use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Range;
+use Symfony\Component\Validator\Constraints\Regex;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Parser\ObligationExtensionParser;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValue;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRMustSupport;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRObligation;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRObligationConstraint;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValue;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRQuantityRange;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTemporalRange;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
+use Ardenexal\FHIRTools\Component\Metadata\ObligationCode;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Traits\FHIRExtensionsTrait;
 
@@ -329,6 +346,28 @@ class FHIRModelGenerator implements GeneratorInterface
             $class->addComment('@description ' . $structureDefinition['snapshot']['element'][0]['definition']);
         }
 
+        // Emit FHIRPathInvariant attributes from root element constraints.
+        // Invariants with only an XPath expression (no `expression` field) are skipped.
+        // Inherited invariants (source ≠ current SD URL) are skipped to avoid double-firing
+        // because the parent PHP class already carries them.
+        $sdUrl = $structureDefinition['url'];
+        foreach ($structureDefinition['snapshot']['element'][0]['constraint'] ?? [] as $constraint) {
+            $expression = $constraint['expression'] ?? '';
+            if ($expression === '') {
+                continue;
+            }
+            $constraintSource = $constraint['source'] ?? null;
+            if ($constraintSource !== null && $constraintSource !== $sdUrl) {
+                continue;
+            }
+            $class->addAttribute(FHIRPathInvariant::class, [
+                'key'        => $constraint['key'],
+                'severity'   => $constraint['severity'],
+                'expression' => $expression,
+                'human'      => $constraint['human'],
+            ]);
+        }
+
         // Inject FHIRExtensionsTrait into Element and DomainResource base classes so that all
         // data types, complex types, backbone elements, and resources inherit extension helpers.
         if (in_array($structureDefinition['name'], ['Element', 'DomainResource'], true)) {
@@ -361,7 +400,7 @@ class FHIRModelGenerator implements GeneratorInterface
                 ) {
                     $parentParameters[] = $this->convertToMethodName($element['base']['path']);
                 }
-                $this->createForElement($class, $property['_element'], $property['_properties'], $version, $builderContext);
+                $this->createForElement($class, $property['_element'], $property['_properties'], $version, $builderContext, $sdUrl);
             }
         }
 
@@ -377,7 +416,7 @@ class FHIRModelGenerator implements GeneratorInterface
      *
      * @return ClassType
      */
-    public function createForElement(ClassType $classType, array $classElement, array $propertyElements, string $version, BuilderContextInterface $builderContext): ClassType
+    public function createForElement(ClassType $classType, array $classElement, array $propertyElements, string $version, BuilderContextInterface $builderContext, ?string $sdUrl = null): ClassType
     {
         $constructor      = $classType->getMethod('__construct');
         $parentParameters = [];
@@ -485,9 +524,27 @@ class FHIRModelGenerator implements GeneratorInterface
                 }
                 $this->addElementAsProperty($element, $constructor, $version, $builderContext, $classNamespace);
 
+                // Emit FHIRPathInvariant attributes on child classes from their element constraints.
+                foreach ($element['constraint'] ?? [] as $constraint) {
+                    $expression = $constraint['expression'] ?? '';
+                    if ($expression === '') {
+                        continue;
+                    }
+                    $constraintSource = $constraint['source'] ?? null;
+                    if ($constraintSource !== null && $constraintSource !== $sdUrl) {
+                        continue;
+                    }
+                    $childClass->addAttribute(FHIRPathInvariant::class, [
+                        'key'        => $constraint['key'],
+                        'severity'   => $constraint['severity'],
+                        'expression' => $expression,
+                        'human'      => $constraint['human'],
+                    ]);
+                }
+
                 if (isset($propertyElement['_properties'])) {
                     // Recursively process nested elements for ValueSet dependencies
-                    $this->createForElement($childClass, $element, $propertyElement['_properties'], $version, $builderContext);
+                    $this->createForElement($childClass, $element, $propertyElement['_properties'], $version, $builderContext, $sdUrl);
                 }
             }
         }
@@ -723,21 +780,229 @@ class FHIRModelGenerator implements GeneratorInterface
                 } else {
                     $typeHint = count($docblockTypes) > 0 ? implode('|', array_unique($docblockTypes)) : 'mixed';
                 }
-                $method->addPromotedParameter($parameterName, [])
+                $param = $method->addPromotedParameter($parameterName, [])
                     ->setNullable(false)
                     ->setType('array')
-                    ->addComment('@var  array<' . $typeHint . '> ' . $parameterName . ' ' . $shortDescription)
-                    ->addAttribute(FhirProperty::class, $attributeArgs);
+                    ->addComment('@var  array<' . $typeHint . '> ' . $parameterName . ' ' . $shortDescription);
+                $param->addAttribute(FhirProperty::class, $attributeArgs);
             } else {
-                $parameter = $method->addPromotedParameter($parameterName, null)
+                $param = $method->addPromotedParameter($parameterName, null)
                     ->setType(implode('|', $types))
                     ->addComment('@var null|' . implode('|', array_unique($docblockTypes)) . ' ' . $parameterName . ' ' . $shortDescription);
-                $parameter->addAttribute(FhirProperty::class, $attributeArgs);
+                $param->addAttribute(FhirProperty::class, $attributeArgs);
                 if ($isNullable === false) {
-                    $parameter->addAttribute(NotBlank::class);
+                    $param->addAttribute(NotBlank::class);
                 }
             }
+
+            // contentReference elements have their value constraints on the referenced type —
+            // skip all value constraint emission here.
+            if (ElementDefinitionHelper::hasContentReference($element)) {
+                return;
+            }
+
+            // Count constraints for array properties with bounded cardinality.
+            if ($isArray) {
+                $countMin  = (int) ($element['min'] ?? 0);
+                $countMax  = $element['max'] ?? '*';
+                $countArgs = [];
+                if ($countMin > 0) {
+                    $countArgs['min'] = $countMin;
+                }
+                if ($countMax !== '*' && is_numeric($countMax)) {
+                    $countArgs['max'] = (int) $countMax;
+                }
+                if ($countArgs !== []) {
+                    $param->addAttribute(Count::class, $countArgs);
+                }
+            }
+
+            // Length constraint from maxLength field.
+            if (isset($element['maxLength'])) {
+                $param->addAttribute(Length::class, ['max' => (int) $element['maxLength']]);
+            }
+
+            // Range constraint from minValue[x] / maxValue[x] polymorphic fields.
+            // Temporal types (date, dateTime, instant, time) use FHIRTemporalRange;
+            // Quantity types use FHIRQuantityRange;
+            // numeric types (decimal, integer, etc.) use Symfony's built-in Range.
+            $rangeMin  = ElementDefinitionHelper::extractPolymorphicField($element, 'minValue');
+            $rangeMax  = ElementDefinitionHelper::extractPolymorphicField($element, 'maxValue');
+            if ($rangeMin !== null || $rangeMax !== null) {
+                $temporalSuffixes = ['Date', 'DateTime', 'Instant', 'Time'];
+                $minSuffix        = $rangeMin !== null ? $rangeMin['type'] : null;
+                $maxSuffix        = $rangeMax !== null ? $rangeMax['type'] : null;
+                $suffix           = $minSuffix ?? $maxSuffix;
+
+                if ($suffix !== null && in_array($suffix, $temporalSuffixes, true)) {
+                    $temporalTypeMap = [
+                        'Date'     => 'date',
+                        'DateTime' => 'dateTime',
+                        'Instant'  => 'instant',
+                        'Time'     => 'time',
+                    ];
+                    $param->addAttribute(FHIRTemporalRange::class, [
+                        'minValue'     => $rangeMin !== null ? (string) $rangeMin['value'] : null,
+                        'maxValue'     => $rangeMax !== null ? (string) $rangeMax['value'] : null,
+                        'temporalType' => $temporalTypeMap[$suffix],
+                    ]);
+                } elseif ($suffix === 'Quantity') {
+                    $minBound = null;
+                    if ($rangeMin !== null && is_array($rangeMin['value'])) {
+                        $minBound = [
+                            'value'  => (float) ($rangeMin['value']['value'] ?? 0.0),
+                            'system' => $rangeMin['value']['system'] ?? null,
+                            'code'   => $rangeMin['value']['code']   ?? null,
+                        ];
+                    }
+                    $maxBound = null;
+                    if ($rangeMax !== null && is_array($rangeMax['value'])) {
+                        $maxBound = [
+                            'value'  => (float) ($rangeMax['value']['value'] ?? 0.0),
+                            'system' => $rangeMax['value']['system'] ?? null,
+                            'code'   => $rangeMax['value']['code']   ?? null,
+                        ];
+                    }
+                    if ($minBound !== null || $maxBound !== null) {
+                        $param->addAttribute(FHIRQuantityRange::class, [
+                            'minValue' => $minBound,
+                            'maxValue' => $maxBound,
+                        ]);
+                    }
+                } else {
+                    $rangeArgs = [];
+                    if ($rangeMin !== null) {
+                        $rangeArgs['min'] = (string) $rangeMin['value'];
+                    }
+                    if ($rangeMax !== null) {
+                        $rangeArgs['max'] = (string) $rangeMax['value'];
+                    }
+                    $param->addAttribute(Range::class, $rangeArgs);
+                }
+            }
+
+            // Regex pattern from primitive type extension.
+            $regexPattern = $this->extractPrimitiveRegexPattern($element);
+            if ($regexPattern !== null) {
+                $param->addAttribute(Regex::class, ['pattern' => $regexPattern]);
+            }
+
+            // FHIRValueSetBinding for required/extensible/preferred-strength bindings.
+            // Skip when valueSet is absent — an empty URL causes the validator to emit a
+            // misleading "no enum class found" violation for every non-null property value.
+            if (isset($element['binding'])) {
+                $bindingStrength = $element['binding']['strength'] ?? 'extensible';
+                $valueSetUrl     = $element['binding']['valueSet'] ?? '';
+                if ($valueSetUrl !== '' && $this->shouldEmitBindingAttribute($bindingStrength)) {
+                    $args = ['valueSetUrl' => $valueSetUrl, 'strength' => $bindingStrength];
+
+                    $maxValueSetUrl = $this->extractMaxValueSetUrl($element['binding']['extension'] ?? []);
+                    if ($maxValueSetUrl !== null) {
+                        $args['maxValueSetUrl'] = $maxValueSetUrl;
+                    }
+
+                    $param->addAttribute(FHIRValueSetBinding::class, $args);
+                }
+            }
+
+            // FHIRFixedValue from fixed[x] polymorphic field (scalar values only).
+            $fixedField = ElementDefinitionHelper::extractPolymorphicField($element, 'fixed');
+            if ($fixedField !== null && is_scalar($fixedField['value'])) {
+                $param->addAttribute(FHIRFixedValue::class, ['value' => $fixedField['value']]);
+            }
+
+            // FHIRPatternValue from pattern[x] polymorphic field (array values only).
+            $patternField = ElementDefinitionHelper::extractPolymorphicField($element, 'pattern');
+            if ($patternField !== null && is_array($patternField['value'])) {
+                $param->addAttribute(FHIRPatternValue::class, ['pattern' => $patternField['value']]);
+            }
+
+            if (($element['mustSupport'] ?? false) === true) {
+                $param->addAttribute(FHIRMustSupport::class);
+            }
+
+            if (($element['isModifier'] ?? false) === true) {
+                $reason = $element['isModifierReason'] ?? null;
+                $args   = $reason !== null ? ['reason' => $reason] : [];
+                $param->addAttribute(FHIRIsModifier::class, $args);
+            }
+
+            // FHIRObligation from obligation extensions on snapshot elements.
+            $obligations             = (new ObligationExtensionParser())->parse($element['extension'] ?? []);
+            $hasPopulationObligation = false;
+            foreach ($obligations as $obligation) {
+                $args = ['code' => $obligation['code']];
+                if ($obligation['actor'] !== null) {
+                    $args['actor'] = $obligation['actor'];
+                }
+                if ($obligation['filter'] !== null) {
+                    $args['filter'] = $obligation['filter'];
+                }
+                if ($obligation['documentation'] !== null) {
+                    $args['documentation'] = $obligation['documentation'];
+                }
+                $param->addAttribute(FHIRObligation::class, $args);
+
+                $obligationCode = ObligationCode::tryFrom($obligation['code']);
+                if ($obligationCode !== null && $obligationCode->isPopulationObligation()) {
+                    $hasPopulationObligation = true;
+                }
+            }
+            if ($hasPopulationObligation) {
+                $param->addAttribute(FHIRObligationConstraint::class);
+            }
+
+            // FHIRTargetProfile from type[].targetProfile arrays (Reference and canonical properties).
+            $targetProfiles = [];
+            foreach ($element['type'] ?? [] as $type) {
+                foreach ($type['targetProfile'] ?? [] as $profileUrl) {
+                    if (is_string($profileUrl) && $profileUrl !== '') {
+                        $targetProfiles[] = $profileUrl;
+                    }
+                }
+            }
+            if ($targetProfiles !== []) {
+                $param->addAttribute(FHIRTargetProfile::class, ['targetProfiles' => array_values(array_unique($targetProfiles))]);
+            }
         }
+    }
+
+    /**
+     * Extract the maxValueSet URL from a binding's extension array.
+     *
+     * Looks for `elementdefinition-maxValueSet` with a `valueCanonical` field.
+     * Returns null when the extension is absent.
+     *
+     * @param array<int, array<string, mixed>> $extensions The binding.extension array
+     */
+    private function extractMaxValueSetUrl(array $extensions): ?string
+    {
+        foreach ($extensions as $ext) {
+            if (($ext['url'] ?? '') === 'http://hl7.org/fhir/StructureDefinition/elementdefinition-maxValueSet') {
+                return isset($ext['valueCanonical']) && is_string($ext['valueCanonical']) ? $ext['valueCanonical'] : null;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Extract a regex pattern from a primitive element's type extension.
+     *
+     * Looks for the `http://hl7.org/fhir/StructureDefinition/regex` extension on element.type[0].
+     * Returns null when the extension is absent.
+     *
+     * @param array<string, mixed> $element The FHIR element definition
+     */
+    private function extractPrimitiveRegexPattern(array $element): ?string
+    {
+        foreach ($element['type'][0]['extension'] ?? [] as $ext) {
+            if (($ext['url'] ?? '') === 'http://hl7.org/fhir/StructureDefinition/regex') {
+                return $ext['valueString'] ?? null;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -949,15 +1214,17 @@ class FHIRModelGenerator implements GeneratorInterface
             return $storedType->namespace;
         }
 
-        // Special logical types that changed namespace between FHIR versions
-        // In R4/R4B: These types are in Resource namespace (logical/backbone types)
-        // In R5: Some moved to DataType namespace, others stayed in Resource namespace
-        $typesMovedToDataTypeInR5 = [
-            'Dosage',           // Moved to DataType in R5
-            'Timing',           // Moved to DataType in R5
-            'ElementDefinition', // Moved to DataType in R5
-            'ProductShelfLife',  // Moved to DataType in R5
-            'MarketingStatus',   // Moved to DataType in R5
+        // Complex types that are generated into the DataType namespace in all FHIR versions.
+        // The generator's `kind: complex-type` switch (see generateModelClass) places them
+        // in getDatatypeNamespace, so getNamespaceForFhirType must agree.
+        // (Previously this list was named "typesMovedToDataTypeInR5" with a wrong R4/R4B
+        // special-case that returned getElementNamespace — that produced broken `use` statements.)
+        $typesInDataTypeNamespace = [
+            'Dosage',
+            'Timing',
+            'ElementDefinition',
+            'ProductShelfLife',
+            'MarketingStatus',
         ];
 
         // Types that remain in Resource namespace across all versions
@@ -967,17 +1234,11 @@ class FHIRModelGenerator implements GeneratorInterface
             'Population',         // Stays in Resource even in R5
         ];
 
-        if (in_array($code, $typesMovedToDataTypeInR5, true)) {
-            // In R4 and R4B, these are logical types (Resource-like structures)
-            // In R5, they moved to DataType namespace
-            if (in_array($version, ['R4', 'R4B'], true)) {
-                return $builderContext->getElementNamespace($version)->getName();
-            }
-            // In R5 and later, they are in DataType namespace
+        if (in_array($code, $typesInDataTypeNamespace, true)) {
+            // These complex types live in DataType namespace in all FHIR versions
             try {
                 return $builderContext->getDatatypeNamespace($version)->getName();
             } catch (GenerationException) {
-                // Fallback to element namespace if datatype namespace is not available
                 return $builderContext->getElementNamespace($version)->getName();
             }
         }
@@ -1114,6 +1375,21 @@ class FHIRModelGenerator implements GeneratorInterface
     private function shouldGenerateEnumForBinding(string $bindingStrength): bool
     {
         return $bindingStrength === 'required';
+    }
+
+    /**
+     * Determine if binding strength warrants emitting a #[FHIRValueSetBinding] attribute.
+     *
+     * Required bindings get an enum-backed attribute; extensible and preferred bindings
+     * get a weaker attribute for optional terminology-server validation. Example bindings
+     * are documentation-only and produce no attribute.
+     */
+    private function shouldEmitBindingAttribute(string $bindingStrength): bool
+    {
+        return match ($bindingStrength) {
+            'required', 'extensible', 'preferred' => true,
+            default                               => false,
+        };
     }
 
     /**

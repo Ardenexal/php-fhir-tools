@@ -6,6 +6,10 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Attachment;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\ConsentStateType;
@@ -19,6 +23,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Consent\ConsentPolicy;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Consent\ConsentProvision;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Consent\ConsentVerification;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -29,6 +34,36 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A record of a healthcare consumer’s  choices, which permits or denies identified recipient(s) or recipient role(s) to perform one or more actions within a given policy context, for specific purposes and periods of time.
  */
 #[FhirResource(type: 'Consent', version: '4.3.0', url: 'http://hl7.org/fhir/StructureDefinition/Consent', fhirVersion: 'R4B')]
+#[FHIRPathInvariant(
+    key: 'ppc-1',
+    severity: 'error',
+    expression: 'policy.exists() or policyRule.exists()',
+    human: 'Either a Policy or PolicyRule',
+)]
+#[FHIRPathInvariant(
+    key: 'ppc-2',
+    severity: 'error',
+    expression: 'patient.exists() or scope.coding.where(system=\'something\' and code=\'patient-privacy\').exists().not()',
+    human: 'IF Scope=privacy, there must be a patient',
+)]
+#[FHIRPathInvariant(
+    key: 'ppc-3',
+    severity: 'error',
+    expression: 'patient.exists() or scope.coding.where(system=\'something\' and code=\'research\').exists().not()',
+    human: 'IF Scope=research, there must be a patient',
+)]
+#[FHIRPathInvariant(
+    key: 'ppc-4',
+    severity: 'error',
+    expression: 'patient.exists() or scope.coding.where(system=\'something\' and code=\'adr\').exists().not()',
+    human: 'IF Scope=adr, there must be a patient',
+)]
+#[FHIRPathInvariant(
+    key: 'ppc-5',
+    severity: 'error',
+    expression: 'patient.exists() or scope.coding.where(system=\'something\' and code=\'treatment\').exists().not()',
+    human: 'IF Scope=treatment, there must be a patient',
+)]
 class ConsentResource extends DomainResourceResource
 {
     public function __construct(
@@ -39,10 +74,15 @@ class ConsentResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies it\'s meaning or interpretation')]
         public ?UriPrimitive $implicitRules = null,
         /** @var string|null language Language of the resource content */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
+            strength: 'preferred',
+            maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+        )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -54,7 +94,7 @@ class ConsentResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the resource that contains them')]
         public array $modifierExtension = [],
         /** @var array<Identifier> identifier Identifier for this record (external references) */
         #[FhirProperty(
@@ -65,10 +105,10 @@ class ConsentResource extends DomainResourceResource
         )]
         public array $identifier = [],
         /** @var ConsentStateType|null status draft | proposed | active | rejected | inactive | entered-in-error */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/consent-state-codes|4.3.0', strength: 'required'), FHIRIsModifier(reason: 'This element is labelled as a modifier because it is a status element that contains status entered-in-error which means that the resource should not be treated as valid')]
         public ?ConsentStateType $status = null,
         /** @var CodeableConcept|null scope Which of the four areas this resource covers (extensible) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/consent-scope', strength: 'extensible'), FHIRIsModifier(reason: 'Allows changes to codes based on scope selection')]
         public ?CodeableConcept $scope = null,
         /** @var array<CodeableConcept> category Classification of the consent statement - for indexing/retrieval */
         #[FhirProperty(
@@ -78,9 +118,11 @@ class ConsentResource extends DomainResourceResource
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[Count(min: 1)]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/consent-category', strength: 'extensible')]
         public array $category = [],
         /** @var Reference|null patient Who the consent applies to */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Patient'])]
         public ?Reference $patient = null,
         /** @var DateTimePrimitive|null dateTime When this Consent was created or indexed */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
@@ -92,6 +134,13 @@ class ConsentResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Organization',
+            'http://hl7.org/fhir/StructureDefinition/Patient',
+            'http://hl7.org/fhir/StructureDefinition/Practitioner',
+            'http://hl7.org/fhir/StructureDefinition/RelatedPerson',
+            'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
+        ])]
         public array $performer = [],
         /** @var array<Reference> organization Custodian of the consent */
         #[FhirProperty(
@@ -100,6 +149,7 @@ class ConsentResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public array $organization = [],
         /** @var Attachment|Reference|null source Source from which this consent is taken */
         #[FhirProperty(
@@ -121,6 +171,12 @@ class ConsentResource extends DomainResourceResource
                 ],
             ],
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Consent',
+            'http://hl7.org/fhir/StructureDefinition/DocumentReference',
+            'http://hl7.org/fhir/StructureDefinition/Contract',
+            'http://hl7.org/fhir/StructureDefinition/QuestionnaireResponse',
+        ])]
         public Attachment|Reference|null $source = null,
         /** @var array<ConsentPolicy> policy Policies covered by this consent */
         #[FhirProperty(
@@ -131,7 +187,7 @@ class ConsentResource extends DomainResourceResource
         )]
         public array $policy = [],
         /** @var CodeableConcept|null policyRule Regulation that this consents to */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/consent-policy', strength: 'extensible')]
         public ?CodeableConcept $policyRule = null,
         /** @var array<ConsentVerification> verification Consent Verified by patient or family */
         #[FhirProperty(

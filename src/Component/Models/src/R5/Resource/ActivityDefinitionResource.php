@@ -6,6 +6,10 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Age;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
@@ -52,6 +56,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     url: 'http://hl7.org/fhir/StructureDefinition/ActivityDefinition',
     fhirVersion: 'R5',
 )]
+#[FHIRPathInvariant(
+    key: 'cnl-0',
+    severity: 'warning',
+    expression: 'name.exists() implies name.matches(\'^[A-Z]([A-Za-z0-9_]){1,254}$\')',
+    human: 'Name should be usable as an identifier for the module by machine processing applications such as code generation',
+)]
 class ActivityDefinitionResource extends DomainResourceResource
 {
     public function __construct(
@@ -62,10 +72,10 @@ class ActivityDefinitionResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -77,7 +87,7 @@ class ActivityDefinitionResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the resource that contains them')]
         public array $modifierExtension = [],
         /** @var UriPrimitive|null url Canonical identifier for this activity definition, represented as a URI (globally unique) */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
@@ -113,6 +123,7 @@ class ActivityDefinitionResource extends DomainResourceResource
                 ],
             ],
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/version-algorithm', strength: 'extensible')]
         public StringPrimitive|string|Coding|null $versionAlgorithm = null,
         /** @var StringPrimitive|string|null name Name for this activity definition (computer friendly) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -124,7 +135,7 @@ class ActivityDefinitionResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $subtitle = null,
         /** @var PublicationStatusType|null status draft | active | retired | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because applications should not use a retired {{title}} without due consideration')]
         public ?PublicationStatusType $status = null,
         /** @var bool|null experimental For testing purposes, not real usage */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
@@ -155,6 +166,16 @@ class ActivityDefinitionResource extends DomainResourceResource
                 ],
             ],
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/participant-resource-types', strength: 'extensible')]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Group',
+            'http://hl7.org/fhir/StructureDefinition/MedicinalProductDefinition',
+            'http://hl7.org/fhir/StructureDefinition/SubstanceDefinition',
+            'http://hl7.org/fhir/StructureDefinition/AdministrableProductDefinition',
+            'http://hl7.org/fhir/StructureDefinition/ManufacturedItemDefinition',
+            'http://hl7.org/fhir/StructureDefinition/PackagedProductDefinition',
+            'http://hl7.org/fhir/StructureDefinition/EvidenceVariable',
+        ])]
         public CodeableConcept|Reference|CanonicalPrimitive|null $subject = null,
         /** @var DateTimePrimitive|null date Date last changed */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
@@ -188,6 +209,7 @@ class ActivityDefinitionResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/jurisdiction', strength: 'extensible')]
         public array $jurisdiction = [],
         /** @var MarkdownPrimitive|null purpose Why this activity definition is defined */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -259,25 +281,25 @@ class ActivityDefinitionResource extends DomainResourceResource
         )]
         public array $relatedArtifact = [],
         /** @var array<CanonicalPrimitive> library Logic used by the activity definition */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Library'])]
         public array $library = [],
         /** @var RequestResourceTypesType|null kind Kind of resource */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/request-resource-types|5.0.0', strength: 'required')]
         public ?RequestResourceTypesType $kind = null,
         /** @var CanonicalPrimitive|null profile What profile the resource needs to conform to */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/StructureDefinition'])]
         public ?CanonicalPrimitive $profile = null,
         /** @var CodeableConcept|null code Detail type of activity */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $code = null,
         /** @var RequestIntentType|null intent proposal | plan | directive | order | original-order | reflex-order | filler-order | instance-order | option */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/request-intent|5.0.0', strength: 'required')]
         public ?RequestIntentType $intent = null,
         /** @var RequestPriorityType|null priority routine | urgent | asap | stat */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/request-priority|5.0.0', strength: 'required')]
         public ?RequestPriorityType $priority = null,
         /** @var bool|null doNotPerform True if the activity should not be performed */
-        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
+        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar'), FHIRIsModifier(reason: 'If true this element negates the specified action. For Example,  instead of a request for a procedure, it is a request for the procedure to not occur.')]
         public ?bool $doNotPerform = null,
         /** @var Timing|Age|Range|Duration|null timing When activity is to occur */
         #[FhirProperty(
@@ -329,7 +351,7 @@ class ActivityDefinitionResource extends DomainResourceResource
         )]
         public bool|CodeableConcept|null $asNeeded = null,
         /** @var CodeableReference|null location Where it should happen */
-        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
         public ?CodeableReference $location = null,
         /** @var array<ActivityDefinitionParticipant> participant Who should participate in the action */
         #[FhirProperty(
@@ -359,6 +381,12 @@ class ActivityDefinitionResource extends DomainResourceResource
                 ],
             ],
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Medication',
+            'http://hl7.org/fhir/StructureDefinition/Ingredient',
+            'http://hl7.org/fhir/StructureDefinition/Substance',
+            'http://hl7.org/fhir/StructureDefinition/SubstanceDefinition',
+        ])]
         public Reference|CodeableConcept|null $product = null,
         /** @var Quantity|null quantity How much is administered/consumed/supplied */
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
@@ -380,16 +408,16 @@ class ActivityDefinitionResource extends DomainResourceResource
         )]
         public array $bodySite = [],
         /** @var array<CanonicalPrimitive> specimenRequirement What specimens are required to perform this action */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/SpecimenDefinition'])]
         public array $specimenRequirement = [],
         /** @var array<CanonicalPrimitive> observationRequirement What observations are required to perform this action */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ObservationDefinition'])]
         public array $observationRequirement = [],
         /** @var array<CanonicalPrimitive> observationResultRequirement What observations must be produced by this action */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ObservationDefinition'])]
         public array $observationResultRequirement = [],
         /** @var CanonicalPrimitive|null transform Transform to apply the template */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/StructureMap'])]
         public ?CanonicalPrimitive $transform = null,
         /** @var array<ActivityDefinitionDynamicValue> dynamicValue Dynamic aspects of the definition */
         #[FhirProperty(

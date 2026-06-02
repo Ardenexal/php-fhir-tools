@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\InstantPrimitive;
@@ -38,7 +40,7 @@ class Meta extends DataType
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
         public ?UriPrimitive $source = null,
         /** @var array<CanonicalPrimitive> profile Profiles this resource claims to conform to */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/StructureDefinition'])]
         public array $profile = [],
         /** @var array<Coding> security Security Labels applied to this resource */
         #[FhirProperty(
@@ -47,6 +49,7 @@ class Meta extends DataType
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/security-labels', strength: 'extensible')]
         public array $security = [],
         /** @var array<Coding> tag Tags applied to this resource */
         #[FhirProperty(

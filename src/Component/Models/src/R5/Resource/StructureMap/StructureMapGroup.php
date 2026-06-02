@@ -6,11 +6,14 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\StructureMap;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\StructureMapGroupTypeModeType;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -27,7 +30,7 @@ class StructureMapGroup extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var IdPrimitive|null name Human-readable label */
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive', isRequired: true), NotBlank]
@@ -36,7 +39,7 @@ class StructureMapGroup extends BackboneElement
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive')]
         public ?IdPrimitive $extends = null,
         /** @var StructureMapGroupTypeModeType|null typeMode types | type-and-types */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/map-group-type-mode|5.0.0', strength: 'required')]
         public ?StructureMapGroupTypeModeType $typeMode = null,
         /** @var StringPrimitive|string|null documentation Additional description/explanation for group */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -49,6 +52,7 @@ class StructureMapGroup extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\StructureMap\StructureMapGroupInput',
         )]
+        #[Count(min: 1)]
         public array $input = [],
         /** @var array<StructureMapGroupRule> rule Transform Rule from source to target */
         #[FhirProperty(

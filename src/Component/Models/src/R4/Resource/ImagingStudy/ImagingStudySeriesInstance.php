@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\ImagingStudy;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -28,13 +30,18 @@ class ImagingStudySeriesInstance extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var IdPrimitive|null uid DICOM SOP Instance UID */
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?IdPrimitive $uid = null,
         /** @var Coding|null sopClass DICOM class type */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true)]
+        #[NotBlank]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://dicom.nema.org/medical/dicom/current/output/chtml/part04/sect_B.5.html#table_B.5-1',
+            strength: 'extensible',
+        )]
         public ?Coding $sopClass = null,
         /** @var UnsignedIntPrimitive|null number The number of this instance in the series */
         #[FhirProperty(fhirType: 'unsignedInt', propertyKind: 'primitive')]

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
@@ -19,6 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  * @description Represents a specific logic definition used by the artifact. When logic is referenced from knowledge artifacts, this extension allows each referenced definition to be represented independently so that consumers know which specific expressions are being referenced (i.e. not all expressions in a given library are always used), as well as allows processing applications (such as narrative generation) to easily surface the definitions to provide capabilities such as navigation.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-logicDefinition', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'DomainResource')]
 class LogicDefinitionExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

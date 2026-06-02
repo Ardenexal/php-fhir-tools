@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRContextInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Expression;
@@ -19,6 +21,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * @description Allows disabling certain questionnaire options for the containing item based on evaluating expressions.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaire-optionRestriction', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item')]
+#[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]
+#[FHIRContextInvariant(expression: 'ofType(ElementDefinition).binding.where(strength=\'required\').exists() or where(%resource.is(Questionnaire)).exists(answerValueSet.exists() or answerOption.exists())')]
 class QOptionRestrictionExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

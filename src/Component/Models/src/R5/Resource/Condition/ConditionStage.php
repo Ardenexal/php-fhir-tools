@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\Condition;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -15,6 +18,12 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  * @description A simple summary of the stage such as "Stage 3" or "Early Onset". The determination of the stage is disease-specific, such as cancer, retinopathy of prematurity, kidney diseases, Alzheimer's, or Parkinson disease.
  */
 #[FHIRBackboneElement(parentResource: 'Condition', elementPath: 'Condition.stage', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'con-1',
+    severity: 'error',
+    expression: 'summary.exists() or assessment.exists()',
+    human: 'Stage SHALL have summary or assessment',
+)]
 class ConditionStage extends BackboneElement
 {
     public function __construct(
@@ -25,7 +34,7 @@ class ConditionStage extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null summary Simple summary (disease specific) */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
@@ -37,6 +46,11 @@ class ConditionStage extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/ClinicalImpression',
+            'http://hl7.org/fhir/StructureDefinition/DiagnosticReport',
+            'http://hl7.org/fhir/StructureDefinition/Observation',
+        ])]
         public array $assessment = [],
         /** @var CodeableConcept|null type Kind of staging */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]

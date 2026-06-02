@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
 
 /**
@@ -13,6 +14,30 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\BundleResource;
  * @description This profile holds all the requirements and constraints related to a FHIR batch response.
  */
 #[FHIRProfile(profileUrl: 'http://hl7.org/fhir/StructureDefinition/batch-response-bundle', baseType: 'Bundle', fhirVersion: 'R5')]
+#[FHIRProfileConstraint(
+    path: 'total',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['max' => 0],
+    groups: ['http://hl7.org/fhir/StructureDefinition/batch-response-bundle'],
+)]
+#[FHIRProfileConstraint(
+    path: 'entry.fullUrl',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['min' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/batch-response-bundle'],
+)]
+#[FHIRProfileConstraint(
+    path: 'entry.search',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['max' => 0],
+    groups: ['http://hl7.org/fhir/StructureDefinition/batch-response-bundle'],
+)]
+#[FHIRProfileConstraint(
+    path: 'entry.request',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['max' => 0],
+    groups: ['http://hl7.org/fhir/StructureDefinition/batch-response-bundle'],
+)]
 class BatchResponseBundleProfile extends BundleResource
 {
     /** Canonical URL of this profile's StructureDefinition. */

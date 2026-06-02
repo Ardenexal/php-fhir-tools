@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\CarePlan;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CarePlanActivityKindType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CarePlanActivityStatusType;
@@ -14,10 +17,10 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
-use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -34,13 +37,20 @@ class CarePlanActivityDetail extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CarePlanActivityKindType|null kind Appointment | CommunicationRequest | DeviceRequest | MedicationRequest | NutritionOrder | Task | ServiceRequest | VisionPrescription */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/care-plan-activity-kind|4.3.0', strength: 'required')]
         public ?CarePlanActivityKindType $kind = null,
         /** @var array<CanonicalPrimitive> instantiatesCanonical Instantiates FHIR protocol or definition */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true)]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/PlanDefinition',
+            'http://hl7.org/fhir/StructureDefinition/ActivityDefinition',
+            'http://hl7.org/fhir/StructureDefinition/Questionnaire',
+            'http://hl7.org/fhir/StructureDefinition/Measure',
+            'http://hl7.org/fhir/StructureDefinition/OperationDefinition',
+        ])]
         public array $instantiatesCanonical = [],
         /** @var array<UriPrimitive> instantiatesUri Instantiates external protocol or definition */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isArray: true)]
@@ -63,6 +73,12 @@ class CarePlanActivityDetail extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Condition',
+            'http://hl7.org/fhir/StructureDefinition/Observation',
+            'http://hl7.org/fhir/StructureDefinition/DiagnosticReport',
+            'http://hl7.org/fhir/StructureDefinition/DocumentReference',
+        ])]
         public array $reasonReference = [],
         /** @var array<Reference> goal Goals this activity relates to */
         #[FhirProperty(
@@ -71,15 +87,16 @@ class CarePlanActivityDetail extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Goal'])]
         public array $goal = [],
         /** @var CarePlanActivityStatusType|null status not-started | scheduled | in-progress | on-hold | completed | cancelled | stopped | unknown | entered-in-error */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/care-plan-activity-status|4.3.0', strength: 'required'), FHIRIsModifier(reason: 'This element is labelled as a modifier because it is a status element that contains status entered-in-error which means that the activity should not be treated as valid')]
         public ?CarePlanActivityStatusType $status = null,
         /** @var CodeableConcept|null statusReason Reason for current status */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $statusReason = null,
         /** @var bool|null doNotPerform If true, activity is prohibiting action */
-        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
+        #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar'), FHIRIsModifier(reason: 'If true this element negates the specified action. For example, instead of a request for a procedure, it is a request for the procedure to not occur.')]
         public ?bool $doNotPerform = null,
         /** @var Timing|Period|StringPrimitive|string|null scheduled When activity is to occur */
         #[FhirProperty(
@@ -90,7 +107,7 @@ class CarePlanActivityDetail extends BackboneElement
                 [
                     'fhirType'     => 'Timing',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing',
                     'jsonKey'      => 'scheduledTiming',
                 ],
                 [
@@ -109,7 +126,7 @@ class CarePlanActivityDetail extends BackboneElement
         )]
         public Timing|Period|StringPrimitive|string|null $scheduled = null,
         /** @var Reference|null location Where it should happen */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
         public ?Reference $location = null,
         /** @var array<Reference> performer Who will be responsible? */
         #[FhirProperty(
@@ -118,6 +135,16 @@ class CarePlanActivityDetail extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Practitioner',
+            'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
+            'http://hl7.org/fhir/StructureDefinition/Organization',
+            'http://hl7.org/fhir/StructureDefinition/RelatedPerson',
+            'http://hl7.org/fhir/StructureDefinition/Patient',
+            'http://hl7.org/fhir/StructureDefinition/CareTeam',
+            'http://hl7.org/fhir/StructureDefinition/HealthcareService',
+            'http://hl7.org/fhir/StructureDefinition/Device',
+        ])]
         public array $performer = [],
         /** @var CodeableConcept|Reference|null product What is to be administered/supplied */
         #[FhirProperty(
@@ -139,6 +166,10 @@ class CarePlanActivityDetail extends BackboneElement
                 ],
             ],
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Medication',
+            'http://hl7.org/fhir/StructureDefinition/Substance',
+        ])]
         public CodeableConcept|Reference|null $product = null,
         /** @var Quantity|null dailyAmount How to consume/day? */
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]

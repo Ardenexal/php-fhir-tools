@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
@@ -20,6 +21,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
  * @description The pharmacies that are preferred for dispensing prescribed medications.  A patient might prefer their local pharmacy.  A provider in a given practice may prefer a pharmacy near their clinic.  Or facilities may have a preference to use an in-house pharmacy.  These preferences may be represented using this extension on several resource types, and are expected to be inputs into a process that determines which pharmacy is ultimately used to dispense a medication.  That process may include considering drug formularies, pharmacy operating hours, pharmacy inventory, practitioner preferences, patient preferences, etc.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/patient-preferredPharmacy', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'Patient')]
+#[FHIRExtensionContext(type: 'element', expression: 'Encounter')]
+#[FHIRExtensionContext(type: 'element', expression: 'PractitionerRole')]
+#[FHIRExtensionContext(type: 'element', expression: 'Organization')]
+#[FHIRExtensionContext(type: 'element', expression: 'Location')]
 class PatientPreferredPharmacyExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

@@ -6,10 +6,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\StructureMap;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -26,13 +28,13 @@ class StructureMapGroupRuleDependent extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var IdPrimitive|null name Name of a rule or group to apply */
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?IdPrimitive $name = null,
         /** @var array<StringPrimitive|string> variable Variable to pass to the rule or group */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true, isRequired: true)]
+        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true, isRequired: true), Count(min: 1)]
         public array $variable = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

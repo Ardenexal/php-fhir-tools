@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\DeviceMetric;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\DeviceMetricCalibrationStateType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\DeviceMetricCalibrationTypeType;
@@ -26,13 +28,13 @@ class DeviceMetricCalibration extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var DeviceMetricCalibrationTypeType|null type unspecified | offset | gain | two-point */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/metric-calibration-type|4.3.0', strength: 'required')]
         public ?DeviceMetricCalibrationTypeType $type = null,
         /** @var DeviceMetricCalibrationStateType|null state not-calibrated | calibration-required | calibrated | unspecified */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/metric-calibration-state|4.3.0', strength: 'required')]
         public ?DeviceMetricCalibrationStateType $state = null,
         /** @var InstantPrimitive|null time Describes the time last calibration has been performed */
         #[FhirProperty(fhirType: 'instant', propertyKind: 'primitive')]

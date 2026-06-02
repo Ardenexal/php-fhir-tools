@@ -6,6 +6,10 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding;
@@ -43,6 +47,24 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     url: 'http://hl7.org/fhir/StructureDefinition/PlanDefinition',
     fhirVersion: 'R5',
 )]
+#[FHIRPathInvariant(
+    key: 'cnl-0',
+    severity: 'warning',
+    expression: 'name.exists() implies name.matches(\'^[A-Z]([A-Za-z0-9_]){1,254}$\')',
+    human: 'Name should be usable as an identifier for the module by machine processing applications such as code generation',
+)]
+#[FHIRPathInvariant(
+    key: 'pld-3',
+    severity: 'warning',
+    expression: '%context.repeat(action).where((goalId in %context.goal.id).not()).exists().not()',
+    human: 'goalid should reference the id of a goal definition',
+)]
+#[FHIRPathInvariant(
+    key: 'pld-4',
+    severity: 'warning',
+    expression: '%context.repeat(action).relatedAction.where((targetId in %context.repeat(action).id).not()).exists().not()',
+    human: 'targetId should reference the id of an action',
+)]
 class PlanDefinitionResource extends DomainResourceResource
 {
     public function __construct(
@@ -53,10 +75,10 @@ class PlanDefinitionResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -68,7 +90,7 @@ class PlanDefinitionResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the resource that contains them')]
         public array $modifierExtension = [],
         /** @var UriPrimitive|null url Canonical identifier for this plan definition, represented as a URI (globally unique) */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
@@ -104,6 +126,7 @@ class PlanDefinitionResource extends DomainResourceResource
                 ],
             ],
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/version-algorithm', strength: 'extensible')]
         public StringPrimitive|string|Coding|null $versionAlgorithm = null,
         /** @var StringPrimitive|string|null name Name for this plan definition (computer friendly) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -115,10 +138,10 @@ class PlanDefinitionResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $subtitle = null,
         /** @var CodeableConcept|null type order-set | clinical-protocol | eca-rule | workflow-definition */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/plan-definition-type', strength: 'extensible')]
         public ?CodeableConcept $type = null,
         /** @var PublicationStatusType|null status draft | active | retired | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because applications should not use a retired {{title}} without due consideration')]
         public ?PublicationStatusType $status = null,
         /** @var bool|null experimental For testing purposes, not real usage */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
@@ -149,6 +172,16 @@ class PlanDefinitionResource extends DomainResourceResource
                 ],
             ],
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/participant-resource-types', strength: 'extensible')]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Group',
+            'http://hl7.org/fhir/StructureDefinition/MedicinalProductDefinition',
+            'http://hl7.org/fhir/StructureDefinition/SubstanceDefinition',
+            'http://hl7.org/fhir/StructureDefinition/AdministrableProductDefinition',
+            'http://hl7.org/fhir/StructureDefinition/ManufacturedItemDefinition',
+            'http://hl7.org/fhir/StructureDefinition/PackagedProductDefinition',
+            'http://hl7.org/fhir/StructureDefinition/EvidenceVariable',
+        ])]
         public CodeableConcept|Reference|CanonicalPrimitive|null $subject = null,
         /** @var DateTimePrimitive|null date Date last changed */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
@@ -182,6 +215,7 @@ class PlanDefinitionResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/jurisdiction', strength: 'extensible')]
         public array $jurisdiction = [],
         /** @var MarkdownPrimitive|null purpose Why this plan definition is defined */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -253,7 +287,7 @@ class PlanDefinitionResource extends DomainResourceResource
         )]
         public array $relatedArtifact = [],
         /** @var array<CanonicalPrimitive> library Logic used by the plan definition */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Library'])]
         public array $library = [],
         /** @var array<PlanDefinitionGoal> goal What the plan is trying to accomplish */
         #[FhirProperty(

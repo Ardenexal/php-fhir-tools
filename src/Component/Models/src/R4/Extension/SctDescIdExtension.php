@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IdPrimitive;
 
@@ -17,6 +18,11 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IdPrimitive;
  * @description The SNOMED CT Description ID for the display.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/coding-sctdescid', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'Coding')]
+#[FHIRExtensionContext(type: 'element', expression: 'CodeSystem.concept.display')]
+#[FHIRExtensionContext(type: 'element', expression: 'CodeSystem.concept.designation')]
+#[FHIRExtensionContext(type: 'element', expression: 'ValueSet.expansion.contains.display')]
+#[FHIRExtensionContext(type: 'element', expression: 'ValueSet.expansion.contains.designation')]
 class SctDescIdExtension extends Extension
 {
     public function __construct(

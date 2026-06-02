@@ -1,0 +1,43 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "patient-place-of-birth",
+  "url": "http://example.org/fhir/StructureDefinition/patient-place-of-birth",
+  "version": "1.0.0",
+  "name": "patient-place-of-birth",
+  "title": "Place of Birth",
+  "status": "active",
+  "description": "Test extension with context and contextInvariant.",
+  "fhirVersion": "4.0.1",
+  "kind": "complex-type",
+  "abstract": false,
+  "type": "Extension",
+  "derivation": "constraint",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Extension",
+  "context": [
+    {"type": "element", "expression": "Patient"},
+    {"type": "element", "expression": "RelatedPerson"}
+  ],
+  "contextInvariant": [
+    "name.exists()",
+    "birthDate.exists()"
+  ],
+  "snapshot": {
+    "element": [
+      {
+        "id": "Extension",
+        "path": "Extension",
+        "short": "Place of Birth",
+        "min": 0,
+        "max": "1"
+      },
+      {
+        "id": "Extension.value[x]",
+        "path": "Extension.value[x]",
+        "short": "Value of extension",
+        "min": 0,
+        "max": "1",
+        "type": [{"code": "string"}]
+      }
+    ]
+  }
+}

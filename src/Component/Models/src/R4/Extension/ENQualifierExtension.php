@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
 
@@ -17,6 +18,10 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
  * @description A set of codes each of which specifies a certain subcategory of the name part in addition to the main name part type.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/iso21090-EN-qualifier', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'HumanName.family')]
+#[FHIRExtensionContext(type: 'element', expression: 'HumanName.given')]
+#[FHIRExtensionContext(type: 'element', expression: 'HumanName.prefix')]
+#[FHIRExtensionContext(type: 'element', expression: 'HumanName.suffix')]
 class ENQualifierExtension extends Extension
 {
     public function __construct(

@@ -8,6 +8,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Element;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Symfony\Component\Validator\Constraints\Regex;
 
 /**
  * @author HL7 FHIR Standard
@@ -32,7 +33,7 @@ class BooleanPrimitive extends Element implements \Stringable
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var bool|null value Primitive value for boolean */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.Boolean', propertyKind: 'scalar', xmlSerializedName: '@value')]
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.Boolean', propertyKind: 'scalar', xmlSerializedName: '@value'), Regex(pattern: 'true|false')]
         public ?bool $value = null,
     ) {
         parent::__construct($id, $extension);

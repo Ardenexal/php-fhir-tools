@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Serialization\Tests\Integration;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\BundleResource;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -21,7 +22,7 @@ class BundleXmlPolymorphicResourceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->serializer = FHIRSerializationService::createDefault();
+        $this->serializer = FHIRSerializationService::createDefault(FhirVersion::R4);
     }
 
     public function testDeserializeBundleXmlWithPatientResource(): void

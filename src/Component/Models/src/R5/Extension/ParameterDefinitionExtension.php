@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRContextInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\ParameterDefinition;
 
@@ -17,6 +19,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\ParameterDefinition;
  * @description The definition of a parameter that is expected to be provided as part of the invocation of the trigger.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-parameterDefinition', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'TriggerDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'ParameterDefinition')]
+#[FHIRContextInvariant(expression: '($this is ParameterDefinition).not() or ($this.ofType(ParameterDefinition).type in (\'BackboneElement\' | \'Extension\'))')]
 class ParameterDefinitionExtension extends Extension
 {
     public function __construct(

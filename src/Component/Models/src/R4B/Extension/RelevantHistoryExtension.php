@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 
@@ -17,6 +18,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
  * @description Links to Provenance records for past versions of this resource or fulfilling request or event resources that identify key state transitions or updates that are likely to be relevant to a user looking at the current version of the resource.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/request-relevantHistory', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'NutritionOrder')]
+#[FHIRExtensionContext(type: 'element', expression: 'CommunicationRequest')]
+#[FHIRExtensionContext(type: 'element', expression: 'CarePlan')]
 class RelevantHistoryExtension extends Extension
 {
     public function __construct(

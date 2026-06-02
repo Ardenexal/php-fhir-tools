@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -14,6 +17,18 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description Binds to a value set if this element is coded (code, Coding, CodeableConcept, Quantity), or the data types (string, uri).
  */
 #[FHIRComplexType(typeName: 'ElementDefinition.binding', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'eld-12',
+    severity: 'error',
+    expression: 'valueSet.exists() implies (valueSet.startsWith(\'http:\') or valueSet.startsWith(\'https\') or valueSet.startsWith(\'urn:\') or valueSet.startsWith(\'#\'))',
+    human: 'ValueSet SHALL start with http:// or https:// or urn: or #',
+)]
+#[FHIRPathInvariant(
+    key: 'eld-23',
+    severity: 'error',
+    expression: 'description.exists() or valueSet.exists()',
+    human: 'binding SHALL have either description or valueSet',
+)]
 class ElementDefinitionBinding extends Element
 {
     public function __construct(
@@ -24,13 +39,13 @@ class ElementDefinitionBinding extends Element
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var BindingStrengthType|null strength required | extensible | preferred | example */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/binding-strength|5.0.0', strength: 'required')]
         public ?BindingStrengthType $strength = null,
         /** @var MarkdownPrimitive|null description Intended use of codes in the bound value set */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $description = null,
         /** @var CanonicalPrimitive|null valueSet Source of value set */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ValueSet'])]
         public ?CanonicalPrimitive $valueSet = null,
         /** @var array<ElementDefinitionBindingAdditional> additional Additional Bindings - more rules about the binding */
         #[FhirProperty(

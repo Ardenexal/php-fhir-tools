@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
@@ -17,6 +18,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  * @description Indicates alternate codings and/or original text for the concept represented by the code.  Codings or text provided SHALL convey equivalent meaning to the meaning of the code being extended (though with potential differences in level of detail conveyed).
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/alternate-codes', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'code')]
+#[FHIRExtensionContext(type: 'element', expression: 'string')]
+#[FHIRExtensionContext(type: 'element', expression: 'Coding')]
 class AlternateCodesExtension extends Extension
 {
     public function __construct(

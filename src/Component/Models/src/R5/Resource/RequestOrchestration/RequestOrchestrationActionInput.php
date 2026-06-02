@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\RequestOrchestration;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\DataRequirement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -16,6 +18,12 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  * @description Defines input data requirements for the action.
  */
 #[FHIRBackboneElement(parentResource: 'RequestOrchestration', elementPath: 'RequestOrchestration.action.input', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'pld-0',
+    severity: 'error',
+    expression: 'requirement.exists() xor relatedData.exists()',
+    human: 'Input data elements must have a requirement or a relatedData, but not both',
+)]
 class RequestOrchestrationActionInput extends BackboneElement
 {
     public function __construct(
@@ -26,7 +34,7 @@ class RequestOrchestrationActionInput extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var StringPrimitive|string|null title User-visible title */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

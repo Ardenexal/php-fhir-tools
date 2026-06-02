@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Expression;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  * @description An expression that defines the criteria for group membership. This extension can only be used on a Group resource with a membership of `definitional`. When this expression is used, the Group resource cannot have any characteristic elements; this mechanism is exclusive with characteristics. The result of the expression SHALL be boolean-valued. The expression SHALL be parameterized with a `%context` variable that represents the subject being tested for membership. If evaluation of the expression results in `true`, the subject is considered a member of the group.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/characteristicExpression', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'Group')]
 class CharacteristicExpressionExtension extends Extension
 {
     public function __construct(

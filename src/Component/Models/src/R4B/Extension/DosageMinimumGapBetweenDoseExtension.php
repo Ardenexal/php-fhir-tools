@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
@@ -19,6 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\Base64BinaryPrimitive;
  * @description The minimum amount of time that must pass between administering the specified dose amount.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/dosage-minimumGapBetweenDose', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'Dosage')]
 class DosageMinimumGapBetweenDoseExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

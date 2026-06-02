@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\CarePlan;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference;
@@ -26,7 +28,7 @@ class CarePlanActivity extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var array<CodeableReference> performedActivity Results of the activity (concept, or Appointment, Encounter, Procedure, etc.) */
         #[FhirProperty(
@@ -35,6 +37,7 @@ class CarePlanActivity extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public array $performedActivity = [],
         /** @var array<Annotation> progress Comments about the activity status/progress */
         #[FhirProperty(
@@ -46,6 +49,19 @@ class CarePlanActivity extends BackboneElement
         public array $progress = [],
         /** @var Reference|null plannedActivityReference Activity that is intended to be part of the care plan */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Appointment',
+            'http://hl7.org/fhir/StructureDefinition/CommunicationRequest',
+            'http://hl7.org/fhir/StructureDefinition/DeviceRequest',
+            'http://hl7.org/fhir/StructureDefinition/MedicationRequest',
+            'http://hl7.org/fhir/StructureDefinition/NutritionOrder',
+            'http://hl7.org/fhir/StructureDefinition/Task',
+            'http://hl7.org/fhir/StructureDefinition/ServiceRequest',
+            'http://hl7.org/fhir/StructureDefinition/VisionPrescription',
+            'http://hl7.org/fhir/StructureDefinition/RequestOrchestration',
+            'http://hl7.org/fhir/StructureDefinition/ImmunizationRecommendation',
+            'http://hl7.org/fhir/StructureDefinition/SupplyRequest',
+        ])]
         public ?Reference $plannedActivityReference = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

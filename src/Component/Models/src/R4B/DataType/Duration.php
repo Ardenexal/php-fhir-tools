@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
@@ -18,6 +21,12 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
  * @description A length of time.
  */
 #[FHIRComplexType(typeName: 'Duration', fhirVersion: 'R4B')]
+#[FHIRPathInvariant(
+    key: 'drt-1',
+    severity: 'error',
+    expression: 'value.exists() implies ((system = %ucum) and code.exists())',
+    human: 'There SHALL be a code if there is a value and it SHALL be an expression of time.  If system is present, it SHALL be UCUM.',
+)]
 class Duration extends Quantity
 {
     public function __construct(
@@ -31,7 +40,7 @@ class Duration extends Quantity
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]
         public ?string $value = null,
         /** @var QuantityComparatorType|null comparator < | <= | >= | > - how to understand the value */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/quantity-comparator|4.3.0', strength: 'required'), FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because the comparator modifies the interpretation of the value significantly. If there is no comparator, then there is no modification of the value')]
         public ?QuantityComparatorType $comparator = null,
         /** @var StringPrimitive|string|null unit Unit representation */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

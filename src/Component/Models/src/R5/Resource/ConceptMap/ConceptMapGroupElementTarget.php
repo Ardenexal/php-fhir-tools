@@ -6,6 +6,10 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\ConceptMap;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\ConceptMapRelationshipType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -18,6 +22,18 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A concept from the target value set that this concept maps to.
  */
 #[FHIRBackboneElement(parentResource: 'ConceptMap', elementPath: 'ConceptMap.group.element.target', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'cmd-1',
+    severity: 'error',
+    expression: 'comment.exists() or (%resource.status = \'draft\') or relationship.empty() or ((relationship != \'source-is-broader-than-target\') and (relationship != \'not-related-to\'))',
+    human: 'If the map is source-is-broader-than-target or not-related-to, there SHALL be some comments, unless the status is \'draft\'',
+)]
+#[FHIRPathInvariant(
+    key: 'cmd-7',
+    severity: 'error',
+    expression: '(code.exists() and valueSet.empty()) or (code.empty() and valueSet.exists())',
+    human: 'Either code or valueSet SHALL be present but not both.',
+)]
 class ConceptMapGroupElementTarget extends BackboneElement
 {
     public function __construct(
@@ -28,7 +44,7 @@ class ConceptMapGroupElementTarget extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodePrimitive|null code Code that identifies the target element */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
@@ -37,10 +53,10 @@ class ConceptMapGroupElementTarget extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $display = null,
         /** @var CanonicalPrimitive|null valueSet Identifies the set of target concepts */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ValueSet'])]
         public ?CanonicalPrimitive $valueSet = null,
         /** @var ConceptMapRelationshipType|null relationship related-to | equivalent | source-is-narrower-than-target | source-is-broader-than-target | not-related-to */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/concept-map-relationship|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'The \'not-related-to\' relationship means that there is no mapping from the source to the target, and the mapping cannot be interpreted without knowing this value as it could mean the elements are equivalent, totally mismatched or anything in between')]
         public ?ConceptMapRelationshipType $relationship = null,
         /** @var StringPrimitive|string|null comment Description of status/issues in mapping */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

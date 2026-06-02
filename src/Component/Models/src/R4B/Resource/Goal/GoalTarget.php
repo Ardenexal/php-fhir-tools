@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\Goal;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Duration;
@@ -20,6 +22,12 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  * @description Indicates what should be done by when.
  */
 #[FHIRBackboneElement(parentResource: 'Goal', elementPath: 'Goal.target', fhirVersion: 'R4B')]
+#[FHIRPathInvariant(
+    key: 'gol-1',
+    severity: 'error',
+    expression: '(detail.exists() and measure.exists()) or detail.exists().not()',
+    human: 'Goal.target.measure is required if Goal.target.detail is populated',
+)]
 class GoalTarget extends BackboneElement
 {
     public function __construct(
@@ -30,7 +38,7 @@ class GoalTarget extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null measure The parameter whose value is being tracked */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
 
@@ -17,6 +18,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
  * @description Indicates one of the resources that was used to infer the specified maturity or standards status.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/structuredefinition-conformance-derivedFrom', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'fhirpath', expression: 'extension(\'http://hl7.org/fhir/StructureDefinition/structuredefinition-fmm\').value')]
+#[FHIRExtensionContext(
+    type: 'fhirpath',
+    expression: 'extension(\'http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status\').value',
+)]
 class SDStatusDerivationExtension extends Extension
 {
     public function __construct(

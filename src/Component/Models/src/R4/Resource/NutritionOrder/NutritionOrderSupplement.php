@@ -6,12 +6,13 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\NutritionOrder;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\Timing;
 
 /**
  * @description Oral nutritional products given in order to add further nutritional value to the patient's diet.
@@ -27,7 +28,7 @@ class NutritionOrderSupplement extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null type Type of supplement product requested */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
@@ -40,7 +41,7 @@ class NutritionOrderSupplement extends BackboneElement
             fhirType: 'Timing',
             propertyKind: 'complex',
             isArray: true,
-            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Timing',
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing',
         )]
         public array $schedule = [],
         /** @var Quantity|null quantity Amount of the nutritional supplement */

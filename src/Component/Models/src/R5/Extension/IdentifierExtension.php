@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
  * @description External Identifiers associated with this element - these are identifiers that are associated with the concept this element represents. DEPRECATED: Use either ElementDefinition.code or ElementDefinition.mapping to provide the mapping instead
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/elementdefinition-identifier', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]
 class IdentifierExtension extends Extension
 {
     public function __construct(

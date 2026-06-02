@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\EvidenceVariable;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
@@ -22,6 +25,12 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
  * @description A defining factor of the EvidenceVariable. Multiple characteristics are applied with "and" semantics.
  */
 #[FHIRBackboneElement(parentResource: 'EvidenceVariable', elementPath: 'EvidenceVariable.characteristic', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'evv-1',
+    severity: 'error',
+    expression: '(definitionReference.count() + definitionCanonical.count() + definitionCodeableConcept.count() + definitionId.count() + definitionByTypeAndValue.count() + definitionByCombination.count())  < 2',
+    human: 'In a characteristic, at most one of these six elements shall be used: definitionReference or definitionCanonical or definitionCodeableConcept or definitionId or definitionByTypeAndValue or definitionByCombination',
+)]
 class EvidenceVariableCharacteristic extends BackboneElement
 {
     public function __construct(
@@ -32,7 +41,7 @@ class EvidenceVariableCharacteristic extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var IdPrimitive|null linkId Label for internal linking */
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive')]
@@ -53,9 +62,18 @@ class EvidenceVariableCharacteristic extends BackboneElement
         public ?bool $exclude = null,
         /** @var Reference|null definitionReference Defines the characteristic (without using type and value) by a Reference */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/EvidenceVariable',
+            'http://hl7.org/fhir/StructureDefinition/Group',
+            'http://hl7.org/fhir/StructureDefinition/Evidence',
+        ])]
         public ?Reference $definitionReference = null,
         /** @var CanonicalPrimitive|null definitionCanonical Defines the characteristic (without using type and value) by a Canonical */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/EvidenceVariable',
+            'http://hl7.org/fhir/StructureDefinition/Evidence',
+        ])]
         public ?CanonicalPrimitive $definitionCanonical = null,
         /** @var CodeableConcept|null definitionCodeableConcept Defines the characteristic (without using type and value) by a CodeableConcept */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]

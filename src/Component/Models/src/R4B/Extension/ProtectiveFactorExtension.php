@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableReference;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
@@ -17,6 +18,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  * @description Characteristics or strengths of individuals, families, community situations or societies that mitigate risks and promote positivewell-being and healthy development; attributes that help to successfully navigate difficult situations; factors that may contribute to or explain positive outcomes.  A trait or habit that "protects" people and makes them less likely to get a chronic disease that include, but are not limited to exercise, healthy eating, managing weight, managing blood pressure and cholesterol, managing mental health,  feeling happy, strong emotional support and social connections.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-protectiveFactor', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'Goal')]
+#[FHIRExtensionContext(type: 'element', expression: 'CommunicationRequest')]
+#[FHIRExtensionContext(type: 'element', expression: 'CarePlan.activity')]
 class ProtectiveFactorExtension extends Extension
 {
     public function __construct(

@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CapabilityStatementKindType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeSearchSupportType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
@@ -41,6 +44,36 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     url: 'http://hl7.org/fhir/StructureDefinition/TerminologyCapabilities',
     fhirVersion: 'R4',
 )]
+#[FHIRPathInvariant(
+    key: 'tcp-0',
+    severity: 'warning',
+    expression: 'name.matches(\'[A-Z]([A-Za-z0-9_]){0,254}\')',
+    human: 'Name should be usable as an identifier for the module by machine processing applications such as code generation',
+)]
+#[FHIRPathInvariant(
+    key: 'tcp-2',
+    severity: 'error',
+    expression: '(description.count() + software.count() + implementation.count()) > 0',
+    human: 'A Capability Statement SHALL have at least one of description, software, or implementation element.',
+)]
+#[FHIRPathInvariant(
+    key: 'tcp-3',
+    severity: 'error',
+    expression: '(kind != \'instance\') or implementation.exists()',
+    human: 'If kind = instance, implementation must be present and software may be present',
+)]
+#[FHIRPathInvariant(
+    key: 'tcp-4',
+    severity: 'error',
+    expression: '(kind != \'capability\') or (implementation.exists().not() and software.exists())',
+    human: 'If kind = capability, implementation must be absent, software must be present',
+)]
+#[FHIRPathInvariant(
+    key: 'tcp-5',
+    severity: 'error',
+    expression: '(kind!=\'requirements\') or (implementation.exists().not() and software.exists().not())',
+    human: 'If kind = requirements, implementation and software must be absent',
+)]
 class TerminologyCapabilitiesResource extends DomainResourceResource
 {
     public function __construct(
@@ -51,10 +84,15 @@ class TerminologyCapabilitiesResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies it\'s meaning or interpretation')]
         public ?UriPrimitive $implicitRules = null,
         /** @var string|null language Language of the resource content */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
+            strength: 'preferred',
+            maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+        )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -66,7 +104,7 @@ class TerminologyCapabilitiesResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the resource that contains them')]
         public array $modifierExtension = [],
         /** @var UriPrimitive|null url Canonical identifier for this terminology capabilities, represented as a URI (globally unique) */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
@@ -81,7 +119,7 @@ class TerminologyCapabilitiesResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $title = null,
         /** @var PublicationStatusType|null status draft | active | retired | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|4.0.1', strength: 'required'), FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because applications should not use a retired {{title}} without due consideration')]
         public ?PublicationStatusType $status = null,
         /** @var bool|null experimental For testing purposes, not real usage */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
@@ -118,6 +156,7 @@ class TerminologyCapabilitiesResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/jurisdiction', strength: 'extensible')]
         public array $jurisdiction = [],
         /** @var MarkdownPrimitive|null purpose Why this terminology capabilities is defined */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -126,7 +165,7 @@ class TerminologyCapabilitiesResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $copyright = null,
         /** @var CapabilityStatementKindType|null kind instance | capability | requirements */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/capability-statement-kind|4.0.1', strength: 'required')]
         public ?CapabilityStatementKindType $kind = null,
         /** @var TerminologyCapabilitiesSoftware|null software Software that is covered by this terminology capability statement */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
@@ -149,7 +188,7 @@ class TerminologyCapabilitiesResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
         public ?TerminologyCapabilitiesExpansion $expansion = null,
         /** @var CodeSearchSupportType|null codeSearch explicit | all */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/code-search-support|4.0.1', strength: 'required')]
         public ?CodeSearchSupportType $codeSearch = null,
         /** @var TerminologyCapabilitiesValidateCode|null validateCode Information about the [ValueSet/$validate-code](valueset-operation-validate-code.html) operation */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]

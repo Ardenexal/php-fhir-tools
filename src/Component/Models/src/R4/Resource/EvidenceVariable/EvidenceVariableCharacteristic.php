@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\EvidenceVariable;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\DataRequirement;
@@ -15,12 +18,12 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\GroupMeasureType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\TriggerDefinition;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\UsageContext;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\Timing;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -37,7 +40,7 @@ class EvidenceVariableCharacteristic extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var StringPrimitive|string|null description Natural language description of the characteristic */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -88,6 +91,10 @@ class EvidenceVariableCharacteristic extends BackboneElement
             ],
         )]
         #[NotBlank]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Group',
+            'http://hl7.org/fhir/StructureDefinition/ActivityDefinition',
+        ])]
         public Reference|CanonicalPrimitive|CodeableConcept|Expression|DataRequirement|TriggerDefinition|null $definition = null,
         /** @var array<UsageContext> usageContext What code/value pairs define members? */
         #[FhirProperty(
@@ -127,7 +134,7 @@ class EvidenceVariableCharacteristic extends BackboneElement
                 [
                     'fhirType'     => 'Timing',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Timing',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing',
                     'jsonKey'      => 'participantEffectiveTiming',
                 ],
             ],
@@ -137,7 +144,7 @@ class EvidenceVariableCharacteristic extends BackboneElement
         #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex')]
         public ?Duration $timeFromStart = null,
         /** @var GroupMeasureType|null groupMeasure mean | median | mean-of-mean | mean-of-median | median-of-mean | median-of-median */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/group-measure|4.0.1', strength: 'required')]
         public ?GroupMeasureType $groupMeasure = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

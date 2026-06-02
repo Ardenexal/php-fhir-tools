@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
  * @description A result of the condition. The "Cause of death" for a patient is typically captured as an Observation.  The "outcome" doesn't imply causality.  Some outcomes might not be assessable until the condition.clinicalStatus is no longer active.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/condition-outcome', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'Condition')]
 class ConditionOutcomeExtension extends Extension
 {
     public function __construct(

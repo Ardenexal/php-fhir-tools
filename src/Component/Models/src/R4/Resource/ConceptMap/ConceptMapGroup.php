@@ -6,10 +6,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\ConceptMap;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
+use Symfony\Component\Validator\Constraints\Count;
 
 /**
  * @description A group of mappings that all have the same source and target system.
@@ -25,7 +27,7 @@ class ConceptMapGroup extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var UriPrimitive|null source Source system where concepts to be mapped are defined */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
@@ -47,6 +49,7 @@ class ConceptMapGroup extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Resource\ConceptMap\ConceptMapGroupElement',
         )]
+        #[Count(min: 1)]
         public array $element = [],
         /** @var ConceptMapGroupUnmapped|null unmapped What to do when there is no mapping for the source concept */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]

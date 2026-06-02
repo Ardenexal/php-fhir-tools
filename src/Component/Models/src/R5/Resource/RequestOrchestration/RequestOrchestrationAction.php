@@ -6,6 +6,10 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\RequestOrchestration;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\ActionCardinalityBehaviorType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\ActionGroupingBehaviorType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\ActionPrecheckBehaviorType;
@@ -33,6 +37,12 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
  * @description The actions, if any, produced by the evaluation of the artifact.
  */
 #[FHIRBackboneElement(parentResource: 'RequestOrchestration', elementPath: 'RequestOrchestration.action', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'rqg-1',
+    severity: 'error',
+    expression: 'resource.exists() != action.exists()',
+    human: 'Must have resource or action but not both',
+)]
 class RequestOrchestrationAction extends BackboneElement
 {
     public function __construct(
@@ -43,7 +53,7 @@ class RequestOrchestrationAction extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var StringPrimitive|string|null linkId Pointer to specific item from the PlanDefinition */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -61,7 +71,7 @@ class RequestOrchestrationAction extends BackboneElement
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $textEquivalent = null,
         /** @var RequestPriorityType|null priority routine | urgent | asap | stat */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/request-priority|5.0.0', strength: 'required')]
         public ?RequestPriorityType $priority = null,
         /** @var array<CodeableConcept> code Code representing the meaning of the action or sub-actions */
         #[FhirProperty(
@@ -86,6 +96,7 @@ class RequestOrchestrationAction extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Goal'])]
         public array $goal = [],
         /** @var array<RequestOrchestrationActionCondition> condition Whether or not the action is applicable */
         #[FhirProperty(
@@ -165,7 +176,7 @@ class RequestOrchestrationAction extends BackboneElement
         )]
         public DateTimePrimitive|Age|Period|Duration|Range|Timing|null $timing = null,
         /** @var CodeableReference|null location Where it should happen */
-        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
         public ?CodeableReference $location = null,
         /** @var array<RequestOrchestrationActionParticipant> participant Who should perform the action */
         #[FhirProperty(
@@ -176,25 +187,25 @@ class RequestOrchestrationAction extends BackboneElement
         )]
         public array $participant = [],
         /** @var CodeableConcept|null type create | update | remove | fire-event */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-type', strength: 'extensible')]
         public ?CodeableConcept $type = null,
         /** @var ActionGroupingBehaviorType|null groupingBehavior visual-group | logical-group | sentence-group */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-grouping-behavior|5.0.0', strength: 'required')]
         public ?ActionGroupingBehaviorType $groupingBehavior = null,
         /** @var ActionSelectionBehaviorType|null selectionBehavior any | all | all-or-none | exactly-one | at-most-one | one-or-more */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-selection-behavior|5.0.0', strength: 'required')]
         public ?ActionSelectionBehaviorType $selectionBehavior = null,
         /** @var ActionRequiredBehaviorType|null requiredBehavior must | could | must-unless-documented */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-required-behavior|5.0.0', strength: 'required')]
         public ?ActionRequiredBehaviorType $requiredBehavior = null,
         /** @var ActionPrecheckBehaviorType|null precheckBehavior yes | no */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-precheck-behavior|5.0.0', strength: 'required')]
         public ?ActionPrecheckBehaviorType $precheckBehavior = null,
         /** @var ActionCardinalityBehaviorType|null cardinalityBehavior single | multiple */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-cardinality-behavior|5.0.0', strength: 'required')]
         public ?ActionCardinalityBehaviorType $cardinalityBehavior = null,
         /** @var Reference|null resource The target of the action */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public ?Reference $resource = null,
         /** @var CanonicalPrimitive|UriPrimitive|null definition Description of the activity to be performed */
         #[FhirProperty(
@@ -216,9 +227,16 @@ class RequestOrchestrationAction extends BackboneElement
                 ],
             ],
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/ActivityDefinition',
+            'http://hl7.org/fhir/StructureDefinition/ObservationDefinition',
+            'http://hl7.org/fhir/StructureDefinition/PlanDefinition',
+            'http://hl7.org/fhir/StructureDefinition/Questionnaire',
+            'http://hl7.org/fhir/StructureDefinition/SpecimenDefinition',
+        ])]
         public CanonicalPrimitive|UriPrimitive|null $definition = null,
         /** @var CanonicalPrimitive|null transform Transform to apply the template */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/StructureMap'])]
         public ?CanonicalPrimitive $transform = null,
         /** @var array<RequestOrchestrationActionDynamicValue> dynamicValue Dynamic aspects of the definition */
         #[FhirProperty(

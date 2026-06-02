@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
 
@@ -14,9 +15,10 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
  *
  * @see http://hl7.org/fhir/StructureDefinition/endpoint-fhir-version
  *
- * @description The Patient Access Endpoint's FHIR Version. This Extension is a denormalization to help clients focus on supported endpoints.
+ * @description The Endpoint's FHIR Version. This Extension is a denormalization to help clients focus on supported endpoints.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/endpoint-fhir-version', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'Endpoint')]
 class EndpointFhirVersionExtension extends Extension
 {
     public function __construct(

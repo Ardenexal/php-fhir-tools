@@ -6,6 +6,10 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\Composition;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -18,6 +22,18 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  * @description The root of the sections that make up the composition.
  */
 #[FHIRBackboneElement(parentResource: 'Composition', elementPath: 'Composition.section', fhirVersion: 'R4')]
+#[FHIRPathInvariant(
+    key: 'cmp-1',
+    severity: 'error',
+    expression: 'text.exists() or entry.exists() or section.exists()',
+    human: 'A section must contain at least one of text, entries, or sub-sections',
+)]
+#[FHIRPathInvariant(
+    key: 'cmp-2',
+    severity: 'error',
+    expression: 'emptyReason.empty() or entry.empty()',
+    human: 'A section can only have an emptyReason if it is empty',
+)]
 class CompositionSection extends BackboneElement
 {
     public function __construct(
@@ -28,7 +44,7 @@ class CompositionSection extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var StringPrimitive|string|null title Label for section (e.g. for ToC) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -43,18 +59,26 @@ class CompositionSection extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Practitioner',
+            'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
+            'http://hl7.org/fhir/StructureDefinition/Device',
+            'http://hl7.org/fhir/StructureDefinition/Patient',
+            'http://hl7.org/fhir/StructureDefinition/RelatedPerson',
+            'http://hl7.org/fhir/StructureDefinition/Organization',
+        ])]
         public array $author = [],
         /** @var Reference|null focus Who/what the section is about, when it is not about the subject of composition */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public ?Reference $focus = null,
         /** @var Narrative|null text Text summary of the section, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
         /** @var ListModeType|null mode working | snapshot | changes */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/list-mode|4.0.1', strength: 'required')]
         public ?ListModeType $mode = null,
         /** @var CodeableConcept|null orderedBy Order of section entries */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/list-order', strength: 'preferred')]
         public ?CodeableConcept $orderedBy = null,
         /** @var array<Reference> entry A reference to data that supports this section */
         #[FhirProperty(
@@ -63,9 +87,10 @@ class CompositionSection extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public array $entry = [],
         /** @var CodeableConcept|null emptyReason Why the section is empty */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/list-empty-reason', strength: 'preferred')]
         public ?CodeableConcept $emptyReason = null,
         /** @var array<CompositionSection> section Nested Section */
         #[FhirProperty(

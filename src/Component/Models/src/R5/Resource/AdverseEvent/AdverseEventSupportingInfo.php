@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\AdverseEvent;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -26,7 +28,7 @@ class AdverseEventSupportingInfo extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var Reference|CodeableConcept|null item Subject medical history or document relevant to this adverse event */
         #[FhirProperty(
@@ -50,6 +52,18 @@ class AdverseEventSupportingInfo extends BackboneElement
             ],
         )]
         #[NotBlank]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Condition',
+            'http://hl7.org/fhir/StructureDefinition/Observation',
+            'http://hl7.org/fhir/StructureDefinition/AllergyIntolerance',
+            'http://hl7.org/fhir/StructureDefinition/FamilyMemberHistory',
+            'http://hl7.org/fhir/StructureDefinition/Immunization',
+            'http://hl7.org/fhir/StructureDefinition/Procedure',
+            'http://hl7.org/fhir/StructureDefinition/DocumentReference',
+            'http://hl7.org/fhir/StructureDefinition/MedicationAdministration',
+            'http://hl7.org/fhir/StructureDefinition/MedicationStatement',
+            'http://hl7.org/fhir/StructureDefinition/QuestionnaireResponse',
+        ])]
         public Reference|CodeableConcept|null $item = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

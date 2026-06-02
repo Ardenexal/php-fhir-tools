@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Primitive;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Symfony\Component\Validator\Constraints\Regex;
 
 /**
  * @author HL7 FHIR Standard
@@ -31,7 +32,7 @@ class IdPrimitive extends StringPrimitive implements \Stringable
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var string|null value Primitive value for id */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@value')]
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.String', propertyKind: 'scalar', xmlSerializedName: '@value'), Regex(pattern: '[A-Za-z0-9\-\.]{1,64}')]
         public ?string $value = null,
     ) {
         parent::__construct($id, $extension, $value);

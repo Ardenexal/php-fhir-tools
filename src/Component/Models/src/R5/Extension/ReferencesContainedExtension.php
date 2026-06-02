@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 
@@ -17,6 +18,10 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
  * @description This indicates that the element containing this extension has an expression, xhtml, or some other content that makes reference to the specified contained resource in a way that is not detectable by the dom-3 constraint.  This extension is included to make the reference 'visible' to the dom-3 constraint.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/referencesContained', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'markdown')]
+#[FHIRExtensionContext(type: 'element', expression: 'string')]
+#[FHIRExtensionContext(type: 'element', expression: 'Narrative')]
+#[FHIRExtensionContext(type: 'element', expression: 'Expression')]
 class ReferencesContainedExtension extends Extension
 {
     public function __construct(

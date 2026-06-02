@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R5\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\TestScriptResource;
 
 /**
@@ -15,6 +16,36 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\TestScriptResource;
  * @description Enforces the minimum information set for the test script metadata required by HL7 and other organizations that share and publish test scripts
  */
 #[FHIRProfile(profileUrl: 'http://hl7.org/fhir/StructureDefinition/shareabletestscript', baseType: 'TestScript', fhirVersion: 'R5')]
+#[FHIRProfileConstraint(
+    path: 'url',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['min' => 1, 'max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/shareabletestscript'],
+)]
+#[FHIRProfileConstraint(
+    path: 'version',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['min' => 1, 'max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/shareabletestscript'],
+)]
+#[FHIRProfileConstraint(
+    path: 'experimental',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['min' => 1, 'max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/shareabletestscript'],
+)]
+#[FHIRProfileConstraint(
+    path: 'publisher',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['min' => 1, 'max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/shareabletestscript'],
+)]
+#[FHIRProfileConstraint(
+    path: 'description',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['min' => 1, 'max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/shareabletestscript'],
+)]
 class ShareableTestScriptProfile extends TestScriptResource
 {
     /** Canonical URL of this profile's StructureDefinition. */

@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
@@ -23,6 +26,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\NutritionIntake\NutritionIntakeConsumedItem;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\NutritionIntake\NutritionIntakeIngredientLabel;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\NutritionIntake\NutritionIntakePerformer;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -48,10 +52,10 @@ class NutritionIntakeResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -63,7 +67,7 @@ class NutritionIntakeResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the resource that contains them')]
         public array $modifierExtension = [],
         /** @var array<Identifier> identifier External identifier */
         #[FhirProperty(
@@ -75,6 +79,22 @@ class NutritionIntakeResource extends DomainResourceResource
         public array $identifier = [],
         /** @var array<CanonicalPrimitive> instantiatesCanonical Instantiates FHIR protocol or definition */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true)]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/ActivityDefinition',
+            'http://hl7.org/fhir/StructureDefinition/ChargeItemDefinition',
+            'http://hl7.org/fhir/StructureDefinition/ClinicalUseDefinition',
+            'http://hl7.org/fhir/StructureDefinition/EventDefinition',
+            'http://hl7.org/fhir/StructureDefinition/Measure',
+            'http://hl7.org/fhir/StructureDefinition/MessageDefinition',
+            'http://hl7.org/fhir/StructureDefinition/ObservationDefinition',
+            'http://hl7.org/fhir/StructureDefinition/OperationDefinition',
+            'http://hl7.org/fhir/StructureDefinition/PlanDefinition',
+            'http://hl7.org/fhir/StructureDefinition/Questionnaire',
+            'http://hl7.org/fhir/StructureDefinition/Requirements',
+            'http://hl7.org/fhir/StructureDefinition/SubscriptionTopic',
+            'http://hl7.org/fhir/StructureDefinition/TestPlan',
+            'http://hl7.org/fhir/StructureDefinition/TestScript',
+        ])]
         public array $instantiatesCanonical = [],
         /** @var array<UriPrimitive> instantiatesUri Instantiates external protocol or definition */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isArray: true)]
@@ -86,6 +106,11 @@ class NutritionIntakeResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/NutritionOrder',
+            'http://hl7.org/fhir/StructureDefinition/CarePlan',
+            'http://hl7.org/fhir/StructureDefinition/ServiceRequest',
+        ])]
         public array $basedOn = [],
         /** @var array<Reference> partOf Part of referenced event */
         #[FhirProperty(
@@ -94,9 +119,14 @@ class NutritionIntakeResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/NutritionIntake',
+            'http://hl7.org/fhir/StructureDefinition/Procedure',
+            'http://hl7.org/fhir/StructureDefinition/Observation',
+        ])]
         public array $partOf = [],
         /** @var EventStatusType|null status preparation | in-progress | not-done | on-hold | stopped | completed | entered-in-error | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/event-status|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'This element is labelled as a modifier because it is a status element that contains status entered-in-error which means that the resource should not be treated as valid')]
         public ?EventStatusType $status = null,
         /** @var array<CodeableConcept> statusReason Reason for current status */
         #[FhirProperty(
@@ -110,10 +140,10 @@ class NutritionIntakeResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $code = null,
         /** @var Reference|null subject Who is/was consuming the food or fluid */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Patient', 'http://hl7.org/fhir/StructureDefinition/Group'])]
         public ?Reference $subject = null,
         /** @var Reference|null encounter Encounter associated with NutritionIntake */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Encounter'])]
         public ?Reference $encounter = null,
         /** @var DateTimePrimitive|Period|null occurrence The date/time or interval when the food or fluid is/was consumed */
         #[FhirProperty(
@@ -154,6 +184,13 @@ class NutritionIntakeResource extends DomainResourceResource
                 ],
             ],
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Patient',
+            'http://hl7.org/fhir/StructureDefinition/RelatedPerson',
+            'http://hl7.org/fhir/StructureDefinition/Practitioner',
+            'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
+            'http://hl7.org/fhir/StructureDefinition/Organization',
+        ])]
         public bool|Reference|null $reported = null,
         /** @var array<NutritionIntakeConsumedItem> consumedItem What food or fluid product or item was consumed */
         #[FhirProperty(
@@ -163,6 +200,7 @@ class NutritionIntakeResource extends DomainResourceResource
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\NutritionIntake\NutritionIntakeConsumedItem',
         )]
+        #[Count(min: 1)]
         public array $consumedItem = [],
         /** @var array<NutritionIntakeIngredientLabel> ingredientLabel Total nutrient for the whole meal, product, serving */
         #[FhirProperty(
@@ -181,7 +219,7 @@ class NutritionIntakeResource extends DomainResourceResource
         )]
         public array $performer = [],
         /** @var Reference|null location Where the intake occurred */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
         public ?Reference $location = null,
         /** @var array<Reference> derivedFrom Additional supporting information */
         #[FhirProperty(
@@ -190,6 +228,7 @@ class NutritionIntakeResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public array $derivedFrom = [],
         /** @var array<CodeableReference> reason Reason for why the food or fluid is /was consumed */
         #[FhirProperty(
@@ -198,6 +237,12 @@ class NutritionIntakeResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Condition',
+            'http://hl7.org/fhir/StructureDefinition/Observation',
+            'http://hl7.org/fhir/StructureDefinition/DiagnosticReport',
+            'http://hl7.org/fhir/StructureDefinition/DocumentReference',
+        ])]
         public array $reason = [],
         /** @var array<Annotation> note Further information about the consumption */
         #[FhirProperty(

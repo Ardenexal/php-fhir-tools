@@ -6,12 +6,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Range;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
 
 /**
@@ -22,18 +22,20 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
  * @description Alert detection activation state describes whether a device is set to annunciate when a [DeviceAlert](http://hl7.org/fhir/StructureDefinition/DeviceAlert) condition occurs. This extension describes the reported alert detection activation state for the indicated combination of alert code and priority at the indicated point in time. The extension may be used on a [Device](http://hl7.org/fhir/StructureDefinition/Device), or on the specific [DeviceMetric](http://hl7.org/fhir/StructureDefinition/DeviceMetric) that could detect the condition or annunciate the alert.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/device-alertDetection', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceMetric')]
+#[FHIRExtensionContext(type: 'element', expression: 'Device')]
 class DeviceAlertDetectionExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(
-        /** @var CodePrimitive activationState The activation state of the specified alert (or alerts) */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
-        public CodePrimitive $activationState,
+        /** @var CodeableConcept activationState The activation state of the specified alert (or alerts) */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public CodeableConcept $activationState,
         /** @var CodeableConcept|null alertCode The alert for which the alert detection activation state is described */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $alertCode = null,
-        /** @var CodePrimitive|null priority The alert priority for which the alert detection activation state is described */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
-        public ?CodePrimitive $priority = null,
+        /** @var CodeableConcept|null priority The alert priority for which the alert detection activation state is described */
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        public ?CodeableConcept $priority = null,
         /** @var DateTimePrimitive|null effective The point(s) in time this activation state was in effect */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $effective = null,
@@ -82,13 +84,13 @@ class DeviceAlertDetectionExtension extends Extension implements FHIRComplexExte
             if ($extUrl === 'alertCode' && $ext->value instanceof CodeableConcept) {
                 $alertCode = $ext->value;
             }
-            if ($extUrl === 'priority' && $ext->value instanceof CodePrimitive) {
+            if ($extUrl === 'priority' && $ext->value instanceof CodeableConcept) {
                 $priority = $ext->value;
             }
             if ($extUrl === 'effective' && $ext->value instanceof DateTimePrimitive) {
                 $effective = $ext->value;
             }
-            if ($extUrl === 'activationState' && $ext->value instanceof CodePrimitive) {
+            if ($extUrl === 'activationState' && $ext->value instanceof CodeableConcept) {
                 $activationState = $ext->value;
             }
             if ($extUrl === 'limitRange' && $ext->value instanceof Range) {

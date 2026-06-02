@@ -6,6 +6,10 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\ConceptMap;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\ConceptMapPropertyTypeType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -19,6 +23,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A property defines a slot through which additional information can be provided about a map from source -> target.
  */
 #[FHIRBackboneElement(parentResource: 'ConceptMap', elementPath: 'ConceptMap.property', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'cmd-11',
+    severity: 'error',
+    expression: 'type = \'code\' implies system.exists()',
+    human: 'If the property type is code, a system SHALL be specified',
+)]
 class ConceptMapProperty extends BackboneElement
 {
     public function __construct(
@@ -29,7 +39,7 @@ class ConceptMapProperty extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodePrimitive|null code Identifies the property on the mappings, and when referred to in the $translate operation */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
@@ -41,10 +51,10 @@ class ConceptMapProperty extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $description = null,
         /** @var ConceptMapPropertyTypeType|null type Coding | string | integer | boolean | dateTime | decimal | code */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/conceptmap-property-type|5.0.0', strength: 'required')]
         public ?ConceptMapPropertyTypeType $type = null,
         /** @var CanonicalPrimitive|null system The CodeSystem from which code values come */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/CodeSystem'])]
         public ?CanonicalPrimitive $system = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

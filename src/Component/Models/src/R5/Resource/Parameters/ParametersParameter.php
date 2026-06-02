@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\Parameters;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Address;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Age;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation;
@@ -66,6 +68,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A parameter passed to or received from the operation.
  */
 #[FHIRBackboneElement(parentResource: 'Parameters', elementPath: 'Parameters.parameter', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'inv-1',
+    severity: 'error',
+    expression: '(part.exists() and value.empty() and resource.empty()) or (part.empty() and (value.exists() xor resource.exists()))',
+    human: 'A parameter must have one and only one of (value, resource, part)',
+)]
 class ParametersParameter extends BackboneElement
 {
     public function __construct(
@@ -76,7 +84,7 @@ class ParametersParameter extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var StringPrimitive|string|null name Name from the definition */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]

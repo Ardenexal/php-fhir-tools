@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Distance;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
@@ -21,6 +22,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  * If multiple near positions are included in the search query, the distance to the closest point provided may be included.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/location-distance', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'Bundle.entry.search')]
 class BundleLocationDistanceExtension extends Extension
 {
     public function __construct(

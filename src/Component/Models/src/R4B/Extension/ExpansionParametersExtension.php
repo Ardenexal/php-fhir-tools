@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 
@@ -17,6 +18,8 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
  * @description Specifies the expansion parameters that should be used to expand ValueSets referenced from artifacts in the Library or ImplementationGuide.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/cqf-expansionParameters', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'Library')]
+#[FHIRExtensionContext(type: 'element', expression: 'ImplementationGuide')]
 class ExpansionParametersExtension extends Extension
 {
     public function __construct(

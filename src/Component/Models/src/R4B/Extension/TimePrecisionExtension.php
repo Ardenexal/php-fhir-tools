@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
 
@@ -17,6 +18,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
  * @description Specifies that the precision of the datetime, time, or instant value is less than what appears and indicates the actual level of precision. This extension is used when the precision of a datetime, time, or instant value is not conveyed by the value itself (e.g. the datetime value 2014-02-01T10:00:00Z has a precision of 'min' and actually represents "10:00" and unknown seconds on Feb 1, 2014.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/time-precision', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'instant')]
+#[FHIRExtensionContext(type: 'element', expression: 'dateTime')]
+#[FHIRExtensionContext(type: 'element', expression: 'time')]
 class TimePrecisionExtension extends Extension
 {
     public function __construct(

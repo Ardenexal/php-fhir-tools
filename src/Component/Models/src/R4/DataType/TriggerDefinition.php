@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
@@ -19,6 +22,24 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A description of a triggering event. Triggering events can be named events, data events, or periodic, as determined by the type element.
  */
 #[FHIRComplexType(typeName: 'TriggerDefinition', fhirVersion: 'R4')]
+#[FHIRPathInvariant(
+    key: 'trd-1',
+    severity: 'error',
+    expression: 'data.empty() or timing.empty()',
+    human: 'Either timing, or a data requirement, but not both',
+)]
+#[FHIRPathInvariant(
+    key: 'trd-2',
+    severity: 'error',
+    expression: 'condition.exists() implies data.exists()',
+    human: 'A condition only if there is a data requirement',
+)]
+#[FHIRPathInvariant(
+    key: 'trd-3',
+    severity: 'error',
+    expression: '(type = \'named-event\' implies name.exists()) and (type = \'periodic\' implies timing.exists()) and (type.startsWith(\'data-\') implies data.exists())',
+    human: 'A named event requires a name, a periodic event requires timing, and a data event requires data',
+)]
 class TriggerDefinition extends Element
 {
     public function __construct(
@@ -29,7 +50,7 @@ class TriggerDefinition extends Element
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var TriggerTypeType|null type named-event | periodic | data-changed | data-added | data-modified | data-removed | data-accessed | data-access-ended */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/trigger-type|4.0.1', strength: 'required')]
         public ?TriggerTypeType $type = null,
         /** @var StringPrimitive|string|null name Name or URI that identifies the event */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -66,6 +87,7 @@ class TriggerDefinition extends Element
                 ],
             ],
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Schedule'])]
         public Timing|Reference|DatePrimitive|DateTimePrimitive|null $timing = null,
         /** @var array<DataRequirement> data Triggering data of the event (multiple = 'and') */
         #[FhirProperty(

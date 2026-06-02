@@ -6,6 +6,10 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\CapabilityStatement;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\RestfulCapabilityModeType;
@@ -17,6 +21,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A definition of the restful capabilities of the solution, if any.
  */
 #[FHIRBackboneElement(parentResource: 'CapabilityStatement', elementPath: 'CapabilityStatement.rest', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'cpb-9',
+    severity: 'error',
+    expression: 'resource.select(type).isDistinct()',
+    human: 'A given resource can only be described once per RESTful mode.',
+)]
 class CapabilityStatementRest extends BackboneElement
 {
     public function __construct(
@@ -27,10 +37,10 @@ class CapabilityStatementRest extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var RestfulCapabilityModeType|null mode client | server */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/restful-capability-mode|5.0.0', strength: 'required')]
         public ?RestfulCapabilityModeType $mode = null,
         /** @var MarkdownPrimitive|null documentation General description of implementation */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -71,7 +81,7 @@ class CapabilityStatementRest extends BackboneElement
         )]
         public array $operation = [],
         /** @var array<CanonicalPrimitive> compartment Compartments served/used by system */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/CompartmentDefinition'])]
         public array $compartment = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
@@ -18,6 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
  * @description Further conditions, problems, diagnoses, procedures or events or the substance that caused/triggered this Condition.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/condition-dueTo', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'Condition')]
 class ConditionDueToExtension extends Extension
 {
     public function __construct(

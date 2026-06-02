@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 
 /**
  * @author HL7 FHIR Standard
@@ -25,7 +27,7 @@ class ExtendedContactDetail extends DataType
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var CodeableConcept|null purpose The type of contact */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/contactentity-type', strength: 'preferred')]
         public ?CodeableConcept $purpose = null,
         /** @var array<HumanName> name Name of an individual to contact */
         #[FhirProperty(
@@ -47,7 +49,7 @@ class ExtendedContactDetail extends DataType
         #[FhirProperty(fhirType: 'Address', propertyKind: 'complex')]
         public ?Address $address = null,
         /** @var Reference|null organization This contact detail is handled/monitored by a specific organization */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $organization = null,
         /** @var Period|null period Period that this contact was valid for usage */
         #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]

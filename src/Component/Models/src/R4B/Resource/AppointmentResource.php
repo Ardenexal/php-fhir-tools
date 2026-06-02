@@ -6,6 +6,10 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\AppointmentStatusType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
@@ -21,6 +25,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UnsignedIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Appointment\AppointmentParticipant;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -31,6 +36,24 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A booking of a healthcare event among patient(s), practitioner(s), related person(s) and/or device(s) for a specific date/time. This may result in one or more Encounter(s).
  */
 #[FhirResource(type: 'Appointment', version: '4.3.0', url: 'http://hl7.org/fhir/StructureDefinition/Appointment', fhirVersion: 'R4B')]
+#[FHIRPathInvariant(
+    key: 'app-2',
+    severity: 'error',
+    expression: 'start.exists() = end.exists()',
+    human: 'Either start and end are specified, or neither',
+)]
+#[FHIRPathInvariant(
+    key: 'app-3',
+    severity: 'error',
+    expression: '(start.exists() and end.exists()) or (status in (\'proposed\' | \'cancelled\' | \'waitlist\'))',
+    human: 'Only proposed or cancelled appointments can be missing start/end dates',
+)]
+#[FHIRPathInvariant(
+    key: 'app-4',
+    severity: 'error',
+    expression: 'Appointment.cancelationReason.exists() implies (Appointment.status=\'no-show\' or Appointment.status=\'cancelled\')',
+    human: 'Cancelation reason is only used for appointments that have been cancelled, or no-show',
+)]
 class AppointmentResource extends DomainResourceResource
 {
     public function __construct(
@@ -41,10 +64,15 @@ class AppointmentResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies it\'s meaning or interpretation')]
         public ?UriPrimitive $implicitRules = null,
         /** @var string|null language Language of the resource content */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FHIRValueSetBinding(
+            valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
+            strength: 'preferred',
+            maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
+        )]
         public ?string $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -56,7 +84,7 @@ class AppointmentResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the resource that contains them')]
         public array $modifierExtension = [],
         /** @var array<Identifier> identifier External Ids for this item */
         #[FhirProperty(
@@ -67,7 +95,7 @@ class AppointmentResource extends DomainResourceResource
         )]
         public array $identifier = [],
         /** @var AppointmentStatusType|null status proposed | pending | booked | arrived | fulfilled | cancelled | noshow | entered-in-error | checked-in | waitlist */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/appointmentstatus|4.3.0', strength: 'required'), FHIRIsModifier(reason: 'This element is labelled as a modifier because it is a status element that contains status entered-in-error which means that the resource should not be treated as valid')]
         public ?AppointmentStatusType $status = null,
         /** @var CodeableConcept|null cancelationReason The coded reason for the appointment being cancelled */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
@@ -95,9 +123,10 @@ class AppointmentResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/c80-practice-codes', strength: 'preferred')]
         public array $specialty = [],
         /** @var CodeableConcept|null appointmentType The style of appointment or patient that has been booked in the slot (not service type) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://terminology.hl7.org/ValueSet/v2-0276', strength: 'preferred')]
         public ?CodeableConcept $appointmentType = null,
         /** @var array<CodeableConcept> reasonCode Coded reason this appointment is scheduled */
         #[FhirProperty(
@@ -106,6 +135,7 @@ class AppointmentResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/encounter-reason', strength: 'preferred')]
         public array $reasonCode = [],
         /** @var array<Reference> reasonReference Reason the appointment is to take place (resource) */
         #[FhirProperty(
@@ -114,6 +144,12 @@ class AppointmentResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Condition',
+            'http://hl7.org/fhir/StructureDefinition/Procedure',
+            'http://hl7.org/fhir/StructureDefinition/Observation',
+            'http://hl7.org/fhir/StructureDefinition/ImmunizationRecommendation',
+        ])]
         public array $reasonReference = [],
         /** @var UnsignedIntPrimitive|null priority Used to make informed decisions if needing to re-prioritize */
         #[FhirProperty(fhirType: 'unsignedInt', propertyKind: 'primitive')]
@@ -128,6 +164,7 @@ class AppointmentResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public array $supportingInformation = [],
         /** @var InstantPrimitive|null start When appointment is to take place */
         #[FhirProperty(fhirType: 'instant', propertyKind: 'primitive')]
@@ -145,6 +182,7 @@ class AppointmentResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Slot'])]
         public array $slot = [],
         /** @var DateTimePrimitive|null created The date that this appointment was initially created */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
@@ -162,6 +200,7 @@ class AppointmentResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ServiceRequest'])]
         public array $basedOn = [],
         /** @var array<AppointmentParticipant> participant Participants involved in appointment */
         #[FhirProperty(
@@ -171,6 +210,7 @@ class AppointmentResource extends DomainResourceResource
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Appointment\AppointmentParticipant',
         )]
+        #[Count(min: 1)]
         public array $participant = [],
         /** @var array<Period> requestedPeriod Potential date/time interval(s) requested to allocate the appointment within */
         #[FhirProperty(

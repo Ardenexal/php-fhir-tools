@@ -6,6 +6,10 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference;
@@ -24,6 +28,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\DocumentReference\DocumentReferenceAttester;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\DocumentReference\DocumentReferenceContent;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\DocumentReference\DocumentReferenceRelatesTo;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -39,6 +44,18 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     url: 'http://hl7.org/fhir/StructureDefinition/DocumentReference',
     fhirVersion: 'R5',
 )]
+#[FHIRPathInvariant(
+    key: 'docRef-1',
+    severity: 'warning',
+    expression: 'facilityType.empty() or context.where(resolve() is Encounter).empty()',
+    human: 'facilityType SHALL only be present if context is not an encounter',
+)]
+#[FHIRPathInvariant(
+    key: 'docRef-2',
+    severity: 'warning',
+    expression: 'practiceSetting.empty() or context.where(resolve() is Encounter).empty()',
+    human: 'practiceSetting SHALL only be present if context is not present',
+)]
 class DocumentReferenceResource extends DomainResourceResource
 {
     public function __construct(
@@ -49,10 +66,10 @@ class DocumentReferenceResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -64,7 +81,7 @@ class DocumentReferenceResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the resource that contains them')]
         public array $modifierExtension = [],
         /** @var array<Identifier> identifier Business identifiers for the document */
         #[FhirProperty(
@@ -84,12 +101,30 @@ class DocumentReferenceResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Appointment',
+            'http://hl7.org/fhir/StructureDefinition/AppointmentResponse',
+            'http://hl7.org/fhir/StructureDefinition/CarePlan',
+            'http://hl7.org/fhir/StructureDefinition/Claim',
+            'http://hl7.org/fhir/StructureDefinition/CommunicationRequest',
+            'http://hl7.org/fhir/StructureDefinition/Contract',
+            'http://hl7.org/fhir/StructureDefinition/CoverageEligibilityRequest',
+            'http://hl7.org/fhir/StructureDefinition/DeviceRequest',
+            'http://hl7.org/fhir/StructureDefinition/EnrollmentRequest',
+            'http://hl7.org/fhir/StructureDefinition/ImmunizationRecommendation',
+            'http://hl7.org/fhir/StructureDefinition/MedicationRequest',
+            'http://hl7.org/fhir/StructureDefinition/NutritionOrder',
+            'http://hl7.org/fhir/StructureDefinition/RequestOrchestration',
+            'http://hl7.org/fhir/StructureDefinition/ServiceRequest',
+            'http://hl7.org/fhir/StructureDefinition/SupplyRequest',
+            'http://hl7.org/fhir/StructureDefinition/VisionPrescription',
+        ])]
         public array $basedOn = [],
         /** @var DocumentReferenceStatusType|null status current | superseded | entered-in-error */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/document-reference-status|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'This element is labelled as a modifier because it is a status element that contains status entered-in-error which means that the resource should not be treated as valid')]
         public ?DocumentReferenceStatusType $status = null,
         /** @var CompositionStatusType|null docStatus registered | partial | preliminary | final | amended | corrected | appended | cancelled | entered-in-error | deprecated | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/composition-status|5.0.0', strength: 'required')]
         public ?CompositionStatusType $docStatus = null,
         /** @var array<CodeableConcept> modality Imaging modality used */
         #[FhirProperty(
@@ -98,9 +133,10 @@ class DocumentReferenceResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_33.html', strength: 'extensible')]
         public array $modality = [],
         /** @var CodeableConcept|null type Kind of document (LOINC if possible) */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/doc-typecodes', strength: 'preferred')]
         public ?CodeableConcept $type = null,
         /** @var array<CodeableConcept> category Categorization of document */
         #[FhirProperty(
@@ -111,7 +147,7 @@ class DocumentReferenceResource extends DomainResourceResource
         )]
         public array $category = [],
         /** @var Reference|null subject Who/what is the subject of the document */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public ?Reference $subject = null,
         /** @var array<Reference> context Context of the document content */
         #[FhirProperty(
@@ -120,6 +156,11 @@ class DocumentReferenceResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Appointment',
+            'http://hl7.org/fhir/StructureDefinition/Encounter',
+            'http://hl7.org/fhir/StructureDefinition/EpisodeOfCare',
+        ])]
         public array $context = [],
         /** @var array<CodeableReference> event Main clinical acts documented */
         #[FhirProperty(
@@ -136,6 +177,7 @@ class DocumentReferenceResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/BodyStructure'])]
         public array $bodySite = [],
         /** @var CodeableConcept|null facilityType Kind of facility where patient was seen */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
@@ -156,6 +198,15 @@ class DocumentReferenceResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Practitioner',
+            'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
+            'http://hl7.org/fhir/StructureDefinition/Organization',
+            'http://hl7.org/fhir/StructureDefinition/Device',
+            'http://hl7.org/fhir/StructureDefinition/Patient',
+            'http://hl7.org/fhir/StructureDefinition/RelatedPerson',
+            'http://hl7.org/fhir/StructureDefinition/CareTeam',
+        ])]
         public array $author = [],
         /** @var array<DocumentReferenceAttester> attester Attests to accuracy of the document */
         #[FhirProperty(
@@ -166,7 +217,7 @@ class DocumentReferenceResource extends DomainResourceResource
         )]
         public array $attester = [],
         /** @var Reference|null custodian Organization which maintains the document */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $custodian = null,
         /** @var array<DocumentReferenceRelatesTo> relatesTo Relationships to other documents */
         #[FhirProperty(
@@ -195,6 +246,7 @@ class DocumentReferenceResource extends DomainResourceResource
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Resource\DocumentReference\DocumentReferenceContent',
         )]
+        #[Count(min: 1)]
         public array $content = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

@@ -6,6 +6,10 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\Account;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference;
@@ -18,6 +22,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description When using an account for billing a specific Encounter the set of diagnoses that are relevant for billing are stored here on the account where they are able to be sequenced appropriately prior to processing to produce claim(s).
  */
 #[FHIRBackboneElement(parentResource: 'Account', elementPath: 'Account.diagnosis', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'act-1',
+    severity: 'error',
+    expression: 'condition.reference.empty().not() implies dateOfDiagnosis.empty()',
+    human: 'The dateOfDiagnosis is not valid when using a reference to a diagnosis',
+)]
 class AccountDiagnosis extends BackboneElement
 {
     public function __construct(
@@ -28,13 +38,13 @@ class AccountDiagnosis extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var PositiveIntPrimitive|null sequence Ranking of the diagnosis (for each type) */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]
         public ?PositiveIntPrimitive $sequence = null,
         /** @var CodeableReference|null condition The diagnosis relevant to the account */
-        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex', isRequired: true), NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Condition'])]
         public ?CodeableReference $condition = null,
         /** @var DateTimePrimitive|null dateOfDiagnosis Date of the diagnosis (when coded diagnosis) */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
@@ -46,6 +56,7 @@ class AccountDiagnosis extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/encounter-diagnosis-use', strength: 'preferred')]
         public array $type = [],
         /** @var bool|null onAdmission Diagnosis present on Admission */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]

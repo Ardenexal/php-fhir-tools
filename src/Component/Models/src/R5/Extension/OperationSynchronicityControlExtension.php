@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 
@@ -14,9 +15,12 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
  *
  * @see http://hl7.org/fhir/StructureDefinition/synchronicity-control
  *
- * @description Indicates that an operation or interaction must always be handled as synchronous or asynchronous, or that the server must or does provide both, and clients can choose
+ * @description Indicates that an operation or interaction must always be handled as synchronous or asynchronous, or that the server must or does provide both, and clients can choose. In R6, use OperationDefinition.synchronicity
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/synchronicity-control', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.operation')]
+#[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.resource.interaction')]
+#[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest.resource.operation')]
 class OperationSynchronicityControlExtension extends Extension
 {
     public function __construct(

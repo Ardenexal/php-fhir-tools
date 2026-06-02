@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\CoverageEligibilityRe
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -28,7 +30,7 @@ class CoverageEligibilityRequestItem extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var array<PositiveIntPrimitive> supportingInfoSequence Applicable exception or supporting information */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isArray: true)]
@@ -49,6 +51,10 @@ class CoverageEligibilityRequestItem extends BackboneElement
         public array $modifier = [],
         /** @var Reference|null provider Perfoming practitioner */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Practitioner',
+            'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
+        ])]
         public ?Reference $provider = null,
         /** @var Quantity|null quantity Count of products or services */
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]
@@ -58,6 +64,10 @@ class CoverageEligibilityRequestItem extends BackboneElement
         public ?Money $unitPrice = null,
         /** @var Reference|null facility Servicing facility */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Location',
+            'http://hl7.org/fhir/StructureDefinition/Organization',
+        ])]
         public ?Reference $facility = null,
         /** @var array<CoverageEligibilityRequestItemDiagnosis> diagnosis Applicable diagnosis */
         #[FhirProperty(
@@ -74,6 +84,7 @@ class CoverageEligibilityRequestItem extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public array $detail = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

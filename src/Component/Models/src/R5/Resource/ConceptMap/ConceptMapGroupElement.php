@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\ConceptMap;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
@@ -16,6 +19,18 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  * @description Mappings for an individual concept in the source to one or more concepts in the target.
  */
 #[FHIRBackboneElement(parentResource: 'ConceptMap', elementPath: 'ConceptMap.group.element', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'cmd-4',
+    severity: 'error',
+    expression: '(noMap.exists() and noMap=true) implies target.empty()',
+    human: 'If noMap is present, target SHALL NOT be present',
+)]
+#[FHIRPathInvariant(
+    key: 'cmd-5',
+    severity: 'error',
+    expression: '(code.exists() and valueSet.empty()) or (code.empty() and valueSet.exists())',
+    human: 'Either code or valueSet SHALL be present but not both.',
+)]
 class ConceptMapGroupElement extends BackboneElement
 {
     public function __construct(
@@ -26,7 +41,7 @@ class ConceptMapGroupElement extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodePrimitive|null code Identifies element being mapped */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
@@ -35,7 +50,7 @@ class ConceptMapGroupElement extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $display = null,
         /** @var CanonicalPrimitive|null valueSet Identifies the set of concepts being mapped */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ValueSet'])]
         public ?CanonicalPrimitive $valueSet = null,
         /** @var bool|null noMap No mapping to a target concept for this source concept */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  * @description Defines the group in which this usage context is a member. Multiple groups are "OR'ed", contexts within a group are "AND'ed".
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/usagecontext-group', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'UsageContext')]
 class GroupExtension extends Extension
 {
     public function __construct(

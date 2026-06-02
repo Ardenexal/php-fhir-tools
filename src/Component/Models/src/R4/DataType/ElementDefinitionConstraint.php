@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
@@ -15,6 +18,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description Formal constraints such as co-occurrence and other constraints that can be computationally evaluated within the context of the instance.
  */
 #[FHIRComplexType(typeName: 'ElementDefinition.constraint', fhirVersion: 'R4')]
+#[FHIRPathInvariant(
+    key: 'eld-21',
+    severity: 'warning',
+    expression: 'expression.exists()',
+    human: 'Constraints should have an expression or else validators will not be able to enforce them',
+)]
 class ElementDefinitionConstraint extends Element
 {
     public function __construct(
@@ -31,7 +40,7 @@ class ElementDefinitionConstraint extends Element
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $requirements = null,
         /** @var ConstraintSeverityType|null severity error | warning */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/constraint-severity|4.0.1', strength: 'required')]
         public ?ConstraintSeverityType $severity = null,
         /** @var StringPrimitive|string|null human Human description of constraint */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
@@ -43,7 +52,7 @@ class ElementDefinitionConstraint extends Element
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $xpath = null,
         /** @var CanonicalPrimitive|null source Reference to original source of constraint */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/StructureDefinition'])]
         public ?CanonicalPrimitive $source = null,
     ) {
         parent::__construct($id, $extension);

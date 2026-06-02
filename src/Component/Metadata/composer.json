@@ -12,7 +12,8 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
-        "php": ">=8.2"
+        "php": ">=8.2",
+        "symfony/validator": "^6.4|^7.4"
     },
     "autoload": {
         "psr-4": {

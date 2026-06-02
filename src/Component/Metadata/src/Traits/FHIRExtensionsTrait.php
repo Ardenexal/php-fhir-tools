@@ -42,6 +42,10 @@ trait FHIRExtensionsTrait
      */
     public function findExtension(string $extensionClass): ?object
     {
+        if (!isset($this->extension)) {
+            return null;
+        }
+
         foreach ($this->extension as $ext) {
             if ($ext instanceof $extensionClass) {
                 return $ext;
@@ -62,6 +66,10 @@ trait FHIRExtensionsTrait
      */
     public function findExtensions(string $extensionClass): array
     {
+        if (!isset($this->extension)) {
+            return [];
+        }
+
         $found = [];
         foreach ($this->extension as $ext) {
             if ($ext instanceof $extensionClass) {
@@ -79,6 +87,10 @@ trait FHIRExtensionsTrait
      */
     public function hasExtension(string $extensionClass): bool
     {
+        if (!isset($this->extension)) {
+            return false;
+        }
+
         foreach ($this->extension as $ext) {
             if ($ext instanceof $extensionClass) {
                 return true;
@@ -99,6 +111,10 @@ trait FHIRExtensionsTrait
      */
     public function findExtensionByUrl(string $url): ?FHIRExtensionInterface
     {
+        if (!isset($this->extension)) {
+            return null;
+        }
+
         foreach ($this->extension as $ext) {
             if ($ext->getExtensionUrl() === $url) {
                 return $ext;
@@ -115,6 +131,10 @@ trait FHIRExtensionsTrait
      */
     public function findExtensionsByUrl(string $url): array
     {
+        if (!isset($this->extension)) {
+            return [];
+        }
+
         $found = [];
         foreach ($this->extension as $ext) {
             if ($ext->getExtensionUrl() === $url) {
@@ -123,5 +143,15 @@ trait FHIRExtensionsTrait
         }
 
         return $found;
+    }
+
+    /**
+     * Return all extensions attached to this element.
+     *
+     * @return list<FHIRExtensionInterface>
+     */
+    public function getExtensions(): array
+    {
+        return isset($this->extension) ? $this->extension : [];
     }
 }

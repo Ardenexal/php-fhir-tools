@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
 
@@ -17,6 +18,8 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
  * @description When the asserter identified the allergy, intolerance, condition, problem, or diagnosis or other event, situation, issue, or clinical concept that may have risen to a level of or remains a concern.  For example, when the patient experiences chest pain, the asserted date represents when the clinician began following the chest pain - not when the patient experienced the chest pain.  Asserted date supports the recognition that information is not always entered in a system immediately.  Assertion and recording are different acts, so asserted date and recorded date are semantically different. However, they may be the same date and close in time.  If this difference is significant for your use case, assertion date may be useful.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/condition-assertedDate', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'Condition')]
+#[FHIRExtensionContext(type: 'element', expression: 'AllergyIntolerance')]
 class ConditionAssertedDateExtension extends Extension
 {
     public function __construct(

@@ -62,7 +62,7 @@ services:
         public: true
 
     # Serialization - IG Type Registry (maps populated by FHIRIGRegistryCompilerPass at container build time)
-    Ardenexal\FHIRTools\Component\Serialization\FHIRIGTypeRegistry: ~
+    Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry: ~
 
     # Serialization - Type Resolver
     Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolver: ~
@@ -95,6 +95,99 @@ services:
 
     fhir.serialization_service:
         alias: 'Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService'
+        public: true
+
+    # Validation
+    Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry:
+        public: true
+
+    fhir.validation_message_registry:
+        alias: 'Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry'
+        public: true
+
+    Ardenexal\FHIRTools\Component\Validation\Validator\FHIRPathInvariantValidator:
+        arguments:
+            $pathService: '@Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService'
+            $messageRegistry: '@Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry'
+        tags:
+            - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariantValidator' }
+        public: true
+
+    Ardenexal\FHIRTools\Component\Validation\NullFHIRTerminologyClient: ~
+
+    # To use a real terminology server, override the FHIRTerminologyClientInterface alias in your
+    # application's services.yaml and register HttpFHIRTerminologyClient with your server URL:
+    #
+    #   Ardenexal\FHIRTools\Component\Validation\HttpFHIRTerminologyClient:
+    #       arguments:
+    #           $serverUrl: '%env(FHIR_TERMINOLOGY_SERVER_URL)%'
+    #   Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyClientInterface:
+    #       alias: 'Ardenexal\FHIRTools\Component\Validation\HttpFHIRTerminologyClient'
+    Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyClientInterface:
+        alias: 'Ardenexal\FHIRTools\Component\Validation\NullFHIRTerminologyClient'
+
+    Ardenexal\FHIRTools\Component\Validation\Validator\FHIRValueSetBindingValidator:
+        arguments:
+            $messageRegistry: '@Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry'
+            $enumNamespaceRoots:
+                - 'Ardenexal\FHIRTools\Component\Models\R4\Enum'
+                - 'Ardenexal\FHIRTools\Component\Models\R4B\Enum'
+                - 'Ardenexal\FHIRTools\Component\Models\R5\Enum'
+            $terminologyClient: '@Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyClientInterface'
+        tags:
+            - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBindingValidator' }
+
+    Ardenexal\FHIRTools\Component\Validation\Validator\FHIRFixedValueValidator:
+        arguments:
+            $messageRegistry: '@Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry'
+        tags:
+            - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRFixedValueValidator' }
+
+    Ardenexal\FHIRTools\Component\Validation\Validator\FHIRPatternValueValidator:
+        arguments:
+            $messageRegistry: '@Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry'
+        tags:
+            - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPatternValueValidator' }
+
+    Ardenexal\FHIRTools\Component\Validation\Validator\FHIRProfileConstraintValidator:
+        tags:
+            - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraintValidator' }
+
+    Ardenexal\FHIRTools\Component\Validation\SliceDiscriminatorMatcher: ~
+
+    Ardenexal\FHIRTools\Component\Validation\Validator\FHIRSliceConstraintValidator:
+        tags:
+            - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRSliceConstraintValidator' }
+
+    Ardenexal\FHIRTools\Component\Validation\NullFHIRReferenceResolver: ~
+
+    Ardenexal\FHIRTools\Component\Validation\FHIRReferenceResolverInterface:
+        alias: 'Ardenexal\FHIRTools\Component\Validation\NullFHIRReferenceResolver'
+
+    Ardenexal\FHIRTools\Component\Validation\Validator\FHIRTargetProfileValidator:
+        arguments:
+            $resolver: '@Ardenexal\FHIRTools\Component\Validation\FHIRReferenceResolverInterface'
+            $messageRegistry: '@Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry'
+        tags:
+            - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfileValidator' }
+
+    # Type hierarchy resolver — enables inheritance-aware extension context validation
+    # (supertype and foreign-root type-path contexts). Monotonic: only removes false positives.
+    Ardenexal\FHIRTools\Component\Validation\FhirPropertyTypeHierarchyResolver: ~
+
+    Ardenexal\FHIRTools\Component\Validation\FHIRTypeHierarchyResolverInterface:
+        alias: 'Ardenexal\FHIRTools\Component\Validation\FhirPropertyTypeHierarchyResolver'
+
+    # Validation Service
+    Ardenexal\FHIRTools\Component\Validation\FHIRValidationService:
+        public: true
+
+    Ardenexal\FHIRTools\Component\Validation\FHIRValidationServiceInterface:
+        alias: 'Ardenexal\FHIRTools\Component\Validation\FHIRValidationService'
+        public: true
+
+    fhir.validation_service:
+        alias: 'Ardenexal\FHIRTools\Component\Validation\FHIRValidationService'
         public: true
 
     # Named service aliases

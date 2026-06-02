@@ -406,6 +406,19 @@ class FHIRPathParser
             return new IdentifierNode($token->value, $token->line, $token->column);
         }
 
+        // Contextual keywords: 'as' and 'is' can appear as function calls in expression position
+        // (e.g. descendants().where(as(canonical) = '#')). When followed by '(' treat as a type
+        // expression applied to the implicit focus ($this) — equivalent to $this.as(Type).
+        if (($this->check(TokenType::AS) || $this->check(TokenType::IS)) && $this->checkNext(TokenType::LPAREN)) {
+            $keyword = $this->advance(); // consume AS/IS
+            $this->advance();            // consume LPAREN
+            $typeName = $this->parseTypeName();
+            $this->consume(TokenType::RPAREN, ')');
+            $focus = new IdentifierNode('$this', $keyword->line, $keyword->column);
+
+            return new TypeExpressionNode($focus, $keyword->type, $typeName, $keyword->line, $keyword->column);
+        }
+
         // Function call or identifier
         if ($this->match(TokenType::IDENTIFIER)) {
             $identifier = $this->previous();

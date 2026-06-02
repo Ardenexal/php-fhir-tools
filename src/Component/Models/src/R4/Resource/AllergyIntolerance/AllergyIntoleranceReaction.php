@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\AllergyIntolerance;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\AllergyIntoleranceSeverityType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
@@ -13,6 +15,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Symfony\Component\Validator\Constraints\Count;
 
 /**
  * @description Details about each adverse reaction event linked to exposure to the identified substance.
@@ -28,7 +31,7 @@ class AllergyIntoleranceReaction extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null substance Specific substance or pharmaceutical product considered to be responsible for event */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
@@ -41,6 +44,7 @@ class AllergyIntoleranceReaction extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
         )]
+        #[Count(min: 1)]
         public array $manifestation = [],
         /** @var StringPrimitive|string|null description Description of the event as a whole */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -49,7 +53,7 @@ class AllergyIntoleranceReaction extends BackboneElement
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
         public ?DateTimePrimitive $onset = null,
         /** @var AllergyIntoleranceSeverityType|null severity mild | moderate | severe (of event as a whole) */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/reaction-event-severity|4.0.1', strength: 'required')]
         public ?AllergyIntoleranceSeverityType $severity = null,
         /** @var CodeableConcept|null exposureRoute How the subject was exposed to the substance */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 
@@ -17,6 +18,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * @description Provides additional classifiers of a related artifact. In R6, this can also be used on ArtifactAssessment.relatesTo, Citation.relatesTo, Evidence.relatesTo, EvidenceVariable.relatesTo, and ResearchStudy.relatesTo
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/relatesto-classifier', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'RelatedArtifact')]
+#[FHIRExtensionContext(type: 'element', expression: 'Composition.relatesTo')]
 class RelatesToClassifierExtension extends Extension
 {
     public function __construct(

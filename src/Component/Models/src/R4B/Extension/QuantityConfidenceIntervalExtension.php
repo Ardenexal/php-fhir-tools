@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
@@ -25,6 +26,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Range;
  * The interval range low and high units are usually the same as the reported value's units. Confidence interval range low and high units SHOULD be provided for clarity; if omitted, they are implied to be the same as the reported value's units.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/quantity-confidenceInterval', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'Quantity')]
 class QuantityConfidenceIntervalExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

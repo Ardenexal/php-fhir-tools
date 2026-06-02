@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\ValueSet;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
@@ -16,6 +19,24 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
  * @description Include one or more codes from a code system or other value set(s).
  */
 #[FHIRBackboneElement(parentResource: 'ValueSet', elementPath: 'ValueSet.compose.include', fhirVersion: 'R4')]
+#[FHIRPathInvariant(
+    key: 'vsd-1',
+    severity: 'error',
+    expression: 'valueSet.exists() or system.exists()',
+    human: 'A value set include/exclude SHALL have a value set or a system',
+)]
+#[FHIRPathInvariant(
+    key: 'vsd-2',
+    severity: 'error',
+    expression: '(concept.exists() or filter.exists()) implies system.exists()',
+    human: 'A value set with concepts or filters SHALL include a system',
+)]
+#[FHIRPathInvariant(
+    key: 'vsd-3',
+    severity: 'error',
+    expression: 'concept.empty() or filter.empty()',
+    human: 'Cannot have both concept and filter',
+)]
 class ValueSetComposeInclude extends BackboneElement
 {
     public function __construct(
@@ -26,7 +47,7 @@ class ValueSetComposeInclude extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var UriPrimitive|null system The system the codes come from */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
@@ -51,7 +72,7 @@ class ValueSetComposeInclude extends BackboneElement
         )]
         public array $filter = [],
         /** @var array<CanonicalPrimitive> valueSet Select the contents included in this value set */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ValueSet'])]
         public array $valueSet = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

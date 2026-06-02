@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\ParameterDefinition;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\ParameterDefinition;
  * @description This specifies the definition for a parameter if needed. This is useful for communicating the type of a parameter when the parameter has no value.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/parameters-definition', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Parameters.parameter')]
 class ParametersDefinitionExtension extends Extension
 {
     public function __construct(

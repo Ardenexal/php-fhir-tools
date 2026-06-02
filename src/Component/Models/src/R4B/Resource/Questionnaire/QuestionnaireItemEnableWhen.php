@@ -6,6 +6,10 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\Questionnaire;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
@@ -22,6 +26,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A constraint indicating that this item should only be enabled (displayed/allow answers to be captured) when the specified condition is true.
  */
 #[FHIRBackboneElement(parentResource: 'Questionnaire', elementPath: 'Questionnaire.item.enableWhen', fhirVersion: 'R4B')]
+#[FHIRPathInvariant(
+    key: 'que-7',
+    severity: 'error',
+    expression: 'operator = \'exists\' implies (answer is boolean)',
+    human: 'If the operator is \'exists\', the value must be a boolean',
+)]
 class QuestionnaireItemEnableWhen extends BackboneElement
 {
     public function __construct(
@@ -32,13 +42,13 @@ class QuestionnaireItemEnableWhen extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var StringPrimitive|string|null question Question that determines whether item is enabled */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $question = null,
         /** @var QuestionnaireItemOperatorType|null operator exists | = | != | > | < | >= | <= */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/questionnaire-enable-operator|4.3.0', strength: 'required')]
         public ?QuestionnaireItemOperatorType $operator = null,
         /** @var bool|string|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|Coding|Quantity|Reference|null answer Value for question comparison based on operator */
         #[FhirProperty(
@@ -95,6 +105,7 @@ class QuestionnaireItemEnableWhen extends BackboneElement
             ],
         )]
         #[NotBlank]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public bool|string|int|DatePrimitive|DateTimePrimitive|TimePrimitive|StringPrimitive|Coding|Quantity|Reference|null $answer = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

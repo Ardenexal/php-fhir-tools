@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\EvidenceVariable;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Expression;
@@ -30,7 +33,7 @@ class EvidenceVariableCharacteristic extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var StringPrimitive|string|null description Natural language description of the characteristic */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -69,12 +72,21 @@ class EvidenceVariableCharacteristic extends BackboneElement
             ],
         )]
         #[NotBlank]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Group',
+            'http://hl7.org/fhir/StructureDefinition/EvidenceVariable',
+            'http://hl7.org/fhir/StructureDefinition/Resource',
+        ])]
         public Reference|CanonicalPrimitive|CodeableConcept|Expression|null $definition = null,
         /** @var CodeableConcept|null method Method used for describing characteristic */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $method = null,
         /** @var Reference|null device Device used for determining characteristic */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Device',
+            'http://hl7.org/fhir/StructureDefinition/DeviceMetric',
+        ])]
         public ?Reference $device = null,
         /** @var bool|null exclude Whether the characteristic includes or excludes members */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
@@ -83,7 +95,7 @@ class EvidenceVariableCharacteristic extends BackboneElement
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
         public ?EvidenceVariableCharacteristicTimeFromStart $timeFromStart = null,
         /** @var GroupMeasureType|null groupMeasure mean | median | mean-of-mean | mean-of-median | median-of-mean | median-of-median */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/group-measure|4.3.0', strength: 'required')]
         public ?GroupMeasureType $groupMeasure = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

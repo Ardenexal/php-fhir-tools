@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRContextInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
@@ -17,6 +19,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  * @description Provides a computable unit of measure associated with numeric questions to support subsequent computation on responses. This is for use on items of type integer and decimal, and its purpose is to support converting the integer or decimal answer into a Quantity when extracting the data into a resource.      If a 'display' value is provided for valueCoding of this extension and the associated question item does not have a child 'display' item with an itemControl extension of 'unit', then form fillers SHOULD take the display value of this extension and use it as as the unit display.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaire-unit', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item')]
+#[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]
+#[FHIRContextInvariant(expression: 'ofType(ElementDefinition).type.exists(code=\'integer\' or code=\'decimal\') or where(%resource.is(Questionnaire)).exists(type.first()=\'integer\' or type.first()=\'decimal\')')]
 class QUnitExtension extends Extension
 {
     public function __construct(

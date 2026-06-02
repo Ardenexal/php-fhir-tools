@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\ImagingStudy;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -30,7 +33,7 @@ class ImagingStudySeries extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var IdPrimitive|null uid DICOM Series Instance UID for the series */
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive', isRequired: true), NotBlank]
@@ -39,7 +42,7 @@ class ImagingStudySeries extends BackboneElement
         #[FhirProperty(fhirType: 'unsignedInt', propertyKind: 'primitive')]
         public ?UnsignedIntPrimitive $number = null,
         /** @var Coding|null modality The modality of the instances in the series */
-        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_29.html', strength: 'extensible')]
         public ?Coding $modality = null,
         /** @var StringPrimitive|string|null description A short human readable summary of the series */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -54,6 +57,7 @@ class ImagingStudySeries extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Endpoint'])]
         public array $endpoint = [],
         /** @var Coding|null bodySite Body part examined */
         #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]
@@ -68,6 +72,7 @@ class ImagingStudySeries extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Specimen'])]
         public array $specimen = [],
         /** @var DateTimePrimitive|null started When the series started */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]

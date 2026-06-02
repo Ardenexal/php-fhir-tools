@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\PlanDefinition;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\ActionCardinalityBehaviorType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\ActionGroupingBehaviorType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\ActionPrecheckBehaviorType;
@@ -22,13 +25,13 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Range;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\RelatedArtifact;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\RequestPriorityType;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\TriggerDefinition;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\IdPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
-use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing;
 
 /**
  * @description An action or group of actions to be taken as part of the plan. For example, in clinical care, an action would be to prescribe a particular indicated medication, or perform a particular test as appropriate. In pharmaceutical quality, an action would be the test that needs to be performed on a drug product as defined in the quality specification.
@@ -44,7 +47,7 @@ class PlanDefinitionAction extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var StringPrimitive|string|null prefix User-visible prefix for the action (e.g. 1. or A.) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -59,7 +62,7 @@ class PlanDefinitionAction extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $textEquivalent = null,
         /** @var RequestPriorityType|null priority routine | urgent | asap | stat */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/request-priority|4.3.0', strength: 'required')]
         public ?RequestPriorityType $priority = null,
         /** @var array<CodeableConcept> code Code representing the meaning of the action or sub-actions */
         #[FhirProperty(
@@ -114,6 +117,8 @@ class PlanDefinitionAction extends BackboneElement
                 ],
             ],
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/subject-type', strength: 'extensible')]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Group'])]
         public CodeableConcept|Reference|CanonicalPrimitive|null $subject = null,
         /** @var array<TriggerDefinition> trigger When the action should be triggered */
         #[FhirProperty(
@@ -194,7 +199,7 @@ class PlanDefinitionAction extends BackboneElement
                 [
                     'fhirType'     => 'Timing',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing',
                     'jsonKey'      => 'timingTiming',
                 ],
             ],
@@ -209,22 +214,22 @@ class PlanDefinitionAction extends BackboneElement
         )]
         public array $participant = [],
         /** @var CodeableConcept|null type create | update | remove | fire-event */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-type', strength: 'extensible')]
         public ?CodeableConcept $type = null,
         /** @var ActionGroupingBehaviorType|null groupingBehavior visual-group | logical-group | sentence-group */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-grouping-behavior|4.3.0', strength: 'required')]
         public ?ActionGroupingBehaviorType $groupingBehavior = null,
         /** @var ActionSelectionBehaviorType|null selectionBehavior any | all | all-or-none | exactly-one | at-most-one | one-or-more */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-selection-behavior|4.3.0', strength: 'required')]
         public ?ActionSelectionBehaviorType $selectionBehavior = null,
         /** @var ActionRequiredBehaviorType|null requiredBehavior must | could | must-unless-documented */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-required-behavior|4.3.0', strength: 'required')]
         public ?ActionRequiredBehaviorType $requiredBehavior = null,
         /** @var ActionPrecheckBehaviorType|null precheckBehavior yes | no */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-precheck-behavior|4.3.0', strength: 'required')]
         public ?ActionPrecheckBehaviorType $precheckBehavior = null,
         /** @var ActionCardinalityBehaviorType|null cardinalityBehavior single | multiple */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/action-cardinality-behavior|4.3.0', strength: 'required')]
         public ?ActionCardinalityBehaviorType $cardinalityBehavior = null,
         /** @var CanonicalPrimitive|UriPrimitive|null definition Description of the activity to be performed */
         #[FhirProperty(
@@ -246,9 +251,14 @@ class PlanDefinitionAction extends BackboneElement
                 ],
             ],
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/ActivityDefinition',
+            'http://hl7.org/fhir/StructureDefinition/PlanDefinition',
+            'http://hl7.org/fhir/StructureDefinition/Questionnaire',
+        ])]
         public CanonicalPrimitive|UriPrimitive|null $definition = null,
         /** @var CanonicalPrimitive|null transform Transform to apply the template */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/StructureMap'])]
         public ?CanonicalPrimitive $transform = null,
         /** @var array<PlanDefinitionActionDynamicValue> dynamicValue Dynamic aspects of the definition */
         #[FhirProperty(

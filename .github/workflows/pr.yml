@@ -67,11 +67,19 @@ jobs:
             -   name: Validate composer files
                 run: composer validate --strict
 
-    unit-tests:
+            -   name: Check code style (Pint)
+                run: composer run lint -- --test
+
+    static-analysis:
         runs-on: ubuntu-latest
         env:
-            XDEBUG_MODE: coverage
+            XDEBUG_MODE: off
             COMPOSER_NO_INTERACTION: 1
+        strategy:
+            fail-fast: false
+            matrix:
+                component: [ bundle, codegen, fhir-path, validation ]
+
         steps:
             -   uses: actions/checkout@v4
                 with:
@@ -96,20 +104,26 @@ jobs:
             -   name: Install dependencies
                 run: composer install --prefer-dist --no-progress --no-suggest
 
-            -   name: Run unit tests
-                run: composer run test-unit -- --log-junit=./results/unit-tests.xml --coverage-clover ./results/coverage.xml
-            -   name: Upload test results to Codecov
-                if: ${{ !cancelled() }}
-                uses: codecov/codecov-action@v5
-                with:
-                    token: ${{ secrets.CODECOV_TOKEN }}
-                    directory: ./results
+            -   name: Run PHPStan static analysis
+                run: composer run phpstan:${{ matrix.component }}
 
-    integration-tests:
+    tests:
         runs-on: ubuntu-latest
         env:
-            COMPOSER_NO_INTERACTION: 1
             XDEBUG_MODE: coverage
+            COMPOSER_NO_INTERACTION: 1
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    -   suite: unit
+                    -   suite: integration-root
+                    -   suite: integration-serialization
+                    -   suite: integration-codegen
+                    -   suite: integration-fhir-path
+                    -   suite: integration-validation
+                    -   suite: fhirpath-spec
+                        extra: --functional --max-batch-size=50
         steps:
             -   uses: actions/checkout@v4
                 with:
@@ -134,12 +148,8 @@ jobs:
             -   name: Install dependencies
                 run: composer install --prefer-dist --no-progress --no-suggest
 
-
-            -   name: Run integration tests
-                run: composer run test-integration -- --log-junit=./results/integration-tests.xml --coverage-clover ./results/integration-coverage.xml
-
-            -   name: Run FHIRPath specification tests
-                run: composer run test-fhirpath-spec -- --log-junit=./results/fhir-path-tests.xml --coverage-clover ./results/fhir-path-coverage.xml
+            -   name: Run ${{ matrix.suite }} tests
+                run: php ./vendor/bin/paratest --testsuite=${{ matrix.suite }} ${{ matrix.extra }} --log-junit=./results/${{ matrix.suite }}-tests.xml --coverage-clover ./results/${{ matrix.suite }}-coverage.xml
 
             -   name: Upload test results to Codecov
                 if: ${{ !cancelled() }}
@@ -147,6 +157,21 @@ jobs:
                 with:
                     token: ${{ secrets.CODECOV_TOKEN }}
                     directory: ./results
+                    flags: ${{ matrix.suite }}
+
+    # Fan-in gate for branch protection: require this single check instead of
+    # individual matrix legs so the ruleset survives future matrix changes.
+    tests-passed:
+        runs-on: ubuntu-latest
+        needs: [ tests ]
+        if: ${{ always() }}
+        steps:
+            -   name: Check test matrix result
+                run: |
+                    if [ "${{ needs.tests.result }}" != "success" ]; then
+                      echo "Test matrix result: ${{ needs.tests.result }}"
+                      exit 1
+                    fi
 
     recipe-validation:
         runs-on: ubuntu-latest
@@ -178,7 +203,7 @@ jobs:
 
     fhir-generation-test:
         runs-on: ubuntu-latest
-        needs: [ unit-tests,integration-tests ]
+        needs: [ tests ]
         permissions:
             pull-requests: write
             contents: read
@@ -311,7 +336,7 @@ jobs:
 
     benchmarks:
         runs-on: ubuntu-latest
-        needs: [ unit-tests, integration-tests ]
+        needs: [ tests ]
         permissions:
             pull-requests: write
             contents: read

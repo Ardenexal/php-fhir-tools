@@ -6,6 +6,10 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 
@@ -17,6 +21,12 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
  * @description An identifier - identifies some entity uniquely and unambiguously. Typically this is used for business identifiers.
  */
 #[FHIRComplexType(typeName: 'Identifier', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'ident-1',
+    severity: 'warning',
+    expression: 'value.exists()',
+    human: 'Identifier with no value has limited utility.  If communicating that an identifier value has been suppressed or missing, the value element SHOULD be present with an extension indicating the missing semantic - e.g. data-absent-reason',
+)]
 class Identifier extends DataType
 {
     public function __construct(
@@ -27,10 +37,10 @@ class Identifier extends DataType
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var IdentifierUseType|null use usual | official | temp | secondary | old (If known) */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/identifier-use|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because applications should not mistake a temporary id for a permanent one.')]
         public ?IdentifierUseType $use = null,
         /** @var CodeableConcept|null type Description of identifier */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/identifier-type', strength: 'extensible')]
         public ?CodeableConcept $type = null,
         /** @var UriPrimitive|null system The namespace for the identifier value */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
@@ -42,7 +52,7 @@ class Identifier extends DataType
         #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
         public ?Period $period = null,
         /** @var Reference|null assigner Organization that issued id (may be just text) */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $assigner = null,
     ) {
         parent::__construct($id, $extension);

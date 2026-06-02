@@ -6,6 +6,10 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\Patient;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Address;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\AdministrativeGenderType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
@@ -20,6 +24,12 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
  * @description A contact party (e.g. guardian, partner, friend) for the patient.
  */
 #[FHIRBackboneElement(parentResource: 'Patient', elementPath: 'Patient.contact', fhirVersion: 'R4B')]
+#[FHIRPathInvariant(
+    key: 'pat-1',
+    severity: 'error',
+    expression: 'name.exists() or telecom.exists() or address.exists() or organization.exists()',
+    human: 'SHALL at least contain a contact\'s details or a reference to an organization',
+)]
 class PatientContact extends BackboneElement
 {
     public function __construct(
@@ -30,7 +40,7 @@ class PatientContact extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var array<CodeableConcept> relationship The kind of relationship */
         #[FhirProperty(
@@ -39,6 +49,7 @@ class PatientContact extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/patient-contactrelationship', strength: 'extensible')]
         public array $relationship = [],
         /** @var HumanName|null name A name associated with the contact person */
         #[FhirProperty(fhirType: 'HumanName', propertyKind: 'complex')]
@@ -55,10 +66,10 @@ class PatientContact extends BackboneElement
         #[FhirProperty(fhirType: 'Address', propertyKind: 'complex')]
         public ?Address $address = null,
         /** @var AdministrativeGenderType|null gender male | female | other | unknown */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/administrative-gender|4.3.0', strength: 'required')]
         public ?AdministrativeGenderType $gender = null,
         /** @var Reference|null organization Organization that is associated with the contact */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $organization = null,
         /** @var Period|null period The period during which this contact person or organization is valid to be contacted relating to this patient */
         #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]

@@ -405,6 +405,64 @@ class FHIRExtensionGeneratorTest extends TestCase
     }
 
     // -----------------------------------------------------------------
+    // Context and contextInvariant attribute emission
+    // -----------------------------------------------------------------
+
+    public function testExtensionContextAttributesEmitted(): void
+    {
+        $sd    = $this->loadFixture('ExtensionWithContext.json');
+        $class = $this->generator->generate($sd, 'R4', $this->context, $this->namespace);
+
+        $contextAttrs = array_values(array_filter(
+            $class->getAttributes(),
+            static fn ($a) => str_contains($a->getName(), 'FHIRExtensionContext'),
+        ));
+
+        self::assertCount(2, $contextAttrs, 'Two FHIRExtensionContext attributes expected');
+
+        $args0 = $contextAttrs[0]->getArguments();
+        self::assertSame('element', $args0['type']);
+        self::assertSame('Patient', $args0['expression']);
+
+        $args1 = $contextAttrs[1]->getArguments();
+        self::assertSame('element', $args1['type']);
+        self::assertSame('RelatedPerson', $args1['expression']);
+    }
+
+    public function testContextInvariantAttributesEmitted(): void
+    {
+        $sd    = $this->loadFixture('ExtensionWithContext.json');
+        $class = $this->generator->generate($sd, 'R4', $this->context, $this->namespace);
+
+        $invariantAttrs = array_values(array_filter(
+            $class->getAttributes(),
+            static fn ($a) => str_contains($a->getName(), 'FHIRContextInvariant'),
+        ));
+
+        self::assertCount(2, $invariantAttrs, 'Two FHIRContextInvariant attributes expected');
+        self::assertSame('name.exists()', $invariantAttrs[0]->getArguments()['expression']);
+        self::assertSame('birthDate.exists()', $invariantAttrs[1]->getArguments()['expression']);
+    }
+
+    public function testNoContextAttributesWhenStructureDefinitionHasNone(): void
+    {
+        $sd    = $this->loadFixture('SimpleExtension.json');
+        $class = $this->generator->generate($sd, 'R4', $this->context, $this->namespace);
+
+        $contextAttrs = array_filter(
+            $class->getAttributes(),
+            static fn ($a) => str_contains($a->getName(), 'FHIRExtensionContext'),
+        );
+        $invariantAttrs = array_filter(
+            $class->getAttributes(),
+            static fn ($a) => str_contains($a->getName(), 'FHIRContextInvariant'),
+        );
+
+        self::assertEmpty($contextAttrs, 'No FHIRExtensionContext attributes expected when SD has no context');
+        self::assertEmpty($invariantAttrs, 'No FHIRContextInvariant attributes expected when SD has no contextInvariant');
+    }
+
+    // -----------------------------------------------------------------
     // Helpers
     // -----------------------------------------------------------------
 

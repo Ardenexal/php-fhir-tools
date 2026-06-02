@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
@@ -19,6 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * @description Knowledge-based comments on the effect of the sequence on patient's condition/medication reaction.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/DiagnosticReport-geneticsAnalysis', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport')]
 class AnalysisExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

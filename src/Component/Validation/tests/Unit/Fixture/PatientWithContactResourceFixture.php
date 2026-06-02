@@ -1,0 +1,25 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Fixture;
+
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Traits\FHIRExtensionsTrait;
+
+#[FhirResource(type: 'Patient', version: '4.0.1', url: 'http://hl7.org/fhir/StructureDefinition/Patient', fhirVersion: 'R4')]
+final class PatientWithContactResourceFixture
+{
+    use FHIRExtensionsTrait;
+
+    /**
+     * @param list<object>                 $contact
+     * @param list<FHIRExtensionInterface> $extension
+     */
+    public function __construct(
+        public readonly array $contact = [],
+        private readonly array $extension = [],
+    ) {
+    }
+}

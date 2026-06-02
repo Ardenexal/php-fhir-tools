@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
 
@@ -25,6 +26,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
  * The codes 'probable' and 'possible' although similar, indicate the level of confidence the matching engine has that the result is a match. This could be through the number of matching fields, or other similar levels of certainty. Probable indicates that the match is likely, however  possible indicates it had some partial matching data.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/match-grade', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'Bundle.entry.search')]
 class BundleMatchGradeExtension extends Extension
 {
     public function __construct(

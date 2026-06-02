@@ -6,13 +6,22 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\ImplementationGuide;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
+use Symfony\Component\Validator\Constraints\Count;
 
 /**
  * @description The information needed by an IG publisher tool to publish the whole implementation guide.
  */
 #[FHIRBackboneElement(parentResource: 'ImplementationGuide', elementPath: 'ImplementationGuide.definition', fhirVersion: 'R4B')]
+#[FHIRPathInvariant(
+    key: 'ig-1',
+    severity: 'error',
+    expression: 'resource.groupingId.all(%context.grouping.id contains $this)',
+    human: 'If a resource has a groupingId, it must refer to a grouping defined in the Implementation Guide',
+)]
 class ImplementationGuideDefinition extends BackboneElement
 {
     public function __construct(
@@ -23,7 +32,7 @@ class ImplementationGuideDefinition extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var array<ImplementationGuideDefinitionGrouping> grouping Grouping used to present related resources in the IG */
         #[FhirProperty(
@@ -41,6 +50,7 @@ class ImplementationGuideDefinition extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\ImplementationGuide\ImplementationGuideDefinitionResource',
         )]
+        #[Count(min: 1)]
         public array $resource = [],
         /** @var ImplementationGuideDefinitionPage|null page Page/Section in the Guide */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]

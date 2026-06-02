@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Traits\FHIRExtensionsTrait;
 
 /**
@@ -16,6 +17,12 @@ use Ardenexal\FHIRTools\Component\Metadata\Traits\FHIRExtensionsTrait;
  * @description Base definition for all elements in a resource.
  */
 #[FHIRComplexType(typeName: 'Element', fhirVersion: 'R4B')]
+#[FHIRPathInvariant(
+    key: 'ele-1',
+    severity: 'error',
+    expression: 'hasValue() or (children().count() > id.count()) or $this is Parameters',
+    human: 'All FHIR elements must have a @value or children unless an empty Parameters resource',
+)]
 abstract class Element
 {
     use FHIRExtensionsTrait;

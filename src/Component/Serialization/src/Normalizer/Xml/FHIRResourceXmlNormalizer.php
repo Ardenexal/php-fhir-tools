@@ -8,7 +8,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationDebugInfo;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
-use Ardenexal\FHIRTools\Component\Serialization\FHIRIGTypeRegistry;
+use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Common\AbstractFHIRNormalizer;
@@ -406,13 +406,27 @@ class FHIRResourceXmlNormalizer extends AbstractFHIRNormalizer
                     } else {
                         $denormalizedValue = $this->unwrapXmlValue($value, $propertyType);
 
-                        $scalarPhpType = $propertyMetadata?->phpItemClass;
-                        if ($scalarPhpType === 'int') {
-                            $denormalizedValue = (int) $denormalizedValue;
-                        } elseif ($scalarPhpType === 'float') {
-                            $denormalizedValue = (float) $denormalizedValue;
-                        } elseif ($scalarPhpType === 'bool') {
-                            $denormalizedValue = filter_var($denormalizedValue, FILTER_VALIDATE_BOOLEAN);
+                        // Primitive-with-extension: <field value="X"><extension .../></field> or
+                        // extension-only: <field><extension .../></field> (data-absent).
+                        // Only applies to scalar builtin types — array properties return a real PHP
+                        // array from unwrapXmlValue and must not be treated as primitive-with-extension.
+                        if (is_array($denormalizedValue) && $propertyType !== 'array') {
+                            $rawValue          = isset($denormalizedValue['@value']) ? $denormalizedValue['@value'] : null;
+                            $denormalizedValue = match ($propertyType) {
+                                'bool'  => $rawValue !== null ? ($rawValue === 'true' || $rawValue === true) : null,
+                                'int'   => $rawValue !== null ? (int) $rawValue : null,
+                                'float' => $rawValue !== null ? (float) $rawValue : null,
+                                default => $rawValue,
+                            };
+                        } else {
+                            $scalarPhpType = $propertyMetadata?->phpItemClass;
+                            if ($scalarPhpType === 'int') {
+                                $denormalizedValue = (int) $denormalizedValue;
+                            } elseif ($scalarPhpType === 'float') {
+                                $denormalizedValue = (float) $denormalizedValue;
+                            } elseif ($scalarPhpType === 'bool') {
+                                $denormalizedValue = filter_var($denormalizedValue, FILTER_VALIDATE_BOOLEAN);
+                            }
                         }
                     }
 

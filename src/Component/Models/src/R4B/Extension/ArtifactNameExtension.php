@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 
@@ -17,6 +18,20 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  * @description A natural language name identifying the artifact. This name should be usable as an identifier for the module by machine processing applications such as code generation.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-name', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'ArtifactAssessment')]
+#[FHIRExtensionContext(type: 'element', expression: 'ClinicalUseDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'Composition')]
+#[FHIRExtensionContext(type: 'element', expression: 'ConditionDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'Group')]
+#[FHIRExtensionContext(type: 'element', expression: 'Medication')]
+#[FHIRExtensionContext(type: 'element', expression: 'MedicationKnowledge')]
+#[FHIRExtensionContext(type: 'element', expression: 'ObservationDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'ResearchStudy')]
+#[FHIRExtensionContext(type: 'element', expression: 'SpecimenDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'Substance')]
+#[FHIRExtensionContext(type: 'element', expression: 'SubstanceDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'SubscriptionTopic')]
 class ArtifactNameExtension extends Extension
 {
     public function __construct(

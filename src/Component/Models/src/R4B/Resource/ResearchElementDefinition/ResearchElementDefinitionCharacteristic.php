@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\ResearchElementDefin
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\DataRequirement;
@@ -14,11 +17,11 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Expression;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\GroupMeasureType;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Period;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\UsageContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
-use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -35,7 +38,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|CanonicalPrimitive|Expression|DataRequirement|null definition What code or expression defines members? */
         #[FhirProperty(
@@ -71,6 +74,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
             ],
         )]
         #[NotBlank]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ValueSet'])]
         public CodeableConcept|CanonicalPrimitive|Expression|DataRequirement|null $definition = null,
         /** @var array<UsageContext> usageContext What code/value pairs define members? */
         #[FhirProperty(
@@ -84,7 +88,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $exclude = null,
         /** @var CodeableConcept|null unitOfMeasure What unit is the outcome described in? */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/ucum-units|4.3.0', strength: 'required')]
         public ?CodeableConcept $unitOfMeasure = null,
         /** @var StringPrimitive|string|null studyEffectiveDescription What time period does the study cover */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -116,7 +120,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
                 [
                     'fhirType'     => 'Timing',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing',
                     'jsonKey'      => 'studyEffectiveTiming',
                 ],
             ],
@@ -126,7 +130,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
         #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex')]
         public ?Duration $studyEffectiveTimeFromStart = null,
         /** @var GroupMeasureType|null studyEffectiveGroupMeasure mean | median | mean-of-mean | mean-of-median | median-of-mean | median-of-median */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/group-measure|4.3.0', strength: 'required')]
         public ?GroupMeasureType $studyEffectiveGroupMeasure = null,
         /** @var StringPrimitive|string|null participantEffectiveDescription What time period do participants cover */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -158,7 +162,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
                 [
                     'fhirType'     => 'Timing',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing',
                     'jsonKey'      => 'participantEffectiveTiming',
                 ],
             ],
@@ -168,7 +172,7 @@ class ResearchElementDefinitionCharacteristic extends BackboneElement
         #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex')]
         public ?Duration $participantEffectiveTimeFromStart = null,
         /** @var GroupMeasureType|null participantEffectiveGroupMeasure mean | median | mean-of-mean | mean-of-median | median-of-mean | median-of-median */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/group-measure|4.3.0', strength: 'required')]
         public ?GroupMeasureType $participantEffectiveGroupMeasure = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);

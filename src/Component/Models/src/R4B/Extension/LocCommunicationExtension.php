@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
@@ -17,6 +18,10 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
  * @description Language(s) that services are available in at this location/organization.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/location-communication', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'Location')]
+#[FHIRExtensionContext(type: 'element', expression: 'ExtendedContactDetail')]
+#[FHIRExtensionContext(type: 'element', expression: 'Organization')]
+#[FHIRExtensionContext(type: 'element', expression: 'OrganizationAffiliation')]
 class LocCommunicationExtension extends Extension
 {
     public function __construct(

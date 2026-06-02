@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\GenomicStudy;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
@@ -31,7 +34,7 @@ class GenomicStudyAnalysis extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var array<Identifier> identifier Identifiers for the analysis event */
         #[FhirProperty(
@@ -58,10 +61,14 @@ class GenomicStudyAnalysis extends BackboneElement
         )]
         public array $changeType = [],
         /** @var CodeableConcept|null genomeBuild Genome build that is used in this analysis */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://loinc.org/vs/LL1040-6', strength: 'extensible')]
         public ?CodeableConcept $genomeBuild = null,
         /** @var CanonicalPrimitive|null instantiatesCanonical The defined protocol that describes the analysis */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/PlanDefinition',
+            'http://hl7.org/fhir/StructureDefinition/ActivityDefinition',
+        ])]
         public ?CanonicalPrimitive $instantiatesCanonical = null,
         /** @var UriPrimitive|null instantiatesUri The URL pointing to an externally maintained protocol that describes the analysis */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
@@ -76,6 +83,7 @@ class GenomicStudyAnalysis extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public array $focus = [],
         /** @var array<Reference> specimen The specimen used in the analysis event */
         #[FhirProperty(
@@ -84,6 +92,7 @@ class GenomicStudyAnalysis extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Specimen'])]
         public array $specimen = [],
         /** @var DateTimePrimitive|null date The date of the analysis event */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]
@@ -97,7 +106,7 @@ class GenomicStudyAnalysis extends BackboneElement
         )]
         public array $note = [],
         /** @var Reference|null protocolPerformed The protocol that was performed for the analysis event */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Procedure', 'http://hl7.org/fhir/StructureDefinition/Task'])]
         public ?Reference $protocolPerformed = null,
         /** @var array<Reference> regionsStudied The genomic regions to be studied in the analysis (BED file) */
         #[FhirProperty(
@@ -106,6 +115,10 @@ class GenomicStudyAnalysis extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/DocumentReference',
+            'http://hl7.org/fhir/StructureDefinition/Observation',
+        ])]
         public array $regionsStudied = [],
         /** @var array<Reference> regionsCalled Genomic regions actually called in the analysis event (BED file) */
         #[FhirProperty(
@@ -114,6 +127,10 @@ class GenomicStudyAnalysis extends BackboneElement
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
         )]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/DocumentReference',
+            'http://hl7.org/fhir/StructureDefinition/Observation',
+        ])]
         public array $regionsCalled = [],
         /** @var array<GenomicStudyAnalysisInput> input Inputs for the analysis event */
         #[FhirProperty(

@@ -330,7 +330,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         }>,
  *     },
  *     validation?: bool|array{ // Validation configuration
- *         enabled?: bool|Param, // Default: false
+ *         enabled?: bool|Param, // Default: true
  *         cache?: scalar|Param|null, // Deprecated: Setting the "framework.validation.cache.cache" configuration option is deprecated. It will be removed in version 8.0.
  *         enable_attributes?: bool|Param, // Default: true
  *         static_method?: list<scalar|Param|null>,
@@ -796,7 +796,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             use_underscore?: bool|Param, // Default: true
  *             unordered_list_markers?: list<scalar|Param|null>,
  *         },
- *         ...<mixed>
+ *         ...<string, mixed>
  *     },
  * }
  * @psalm-type MakerConfig = array{
@@ -811,6 +811,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     validation?: array{
  *         enabled?: bool|Param, // Enable FHIR validation during code generation // Default: true
  *         strict_mode?: bool|Param, // Enable strict validation mode (fail on warnings) // Default: false
+ *         message_overrides?: array<string, scalar|Param|null>,
  *     },
  *     packages?: array<string, array{ // Default: []
  *         version?: scalar|Param|null, // Package version to use

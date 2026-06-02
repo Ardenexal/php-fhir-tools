@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -20,6 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  * @description Indicates where the extension is intended to be used, like StructureDefinition.context, but is merely guidance. E.g An extension might be defined for use on any Element, but an author can use this indicate that the extension is intended to be used on a few particular DataTypes.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/intended-context', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition')]
 class IntendedContextExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

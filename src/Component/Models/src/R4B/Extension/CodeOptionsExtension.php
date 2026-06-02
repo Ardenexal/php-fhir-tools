@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRContextInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
 
@@ -17,6 +19,8 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive;
  * @description A logical reference (i.e. a reference to ValueSet.url) to a value set (and optionally a version) that identifies a set of possible coded values for the element. This extension is used to convey a list of candidate codes when there is no formal code in the code system already defined that captures the intended set. For example, the concept of COVID preventative medications could be expressed as a value set because there is no specific code representing that concept.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/codeOptions', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'CodeableConcept')]
+#[FHIRContextInvariant(expression: 'ofType(CodeableConcept).coding.exists().not()')]
 class CodeOptionsExtension extends Extension
 {
     public function __construct(

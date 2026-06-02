@@ -6,9 +6,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\ImagingSelection;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\ImagingSelection3DGraphicTypeType;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -25,13 +28,13 @@ class ImagingSelectionInstanceImageRegion3D extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var ImagingSelection3DGraphicTypeType|null regionType point | multipoint | polyline | polygon | ellipse | ellipsoid */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/imagingselection-3dgraphictype|5.0.0', strength: 'required')]
         public ?ImagingSelection3DGraphicTypeType $regionType = null,
         /** @var array<numeric-string> coordinate Specifies the coordinates that define the image region */
-        #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar', isArray: true, isRequired: true)]
+        #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar', isArray: true, isRequired: true), Count(min: 1)]
         public array $coordinate = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

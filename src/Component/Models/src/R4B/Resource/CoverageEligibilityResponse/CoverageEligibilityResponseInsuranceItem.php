@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\CoverageEligibilityR
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
@@ -21,6 +24,12 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
     elementPath: 'CoverageEligibilityResponse.insurance.item',
     fhirVersion: 'R4B',
 )]
+#[FHIRPathInvariant(
+    key: 'ces-1',
+    severity: 'error',
+    expression: 'category.exists() xor productOrService.exists()',
+    human: 'SHALL contain a category or a billcode but not both.',
+)]
 class CoverageEligibilityResponseInsuranceItem extends BackboneElement
 {
     public function __construct(
@@ -31,7 +40,7 @@ class CoverageEligibilityResponseInsuranceItem extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null category Benefit classification */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
@@ -49,6 +58,10 @@ class CoverageEligibilityResponseInsuranceItem extends BackboneElement
         public array $modifier = [],
         /** @var Reference|null provider Performing practitioner */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Practitioner',
+            'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
+        ])]
         public ?Reference $provider = null,
         /** @var bool|null excluded Excluded from the plan */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]

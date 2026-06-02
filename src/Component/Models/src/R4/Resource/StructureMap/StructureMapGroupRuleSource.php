@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\StructureMap;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Address;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Age;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Annotation;
@@ -37,6 +39,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\RelatedArtifact;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\SampledData;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Signature;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\StructureMapSourceListModeType;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\TriggerDefinition;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\UsageContext;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\Base64BinaryPrimitive;
@@ -55,7 +58,6 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UnsignedIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UrlPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UuidPrimitive;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\Timing;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -72,7 +74,7 @@ class StructureMapGroupRuleSource extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var IdPrimitive|null context Type or variable this rule applies to */
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive', isRequired: true), NotBlank]
@@ -314,7 +316,7 @@ class StructureMapGroupRuleSource extends BackboneElement
                 [
                     'fhirType'     => 'Timing',
                     'propertyKind' => 'complex',
-                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Resource\Timing',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing',
                     'jsonKey'      => 'defaultValueTiming',
                 ],
                 [
@@ -384,7 +386,7 @@ class StructureMapGroupRuleSource extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $element = null,
         /** @var StructureMapSourceListModeType|null listMode first | not_first | last | not_last | only_one */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/map-source-list-mode|4.0.1', strength: 'required')]
         public ?StructureMapSourceListModeType $listMode = null,
         /** @var IdPrimitive|null variable Named context for field, if a field is specified */
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive')]

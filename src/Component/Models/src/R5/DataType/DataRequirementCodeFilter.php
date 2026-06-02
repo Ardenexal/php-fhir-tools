@@ -6,6 +6,8 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 
@@ -13,6 +15,12 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  * @description Code filters specify additional constraints on the data, specifying the value set of interest for a particular element of the data. Each code filter defines an additional constraint on the data, i.e. code filters are AND'ed, not OR'ed.
  */
 #[FHIRComplexType(typeName: 'DataRequirement.codeFilter', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'drq-1',
+    severity: 'error',
+    expression: 'path.exists() xor searchParam.exists()',
+    human: 'Either a path or a searchParam must be provided, but not both',
+)]
 class DataRequirementCodeFilter extends Element
 {
     public function __construct(
@@ -29,7 +37,7 @@ class DataRequirementCodeFilter extends Element
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $searchParam = null,
         /** @var CanonicalPrimitive|null valueSet ValueSet for the filter */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ValueSet'])]
         public ?CanonicalPrimitive $valueSet = null,
         /** @var array<Coding> code What code is expected */
         #[FhirProperty(

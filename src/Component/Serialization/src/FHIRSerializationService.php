@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Serialization;
 
+use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistryFactory;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContextFactory;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationDebugInfo;
 use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
@@ -72,7 +73,7 @@ class FHIRSerializationService
     ): self {
         $metadataExtractor = new FHIRMetadataExtractor();
         $registry          = FHIRIGTypeRegistryFactory::create($igOutputDirectory, $igNamespace);
-        $typeResolver      = new FHIRTypeResolver(igTypeRegistry: $registry);
+        $typeResolver      = new FHIRTypeResolver(igTypeRegistry: $registry, fhirVersion: $version->value);
 
         $normalizers = [
             new FHIRResourceJsonNormalizer($metadataExtractor, $typeResolver, fhirVersion: $version->value, igTypeRegistry: $registry),
@@ -87,7 +88,7 @@ class FHIRSerializationService
 
         $serializer = new Serializer($normalizers, [new JsonEncoder(), new XmlEncoder()]);
 
-        return new self($serializer, new FHIRSerializationContextFactory(), new FHIRSerializationDebugInfo('initial', 'json'), $metadataExtractor);
+        return new self($serializer, new FHIRSerializationContextFactory(), new FHIRSerializationDebugInfo('initial', 'json'), $metadataExtractor, $typeResolver);
     }
 
     /**
@@ -143,9 +144,13 @@ class FHIRSerializationService
     /**
      * Deserialize JSON data to a FHIR object.
      *
+     * @template T of object
+     *
      * @param string               $jsonData    The JSON data to deserialize
-     * @param string               $targetClass The target FHIR class name
+     * @param class-string<T>      $targetClass The target FHIR class name
      * @param array<string, mixed> $context     Additional deserialization context
+     *
+     * @return T
      *
      * @throws FHIRSerializationException If deserialization fails
      */
@@ -160,6 +165,7 @@ class FHIRSerializationService
                 throw new FHIRSerializationException('Deserialization did not produce an object');
             }
 
+            /** @var T $result */
             return $result;
         } catch (\Exception $e) {
             throw new FHIRSerializationException(sprintf('Failed to deserialize JSON to FHIR object: %s', $e->getMessage()), 0, $e);
@@ -169,9 +175,13 @@ class FHIRSerializationService
     /**
      * Deserialize XML data to a FHIR object.
      *
+     * @template T of object
+     *
      * @param string               $xmlData     The XML data to deserialize
-     * @param string               $targetClass The target FHIR class name
+     * @param class-string<T>      $targetClass The target FHIR class name
      * @param array<string, mixed> $context     Additional deserialization context
+     *
+     * @return T
      *
      * @throws FHIRSerializationException If deserialization fails
      */
@@ -192,6 +202,7 @@ class FHIRSerializationService
                 throw new FHIRSerializationException('Deserialization did not produce an object');
             }
 
+            /** @var T $result */
             return $result;
         } catch (\Exception $e) {
             throw new FHIRSerializationException(sprintf('Failed to deserialize XML to FHIR object: %s', $e->getMessage()), 0, $e);
@@ -218,7 +229,9 @@ class FHIRSerializationService
         }
 
         return match ($format) {
+            /** @phpstan-ignore argument.type */
             'json'  => $this->deserializeFromJson($data, $targetClass, $context),
+            /** @phpstan-ignore argument.type */
             'xml'   => $this->deserializeFromXml($data, $targetClass, $context),
             default => throw new FHIRSerializationException("Unsupported format: {$format}")
         };

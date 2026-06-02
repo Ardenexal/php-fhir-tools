@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -22,6 +23,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
  * It is also allowed to provide translations of elements of type `code`, which may be appropriate to use for rendering when the code itself is a natural language word (usually in English). In such cases, the translation is not provided as an alternative code, and is not intended for machine interpretation. This extension should never appear on a code that is part of a Coding, as placing the translation on Coding.display is more appropriate.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/translation', fhirVersion: 'R4')]
+#[FHIRExtensionContext(type: 'element', expression: 'string')]
+#[FHIRExtensionContext(type: 'element', expression: 'markdown')]
+#[FHIRExtensionContext(type: 'element', expression: 'code')]
 class TranslationExtension extends Extension implements FHIRComplexExtensionInterface
 {
     public function __construct(

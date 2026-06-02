@@ -6,11 +6,12 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource\NutritionOrder;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
-use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing;
 
 /**
  * @description Diet given orally in contrast to enteral (tube) feeding.
@@ -26,7 +27,7 @@ class NutritionOrderOralDiet extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var array<CodeableConcept> type Type of oral diet or diet restrictions that describe what can be consumed orally */
         #[FhirProperty(
@@ -41,7 +42,7 @@ class NutritionOrderOralDiet extends BackboneElement
             fhirType: 'Timing',
             propertyKind: 'complex',
             isArray: true,
-            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Resource\Timing',
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Timing',
         )]
         public array $schedule = [],
         /** @var array<NutritionOrderOralDietNutrient> nutrient Required  nutrient modifications */

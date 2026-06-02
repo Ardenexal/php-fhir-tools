@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Signature;
 
@@ -17,6 +18,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Signature;
  * @description Represents a wet or electronic signature for either the form overall or for the question or item it's associated with.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/questionnaireresponse-signature', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'QuestionnaireResponse')]
+#[FHIRExtensionContext(type: 'element', expression: 'QuestionnaireResponse.item')]
+#[FHIRExtensionContext(type: 'element', expression: 'QuestionnaireResponse.item.item')]
 class QRSignatureExtension extends Extension
 {
     public function __construct(

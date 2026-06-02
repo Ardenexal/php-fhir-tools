@@ -40,7 +40,7 @@ Full system context: `.goat-flow/architecture.md` · File layout: `.goat-flow/co
 | Footguns | `.goat-flow/footguns/` |
 | Lessons | `.goat-flow/lessons/` |
 | Decisions | `.goat-flow/decisions/` |
-| Tool playbooks (CLI/MCP availability checks: browser-use, page-capture, skill-* references) | `.goat-flow/skill-reference/` — read BEFORE declaring a tool unavailable |
+| Skill playbooks (tools) | `.goat-flow/skill-playbooks/` (README.md index; read BEFORE declaring a tool unavailable) |
 | Test/PHPStan commands | `.goat-flow/skill-reference/testing.md` |
 | Agent instructions | `mate/AGENT_INSTRUCTIONS.md` |
 
@@ -54,7 +54,7 @@ Full system context: `.goat-flow/architecture.md` · File layout: `.goat-flow/co
 | Known traps and footguns | `.goat-flow/footguns/` |
 | Lessons from past incidents | `.goat-flow/lessons/` |
 | Architecture decisions | `.goat-flow/decisions/` |
-| Tool playbooks (CLI/MCP availability checks: browser-use, page-capture, skill-* references) | `.goat-flow/skill-reference/` — read BEFORE declaring a tool unavailable |
+| Skill playbooks (tools) | `.goat-flow/skill-playbooks/` (README.md index; read BEFORE declaring a tool unavailable) |
 
 ## Essential Commands
 
@@ -89,7 +89,7 @@ GPG-sign when possible. Full rules: `.github/git-commit-instructions.md`.
 
 Before starting: read `.goat-flow/architecture.md` and `.goat-flow/code-map.md`.
 Before declaring any tool or capability unavailable, read the matching playbook in
-`.goat-flow/skill-reference/` (e.g. `browser-use.md`, `page-capture.md`) and run that
+`.goat-flow/skill-playbooks/` (e.g. `browser-use.md`, `page-capture.md`) and run that
 doc's "Availability Check" section verbatim — project-local CLI tools at `~/.local/bin/`
 are valid; do not conflate "no harness/MCP tool" with "no tool".
 

@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 
 /**
  * @author HL7 FHIR Standard
@@ -15,6 +16,12 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
  * @description A relationship of two Quantity values - expressed as a numerator and a denominator.
  */
 #[FHIRComplexType(typeName: 'Ratio', fhirVersion: 'R4')]
+#[FHIRPathInvariant(
+    key: 'rat-1',
+    severity: 'error',
+    expression: '(numerator.empty() xor denominator.exists()) and (numerator.exists() or extension.exists())',
+    human: 'Numerator and denominator SHALL both be present, or both are absent. If both are absent, there SHALL be some extension present',
+)]
 class Ratio extends Element
 {
     public function __construct(

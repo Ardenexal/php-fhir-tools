@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\PositiveIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 
@@ -17,6 +20,12 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
  * @description Details for all kinds of technology mediated contact points for a person or organization, including telephone, email, etc.
  */
 #[FHIRComplexType(typeName: 'ContactPoint', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'cpt-2',
+    severity: 'error',
+    expression: 'value.empty() or system.exists()',
+    human: 'A system is required if a value is provided.',
+)]
 class ContactPoint extends DataType
 {
     public function __construct(
@@ -27,13 +36,13 @@ class ContactPoint extends DataType
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var ContactPointSystemType|null system phone | fax | email | pager | url | sms | other */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/contact-point-system|5.0.0', strength: 'required')]
         public ?ContactPointSystemType $system = null,
         /** @var StringPrimitive|string|null value The actual contact point details */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $value = null,
         /** @var ContactPointUseType|null use home | work | temp | old | mobile - purpose of this contact point */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/contact-point-use|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because applications should not mistake a temporary or old contact etc.for a current/permanent one')]
         public ?ContactPointUseType $use = null,
         /** @var PositiveIntPrimitive|null rank Specify preferred order of use (1 = highest) */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]

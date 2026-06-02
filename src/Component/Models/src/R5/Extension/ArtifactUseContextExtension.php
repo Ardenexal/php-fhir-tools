@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\UsageContext;
 
@@ -17,6 +18,20 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\UsageContext;
  * @description The content was developed with a focus and intent of supporting the contexts that are listed. These contexts may be general categories (gender, age, ...) or may be references to specific programs (insurance plans, studies, ...) and may be used to assist with indexing and searching for appropriate artifact instances.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/artifact-useContext', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'ArtifactAssessment')]
+#[FHIRExtensionContext(type: 'element', expression: 'ClinicalUseDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'Composition')]
+#[FHIRExtensionContext(type: 'element', expression: 'ConditionDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'Group')]
+#[FHIRExtensionContext(type: 'element', expression: 'Medication')]
+#[FHIRExtensionContext(type: 'element', expression: 'MedicationKnowledge')]
+#[FHIRExtensionContext(type: 'element', expression: 'ObservationDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'ResearchStudy')]
+#[FHIRExtensionContext(type: 'element', expression: 'SpecimenDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'Substance')]
+#[FHIRExtensionContext(type: 'element', expression: 'SubstanceDefinition')]
+#[FHIRExtensionContext(type: 'element', expression: 'SubscriptionTopic')]
 class ArtifactUseContextExtension extends Extension
 {
     public function __construct(

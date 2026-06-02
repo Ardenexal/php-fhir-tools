@@ -6,6 +6,9 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource\CareTeam;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
@@ -17,6 +20,18 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Timing;
  * @description Identifies all people and organizations who are expected to be involved in the care team.
  */
 #[FHIRBackboneElement(parentResource: 'CareTeam', elementPath: 'CareTeam.participant', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'ctm-1',
+    severity: 'error',
+    expression: 'onBehalfOf.exists() implies (member.resolve() is Practitioner)',
+    human: 'CareTeam.participant.onBehalfOf can only be populated when CareTeam.participant.member is a Practitioner',
+)]
+#[FHIRPathInvariant(
+    key: 'ctm-2',
+    severity: 'warning',
+    expression: 'role.exists() or member.exists()',
+    human: 'CareTeam.participant.role or CareTeam.participant.member exists',
+)]
 class CareTeamParticipant extends BackboneElement
 {
     public function __construct(
@@ -27,16 +42,24 @@ class CareTeamParticipant extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var CodeableConcept|null role Type of involvement */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $role = null,
         /** @var Reference|null member Who is involved */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FHIRTargetProfile(targetProfiles: [
+            'http://hl7.org/fhir/StructureDefinition/Practitioner',
+            'http://hl7.org/fhir/StructureDefinition/PractitionerRole',
+            'http://hl7.org/fhir/StructureDefinition/RelatedPerson',
+            'http://hl7.org/fhir/StructureDefinition/Patient',
+            'http://hl7.org/fhir/StructureDefinition/Organization',
+            'http://hl7.org/fhir/StructureDefinition/CareTeam',
+        ])]
         public ?Reference $member = null,
         /** @var Reference|null onBehalfOf Organization of the practitioner */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Organization'])]
         public ?Reference $onBehalfOf = null,
         /** @var Period|Timing|null coverage When the member is generally available within this care team */
         #[FhirProperty(

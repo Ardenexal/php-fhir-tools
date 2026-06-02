@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Models\R4B\Profile;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileConstraint;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRProfileMustSupport;
 use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ActivityDefinitionResource;
 
 /**
@@ -19,6 +21,60 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ActivityDefinitionResource
     baseType: 'ActivityDefinition',
     fhirVersion: 'R4B',
 )]
+#[FHIRProfileConstraint(
+    path: 'url',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['min' => 1, 'max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/shareableactivitydefinition'],
+)]
+#[FHIRProfileConstraint(
+    path: 'version',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['min' => 1, 'max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/shareableactivitydefinition'],
+)]
+#[FHIRProfileConstraint(
+    path: 'name',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['min' => 1, 'max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/shareableactivitydefinition'],
+)]
+#[FHIRProfileConstraint(
+    path: 'title',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/shareableactivitydefinition'],
+)]
+#[FHIRProfileConstraint(
+    path: 'experimental',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['min' => 1, 'max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/shareableactivitydefinition'],
+)]
+#[FHIRProfileConstraint(
+    path: 'date',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/shareableactivitydefinition'],
+)]
+#[FHIRProfileConstraint(
+    path: 'publisher',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['min' => 1, 'max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/shareableactivitydefinition'],
+)]
+#[FHIRProfileConstraint(
+    path: 'description',
+    constraint: 'Symfony\Component\Validator\Constraints\Count',
+    options: ['min' => 1, 'max' => 1],
+    groups: ['http://hl7.org/fhir/StructureDefinition/shareableactivitydefinition'],
+)]
+#[FHIRProfileMustSupport(path: 'identifier', groups: ['http://hl7.org/fhir/StructureDefinition/shareableactivitydefinition'])]
+#[FHIRProfileMustSupport(path: 'title', groups: ['http://hl7.org/fhir/StructureDefinition/shareableactivitydefinition'])]
+#[FHIRProfileMustSupport(path: 'date', groups: ['http://hl7.org/fhir/StructureDefinition/shareableactivitydefinition'])]
+#[FHIRProfileMustSupport(path: 'contact', groups: ['http://hl7.org/fhir/StructureDefinition/shareableactivitydefinition'])]
+#[FHIRProfileMustSupport(path: 'useContext', groups: ['http://hl7.org/fhir/StructureDefinition/shareableactivitydefinition'])]
+#[FHIRProfileMustSupport(path: 'jurisdiction', groups: ['http://hl7.org/fhir/StructureDefinition/shareableactivitydefinition'])]
 class ShareableActivityDefinitionProfile extends ActivityDefinitionResource
 {
     /** Canonical URL of this profile's StructureDefinition. */

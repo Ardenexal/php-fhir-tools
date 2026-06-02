@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\DataType;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 
@@ -13,6 +14,12 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
  * @description Date filters specify additional constraints on the data in terms of the applicable date range for specific elements. Each date filter specifies an additional constraint on the data, i.e. date filters are AND'ed, not OR'ed.
  */
 #[FHIRComplexType(typeName: 'DataRequirement.dateFilter', fhirVersion: 'R4B')]
+#[FHIRPathInvariant(
+    key: 'drq-2',
+    severity: 'error',
+    expression: 'path.exists() xor searchParam.exists()',
+    human: 'Either a path or a searchParam must be provided, but not both',
+)]
 class DataRequirementDateFilter extends Element
 {
     public function __construct(

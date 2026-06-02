@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 
@@ -17,6 +18,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
  * @description Where the server provides its web socket end-point. Note: this extension is deprecated because it's poorly defined and is also over-constrained to just 1 occurrence. If there is a need for an extension like this as a common extension, please submit a change request and we will create one that is better defined, clear about its purpose, and has an appropriate cardinality.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/capabilitystatement-websocket', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'CapabilityStatement.rest')]
 class CSWebsocketExtension extends Extension
 {
     public function __construct(

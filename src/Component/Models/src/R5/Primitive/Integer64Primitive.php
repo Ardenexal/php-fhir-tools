@@ -8,6 +8,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\PrimitiveType;
+use Symfony\Component\Validator\Constraints\Range;
+use Symfony\Component\Validator\Constraints\Regex;
 
 /**
  * @author HL7 FHIR Standard
@@ -32,7 +34,7 @@ class Integer64Primitive extends PrimitiveType implements \Stringable
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var int|null value Primitive value for integer64 */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.Integer', propertyKind: 'scalar', xmlSerializedName: '@value')]
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.Integer', propertyKind: 'scalar', xmlSerializedName: '@value'), Range(min: '-9223372036854775808', max: '9223372036854775807'), Regex(pattern: '[0]|[-+]?[1-9][0-9]*')]
         public ?int $value = null,
     ) {
         parent::__construct($id, $extension);

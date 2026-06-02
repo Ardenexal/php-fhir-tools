@@ -81,14 +81,14 @@ enum Currencies: string
     /** Bosnia-Herzegovina Dinar (1992–1994) */
     case bosniaherzegovinadinar19921994 = 'BAD';
 
-    /** Bosnia-Herzegovina Convertible Marka */
-    case bosniaherzegovinaconvertiblemarka = 'BAM';
+    /** Bosnia-Herzegovina Convertible Mark */
+    case bosniaherzegovinaconvertiblemark = 'BAM';
 
     /** Bosnia-Herzegovina New Dinar (1994–1997) */
     case bosniaherzegovinanewdinar19941997 = 'BAN';
 
-    /** Barbados Dollar */
-    case barbadosdollar = 'BBD';
+    /** Barbadian Dollar */
+    case barbadiandollar = 'BBD';
 
     /** Bangladeshi Taka */
     case bangladeshitaka = 'BDT';
@@ -120,13 +120,13 @@ enum Currencies: string
     /** Burundian Franc */
     case burundianfranc = 'BIF';
 
-    /** Bermuda Dollar */
-    case bermudadollar = 'BMD';
+    /** Bermudan Dollar */
+    case bermudandollar = 'BMD';
 
     /** Brunei Dollar */
     case bruneidollar = 'BND';
 
-    /** Bolivian boliviano */
+    /** Bolivian Boliviano */
     case bolivianboliviano = 'BOB';
 
     /** Bolivian Boliviano (1863–1963) */
@@ -381,8 +381,8 @@ enum Currencies: string
     /** Israeli Shekel (1980–1985) */
     case israelishekel19801985 = 'ILR';
 
-    /** Israeli Shekel */
-    case israelishekel = 'ILS';
+    /** Israeli New Shekel */
+    case israelinewshekel = 'ILS';
 
     /** Indian Rupee */
     case indianrupee = 'INR';
@@ -687,14 +687,14 @@ enum Currencies: string
     /** Sierra Leonean Leone */
     case sierraleoneanleone = 'SLE';
 
-    /** Sierra Leonean Leone (1964–2022) */
+    /** Sierra Leonean Leone (1964—2022) */
     case sierraleoneanleone19642022 = 'SLL';
 
     /** Somali Shilling */
     case somalishilling = 'SOS';
 
-    /** Suriname Dollar */
-    case surinamedollar = 'SRD';
+    /** Surinamese Dollar */
+    case surinamesedollar = 'SRD';
 
     /** Surinamese Guilder */
     case surinameseguilder = 'SRG';
@@ -786,8 +786,8 @@ enum Currencies: string
     /** Uruguayan Peso (1975–1993) */
     case uruguayanpeso19751993 = 'UYP';
 
-    /** Peso Uruguayo */
-    case pesouruguayo = 'UYU';
+    /** Uruguayan Peso */
+    case uruguayanpeso = 'UYU';
 
     /** Uruguayan Nominal Wage Index Unit */
     case uruguayannominalwageindexunit = 'UYW';
@@ -804,7 +804,7 @@ enum Currencies: string
     /** Venezuelan Bolívar (2008–2018) */
     case venezuelanbolívar20082018 = 'VEF';
 
-    /** Venezuelan bolívar */
+    /** Venezuelan Bolívar */
     case venezuelanbolívar = 'VES';
 
     /** Vietnamese Dong */

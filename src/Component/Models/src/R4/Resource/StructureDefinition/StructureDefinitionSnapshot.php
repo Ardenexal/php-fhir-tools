@@ -6,14 +6,35 @@ namespace Ardenexal\FHIRTools\Component\Models\R4\Resource\StructureDefinition;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\ElementDefinition;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
+use Symfony\Component\Validator\Constraints\Count;
 
 /**
  * @description A snapshot view is expressed in a standalone form that can be used and interpreted without considering the base StructureDefinition.
  */
 #[FHIRBackboneElement(parentResource: 'StructureDefinition', elementPath: 'StructureDefinition.snapshot', fhirVersion: 'R4')]
+#[FHIRPathInvariant(
+    key: 'sdf-3',
+    severity: 'error',
+    expression: 'element.all(definition.exists() and min.exists() and max.exists())',
+    human: 'Each element definition in a snapshot must have a formal definition and cardinalities',
+)]
+#[FHIRPathInvariant(
+    key: 'sdf-8',
+    severity: 'error',
+    expression: '(%resource.kind = \'logical\' or element.first().path = %resource.type) and element.tail().all(path.startsWith(%resource.snapshot.element.first().path&\'.\'))',
+    human: 'All snapshot elements must start with the StructureDefinition\'s specified type for non-logical models, or with the same type name for logical models',
+)]
+#[FHIRPathInvariant(
+    key: 'sdf-8b',
+    severity: 'error',
+    expression: 'element.all(base.exists())',
+    human: 'All snapshot elements must have a base definition',
+)]
 class StructureDefinitionSnapshot extends BackboneElement
 {
     public function __construct(
@@ -24,7 +45,7 @@ class StructureDefinitionSnapshot extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored even if unrecognized */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var array<ElementDefinition> element Definition of elements in the resource (if no StructureDefinition) */
         #[FhirProperty(
@@ -34,6 +55,7 @@ class StructureDefinitionSnapshot extends BackboneElement
             isRequired: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\ElementDefinition',
         )]
+        #[Count(min: 1)]
         public array $element = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

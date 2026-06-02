@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 
@@ -17,6 +18,10 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
  * @description Distinguishes the type of involvement of the performer in the event. For example, 'author',  'verifier' or 'responsible party'.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/event-performerFunction', fhirVersion: 'R5')]
+#[FHIRExtensionContext(type: 'element', expression: 'Observation.performer')]
+#[FHIRExtensionContext(type: 'element', expression: 'DiagnosticReport.performer')]
+#[FHIRExtensionContext(type: 'element', expression: 'DocumentReference.author')]
+#[FHIRExtensionContext(type: 'element', expression: 'Consent.grantee')]
 class PerformerFunctionExtension extends Extension
 {
     public function __construct(

@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRTime;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\PrimitiveType;
+use Symfony\Component\Validator\Constraints\Regex;
 
 /**
  * @author HL7 FHIR Standard
@@ -33,7 +34,7 @@ class TimePrimitive extends PrimitiveType implements \Stringable
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var FHIRTime|null value Primitive value for time */
-        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.Time', propertyKind: 'scalar', xmlSerializedName: '@value')]
+        #[FhirProperty(fhirType: 'http://hl7.org/fhirpath/System.Time', propertyKind: 'scalar', xmlSerializedName: '@value'), Regex(pattern: '([01][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\.[0-9]{1,9})?')]
         public ?FHIRTime $value = null,
     ) {
         parent::__construct($id, $extension);

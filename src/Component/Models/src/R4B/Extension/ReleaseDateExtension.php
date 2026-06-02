@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R4B\Extension;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
 
@@ -17,6 +18,34 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive;
  * @description Indicates the date on which request or event resource that has a status of 'on-hold' or 'suspended' should be moved back to an active state.
  */
 #[FHIRExtensionDefinition(url: 'http://hl7.org/fhir/StructureDefinition/workflow-releaseDate', fhirVersion: 'R4B')]
+#[FHIRExtensionContext(type: 'element', expression: 'Account')]
+#[FHIRExtensionContext(type: 'element', expression: 'Appointment')]
+#[FHIRExtensionContext(type: 'element', expression: 'ArtifactAssessment')]
+#[FHIRExtensionContext(type: 'element', expression: 'CarePlan')]
+#[FHIRExtensionContext(type: 'element', expression: 'CarePlan.activity')]
+#[FHIRExtensionContext(type: 'element', expression: 'ClinicalImpression')]
+#[FHIRExtensionContext(type: 'element', expression: 'Communication')]
+#[FHIRExtensionContext(type: 'element', expression: 'CommunicationRequest')]
+#[FHIRExtensionContext(type: 'element', expression: 'Contract')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceDispense')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceRequest')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceUsage')]
+#[FHIRExtensionContext(type: 'element', expression: 'DeviceUseStatement')]
+#[FHIRExtensionContext(type: 'element', expression: 'Encounter')]
+#[FHIRExtensionContext(type: 'element', expression: 'Endpoint')]
+#[FHIRExtensionContext(type: 'element', expression: 'EpisodeOfCare')]
+#[FHIRExtensionContext(type: 'element', expression: 'Goal')]
+#[FHIRExtensionContext(type: 'element', expression: 'MedicationAdministration')]
+#[FHIRExtensionContext(type: 'element', expression: 'MedicationDispense')]
+#[FHIRExtensionContext(type: 'element', expression: 'MedicationRequest')]
+#[FHIRExtensionContext(type: 'element', expression: 'NutritionIntake')]
+#[FHIRExtensionContext(type: 'element', expression: 'NutritionOrder')]
+#[FHIRExtensionContext(type: 'element', expression: 'Procedure')]
+#[FHIRExtensionContext(type: 'element', expression: 'RequestOrchestration')]
+#[FHIRExtensionContext(type: 'element', expression: 'RequestGroup')]
+#[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest')]
+#[FHIRExtensionContext(type: 'element', expression: 'SupplyRequest')]
+#[FHIRExtensionContext(type: 'element', expression: 'Task')]
 class ReleaseDateExtension extends Extension
 {
     public function __construct(

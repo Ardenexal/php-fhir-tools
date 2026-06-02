@@ -6,6 +6,10 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTargetProfile;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Age;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Annotation;
@@ -33,6 +37,18 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A clinical condition, problem, diagnosis, or other event, situation, issue, or clinical concept that has risen to a level of concern.
  */
 #[FhirResource(type: 'Condition', version: '5.0.0', url: 'http://hl7.org/fhir/StructureDefinition/Condition', fhirVersion: 'R5')]
+#[FHIRPathInvariant(
+    key: 'con-2',
+    severity: 'warning',
+    expression: 'category.coding.where(system=\'http://terminology.hl7.org/CodeSystem/condition-category\' and code=\'problem-list-item\').exists() implies clinicalStatus.coding.where(system=\'http://terminology.hl7.org/CodeSystem/condition-clinical\' and code=\'unknown\').exists().not()',
+    human: 'If category is problems list item, the clinicalStatus should not be unknown',
+)]
+#[FHIRPathInvariant(
+    key: 'con-3',
+    severity: 'error',
+    expression: 'abatement.exists() implies (clinicalStatus.coding.where(system=\'http://terminology.hl7.org/CodeSystem/condition-clinical\' and (code=\'inactive\' or code=\'resolved\' or code=\'remission\')).exists())',
+    human: 'If condition is abated, then clinicalStatus must be either inactive, resolved, or remission.',
+)]
 class ConditionResource extends DomainResourceResource
 {
     public function __construct(
@@ -43,10 +59,10 @@ class ConditionResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
         public ?UriPrimitive $implicitRules = null,
         /** @var AllLanguagesType|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
@@ -58,7 +74,7 @@ class ConditionResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'extension', isArray: true)]
         public array $extension = [],
         /** @var array<Extension> modifierExtension Extensions that cannot be ignored */
-        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true)]
+        #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the resource that contains them')]
         public array $modifierExtension = [],
         /** @var array<Identifier> identifier External Ids for this condition */
         #[FhirProperty(
@@ -69,10 +85,10 @@ class ConditionResource extends DomainResourceResource
         )]
         public array $identifier = [],
         /** @var CodeableConcept|null clinicalStatus active | recurrence | relapse | inactive | remission | resolved | unknown */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/condition-clinical|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the status contains codes that mark the condition as no longer active.')]
         public ?CodeableConcept $clinicalStatus = null,
         /** @var CodeableConcept|null verificationStatus unconfirmed | provisional | differential | confirmed | refuted | entered-in-error */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/condition-ver-status|5.0.0', strength: 'required'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the status contains the code refuted and entered-in-error that mark the Condition as not currently valid.')]
         public ?CodeableConcept $verificationStatus = null,
         /** @var array<CodeableConcept> category problem-list-item | encounter-diagnosis */
         #[FhirProperty(
@@ -81,9 +97,10 @@ class ConditionResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
         )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/condition-category', strength: 'preferred')]
         public array $category = [],
         /** @var CodeableConcept|null severity Subjective severity of condition */
-        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/condition-severity', strength: 'preferred')]
         public ?CodeableConcept $severity = null,
         /** @var CodeableConcept|null code Identification of the condition, problem or diagnosis */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
@@ -97,10 +114,10 @@ class ConditionResource extends DomainResourceResource
         )]
         public array $bodySite = [],
         /** @var Reference|null subject Who has the condition? */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Patient', 'http://hl7.org/fhir/StructureDefinition/Group'])]
         public ?Reference $subject = null,
         /** @var Reference|null encounter The Encounter during which this Condition was created */
-        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]
+        #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Encounter'])]
         public ?Reference $encounter = null,
         /** @var DateTimePrimitive|Age|Period|Range|StringPrimitive|string|null onset Estimated or actual date,  date-time, or age */
         #[FhirProperty(
@@ -206,6 +223,7 @@ class ConditionResource extends DomainResourceResource
             isArray: true,
             phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableReference',
         )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Resource'])]
         public array $evidence = [],
         /** @var array<Annotation> note Additional information about the Condition */
         #[FhirProperty(
