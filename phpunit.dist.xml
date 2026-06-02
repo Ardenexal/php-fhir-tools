@@ -37,6 +37,25 @@
             <!-- The FHIRPath specification cases run via the dedicated fhirpath-spec suite -->
             <exclude>src/Component/FHIRPath/tests/Integration/FHIRPathSpecificationTest.php</exclude>
         </testsuite>
+        <!-- Per-module integration suites: CI runs these in parallel matrix legs.
+             Together they must cover exactly the same tests as the "integration" suite above. -->
+        <testsuite name="integration-root">
+            <directory>tests/Integration</directory>
+        </testsuite>
+        <testsuite name="integration-serialization">
+            <directory>src/Component/Serialization/tests/Integration</directory>
+        </testsuite>
+        <testsuite name="integration-codegen">
+            <directory>src/Component/CodeGeneration/tests/Integration</directory>
+        </testsuite>
+        <testsuite name="integration-fhir-path">
+            <directory>src/Component/FHIRPath/tests/Integration</directory>
+            <!-- The FHIRPath specification cases run via the dedicated fhirpath-spec suite -->
+            <exclude>src/Component/FHIRPath/tests/Integration/FHIRPathSpecificationTest.php</exclude>
+        </testsuite>
+        <testsuite name="integration-validation">
+            <directory>src/Component/Validation/tests/Integration</directory>
+        </testsuite>
         <testsuite name="fhirpath-spec">
             <file>src/Component/FHIRPath/tests/Integration/FHIRPathSpecificationTest.php</file>
         </testsuite>
