@@ -546,6 +546,24 @@ referenced question occurs once; see the ADR-007 addendum for the conformance pl
 Violations carry `FHIRQuestionnaireConstraint::class` in `constraintClass` so they
 can be distinguished after merging.
 
+### Conformance coverage
+
+The validator is exercised against the official `fhir/fhir-test-cases` QuestionnaireResponse
+corpus via `FHIRQuestionnaireConformanceTest` (its own `questionnaire-spec` suite — run with
+`composer test-ai-questionnaire-spec`). Of the 78 eligible R4 cross-resource cases (a
+QuestionnaireResponse plus its source Questionnaire):
+
+- **41 are asserted** — error/warning counts match seeded expectations; for these the validator's
+  verdict agrees with the HL7 Java validator's error-presence (answer-type mismatches are reported
+  at `warning` rather than `error`, by design).
+- **36 are out of scope** and left incomplete (not silently passing) — they test rules this
+  validator does not implement (answerOption/value-set membership, min/max, regex, Quantity units,
+  Attachment constraints, Reference target types, SDC `enableWhenExpression`). See the plan backlog.
+- **1 is skipped** — its supporting resource is not a Questionnaire.
+
+The validator reports **no false-positive errors** across the corpus (its error count never exceeds
+the reference validator's).
+
 ---
 
 ## OperationOutcome Mapping
