@@ -317,7 +317,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
     }
 
     /**
-     * Rule 3b — a non-repeating item must carry at most one answer.
+     * Rule 4b — a non-repeating item must carry at most one answer.
      *
      * @param R4ResponseItem|R4BResponseItem|R5ResponseItem $item
      * @param R4Item|R4BItem|R5Item                         $questionnaireItem
@@ -346,7 +346,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
     }
 
     /**
-     * Rule 4 — the answer value type must match the declared item type (warning severity:
+     * Rule 5 — the answer value type must match the declared item type (warning severity:
      * a mismatch may be legitimate in some contexts per the specification).
      *
      * @param R4ResponseItem|R4BResponseItem|R5ResponseItem $item
@@ -392,7 +392,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
     }
 
     /**
-     * Rule 3a — a non-repeating item must not occur more than once among its siblings.
+     * Rule 4a — a non-repeating item must not occur more than once among its siblings.
      *
      * Occurrence counting is sibling-scoped, not response-global: a non-repeating child of a
      * repeating group legitimately appears once per group instance, but never twice within
