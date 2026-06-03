@@ -534,7 +534,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
                 $satisfied = false;
 
                 foreach ($occurrences as $occurrence) {
-                    if ($occurrence->answer !== []) {
+                    if ($this->hasAnswerValue($occurrence)) {
                         $satisfied = true;
                         break;
                     }
@@ -581,7 +581,26 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
     private function hasAnsweredDescendant(object $item): bool
     {
         foreach ($this->collectChildResponseItems($item) as $child) {
-            if ($child->answer !== [] || $this->hasAnsweredDescendant($child)) {
+            if ($this->hasAnswerValue($child) || $this->hasAnsweredDescendant($child)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Whether the response item carries at least one answer with a non-null value. An answer
+     * element with no value (e.g. answer: [{}]) answers nothing and does not count — the model
+     * declares QuestionnaireResponseItemAnswer::$value nullable, so an empty element is valid
+     * FHIR but must not satisfy a required item or a required group's descendant rule.
+     *
+     * @param R4ResponseItem|R4BResponseItem|R5ResponseItem $item
+     */
+    private function hasAnswerValue(object $item): bool
+    {
+        foreach ($item->answer as $answer) {
+            if ($answer->value !== null) {
                 return true;
             }
         }
@@ -715,9 +734,11 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
             $a = $this->normalizeValue($actual);
             $b = $this->normalizeValue($expected);
 
-            $equal = $a !== null && $b !== null && $a === $b;
+            if ($a === null || $b === null) {
+                return false; // incomparable operands satisfy neither '=' nor '!=' — never enable on the unknown
+            }
 
-            return $operator === '=' ? $equal : !$equal;
+            return $operator === '=' ? $a === $b : $a !== $b;
         }
 
         $a = $this->comparableValue($actual);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit;
 
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Attachment;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\EnableWhenBehaviorType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\QuestionnaireItemOperatorType;
@@ -641,5 +642,82 @@ final class FHIRQuestionnaireValidatorTest extends TestCase
         $this->expectExceptionMessage('Expected a QuestionnaireResponseResource');
 
         $this->validator->validate(new QuestionnaireResource(), new \stdClass());
+    }
+
+    public function testRequiredItemWithEmptyAnswerElementProducesError(): void
+    {
+        $questionnaire = new QuestionnaireResource(item: [self::stringItem('q1', required: true)]);
+        // An answer element with no value (answer: [{}]) answers nothing and must not satisfy required.
+        $response = self::response('completed', new QuestionnaireResponseItem(
+            linkId: 'q1',
+            answer: [new QuestionnaireResponseItemAnswer()],
+        ));
+
+        $report = $this->validator->validate($questionnaire, $response);
+
+        self::assertCount(1, $report->errors());
+        self::assertStringContainsString("Required item 'q1' has no answer", $report->errors()[0]->message);
+    }
+
+    public function testRequiredItemWithNonNullAnswerValueIsValid(): void
+    {
+        $questionnaire = new QuestionnaireResource(item: [self::stringItem('q1', required: true)]);
+        // Boundary counterpart: a present value satisfies the same required item that an empty element does not.
+        $response = self::response('completed', new QuestionnaireResponseItem(
+            linkId: 'q1',
+            answer: [self::stringAnswer('answered')],
+        ));
+
+        $report = $this->validator->validate($questionnaire, $response);
+
+        self::assertSame([], $report->violations);
+    }
+
+    public function testRequiredGroupWithEmptyDescendantAnswerProducesError(): void
+    {
+        $questionnaire = new QuestionnaireResource(item: [new QuestionnaireItem(
+            linkId: 'group1',
+            type: new QuestionnaireItemTypeType('group'),
+            required: true,
+            item: [self::stringItem('q1')],
+        )]);
+        // Descendant present, but its only answer element carries no value — the group is not satisfied.
+        $response = self::response('completed', new QuestionnaireResponseItem(
+            linkId: 'group1',
+            item: [new QuestionnaireResponseItem(linkId: 'q1', answer: [new QuestionnaireResponseItemAnswer()])],
+        ));
+
+        $report = $this->validator->validate($questionnaire, $response);
+
+        self::assertCount(1, $report->errors());
+        self::assertStringContainsString("Required group 'group1' has no answered descendant question", $report->errors()[0]->message);
+    }
+
+    public function testEnableWhenNotEqualWithIncomparableAnswerDoesNotEnable(): void
+    {
+        $questionnaire = new QuestionnaireResource(item: [
+            new QuestionnaireItem(linkId: 'q1', type: new QuestionnaireItemTypeType('attachment')),
+            new QuestionnaireItem(
+                linkId: 'q2',
+                type: new QuestionnaireItemTypeType('string'),
+                required: true,
+                enableWhen: [new QuestionnaireItemEnableWhen(
+                    question: 'q1',
+                    operator: new QuestionnaireItemOperatorType('!='),
+                    answer: 'expected',
+                )],
+            ),
+        ]);
+        // q1's answer is an Attachment — it has no scalar normalization, so it is incomparable.
+        // '!=' must not enable q2 on an incomparable operand; otherwise q2 would be wrongly
+        // treated as required and flagged unanswered.
+        $response = self::response('completed', new QuestionnaireResponseItem(
+            linkId: 'q1',
+            answer: [new QuestionnaireResponseItemAnswer(value: new Attachment(title: 'scan.pdf'))],
+        ));
+
+        $report = $this->validator->validate($questionnaire, $response);
+
+        self::assertSame([], $report->errors(), 'incomparable != operand must not enable & require q2');
     }
 }

@@ -505,6 +505,7 @@ complete QuestionnaireResponse coverage:
 
 ```php
 use Ardenexal\FHIRTools\Component\Validation\FHIRQuestionnaireValidator;
+use Ardenexal\FHIRTools\Component\Validation\FHIRValidationReport;
 
 $questionnaireValidator = new FHIRQuestionnaireValidator();
 
