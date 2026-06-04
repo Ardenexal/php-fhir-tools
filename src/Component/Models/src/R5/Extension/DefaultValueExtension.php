@@ -31,7 +31,70 @@ class DefaultValueExtension extends Extension
 {
     public function __construct(
         /** @var StringPrimitive|bool|int|string|DatePrimitive|DateTimePrimitive|Coding|CodeableConcept|Period|Range|Quantity|Ratio|null value Value of extension */
-        #[FhirProperty(fhirType: 'choice', propertyKind: 'choice', isChoice: true)]
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'string',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive',
+                    'jsonKey'      => 'valueString',
+                ],
+                ['fhirType' => 'boolean', 'propertyKind' => 'scalar', 'phpType' => 'bool', 'jsonKey' => 'valueBoolean'],
+                ['fhirType' => 'integer', 'propertyKind' => 'scalar', 'phpType' => 'int', 'jsonKey' => 'valueInteger'],
+                ['fhirType' => 'decimal', 'propertyKind' => 'scalar', 'phpType' => 'string', 'jsonKey' => 'valueDecimal'],
+                [
+                    'fhirType'     => 'date',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive',
+                    'jsonKey'      => 'valueDate',
+                ],
+                [
+                    'fhirType'     => 'dateTime',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive',
+                    'jsonKey'      => 'valueDateTime',
+                ],
+                [
+                    'fhirType'     => 'Coding',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding',
+                    'jsonKey'      => 'valueCoding',
+                ],
+                [
+                    'fhirType'     => 'CodeableConcept',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
+                    'jsonKey'      => 'valueCodeableConcept',
+                ],
+                [
+                    'fhirType'     => 'Period',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Period',
+                    'jsonKey'      => 'valuePeriod',
+                ],
+                [
+                    'fhirType'     => 'Range',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Range',
+                    'jsonKey'      => 'valueRange',
+                ],
+                [
+                    'fhirType'     => 'Quantity',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity',
+                    'jsonKey'      => 'valueQuantity',
+                ],
+                [
+                    'fhirType'     => 'Ratio',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Ratio',
+                    'jsonKey'      => 'valueRatio',
+                ],
+            ],
+        )]
         StringPrimitive|bool|int|string|DatePrimitive|DateTimePrimitive|Coding|CodeableConcept|Period|Range|Quantity|Ratio|null $value = null,
         ?string $id = null,
         array $extension = [],

@@ -44,7 +44,31 @@ class ShallComplyWithExtension extends Extension
 {
     public function __construct(
         /** @var CanonicalPrimitive|Reference|UriPrimitive|null value Value of extension */
-        #[FhirProperty(fhirType: 'choice', propertyKind: 'choice', isChoice: true)]
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'canonical',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive',
+                    'jsonKey'      => 'valueCanonical',
+                ],
+                [
+                    'fhirType'     => 'Reference',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference',
+                    'jsonKey'      => 'valueReference',
+                ],
+                [
+                    'fhirType'     => 'uri',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive',
+                    'jsonKey'      => 'valueUri',
+                ],
+            ],
+        )]
         CanonicalPrimitive|Reference|UriPrimitive|null $value = null,
         ?string $id = null,
         array $extension = [],

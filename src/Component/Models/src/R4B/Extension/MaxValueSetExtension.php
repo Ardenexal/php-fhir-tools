@@ -24,7 +24,25 @@ class MaxValueSetExtension extends Extension
 {
     public function __construct(
         /** @var UriPrimitive|CanonicalPrimitive|null value Value of extension */
-        #[FhirProperty(fhirType: 'choice', propertyKind: 'choice', isChoice: true)]
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'uri',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive',
+                    'jsonKey'      => 'valueUri',
+                ],
+                [
+                    'fhirType'     => 'canonical',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive',
+                    'jsonKey'      => 'valueCanonical',
+                ],
+            ],
+        )]
         UriPrimitive|CanonicalPrimitive|null $value = null,
         ?string $id = null,
         array $extension = [],

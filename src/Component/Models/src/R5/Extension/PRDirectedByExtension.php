@@ -25,7 +25,25 @@ class PRDirectedByExtension extends Extension
 {
     public function __construct(
         /** @var CodeableConcept|Reference|null value Value of extension */
-        #[FhirProperty(fhirType: 'choice', propertyKind: 'choice', isChoice: true)]
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'CodeableConcept',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
+                    'jsonKey'      => 'valueCodeableConcept',
+                ],
+                [
+                    'fhirType'     => 'Reference',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
+                    'jsonKey'      => 'valueReference',
+                ],
+            ],
+        )]
         CodeableConcept|Reference|null $value = null,
         ?string $id = null,
         array $extension = [],

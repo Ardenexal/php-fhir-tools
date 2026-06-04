@@ -46,6 +46,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\QuestionnaireResponseResour
  *     answer (error)
  *  5. answer type — the answer value type must match the declared item type (warning)
  *  6. enableWhen — items present while their enableWhen conditions are unsatisfied (warning)
+ *  7. answer constraints — item constraint extensions compared against the answer value (error):
+ *     min/max value bounds today; further bounds (length, occurs, decimal places, regex) in M13.4.
+ *     ADR-007 amendment (2026-06-04).
  *
  * Type dispatch uses raw code strings, never the generated QuestionnaireItemType enum — the
  * enum only contains the three hierarchy-root codes (see footgun generated-enum-hierarchy-gap).
@@ -63,6 +66,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\QuestionnaireResponseResour
  * @phpstan-type ResponseIndex array<string, list<array{item: R4ResponseItem|R4BResponseItem|R5ResponseItem, path: string}>>
  * @phpstan-type ItemIndex array<string, R4Item|R4BItem|R5Item>
  * @phpstan-type ParentIndex array<string, string|null>
+ * @phpstan-type ItemConstraints array{minValue?: mixed, maxValue?: mixed, minLength?: int, maxLength?: int, maxDecimalPlaces?: int, regex?: string, minOccurs?: int, maxOccurs?: int}
  */
 final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInterface
 {
@@ -91,6 +95,26 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
     ];
 
     private const array ANSWERABLE_STATUSES = ['completed', 'amended'];
+
+    /**
+     * FHIR item-constraint extension URLs. These canonical URLs are shared across R4/R4B/R5 and
+     * are read off the source Questionnaire item, then compared against the response answer — no
+     * terminology or server context (ADR-007 amendment 2026-06-04). `maxLength` is a core item
+     * property, not an extension, so it has no URL here.
+     */
+    private const string EXT_MIN_VALUE          = 'http://hl7.org/fhir/StructureDefinition/minValue';
+
+    private const string EXT_MAX_VALUE          = 'http://hl7.org/fhir/StructureDefinition/maxValue';
+
+    private const string EXT_MIN_LENGTH         = 'http://hl7.org/fhir/StructureDefinition/minLength';
+
+    private const string EXT_MAX_DECIMAL_PLACES = 'http://hl7.org/fhir/StructureDefinition/maxDecimalPlaces';
+
+    private const string EXT_REGEX              = 'http://hl7.org/fhir/StructureDefinition/regex';
+
+    private const string EXT_MIN_OCCURS         = 'http://hl7.org/fhir/StructureDefinition/questionnaire-minOccurs';
+
+    private const string EXT_MAX_OCCURS         = 'http://hl7.org/fhir/StructureDefinition/questionnaire-maxOccurs';
 
     public function validate(
         object $questionnaire,
@@ -259,6 +283,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
 
                     $this->checkAnswerCardinality($item, $questionnaireItem, $linkId, $path, $violations);
                     $this->checkAnswerTypes($item, $questionnaireItem, $linkId, $path, $violations);
+                    $this->checkAnswerConstraints($item, $questionnaireItem, $linkId, $path, $violations);
 
                     $evaluating = [];
                     $enabled    = $this->isItemEnabled($questionnaireItem, $itemIndex, $responseIndex, $evaluating);
@@ -389,6 +414,238 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
                 );
             }
         }
+    }
+
+    /**
+     * Rule 7 — item constraint extensions (ADR-007 amendment, milestones M13–M16). Reads the
+     * item's normalized constraints once, then applies them to the answers. min/max value is
+     * wired here (M13); the length/occurs/decimal/regex bounds the accessor also reads are wired
+     * by the remainder of M13.4.
+     *
+     * @param R4ResponseItem|R4BResponseItem|R5ResponseItem $item
+     * @param R4Item|R4BItem|R5Item                         $questionnaireItem
+     * @param list<FHIRValidationViolation>                 $violations
+     */
+    private function checkAnswerConstraints(
+        object $item,
+        object $questionnaireItem,
+        string $linkId,
+        string $path,
+        array &$violations,
+    ): void {
+        $constraints = $this->itemConstraints($questionnaireItem);
+
+        if ($constraints === []) {
+            return;
+        }
+
+        foreach (array_values($item->answer) as $j => $answer) {
+            if ($answer->value === null) {
+                continue;
+            }
+
+            $this->checkValueBounds(
+                $answer->value,
+                $constraints,
+                $linkId,
+                sprintf('%s.answer[%d].value', $path, $j),
+                $violations,
+            );
+        }
+    }
+
+    /**
+     * Reads an item's typed constraint carriers into a normalized struct: the core `maxLength`
+     * property plus the minValue/maxValue/minLength/maxDecimalPlaces/regex/min-maxOccurs
+     * extensions (their canonical URLs are shared across R4/R4B/R5). Absent carriers are omitted,
+     * so an empty result means "no constraints to check".
+     *
+     * @param R4Item|R4BItem|R5Item $questionnaireItem
+     *
+     * @return ItemConstraints
+     */
+    private function itemConstraints(object $questionnaireItem): array
+    {
+        $constraints = [];
+
+        if ($questionnaireItem->maxLength !== null) {
+            $constraints['maxLength'] = (int) $questionnaireItem->maxLength;
+        }
+
+        foreach ($questionnaireItem->extension as $extension) {
+            $url   = $extension->url;
+            $value = isset($extension->value) ? $extension->value : null;
+            if ($url === null || $value === null) {
+                continue;
+            }
+
+            switch ($url) {
+                case self::EXT_MIN_VALUE:
+                    $constraints['minValue'] = $value;
+                    break;
+                case self::EXT_MAX_VALUE:
+                    $constraints['maxValue'] = $value;
+                    break;
+                case self::EXT_MIN_LENGTH:
+                    $int = $this->extensionInt($value);
+                    if ($int !== null) {
+                        $constraints['minLength'] = $int;
+                    }
+                    break;
+                case self::EXT_MAX_DECIMAL_PLACES:
+                    $int = $this->extensionInt($value);
+                    if ($int !== null) {
+                        $constraints['maxDecimalPlaces'] = $int;
+                    }
+                    break;
+                case self::EXT_REGEX:
+                    $regex = $this->extensionString($value);
+                    if ($regex !== null) {
+                        $constraints['regex'] = $regex;
+                    }
+                    break;
+                case self::EXT_MIN_OCCURS:
+                    $int = $this->extensionInt($value);
+                    if ($int !== null) {
+                        $constraints['minOccurs'] = $int;
+                    }
+                    break;
+                case self::EXT_MAX_OCCURS:
+                    $int = $this->extensionInt($value);
+                    if ($int !== null) {
+                        $constraints['maxOccurs'] = $int;
+                    }
+                    break;
+            }
+        }
+
+        return $constraints;
+    }
+
+    /**
+     * min/max value: emit an error when an ordered answer (date, dateTime, decimal, integer) falls
+     * outside the item's [minValue, maxValue] bound. Reuses comparableValue() so integer/decimal
+     * answers compare numerically and date/time answers compare by ISO-string ordering; an answer
+     * or bound that has no orderable scalar is skipped (never a spurious error).
+     *
+     * @param ItemConstraints               $constraints
+     * @param list<FHIRValidationViolation> $violations
+     */
+    private function checkValueBounds(mixed $answerValue, array $constraints, string $linkId, string $path, array &$violations): void
+    {
+        $actual = $this->comparableValue($answerValue);
+        if ($actual === null) {
+            return;
+        }
+
+        if (array_key_exists('minValue', $constraints)) {
+            $min = $this->comparableValue($constraints['minValue']);
+            $cmp = $min !== null ? $this->compareScalar($actual, $min) : null;
+            if ($cmp !== null && $cmp < 0) {
+                $violations[] = $this->violation(
+                    'error',
+                    $path,
+                    sprintf(
+                        "Answer '%s' for item '%s' is less than the allowed minimum of '%s'.",
+                        $this->displayValue($answerValue),
+                        $linkId,
+                        $this->displayValue($constraints['minValue']),
+                    ),
+                );
+            }
+        }
+
+        if (array_key_exists('maxValue', $constraints)) {
+            $max = $this->comparableValue($constraints['maxValue']);
+            $cmp = $max !== null ? $this->compareScalar($actual, $max) : null;
+            if ($cmp !== null && $cmp > 0) {
+                $violations[] = $this->violation(
+                    'error',
+                    $path,
+                    sprintf(
+                        "Answer '%s' for item '%s' is greater than the allowed maximum of '%s'.",
+                        $this->displayValue($answerValue),
+                        $linkId,
+                        $this->displayValue($constraints['maxValue']),
+                    ),
+                );
+            }
+        }
+    }
+
+    /**
+     * Compares two orderable scalars of the same kind, mirroring compareValues()'s relational
+     * branch: floats numerically, strings lexicographically (ISO date/time formats order
+     * correctly). Returns null when the kinds differ — an incomparable pair is never a violation.
+     */
+    private function compareScalar(float|string $a, float|string $b): ?int
+    {
+        if (\is_float($a) && \is_float($b)) {
+            return $a <=> $b;
+        }
+
+        if (\is_string($a) && \is_string($b)) {
+            return $a <=> $b;
+        }
+
+        return null;
+    }
+
+    /**
+     * Coerces an integer-valued extension value (PHP int, numeric primitive, or numeric string)
+     * to int; returns null when the value is not integer-like.
+     */
+    private function extensionInt(mixed $value): ?int
+    {
+        if (\is_int($value)) {
+            return $value;
+        }
+
+        if (\is_string($value)) {
+            return is_numeric($value) ? (int) $value : null;
+        }
+
+        if ($value instanceof \Stringable) {
+            $string = (string) $value;
+
+            return is_numeric($string) ? (int) $string : null;
+        }
+
+        return null;
+    }
+
+    /**
+     * Extracts a string from a string-valued extension value (raw string or string primitive);
+     * returns null for non-string values.
+     */
+    private function extensionString(mixed $value): ?string
+    {
+        if (\is_string($value)) {
+            return $value;
+        }
+
+        if ($value instanceof \Stringable) {
+            return (string) $value;
+        }
+
+        return null;
+    }
+
+    /**
+     * Renders a value for a violation message without assuming it stringifies (the answer/bound
+     * unions include non-Stringable complex types).
+     */
+    private function displayValue(mixed $value): string
+    {
+        if (\is_bool($value)) {
+            return $value ? 'true' : 'false';
+        }
+
+        if (\is_scalar($value) || $value instanceof \Stringable) {
+            return (string) $value;
+        }
+
+        return get_debug_type($value);
     }
 
     /**

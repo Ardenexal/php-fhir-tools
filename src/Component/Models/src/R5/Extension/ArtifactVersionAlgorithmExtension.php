@@ -57,7 +57,25 @@ class ArtifactVersionAlgorithmExtension extends Extension
 {
     public function __construct(
         /** @var StringPrimitive|Coding|null value Value of extension */
-        #[FhirProperty(fhirType: 'choice', propertyKind: 'choice', isChoice: true)]
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'string',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive',
+                    'jsonKey'      => 'valueString',
+                ],
+                [
+                    'fhirType'     => 'Coding',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding',
+                    'jsonKey'      => 'valueCoding',
+                ],
+            ],
+        )]
         StringPrimitive|Coding|null $value = null,
         ?string $id = null,
         array $extension = [],

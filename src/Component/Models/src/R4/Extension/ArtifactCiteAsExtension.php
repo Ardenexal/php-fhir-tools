@@ -62,7 +62,25 @@ class ArtifactCiteAsExtension extends Extension
 {
     public function __construct(
         /** @var Reference|MarkdownPrimitive|null value Value of extension */
-        #[FhirProperty(fhirType: 'choice', propertyKind: 'choice', isChoice: true)]
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'Reference',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference',
+                    'jsonKey'      => 'valueReference',
+                ],
+                [
+                    'fhirType'     => 'markdown',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive',
+                    'jsonKey'      => 'valueMarkdown',
+                ],
+            ],
+        )]
         Reference|MarkdownPrimitive|null $value = null,
         ?string $id = null,
         array $extension = [],

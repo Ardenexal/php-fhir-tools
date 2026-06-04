@@ -24,7 +24,26 @@ class FMHAbatementExtension extends Extension
 {
     public function __construct(
         /** @var DatePrimitive|Age|bool|null value Value of extension */
-        #[FhirProperty(fhirType: 'choice', propertyKind: 'choice', isChoice: true)]
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'date',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive',
+                    'jsonKey'      => 'valueDate',
+                ],
+                [
+                    'fhirType'     => 'Age',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Age',
+                    'jsonKey'      => 'valueAge',
+                ],
+                ['fhirType' => 'boolean', 'propertyKind' => 'scalar', 'phpType' => 'bool', 'jsonKey' => 'valueBoolean'],
+            ],
+        )]
         DatePrimitive|Age|bool|null $value = null,
         ?string $id = null,
         array $extension = [],

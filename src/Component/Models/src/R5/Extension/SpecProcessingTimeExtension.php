@@ -24,7 +24,25 @@ class SpecProcessingTimeExtension extends Extension
 {
     public function __construct(
         /** @var Period|Duration|null value Value of extension */
-        #[FhirProperty(fhirType: 'choice', propertyKind: 'choice', isChoice: true)]
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'Period',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Period',
+                    'jsonKey'      => 'valuePeriod',
+                ],
+                [
+                    'fhirType'     => 'Duration',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Duration',
+                    'jsonKey'      => 'valueDuration',
+                ],
+            ],
+        )]
         Period|Duration|null $value = null,
         ?string $id = null,
         array $extension = [],

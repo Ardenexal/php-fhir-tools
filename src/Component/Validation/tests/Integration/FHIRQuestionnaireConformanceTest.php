@@ -54,6 +54,24 @@ final class FHIRQuestionnaireConformanceTest extends TestCase
      */
     private const KNOWN_GAPS = [];
 
+    /**
+     * Unseeded cases that are DEFERRED (blocked on a capability the library does not have), as
+     * distinct from cases merely not-yet-implemented by an open milestone. The M13.1 triage
+     * (2026-06-04) classified all six as terminology-bound (value-set membership / coding display),
+     * blocked on a terminology-client abstraction — enhancement #71. ADR-007's amendment keeps
+     * these out of scope. Maps case name => short reason.
+     *
+     * @var array<string, string>
+     */
+    private const DEFERRED_CASES = [
+        'choice-async-qr'                                                       => 'terminology: answerValueSet membership (#71)',
+        'choice-gender-coding-async-qr'                                         => 'terminology: coding value-set + display (#71)',
+        'open-choice-gender-coding-async-qr'                                    => 'terminology: coding value-set + display (#71)',
+        'string-with-coding-async-qr'                                           => 'terminology: answerValueSet membership (#71)',
+        'quantity-units-not-in-value-set-qr'                                    => 'terminology: quantity unitValueSet (#71)',
+        'questionnaireresponse-hai-ltcf-questionnaireresponse-mdro-cdi-event'   => 'terminology: SNOMED answerValueSet membership (#71)',
+    ];
+
     private FHIRSerializationService $serialization;
 
     private FHIRQuestionnaireValidator $validator;
@@ -139,9 +157,13 @@ final class FHIRQuestionnaireConformanceTest extends TestCase
 
         $outcomeFile = self::OUTCOMES_DIR . '/R4.' . self::sanitizeName($name) . '-base.json';
         if (!file_exists($outcomeFile)) {
-            // Out-of-scope case (exercises a rule the validator does not implement). Kept
-            // visible as incomplete rather than silently passing. See plan backlog.
-            $this->markTestIncomplete("No seeded outcome for '{$name}' — out of validator scope (ADR-007).");
+            // No seeded outcome yet. Kept visible as incomplete rather than silently passing.
+            // Distinguish DEFERRED (blocked on terminology/FHIRPath/canonical-URL the library
+            // lacks — ADR-007 keeps these out of scope) from NOT-YET-IMPLEMENTED (an in-scope
+            // rule an open milestone M13–M16 will deliver). See plan backlog + M13.1 triage.
+            $reason = self::DEFERRED_CASES[$name]
+                ?? 'not yet implemented — in scope, pending milestone M13–M16';
+            $this->markTestIncomplete("No seeded outcome for '{$name}' — {$reason} (ADR-007).");
         }
 
         /** @var array{errorCount: int, warningCount: int} $expected */

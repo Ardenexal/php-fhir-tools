@@ -25,7 +25,25 @@ class ConfidentialExtension extends Extension
 {
     public function __construct(
         /** @var UriPrimitive|CodeableConcept|null value Value of extension */
-        #[FhirProperty(fhirType: 'choice', propertyKind: 'choice', isChoice: true)]
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'uri',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive',
+                    'jsonKey'      => 'valueUri',
+                ],
+                [
+                    'fhirType'     => 'CodeableConcept',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
+                    'jsonKey'      => 'valueCodeableConcept',
+                ],
+            ],
+        )]
         UriPrimitive|CodeableConcept|null $value = null,
         ?string $id = null,
         array $extension = [],

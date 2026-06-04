@@ -25,7 +25,31 @@ class ArtifactReferenceExtension extends Extension
 {
     public function __construct(
         /** @var Reference|CanonicalPrimitive|UriPrimitive|null value Value of extension */
-        #[FhirProperty(fhirType: 'choice', propertyKind: 'choice', isChoice: true)]
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'Reference',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference',
+                    'jsonKey'      => 'valueReference',
+                ],
+                [
+                    'fhirType'     => 'canonical',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive',
+                    'jsonKey'      => 'valueCanonical',
+                ],
+                [
+                    'fhirType'     => 'uri',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive',
+                    'jsonKey'      => 'valueUri',
+                ],
+            ],
+        )]
         Reference|CanonicalPrimitive|UriPrimitive|null $value = null,
         ?string $id = null,
         array $extension = [],
