@@ -418,9 +418,9 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
 
     /**
      * Rule 7 — item constraint extensions (ADR-007 amendment, milestones M13–M16). Reads the
-     * item's normalized constraints once, then applies them to the answers. min/max value is
-     * wired here (M13); the length/occurs/decimal/regex bounds the accessor also reads are wired
-     * by the remainder of M13.4.
+     * item's normalized constraints once, then applies them: the answer-count bounds (min/max
+     * occurs) once per item, and the per-value bounds (min/max value, length, decimal places,
+     * regex) for each answer.
      *
      * @param R4ResponseItem|R4BResponseItem|R5ResponseItem $item
      * @param R4Item|R4BItem|R5Item                         $questionnaireItem
@@ -439,19 +439,168 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
             return;
         }
 
+        $this->checkOccurs($item, $constraints, $linkId, $path, $violations);
+
         foreach (array_values($item->answer) as $j => $answer) {
             if ($answer->value === null) {
                 continue;
             }
 
-            $this->checkValueBounds(
-                $answer->value,
-                $constraints,
-                $linkId,
-                sprintf('%s.answer[%d].value', $path, $j),
-                $violations,
+            $valuePath = sprintf('%s.answer[%d].value', $path, $j);
+            $this->checkValueBounds($answer->value, $constraints, $linkId, $valuePath, $violations);
+            $this->checkLength($answer->value, $constraints, $linkId, $valuePath, $violations);
+            $this->checkDecimalPlaces($answer->value, $constraints, $linkId, $valuePath, $violations);
+            $this->checkRegex($answer->value, $constraints, $linkId, $valuePath, $violations);
+        }
+    }
+
+    /**
+     * min/max occurs: the answer count of a single response item must lie within the item's
+     * questionnaire-min/maxOccurs bounds. Count-based (not per-answer); minOccurs is only enforced
+     * for an item that is present in the response.
+     *
+     * @param R4ResponseItem|R4BResponseItem|R5ResponseItem $item
+     * @param ItemConstraints                               $constraints
+     * @param list<FHIRValidationViolation>                 $violations
+     */
+    private function checkOccurs(object $item, array $constraints, string $linkId, string $path, array &$violations): void
+    {
+        if (!\array_key_exists('minOccurs', $constraints) && !\array_key_exists('maxOccurs', $constraints)) {
+            return;
+        }
+
+        $count = \count($item->answer);
+
+        if (\array_key_exists('minOccurs', $constraints) && $count < $constraints['minOccurs']) {
+            $violations[] = $this->violation(
+                'error',
+                $path . '.answer',
+                sprintf("Item '%s' requires at least %d answer(s) but %d were provided.", $linkId, $constraints['minOccurs'], $count),
             );
         }
+
+        if (\array_key_exists('maxOccurs', $constraints) && $count > $constraints['maxOccurs']) {
+            $violations[] = $this->violation(
+                'error',
+                $path . '.answer',
+                sprintf("Item '%s' allows at most %d answer(s) but %d were provided.", $linkId, $constraints['maxOccurs'], $count),
+            );
+        }
+    }
+
+    /**
+     * min/maxLength: a string-valued answer (string, text, or url) must lie within the item's
+     * length bounds (`maxLength` is the core property; `minLength` an extension). Length is counted
+     * in Unicode characters. Non-string answers (numerics, dates, complex types) are skipped — the
+     * raw PHP `string` answer type carries decimals, not text, so it is intentionally excluded.
+     *
+     * @param ItemConstraints               $constraints
+     * @param list<FHIRValidationViolation> $violations
+     */
+    private function checkLength(mixed $answerValue, array $constraints, string $linkId, string $path, array &$violations): void
+    {
+        if (!\array_key_exists('minLength', $constraints) && !\array_key_exists('maxLength', $constraints)) {
+            return;
+        }
+
+        $string = $this->answerStringValue($answerValue);
+        if ($string === null) {
+            return;
+        }
+
+        $length = mb_strlen($string);
+
+        if (\array_key_exists('minLength', $constraints) && $length < $constraints['minLength']) {
+            $violations[] = $this->violation(
+                'error',
+                $path,
+                sprintf("Answer for item '%s' is shorter than the minimum length of %d (length %d).", $linkId, $constraints['minLength'], $length),
+            );
+        }
+
+        if (\array_key_exists('maxLength', $constraints) && $length > $constraints['maxLength']) {
+            $violations[] = $this->violation(
+                'error',
+                $path,
+                sprintf("Answer for item '%s' is longer than the maximum length of %d (length %d).", $linkId, $constraints['maxLength'], $length),
+            );
+        }
+    }
+
+    /**
+     * maxDecimalPlaces: a decimal answer must not carry more fractional digits than allowed. FHIR
+     * decimals deserialize to a PHP string to preserve their lexical form (incl. trailing zeros),
+     * so the place count is taken from that string; non-decimal answers are skipped.
+     *
+     * @param ItemConstraints               $constraints
+     * @param list<FHIRValidationViolation> $violations
+     */
+    private function checkDecimalPlaces(mixed $answerValue, array $constraints, string $linkId, string $path, array &$violations): void
+    {
+        if (!\array_key_exists('maxDecimalPlaces', $constraints) || !\is_string($answerValue)) {
+            return;
+        }
+
+        $dotPosition = strpos($answerValue, '.');
+        $places      = $dotPosition === false ? 0 : \strlen(substr($answerValue, $dotPosition + 1));
+
+        if ($places > $constraints['maxDecimalPlaces']) {
+            $violations[] = $this->violation(
+                'error',
+                $path,
+                sprintf("Answer '%s' for item '%s' has %d decimal places but at most %d are allowed.", $answerValue, $linkId, $places, $constraints['maxDecimalPlaces']),
+            );
+        }
+    }
+
+    /**
+     * regex: a string-valued answer must fully match the item's regex constraint. FHIR regexes are
+     * implicitly whole-value anchored, so the pattern is wrapped accordingly. An unparseable
+     * pattern is skipped rather than raised (it is a Questionnaire authoring error, not a response
+     * error).
+     *
+     * @param ItemConstraints               $constraints
+     * @param list<FHIRValidationViolation> $violations
+     */
+    private function checkRegex(mixed $answerValue, array $constraints, string $linkId, string $path, array &$violations): void
+    {
+        if (!\array_key_exists('regex', $constraints)) {
+            return;
+        }
+
+        $string = $this->answerStringValue($answerValue);
+        if ($string === null) {
+            return;
+        }
+
+        $escaped = str_replace('~', '\~', $constraints['regex']);
+        $pattern = '~^(?:' . $escaped . ')$~u';
+        $matched = @preg_match($pattern, $string);
+        if ($matched === false) {
+            return; // invalid pattern in the Questionnaire — not a response violation
+        }
+
+        if ($matched === 0) {
+            $violations[] = $this->violation(
+                'error',
+                $path,
+                sprintf("Answer '%s' for item '%s' does not match the required pattern '%s'.", $string, $linkId, $constraints['regex']),
+            );
+        }
+    }
+
+    /**
+     * Extracts text content from a string-family answer (string/text → StringPrimitive,
+     * url → UriPrimitive) for length and regex checks; returns null for any other value type so
+     * those rules never apply to numerics, dates, or complex types.
+     */
+    private function answerStringValue(mixed $value): ?string
+    {
+        if ($value instanceof \Stringable && \in_array($this->classBasename($value::class), ['StringPrimitive', 'UriPrimitive'], true)) {
+            return (string) $value;
+        }
+
+        return null;
     }
 
     /**
