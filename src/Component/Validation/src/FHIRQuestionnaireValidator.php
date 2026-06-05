@@ -40,6 +40,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\QuestionnaireResource as R5
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\QuestionnaireResponse\QuestionnaireResponseItem as R5ResponseItem;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\QuestionnaireResponse\QuestionnaireResponseItemAnswer as R5Answer;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\QuestionnaireResponseResource as R5Response;
+use Ardenexal\FHIRTools\Component\Metadata\Ucum\UcumConverter;
 
 /**
  * Validates a QuestionnaireResponse against its source Questionnaire (R4, R4B, and R5).
@@ -80,7 +81,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\QuestionnaireResponseResour
  * @phpstan-type ResponseIndex array<string, list<array{item: R4ResponseItem|R4BResponseItem|R5ResponseItem, path: string}>>
  * @phpstan-type ItemIndex array<string, R4Item|R4BItem|R5Item>
  * @phpstan-type ParentIndex array<string, string|null>
- * @phpstan-type ItemConstraints array{minValue?: mixed, maxValue?: mixed, minLength?: int, maxLength?: int, maxDecimalPlaces?: int, regex?: string, minOccurs?: int, maxOccurs?: int}
+ * @phpstan-type UnitOption array{system: string|null, code: string|null}
+ * @phpstan-type ItemConstraints array{minValue?: mixed, maxValue?: mixed, minLength?: int, maxLength?: int, maxDecimalPlaces?: int, regex?: string, minOccurs?: int, maxOccurs?: int, minQuantity?: mixed, maxQuantity?: mixed, unitOption?: list<array{system: string|null, code: string|null}>}
  */
 final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInterface
 {
@@ -144,12 +146,30 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
     private const string EXT_MAX_SIZE           = 'http://hl7.org/fhir/StructureDefinition/maxSize';
 
     /**
+     * M15 quantity-answer extension URLs (ADR-007 amendment). Quantity min/max bounds are NOT the
+     * generic minValue/maxValue extensions M13 handles — they are the SDC-specific
+     * sdc-questionnaire-min/maxQuantity carriers, each holding a valueQuantity. `unitOption` lists
+     * the inline UCUM codings an answer's unit may take (a coded enumeration, distinct from the
+     * terminology-bound `unitValueSet` which stays deferred — #71).
+     */
+    private const string EXT_MIN_QUANTITY       = 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-minQuantity';
+
+    private const string EXT_MAX_QUANTITY       = 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-maxQuantity';
+
+    private const string EXT_UNIT_OPTION        = 'http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption';
+
+    /**
      * Item types that carry no answer value of their own: `display` is presentational and the
      * abstract `question` root is never a concrete answerable type. A `group` is intentionally
      * excluded — its structure is checked by the required-children rules, not here. An answer on
      * one of these is a structural error (FHIR reports it fatal; we surface it as an error).
      */
     private const array NON_ANSWERABLE_TYPES    = ['display', 'question'];
+
+    public function __construct(
+        private readonly UcumConverter $ucum = new UcumConverter(),
+    ) {
+    }
 
     public function validate(
         object $questionnaire,
@@ -550,6 +570,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
             $this->checkLength($answer->value, $constraints, $linkId, $valuePath, $violations);
             $this->checkDecimalPlaces($answer->value, $constraints, $linkId, $valuePath, $violations);
             $this->checkRegex($answer->value, $constraints, $linkId, $valuePath, $violations);
+            $this->checkQuantityConstraints($answer->value, $constraints, $linkId, $valuePath, $violations);
         }
     }
 
@@ -613,6 +634,20 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
                     $int = $this->extensionInt($value);
                     if ($int !== null) {
                         $constraints['maxOccurs'] = $int;
+                    }
+                    break;
+                case self::EXT_MIN_QUANTITY:
+                    $constraints['minQuantity'] = $value;
+                    break;
+                case self::EXT_MAX_QUANTITY:
+                    $constraints['maxQuantity'] = $value;
+                    break;
+                case self::EXT_UNIT_OPTION:
+                    $coding = $this->codingParts($value);
+                    if ($coding !== null) {
+                        $options                   = $constraints['unitOption'] ?? [];
+                        $options[]                 = $coding;
+                        $constraints['unitOption'] = $options;
                     }
                     break;
             }
@@ -744,6 +779,252 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
                 );
             }
         }
+    }
+
+    /**
+     * Quantity answer rules (M15): min/max bounds carried by the SDC min/maxQuantity extensions and
+     * unit membership carried by unitOption. Unit-aware throughout — comparisons go through the
+     * shared UcumConverter so commensurable units (e.g. m vs km) are converted before comparing,
+     * and a dimensional mismatch (e.g. kg vs miles) is reported rather than silently compared by
+     * bare magnitude. A non-Quantity answer is ignored here (the answer-type rule warns on it).
+     *
+     * @param ItemConstraints               $constraints
+     * @param list<FHIRValidationViolation> $violations
+     */
+    private function checkQuantityConstraints(mixed $answerValue, array $constraints, string $linkId, string $path, array &$violations): void
+    {
+        $hasMin        = \array_key_exists('minQuantity', $constraints);
+        $hasMax        = \array_key_exists('maxQuantity', $constraints);
+        $hasUnitOption = \array_key_exists('unitOption', $constraints);
+
+        if (!$hasMin && !$hasMax && !$hasUnitOption) {
+            return;
+        }
+
+        $answer = $this->quantityParts($answerValue);
+        if ($answer === null) {
+            return;
+        }
+
+        if ($hasUnitOption) {
+            $this->checkUnitOption($answer, $constraints['unitOption'], $linkId, $path, $violations);
+        }
+
+        // Bound order mirrors the reference validator: minimum first, then maximum.
+        if ($hasMin) {
+            $this->checkQuantityBound($answer, $this->quantityParts($constraints['minQuantity']), 'minimum', $linkId, $path, $violations);
+        }
+        if ($hasMax) {
+            $this->checkQuantityBound($answer, $this->quantityParts($constraints['maxQuantity']), 'maximum', $linkId, $path, $violations);
+        }
+    }
+
+    /**
+     * Compares an answer quantity against a single bound. Two preconditions gate the numeric
+     * comparison, each an error in its own right (matching the reference validator's per-bound
+     * error): both quantities must carry formal UCUM units, and the units must be commensurable.
+     * Only when both hold is the converted magnitude compared against the bound.
+     *
+     * @param array{value: float, unit: string|null, system: string|null, code: string|null}      $answer
+     * @param array{value: float, unit: string|null, system: string|null, code: string|null}|null $bound
+     * @param list<FHIRValidationViolation>                                                       $violations
+     */
+    private function checkQuantityBound(array $answer, ?array $bound, string $kind, string $linkId, string $path, array &$violations): void
+    {
+        if ($bound === null) {
+            return;
+        }
+
+        if (!$this->hasFormalUnits($answer) || !$this->hasFormalUnits($bound)) {
+            $violations[] = $this->violation(
+                'error',
+                $path,
+                sprintf(
+                    "Answer '%s' for item '%s' cannot be compared to the allowed %s of '%s' because no formal units are specified.",
+                    $this->quantityDisplay($answer),
+                    $linkId,
+                    $kind,
+                    $this->quantityDisplay($bound),
+                ),
+            );
+
+            return;
+        }
+
+        $cmp = $this->ucum->compare($answer['value'], (string) $answer['code'], $bound['value'], (string) $bound['code']);
+        if ($cmp === null) {
+            // compare() returns null for two distinct reasons; report them differently rather than
+            // asserting a dimensional mismatch the converter cannot actually establish. An
+            // unrecognised code is a limitation of this minimal converter, not proof the units are
+            // incompatible — only when both codes are known and still don't convert is the failure a
+            // genuine cross-dimension mismatch.
+            $answerKnown = $this->ucum->knows((string) $answer['code']);
+            $boundKnown  = $this->ucum->knows((string) $bound['code']);
+
+            if (!$answerKnown || !$boundKnown) {
+                $unsupported = $answerKnown ? $bound['code'] : $answer['code'];
+                $message     = sprintf(
+                    "Answer '%s' for item '%s' cannot be compared to the allowed %s of '%s' because the unit '%s' is not supported for unit conversion.",
+                    $this->quantityDisplay($answer),
+                    $linkId,
+                    $kind,
+                    $this->quantityDisplay($bound),
+                    $unsupported,
+                );
+            } else {
+                $message = sprintf(
+                    "Answer '%s' for item '%s' cannot be compared to the allowed %s of '%s' because the units are not compatible.",
+                    $this->quantityDisplay($answer),
+                    $linkId,
+                    $kind,
+                    $this->quantityDisplay($bound),
+                );
+            }
+
+            $violations[] = $this->violation('error', $path, $message);
+
+            return;
+        }
+
+        if ($kind === 'minimum' && $cmp < 0) {
+            $violations[] = $this->violation(
+                'error',
+                $path,
+                sprintf(
+                    "Answer '%s' for item '%s' is less than the allowed minimum of '%s'.",
+                    $this->quantityDisplay($answer),
+                    $linkId,
+                    $this->quantityDisplay($bound),
+                ),
+            );
+        } elseif ($kind === 'maximum' && $cmp > 0) {
+            $violations[] = $this->violation(
+                'error',
+                $path,
+                sprintf(
+                    "Answer '%s' for item '%s' is greater than the allowed maximum of '%s'.",
+                    $this->quantityDisplay($answer),
+                    $linkId,
+                    $this->quantityDisplay($bound),
+                ),
+            );
+        }
+    }
+
+    /**
+     * unitOption membership: a coded answer unit must match one of the allowed codings (by UCUM
+     * code, with the system honoured when both sides carry one). An answer without a coded unit is
+     * not checked here — there is nothing to match against the coded option list.
+     *
+     * @param array{value: float, unit: string|null, system: string|null, code: string|null} $answer
+     * @param list<array{system: string|null, code: string|null}>                            $allowed
+     * @param list<FHIRValidationViolation>                                                  $violations
+     */
+    private function checkUnitOption(array $answer, array $allowed, string $linkId, string $path, array &$violations): void
+    {
+        $code = $answer['code'];
+        if ($code === null || $code === '') {
+            return;
+        }
+
+        foreach ($allowed as $option) {
+            if (
+                $option['code'] === $code
+                && ($option['system'] === null || $answer['system'] === null || $option['system'] === $answer['system'])
+            ) {
+                return;
+            }
+        }
+
+        $allowedCodes = implode(', ', array_filter(array_map(static fn (array $o): ?string => $o['code'], $allowed)));
+
+        $violations[] = $this->violation(
+            'error',
+            $path,
+            sprintf(
+                "Answer unit '%s' for item '%s' is not one of the allowed units (%s).",
+                $code,
+                $linkId,
+                $allowedCodes,
+            ),
+        );
+    }
+
+    /**
+     * Extracts the comparison-relevant parts of a Quantity-typed value (R4/R4B/R5). Returns null
+     * when the value is not a Quantity or carries no numeric magnitude — either way there is no
+     * quantity to compare.
+     *
+     * @return array{value: float, unit: string|null, system: string|null, code: string|null}|null
+     */
+    private function quantityParts(mixed $value): ?array
+    {
+        if (!$value instanceof R4Quantity && !$value instanceof R4BQuantity && !$value instanceof R5Quantity) {
+            return null;
+        }
+
+        // Deserialization leaves absent optional properties uninitialized (not null), so each is
+        // read through isset() — a bare property access on an unset typed property would throw.
+        $magnitude = isset($value->value) ? $value->value : null;
+        if ($magnitude === null) {
+            return null;
+        }
+
+        return [
+            'value'  => (float) $magnitude,
+            'unit'   => isset($value->unit) ? $this->extensionString($value->unit) : null,
+            'system' => isset($value->system) ? $this->extensionString($value->system) : null,
+            'code'   => isset($value->code) ? $this->extensionString($value->code) : null,
+        ];
+    }
+
+    /**
+     * Extracts a Coding's system/code (R4/R4B/R5) for unitOption comparison; null when the value is
+     * not a Coding.
+     *
+     * @return array{system: string|null, code: string|null}|null
+     */
+    private function codingParts(mixed $value): ?array
+    {
+        if (!$value instanceof R4Coding && !$value instanceof R4BCoding && !$value instanceof R5Coding) {
+            return null;
+        }
+
+        return [
+            'system' => isset($value->system) ? $this->extensionString($value->system) : null,
+            'code'   => isset($value->code) ? $this->extensionString($value->code) : null,
+        ];
+    }
+
+    /**
+     * A quantity has formal units when it carries a UCUM-coded unit (a code in the UCUM system).
+     * Without one, magnitudes cannot be safely compared and the reference validator reports the
+     * pair as incomparable.
+     *
+     * @param array{value: float, unit: string|null, system: string|null, code: string|null} $quantity
+     */
+    private function hasFormalUnits(array $quantity): bool
+    {
+        return $quantity['code'] !== null
+            && $quantity['code'] !== ''
+            && $quantity['system'] === UcumConverter::SYSTEM_URL;
+    }
+
+    /**
+     * Renders a quantity as "<value> <unit>" for violation messages, preferring the human unit
+     * label and falling back to the UCUM code.
+     *
+     * @param array{value: float, unit: string|null, system: string|null, code: string|null} $quantity
+     */
+    private function quantityDisplay(array $quantity): string
+    {
+        $magnitude = $quantity['value'] == (int) $quantity['value']
+            ? (string) (int) $quantity['value']
+            : (string) $quantity['value'];
+
+        $unit = $quantity['unit'] ?? $quantity['code'];
+
+        return $unit === null || $unit === '' ? $magnitude : $magnitude . ' ' . $unit;
     }
 
     /**
