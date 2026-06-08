@@ -152,6 +152,60 @@ class FHIRExtensionGeneratorTest extends TestCase
     }
 
     // -----------------------------------------------------------------
+    // Multi-type value[x] extension (minValue-style: choice of value types)
+    // -----------------------------------------------------------------
+
+    public function testMultiTypeValueExtensionHasChoiceValueParameter(): void
+    {
+        $sd    = $this->loadFixture('MultiTypeValueExtension.json');
+        $class = $this->generator->generate($sd, 'R4', $this->context, $this->namespace);
+
+        $params = $class->getMethod('__construct')->getParameters();
+        self::assertArrayHasKey('value', $params);
+
+        $type = (string) $params['value']->getType();
+        self::assertStringContainsString('DatePrimitive', $type);
+        self::assertStringContainsString('int', $type);
+        self::assertStringContainsString('Period', $type);
+    }
+
+    public function testMultiTypeValueExtensionEmitsChoiceVariants(): void
+    {
+        $sd    = $this->loadFixture('MultiTypeValueExtension.json');
+        $class = $this->generator->generate($sd, 'R4', $this->context, $this->namespace);
+
+        $valueParam = $class->getMethod('__construct')->getParameters()['value'] ?? null;
+        self::assertNotNull($valueParam);
+
+        $variants = null;
+        foreach ($valueParam->getAttributes() as $attribute) {
+            if (str_contains($attribute->getName(), 'FhirProperty')) {
+                $args = $attribute->getArguments();
+                self::assertTrue($args['isChoice'] ?? false, 'choice value[x] param must set isChoice');
+                $variants = $args['variants'] ?? null;
+            }
+        }
+
+        // Without variants the normalizer's choice index is empty and the value is dropped on
+        // deserialization — the whole point of this regression test.
+        self::assertIsArray($variants);
+        self::assertNotEmpty($variants);
+
+        $jsonKeys = array_column($variants, 'jsonKey');
+        self::assertContains('valueDate', $jsonKeys);
+        self::assertContains('valueDateTime', $jsonKeys);
+        self::assertContains('valueInteger', $jsonKeys);
+        self::assertContains('valuePeriod', $jsonKeys);
+
+        foreach ($variants as $variant) {
+            self::assertArrayHasKey('fhirType', $variant);
+            self::assertArrayHasKey('propertyKind', $variant);
+            self::assertArrayHasKey('phpType', $variant);
+            self::assertArrayHasKey('jsonKey', $variant);
+        }
+    }
+
+    // -----------------------------------------------------------------
     // Complex extension (us-core-race: sub-extension slices)
     // -----------------------------------------------------------------
 

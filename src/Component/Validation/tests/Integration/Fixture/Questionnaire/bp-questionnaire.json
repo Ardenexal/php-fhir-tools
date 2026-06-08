@@ -1,0 +1,31 @@
+{
+    "resourceType": "Questionnaire",
+    "status": "active",
+    "title": "Blood pressure capture",
+    "item": [
+        {
+            "linkId": "systolic",
+            "text": "Systolic blood pressure (mmHg)",
+            "type": "decimal",
+            "required": true
+        },
+        {
+            "linkId": "diastolic",
+            "text": "Diastolic blood pressure (mmHg)",
+            "type": "decimal",
+            "required": true
+        },
+        {
+            "linkId": "followUp",
+            "text": "Describe the hypertension follow-up plan",
+            "type": "string",
+            "enableWhen": [
+                {
+                    "question": "systolic",
+                    "operator": ">",
+                    "answerDecimal": 180
+                }
+            ]
+        }
+    ]
+}

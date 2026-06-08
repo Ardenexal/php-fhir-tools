@@ -27,7 +27,43 @@ class AbatementExtension extends Extension
 {
     public function __construct(
         /** @var DateTimePrimitive|Age|Period|Range|StringPrimitive|null value Value of extension */
-        #[FhirProperty(fhirType: 'choice', propertyKind: 'choice', isChoice: true)]
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'dateTime',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive',
+                    'jsonKey'      => 'valueDateTime',
+                ],
+                [
+                    'fhirType'     => 'Age',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Age',
+                    'jsonKey'      => 'valueAge',
+                ],
+                [
+                    'fhirType'     => 'Period',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Period',
+                    'jsonKey'      => 'valuePeriod',
+                ],
+                [
+                    'fhirType'     => 'Range',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\Range',
+                    'jsonKey'      => 'valueRange',
+                ],
+                [
+                    'fhirType'     => 'string',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive',
+                    'jsonKey'      => 'valueString',
+                ],
+            ],
+        )]
         DateTimePrimitive|Age|Period|Range|StringPrimitive|null $value = null,
         ?string $id = null,
         array $extension = [],

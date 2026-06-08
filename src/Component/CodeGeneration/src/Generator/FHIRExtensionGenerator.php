@@ -298,19 +298,28 @@ class FHIRExtensionGenerator
         string $url,
         ?ErrorCollector $errorCollector = null,
     ): void {
-        // Union of all allowed PHP types
-        $phpTypes  = [];
-        $fhirTypes = [];
+        // Union of all allowed PHP types, plus the per-variant metadata the normalizer needs to
+        // resolve an incoming value[x] element (e.g. valueDate) back onto the choice property.
+        // Without variants the choice index is empty and the value is silently dropped on
+        // deserialization (see findChoicePropertyByKey).
+        $phpTypes = [];
+        $variants = [];
 
         foreach ($types as $t) {
-            $code        = $t['code'];
-            $phpTypes[]  = $this->resolvePhpType($code, $version, $context, $errorCollector);
-            $fhirTypes[] = $code;
+            $code       = $t['code'];
+            $phpType    = $this->resolvePhpType($code, $version, $context, $errorCollector);
+            $phpTypes[] = $phpType;
 
-            $phpType = end($phpTypes);
             if ($phpType !== 'bool' && $phpType !== 'int' && $phpType !== 'string') {
                 $namespace->addUse(ltrim($phpType, '\\'));
             }
+
+            $variants[] = [
+                'fhirType'     => $code,
+                'propertyKind' => $this->resolvePropertyKindFromCode($code),
+                'phpType'      => ltrim($phpType, '\\'),
+                'jsonKey'      => 'value' . u($code)->pascal()->toString(),
+            ];
         }
 
         $unionType  = implode('|', array_unique($phpTypes)) . '|null';
@@ -328,6 +337,7 @@ class FHIRExtensionGenerator
             'fhirType'     => 'choice',
             'propertyKind' => 'choice',
             'isChoice'     => true,
+            'variants'     => $variants,
         ]);
         $param->addComment("@var {$unionType} value Value of extension");
 

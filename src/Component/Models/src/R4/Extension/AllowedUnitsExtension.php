@@ -24,7 +24,25 @@ class AllowedUnitsExtension extends Extension
 {
     public function __construct(
         /** @var CodeableConcept|CanonicalPrimitive|null value Value of extension */
-        #[FhirProperty(fhirType: 'choice', propertyKind: 'choice', isChoice: true)]
+        #[FhirProperty(
+            fhirType: 'choice',
+            propertyKind: 'choice',
+            isChoice: true,
+            variants: [
+                [
+                    'fhirType'     => 'CodeableConcept',
+                    'propertyKind' => 'complex',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept',
+                    'jsonKey'      => 'valueCodeableConcept',
+                ],
+                [
+                    'fhirType'     => 'canonical',
+                    'propertyKind' => 'primitive',
+                    'phpType'      => 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive',
+                    'jsonKey'      => 'valueCanonical',
+                ],
+            ],
+        )]
         CodeableConcept|CanonicalPrimitive|null $value = null,
         ?string $id = null,
         array $extension = [],

@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Evaluator;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathTemporalTypeInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Ucum\UcumConverter;
 
 /**
  * Handles FHIRPath comparison operations with collection semantics and precision-aware temporal comparisons.
@@ -75,26 +76,9 @@ final class ComparisonService
         'milliseconds' => 'ms',
     ];
 
-    private const UCUM_CONVERSIONS = [
-        '1'       => ['base' => '1', 'factor' => 1.0],
-        'kg'      => ['base' => 'kg', 'factor' => 1.0],
-        'g'       => ['base' => 'kg', 'factor' => 0.001],
-        'mg'      => ['base' => 'kg', 'factor' => 0.000001],
-        '[lb_av]' => ['base' => 'kg', 'factor' => 0.45359237],
-        'm'       => ['base' => 'm', 'factor' => 1.0],
-        'cm'      => ['base' => 'm', 'factor' => 0.01],
-        'mm'      => ['base' => 'm', 'factor' => 0.001],
-        'km'      => ['base' => 'm', 'factor' => 1000.0],
-        '[in_i]'  => ['base' => 'm', 'factor' => 0.0254],
-        '[ft_i]'  => ['base' => 'm', 'factor' => 0.3048],
-        'L'       => ['base' => 'L', 'factor' => 1.0],
-        'mL'      => ['base' => 'L', 'factor' => 0.001],
-        'wk'      => ['base' => 'd', 'factor' => 7.0],
-        'd'       => ['base' => 'd', 'factor' => 1.0],
-    ];
-
     public function __construct(
-        private readonly FHIRPathEvaluator $evaluator
+        private readonly FHIRPathEvaluator $evaluator,
+        private readonly UcumConverter $ucum = new UcumConverter(),
     ) {
     }
 
@@ -1014,8 +998,8 @@ final class ComparisonService
             return $left['value'] * $leftSeconds - $right['value'] * $rightSeconds;
         }
 
-        $leftConverted  = $this->convertUcumToBase($leftUnit, $left['value']);
-        $rightConverted = $this->convertUcumToBase($rightUnit, $right['value']);
+        $leftConverted  = $this->ucum->toBase($leftUnit, $left['value']);
+        $rightConverted = $this->ucum->toBase($rightUnit, $right['value']);
 
         if ($leftConverted === null || $rightConverted === null) {
             return null;
@@ -1026,22 +1010,6 @@ final class ComparisonService
         }
 
         return $leftConverted['value'] - $rightConverted['value'];
-    }
-
-    /**
-     * @return array{base: string, value: float}|null
-     */
-    private function convertUcumToBase(string $unit, float $value): ?array
-    {
-        $definition = self::UCUM_CONVERSIONS[$unit] ?? null;
-        if ($definition === null) {
-            return null;
-        }
-
-        return [
-            'base'  => $definition['base'],
-            'value' => $value * $definition['factor'],
-        ];
     }
 
     /**

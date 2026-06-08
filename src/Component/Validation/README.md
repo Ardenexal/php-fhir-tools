@@ -497,11 +497,18 @@ and is queryable via `FHIRValidationReport::hasUncheckedBindings()` / `unchecked
 
 ## Questionnaire Validation
 
-Questionnaire/QuestionnaireResponse validation is handled by a separate
-`FHIRQuestionnaireValidator` service (planned — see GitHub #74). When available,
-use it alongside `FHIRValidationService` for complete QuestionnaireResponse coverage:
+Questionnaire/QuestionnaireResponse validation is handled by the standalone
+`FHIRQuestionnaireValidator` service (GitHub #74, ADR-007). It validates a
+`QuestionnaireResponse` against its source `Questionnaire` (R4, R4B, and R5) and
+needs no constructor arguments. Use it alongside `FHIRValidationService` for
+complete QuestionnaireResponse coverage:
 
 ```php
+use Ardenexal\FHIRTools\Component\Validation\FHIRQuestionnaireValidator;
+use Ardenexal\FHIRTools\Component\Validation\FHIRValidationReport;
+
+$questionnaireValidator = new FHIRQuestionnaireValidator();
+
 // Validate the response structure (cardinality, bindings, invariants)
 $structuralReport = $service->validate($response);
 
@@ -509,11 +516,53 @@ $structuralReport = $service->validate($response);
 $questionnaireReport = $questionnaireValidator->validate($questionnaire, $response);
 
 // Combine reports for a unified view
-$allViolations = array_merge(
-    $structuralReport->violations,
-    $questionnaireReport->violations,
-);
+$merged = new FHIRValidationReport([
+    ...$structuralReport->violations,
+    ...$questionnaireReport->violations,
+]);
 ```
+
+Implemented rules and severities:
+
+| Rule | Severity |
+|---|---|
+| Response item `linkId` must exist in the source Questionnaire | `error` |
+| Response items must sit at the position their `linkId` is declared at in the Questionnaire hierarchy | `error` |
+| Required, enabled items must be answered when status is `completed`/`amended`, checked **per parent instance**: each instance of a repeating parent is checked independently, and an absent optional parent exempts its children | `error` |
+| A required group needs at least one answered descendant question (presence alone is not enough) | `error` |
+| Non-repeating items: at most one occurrence per parent and one answer | `error` |
+| Answer value type must match the declared item type | `warning` |
+| Items present while their `enableWhen` conditions are unsatisfied | `warning` |
+| `enableWhen.question` must reference a known `linkId` | `warning` |
+
+Pass `strictStatus: false` to skip the required-item check regardless of response
+status (useful for drafts). The validator never resolves
+`QuestionnaireResponse.questionnaire` canonical URLs — callers supply the source
+`Questionnaire` object. SDC extensions (`enableWhenExpression`, `answerExpression`,
+calculated expressions, regex constraints) and R5 `answerConstraint` are not yet
+covered. enableWhen answers are looked up response-globally — a documented
+approximation of the spec's nearest-occurrence resolution that is exact whenever the
+referenced question occurs once; see the ADR-007 addendum for the conformance plan.
+Violations carry `FHIRQuestionnaireConstraint::class` in `constraintClass` so they
+can be distinguished after merging.
+
+### Conformance coverage
+
+The validator is exercised against the official `fhir/fhir-test-cases` QuestionnaireResponse
+corpus via `FHIRQuestionnaireConformanceTest` (its own `questionnaire-spec` suite — run with
+`composer test-ai-questionnaire-spec`). Of the 78 eligible R4 cross-resource cases (a
+QuestionnaireResponse plus its source Questionnaire):
+
+- **41 are asserted** — error/warning counts match seeded expectations; for these the validator's
+  verdict agrees with the HL7 Java validator's error-presence (answer-type mismatches are reported
+  at `warning` rather than `error`, by design).
+- **36 are out of scope** and left incomplete (not silently passing) — they test rules this
+  validator does not implement (answerOption/value-set membership, min/max, regex, Quantity units,
+  Attachment constraints, Reference target types, SDC `enableWhenExpression`). See the plan backlog.
+- **1 is skipped** — its supporting resource is not a Questionnaire.
+
+The validator reports **no false-positive errors** across the corpus (its error count never exceeds
+the reference validator's).
 
 ---
 
@@ -553,4 +602,5 @@ a FHIR server context.
 - [ADR-002: Validator component location](./../../../.goat-flow/decisions/ADR-002-validator-component-location.md)
 - [ADR-004: Extensible/preferred binding strictness](./../../../.goat-flow/decisions/ADR-004-extensible-preferred-binding-strictness.md)
 - [ADR-005: Target profile resolver pattern](./../../../.goat-flow/decisions/ADR-005-targetprofile-resolver-pattern.md)
+- [ADR-007: Questionnaire validator architecture](./../../../.goat-flow/decisions/ADR-007-questionnaire-validator-architecture.md)
 - [GitHub Epic #76](https://github.com/Ardenexal/php-fhir-tools/issues/76)

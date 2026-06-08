@@ -1,0 +1,63 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "test-min-value",
+  "url": "http://hl7.org/fhir/StructureDefinition/test-min-value",
+  "version": "4.0.1",
+  "name": "test-min-value",
+  "title": "Minimum Value",
+  "status": "active",
+  "publisher": "HL7",
+  "description": "A constraint extension whose value[x] permits several types, mirroring minValue.",
+  "fhirVersion": "4.0.1",
+  "kind": "complex-type",
+  "abstract": false,
+  "type": "Extension",
+  "derivation": "constraint",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Extension",
+  "snapshot": {
+    "element": [
+      {
+        "id": "Extension",
+        "path": "Extension",
+        "short": "Minimum Value",
+        "definition": "The inclusive lower bound on the range of allowed values.",
+        "min": 0,
+        "max": "1"
+      },
+      {
+        "id": "Extension.id",
+        "path": "Extension.id",
+        "representation": ["xmlAttr"],
+        "min": 0,
+        "max": "1",
+        "type": [{"code": "http://hl7.org/fhirpath/System.String"}]
+      },
+      {
+        "id": "Extension.extension",
+        "path": "Extension.extension",
+        "max": "0"
+      },
+      {
+        "id": "Extension.url",
+        "path": "Extension.url",
+        "representation": ["xmlAttr"],
+        "min": 1,
+        "max": "1",
+        "fixedUri": "http://hl7.org/fhir/StructureDefinition/test-min-value"
+      },
+      {
+        "id": "Extension.value[x]",
+        "path": "Extension.value[x]",
+        "short": "Value of extension",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {"code": "date"},
+          {"code": "dateTime"},
+          {"code": "integer"},
+          {"code": "Period"}
+        ]
+      }
+    ]
+  }
+}
