@@ -40,6 +40,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\QuestionnaireResource as R5
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\QuestionnaireResponse\QuestionnaireResponseItem as R5ResponseItem;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\QuestionnaireResponse\QuestionnaireResponseItemAnswer as R5Answer;
 use Ardenexal\FHIRTools\Component\Models\R5\Resource\QuestionnaireResponseResource as R5Response;
+use Ardenexal\FHIRTools\Component\FHIRPath\Exception\FHIRPathException;
+use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Metadata\Ucum\UcumConverter;
 
 /**
@@ -158,6 +160,12 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
 
     private const string EXT_UNIT_OPTION        = 'http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption';
 
+    /** Kanta PHR enableWhenExpression variant — carries a FHIRPath expression as `valueString`. */
+    private const string EXT_ENABLE_WHEN_EXPRESSION_KANTA = 'http://phr.kanta.fi/StructureDefinition/fiphr-ext-questionnaire-enablewhen';
+
+    /** Canonical SDC enableWhenExpression — carries the expression as `valueExpression.expression`. */
+    private const string EXT_ENABLE_WHEN_EXPRESSION_SDC = 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression';
+
     /**
      * Item types that carry no answer value of their own: `display` is presentational and the
      * abstract `question` root is never a concrete answerable type. A `group` is intentionally
@@ -166,8 +174,11 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
      */
     private const array NON_ANSWERABLE_TYPES    = ['display', 'question'];
 
+    private ?object $currentResponse = null;
+
     public function __construct(
         private readonly UcumConverter $ucum = new UcumConverter(),
+        private readonly FHIRPathService $pathService = new FHIRPathService(),
     ) {
     }
 
@@ -192,36 +203,42 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
             throw new \InvalidArgumentException(sprintf('Expected a QuestionnaireResponseResource (R4, R4B, or R5), got %s.', $response::class));
         }
 
-        $itemIndex = [];
-        $parentOf  = [];
-        $this->indexQuestionnaireItems($questionnaire->item, $itemIndex, $parentOf, null);
+        $this->currentResponse = $response;
 
-        $responseIndex = [];
-        $this->indexResponseItems($response->item, 'item', $responseIndex);
+        try {
+            $itemIndex = [];
+            $parentOf  = [];
+            $this->indexQuestionnaireItems($questionnaire->item, $itemIndex, $parentOf, null);
 
-        $violations = [];
+            $responseIndex = [];
+            $this->indexResponseItems($response->item, 'item', $responseIndex);
 
-        $checkRequired = $strictStatus && \in_array((string) ($response->status ?? ''), self::ANSWERABLE_STATUSES, true);
+            $violations = [];
 
-        $this->walkResponseItems(
-            $response->item,
-            'item',
-            null,
-            true,
-            $checkRequired,
-            $itemIndex,
-            $parentOf,
-            $responseIndex,
-            $violations,
-        );
-        $this->checkEnableWhenReferences($itemIndex, $violations);
+            $checkRequired = $strictStatus && \in_array((string) ($response->status ?? ''), self::ANSWERABLE_STATUSES, true);
 
-        if ($checkRequired) {
-            // The response root is the single instance for top-level questionnaire items.
-            $this->checkRequiredChildren($questionnaire->item, array_values($response->item), 'item', $itemIndex, $responseIndex, $violations);
+            $this->walkResponseItems(
+                $response->item,
+                'item',
+                null,
+                true,
+                $checkRequired,
+                $itemIndex,
+                $parentOf,
+                $responseIndex,
+                $violations,
+            );
+            $this->checkEnableWhenReferences($itemIndex, $violations);
+
+            if ($checkRequired) {
+                // The response root is the single instance for top-level questionnaire items.
+                $this->checkRequiredChildren($questionnaire->item, array_values($response->item), 'item', $itemIndex, $responseIndex, $violations);
+            }
+
+            return new FHIRValidationReport($violations);
+        } finally {
+            $this->currentResponse = null;
         }
-
-        return new FHIRValidationReport($violations);
     }
 
     /**
@@ -1688,6 +1705,11 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
      */
     private function isItemEnabled(object $item, array $itemIndex, array $responseIndex, array &$evaluating): bool
     {
+        $expressionResult = $this->evaluateEnableWhenExpression($item);
+        if ($expressionResult !== null) {
+            return $expressionResult;
+        }
+
         if ($item->enableWhen === []) {
             return true;
         }
@@ -1717,6 +1739,55 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         } finally {
             unset($evaluating[$linkId]);
         }
+    }
+
+    /**
+     * @param R4Item|R4BItem|R5Item $item
+     */
+    private function evaluateEnableWhenExpression(object $item): ?bool
+    {
+        $response = $this->currentResponse;
+        if ($response === null) {
+            return null;
+        }
+
+        $expression = null;
+        foreach ($item->extension as $extension) {
+            $url = $extension->url;
+            if ($url === self::EXT_ENABLE_WHEN_EXPRESSION_KANTA) {
+                $value      = isset($extension->value) ? $extension->value : null;
+                $expression = $this->extensionString($value);
+            } elseif ($url === self::EXT_ENABLE_WHEN_EXPRESSION_SDC) {
+                // valueExpression carries the FHIRPath in its nested `expression` string field.
+                $valueExpr  = isset($extension->value) ? $extension->value : null;
+                $expression = ($valueExpr !== null && isset($valueExpr->expression))
+                    ? $this->extensionString($valueExpr->expression)
+                    : null;
+            } else {
+                continue;
+            }
+            if ($expression !== null) {
+                break;
+            }
+        }
+
+        if ($expression === null || $expression === '') {
+            return null;
+        }
+
+        try {
+            $result = $this->pathService->evaluate($expression, $response);
+        } catch (FHIRPathException) {
+            return null; // DEFER-not-DENY: treat as enabled on evaluation failure
+        }
+
+        foreach ($result as $value) {
+            if ($value === true) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
