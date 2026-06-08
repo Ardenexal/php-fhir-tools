@@ -114,6 +114,7 @@
         "phpstan:serialization": "php ./vendor/bin/phpstan.phar analyse src/Component/Serialization/ --configuration=phpstan.neon --memory-limit=-1 -v",
         "phpstan:fhir-path": "php ./vendor/bin/phpstan.phar analyse src/Component/FHIRPath/ --configuration=phpstan.neon --memory-limit=-1 -v",
         "phpstan:validation": "php ./vendor/bin/phpstan.phar analyse src/Component/Validation/ --configuration=phpstan.neon --memory-limit=-1 -v",
+        "phpstan:models": "php ./vendor/bin/phpstan.phar analyse src/Component/Models/src/ --configuration=phpstan.neon --memory-limit=-1 -v",
         "phpstan-ai": "php scripts/ai-phpstan-runner.php",
         "phpstan-ai:bundle": "php scripts/ai-phpstan-runner.php src/Bundle/",
         "phpstan-ai:codegen": "php scripts/ai-phpstan-runner.php src/Component/CodeGeneration/",

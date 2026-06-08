@@ -78,7 +78,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                component: [ bundle, codegen, fhir-path, validation ]
+                component: [ bundle, codegen, fhir-path, validation, models ]
 
         steps:
             -   uses: actions/checkout@v4
