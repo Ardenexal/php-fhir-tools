@@ -22,6 +22,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]
 class MimeTypeExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var CodePrimitive|null valueCode Value of extension */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]

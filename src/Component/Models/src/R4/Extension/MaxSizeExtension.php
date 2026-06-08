@@ -21,6 +21,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]
 class MaxSizeExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var string|null valueDecimal Value of extension */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]

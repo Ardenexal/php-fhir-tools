@@ -21,6 +21,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UrlPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'ContactPoint')]
 class TELAddressExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var UrlPrimitive|null valueUrl Value of extension */
         #[FhirProperty(fhirType: 'url', propertyKind: 'primitive')]

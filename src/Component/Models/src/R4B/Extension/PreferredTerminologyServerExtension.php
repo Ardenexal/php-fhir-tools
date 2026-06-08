@@ -23,6 +23,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UrlPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]
 class PreferredTerminologyServerExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var UrlPrimitive|null valueUrl Value of extension */
         #[FhirProperty(fhirType: 'url', propertyKind: 'primitive')]

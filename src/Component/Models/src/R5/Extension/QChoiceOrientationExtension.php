@@ -24,6 +24,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
 #[FHIRContextInvariant(expression: 'type.exists(code=\'Coding\') or (type.hasValue() and type!=\'group\' and type!=\'display\')')]
 class QChoiceOrientationExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var CodePrimitive|null valueCode Value of extension */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]

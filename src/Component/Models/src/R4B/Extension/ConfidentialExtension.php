@@ -23,6 +23,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'ContactPoint')]
 class ConfidentialExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var UriPrimitive|CodeableConcept|null value Value of extension */
         #[FhirProperty(

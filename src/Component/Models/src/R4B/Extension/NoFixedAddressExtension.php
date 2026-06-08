@@ -20,6 +20,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'Address')]
 class NoFixedAddressExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var bool|null valueBoolean Value of extension */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]

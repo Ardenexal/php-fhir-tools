@@ -21,6 +21,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'Resource')]
 class ArtifactExtendedContactDetailExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var ExtendedContactDetail|null valueExtendedContactDetail Value of extension */
         #[FhirProperty(fhirType: 'ExtendedContactDetail', propertyKind: 'complex')]

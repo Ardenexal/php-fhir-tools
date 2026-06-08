@@ -21,6 +21,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UrlPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'CanonicalResource')]
 class EnteredInErrorStatusExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var UrlPrimitive|null valueUrl Value of extension */
         #[FhirProperty(fhirType: 'url', propertyKind: 'primitive')]

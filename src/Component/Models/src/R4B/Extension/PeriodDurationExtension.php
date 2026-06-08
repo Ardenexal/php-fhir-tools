@@ -21,6 +21,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'Period')]
 class PeriodDurationExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var Duration|null valueDuration Value of extension */
         #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex')]

@@ -21,6 +21,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'Resource')]
 class ArtifactAssessmentWorkflowStatusExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var CodePrimitive|null valueCode submitted | triaged | waiting-for-input | resolved-no-change | resolved-change-required | deferred | duplicate | applied | published */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]

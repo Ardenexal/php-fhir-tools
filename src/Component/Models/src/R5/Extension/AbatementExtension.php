@@ -25,6 +25,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'AllergyIntolerance')]
 class AbatementExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var DateTimePrimitive|Age|Period|Range|StringPrimitive|null value Value of extension */
         #[FhirProperty(

@@ -22,6 +22,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition.binding')]
 class MaxValueSetExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var UriPrimitive|CanonicalPrimitive|null value Value of extension */
         #[FhirProperty(

@@ -23,6 +23,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 #[FHIRContextInvariant(expression: '(%resource is ServiceRequest) implies (%resource.doNotPerform.empty() or %resource.doNotPerform = false)')]
 class PerformConditionExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var Expression|null valueExpression Value of extension */
         #[FhirProperty(fhirType: 'Expression', propertyKind: 'complex')]

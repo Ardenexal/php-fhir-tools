@@ -22,6 +22,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 #[FHIRExtensionContext(type: 'extension', expression: 'http://hl7.org/fhir/StructureDefinition/targetConstraint')]
 class BestPracticeExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var bool|CodeableConcept|null value Value of extension */
         #[FhirProperty(

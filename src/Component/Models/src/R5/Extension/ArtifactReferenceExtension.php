@@ -23,6 +23,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'Element')]
 class ArtifactReferenceExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var Reference|CanonicalPrimitive|UriPrimitive|null value Value of extension */
         #[FhirProperty(

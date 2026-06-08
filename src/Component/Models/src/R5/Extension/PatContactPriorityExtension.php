@@ -23,6 +23,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\PositiveIntPrimitive;
 #[FHIRExtensionContext(type: 'fhirpath', expression: 'ofType(ExtendedContactDetail)')]
 class PatContactPriorityExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var PositiveIntPrimitive|null valuePositiveInt Value of extension */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]

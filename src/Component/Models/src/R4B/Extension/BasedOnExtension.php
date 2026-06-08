@@ -34,6 +34,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Reference;
 #[FHIRExtensionContext(type: 'element', expression: 'PaymentReconciliation')]
 class BasedOnExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var Reference|null valueReference Value of extension */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]

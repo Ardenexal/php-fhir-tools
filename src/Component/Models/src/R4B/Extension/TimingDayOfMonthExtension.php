@@ -21,6 +21,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\PositiveIntPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'Timing.repeat')]
 class TimingDayOfMonthExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var PositiveIntPrimitive|null valuePositiveInt Value of extension */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]

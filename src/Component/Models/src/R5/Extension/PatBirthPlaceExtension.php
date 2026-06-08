@@ -21,6 +21,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'Patient')]
 class PatBirthPlaceExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var Address|null valueAddress Value of extension */
         #[FhirProperty(fhirType: 'Address', propertyKind: 'complex')]

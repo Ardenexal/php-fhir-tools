@@ -29,6 +29,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'ParameterDefinition')]
 class DefaultValueExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var StringPrimitive|bool|int|string|DatePrimitive|DateTimePrimitive|Coding|CodeableConcept|Period|Range|Quantity|Ratio|null value Value of extension */
         #[FhirProperty(

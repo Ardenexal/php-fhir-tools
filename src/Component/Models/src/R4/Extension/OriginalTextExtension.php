@@ -22,6 +22,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UrlPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'Element')]
 class OriginalTextExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var StringPrimitive|UrlPrimitive|null value Value of extension */
         #[FhirProperty(

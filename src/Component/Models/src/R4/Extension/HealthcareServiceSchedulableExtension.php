@@ -20,6 +20,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'HealthcareService')]
 class HealthcareServiceSchedulableExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var bool|null valueBoolean Whether the service is schedulable */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]

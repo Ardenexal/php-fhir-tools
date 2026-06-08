@@ -21,6 +21,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Identifier;
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]
 class IdentifierExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var Identifier|null valueIdentifier Value of extension */
         #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]

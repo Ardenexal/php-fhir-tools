@@ -24,6 +24,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 #[FHIRContextInvariant(expression: 'ofType(ElementDefinition).type.exists(code=\'Quantity\') or where(%resource.is(Questionnaire)).exists(type.first()=\'quantity\')')]
 class QRUnitValueSetExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var CanonicalPrimitive|null valueCanonical Value of extension */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]

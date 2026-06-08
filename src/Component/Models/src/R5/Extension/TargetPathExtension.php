@@ -22,6 +22,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'canonical')]
 class TargetPathExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var StringPrimitive|null valueString Value of extension */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

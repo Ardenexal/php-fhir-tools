@@ -25,6 +25,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'Bundle.entry.search')]
 class BundleLocationDistanceExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var Distance|null valueDistance Value of extension */
         #[FhirProperty(fhirType: 'Distance', propertyKind: 'complex')]

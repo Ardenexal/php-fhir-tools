@@ -32,6 +32,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'ImplementationGuide.definition.page')]
 class SDStandardsStatusExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var CodePrimitive|null valueCode Value of extension */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]

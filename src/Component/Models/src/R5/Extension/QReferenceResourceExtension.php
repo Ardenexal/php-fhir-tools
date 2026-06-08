@@ -24,6 +24,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
 #[FHIRContextInvariant(expression: 'ofType(ElementDefinition).type.exists(code=\'Reference\') or where(%resource.is(Questionnaire)).exists(type.first()=\'reference\')')]
 class QReferenceResourceExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var CodePrimitive|null valueCode Value of extension */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]

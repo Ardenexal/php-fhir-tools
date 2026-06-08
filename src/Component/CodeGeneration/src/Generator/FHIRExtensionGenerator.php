@@ -245,6 +245,7 @@ class FHIRExtensionGenerator
                     ->setType('array')
                     ->setNullable(false)
                     ->setDefaultValue([]);
+                $constructor->addComment("@param list<\\Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\DataType\\Extension> \$extension");
 
                 $constructor->setBody(
                     "parent::__construct(\n" .
@@ -275,6 +276,7 @@ class FHIRExtensionGenerator
             ->setType('array')
             ->setNullable(false)
             ->setDefaultValue([]);
+        $constructor->addComment("@param list<\\Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\DataType\\Extension> \$extension");
         $constructor->setBody(
             "parent::__construct(\n" .
             "    id: \$id,\n" .
@@ -349,6 +351,7 @@ class FHIRExtensionGenerator
             ->setType('array')
             ->setNullable(false)
             ->setDefaultValue([]);
+        $constructor->addComment("@param list<\\Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\DataType\\Extension> \$extension");
         $constructor->setBody(
             "parent::__construct(\n" .
             "    id: \$id,\n" .
@@ -502,7 +505,7 @@ class FHIRExtensionGenerator
             ->setDefaultValue(null);
 
         $method->addComment('Reconstruct from an array of already-denormalized sub-extension objects.');
-        $method->addComment('@param array<\Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface> $subExtensions');
+        $method->addComment("@param array<\\Ardenexal\\FHIRTools\\Component\\Models\\{$version}\\DataType\\Extension> \$subExtensions");
         $method->addComment('@param string|null $id');
 
         // Initialise parameter variables
@@ -555,7 +558,7 @@ class FHIRExtensionGenerator
 
         $args    = array_map(static fn (array $s): string => "\${$s['paramName']}", $slices);
         $args[]  = '$id';
-        $lines[] = 'return new static(' . implode(', ', $args) . ');';
+        $lines[] = 'return new self(' . implode(', ', $args) . ');';
 
         $method->setBody(implode("\n", $lines));
     }

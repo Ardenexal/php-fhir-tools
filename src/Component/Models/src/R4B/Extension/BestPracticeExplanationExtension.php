@@ -22,6 +22,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\MarkdownPrimitive;
 #[FHIRExtensionContext(type: 'extension', expression: 'http://hl7.org/fhir/StructureDefinition/targetConstraint')]
 class BestPracticeExplanationExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var MarkdownPrimitive|null valueMarkdown Value of extension */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]

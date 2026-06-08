@@ -21,6 +21,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'Address')]
 class OfficialAddressExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var bool|CodeableConcept|null value Value of extension */
         #[FhirProperty(

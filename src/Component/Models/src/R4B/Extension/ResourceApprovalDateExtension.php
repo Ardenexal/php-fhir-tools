@@ -32,6 +32,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DatePrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'Group')]
 class ResourceApprovalDateExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var DatePrimitive|null valueDate Value of extension */
         #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]

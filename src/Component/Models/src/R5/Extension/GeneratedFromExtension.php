@@ -37,6 +37,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'VisionPrescription')]
 class GeneratedFromExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var CanonicalPrimitive|null valueCanonical Value of extension */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]

@@ -21,6 +21,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Timing;
 #[FHIRExtensionContext(type: 'element', expression: 'Procedure')]
 class ProcedureScheduleExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var Timing|null valueTiming Value of extension */
         #[FhirProperty(fhirType: 'Timing', propertyKind: 'complex')]

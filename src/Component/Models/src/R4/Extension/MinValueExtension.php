@@ -24,6 +24,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\TimePrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item')]
 class MinValueExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var DatePrimitive|DateTimePrimitive|TimePrimitive|string|int|Quantity|null value Value of extension */
         #[FhirProperty(

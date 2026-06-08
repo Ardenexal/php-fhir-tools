@@ -54,6 +54,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Period;
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet')]
 class ArtifactEffectivePeriodExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var Period|null valuePeriod Value of extension */
         #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]

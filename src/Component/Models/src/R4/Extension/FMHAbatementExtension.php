@@ -22,6 +22,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'FamilyMemberHistory.condition')]
 class FMHAbatementExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var DatePrimitive|Age|bool|null value Value of extension */
         #[FhirProperty(

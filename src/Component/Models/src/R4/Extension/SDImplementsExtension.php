@@ -22,6 +22,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'StructureDefinition')]
 class SDImplementsExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var CanonicalPrimitive|UriPrimitive|null value Value of extension */
         #[FhirProperty(

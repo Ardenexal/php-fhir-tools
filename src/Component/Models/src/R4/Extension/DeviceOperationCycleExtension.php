@@ -21,6 +21,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'Device')]
 class DeviceOperationCycleExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var Count|null valueCount Value of extension */
         #[FhirProperty(fhirType: 'Count', propertyKind: 'complex')]

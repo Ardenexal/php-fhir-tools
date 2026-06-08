@@ -21,6 +21,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'Resource')]
 class ArtifactAssessmentDispositionExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var CodePrimitive|null valueCode unresolved | not-persuasive | persuasive | persuasive-with-modification | not-persuasive-with-modification */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]

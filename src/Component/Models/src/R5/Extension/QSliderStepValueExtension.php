@@ -23,6 +23,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 #[FHIRContextInvariant(expression: 'ofType(ElementDefinition).type.exists(code=\'integer\') or where(%resource.is(Questionnaire)).exists(type.first()=\'integer\')')]
 class QSliderStepValueExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var int|null valueInteger Value of extension */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]

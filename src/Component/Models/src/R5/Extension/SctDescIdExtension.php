@@ -25,6 +25,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\IdPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet.expansion.contains.designation')]
 class SctDescIdExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var IdPrimitive|null valueId Value of extension */
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive')]

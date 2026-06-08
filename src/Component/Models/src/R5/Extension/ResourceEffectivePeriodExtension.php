@@ -32,6 +32,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
 #[FHIRExtensionContext(type: 'element', expression: 'Group')]
 class ResourceEffectivePeriodExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var Period|null valuePeriod Value of extension */
         #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]

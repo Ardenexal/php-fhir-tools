@@ -23,6 +23,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'CarePlan.activity')]
 class WorkflowBarrierExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var CodeableReference|null valueCodeableReference Value of extension */
         #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex')]

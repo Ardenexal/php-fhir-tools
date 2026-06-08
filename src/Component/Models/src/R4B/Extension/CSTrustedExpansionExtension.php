@@ -21,6 +21,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'CodeSystem')]
 class CSTrustedExpansionExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var UriPrimitive|null valueUri Value of extension */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]

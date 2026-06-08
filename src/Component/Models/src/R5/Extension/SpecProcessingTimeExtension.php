@@ -22,6 +22,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
 #[FHIRExtensionContext(type: 'element', expression: 'Specimen.processing')]
 class SpecProcessingTimeExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var Period|Duration|null value Value of extension */
         #[FhirProperty(

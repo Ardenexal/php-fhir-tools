@@ -21,6 +21,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 #[FHIRExtensionContext(type: 'element', expression: 'MedicationDispense')]
 class MedQuantityRemainingExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var Quantity|null valueQuantity Value of extension */
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]

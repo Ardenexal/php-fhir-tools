@@ -23,6 +23,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'Observation.component')]
 class NoteExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var Annotation|null valueAnnotation Notes for this resource/element */
         #[FhirProperty(fhirType: 'Annotation', propertyKind: 'complex')]

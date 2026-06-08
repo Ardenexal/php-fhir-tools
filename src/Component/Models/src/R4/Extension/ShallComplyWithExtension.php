@@ -42,6 +42,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'VisionPrescription')]
 class ShallComplyWithExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var CanonicalPrimitive|Reference|UriPrimitive|null value Value of extension */
         #[FhirProperty(

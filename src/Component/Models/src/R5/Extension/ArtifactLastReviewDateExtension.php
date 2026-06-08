@@ -52,6 +52,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet')]
 class ArtifactLastReviewDateExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var DatePrimitive|null valueDate Value of extension */
         #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]

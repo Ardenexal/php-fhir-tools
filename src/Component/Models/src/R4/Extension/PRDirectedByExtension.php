@@ -23,6 +23,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 #[FHIRExtensionContext(type: 'element', expression: 'ServiceRequest')]
 class PRDirectedByExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var CodeableConcept|Reference|null value Value of extension */
         #[FhirProperty(

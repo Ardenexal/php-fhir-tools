@@ -18,6 +18,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'CodeSystem.property')]
 class SupportedConceptRelationshipIsNavigableExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var bool|null valueBoolean Value of extension */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]

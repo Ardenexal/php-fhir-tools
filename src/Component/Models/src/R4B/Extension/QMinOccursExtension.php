@@ -22,6 +22,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 #[FHIRContextInvariant(expression: 'type!=\'display\' and (required=true or (required.value.empty() and required.extension.exists()))')]
 class QMinOccursExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var int|null valueInteger Value of extension */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
