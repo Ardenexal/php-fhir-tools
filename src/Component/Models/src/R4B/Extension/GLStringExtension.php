@@ -8,7 +8,6 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
-use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
@@ -50,10 +49,10 @@ class GLStringExtension extends Extension implements FHIRComplexExtensionInterfa
     /**
      * Reconstruct from an array of already-denormalized sub-extension objects.
      *
-     * @param array<FHIRExtensionInterface> $subExtensions
-     * @param string|null                   $id
+     * @param array<Extension> $subExtensions
+     * @param string|null      $id
      */
-    public static function fromSubExtensions(array $subExtensions, ?string $id = null): static
+    public static function fromSubExtensions(array $subExtensions, ?string $id = null): self
     {
         $urlSlice = null;
         $text     = null;
@@ -68,6 +67,6 @@ class GLStringExtension extends Extension implements FHIRComplexExtensionInterfa
             }
         }
 
-        return new static($urlSlice, $text, $id);
+        return new self($urlSlice, $text, $id);
     }
 }

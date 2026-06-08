@@ -493,9 +493,17 @@ class FHIRExtensionGenerator
     ): void {
         $slices = $this->collectSlices($elements, $version, $context, $namespace, $errorCollector);
 
+        // Match the constructor's required-first parameter order so $args aligns positionally.
+        usort($slices, static function(array $a, array $b): int {
+            $aRequired = $a['isRequired'] && !$a['isArray'];
+            $bRequired = $b['isRequired'] && !$b['isArray'];
+
+            return ($bRequired ? 1 : 0) <=> ($aRequired ? 1 : 0);
+        });
+
         $method = $class->addMethod('fromSubExtensions')
             ->setStatic(true)
-            ->setReturnType('static')
+            ->setReturnType('self')
             ->setVisibility('public');
 
         $method->addParameter('subExtensions')->setType('array');

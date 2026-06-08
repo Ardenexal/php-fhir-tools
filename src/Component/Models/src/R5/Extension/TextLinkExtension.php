@@ -8,7 +8,6 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
-use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
@@ -54,22 +53,22 @@ class TextLinkExtension extends Extension implements FHIRComplexExtensionInterfa
     /**
      * Reconstruct from an array of already-denormalized sub-extension objects.
      *
-     * @param array<FHIRExtensionInterface> $subExtensions
-     * @param string|null                   $id
+     * @param array<Extension> $subExtensions
+     * @param string|null      $id
      */
-    public static function fromSubExtensions(array $subExtensions, ?string $id = null): static
+    public static function fromSubExtensions(array $subExtensions, ?string $id = null): self
     {
-        $htmlid   = [];
         $data     = null;
+        $htmlid   = [];
         $selector = null;
 
         foreach ($subExtensions as $ext) {
             $extUrl = $ext->getExtensionUrl();
-            if ($extUrl === 'htmlid' && $ext->value instanceof StringPrimitive) {
-                $htmlid[] = $ext->value;
-            }
             if ($extUrl === 'data' && $ext->value instanceof UriPrimitive) {
                 $data = $ext->value;
+            }
+            if ($extUrl === 'htmlid' && $ext->value instanceof StringPrimitive) {
+                $htmlid[] = $ext->value;
             }
             if ($extUrl === 'selector' && $ext->value instanceof StringPrimitive) {
                 $selector = $ext->value;
@@ -80,6 +79,6 @@ class TextLinkExtension extends Extension implements FHIRComplexExtensionInterfa
             throw new \InvalidArgumentException('Required sub-extension "data" not found or type mismatch in ' . static::class . '::fromSubExtensions()');
         }
 
-        return new static($htmlid, $data, $selector, $id);
+        return new self($data, $htmlid, $selector, $id);
     }
 }

@@ -8,7 +8,6 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
-use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 
@@ -52,10 +51,10 @@ class PatProficiencyExtension extends Extension implements FHIRComplexExtensionI
     /**
      * Reconstruct from an array of already-denormalized sub-extension objects.
      *
-     * @param array<FHIRExtensionInterface> $subExtensions
-     * @param string|null                   $id
+     * @param array<Extension> $subExtensions
+     * @param string|null      $id
      */
-    public static function fromSubExtensions(array $subExtensions, ?string $id = null): static
+    public static function fromSubExtensions(array $subExtensions, ?string $id = null): self
     {
         $level = null;
         $type  = [];
@@ -70,6 +69,6 @@ class PatProficiencyExtension extends Extension implements FHIRComplexExtensionI
             }
         }
 
-        return new static($level, $type, $id);
+        return new self($level, $type, $id);
     }
 }

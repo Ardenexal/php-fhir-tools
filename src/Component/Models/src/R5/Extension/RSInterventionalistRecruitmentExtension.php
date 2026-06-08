@@ -8,7 +8,6 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
-use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
@@ -63,10 +62,10 @@ class RSInterventionalistRecruitmentExtension extends Extension implements FHIRC
     /**
      * Reconstruct from an array of already-denormalized sub-extension objects.
      *
-     * @param array<FHIRExtensionInterface> $subExtensions
-     * @param string|null                   $id
+     * @param array<Extension> $subExtensions
+     * @param string|null      $id
      */
-    public static function fromSubExtensions(array $subExtensions, ?string $id = null): static
+    public static function fromSubExtensions(array $subExtensions, ?string $id = null): self
     {
         $targetNumber        = null;
         $actualNumber        = null;
@@ -89,6 +88,6 @@ class RSInterventionalistRecruitmentExtension extends Extension implements FHIRC
             }
         }
 
-        return new static($targetNumber, $actualNumber, $description, $eligibilityCriteria, $id);
+        return new self($targetNumber, $actualNumber, $description, $eligibilityCriteria, $id);
     }
 }

@@ -332,7 +332,7 @@ class FHIRExtensionGeneratorTest extends TestCase
         self::assertStringContainsString("'value'", $body, 'fromSubExtensions body should check slice URL "value"');
         self::assertStringContainsString("'period'", $body, 'fromSubExtensions body should check slice URL "period"');
         self::assertStringContainsString("'comment'", $body, 'fromSubExtensions body should check slice URL "comment"');
-        self::assertStringContainsString('return new static(', $body, 'fromSubExtensions must return new static(...)');
+        self::assertStringContainsString('return new self(', $body, 'fromSubExtensions must return new self(...)');
     }
 
     public function testFromSubExtensionsBodyUsesInstanceofForClassTypes(): void

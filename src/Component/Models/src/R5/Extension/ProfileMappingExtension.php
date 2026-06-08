@@ -8,7 +8,6 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
-use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
@@ -69,10 +68,10 @@ class ProfileMappingExtension extends Extension implements FHIRComplexExtensionI
     /**
      * Reconstruct from an array of already-denormalized sub-extension objects.
      *
-     * @param array<FHIRExtensionInterface> $subExtensions
-     * @param string|null                   $id
+     * @param array<Extension> $subExtensions
+     * @param string|null      $id
      */
-    public static function fromSubExtensions(array $subExtensions, ?string $id = null): static
+    public static function fromSubExtensions(array $subExtensions, ?string $id = null): self
     {
         $search        = null;
         $profile       = [];
@@ -95,6 +94,6 @@ class ProfileMappingExtension extends Extension implements FHIRComplexExtensionI
             throw new \InvalidArgumentException('Required sub-extension "search" not found or type mismatch in ' . static::class . '::fromSubExtensions()');
         }
 
-        return new static($search, $profile, $documentation, $id);
+        return new self($search, $profile, $documentation, $id);
     }
 }

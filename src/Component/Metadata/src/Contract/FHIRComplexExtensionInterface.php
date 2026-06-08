@@ -34,5 +34,5 @@ interface FHIRComplexExtensionInterface extends FHIRExtensionInterface
      * @param array<FHIRExtensionInterface> $subExtensions Denormalized sub-extension objects
      * @param string|null                   $id            Optional element id
      */
-    public static function fromSubExtensions(array $subExtensions, ?string $id = null): static;
+    public static function fromSubExtensions(array $subExtensions, ?string $id = null): self;
 }

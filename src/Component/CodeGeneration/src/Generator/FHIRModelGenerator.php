@@ -388,19 +388,33 @@ class FHIRModelGenerator implements GeneratorInterface
         $class->addMethod('__construct');
         $parentParameters = [];
 
+        // Build a set of param names the PHP parent constructor actually accepts.
+        // This prevents passing CanonicalResource-inherited params to DomainResourceResource
+        // when a FHIR type (e.g. MetadataResource) lists both as ancestors via base.path.
+        $validParentParamNames = [];
+        if (isset($parentClass) && $parentClass->class instanceof ClassType) {
+            try {
+                $validParentParamNames = array_keys($parentClass->class->getMethod('__construct')->getParameters());
+            } catch (\Throwable) {
+                // Parent has no __construct — pass all params as before
+            }
+        }
+
         if (isset($structureDefinition['snapshot']) === true) {
             $elements = $this->nestElements($structureDefinition['snapshot']['element']);
 
             foreach ($elements['_properties'] as $property) {
-                $element = $property['_element'];
+                $element      = $property['_element'];
+                $derivedParam = $this->convertToMethodName($element['base']['path']);
                 if (
                     $element['path'] !== $element['base']['path']
                     && ! in_array($element['path'], $parentParameters, true)
                     && $element['max'] !== '0'
+                    && ($validParentParamNames === [] || in_array($derivedParam, $validParentParamNames, true))
                 ) {
-                    $parentParameters[] = $this->convertToMethodName($element['base']['path']);
+                    $parentParameters[] = $derivedParam;
                 }
-                $this->createForElement($class, $property['_element'], $property['_properties'], $version, $builderContext, $sdUrl);
+                $this->createForElement($class, $property['_element'], $property['_properties'], $version, $builderContext, $sdUrl, $validParentParamNames);
             }
         }
 
@@ -416,7 +430,14 @@ class FHIRModelGenerator implements GeneratorInterface
      *
      * @return ClassType
      */
-    public function createForElement(ClassType $classType, array $classElement, array $propertyElements, string $version, BuilderContextInterface $builderContext, ?string $sdUrl = null): ClassType
+    /**
+     * @param list<string> $validParentParamNames When non-empty, only elements whose derived parameter
+     *                                            name appears in this list are added to the parent::__construct() call.
+     *                                            Pass the PHP parent constructor's parameter names to prevent
+     *                                            abstract-intermediate FHIR types (e.g. CanonicalResource) from
+     *                                            appearing in the call for a class that does not extend them.
+     */
+    public function createForElement(ClassType $classType, array $classElement, array $propertyElements, string $version, BuilderContextInterface $builderContext, ?string $sdUrl = null, array $validParentParamNames = []): ClassType
     {
         $constructor      = $classType->getMethod('__construct');
         $parentParameters = [];
@@ -437,12 +458,14 @@ class FHIRModelGenerator implements GeneratorInterface
                 // Track ValueSet dependencies for primitive elements with bindings
                 $this->trackValueSetDependencies($element, $builderContext);
 
+                $derivedParam = $this->convertToMethodName($element['base']['path']);
                 if (
                     $element['path'] !== $element['base']['path']
                     && ! in_array($element['path'], $parentParameters, true)
                     && $element['max'] !== '0'
+                    && ($validParentParamNames === [] || in_array($derivedParam, $validParentParamNames, true))
                 ) {
-                    $parentParameters[] = $this->convertToMethodName($element['base']['path']);
+                    $parentParameters[] = $derivedParam;
                 }
                 $this->addElementAsProperty($propertyElement['_element'], $constructor, $version, $builderContext, $classNamespace);
             } else {
@@ -515,12 +538,14 @@ class FHIRModelGenerator implements GeneratorInterface
                 if (isset($element['definition'])) {
                     $childClass->addComment('@description ' . $element['definition']);
                 }
+                $derivedParam = $this->convertToMethodName($element['base']['path']);
                 if (
                     $element['path'] !== $element['base']['path']
                     && ! in_array($element['path'], $parentParameters, true)
                     && $element['max'] !== '0'
+                    && ($validParentParamNames === [] || in_array($derivedParam, $validParentParamNames, true))
                 ) {
-                    $parentParameters[] = $this->convertToMethodName($element['base']['path']);
+                    $parentParameters[] = $derivedParam;
                 }
                 $this->addElementAsProperty($element, $constructor, $version, $builderContext, $classNamespace);
 
@@ -1225,14 +1250,13 @@ class FHIRModelGenerator implements GeneratorInterface
             'ElementDefinition',
             'ProductShelfLife',
             'MarketingStatus',
+            'SubstanceAmount',    // complex-type in all FHIR versions; generated into DataType
+            'ProdCharacteristic', // complex-type in all FHIR versions; generated into DataType
+            'Population',         // complex-type in all FHIR versions; generated into DataType
         ];
 
         // Types that remain in Resource namespace across all versions
-        $typesAlwaysInResource = [
-            'SubstanceAmount',    // Stays in Resource even in R5
-            'ProdCharacteristic', // Stays in Resource even in R5
-            'Population',         // Stays in Resource even in R5
-        ];
+        $typesAlwaysInResource = [];
 
         if (in_array($code, $typesInDataTypeNamespace, true)) {
             // These complex types live in DataType namespace in all FHIR versions

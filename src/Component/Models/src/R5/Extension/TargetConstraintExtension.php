@@ -8,7 +8,6 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
-use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Expression;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
@@ -84,25 +83,22 @@ class TargetConstraintExtension extends Extension implements FHIRComplexExtensio
     /**
      * Reconstruct from an array of already-denormalized sub-extension objects.
      *
-     * @param array<FHIRExtensionInterface> $subExtensions
-     * @param string|null                   $id
+     * @param array<Extension> $subExtensions
+     * @param string|null      $id
      */
-    public static function fromSubExtensions(array $subExtensions, ?string $id = null): static
+    public static function fromSubExtensions(array $subExtensions, ?string $id = null): self
     {
         $key          = null;
-        $requirements = null;
         $severity     = null;
         $expression   = null;
         $human        = null;
+        $requirements = null;
         $location     = [];
 
         foreach ($subExtensions as $ext) {
             $extUrl = $ext->getExtensionUrl();
             if ($extUrl === 'key' && $ext->value instanceof IdPrimitive) {
                 $key = $ext->value;
-            }
-            if ($extUrl === 'requirements' && $ext->value instanceof MarkdownPrimitive) {
-                $requirements = $ext->value;
             }
             if ($extUrl === 'severity' && $ext->value instanceof CodePrimitive) {
                 $severity = $ext->value;
@@ -112,6 +108,9 @@ class TargetConstraintExtension extends Extension implements FHIRComplexExtensio
             }
             if ($extUrl === 'human' && $ext->value instanceof StringPrimitive) {
                 $human = $ext->value;
+            }
+            if ($extUrl === 'requirements' && $ext->value instanceof MarkdownPrimitive) {
+                $requirements = $ext->value;
             }
             if ($extUrl === 'location' && $ext->value instanceof StringPrimitive) {
                 $location[] = $ext->value;
@@ -131,6 +130,6 @@ class TargetConstraintExtension extends Extension implements FHIRComplexExtensio
             throw new \InvalidArgumentException('Required sub-extension "human" not found or type mismatch in ' . static::class . '::fromSubExtensions()');
         }
 
-        return new static($key, $requirements, $severity, $expression, $human, $location, $id);
+        return new self($key, $severity, $expression, $human, $requirements, $location, $id);
     }
 }

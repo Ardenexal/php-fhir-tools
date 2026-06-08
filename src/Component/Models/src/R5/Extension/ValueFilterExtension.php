@@ -8,7 +8,6 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
-use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
@@ -60,26 +59,26 @@ class ValueFilterExtension extends Extension implements FHIRComplexExtensionInte
     /**
      * Reconstruct from an array of already-denormalized sub-extension objects.
      *
-     * @param array<FHIRExtensionInterface> $subExtensions
-     * @param string|null                   $id
+     * @param array<Extension> $subExtensions
+     * @param string|null      $id
      */
-    public static function fromSubExtensions(array $subExtensions, ?string $id = null): static
+    public static function fromSubExtensions(array $subExtensions, ?string $id = null): self
     {
+        $comparator  = null;
         $path        = null;
         $searchParam = null;
-        $comparator  = null;
         $valueSlice  = null;
 
         foreach ($subExtensions as $ext) {
             $extUrl = $ext->getExtensionUrl();
+            if ($extUrl === 'comparator' && $ext->value instanceof CodePrimitive) {
+                $comparator = $ext->value;
+            }
             if ($extUrl === 'path' && $ext->value instanceof StringPrimitive) {
                 $path = $ext->value;
             }
             if ($extUrl === 'searchParam' && $ext->value instanceof StringPrimitive) {
                 $searchParam = $ext->value;
-            }
-            if ($extUrl === 'comparator' && $ext->value instanceof CodePrimitive) {
-                $comparator = $ext->value;
             }
             if ($extUrl === 'value' && is_bool($ext->value)) {
                 $valueSlice = $ext->value;
@@ -90,6 +89,6 @@ class ValueFilterExtension extends Extension implements FHIRComplexExtensionInte
             throw new \InvalidArgumentException('Required sub-extension "comparator" not found or type mismatch in ' . static::class . '::fromSubExtensions()');
         }
 
-        return new static($path, $searchParam, $comparator, $valueSlice, $id);
+        return new self($comparator, $path, $searchParam, $valueSlice, $id);
     }
 }

@@ -9,7 +9,6 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRContextInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
-use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Expression;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 
@@ -50,21 +49,21 @@ class QOptionRestrictionExtension extends Extension implements FHIRComplexExtens
     /**
      * Reconstruct from an array of already-denormalized sub-extension objects.
      *
-     * @param array<FHIRExtensionInterface> $subExtensions
-     * @param string|null                   $id
+     * @param array<Extension> $subExtensions
+     * @param string|null      $id
      */
-    public static function fromSubExtensions(array $subExtensions, ?string $id = null): static
+    public static function fromSubExtensions(array $subExtensions, ?string $id = null): self
     {
-        $option     = [];
         $expression = null;
+        $option     = [];
 
         foreach ($subExtensions as $ext) {
             $extUrl = $ext->getExtensionUrl();
-            if ($extUrl === 'option' && is_int($ext->value)) {
-                $option[] = $ext->value;
-            }
             if ($extUrl === 'expression' && $ext->value instanceof Expression) {
                 $expression = $ext->value;
+            }
+            if ($extUrl === 'option' && is_int($ext->value)) {
+                $option[] = $ext->value;
             }
         }
 
@@ -72,6 +71,6 @@ class QOptionRestrictionExtension extends Extension implements FHIRComplexExtens
             throw new \InvalidArgumentException('Required sub-extension "expression" not found or type mismatch in ' . static::class . '::fromSubExtensions()');
         }
 
-        return new static($option, $expression, $id);
+        return new self($expression, $option, $id);
     }
 }

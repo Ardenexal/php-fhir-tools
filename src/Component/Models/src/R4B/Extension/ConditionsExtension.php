@@ -8,7 +8,6 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
-use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\Base64BinaryPrimitive;
 
@@ -55,10 +54,10 @@ class ConditionsExtension extends Extension implements FHIRComplexExtensionInter
     /**
      * Reconstruct from an array of already-denormalized sub-extension objects.
      *
-     * @param array<FHIRExtensionInterface> $subExtensions
-     * @param string|null                   $id
+     * @param array<Extension> $subExtensions
+     * @param string|null      $id
      */
-    public static function fromSubExtensions(array $subExtensions, ?string $id = null): static
+    public static function fromSubExtensions(array $subExtensions, ?string $id = null): self
     {
         $meetGoal     = [];
         $whenTrigger  = [];
@@ -77,6 +76,6 @@ class ConditionsExtension extends Extension implements FHIRComplexExtensionInter
             }
         }
 
-        return new static($meetGoal, $whenTrigger, $precondition, $id);
+        return new self($meetGoal, $whenTrigger, $precondition, $id);
     }
 }

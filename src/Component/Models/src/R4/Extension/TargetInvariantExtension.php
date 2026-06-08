@@ -8,7 +8,6 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
-use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Expression;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
@@ -83,29 +82,29 @@ class TargetInvariantExtension extends Extension implements FHIRComplexExtension
     /**
      * Reconstruct from an array of already-denormalized sub-extension objects.
      *
-     * @param array<FHIRExtensionInterface> $subExtensions
-     * @param string|null                   $id
+     * @param array<Extension> $subExtensions
+     * @param string|null      $id
      */
-    public static function fromSubExtensions(array $subExtensions, ?string $id = null): static
+    public static function fromSubExtensions(array $subExtensions, ?string $id = null): self
     {
         $key          = null;
-        $requirements = null;
         $severity     = null;
         $expression   = null;
+        $requirements = null;
 
         foreach ($subExtensions as $ext) {
             $extUrl = $ext->getExtensionUrl();
             if ($extUrl === 'key' && $ext->value instanceof IdPrimitive) {
                 $key = $ext->value;
             }
-            if ($extUrl === 'requirements' && $ext->value instanceof StringPrimitive) {
-                $requirements = $ext->value;
-            }
             if ($extUrl === 'severity' && $ext->value instanceof CodePrimitive) {
                 $severity = $ext->value;
             }
             if ($extUrl === 'expression' && $ext->value instanceof Expression) {
                 $expression = $ext->value;
+            }
+            if ($extUrl === 'requirements' && $ext->value instanceof StringPrimitive) {
+                $requirements = $ext->value;
             }
         }
 
@@ -119,6 +118,6 @@ class TargetInvariantExtension extends Extension implements FHIRComplexExtension
             throw new \InvalidArgumentException('Required sub-extension "expression" not found or type mismatch in ' . static::class . '::fromSubExtensions()');
         }
 
-        return new static($key, $requirements, $severity, $expression, $id);
+        return new self($key, $severity, $expression, $requirements, $id);
     }
 }
