@@ -426,8 +426,8 @@ class FHIRModelGenerator implements GeneratorInterface
      * @param array<string,array<string, mixed>> $propertyElements
      * @param string                             $version
      * @param BuilderContextInterface            $builderContext
-     * @param list<string>                       $validParentParamNames When non-empty, only elements whose derived parameter
-     *                                                                  name appears in this list are added to the parent::__construct() call.
+     * @param list<string>                       $validParentParamNames when non-empty, only elements whose derived parameter
+     *                                                                  name appears in this list are added to the parent::__construct() call
      *
      * @return ClassType
      */
@@ -1407,9 +1407,10 @@ class FHIRModelGenerator implements GeneratorInterface
      * Handles ValueSet resolution with versioned URLs, fallback to string type
      * when ValueSet cannot be resolved, and proper enum/code type generation.
      *
-     * @param string                  $valueSetUrl            The ValueSet URL (may include version)
-     * @param BuilderContextInterface $builderContext         The builder context
-     * @param string                  $version                The FHIR version
+     * @param string                  $valueSetUrl    The ValueSet URL (may include version)
+     * @param BuilderContextInterface $builderContext The builder context
+     * @param string                  $version        The FHIR version
+     *
      * @return string The resolved code type (class name or 'string')
      */
     private function resolveValueSetCodeType(
