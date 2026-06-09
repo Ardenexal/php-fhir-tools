@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\Validation;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
+use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\IssueSeverityType as R4IssueSeverityType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\IssueTypeType as R4IssueTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\OperationOutcome\OperationOutcomeIssue as R4Issue;
@@ -116,8 +117,13 @@ final class FHIRValidationReportMapper
     private function mapIssueType(FHIRValidationViolation $violation): string
     {
         if ($violation->code === FHIRViolationCode::EVAL_ERROR
-            || $violation->code === FHIRViolationCode::INFO) {
+            || $violation->code === FHIRViolationCode::UNCHECKED_BINDING
+            || $violation->constraintClass === FHIRValidationService::class) {
             return 'not-supported';
+        }
+
+        if ($violation->code === FHIRViolationCode::INFO) {
+            return 'informational';
         }
 
         return match ($violation->constraintClass) {

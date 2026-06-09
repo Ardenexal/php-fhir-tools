@@ -85,6 +85,28 @@ final class FHIRValidationReportMapperTest extends TestCase
         self::assertSame('not-supported', $outcome->issue[0]->code?->value);
     }
 
+    public function testUncheckedBindingViolationMapsToNotSupported(): void
+    {
+        $report = new FHIRValidationReport([
+            self::violation('info', code: FHIRViolationCode::UNCHECKED_BINDING),
+        ]);
+        $outcome = $this->mapper->toOperationOutcome($report);
+
+        self::assertSame('information', $outcome->issue[0]->severity?->value);
+        self::assertSame('not-supported', $outcome->issue[0]->code?->value);
+    }
+
+    public function testGeneralInfoViolationMapsToInformational(): void
+    {
+        $report = new FHIRValidationReport([
+            self::violation('info', code: FHIRViolationCode::INFO),
+        ]);
+        $outcome = $this->mapper->toOperationOutcome($report);
+
+        self::assertSame('information', $outcome->issue[0]->severity?->value);
+        self::assertSame('informational', $outcome->issue[0]->code?->value);
+    }
+
     public function testFHIRPathInvariantConstraintMapsToInvariantCode(): void
     {
         $report = new FHIRValidationReport([

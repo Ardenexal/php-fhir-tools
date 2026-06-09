@@ -26,8 +26,9 @@ interface FHIRValidationServiceInterface
     /**
      * Validate a FHIR resource and return a standards-compliant OperationOutcome.
      *
-     * @param string       $mode        '' | 'create' | 'update' | 'profile'
-     *                                  'delete' is not supported (server context required)
+     * @param string       $mode        '' | 'create' | 'update' | 'profile' | 'delete'
+     *                                  'delete' returns an information-severity outcome explaining
+     *                                  that referential-integrity checks require a server context
      * @param list<string> $profileUrls profile canonical URLs (used when mode='profile')
      * @param string       $fhirVersion 'R4' | 'R4B' | 'R5'
      *

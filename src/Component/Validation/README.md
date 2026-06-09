@@ -587,8 +587,9 @@ Violations map as follows:
 |---|---|---|
 | `error` | `error` | `invariant` (FHIRPath), `value` (binding), `invalid` (default) |
 | `warning` | `warning` | same mapping |
-| `info` (eval-error) | `information` | `not-supported` |
-| `info` (other) | `information` | `invalid` (default) |
+| `info` (`fhir:eval-error`) | `information` | `not-supported` |
+| `info` (`fhir:unchecked-binding`) | `information` | `not-supported` |
+| `info` (`fhir:info`, general) | `information` | `informational` |
 
 When no violations are found, the outcome contains a single `information`-severity issue:
 `"No issues found — resource is valid."`

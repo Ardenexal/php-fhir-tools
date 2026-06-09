@@ -60,6 +60,14 @@ final class FHIRValidationServiceValidateForOperationTest extends TestCase
         self::assertStringContainsString('delete mode', (string) $outcome->issue[0]->diagnostics);
     }
 
+    public function testInvalidModeThrowsInvalidArgumentException(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/Create/');
+
+        $this->service->validateForOperation(new \stdClass(), mode: 'Create');
+    }
+
     public function testValidResourceProducesNoIssueOutcome(): void
     {
         $outcome = $this->service->validateForOperation(new \stdClass());
