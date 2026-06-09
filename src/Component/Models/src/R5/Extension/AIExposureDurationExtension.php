@@ -21,6 +21,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'AllergyIntolerance.reaction')]
 class AIExposureDurationExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var Duration|null valueDuration Value of extension */
         #[FhirProperty(fhirType: 'Duration', propertyKind: 'complex')]

@@ -24,6 +24,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\RelatedArtifact;
 #[FHIRExtensionContext(type: 'element', expression: 'Observation.component')]
 class RelatedArtifactExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var RelatedArtifact|null valueRelatedArtifact Value of extension */
         #[FhirProperty(fhirType: 'RelatedArtifact', propertyKind: 'complex')]

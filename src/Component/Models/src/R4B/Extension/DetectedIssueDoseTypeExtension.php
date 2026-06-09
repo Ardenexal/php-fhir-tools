@@ -21,6 +21,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'DetectedIssue')]
 class DetectedIssueDoseTypeExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var CodePrimitive|null valueCode Value of extension */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]

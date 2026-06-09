@@ -34,6 +34,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\UsageContext;
 #[FHIRExtensionContext(type: 'element', expression: 'SubscriptionTopic')]
 class ArtifactUseContextExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var UsageContext|null valueUsageContext Value of extension */
         #[FhirProperty(fhirType: 'UsageContext', propertyKind: 'complex')]

@@ -60,6 +60,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet')]
 class ArtifactCiteAsExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var Reference|MarkdownPrimitive|null value Value of extension */
         #[FhirProperty(

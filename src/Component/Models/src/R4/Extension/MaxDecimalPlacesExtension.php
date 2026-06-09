@@ -22,6 +22,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]
 class MaxDecimalPlacesExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var int|Quantity|null value Value of extension */
         #[FhirProperty(

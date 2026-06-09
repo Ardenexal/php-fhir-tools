@@ -21,6 +21,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\MarkdownPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'string')]
 class MarkdownExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var MarkdownPrimitive|null valueMarkdown Value of extension */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]

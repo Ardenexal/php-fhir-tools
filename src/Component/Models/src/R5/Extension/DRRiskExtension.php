@@ -22,6 +22,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 #[FHIRExtensionContext(type: 'element', expression: 'Observation')]
 class DRRiskExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var Reference|null valueReference Value of extension */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]

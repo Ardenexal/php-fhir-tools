@@ -54,6 +54,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet')]
 class ArtifactReviewerExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var ContactDetail|null valueContactDetail Value of extension */
         #[FhirProperty(fhirType: 'ContactDetail', propertyKind: 'complex')]

@@ -22,6 +22,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]
 class RegexExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var StringPrimitive|null valueString Value of extension */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

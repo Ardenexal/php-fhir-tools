@@ -23,6 +23,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Reference;
 #[FHIRContextInvariant(expression: 'mode = \'changes\'')]
 class ListChangeBaseExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var Reference|null valueReference Value of extension */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]

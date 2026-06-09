@@ -8,7 +8,6 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
-use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Duration;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
@@ -66,16 +65,16 @@ class RelativeDateCriteriaExtension extends Extension implements FHIRComplexExte
     /**
      * Reconstruct from an array of already-denormalized sub-extension objects.
      *
-     * @param array<FHIRExtensionInterface> $subExtensions
-     * @param string|null                   $id
+     * @param array<Extension> $subExtensions
+     * @param string|null      $id
      */
-    public static function fromSubExtensions(array $subExtensions, ?string $id = null): static
+    public static function fromSubExtensions(array $subExtensions, ?string $id = null): self
     {
         $targetReference = null;
         $targetCode      = null;
+        $offset          = null;
         $targetPath      = null;
         $relationship    = null;
-        $offset          = null;
 
         foreach ($subExtensions as $ext) {
             $extUrl = $ext->getExtensionUrl();
@@ -85,14 +84,14 @@ class RelativeDateCriteriaExtension extends Extension implements FHIRComplexExte
             if ($extUrl === 'targetCode' && $ext->value instanceof CodeableConcept) {
                 $targetCode = $ext->value;
             }
+            if ($extUrl === 'offset' && $ext->value instanceof Duration) {
+                $offset = $ext->value;
+            }
             if ($extUrl === 'targetPath' && $ext->value instanceof StringPrimitive) {
                 $targetPath = $ext->value;
             }
             if ($extUrl === 'relationship' && $ext->value instanceof CodePrimitive) {
                 $relationship = $ext->value;
-            }
-            if ($extUrl === 'offset' && $ext->value instanceof Duration) {
-                $offset = $ext->value;
             }
         }
 
@@ -106,6 +105,6 @@ class RelativeDateCriteriaExtension extends Extension implements FHIRComplexExte
             throw new \InvalidArgumentException('Required sub-extension "offset" not found or type mismatch in ' . static::class . '::fromSubExtensions()');
         }
 
-        return new static($targetReference, $targetCode, $targetPath, $relationship, $offset, $id);
+        return new self($targetReference, $targetCode, $offset, $targetPath, $relationship, $id);
     }
 }

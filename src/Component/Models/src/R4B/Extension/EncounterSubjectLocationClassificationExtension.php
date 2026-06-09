@@ -22,6 +22,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'EncounterHistory.location')]
 class EncounterSubjectLocationClassificationExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var CodeableConcept|null valueCodeableConcept Value of extension */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]

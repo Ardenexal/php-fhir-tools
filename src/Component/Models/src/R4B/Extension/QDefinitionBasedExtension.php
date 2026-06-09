@@ -20,6 +20,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire')]
 class QDefinitionBasedExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var bool|null valueBoolean Value of extension */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]

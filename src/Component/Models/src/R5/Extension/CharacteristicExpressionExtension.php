@@ -21,6 +21,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'Group')]
 class CharacteristicExpressionExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var Expression|null valueExpression Value of extension */
         #[FhirProperty(fhirType: 'Expression', propertyKind: 'complex')]

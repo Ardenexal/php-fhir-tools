@@ -8,7 +8,6 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
-use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Range;
@@ -68,19 +67,22 @@ class DeviceAlertDetectionExtension extends Extension implements FHIRComplexExte
     /**
      * Reconstruct from an array of already-denormalized sub-extension objects.
      *
-     * @param array<FHIRExtensionInterface> $subExtensions
-     * @param string|null                   $id
+     * @param array<Extension> $subExtensions
+     * @param string|null      $id
      */
-    public static function fromSubExtensions(array $subExtensions, ?string $id = null): static
+    public static function fromSubExtensions(array $subExtensions, ?string $id = null): self
     {
+        $activationState = null;
         $alertCode       = null;
         $priority        = null;
         $effective       = null;
-        $activationState = null;
         $limitRange      = null;
 
         foreach ($subExtensions as $ext) {
             $extUrl = $ext->getExtensionUrl();
+            if ($extUrl === 'activationState' && $ext->value instanceof CodeableConcept) {
+                $activationState = $ext->value;
+            }
             if ($extUrl === 'alertCode' && $ext->value instanceof CodeableConcept) {
                 $alertCode = $ext->value;
             }
@@ -89,9 +91,6 @@ class DeviceAlertDetectionExtension extends Extension implements FHIRComplexExte
             }
             if ($extUrl === 'effective' && $ext->value instanceof DateTimePrimitive) {
                 $effective = $ext->value;
-            }
-            if ($extUrl === 'activationState' && $ext->value instanceof CodeableConcept) {
-                $activationState = $ext->value;
             }
             if ($extUrl === 'limitRange' && $ext->value instanceof Range) {
                 $limitRange = $ext->value;
@@ -102,6 +101,6 @@ class DeviceAlertDetectionExtension extends Extension implements FHIRComplexExte
             throw new \InvalidArgumentException('Required sub-extension "activationState" not found or type mismatch in ' . static::class . '::fromSubExtensions()');
         }
 
-        return new static($alertCode, $priority, $effective, $activationState, $limitRange, $id);
+        return new self($activationState, $alertCode, $priority, $effective, $limitRange, $id);
     }
 }

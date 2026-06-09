@@ -23,6 +23,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'Questionnaire.item.answerValueSet')]
 class PermittedValueValuesetExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var CanonicalPrimitive|null valueCanonical Value of extension */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]

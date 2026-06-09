@@ -60,6 +60,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive;
 )]
 class CSExpectationExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var CodePrimitive|null valueCode Value of extension */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]

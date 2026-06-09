@@ -9,7 +9,6 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRContextInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
-use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UnsignedIntPrimitive;
 
@@ -49,10 +48,10 @@ class DeviceDefinitionPartVariableCountExtension extends Extension implements FH
     /**
      * Reconstruct from an array of already-denormalized sub-extension objects.
      *
-     * @param array<FHIRExtensionInterface> $subExtensions
-     * @param string|null                   $id
+     * @param array<Extension> $subExtensions
+     * @param string|null      $id
      */
-    public static function fromSubExtensions(array $subExtensions, ?string $id = null): static
+    public static function fromSubExtensions(array $subExtensions, ?string $id = null): self
     {
         $minimum = null;
         $maximum = null;
@@ -74,6 +73,6 @@ class DeviceDefinitionPartVariableCountExtension extends Extension implements FH
             throw new \InvalidArgumentException('Required sub-extension "maximum" not found or type mismatch in ' . static::class . '::fromSubExtensions()');
         }
 
-        return new static($minimum, $maximum, $id);
+        return new self($minimum, $maximum, $id);
     }
 }

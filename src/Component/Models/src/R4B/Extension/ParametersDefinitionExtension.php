@@ -21,6 +21,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\ParameterDefinition;
 #[FHIRExtensionContext(type: 'element', expression: 'Parameters.parameter')]
 class ParametersDefinitionExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var ParameterDefinition|null valueParameterDefinition Value of extension */
         #[FhirProperty(fhirType: 'ParameterDefinition', propertyKind: 'complex')]

@@ -24,6 +24,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 #[FHIRContextInvariant(expression: 'ofType(ElementDefinition).type.exists(code=\'Quantity\') or where(%resource.is(Questionnaire)).exists(type.first()=\'quantity\')')]
 class QRUnitOptionExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var Coding|null valueCoding Value of extension */
         #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]

@@ -216,6 +216,6 @@ abstract class MetadataResourceResource extends DomainResourceResource
         )]
         public array $relatedArtifact = [],
     ) {
-        parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension, $url, $identifier, $version, $versionAlgorithm, $name, $title, $status, $experimental, $date, $publisher, $contact, $description, $useContext, $jurisdiction, $purpose, $copyright, $copyrightLabel);
+        parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
     }
 }

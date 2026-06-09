@@ -21,6 +21,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'Location')]
 class LocBoundaryGeojsonExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var Attachment|null valueAttachment Value of extension */
         #[FhirProperty(fhirType: 'Attachment', propertyKind: 'complex')]

@@ -20,6 +20,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'CodeSystem.concept')]
 class CSConceptOrderExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var int|null valueInteger Value of extension */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]

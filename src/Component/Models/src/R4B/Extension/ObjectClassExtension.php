@@ -21,6 +21,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition.mapping')]
 class ObjectClassExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var Coding|null valueCoding Value of extension */
         #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]

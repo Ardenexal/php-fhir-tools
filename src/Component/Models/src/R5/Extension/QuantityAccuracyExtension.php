@@ -28,6 +28,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Quantity;
 #[FHIRExtensionContext(type: 'element', expression: 'DeviceMetric')]
 class QuantityAccuracyExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var Quantity|null valueQuantity Absolute maximum deviation of the reported value from the actual value */
         #[FhirProperty(fhirType: 'Quantity', propertyKind: 'complex')]

@@ -25,6 +25,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 #[FHIRExtensionContext(type: 'fhirpath', expression: 'type.exists() and type = \'composed-of\'')]
 class ArtifactIsOwnedExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var bool|null valueBoolean Value of extension */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]

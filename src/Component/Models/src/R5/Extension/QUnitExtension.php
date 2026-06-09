@@ -24,6 +24,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 #[FHIRContextInvariant(expression: 'ofType(ElementDefinition).type.exists(code=\'integer\' or code=\'decimal\') or where(%resource.is(Questionnaire)).exists(type.first()=\'integer\' or type.first()=\'decimal\')')]
 class QUnitExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var Coding|null valueCoding Value of extension */
         #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex')]

@@ -20,6 +20,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'OperationOutcome.issue')]
 class OOIssueLineExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var int|null valueInteger Value of extension */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]

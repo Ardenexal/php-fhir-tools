@@ -8,7 +8,6 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
-use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
@@ -104,10 +103,10 @@ class ArtifactAssessmentContentExtension extends Extension implements FHIRComple
     /**
      * Reconstruct from an array of already-denormalized sub-extension objects.
      *
-     * @param array<FHIRExtensionInterface> $subExtensions
-     * @param string|null                   $id
+     * @param array<Extension> $subExtensions
+     * @param string|null      $id
      */
-    public static function fromSubExtensions(array $subExtensions, ?string $id = null): static
+    public static function fromSubExtensions(array $subExtensions, ?string $id = null): self
     {
         $informationType = null;
         $summary         = null;
@@ -154,6 +153,6 @@ class ArtifactAssessmentContentExtension extends Extension implements FHIRComple
             }
         }
 
-        return new static($informationType, $summary, $type, $classifier, $quantity, $author, $path, $relatedArtifact, $freeToShare, $component, $id);
+        return new self($informationType, $summary, $type, $classifier, $quantity, $author, $path, $relatedArtifact, $freeToShare, $component, $id);
     }
 }

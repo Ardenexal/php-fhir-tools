@@ -23,6 +23,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Signature;
 #[FHIRExtensionContext(type: 'element', expression: 'QuestionnaireResponse.item.item')]
 class QRSignatureExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var Signature|null valueSignature Value of extension */
         #[FhirProperty(fhirType: 'Signature', propertyKind: 'complex')]

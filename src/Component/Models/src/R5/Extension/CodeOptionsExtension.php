@@ -23,6 +23,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 #[FHIRContextInvariant(expression: 'ofType(CodeableConcept).coding.exists().not()')]
 class CodeOptionsExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var CanonicalPrimitive|null valueCanonical Value of extension */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive')]

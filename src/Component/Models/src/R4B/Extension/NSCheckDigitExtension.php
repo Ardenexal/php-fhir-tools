@@ -21,6 +21,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'NamingSystem')]
 class NSCheckDigitExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var StringPrimitive|null valueString Value of extension */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

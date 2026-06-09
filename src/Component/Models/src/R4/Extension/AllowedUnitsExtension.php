@@ -22,6 +22,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'ElementDefinition')]
 class AllowedUnitsExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var CodeableConcept|CanonicalPrimitive|null value Value of extension */
         #[FhirProperty(

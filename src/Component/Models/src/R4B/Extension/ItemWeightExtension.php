@@ -22,6 +22,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'QuestionnaireResponse.item.answer.value')]
 class ItemWeightExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var string|null valueDecimal Value of extension */
         #[FhirProperty(fhirType: 'decimal', propertyKind: 'scalar')]

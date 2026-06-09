@@ -24,6 +24,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 #[FHIRExtensionContext(type: 'extension', expression: 'http://hl7.org/fhir/StructureDefinition/cqf-library')]
 class LibraryAliasExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var StringPrimitive|null valueString Value of extension */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

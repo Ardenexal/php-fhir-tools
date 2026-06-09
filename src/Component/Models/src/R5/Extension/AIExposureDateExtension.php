@@ -21,6 +21,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'AllergyIntolerance.reaction')]
 class AIExposureDateExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var DateTimePrimitive|null valueDateTime Value of extension */
         #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive')]

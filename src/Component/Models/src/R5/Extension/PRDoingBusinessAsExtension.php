@@ -23,6 +23,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\HumanName;
 #[FHIRExtensionContext(type: 'element', expression: 'PractitionerRole')]
 class PRDoingBusinessAsExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var HumanName|null valueHumanName Value of extension */
         #[FhirProperty(fhirType: 'HumanName', propertyKind: 'complex')]

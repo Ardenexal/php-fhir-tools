@@ -24,6 +24,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 #[FHIRExtensionContext(type: 'element', expression: 'Expression')]
 class ReferencesContainedExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var Reference|null valueReference Value of extension */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]

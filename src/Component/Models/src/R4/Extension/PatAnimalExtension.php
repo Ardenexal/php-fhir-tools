@@ -8,7 +8,6 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRExtensionContext;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
-use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRExtensionInterface;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 
@@ -53,10 +52,10 @@ class PatAnimalExtension extends Extension implements FHIRComplexExtensionInterf
     /**
      * Reconstruct from an array of already-denormalized sub-extension objects.
      *
-     * @param array<FHIRExtensionInterface> $subExtensions
-     * @param string|null                   $id
+     * @param array<Extension> $subExtensions
+     * @param string|null      $id
      */
-    public static function fromSubExtensions(array $subExtensions, ?string $id = null): static
+    public static function fromSubExtensions(array $subExtensions, ?string $id = null): self
     {
         $species      = null;
         $breed        = null;
@@ -79,6 +78,6 @@ class PatAnimalExtension extends Extension implements FHIRComplexExtensionInterf
             throw new \InvalidArgumentException('Required sub-extension "species" not found or type mismatch in ' . static::class . '::fromSubExtensions()');
         }
 
-        return new static($species, $breed, $genderStatus, $id);
+        return new self($species, $breed, $genderStatus, $id);
     }
 }

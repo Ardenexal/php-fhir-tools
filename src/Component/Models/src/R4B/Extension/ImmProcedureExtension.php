@@ -21,6 +21,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'Immunization')]
 class ImmProcedureExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var CodeableReference|null valueCodeableReference Value of extension */
         #[FhirProperty(fhirType: 'CodeableReference', propertyKind: 'complex')]

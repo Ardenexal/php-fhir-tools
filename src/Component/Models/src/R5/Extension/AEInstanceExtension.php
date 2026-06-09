@@ -21,6 +21,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
 #[FHIRExtensionContext(type: 'element', expression: 'AuditEvent.entity')]
 class AEInstanceExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var Identifier|null valueIdentifier Value of extension */
         #[FhirProperty(fhirType: 'Identifier', propertyKind: 'complex')]

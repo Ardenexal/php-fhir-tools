@@ -38,6 +38,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'SpecimenDefinition')]
 class CompliesWithExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var CanonicalPrimitive|Reference|UriPrimitive|null value Value of extension */
         #[FhirProperty(

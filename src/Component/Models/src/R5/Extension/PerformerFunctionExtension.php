@@ -24,6 +24,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 #[FHIRExtensionContext(type: 'element', expression: 'Consent.grantee')]
 class PerformerFunctionExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var CodeableConcept|null valueCodeableConcept Value of extension */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]

@@ -22,6 +22,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 #[FHIRContextInvariant(expression: 'type=\'display\' implies (repeats.empty() or repeats=false) and (required.empty() or repeats=false)')]
 class QMaxOccursExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var int|null valueInteger Value of extension */
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]

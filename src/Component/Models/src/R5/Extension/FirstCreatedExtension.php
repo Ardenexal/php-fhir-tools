@@ -21,6 +21,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\Primitive\InstantPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'Meta')]
 class FirstCreatedExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var InstantPrimitive|null valueInstant Value of extension */
         #[FhirProperty(fhirType: 'instant', propertyKind: 'primitive')]

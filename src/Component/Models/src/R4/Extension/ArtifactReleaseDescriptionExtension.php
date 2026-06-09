@@ -61,6 +61,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\MarkdownPrimitive;
 #[FHIRExtensionContext(type: 'element', expression: 'ValueSet')]
 class ArtifactReleaseDescriptionExtension extends Extension
 {
+    /**
+     * @param list<Extension> $extension
+     */
     public function __construct(
         /** @var MarkdownPrimitive|null valueMarkdown Value of extension */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
