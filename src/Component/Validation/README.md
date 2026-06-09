@@ -173,7 +173,7 @@ categories. Coverage as of the current release:
 | **Obligations** (populate) | ⚠️ | ⚠️ | ⚠️ | `SHALL`/`SHOULD:populate` enforced; filter evaluation deferred |
 | **Obligations** (behaviour-only) | ℹ️ N/A | ℹ️ N/A | ℹ️ N/A | display/persist/handle cannot be checked from a resource instance |
 | **Questionnaire validation** | ❌ | ❌ | ❌ | Separate `FHIRQuestionnaireValidator` (planned) |
-| **`$validate` operation output** | ❌ | ❌ | ❌ | `OperationOutcome` adapter planned |
+| **`$validate` operation output** | ✅ | ✅ | ✅ | `FHIRValidationService::validateForOperation()` |
 | **Narrative / XHTML** | ❌ | ❌ | ❌ | Not implemented |
 | **Business rules** (auth, duplicates) | ℹ️ N/A | ℹ️ N/A | ℹ️ N/A | Outside library scope; requires server context |
 
@@ -244,9 +244,10 @@ values themselves.
 **Questionnaire validation** is implemented by a separate `FHIRQuestionnaireValidator`
 service, not by `FHIRValidationService`. See the Questionnaire Validation section below.
 
-**`$validate` operation** — `FHIRValidationService` returns a `FHIRValidationReport`,
-not an `OperationOutcome`. An `FHIRValidationReportMapper` producing
-standards-compliant `OperationOutcomeResource` objects is planned.
+**`$validate` operation** — use `FHIRValidationService::validateForOperation()` to
+validate a resource and receive a standards-compliant `OperationOutcomeResource` directly.
+`FHIRValidationService::validate()` remains available when a `FHIRValidationReport` is
+preferred over an `OperationOutcome`.
 
 ---
 
@@ -568,15 +569,30 @@ the reference validator's).
 
 ## OperationOutcome Mapping
 
-An `FHIRValidationReportMapper` producing standards-compliant
-`OperationOutcomeResource` objects for FHIR `$validate` operation responses is
-planned (see GitHub #73). When available it will map violations as follows:
+`FHIRValidationService::validateForOperation()` returns a standards-compliant
+`OperationOutcomeResource` for FHIR `$validate` operation responses. Pass the target
+FHIR version (`'R4'`, `'R4B'`, or `'R5'`) to receive a version-typed resource:
+
+```php
+$outcome = $service->validateForOperation($patient, fhirVersion: 'R4');
+// $outcome is an R4\Resource\OperationOutcomeResource
+
+$outcome = $service->validateForOperation($patient, mode: 'create', fhirVersion: 'R5');
+// $outcome is an R5\Resource\OperationOutcomeResource
+```
+
+Violations map as follows:
 
 | `FHIRValidationViolation::$severity` | `OperationOutcomeIssue::$severity` | `OperationOutcomeIssue::$code` |
 |---|---|---|
 | `error` | `error` | `invariant` (FHIRPath), `value` (binding), `invalid` (default) |
 | `warning` | `warning` | same mapping |
-| `info` | `information` | `processing` (eval-error), `informational` (must-support) |
+| `info` (`fhir:eval-error`) | `information` | `not-supported` |
+| `info` (`fhir:unchecked-binding`) | `information` | `not-supported` |
+| `info` (`fhir:info`, general) | `information` | `informational` |
+
+When no violations are found, the outcome contains a single `information`-severity issue:
+`"No issues found — resource is valid."`
 
 The `$validate` operation endpoint format per spec:
 ```
@@ -588,7 +604,8 @@ of findings. Structural errors (unparseable JSON/XML) may produce 4xx responses 
 this library is reached.
 
 `mode=delete` is not supported by this library — referential integrity checks require
-a FHIR server context.
+a FHIR server context. A call with `mode='delete'` returns an information-severity
+outcome explaining this limitation.
 
 ---
 

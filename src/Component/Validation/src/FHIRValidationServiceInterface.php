@@ -22,4 +22,22 @@ interface FHIRValidationServiceInterface
         bool $includeMustSupportInfo = false,
         ?FHIRObligationContext $obligationContext = null,
     ): FHIRValidationReport;
+
+    /**
+     * Validate a FHIR resource and return a standards-compliant OperationOutcome.
+     *
+     * @param string       $mode        '' | 'create' | 'update' | 'profile' | 'delete'
+     *                                  'delete' returns an information-severity outcome explaining
+     *                                  that referential-integrity checks require a server context
+     * @param list<string> $profileUrls profile canonical URLs (used when mode='profile')
+     * @param string       $fhirVersion 'R4' | 'R4B' | 'R5'
+     *
+     * @return object OperationOutcomeResource for the requested FHIR version
+     */
+    public function validateForOperation(
+        object $resource,
+        string $mode = '',
+        array $profileUrls = [],
+        string $fhirVersion = 'R4',
+    ): object;
 }

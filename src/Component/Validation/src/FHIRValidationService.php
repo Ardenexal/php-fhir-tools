@@ -39,6 +39,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         private readonly FHIRPathService $pathService,
         private readonly ?FHIRIGTypeRegistry $registry = null,
         private readonly FHIRTypeHierarchyResolverInterface $typeResolver = new FhirPropertyTypeHierarchyResolver(),
+        private readonly FHIRValidationReportMapper $reportMapper = new FHIRValidationReportMapper(),
     ) {
     }
 
@@ -93,6 +94,37 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         }
 
         return new FHIRValidationReport($violations);
+    }
+
+    public function validateForOperation(
+        object $resource,
+        string $mode = '',
+        array $profileUrls = [],
+        string $fhirVersion = 'R4',
+    ): object {
+        if (!in_array($mode, ['', 'create', 'update', 'profile', 'delete'], true)) {
+            throw new \InvalidArgumentException(sprintf('Unsupported mode "%s". Supported values: \'\', create, update, profile, delete.', $mode));
+        }
+
+        if ($mode === 'delete') {
+            $report = new FHIRValidationReport([
+                new FHIRValidationViolation(
+                    severity: 'info',
+                    path: '',
+                    message: 'delete mode: referential integrity check requires a server context — library cannot perform this validation.',
+                    constraintClass: self::class,
+                    profileGroup: null,
+                    invariantKey: null,
+                    code: FHIRViolationCode::INFO,
+                ),
+            ]);
+
+            return $this->reportMapper->toOperationOutcome($report, $fhirVersion);
+        }
+
+        $report = $this->validate($resource, $profileUrls);
+
+        return $this->reportMapper->toOperationOutcome($report, $fhirVersion);
     }
 
     /**
