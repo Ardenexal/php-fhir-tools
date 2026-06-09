@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Validation\FHIRQuestionnaireValidator;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationViolation;
+use Ardenexal\FHIRTools\Component\Validation\InMemoryFHIRTerminologyClient;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -28,9 +29,9 @@ use PHPUnit\Framework\TestCase;
  * ADR-007). Many corpus cases test rules we deliberately do not cover (answerOption, min/max,
  * regex, units, SDC expressions, R5 answerConstraint); for those the Java error count cannot
  * match ours. Triage (M12.1) classified the 78 eligible R4 cases as:
- *   - 41 "meaningful": error-presence matches Java, or we flag the answer-type mismatch as a
+ *   - 47 "meaningful": error-presence matches Java, or we flag the answer-type mismatch as a
  *     warning — these are SEEDED here and asserted.
- *   - 36 "out-of-scope": Java errors on a rule we do not implement — left markTestIncomplete
+ *   - 30 "out-of-scope": Java errors on a rule we do not implement — left markTestIncomplete
  *     (visible, not silently green) and recorded in the plan backlog.
  *   - 1 deser/shape failure (supporting[0] is not a Questionnaire) — markTestSkipped.
  *
@@ -56,21 +57,12 @@ final class FHIRQuestionnaireConformanceTest extends TestCase
 
     /**
      * Unseeded cases that are DEFERRED (blocked on a capability the library does not have), as
-     * distinct from cases merely not-yet-implemented by an open milestone. The M13.1 triage
-     * (2026-06-04) classified all six as terminology-bound (value-set membership / coding display),
-     * blocked on a terminology-client abstraction — enhancement #71. ADR-007's amendment keeps
-     * these out of scope. Maps case name => short reason.
+     * distinct from cases merely not-yet-implemented by an open milestone. Maps case name => short reason.
      *
      * @var array<string, string>
      */
     private const DEFERRED_CASES = [
-        'choice-async-qr'                                                       => 'terminology: answerValueSet membership (#71)',
-        'choice-gender-coding-async-qr'                                         => 'terminology: coding value-set + display (#71)',
-        'open-choice-gender-coding-async-qr'                                    => 'terminology: coding value-set + display (#71)',
-        'string-with-coding-async-qr'                                           => 'terminology: answerValueSet membership (#71)',
-        'quantity-units-not-in-value-set-qr'                                    => 'terminology: quantity unitValueSet (#71)',
-        'questionnaireresponse-hai-ltcf-questionnaireresponse-mdro-cdi-event'   => 'terminology: SNOMED answerValueSet membership (#71)',
-        'qr-validation-issue'                                                   => 'harness: supporting[0] is a ValueSet not a Questionnaire; choice answer validation also requires terminology client (#71)',
+        'qr-validation-issue' => 'harness: supporting[0] is a ValueSet not a Questionnaire',
     ];
 
     private FHIRSerializationService $serialization;
@@ -80,7 +72,31 @@ final class FHIRQuestionnaireConformanceTest extends TestCase
     protected function setUp(): void
     {
         $this->serialization = FHIRSerializationService::createDefault(FhirVersion::R4);
-        $this->validator     = new FHIRQuestionnaireValidator();
+        $this->validator     = new FHIRQuestionnaireValidator(terminologyClient: new InMemoryFHIRTerminologyClient(
+            map: [
+                'http://hl7.org/fhir/ValueSet/jurisdiction' => [
+                    'urn:iso:std:iso:3166|AU'              => true,
+                    'urn:iso:std:iso:3166|BD'              => true,
+                    '|AU'                                  => true,
+                    '|Australia'                           => false,
+                    'http://unitsofmeasure.org|km'         => false,
+                ],
+                'http://hl7.org/fhir/ValueSet/item-type' => [
+                    'http://hl7.org/fhir/item-type|boolean' => true,
+                    'http://hl7.org/fhir/item-type|string'  => true,
+                ],
+                'http://cts.nlm.nih.gov/fhir/ValueSet/2.16.840.1.114222.4.11.3249' => [
+                    'http://snomed.info/sct|119339001' => false,
+                ],
+                'http://cts.nlm.nih.gov/fhir/ValueSet/2.16.840.1.114222.4.11.3194' => [
+                    'http://snomed.info/sct|5933001' => false,
+                ],
+                'http://cts.nlm.nih.gov/fhir/ValueSet/2.16.840.1.113883.10.20.5.1.5.9.3' => [
+                    'https://www.cdc.gov/nhsn/cdaportal/terminology/codesystem/hsloc.html|1258-3' => true,
+                ],
+            ],
+            defaultResult: true,
+        ));
     }
 
     /**
