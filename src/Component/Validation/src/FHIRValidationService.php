@@ -103,9 +103,7 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
         string $fhirVersion = 'R4',
     ): object {
         if (!in_array($mode, ['', 'create', 'update', 'profile', 'delete'], true)) {
-            throw new \InvalidArgumentException(
-                sprintf('Unsupported mode "%s". Supported values: \'\', create, update, profile, delete.', $mode),
-            );
+            throw new \InvalidArgumentException(sprintf('Unsupported mode "%s". Supported values: \'\', create, update, profile, delete.', $mode));
         }
 
         if ($mode === 'delete') {
