@@ -151,14 +151,16 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
      * M15 quantity-answer extension URLs (ADR-007 amendment). Quantity min/max bounds are NOT the
      * generic minValue/maxValue extensions M13 handles — they are the SDC-specific
      * sdc-questionnaire-min/maxQuantity carriers, each holding a valueQuantity. `unitOption` lists
-     * the inline UCUM codings an answer's unit may take (a coded enumeration, distinct from the
-     * terminology-bound `unitValueSet` which stays deferred — #71).
+     * the inline UCUM codings an answer's unit may take (a coded enumeration). `unitValueSet` binds
+     * the unit to a terminology value set (M02, questionnaire-terminology-validation plan).
      */
     private const string EXT_MIN_QUANTITY       = 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-minQuantity';
 
     private const string EXT_MAX_QUANTITY       = 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-maxQuantity';
 
     private const string EXT_UNIT_OPTION        = 'http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption';
+
+    private const string EXT_UNIT_VALUE_SET     = 'http://hl7.org/fhir/StructureDefinition/questionnaire-unitValueSet';
 
     /** Kanta PHR enableWhenExpression variant — carries a FHIRPath expression as `valueString`. */
     private const string EXT_ENABLE_WHEN_EXPRESSION_KANTA = 'http://phr.kanta.fi/StructureDefinition/fiphr-ext-questionnaire-enablewhen';
@@ -179,6 +181,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
     public function __construct(
         private readonly UcumConverter $ucum = new UcumConverter(),
         private readonly FHIRPathService $pathService = new FHIRPathService(),
+        private readonly ?FHIRTerminologyClientInterface $terminologyClient = null,
     ) {
     }
 
@@ -1306,6 +1309,11 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         }
 
         $this->checkAnswerOptionMembership($item, $questionnaireItem, $type, $linkId, $path, $violations);
+        $this->checkAnswerValueSetMembership($item, $questionnaireItem, $type, $linkId, $path, $violations);
+
+        if ($type === 'quantity') {
+            $this->checkUnitValueSetMembership($item, $questionnaireItem, $linkId, $path, $violations);
+        }
 
         foreach (array_values($item->answer) as $j => $answer) {
             $value = $answer->value;
@@ -1342,6 +1350,182 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         }
 
         return false;
+    }
+
+    /**
+     * answerValueSet membership (M02): when the item declares an answerValueSet and a terminology
+     * client is configured, each answer is validated against it. Coding answers call
+     * validateCoding(); StringPrimitive answers (string type) call validateCode(). For open-choice
+     * items, a StringPrimitive answer is always valid per the FHIR R4 spec — only Codings are
+     * checked. Returns immediately when no client is wired (backward-compatible, zero-config).
+     *
+     * @param R4ResponseItem|R4BResponseItem|R5ResponseItem $item
+     * @param R4Item|R4BItem|R5Item                         $questionnaireItem
+     * @param list<FHIRValidationViolation>                 $violations
+     */
+    private function checkAnswerValueSetMembership(
+        object $item,
+        object $questionnaireItem,
+        string $type,
+        string $linkId,
+        string $path,
+        array &$violations,
+    ): void {
+        if ($this->terminologyClient === null) {
+            return;
+        }
+
+        $vsUrl = $questionnaireItem->answerValueSet !== null ? (string) $questionnaireItem->answerValueSet : '';
+        if ($vsUrl === '') {
+            return;
+        }
+
+        foreach (array_values($item->answer) as $j => $answer) {
+            $value = $answer->value;
+            if ($value === null) {
+                continue;
+            }
+
+            $valuePath = sprintf('%s.answer[%d].value', $path, $j);
+
+            if ($value instanceof R4Coding || $value instanceof R4BCoding || $value instanceof R5Coding) {
+                $parts  = $this->codingParts($value);
+                $system = (string) ($parts['system'] ?? '');
+                $code   = (string) ($parts['code'] ?? '');
+                if ($code === '') {
+                    $violations[] = $this->violation(
+                        'error',
+                        $valuePath,
+                        sprintf(
+                            "Answer coding for item '%s' has no code; a code is required to check value set '%s'.",
+                            $linkId,
+                            $vsUrl,
+                        ),
+                    );
+                } elseif (!$this->terminologyClient->validateCoding($vsUrl, $system, $code)) {
+                    $violations[] = $this->violation(
+                        'error',
+                        $valuePath,
+                        sprintf(
+                            "Answer coding '%s|%s' for item '%s' is not a member of value set '%s'.",
+                            $system,
+                            $code,
+                            $linkId,
+                            $vsUrl,
+                        ),
+                    );
+                }
+            } elseif (
+                $type !== 'open-choice'
+                && $value instanceof \Stringable
+                && $this->classBasename($value::class) === 'StringPrimitive'
+            ) {
+                $stringValue = (string) $value;
+                if (!$this->terminologyClient->validateCode($vsUrl, $stringValue)) {
+                    $violations[] = $this->violation(
+                        'error',
+                        $valuePath,
+                        sprintf(
+                            "Answer '%s' for item '%s' is not a member of value set '%s'.",
+                            $stringValue,
+                            $linkId,
+                            $vsUrl,
+                        ),
+                    );
+                }
+            }
+        }
+    }
+
+    /**
+     * unitValueSet membership (M02): when a quantity item carries the questionnaire-unitValueSet
+     * extension and a terminology client is configured, the answer Quantity's system+code is
+     * validated via validateCoding(). A Quantity with no coded unit (code = '') emits an error
+     * because the value set check cannot proceed without one. Returns immediately when no client
+     * is wired (backward-compatible, zero-config).
+     *
+     * @param R4ResponseItem|R4BResponseItem|R5ResponseItem $item
+     * @param R4Item|R4BItem|R5Item                         $questionnaireItem
+     * @param list<FHIRValidationViolation>                 $violations
+     */
+    private function checkUnitValueSetMembership(
+        object $item,
+        object $questionnaireItem,
+        string $linkId,
+        string $path,
+        array &$violations,
+    ): void {
+        if ($this->terminologyClient === null) {
+            return;
+        }
+
+        $unitVsUrl = $this->itemStringExtension($questionnaireItem, self::EXT_UNIT_VALUE_SET);
+        if ($unitVsUrl === null || $unitVsUrl === '') {
+            return;
+        }
+
+        foreach (array_values($item->answer) as $j => $answer) {
+            $value = $answer->value;
+            if ($value === null) {
+                continue;
+            }
+
+            $parts = $this->quantityParts($value);
+            if ($parts === null) {
+                continue;
+            }
+
+            $valuePath = sprintf('%s.answer[%d].value', $path, $j);
+            $system    = (string) ($parts['system'] ?? '');
+            $code      = (string) ($parts['code'] ?? '');
+
+            if ($code === '') {
+                $violations[] = $this->violation(
+                    'error',
+                    $valuePath,
+                    sprintf(
+                        "Quantity answer for item '%s' has no unit code; a coded unit is required for value set '%s'.",
+                        $linkId,
+                        $unitVsUrl,
+                    ),
+                );
+
+                continue;
+            }
+
+            if (!$this->terminologyClient->validateCoding($unitVsUrl, $system, $code)) {
+                $violations[] = $this->violation(
+                    'error',
+                    $valuePath,
+                    sprintf(
+                        "Quantity unit '%s|%s' for item '%s' is not a member of value set '%s'.",
+                        $system,
+                        $code,
+                        $linkId,
+                        $unitVsUrl,
+                    ),
+                );
+            }
+        }
+    }
+
+    /**
+     * Reads the first string-valued item extension matching the given URL; null when absent.
+     * Handles both raw string and Stringable extension values (e.g. CanonicalPrimitive).
+     *
+     * @param R4Item|R4BItem|R5Item $questionnaireItem
+     */
+    private function itemStringExtension(object $questionnaireItem, string $url): ?string
+    {
+        foreach ($questionnaireItem->extension as $extension) {
+            if ($extension->url !== $url || !isset($extension->value)) {
+                continue;
+            }
+
+            return $this->extensionString($extension->value);
+        }
+
+        return null;
     }
 
     /**

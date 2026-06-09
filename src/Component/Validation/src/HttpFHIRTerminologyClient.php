@@ -60,6 +60,43 @@ final class HttpFHIRTerminologyClient implements FHIRTerminologyClientInterface
         return false;
     }
 
+    public function validateCoding(string $valueSetUrl, string $system, string $code): bool
+    {
+        $url = rtrim($this->serverUrl, '/') . '/ValueSet/$validate-code?' . http_build_query([
+            'url'    => $valueSetUrl,
+            'system' => $system,
+            'code'   => $code,
+        ]);
+
+        try {
+            $response = $this->httpClient->request('GET', $url);
+
+            if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
+                return false;
+            }
+
+            $data = json_decode($response->getContent(), true);
+        } catch (TransportExceptionInterface) {
+            return false;
+        }
+
+        if (!is_array($data) || !isset($data['parameter']) || !is_array($data['parameter'])) {
+            return false;
+        }
+
+        foreach ($data['parameter'] as $param) {
+            if (
+                is_array($param)
+                && ($param['name'] ?? null) === 'result'
+                && array_key_exists('valueBoolean', $param)
+            ) {
+                return (bool) $param['valueBoolean'];
+            }
+        }
+
+        return false;
+    }
+
     private function toCodeString(mixed $value): ?string
     {
         if ($value instanceof \BackedEnum) {

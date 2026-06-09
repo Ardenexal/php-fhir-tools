@@ -18,4 +18,9 @@ final class NullFHIRTerminologyClient implements FHIRTerminologyClientInterface
     {
         return true;
     }
+
+    public function validateCoding(string $valueSetUrl, string $system, string $code): bool
+    {
+        return true;
+    }
 }

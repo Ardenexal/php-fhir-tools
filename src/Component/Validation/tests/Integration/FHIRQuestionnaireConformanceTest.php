@@ -70,6 +70,7 @@ final class FHIRQuestionnaireConformanceTest extends TestCase
         'string-with-coding-async-qr'                                           => 'terminology: answerValueSet membership (#71)',
         'quantity-units-not-in-value-set-qr'                                    => 'terminology: quantity unitValueSet (#71)',
         'questionnaireresponse-hai-ltcf-questionnaireresponse-mdro-cdi-event'   => 'terminology: SNOMED answerValueSet membership (#71)',
+        'qr-validation-issue'                                                   => 'harness: supporting[0] is a ValueSet not a Questionnaire; choice answer validation also requires terminology client (#71)',
     ];
 
     private FHIRSerializationService $serialization;

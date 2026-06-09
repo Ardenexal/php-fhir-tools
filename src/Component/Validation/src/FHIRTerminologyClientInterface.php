@@ -16,4 +16,9 @@ interface FHIRTerminologyClientInterface
      * Implementations may accept a string code, an int, or a BackedEnum instance as $value.
      */
     public function validateCode(string $valueSetUrl, mixed $value): bool;
+
+    /**
+     * Returns true when the system+code pair is a valid member of the named value set, false otherwise.
+     */
+    public function validateCoding(string $valueSetUrl, string $system, string $code): bool;
 }
