@@ -162,6 +162,9 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
 
     private const string EXT_UNIT_VALUE_SET     = 'http://hl7.org/fhir/StructureDefinition/questionnaire-unitValueSet';
 
+    /** Canonical URL for the preferred terminology server extension (R4/R4B/R5 shared). */
+    private const string EXT_PREFERRED_TERMINOLOGY_SERVER = 'http://hl7.org/fhir/StructureDefinition/preferredTerminologyServer';
+
     /** Kanta PHR enableWhenExpression variant — carries a FHIRPath expression as `valueString`. */
     private const string EXT_ENABLE_WHEN_EXPRESSION_KANTA = 'http://phr.kanta.fi/StructureDefinition/fiphr-ext-questionnaire-enablewhen';
 
@@ -178,10 +181,20 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
 
     private ?object $currentResponse = null;
 
+    /** @var ItemIndex */
+    private array $currentItemIndex = [];
+
+    /** @var ParentIndex */
+    private array $currentParentOf = [];
+
+    /** @var AnyQuestionnaire|null */
+    private R4Questionnaire|R4BQuestionnaire|R5Questionnaire|null $currentQuestionnaire = null;
+
     public function __construct(
         private readonly UcumConverter $ucum = new UcumConverter(),
         private readonly FHIRPathService $pathService = new FHIRPathService(),
         private readonly ?FHIRTerminologyClientInterface $terminologyClient = null,
+        private readonly ?FHIRTerminologyClientFactoryInterface $clientFactory = null,
     ) {
     }
 
@@ -206,12 +219,16 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
             throw new \InvalidArgumentException(sprintf('Expected a QuestionnaireResponseResource (R4, R4B, or R5), got %s.', $response::class));
         }
 
-        $this->currentResponse = $response;
+        $this->currentResponse      = $response;
+        $this->currentQuestionnaire = $questionnaire;
 
         try {
             $itemIndex = [];
             $parentOf  = [];
             $this->indexQuestionnaireItems($questionnaire->item, $itemIndex, $parentOf, null);
+
+            $this->currentItemIndex = $itemIndex;
+            $this->currentParentOf  = $parentOf;
 
             $responseIndex = [];
             $this->indexResponseItems($response->item, 'item', $responseIndex);
@@ -240,7 +257,10 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
 
             return new FHIRValidationReport($violations);
         } finally {
-            $this->currentResponse = null;
+            $this->currentResponse      = null;
+            $this->currentQuestionnaire = null;
+            $this->currentItemIndex     = [];
+            $this->currentParentOf      = [];
         }
     }
 
@@ -1371,7 +1391,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         string $path,
         array &$violations,
     ): void {
-        if ($this->terminologyClient === null) {
+        if ($this->terminologyClient === null && $this->clientFactory === null) {
             return;
         }
 
@@ -1379,6 +1399,8 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         if ($vsUrl === '') {
             return;
         }
+
+        $client = $this->resolveClientForItem($linkId);
 
         foreach (array_values($item->answer) as $j => $answer) {
             $value = $answer->value;
@@ -1402,7 +1424,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
                             $vsUrl,
                         ),
                     );
-                } elseif (!$this->terminologyClient->validateCoding($vsUrl, $system, $code)) {
+                } elseif (!$client->validateCoding($vsUrl, $system, $code)) {
                     $violations[] = $this->violation(
                         'error',
                         $valuePath,
@@ -1421,7 +1443,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
                 && $this->classBasename($value::class) === 'StringPrimitive'
             ) {
                 $stringValue = (string) $value;
-                if (!$this->terminologyClient->validateCode($vsUrl, $stringValue)) {
+                if (!$client->validateCode($vsUrl, $stringValue)) {
                     $violations[] = $this->violation(
                         'error',
                         $valuePath,
@@ -1455,7 +1477,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         string $path,
         array &$violations,
     ): void {
-        if ($this->terminologyClient === null) {
+        if ($this->terminologyClient === null && $this->clientFactory === null) {
             return;
         }
 
@@ -1463,6 +1485,8 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         if ($unitVsUrl === null || $unitVsUrl === '') {
             return;
         }
+
+        $client = $this->resolveClientForItem($linkId);
 
         foreach (array_values($item->answer) as $j => $answer) {
             $value = $answer->value;
@@ -1493,7 +1517,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
                 continue;
             }
 
-            if (!$this->terminologyClient->validateCoding($unitVsUrl, $system, $code)) {
+            if (!$client->validateCoding($unitVsUrl, $system, $code)) {
                 $violations[] = $this->violation(
                     'error',
                     $valuePath,
@@ -1507,6 +1531,57 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
                 );
             }
         }
+    }
+
+    /**
+     * Resolves the effective terminology client for a given response item linkId. When no
+     * factory is configured, returns the default client (or a NullFHIRTerminologyClient when
+     * no default client is configured either). When a factory is available, walks the item's
+     * ancestor chain and the root Questionnaire to collect preferredTerminologyServer URLs,
+     * deduplicating while preserving declaration order; returns a PreferredServerAwareTerminologyClient
+     * that tries each preferred URL before falling back to the default.
+     */
+    private function resolveClientForItem(string $linkId): FHIRTerminologyClientInterface
+    {
+        $fallback = $this->terminologyClient ?? new NullFHIRTerminologyClient();
+
+        if ($this->clientFactory === null) {
+            return $fallback;
+        }
+
+        $urls    = [];
+        $current = $linkId;
+
+        while ($current !== null && $current !== '') {
+            $item = $this->currentItemIndex[$current] ?? null;
+            if ($item !== null) {
+                foreach ($this->itemCodeExtensions($item, self::EXT_PREFERRED_TERMINOLOGY_SERVER) as $url) {
+                    if (!\in_array($url, $urls, true)) {
+                        $urls[] = $url;
+                    }
+                }
+            }
+            $current = $this->currentParentOf[$current] ?? null;
+        }
+
+        if ($this->currentQuestionnaire !== null) {
+            foreach ($this->itemCodeExtensions($this->currentQuestionnaire, self::EXT_PREFERRED_TERMINOLOGY_SERVER) as $url) {
+                if (!\in_array($url, $urls, true)) {
+                    $urls[] = $url;
+                }
+            }
+        }
+
+        if ($urls === []) {
+            return $fallback;
+        }
+
+        $preferred = array_map(
+            fn (string $url): FHIRTerminologyClientInterface => $this->clientFactory->createForServer($url),
+            $urls,
+        );
+
+        return new PreferredServerAwareTerminologyClient($preferred, $fallback);
     }
 
     /**
@@ -1745,10 +1820,10 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
     }
 
     /**
-     * Collects the valueCode strings of every item extension carrying the given URL (e.g. the
-     * repeatable referenceResource / mimeType allow-lists).
+     * Collects the string values of every extension carrying the given URL, in declaration order.
+     * Used for multi-valued extensions (referenceResource, mimeType, preferredTerminologyServer).
      *
-     * @param R4Item|R4BItem|R5Item $questionnaireItem
+     * @param AnyItem|AnyQuestionnaire $questionnaireItem
      *
      * @return list<string>
      */
