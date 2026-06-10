@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit;
 
+use Ardenexal\FHIRTools\Component\Validation\CodingValidationResult;
 use Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyClientInterface;
 use Ardenexal\FHIRTools\Component\Validation\InMemoryFHIRTerminologyClient;
 use Ardenexal\FHIRTools\Component\Validation\NullFHIRTerminologyClient;
@@ -91,6 +92,11 @@ final class PreferredServerAwareTerminologyClientTest extends TestCase
             }
 
             public function validateCoding(string $valueSetUrl, string $system, string $code): bool
+            {
+                throw new \RuntimeException('server unavailable');
+            }
+
+            public function validateCodingWithDisplay(string $valueSetUrl, string $system, string $code, string $display): CodingValidationResult
             {
                 throw new \RuntimeException('server unavailable');
             }

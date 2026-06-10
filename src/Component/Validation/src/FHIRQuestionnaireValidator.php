@@ -1424,18 +1424,48 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
                             $vsUrl,
                         ),
                     );
-                } elseif (!$client->validateCoding($vsUrl, $system, $code)) {
-                    $violations[] = $this->violation(
-                        'error',
-                        $valuePath,
-                        sprintf(
-                            "Answer coding '%s|%s' for item '%s' is not a member of value set '%s'.",
-                            $system,
-                            $code,
-                            $linkId,
-                            $vsUrl,
-                        ),
-                    );
+                } else {
+                    $display = $this->extensionString($value->display ?? null) ?? '';
+                    if ($display !== '') {
+                        $result = $client->validateCodingWithDisplay($vsUrl, $system, $code, $display);
+                        if (!$result->valid) {
+                            $violations[] = $this->violation(
+                                'error',
+                                $valuePath,
+                                sprintf(
+                                    "Answer coding '%s|%s' for item '%s' is not a member of value set '%s'.",
+                                    $system,
+                                    $code,
+                                    $linkId,
+                                    $vsUrl,
+                                ),
+                            );
+                        } elseif ($result->correctDisplay !== null) {
+                            $violations[] = $this->violation(
+                                'warning',
+                                $valuePath,
+                                sprintf(
+                                    "Coding display '%s' should be '%s' for system %s code %s.",
+                                    $display,
+                                    $result->correctDisplay,
+                                    $system,
+                                    $code,
+                                ),
+                            );
+                        }
+                    } elseif (!$client->validateCoding($vsUrl, $system, $code)) {
+                        $violations[] = $this->violation(
+                            'error',
+                            $valuePath,
+                            sprintf(
+                                "Answer coding '%s|%s' for item '%s' is not a member of value set '%s'.",
+                                $system,
+                                $code,
+                                $linkId,
+                                $vsUrl,
+                            ),
+                        );
+                    }
                 }
             } elseif (
                 $type !== 'open-choice'

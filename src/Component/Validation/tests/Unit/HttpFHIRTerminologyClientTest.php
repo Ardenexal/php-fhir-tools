@@ -248,6 +248,80 @@ final class HttpFHIRTerminologyClientTest extends TestCase
     }
 
     // -------------------------------------------------------------------------
+    // validateCodingWithDisplay
+    // -------------------------------------------------------------------------
+
+    public function testValidateCodingWithDisplayIncludesDisplayQueryParam(): void
+    {
+        $capturedUrl = null;
+        $mockClient  = new MockHttpClient(function(string $_method, string $url) use (&$capturedUrl): MockResponse {
+            $capturedUrl = $url;
+
+            return new MockResponse(json_encode($this->parametersResponse(true)) ?: '{}');
+        });
+
+        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $client->validateCodingWithDisplay(self::VS_URL, 'http://loinc.org', '8867-4', 'Heart rate');
+
+        self::assertStringContainsString('display=' . urlencode('Heart rate'), (string) $capturedUrl);
+        self::assertStringContainsString('system=' . urlencode('http://loinc.org'), (string) $capturedUrl);
+        self::assertStringContainsString('code=8867-4', (string) $capturedUrl);
+    }
+
+    public function testValidateCodingWithDisplayReturnsValidTrueAndNullCorrectDisplayWhenNoDisplayParam(): void
+    {
+        $mockClient = new MockHttpClient(new MockResponse(
+            json_encode($this->parametersResponse(true)) ?: '{}',
+        ));
+
+        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $result = $client->validateCodingWithDisplay(self::VS_URL, 'http://loinc.org', '8867-4', 'Heart rate');
+
+        self::assertTrue($result->valid);
+        self::assertNull($result->correctDisplay);
+    }
+
+    public function testValidateCodingWithDisplayReturnsCorrectDisplayWhenResponseIncludesDisplayParam(): void
+    {
+        $body = json_encode([
+            'resourceType' => 'Parameters',
+            'parameter'    => [
+                ['name' => 'result', 'valueBoolean' => true],
+                ['name' => 'display', 'valueString' => 'Heart rate'],
+            ],
+        ]);
+        $mockClient = new MockHttpClient(new MockResponse($body ?: '{}'));
+
+        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $result = $client->validateCodingWithDisplay(self::VS_URL, 'http://loinc.org', '8867-4', 'heart rate');
+
+        self::assertTrue($result->valid);
+        self::assertSame('Heart rate', $result->correctDisplay);
+    }
+
+    public function testValidateCodingWithDisplayReturnsFalseValidOnNon2xxResponse(): void
+    {
+        $mockClient = new MockHttpClient(new MockResponse('Error', ['http_code' => 500]));
+
+        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $result = $client->validateCodingWithDisplay(self::VS_URL, 'http://loinc.org', '8867-4', 'Heart rate');
+
+        self::assertFalse($result->valid);
+        self::assertNull($result->correctDisplay);
+    }
+
+    public function testValidateCodingWithDisplayReturnsFalseValidOnMalformedJson(): void
+    {
+        $mockClient = new MockHttpClient(new MockResponse('not-json'));
+
+        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $result = $client->validateCodingWithDisplay(self::VS_URL, 'http://loinc.org', '8867-4', 'Heart rate');
+
+        self::assertFalse($result->valid);
+        self::assertNull($result->correctDisplay);
+    }
+
+    // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
 
