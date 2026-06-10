@@ -121,7 +121,7 @@ Full rationalisations table: `.goat-flow/skill-docs/skill-preamble.md` (search: 
 - New code → `src/Component/<Name>/src/`
 - New tests → `src/Component/<Name>/tests/`
 - FHIR models → regenerate via `php demo/bin/console fhir:generate` (never hand-edit)
-- Plans/milestones → `.goat-flow/tasks/`
+- Plans/milestones → `.goat-flow/plans/<active>/`
 - Serialization context: `FHIRSerializationContext::forJson()->withValidationMode(...)`
 
 ## Definition of Done

@@ -16,6 +16,7 @@ final class HttpFHIRTerminologyClient implements FHIRTerminologyClientInterface
     public function __construct(
         private readonly HttpClientInterface $httpClient,
         private readonly string $serverUrl,
+        private readonly bool $usePost = false,
     ) {
     }
 
@@ -38,38 +39,9 @@ final class HttpFHIRTerminologyClient implements FHIRTerminologyClientInterface
             return false;
         }
 
-        $url = rtrim($this->serverUrl, '/') . '/ValueSet/$validate-code?' . http_build_query([
-            'url'  => $valueSetUrl,
-            'code' => $code,
-        ]);
+        $body = $this->dispatchRaw('ValueSet/$validate-code', ['url' => $valueSetUrl, 'code' => $code]);
 
-        try {
-            $response = $this->httpClient->request('GET', $url);
-
-            if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
-                return false;
-            }
-
-            $data = json_decode($response->getContent(), true);
-        } catch (TransportExceptionInterface) {
-            return false;
-        }
-
-        if (!is_array($data) || !isset($data['parameter']) || !is_array($data['parameter'])) {
-            return false;
-        }
-
-        foreach ($data['parameter'] as $param) {
-            if (
-                is_array($param)
-                && ($param['name'] ?? null) === 'result'
-                && array_key_exists('valueBoolean', $param)
-            ) {
-                return (bool) $param['valueBoolean'];
-            }
-        }
-
-        return false;
+        return $body !== null && $this->parseResultParameter($body);
     }
 
     /**
@@ -86,39 +58,13 @@ final class HttpFHIRTerminologyClient implements FHIRTerminologyClientInterface
      */
     public function validateCoding(string $valueSetUrl, string $system, string $code): bool
     {
-        $url = rtrim($this->serverUrl, '/') . '/ValueSet/$validate-code?' . http_build_query([
+        $body = $this->dispatchRaw('ValueSet/$validate-code', [
             'url'    => $valueSetUrl,
             'system' => $system,
             'code'   => $code,
         ]);
 
-        try {
-            $response = $this->httpClient->request('GET', $url);
-
-            if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
-                return false;
-            }
-
-            $data = json_decode($response->getContent(), true);
-        } catch (TransportExceptionInterface) {
-            return false;
-        }
-
-        if (!is_array($data) || !isset($data['parameter']) || !is_array($data['parameter'])) {
-            return false;
-        }
-
-        foreach ($data['parameter'] as $param) {
-            if (
-                is_array($param)
-                && ($param['name'] ?? null) === 'result'
-                && array_key_exists('valueBoolean', $param)
-            ) {
-                return (bool) $param['valueBoolean'];
-            }
-        }
-
-        return false;
+        return $body !== null && $this->parseResultParameter($body);
     }
 
     /**
@@ -141,24 +87,84 @@ final class HttpFHIRTerminologyClient implements FHIRTerminologyClientInterface
         string $code,
         string $display,
     ): CodingValidationResult {
-        $url = rtrim($this->serverUrl, '/') . '/ValueSet/$validate-code?' . http_build_query([
+        $body = $this->dispatchRaw('ValueSet/$validate-code', [
             'url'     => $valueSetUrl,
             'system'  => $system,
             'code'    => $code,
             'display' => $display,
         ]);
 
-        try {
-            $response = $this->httpClient->request('GET', $url);
-
-            if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
-                return new CodingValidationResult(false, null);
-            }
-
-            $data = json_decode($response->getContent(), true);
-        } catch (TransportExceptionInterface) {
+        if ($body === null) {
             return new CodingValidationResult(false, null);
         }
+
+        return $this->parseFullResult($body);
+    }
+
+    /**
+     * Dispatches the request (GET or POST) and returns the raw response body, or null on any error.
+     *
+     * @param array<string, string> $params
+     */
+    private function dispatchRaw(string $endpoint, array $params): ?string
+    {
+        $base = rtrim($this->serverUrl, '/') . '/' . ltrim($endpoint, '/');
+
+        try {
+            if ($this->usePost) {
+                $response = $this->httpClient->request('POST', $base, [
+                    'headers' => [
+                        'Content-Type' => 'application/fhir+json',
+                        'Accept'       => 'application/fhir+json',
+                    ],
+                    'body' => $this->buildParametersBody($params),
+                ]);
+            } else {
+                $response = $this->httpClient->request('GET', $base . '?' . http_build_query($params), [
+                    'headers' => ['Accept' => 'application/fhir+json'],
+                ]);
+            }
+
+            if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
+                return null;
+            }
+
+            return $response->getContent();
+        } catch (TransportExceptionInterface) {
+            return null;
+        }
+    }
+
+    /**
+     * Extracts the result boolean from a FHIR Parameters response body.
+     */
+    private function parseResultParameter(string $body): bool
+    {
+        $data = json_decode($body, true);
+
+        if (!is_array($data) || !isset($data['parameter']) || !is_array($data['parameter'])) {
+            return false;
+        }
+
+        foreach ($data['parameter'] as $param) {
+            if (
+                is_array($param)
+                && ($param['name'] ?? null) === 'result'
+                && array_key_exists('valueBoolean', $param)
+            ) {
+                return (bool) $param['valueBoolean'];
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Parses both the result boolean and optional display correction from a FHIR Parameters response body.
+     */
+    private function parseFullResult(string $body): CodingValidationResult
+    {
+        $data = json_decode($body, true);
 
         if (!is_array($data) || !isset($data['parameter']) || !is_array($data['parameter'])) {
             return new CodingValidationResult(false, null);
@@ -180,6 +186,33 @@ final class HttpFHIRTerminologyClient implements FHIRTerminologyClientInterface
         }
 
         return new CodingValidationResult($valid, $correctDisplay);
+    }
+
+    /**
+     * Builds a FHIR Parameters JSON body for POST $validate-code requests.
+     *
+     * Maps each param name to the correct FHIR value type (valueUri, valueCode, valueString).
+     *
+     * @param array<string, string> $params
+     */
+    private function buildParametersBody(array $params): string
+    {
+        $parameters = [];
+
+        foreach ($params as $name => $value) {
+            if ($value === '') {
+                continue;
+            }
+
+            $parameters[] = match ($name) {
+                'url', 'system' => ['name' => $name, 'valueUri'    => $value],
+                'code'          => ['name' => $name, 'valueCode'   => $value],
+                'display'       => ['name' => $name, 'valueString' => $value],
+                default         => ['name' => $name, 'valueString' => $value],
+            };
+        }
+
+        return json_encode(['resourceType' => 'Parameters', 'parameter' => $parameters], JSON_THROW_ON_ERROR);
     }
 
     /**

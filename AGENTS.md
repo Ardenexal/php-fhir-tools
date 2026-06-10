@@ -137,7 +137,7 @@ docs/
 ## Coding Standards
 - **Symfony Best Practices**: Use DI, Console helpers, avoid `new` in commands.
 - **Strict Types**: Always `declare(strict_types=1);`.
-- **PSR-12 Compliance**: Run PHP-CS-Fixer after changes.
+- **PSR-12 Compliance**: Run `composer lint` (Pint) after changes.
 - **Exceptions**: Use project-specific exceptions.
 - **Docs**: Add PHPDoc for public methods.
 - **Tests**: PHPUnit 12+, use `void` return types and `self::assert*`.
