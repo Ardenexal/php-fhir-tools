@@ -20,8 +20,9 @@ use PHPUnit\Framework\TestCase;
  * QuestionnaireResponse corpus — the cross-resource (QR-against-Questionnaire) cases the
  * single-resource FHIRValidatorSpecificationTest excludes via its supporting/profiles filter.
  *
- * Each eligible manifest case names a source Questionnaire in supporting[0]; we deserialize
- * both that Questionnaire and the QuestionnaireResponse, run the validator, and assert the
+ * Each eligible manifest case has a supporting[] list containing a source Questionnaire; we
+ * search supporting[] for the first Questionnaire-typed file, deserialize both resources, run
+ * the validator, and assert the
  * violation counts against our own seeded outcomes in outcomes/questionnaire/.
  *
  * Why seeded (not Java-parity) outcomes: the validator implements a documented SUBSET of the
@@ -29,14 +30,13 @@ use PHPUnit\Framework\TestCase;
  * ADR-007). Many corpus cases test rules we deliberately do not cover (answerOption, min/max,
  * regex, units, SDC expressions, R5 answerConstraint); for those the Java error count cannot
  * match ours. Triage (M12.1) classified the 78 eligible R4 cases as:
- *   - 47 "meaningful": error-presence matches Java, or we flag the answer-type mismatch as a
+ *   - 48 "meaningful": error-presence matches Java, or we flag the answer-type mismatch as a
  *     warning — these are SEEDED here and asserted.
  *   - 30 "out-of-scope": Java errors on a rule we do not implement — left markTestIncomplete
  *     (visible, not silently green) and recorded in the plan backlog.
- *   - 1 deser/shape failure (supporting[0] is not a Questionnaire) — markTestSkipped.
  *
  * Seeded outcomes capture the validator's CURRENT correct output, so this suite is a
- * regression guard. For the 41 seeded cases triage confirmed zero gaps (our error count never
+ * regression guard. For the 48 seeded cases triage confirmed zero gaps (our error count never
  * exceeds Java's). Any future divergence that IS a known bug must be registered in KNOWN_GAPS.
  */
 #[CoversClass(FHIRQuestionnaireValidator::class)]
@@ -61,9 +61,7 @@ final class FHIRQuestionnaireConformanceTest extends TestCase
      *
      * @var array<string, string>
      */
-    private const DEFERRED_CASES = [
-        'qr-validation-issue' => 'harness: supporting[0] is a ValueSet not a Questionnaire',
-    ];
+    private const DEFERRED_CASES = [];
 
     private FHIRSerializationService $serialization;
 
@@ -93,6 +91,10 @@ final class FHIRQuestionnaireConformanceTest extends TestCase
                 ],
                 'http://cts.nlm.nih.gov/fhir/ValueSet/2.16.840.1.113883.10.20.5.1.5.9.3' => [
                     'https://www.cdc.gov/nhsn/cdaportal/terminology/codesystem/hsloc.html|1258-3' => true,
+                ],
+                'http://example.com/yesno' => [
+                    'http://loinc.org|LA33-6' => true,
+                    'http://loinc.org|LA32-8' => true,
                 ],
             ],
             defaultResult: true,
@@ -153,9 +155,31 @@ final class FHIRQuestionnaireConformanceTest extends TestCase
 
             $base   = $vendorDir . '/' . self::VALIDATOR_DIR;
             $qrPath = $base . '/' . $file;
-            $qPath  = $base . '/' . (string) $case['supporting'][0];
 
-            if (!file_exists($qrPath) || !file_exists($qPath)) {
+            if (!file_exists($qrPath)) {
+                continue;
+            }
+
+            // Search supporting[] for the first file that is a Questionnaire resource.
+            // Some cases (e.g. qr-validation-issue) place a non-Questionnaire resource first.
+            $qPath = null;
+            foreach ($case['supporting'] as $supportingFile) {
+                $candidate = $base . '/' . (string) $supportingFile;
+                if (!file_exists($candidate)) {
+                    continue;
+                }
+                $head = file_get_contents($candidate, false, null, 0, 512);
+                if ($head === false) {
+                    continue;
+                }
+                if (preg_match('/"resourceType"\s*:\s*"Questionnaire"/', $head) === 1
+                    || preg_match('/<Questionnaire[\s>\/]/', $head)             === 1
+                ) {
+                    $qPath = $candidate;
+                    break;
+                }
+            }
+            if ($qPath === null) {
                 continue;
             }
 
@@ -200,7 +224,7 @@ final class FHIRQuestionnaireConformanceTest extends TestCase
         }
 
         if (!$questionnaire instanceof QuestionnaireResource) {
-            $this->markTestSkipped("supporting[0] for '{$name}' is not a Questionnaire");
+            $this->markTestSkipped("Supporting Questionnaire file for '{$name}' did not deserialize to a QuestionnaireResource");
         }
         if (!$response instanceof QuestionnaireResponseResource) {
             $this->markTestSkipped("Case file for '{$name}' is not a QuestionnaireResponse");
