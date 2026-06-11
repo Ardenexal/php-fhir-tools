@@ -6,6 +6,10 @@ namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Tests\Unit;
 
 use Ardenexal\FHIRTools\Bundle\FHIRBundle\DependencyInjection\Configuration;
 use Ardenexal\FHIRTools\Bundle\FHIRBundle\DependencyInjection\FHIRExtension;
+use Ardenexal\FHIRTools\Component\Validation\CachingFHIRTerminologyClient;
+use Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyClientInterface;
+use Ardenexal\FHIRTools\Component\Validation\NullFHIRTerminologyClient;
+use Symfony\Component\DependencyInjection\Reference;
 use Eris\Generator;
 use Eris\TestTrait;
 use PHPUnit\Framework\TestCase;
@@ -172,5 +176,93 @@ class FHIRBundleConfigurationValidationTest extends TestCase
         self::assertFalse($processedConfig['validation']['strict_mode']);
         self::assertEquals('%kernel.project_dir%/output', $processedConfig['output_directory']);
         self::assertEquals('%kernel.cache_dir%/fhir', $processedConfig['cache_directory']);
+    }
+
+    public function testTerminologyCachePoolDefaultsToNull(): void
+    {
+        $configuration = new Configuration();
+        $processor     = new Processor();
+
+        $config = $processor->processConfiguration($configuration, [[]]);
+
+        self::assertNull($config['validation']['terminology_cache_pool']);
+        self::assertSame(3600, $config['validation']['terminology_cache_ttl']);
+    }
+
+    public function testTerminologyCachePoolOmittedNoDecoratorRegistered(): void
+    {
+        $container = new ContainerBuilder();
+        $extension = new FHIRExtension();
+
+        $container->setParameter('kernel.project_dir', '/tmp/test');
+        $container->setParameter('kernel.cache_dir', '/tmp/test/cache');
+
+        $extension->load([[]], $container);
+
+        self::assertFalse($container->hasDefinition('fhir.caching_terminology_client'));
+    }
+
+    public function testTerminologyCachePoolConfiguredRegistersDecorator(): void
+    {
+        $container = new ContainerBuilder();
+        $extension = new FHIRExtension();
+
+        $container->setParameter('kernel.project_dir', '/tmp/test');
+        $container->setParameter('kernel.cache_dir', '/tmp/test/cache');
+
+        $extension->load([['validation' => ['terminology_cache_pool' => 'cache.app']]], $container);
+
+        self::assertTrue($container->hasDefinition('fhir.caching_terminology_client'));
+        $def = $container->getDefinition('fhir.caching_terminology_client');
+        self::assertSame(CachingFHIRTerminologyClient::class, $def->getClass());
+        $decorated = $def->getDecoratedService();
+        self::assertIsArray($decorated);
+        self::assertSame(FHIRTerminologyClientInterface::class, $decorated[0]);
+    }
+
+    public function testTerminologyCacheTtlZeroAccepted(): void
+    {
+        $container = new ContainerBuilder();
+        $extension = new FHIRExtension();
+
+        $container->setParameter('kernel.project_dir', '/tmp/test');
+        $container->setParameter('kernel.cache_dir', '/tmp/test/cache');
+
+        $extension->load([['validation' => ['terminology_cache_pool' => 'cache.app', 'terminology_cache_ttl' => 0]]], $container);
+
+        $def = $container->getDefinition('fhir.caching_terminology_client');
+        self::assertEquals(new Reference('fhir.caching_terminology_client.inner'), $def->getArgument(0));
+        self::assertEquals(new Reference('fhir.terminology_cache'), $def->getArgument(1));
+        self::assertSame(0, $def->getArgument(2));
+    }
+
+    public function testTerminologyCacheDecoratorCompiles(): void
+    {
+        // Minimal container — avoids loading services.yaml (which has unresolvable autowired services in isolation).
+        // Purpose: verify DecoratorServicePass correctly rewires the FHIRTerminologyClientInterface alias.
+        $container = new ContainerBuilder();
+
+        $container->register(NullFHIRTerminologyClient::class)->setPublic(false);
+        $container->setAlias(FHIRTerminologyClientInterface::class, NullFHIRTerminologyClient::class)->setPublic(true);
+        $container->register('cache.app', \ArrayObject::class)->setPublic(true);
+        $container->setAlias('fhir.terminology_cache', 'cache.app')->setPublic(false);
+
+        $container->register('fhir.caching_terminology_client', CachingFHIRTerminologyClient::class)
+            ->setAutowired(false)
+            ->setArguments([
+                new Reference('fhir.caching_terminology_client.inner'),
+                new Reference('fhir.terminology_cache'),
+                3600,
+            ])
+            ->setDecoratedService(FHIRTerminologyClientInterface::class)
+            ->setPublic(false);
+
+        // Pre-compile: verify decoration targets the correct interface
+        $decorated = $container->getDefinition('fhir.caching_terminology_client')->getDecoratedService();
+        self::assertIsArray($decorated);
+        self::assertSame(FHIRTerminologyClientInterface::class, $decorated[0]);
+
+        // Runs DecoratorServicePass — a missing reference or broken alias would throw here
+        $container->compile();
     }
 }
