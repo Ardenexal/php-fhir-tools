@@ -151,7 +151,12 @@ class ClinicalImpressionResource extends DomainResourceResource
         )]
         public array $investigation = [],
         /** @var array<UriPrimitive> protocol Clinical Protocol followed */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'uri',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive',
+        )]
         public array $protocol = [],
         /** @var StringPrimitive|string|null summary Summary of the assessment */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

@@ -64,7 +64,12 @@ class VirtualServiceDetail extends DataType
         )]
         public UrlPrimitive|StringPrimitive|string|ContactPoint|ExtendedContactDetail|null $address = null,
         /** @var array<UrlPrimitive> additionalInfo Address to see alternative connection details */
-        #[FhirProperty(fhirType: 'url', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'url',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\UrlPrimitive',
+        )]
         public array $additionalInfo = [],
         /** @var PositiveIntPrimitive|null maxParticipants Maximum number of participants supported by the virtual service */
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]

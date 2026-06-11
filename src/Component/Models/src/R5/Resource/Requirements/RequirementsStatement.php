@@ -42,7 +42,13 @@ class RequirementsStatement extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $label = null,
         /** @var array<ConformanceExpectationType> conformance SHALL | SHOULD | MAY | SHOULD-NOT */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/conformance-expectation|5.0.0', strength: 'required')]
+        #[FhirProperty(
+            fhirType: 'code',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ConformanceExpectationType',
+        )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/conformance-expectation|5.0.0', strength: 'required')]
         public array $conformance = [],
         /** @var bool|null conditionality Set to true if requirements statement is conditional */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
@@ -57,10 +63,20 @@ class RequirementsStatement extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $parent = null,
         /** @var array<UrlPrimitive> satisfiedBy Design artifact that satisfies this requirement */
-        #[FhirProperty(fhirType: 'url', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'url',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\UrlPrimitive',
+        )]
         public array $satisfiedBy = [],
         /** @var array<UrlPrimitive> reference External artifact (rule/document etc. that) created this requirement */
-        #[FhirProperty(fhirType: 'url', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'url',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\UrlPrimitive',
+        )]
         public array $reference = [],
         /** @var array<Reference> source Who asked for this statement */
         #[FhirProperty(

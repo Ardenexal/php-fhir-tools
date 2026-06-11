@@ -77,7 +77,12 @@ class SubstancePolymerResource extends DomainResourceResource
         )]
         public array $copolymerConnectivity = [],
         /** @var array<StringPrimitive|string> modification Todo */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive',
+        )]
         public array $modification = [],
         /** @var array<SubstancePolymerMonomerSet> monomerSet Todo */
         #[FhirProperty(

@@ -97,7 +97,12 @@ class MedicationKnowledgeResource extends DomainResourceResource
         )]
         public array $intendedJurisdiction = [],
         /** @var array<StringPrimitive|string> name A name associated with the medication being described */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive',
+        )]
         public array $name = [],
         /** @var array<MedicationKnowledgeRelatedMedicationKnowledge> relatedMedicationKnowledge Associated or related medication information */
         #[FhirProperty(

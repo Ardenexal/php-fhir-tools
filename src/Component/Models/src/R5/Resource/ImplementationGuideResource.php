@@ -183,7 +183,15 @@ class ImplementationGuideResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/spdx-license|5.0.0', strength: 'required')]
         public ?SPDXLicenseType $license = null,
         /** @var array<FHIRVersionType> fhirVersion FHIR Version(s) this Implementation Guide targets */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true, isRequired: true), Count(min: 1), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/FHIR-version|5.0.0', strength: 'required')]
+        #[FhirProperty(
+            fhirType: 'code',
+            propertyKind: 'primitive',
+            isArray: true,
+            isRequired: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\FHIRVersionType',
+        )]
+        #[Count(min: 1)]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/FHIR-version|5.0.0', strength: 'required')]
         public array $fhirVersion = [],
         /** @var array<ImplementationGuideDependsOn> dependsOn Another Implementation guide this depends on */
         #[FhirProperty(

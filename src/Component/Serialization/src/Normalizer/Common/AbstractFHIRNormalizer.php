@@ -263,6 +263,77 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
     }
 
     /**
+     * Serialize an array of primitives into parallel FHIR JSON arrays.
+     *
+     * Returns ['values' => [...], 'extensions' => [...]] where 'extensions' is only present
+     * when at least one item carries an extension.
+     *
+     * @param array<mixed>         $array
+     * @param array<string, mixed> $context
+     *
+     * @return array<string, mixed>|null
+     */
+    protected function normalizeArrayWithExtensions(array $array, string $propertyName, FHIRSerializationContext $fhirContext, array $context): ?array
+    {
+        if (empty($array)) {
+            return null;
+        }
+
+        $normalizedValues = [];
+        $extensions       = [];
+        $hasExtensions    = false;
+
+        foreach ($array as $index => $item) {
+            if ($this->shouldOmitValue($item, $fhirContext)) {
+                continue;
+            }
+
+            if (is_object($item) && $this->metadataExtractor->isPrimitiveType($item)) {
+                $primitiveResult = $this->normalizePrimitiveWithExtensions($item, 'json', $context, $fhirContext->includeExtensions);
+                if ($primitiveResult !== null) {
+                    $normalizedValues[$index] = $primitiveResult['value'];
+                    if (isset($primitiveResult['extensions']) && $fhirContext->includeExtensions) {
+                        $extensions[$index] = ['extension' => $primitiveResult['extensions']];
+                        $hasExtensions      = true;
+                    } else {
+                        $extensions[$index] = null;
+                    }
+                }
+            } else {
+                if (is_array($item)) {
+                    $normalizedItem = $item;
+                } elseif ($this->normalizer !== null) {
+                    $normalizedItem = $this->normalizer->normalize($item, 'json', $context);
+                } else {
+                    $normalizedItem = $this->normalizeBasicValue($item, 'json', $context);
+                }
+
+                if ($normalizedItem !== null && !$this->shouldOmitValue($normalizedItem, $fhirContext)) {
+                    $normalizedValues[$index] = $normalizedItem;
+                    $extensions[$index]       = null;
+                }
+            }
+        }
+
+        if (empty($normalizedValues)) {
+            return null;
+        }
+
+        $result = ['values' => array_values($normalizedValues)];
+
+        if ($hasExtensions) {
+            $sparseExtensions = [];
+            $valueIndices     = array_keys($normalizedValues);
+            foreach ($valueIndices as $originalIndex => $valueIndex) {
+                $sparseExtensions[$originalIndex] = $extensions[$valueIndex] ?? null;
+            }
+            $result['extensions'] = array_values($sparseExtensions);
+        }
+
+        return $result;
+    }
+
+    /**
      * Wrap a polymorphic resource property for XML output.
      *
      * FHIR XML requires polymorphic resource properties to be wrapped with the
@@ -394,7 +465,7 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         }
 
         if ($meta->isArray && is_array($value)) {
-            $primitiveClass = $this->resolvePrimitiveArrayItemClass($reflection, $meta->fhirType, $metaMap);
+            $primitiveClass = $meta->phpItemClass ?? $this->resolvePrimitiveArrayItemClass($reflection, $meta->fhirType, $metaMap);
             if ($primitiveClass === null) {
                 return $value;
             }
@@ -499,7 +570,7 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
                             continue;
                         }
 
-                        $primitiveClass = $this->resolvePrimitiveArrayItemClass($reflection, $meta->fhirType, $metaMap);
+                        $primitiveClass = $meta->phpItemClass ?? $this->resolvePrimitiveArrayItemClass($reflection, $meta->fhirType, $metaMap);
                         if ($primitiveClass === null || $this->denormalizer === null) {
                             continue;
                         }

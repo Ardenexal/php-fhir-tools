@@ -54,7 +54,12 @@ class ValueSetCompose extends BackboneElement
         )]
         public array $exclude = [],
         /** @var array<StringPrimitive|string> property Property to return if client doesn't override */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive',
+        )]
         public array $property = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

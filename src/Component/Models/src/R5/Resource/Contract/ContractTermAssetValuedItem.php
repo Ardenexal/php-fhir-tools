@@ -105,10 +105,20 @@ class ContractTermAssetValuedItem extends BackboneElement
         ])]
         public ?Reference $recipient = null,
         /** @var array<StringPrimitive|string> linkId Pointer to specific item */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive',
+        )]
         public array $linkId = [],
         /** @var array<UnsignedIntPrimitive> securityLabelNumber Security Labels that define affected terms */
-        #[FhirProperty(fhirType: 'unsignedInt', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'unsignedInt',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\UnsignedIntPrimitive',
+        )]
         public array $securityLabelNumber = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

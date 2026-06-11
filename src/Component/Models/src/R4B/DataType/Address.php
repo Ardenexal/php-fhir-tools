@@ -37,7 +37,12 @@ class Address extends Element
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $text = null,
         /** @var array<StringPrimitive|string> line Street name, number, direction & P.O. Box etc. */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive',
+        )]
         public array $line = [],
         /** @var StringPrimitive|string|null city Name of city, town etc. */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

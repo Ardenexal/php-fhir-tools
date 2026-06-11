@@ -43,7 +43,12 @@ class CarePlanActivityDetail extends BackboneElement
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/care-plan-activity-kind|4.3.0', strength: 'required')]
         public ?CarePlanActivityKindType $kind = null,
         /** @var array<CanonicalPrimitive> instantiatesCanonical Instantiates FHIR protocol or definition */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'canonical',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive',
+        )]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/PlanDefinition',
             'http://hl7.org/fhir/StructureDefinition/ActivityDefinition',
@@ -53,7 +58,12 @@ class CarePlanActivityDetail extends BackboneElement
         ])]
         public array $instantiatesCanonical = [],
         /** @var array<UriPrimitive> instantiatesUri Instantiates external protocol or definition */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'uri',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive',
+        )]
         public array $instantiatesUri = [],
         /** @var CodeableConcept|null code Detail type of activity */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]

@@ -98,7 +98,12 @@ class InsurancePlanResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $name = null,
         /** @var array<StringPrimitive|string> alias Alternate names */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive',
+        )]
         public array $alias = [],
         /** @var Period|null period When the product is available */
         #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]

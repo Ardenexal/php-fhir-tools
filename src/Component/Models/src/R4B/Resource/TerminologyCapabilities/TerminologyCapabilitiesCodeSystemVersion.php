@@ -38,7 +38,12 @@ class TerminologyCapabilitiesCodeSystemVersion extends BackboneElement
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $compositional = null,
         /** @var array<CodePrimitive> language Language Displays supported */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'code',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive',
+        )]
         public array $language = [],
         /** @var array<TerminologyCapabilitiesCodeSystemVersionFilter> filter Filter Properties supported */
         #[FhirProperty(
@@ -49,7 +54,12 @@ class TerminologyCapabilitiesCodeSystemVersion extends BackboneElement
         )]
         public array $filter = [],
         /** @var array<CodePrimitive> property Properties supported for $lookup */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'code',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CodePrimitive',
+        )]
         public array $property = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

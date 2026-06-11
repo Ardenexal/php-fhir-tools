@@ -31,7 +31,12 @@ class Timing extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var array<DateTimePrimitive> event When the event occurs */
-        #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'dateTime',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\DateTimePrimitive',
+        )]
         public array $event = [],
         /** @var TimingRepeat|null repeat When the event is to occur */
         #[FhirProperty(fhirType: 'Element', propertyKind: 'complex')]

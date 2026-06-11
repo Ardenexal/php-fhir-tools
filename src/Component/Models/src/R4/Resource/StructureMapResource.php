@@ -149,7 +149,13 @@ class StructureMapResource extends DomainResourceResource
         )]
         public array $structure = [],
         /** @var array<CanonicalPrimitive> import Other maps used by this map (canonical URLs) */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/StructureMap'])]
+        #[FhirProperty(
+            fhirType: 'canonical',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive',
+        )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/StructureMap'])]
         public array $import = [],
         /** @var array<StructureMapGroup> group Named sections for reader convenience */
         #[FhirProperty(

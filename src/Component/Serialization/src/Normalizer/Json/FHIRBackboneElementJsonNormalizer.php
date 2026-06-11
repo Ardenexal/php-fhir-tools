@@ -249,6 +249,17 @@ class FHIRBackboneElementJsonNormalizer extends AbstractFHIRNormalizer
                 }
             }
 
+            if ($meta?->propertyKind === 'primitive' && is_array($value)) {
+                $normalizedArray = $this->normalizeArrayWithExtensions($value, $jsonKey, $fhirContext, $context);
+                if ($normalizedArray !== null) {
+                    $data[$jsonKey] = $normalizedArray['values'];
+                    if (isset($normalizedArray['extensions']) && $includeExtensions) {
+                        $data['_' . $jsonKey] = $normalizedArray['extensions'];
+                    }
+                }
+                continue;
+            }
+
             if ($this->isPrimitiveWithExtensions($value)) {
                 $normalizedValue = $this->normalizePrimitiveWithExtensions($value, 'json', $context, $includeExtensions);
                 if ($normalizedValue !== null) {

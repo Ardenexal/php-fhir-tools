@@ -104,7 +104,12 @@ class ContractTermAsset extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $text = null,
         /** @var array<StringPrimitive|string> linkId Pointer to asset text */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive',
+        )]
         public array $linkId = [],
         /** @var array<ContractTermOfferAnswer> answer Response to assets */
         #[FhirProperty(
@@ -115,7 +120,12 @@ class ContractTermAsset extends BackboneElement
         )]
         public array $answer = [],
         /** @var array<UnsignedIntPrimitive> securityLabelNumber Asset restriction numbers */
-        #[FhirProperty(fhirType: 'unsignedInt', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'unsignedInt',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UnsignedIntPrimitive',
+        )]
         public array $securityLabelNumber = [],
         /** @var array<ContractTermAssetValuedItem> valuedItem Contract Valued Item List */
         #[FhirProperty(

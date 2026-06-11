@@ -37,13 +37,28 @@ class ClaimResponseAddItem extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var array<PositiveIntPrimitive> itemSequence Item sequence number */
-        #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'positiveInt',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\PositiveIntPrimitive',
+        )]
         public array $itemSequence = [],
         /** @var array<PositiveIntPrimitive> detailSequence Detail sequence number */
-        #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'positiveInt',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\PositiveIntPrimitive',
+        )]
         public array $detailSequence = [],
         /** @var array<PositiveIntPrimitive> subdetailSequence Subdetail sequence number */
-        #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'positiveInt',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\PositiveIntPrimitive',
+        )]
         public array $subdetailSequence = [],
         /** @var array<Reference> provider Authorized providers */
         #[FhirProperty(
@@ -150,7 +165,12 @@ class ClaimResponseAddItem extends BackboneElement
         )]
         public array $subSite = [],
         /** @var array<PositiveIntPrimitive> noteNumber Applicable note numbers */
-        #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'positiveInt',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\PositiveIntPrimitive',
+        )]
         public array $noteNumber = [],
         /** @var array<ClaimResponseItemAdjudication> adjudication Added items adjudication */
         #[FhirProperty(

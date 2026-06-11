@@ -55,7 +55,12 @@ class ContractTermAction extends BackboneElement
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?CodeableConcept $intent = null,
         /** @var array<StringPrimitive|string> linkId Pointer to specific item */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive',
+        )]
         public array $linkId = [],
         /** @var CodeableConcept|null status State of the action */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
@@ -68,7 +73,12 @@ class ContractTermAction extends BackboneElement
         ])]
         public ?Reference $context = null,
         /** @var array<StringPrimitive|string> contextLinkId Pointer to specific item */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive',
+        )]
         public array $contextLinkId = [],
         /** @var DateTimePrimitive|Period|Timing|null occurrence When action happens */
         #[FhirProperty(
@@ -115,7 +125,12 @@ class ContractTermAction extends BackboneElement
         ])]
         public array $requester = [],
         /** @var array<StringPrimitive|string> requesterLinkId Pointer to specific item */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive',
+        )]
         public array $requesterLinkId = [],
         /** @var array<CodeableConcept> performerType Kind of service performer */
         #[FhirProperty(
@@ -143,7 +158,12 @@ class ContractTermAction extends BackboneElement
         ])]
         public ?Reference $performer = null,
         /** @var array<StringPrimitive|string> performerLinkId Pointer to specific item */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive',
+        )]
         public array $performerLinkId = [],
         /** @var array<CodeableReference> reason Why is action (not) needed? */
         #[FhirProperty(
@@ -162,7 +182,12 @@ class ContractTermAction extends BackboneElement
         ])]
         public array $reason = [],
         /** @var array<StringPrimitive|string> reasonLinkId Pointer to specific item */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive',
+        )]
         public array $reasonLinkId = [],
         /** @var array<Annotation> note Comments about the action */
         #[FhirProperty(
@@ -173,7 +198,12 @@ class ContractTermAction extends BackboneElement
         )]
         public array $note = [],
         /** @var array<UnsignedIntPrimitive> securityLabelNumber Action restriction numbers */
-        #[FhirProperty(fhirType: 'unsignedInt', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'unsignedInt',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\UnsignedIntPrimitive',
+        )]
         public array $securityLabelNumber = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -236,7 +236,13 @@ class MeasureResource extends DomainResourceResource
         )]
         public array $relatedArtifact = [],
         /** @var array<CanonicalPrimitive> library Logic used by the measure */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Library'])]
+        #[FhirProperty(
+            fhirType: 'canonical',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive',
+        )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Library'])]
         public array $library = [],
         /** @var MarkdownPrimitive|null disclaimer Disclaimer for use of the measure or its referenced content */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -272,7 +278,12 @@ class MeasureResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/measure-improvement-notation|4.3.0', strength: 'required')]
         public ?CodeableConcept $improvementNotation = null,
         /** @var array<MarkdownPrimitive> definition Defined terms used in the measure documentation */
-        #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'markdown',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\MarkdownPrimitive',
+        )]
         public array $definition = [],
         /** @var MarkdownPrimitive|null guidance Additional guidance for implementers */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
