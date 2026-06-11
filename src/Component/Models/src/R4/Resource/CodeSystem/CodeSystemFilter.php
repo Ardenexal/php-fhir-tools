@@ -39,7 +39,15 @@ class CodeSystemFilter extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $description = null,
         /** @var array<FilterOperatorType> operator = | is-a | descendent-of | is-not-a | regex | in | not-in | generalizes | exists */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true, isRequired: true), Count(min: 1), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/filter-operator|4.0.1', strength: 'required')]
+        #[FhirProperty(
+            fhirType: 'code',
+            propertyKind: 'primitive',
+            isArray: true,
+            isRequired: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\FilterOperatorType',
+        )]
+        #[Count(min: 1)]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/filter-operator|4.0.1', strength: 'required')]
         public array $operator = [],
         /** @var StringPrimitive|string|null value What to use for the value */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]

@@ -41,7 +41,12 @@ class ClaimResponseItem extends BackboneElement
         )]
         public array $traceNumber = [],
         /** @var array<PositiveIntPrimitive> noteNumber Applicable note numbers */
-        #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'positiveInt',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\PositiveIntPrimitive',
+        )]
         public array $noteNumber = [],
         /** @var ClaimResponseItemReviewOutcome|null reviewOutcome Adjudication results */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]

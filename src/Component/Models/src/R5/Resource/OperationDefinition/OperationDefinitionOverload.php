@@ -28,7 +28,12 @@ class OperationDefinitionOverload extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var array<StringPrimitive|string> parameterName Name of parameter to include in overload */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive',
+        )]
         public array $parameterName = [],
         /** @var StringPrimitive|string|null comment Comments to go on overload */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

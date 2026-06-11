@@ -87,7 +87,13 @@ class ObservationDefinitionResource extends DomainResourceResource
         )]
         public array $identifier = [],
         /** @var array<ObservationDataTypeType> permittedDataType Quantity | CodeableConcept | string | boolean | integer | Range | Ratio | SampledData | time | dateTime | Period */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/permitted-data-type|4.0.1', strength: 'required')]
+        #[FhirProperty(
+            fhirType: 'code',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\ObservationDataTypeType',
+        )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/permitted-data-type|4.0.1', strength: 'required')]
         public array $permittedDataType = [],
         /** @var bool|null multipleResultsAllowed Multiple results allowed */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]

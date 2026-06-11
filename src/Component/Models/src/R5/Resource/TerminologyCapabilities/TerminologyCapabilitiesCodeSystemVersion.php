@@ -40,7 +40,13 @@ class TerminologyCapabilitiesCodeSystemVersion extends BackboneElement
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $compositional = null,
         /** @var array<CommonLanguagesType> language Language Displays supported */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages|5.0.0', strength: 'required')]
+        #[FhirProperty(
+            fhirType: 'code',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CommonLanguagesType',
+        )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages|5.0.0', strength: 'required')]
         public array $language = [],
         /** @var array<TerminologyCapabilitiesCodeSystemVersionFilter> filter Filter Properties supported */
         #[FhirProperty(
@@ -51,7 +57,12 @@ class TerminologyCapabilitiesCodeSystemVersion extends BackboneElement
         )]
         public array $filter = [],
         /** @var array<CodePrimitive> property Properties supported for $lookup */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'code',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive',
+        )]
         public array $property = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

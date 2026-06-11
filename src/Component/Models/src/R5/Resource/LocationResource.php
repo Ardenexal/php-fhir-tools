@@ -81,7 +81,12 @@ class LocationResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $name = null,
         /** @var array<StringPrimitive|string> alias A list of alternate names that the location is known as, or was known as, in the past */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive',
+        )]
         public array $alias = [],
         /** @var MarkdownPrimitive|null description Additional details about the location that could be displayed as further information to identify the location beyond its name */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]

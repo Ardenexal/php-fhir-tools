@@ -185,7 +185,12 @@ class ConditionDefinitionResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $hasStage = null,
         /** @var array<UriPrimitive> definition Formal Definition for the condition */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'uri',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive',
+        )]
         public array $definition = [],
         /** @var array<ConditionDefinitionObservation> observation Observations particularly relevant to this condition */
         #[FhirProperty(

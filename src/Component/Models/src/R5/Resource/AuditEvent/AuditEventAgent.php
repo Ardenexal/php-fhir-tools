@@ -64,7 +64,12 @@ class AuditEventAgent extends BackboneElement
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]
         public ?Reference $location = null,
         /** @var array<UriPrimitive> policy Policy that authorized the agent participation in the event */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'uri',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive',
+        )]
         public array $policy = [],
         /** @var Reference|UriPrimitive|StringPrimitive|string|null network This agent network location for the activity */
         #[FhirProperty(

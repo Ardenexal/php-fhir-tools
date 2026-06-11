@@ -58,7 +58,13 @@ class StructureMapGroupRuleTarget extends BackboneElement
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive')]
         public ?IdPrimitive $variable = null,
         /** @var array<StructureMapTargetListModeType> listMode first | share | last | collate */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/map-target-list-mode|4.0.1', strength: 'required')]
+        #[FhirProperty(
+            fhirType: 'code',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\StructureMapTargetListModeType',
+        )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/map-target-list-mode|4.0.1', strength: 'required')]
         public array $listMode = [],
         /** @var IdPrimitive|null listRuleId Internal rule reference for shared list items */
         #[FhirProperty(fhirType: 'id', propertyKind: 'primitive')]

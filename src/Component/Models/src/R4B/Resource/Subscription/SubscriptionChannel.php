@@ -42,7 +42,12 @@ class SubscriptionChannel extends BackboneElement
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/mimetypes|4.3.0', strength: 'required')]
         public ?MimeTypesType $payload = null,
         /** @var array<StringPrimitive|string> header Usage depends on the channel type */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive',
+        )]
         public array $header = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

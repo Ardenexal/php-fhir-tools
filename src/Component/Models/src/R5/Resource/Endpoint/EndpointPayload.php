@@ -38,7 +38,13 @@ class EndpointPayload extends BackboneElement
         )]
         public array $type = [],
         /** @var array<MimeTypesType> mimeType Mimetype to send. If not specified, the content could be anything (including no payload, if the connectionType defined this) */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/mimetypes|5.0.0', strength: 'required')]
+        #[FhirProperty(
+            fhirType: 'code',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\MimeTypesType',
+        )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/mimetypes|5.0.0', strength: 'required')]
         public array $mimeType = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

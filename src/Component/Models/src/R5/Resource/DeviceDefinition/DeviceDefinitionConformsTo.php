@@ -37,7 +37,12 @@ class DeviceDefinitionConformsTo extends BackboneElement
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?CodeableConcept $specification = null,
         /** @var array<StringPrimitive|string> version The specific form or variant of the standard, specification or formal guidance */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive',
+        )]
         public array $version = [],
         /** @var array<RelatedArtifact> source Standard, regulation, certification, or guidance website, document, or other publication, or similar, supporting the conformance */
         #[FhirProperty(

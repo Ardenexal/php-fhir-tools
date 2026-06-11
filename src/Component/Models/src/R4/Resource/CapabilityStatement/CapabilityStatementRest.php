@@ -81,7 +81,13 @@ class CapabilityStatementRest extends BackboneElement
         )]
         public array $operation = [],
         /** @var array<CanonicalPrimitive> compartment Compartments served/used by system */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/CompartmentDefinition'])]
+        #[FhirProperty(
+            fhirType: 'canonical',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive',
+        )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/CompartmentDefinition'])]
         public array $compartment = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

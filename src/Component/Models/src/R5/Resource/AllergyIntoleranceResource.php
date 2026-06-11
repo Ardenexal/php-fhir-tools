@@ -87,7 +87,13 @@ class AllergyIntoleranceResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/allergy-intolerance-type', strength: 'preferred')]
         public ?CodeableConcept $type = null,
         /** @var array<AllergyIntoleranceCategoryType> category food | medication | environment | biologic */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/allergy-intolerance-category|5.0.0', strength: 'required')]
+        #[FhirProperty(
+            fhirType: 'code',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\AllergyIntoleranceCategoryType',
+        )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/allergy-intolerance-category|5.0.0', strength: 'required')]
         public array $category = [],
         /** @var AllergyIntoleranceCriticalityType|null criticality low | high | unable-to-assess */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/allergy-intolerance-criticality|5.0.0', strength: 'required')]

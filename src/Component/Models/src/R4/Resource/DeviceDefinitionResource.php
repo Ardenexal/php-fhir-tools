@@ -135,7 +135,12 @@ class DeviceDefinitionResource extends DomainResourceResource
         )]
         public array $specialization = [],
         /** @var array<StringPrimitive|string> version Available versions */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive',
+        )]
         public array $version = [],
         /** @var array<CodeableConcept> safety Safety characteristics of the device */
         #[FhirProperty(

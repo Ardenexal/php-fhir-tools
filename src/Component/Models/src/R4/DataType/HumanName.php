@@ -37,13 +37,28 @@ class HumanName extends Element
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $family = null,
         /** @var array<StringPrimitive|string> given Given names (not always 'first'). Includes middle names */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive',
+        )]
         public array $given = [],
         /** @var array<StringPrimitive|string> prefix Parts that come before the name */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive',
+        )]
         public array $prefix = [],
         /** @var array<StringPrimitive|string> suffix Parts that come after the name */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive',
+        )]
         public array $suffix = [],
         /** @var Period|null period Time period when name was/is in use */
         #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]

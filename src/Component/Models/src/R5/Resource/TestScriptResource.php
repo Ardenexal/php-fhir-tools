@@ -204,7 +204,13 @@ class TestScriptResource extends DomainResourceResource
         )]
         public array $fixture = [],
         /** @var array<CanonicalPrimitive> profile Reference of the validation profile */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/StructureDefinition'])]
+        #[FhirProperty(
+            fhirType: 'canonical',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive',
+        )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/StructureDefinition'])]
         public array $profile = [],
         /** @var array<TestScriptVariable> variable Placeholder for evaluated elements */
         #[FhirProperty(

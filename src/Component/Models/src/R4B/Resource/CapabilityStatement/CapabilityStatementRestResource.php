@@ -51,7 +51,13 @@ class CapabilityStatementRestResource extends BackboneElement
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/StructureDefinition'])]
         public ?CanonicalPrimitive $profile = null,
         /** @var array<CanonicalPrimitive> supportedProfile Profiles for use cases supported */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/StructureDefinition'])]
+        #[FhirProperty(
+            fhirType: 'canonical',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive',
+        )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/StructureDefinition'])]
         public array $supportedProfile = [],
         /** @var MarkdownPrimitive|null documentation Additional information about the use of the resource type */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
@@ -86,13 +92,29 @@ class CapabilityStatementRestResource extends BackboneElement
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/conditional-delete-status|4.3.0', strength: 'required')]
         public ?ConditionalDeleteStatusType $conditionalDelete = null,
         /** @var array<ReferenceHandlingPolicyType> referencePolicy literal | logical | resolves | enforced | local */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/reference-handling-policy|4.3.0', strength: 'required')]
+        #[FhirProperty(
+            fhirType: 'code',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\ReferenceHandlingPolicyType',
+        )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/reference-handling-policy|4.3.0', strength: 'required')]
         public array $referencePolicy = [],
         /** @var array<StringPrimitive|string> searchInclude _include values supported by the server */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive',
+        )]
         public array $searchInclude = [],
         /** @var array<StringPrimitive|string> searchRevInclude _revinclude values supported by the server */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive',
+        )]
         public array $searchRevInclude = [],
         /** @var array<CapabilityStatementRestResourceSearchParam> searchParam Search parameters supported by implementation */
         #[FhirProperty(

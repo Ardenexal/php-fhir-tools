@@ -101,7 +101,12 @@ class ExplanationOfBenefitItemDetailSubDetail extends BackboneElement
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Device'])]
         public array $udi = [],
         /** @var array<PositiveIntPrimitive> noteNumber Applicable note numbers */
-        #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'positiveInt',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\PositiveIntPrimitive',
+        )]
         public array $noteNumber = [],
         /** @var ExplanationOfBenefitItemReviewOutcome|null reviewOutcome Subdetail level adjudication results */
         #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex')]

@@ -42,21 +42,37 @@ class ElementDefinitionType extends Element
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/elementdefinition-types', strength: 'extensible')]
         public ?UriPrimitive $code = null,
         /** @var array<CanonicalPrimitive> profile Profiles (StructureDefinition or IG) - one must apply */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'canonical',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive',
+        )]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/StructureDefinition',
             'http://hl7.org/fhir/StructureDefinition/ImplementationGuide',
         ])]
         public array $profile = [],
         /** @var array<CanonicalPrimitive> targetProfile Profile (StructureDefinition or IG) on the Reference/canonical target - one must apply */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'canonical',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive',
+        )]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/StructureDefinition',
             'http://hl7.org/fhir/StructureDefinition/ImplementationGuide',
         ])]
         public array $targetProfile = [],
         /** @var array<AggregationModeType> aggregation contained | referenced | bundled - how aggregated */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/resource-aggregation-mode|5.0.0', strength: 'required')]
+        #[FhirProperty(
+            fhirType: 'code',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\AggregationModeType',
+        )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/resource-aggregation-mode|5.0.0', strength: 'required')]
         public array $aggregation = [],
         /** @var ReferenceVersionRulesType|null versioning either | independent | specific */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/reference-version-rules|5.0.0', strength: 'required')]

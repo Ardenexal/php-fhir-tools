@@ -256,13 +256,6 @@ final class SerializationSpecificationTest extends TestCase
 
         $missingKeys = array_diff($expectedKeys, $actualKeys);
 
-        // Filter out known acceptable missing keys (primitive extensions)
-        $missingKeys = array_filter($missingKeys, function(string $key): bool {
-            // FHIR primitive extensions: "_fieldName" may not be serialized if empty
-            // This is a known limitation documented in KNOWN_ISSUES.md
-            return !str_starts_with($key, '_');
-        });
-
         if (!empty($missingKeys)) {
             $this->fail(sprintf(
                 '[%s] Missing keys at %s: %s',
@@ -296,11 +289,6 @@ final class SerializationSpecificationTest extends TestCase
 
         // Recursively compare each element
         foreach ($expected as $key => $value) {
-            // Skip _field keys that are missing in actual (known limitation)
-            if (is_string($key) && str_starts_with($key, '_') && !isset($actual[$key])) {
-                continue;
-            }
-
             $childPath = $isNumericArray ? "{$path}[{$key}]" : "{$path}.{$key}";
             $this->assertDeepEquals($value, $actual[$key], $filename, $childPath);
         }

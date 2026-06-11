@@ -40,16 +40,36 @@ class ExplanationOfBenefitItem extends BackboneElement
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?PositiveIntPrimitive $sequence = null,
         /** @var array<PositiveIntPrimitive> careTeamSequence Applicable care team members */
-        #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'positiveInt',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive',
+        )]
         public array $careTeamSequence = [],
         /** @var array<PositiveIntPrimitive> diagnosisSequence Applicable diagnoses */
-        #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'positiveInt',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive',
+        )]
         public array $diagnosisSequence = [],
         /** @var array<PositiveIntPrimitive> procedureSequence Applicable procedures */
-        #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'positiveInt',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive',
+        )]
         public array $procedureSequence = [],
         /** @var array<PositiveIntPrimitive> informationSequence Applicable exception and supporting information */
-        #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'positiveInt',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive',
+        )]
         public array $informationSequence = [],
         /** @var CodeableConcept|null revenue Revenue or cost center code */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
@@ -167,7 +187,12 @@ class ExplanationOfBenefitItem extends BackboneElement
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Encounter'])]
         public array $encounter = [],
         /** @var array<PositiveIntPrimitive> noteNumber Applicable note numbers */
-        #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'positiveInt',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\PositiveIntPrimitive',
+        )]
         public array $noteNumber = [],
         /** @var array<ExplanationOfBenefitItemAdjudication> adjudication Adjudication details */
         #[FhirProperty(

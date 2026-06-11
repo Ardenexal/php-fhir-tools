@@ -30,7 +30,12 @@ class ContractTermSecurityLabel extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var array<UnsignedIntPrimitive> number Link to Security Labels */
-        #[FhirProperty(fhirType: 'unsignedInt', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'unsignedInt',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\UnsignedIntPrimitive',
+        )]
         public array $number = [],
         /** @var Coding|null classification Confidentiality Protection */
         #[FhirProperty(fhirType: 'Coding', propertyKind: 'complex', isRequired: true), NotBlank]

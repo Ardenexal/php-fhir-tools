@@ -162,13 +162,30 @@ class RequirementsResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $copyrightLabel = null,
         /** @var array<CanonicalPrimitive> derivedFrom Other set of Requirements this builds on */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Requirements'])]
+        #[FhirProperty(
+            fhirType: 'canonical',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive',
+        )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Requirements'])]
         public array $derivedFrom = [],
         /** @var array<UrlPrimitive> reference External artifact (rule/document etc. that) created this set of requirements */
-        #[FhirProperty(fhirType: 'url', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'url',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\UrlPrimitive',
+        )]
         public array $reference = [],
         /** @var array<CanonicalPrimitive> actor Actor for these requirements */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ActorDefinition'])]
+        #[FhirProperty(
+            fhirType: 'canonical',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive',
+        )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ActorDefinition'])]
         public array $actor = [],
         /** @var array<RequirementsStatement> statement Actual statement as markdown */
         #[FhirProperty(

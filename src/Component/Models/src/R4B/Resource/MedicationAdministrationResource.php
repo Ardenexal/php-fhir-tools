@@ -78,7 +78,12 @@ class MedicationAdministrationResource extends DomainResourceResource
         )]
         public array $identifier = [],
         /** @var array<UriPrimitive> instantiates Instantiates protocol or definition */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'uri',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive',
+        )]
         public array $instantiates = [],
         /** @var array<Reference> partOf Part of referenced event */
         #[FhirProperty(

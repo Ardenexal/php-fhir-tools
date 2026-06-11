@@ -156,7 +156,13 @@ class ElementDefinition extends BackboneType
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isRequired: true), NotBlank]
         public StringPrimitive|string|null $path = null,
         /** @var array<PropertyRepresentationType> representation xmlAttr | xmlText | typeAttr | cdaText | xhtml */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/property-representation|5.0.0', strength: 'required')]
+        #[FhirProperty(
+            fhirType: 'code',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\PropertyRepresentationType',
+        )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/property-representation|5.0.0', strength: 'required')]
         public array $representation = [],
         /** @var StringPrimitive|string|null sliceName Name for this particular element (in a set of slices) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
@@ -191,7 +197,12 @@ class ElementDefinition extends BackboneType
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $requirements = null,
         /** @var array<StringPrimitive|string> alias Other names */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive',
+        )]
         public array $alias = [],
         /** @var UnsignedIntPrimitive|null min Minimum Cardinality */
         #[FhirProperty(fhirType: 'unsignedInt', propertyKind: 'primitive')]
@@ -1303,7 +1314,12 @@ class ElementDefinition extends BackboneType
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
         public ?int $maxLength = null,
         /** @var array<IdPrimitive> condition Reference to invariant about presence */
-        #[FhirProperty(fhirType: 'id', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'id',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\IdPrimitive',
+        )]
         public array $condition = [],
         /** @var array<ElementDefinitionConstraint> constraint Condition that must evaluate to true */
         #[FhirProperty(
@@ -1317,7 +1333,13 @@ class ElementDefinition extends BackboneType
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $mustHaveValue = null,
         /** @var array<CanonicalPrimitive> valueAlternatives Extensions that are allowed to replace a primitive value */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/StructureDefinition'])]
+        #[FhirProperty(
+            fhirType: 'canonical',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive',
+        )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/StructureDefinition'])]
         public array $valueAlternatives = [],
         /** @var bool|null mustSupport If the element must be supported (discouraged - see obligations) */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]

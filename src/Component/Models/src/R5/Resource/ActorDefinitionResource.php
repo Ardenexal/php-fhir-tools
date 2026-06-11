@@ -173,13 +173,24 @@ class ActorDefinitionResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]
         public ?MarkdownPrimitive $documentation = null,
         /** @var array<UrlPrimitive> reference Reference to more information about the actor */
-        #[FhirProperty(fhirType: 'url', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'url',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\UrlPrimitive',
+        )]
         public array $reference = [],
         /** @var CanonicalPrimitive|null capabilities CapabilityStatement for the actor (if applicable) */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/CapabilityStatement'])]
         public ?CanonicalPrimitive $capabilities = null,
         /** @var array<CanonicalPrimitive> derivedFrom Definition of this actor in another context / IG */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ActorDefinition'])]
+        #[FhirProperty(
+            fhirType: 'canonical',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive',
+        )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ActorDefinition'])]
         public array $derivedFrom = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

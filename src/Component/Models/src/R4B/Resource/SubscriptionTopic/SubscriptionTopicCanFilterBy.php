@@ -45,7 +45,13 @@ class SubscriptionTopicCanFilterBy extends BackboneElement
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
         public ?UriPrimitive $filterDefinition = null,
         /** @var array<SubscriptionSearchModifierType> modifier = | eq | ne | gt | lt | ge | le | sa | eb | ap | above | below | in | not-in | of-type */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/subscription-search-modifier|4.3.0', strength: 'required')]
+        #[FhirProperty(
+            fhirType: 'code',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\SubscriptionSearchModifierType',
+        )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/subscription-search-modifier|4.3.0', strength: 'required')]
         public array $modifier = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

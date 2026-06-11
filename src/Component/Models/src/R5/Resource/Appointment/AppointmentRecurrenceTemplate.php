@@ -44,7 +44,12 @@ class AppointmentRecurrenceTemplate extends BackboneElement
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive')]
         public ?PositiveIntPrimitive $occurrenceCount = null,
         /** @var array<DatePrimitive> occurrenceDate Specific dates for a recurring set of appointments (no template) */
-        #[FhirProperty(fhirType: 'date', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'date',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive',
+        )]
         public array $occurrenceDate = [],
         /** @var AppointmentRecurrenceTemplateWeeklyTemplate|null weeklyTemplate Information about weekly recurring appointments */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
@@ -56,10 +61,20 @@ class AppointmentRecurrenceTemplate extends BackboneElement
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
         public ?AppointmentRecurrenceTemplateYearlyTemplate $yearlyTemplate = null,
         /** @var array<DatePrimitive> excludingDate Any dates that should be excluded from the series */
-        #[FhirProperty(fhirType: 'date', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'date',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive',
+        )]
         public array $excludingDate = [],
         /** @var array<PositiveIntPrimitive> excludingRecurrenceId Any recurrence IDs that should be excluded from the recurrence */
-        #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'positiveInt',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\PositiveIntPrimitive',
+        )]
         public array $excludingRecurrenceId = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

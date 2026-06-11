@@ -134,7 +134,13 @@ class ClinicalUseDefinitionResource extends DomainResourceResource
         #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Group'])]
         public array $population = [],
         /** @var array<CanonicalPrimitive> library Logic used by the clinical use definition */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Library'])]
+        #[FhirProperty(
+            fhirType: 'canonical',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive',
+        )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Library'])]
         public array $library = [],
         /** @var ClinicalUseDefinitionUndesirableEffect|null undesirableEffect A possible negative outcome from the use of this treatment */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
