@@ -93,7 +93,13 @@ class SubscriptionTopicResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $title = null,
         /** @var array<CanonicalPrimitive> derivedFrom Based on FHIR protocol or definition */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/SubscriptionTopic'])]
+        #[FhirProperty(
+            fhirType: 'canonical',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive',
+        )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/SubscriptionTopic'])]
         public array $derivedFrom = [],
         /** @var PublicationStatusType|null status draft | active | retired | unknown */
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/publication-status|4.3.0', strength: 'required'), FHIRIsModifier(reason: 'This is labeled as "Is Modifier" because applications should not use a retired SubscriptionTopic without due consideration')]

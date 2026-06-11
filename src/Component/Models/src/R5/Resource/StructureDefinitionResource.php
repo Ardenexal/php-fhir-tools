@@ -314,7 +314,12 @@ class StructureDefinitionResource extends DomainResourceResource
         )]
         public array $context = [],
         /** @var array<StringPrimitive|string> contextInvariant FHIRPath invariants - when the extension can be used */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive',
+        )]
         public array $contextInvariant = [],
         /** @var UriPrimitive|null type Type defined or constrained by this structure */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/fhir-types', strength: 'extensible')]

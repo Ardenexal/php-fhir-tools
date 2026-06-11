@@ -225,10 +225,22 @@ class CapabilityStatementResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/capability-statement-kind|5.0.0', strength: 'required')]
         public ?CapabilityStatementKindType $kind = null,
         /** @var array<CanonicalPrimitive> instantiates Canonical URL of another capability statement this implements */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/CapabilityStatement'])]
+        #[FhirProperty(
+            fhirType: 'canonical',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive',
+        )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/CapabilityStatement'])]
         public array $instantiates = [],
         /** @var array<CanonicalPrimitive> imports Canonical URL of another capability statement this adds to */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/CapabilityStatement'])]
+        #[FhirProperty(
+            fhirType: 'canonical',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive',
+        )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/CapabilityStatement'])]
         public array $imports = [],
         /** @var CapabilityStatementSoftware|null software Software that is covered by this capability statement */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
@@ -240,16 +252,42 @@ class CapabilityStatementResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/FHIR-version|5.0.0', strength: 'required')]
         public ?FHIRVersionType $fhirVersion = null,
         /** @var array<MimeTypesType> format formats supported (xml | json | ttl | mime type) */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true, isRequired: true), Count(min: 1), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/mimetypes|5.0.0', strength: 'required')]
+        #[FhirProperty(
+            fhirType: 'code',
+            propertyKind: 'primitive',
+            isArray: true,
+            isRequired: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\MimeTypesType',
+        )]
+        #[Count(min: 1)]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/mimetypes|5.0.0', strength: 'required')]
         public array $format = [],
         /** @var array<MimeTypesType> patchFormat Patch formats supported */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/mimetypes|5.0.0', strength: 'required')]
+        #[FhirProperty(
+            fhirType: 'code',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\MimeTypesType',
+        )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/mimetypes|5.0.0', strength: 'required')]
         public array $patchFormat = [],
         /** @var array<AllLanguagesType> acceptLanguage Languages supported */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
+        #[FhirProperty(
+            fhirType: 'code',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType',
+        )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
         public array $acceptLanguage = [],
         /** @var array<CanonicalPrimitive> implementationGuide Implementation guides supported */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ImplementationGuide'])]
+        #[FhirProperty(
+            fhirType: 'canonical',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive',
+        )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ImplementationGuide'])]
         public array $implementationGuide = [],
         /** @var array<CapabilityStatementRest> rest If the endpoint is a RESTful one */
         #[FhirProperty(

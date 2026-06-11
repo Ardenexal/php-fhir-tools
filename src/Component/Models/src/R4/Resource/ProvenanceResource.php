@@ -100,7 +100,12 @@ class ProvenanceResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'instant', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?InstantPrimitive $recorded = null,
         /** @var array<UriPrimitive> policy Policy or plan the activity was defined by */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'uri',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive',
+        )]
         public array $policy = [],
         /** @var Reference|null location Where the activity occurred, if relevant */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Location'])]

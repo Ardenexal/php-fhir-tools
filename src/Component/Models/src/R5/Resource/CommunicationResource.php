@@ -70,7 +70,12 @@ class CommunicationResource extends DomainResourceResource
         )]
         public array $identifier = [],
         /** @var array<CanonicalPrimitive> instantiatesCanonical Instantiates FHIR protocol or definition */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'canonical',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive',
+        )]
         #[FHIRTargetProfile(targetProfiles: [
             'http://hl7.org/fhir/StructureDefinition/PlanDefinition',
             'http://hl7.org/fhir/StructureDefinition/ActivityDefinition',
@@ -80,7 +85,12 @@ class CommunicationResource extends DomainResourceResource
         ])]
         public array $instantiatesCanonical = [],
         /** @var array<UriPrimitive> instantiatesUri Instantiates external protocol or definition */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'uri',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive',
+        )]
         public array $instantiatesUri = [],
         /** @var array<Reference> basedOn Request fulfilled by this communication */
         #[FhirProperty(

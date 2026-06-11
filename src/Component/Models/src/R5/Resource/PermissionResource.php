@@ -74,7 +74,12 @@ class PermissionResource extends DomainResourceResource
         ])]
         public ?Reference $asserter = null,
         /** @var array<DateTimePrimitive> date The date that permission was asserted */
-        #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'dateTime',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive',
+        )]
         public array $date = [],
         /** @var Period|null validity The period in which the permission is active */
         #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]

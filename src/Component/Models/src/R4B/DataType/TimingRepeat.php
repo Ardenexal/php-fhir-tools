@@ -137,13 +137,30 @@ class TimingRepeat extends Element
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/units-of-time|4.3.0', strength: 'required')]
         public ?UnitsOfTimeType $periodUnit = null,
         /** @var array<DaysOfWeekType> dayOfWeek mon | tue | wed | thu | fri | sat | sun */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/days-of-week|4.3.0', strength: 'required')]
+        #[FhirProperty(
+            fhirType: 'code',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\DaysOfWeekType',
+        )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/days-of-week|4.3.0', strength: 'required')]
         public array $dayOfWeek = [],
         /** @var array<TimePrimitive> timeOfDay Time of day for action */
-        #[FhirProperty(fhirType: 'time', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'time',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\TimePrimitive',
+        )]
         public array $timeOfDay = [],
         /** @var array<EventTimingType> when Code for time period of occurrence */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/event-timing|4.3.0', strength: 'required')]
+        #[FhirProperty(
+            fhirType: 'code',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\DataType\EventTimingType',
+        )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/event-timing|4.3.0', strength: 'required')]
         public array $when = [],
         /** @var UnsignedIntPrimitive|null offset Minutes from event (before or after) */
         #[FhirProperty(fhirType: 'unsignedInt', propertyKind: 'primitive')]

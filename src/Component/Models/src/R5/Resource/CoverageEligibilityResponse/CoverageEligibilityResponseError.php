@@ -33,7 +33,12 @@ class CoverageEligibilityResponseError extends BackboneElement
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex', isRequired: true), NotBlank]
         public ?CodeableConcept $code = null,
         /** @var array<StringPrimitive|string> expression FHIRPath of element(s) related to issue */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive',
+        )]
         public array $expression = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

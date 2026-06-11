@@ -33,7 +33,12 @@ class CoverageEligibilityRequestItem extends BackboneElement
         #[FhirProperty(fhirType: 'Extension', propertyKind: 'modifierExtension', isArray: true), FHIRIsModifier(reason: 'Modifier extensions are expected to modify the meaning or interpretation of the element that contains them')]
         public array $modifierExtension = [],
         /** @var array<PositiveIntPrimitive> supportingInfoSequence Applicable exception or supporting information */
-        #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'positiveInt',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\PositiveIntPrimitive',
+        )]
         public array $supportingInfoSequence = [],
         /** @var CodeableConcept|null category Benefit classification */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]

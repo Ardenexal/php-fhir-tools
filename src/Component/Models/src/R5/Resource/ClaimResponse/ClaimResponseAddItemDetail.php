@@ -72,7 +72,12 @@ class ClaimResponseAddItemDetail extends BackboneElement
         #[FhirProperty(fhirType: 'Money', propertyKind: 'complex')]
         public ?Money $net = null,
         /** @var array<PositiveIntPrimitive> noteNumber Applicable note numbers */
-        #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'positiveInt',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\PositiveIntPrimitive',
+        )]
         public array $noteNumber = [],
         /** @var ClaimResponseItemReviewOutcome|null reviewOutcome Added items detail level adjudication results */
         #[FhirProperty(fhirType: 'unknown', propertyKind: 'complex')]

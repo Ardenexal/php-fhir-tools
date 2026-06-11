@@ -37,7 +37,14 @@ class TerminologyCapabilitiesCodeSystemVersionFilter extends BackboneElement
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?CodePrimitive $code = null,
         /** @var array<CodePrimitive> op Operations supported for the property */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true, isRequired: true), Count(min: 1)]
+        #[FhirProperty(
+            fhirType: 'code',
+            propertyKind: 'primitive',
+            isArray: true,
+            isRequired: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\CodePrimitive',
+        )]
+        #[Count(min: 1)]
         public array $op = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -91,7 +91,12 @@ class OrganizationResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $name = null,
         /** @var array<StringPrimitive|string> alias A list of alternate names that the organization is known as, or was known as in the past */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive',
+        )]
         public array $alias = [],
         /** @var array<ContactPoint> telecom A contact detail for the organization */
         #[FhirProperty(

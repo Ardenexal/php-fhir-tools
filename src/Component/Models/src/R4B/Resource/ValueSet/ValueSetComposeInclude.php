@@ -72,7 +72,13 @@ class ValueSetComposeInclude extends BackboneElement
         )]
         public array $filter = [],
         /** @var array<CanonicalPrimitive> valueSet Select the contents included in this value set */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ValueSet'])]
+        #[FhirProperty(
+            fhirType: 'canonical',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive',
+        )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/ValueSet'])]
         public array $valueSet = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

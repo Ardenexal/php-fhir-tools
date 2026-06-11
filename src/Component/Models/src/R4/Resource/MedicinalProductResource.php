@@ -93,7 +93,12 @@ class MedicinalProductResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $additionalMonitoringIndicator = null,
         /** @var array<StringPrimitive|string> specialMeasures Whether the Medicinal Product is subject to special measures for regulatory reasons */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive',
+        )]
         public array $specialMeasures = [],
         /** @var CodeableConcept|null paediatricUseIndicator If authorised for use in children */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]

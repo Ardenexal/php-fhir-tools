@@ -148,7 +148,12 @@ class ContractResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $subtitle = null,
         /** @var array<StringPrimitive|string> alias Acronym or short name */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive',
+        )]
         public array $alias = [],
         /** @var Reference|null author Source of Contract */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex')]

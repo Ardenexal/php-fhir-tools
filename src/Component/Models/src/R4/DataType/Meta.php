@@ -40,7 +40,13 @@ class Meta extends Element
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
         public ?UriPrimitive $source = null,
         /** @var array<CanonicalPrimitive> profile Profiles this resource claims to conform to */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/StructureDefinition'])]
+        #[FhirProperty(
+            fhirType: 'canonical',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\CanonicalPrimitive',
+        )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/StructureDefinition'])]
         public array $profile = [],
         /** @var array<Coding> security Security Labels applied to this resource */
         #[FhirProperty(

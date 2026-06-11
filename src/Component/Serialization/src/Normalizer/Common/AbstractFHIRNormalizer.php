@@ -394,7 +394,7 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         }
 
         if ($meta->isArray && is_array($value)) {
-            $primitiveClass = $this->resolvePrimitiveArrayItemClass($reflection, $meta->fhirType, $metaMap);
+            $primitiveClass = $meta->phpItemClass ?? $this->resolvePrimitiveArrayItemClass($reflection, $meta->fhirType, $metaMap);
             if ($primitiveClass === null) {
                 return $value;
             }
@@ -499,7 +499,7 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
                             continue;
                         }
 
-                        $primitiveClass = $this->resolvePrimitiveArrayItemClass($reflection, $meta->fhirType, $metaMap);
+                        $primitiveClass = $meta->phpItemClass ?? $this->resolvePrimitiveArrayItemClass($reflection, $meta->fhirType, $metaMap);
                         if ($primitiveClass === null || $this->denormalizer === null) {
                             continue;
                         }

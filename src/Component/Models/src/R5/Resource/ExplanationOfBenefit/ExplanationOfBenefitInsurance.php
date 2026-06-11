@@ -37,7 +37,12 @@ class ExplanationOfBenefitInsurance extends BackboneElement
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Coverage'])]
         public ?Reference $coverage = null,
         /** @var array<StringPrimitive|string> preAuthRef Prior authorization reference number */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive',
+        )]
         public array $preAuthRef = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

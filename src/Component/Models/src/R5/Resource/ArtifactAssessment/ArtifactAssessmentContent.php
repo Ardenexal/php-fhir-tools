@@ -66,7 +66,12 @@ class ArtifactAssessmentContent extends BackboneElement
         ])]
         public ?Reference $author = null,
         /** @var array<UriPrimitive> path What the comment is directed to */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'uri',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive',
+        )]
         public array $path = [],
         /** @var array<RelatedArtifact> relatedArtifact Additional information */
         #[FhirProperty(

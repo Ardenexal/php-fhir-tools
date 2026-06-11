@@ -64,7 +64,12 @@ class SubstanceProteinResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
         public ?int $numberOfSubunits = null,
         /** @var array<StringPrimitive|string> disulfideLinkage The disulphide bond between two cysteine residues either on the same subunit or on two different subunits shall be described. The position of the disulfide bonds in the SubstanceProtein shall be listed in increasing order of subunit number and position within subunit followed by the abbreviation of the amino acids involved. The disulfide linkage positions shall actually contain the amino acid Cysteine at the respective positions */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive',
+        )]
         public array $disulfideLinkage = [],
         /** @var array<SubstanceProteinSubunit> subunit This subclause refers to the description of each subunit constituting the SubstanceProtein. A subunit is a linear sequence of amino acids linked through peptide bonds. The Subunit information shall be provided when the finished SubstanceProtein is a complex of multiple sequences; subunits are not used to delineate domains within a single sequence. Subunits are listed in order of decreasing length; sequences of the same length will be ordered by decreasing molecular weight; subunits that have identical sequences will be repeated multiple times */
         #[FhirProperty(

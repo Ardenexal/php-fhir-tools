@@ -53,7 +53,12 @@ class ConsentVerification extends BackboneElement
         ])]
         public ?Reference $verifiedWith = null,
         /** @var array<DateTimePrimitive> verificationDate When consent verified */
-        #[FhirProperty(fhirType: 'dateTime', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'dateTime',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive',
+        )]
         public array $verificationDate = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -123,7 +123,12 @@ class EndpointResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'url', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?UrlPrimitive $address = null,
         /** @var array<StringPrimitive|string> header Usage depends on the channel type */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive',
+        )]
         public array $header = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);

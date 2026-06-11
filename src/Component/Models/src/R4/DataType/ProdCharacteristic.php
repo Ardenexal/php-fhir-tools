@@ -51,10 +51,20 @@ class ProdCharacteristic extends BackboneElement
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $shape = null,
         /** @var array<StringPrimitive|string> color Where applicable, the color can be specified An appropriate controlled vocabulary shall be used The term and the term identifier shall be used */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive',
+        )]
         public array $color = [],
         /** @var array<StringPrimitive|string> imprint Where applicable, the imprint can be specified as text */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive',
+        )]
         public array $imprint = [],
         /** @var array<Attachment> image Where applicable, the image can be provided The format of the image attachment shall be specified by regional implementations */
         #[FhirProperty(

@@ -230,7 +230,13 @@ class DeviceDefinitionResource extends DomainResourceResource
         )]
         public array $material = [],
         /** @var array<DeviceProductionIdentifierInUDIType> productionIdentifierInUDI lot-number | manufactured-date | serial-number | expiration-date | biological-source | software-version */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/device-productidentifierinudi|5.0.0', strength: 'required')]
+        #[FhirProperty(
+            fhirType: 'code',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\DeviceProductionIdentifierInUDIType',
+        )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/device-productidentifierinudi|5.0.0', strength: 'required')]
         public array $productionIdentifierInUDI = [],
         /** @var DeviceDefinitionGuideline|null guideline Information aimed at providing directions for the usage of this model of device */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]

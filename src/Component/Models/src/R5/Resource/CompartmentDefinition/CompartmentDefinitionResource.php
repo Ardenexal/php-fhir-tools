@@ -35,7 +35,12 @@ class CompartmentDefinitionResource extends BackboneElement
         #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/resource-types|5.0.0', strength: 'required')]
         public ?ResourceTypeType $code = null,
         /** @var array<StringPrimitive|string> param Search Parameter Name, or chained parameters */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive',
+        )]
         public array $param = [],
         /** @var StringPrimitive|string|null documentation Additional documentation about the resource and compartment */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]

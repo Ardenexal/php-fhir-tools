@@ -89,7 +89,12 @@ class PlanDefinitionAction extends BackboneElement
         )]
         public array $documentation = [],
         /** @var array<IdPrimitive> goalId What goals this action supports */
-        #[FhirProperty(fhirType: 'id', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'id',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\IdPrimitive',
+        )]
         public array $goalId = [],
         /** @var CodeableConcept|Reference|null subject Type of individual the action is focused on */
         #[FhirProperty(

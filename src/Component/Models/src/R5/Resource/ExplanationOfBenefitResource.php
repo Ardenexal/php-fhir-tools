@@ -214,7 +214,12 @@ class ExplanationOfBenefitResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $disposition = null,
         /** @var array<StringPrimitive|string> preAuthRef Preauthorization reference */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive',
+        )]
         public array $preAuthRef = [],
         /** @var array<Period> preAuthRefPeriod Preauthorization in-effect period */
         #[FhirProperty(

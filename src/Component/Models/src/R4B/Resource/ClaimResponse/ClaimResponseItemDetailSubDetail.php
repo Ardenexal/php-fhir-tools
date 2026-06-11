@@ -32,7 +32,12 @@ class ClaimResponseItemDetailSubDetail extends BackboneElement
         #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isRequired: true), NotBlank]
         public ?PositiveIntPrimitive $subDetailSequence = null,
         /** @var array<PositiveIntPrimitive> noteNumber Applicable note numbers */
-        #[FhirProperty(fhirType: 'positiveInt', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'positiveInt',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\PositiveIntPrimitive',
+        )]
         public array $noteNumber = [],
         /** @var array<ClaimResponseItemAdjudication> adjudication Subdetail level adjudication details */
         #[FhirProperty(

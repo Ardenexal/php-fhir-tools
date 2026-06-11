@@ -58,7 +58,12 @@ class MedicationKnowledgeAdministrationGuidelinesPatientCharacteristics extends 
         #[NotBlank]
         public CodeableConcept|Quantity|null $characteristic = null,
         /** @var array<StringPrimitive|string> value The specific characteristic */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive',
+        )]
         public array $value = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -263,7 +263,13 @@ class MeasureResource extends DomainResourceResource
         )]
         public array $relatedArtifact = [],
         /** @var array<CanonicalPrimitive> library Logic used by the measure */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Library'])]
+        #[FhirProperty(
+            fhirType: 'canonical',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive',
+        )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Library'])]
         public array $library = [],
         /** @var MarkdownPrimitive|null disclaimer Disclaimer for use of the measure or its referenced content */
         #[FhirProperty(fhirType: 'markdown', propertyKind: 'primitive')]

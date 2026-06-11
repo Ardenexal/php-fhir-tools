@@ -87,7 +87,15 @@ class CoverageEligibilityRequestResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]
         public ?CodeableConcept $priority = null,
         /** @var array<EligibilityRequestPurposeType> purpose auth-requirements | benefits | discovery | validation */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true, isRequired: true), Count(min: 1), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/eligibilityrequest-purpose|4.0.1', strength: 'required')]
+        #[FhirProperty(
+            fhirType: 'code',
+            propertyKind: 'primitive',
+            isArray: true,
+            isRequired: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\DataType\EligibilityRequestPurposeType',
+        )]
+        #[Count(min: 1)]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/eligibilityrequest-purpose|4.0.1', strength: 'required')]
         public array $purpose = [],
         /** @var Reference|null patient Intended recipient of products and services */
         #[FhirProperty(fhirType: 'Reference', propertyKind: 'complex', isRequired: true), NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/Patient'])]

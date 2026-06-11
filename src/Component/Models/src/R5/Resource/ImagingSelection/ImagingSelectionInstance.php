@@ -46,7 +46,12 @@ class ImagingSelectionInstance extends BackboneElement
         )]
         public ?Coding $sopClass = null,
         /** @var array<StringPrimitive|string> subset The selected subset of the SOP Instance */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive',
+        )]
         public array $subset = [],
         /** @var array<ImagingSelectionInstanceImageRegion2D> imageRegion2D A specific 2D region in a DICOM image / frame */
         #[FhirProperty(

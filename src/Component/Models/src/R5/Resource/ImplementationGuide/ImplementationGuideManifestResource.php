@@ -38,7 +38,13 @@ class ImplementationGuideManifestResource extends BackboneElement
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar')]
         public ?bool $isExample = null,
         /** @var array<CanonicalPrimitive> profile Profile(s) this is an example of */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/StructureDefinition'])]
+        #[FhirProperty(
+            fhirType: 'canonical',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive',
+        )]
+        #[FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/StructureDefinition'])]
         public array $profile = [],
         /** @var UrlPrimitive|null relativePath Relative path for page in IG */
         #[FhirProperty(fhirType: 'url', propertyKind: 'primitive')]

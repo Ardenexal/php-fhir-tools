@@ -203,7 +203,13 @@ class OperationDefinitionResource extends DomainResourceResource
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive'), FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/OperationDefinition'])]
         public ?CanonicalPrimitive $base = null,
         /** @var array<VersionIndependentResourceTypesAllType> resource Types this operation applies to */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive', isArray: true), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/version-independent-all-resource-types|5.0.0', strength: 'required')]
+        #[FhirProperty(
+            fhirType: 'code',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\VersionIndependentResourceTypesAllType',
+        )]
+        #[FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/version-independent-all-resource-types|5.0.0', strength: 'required')]
         public array $resource = [],
         /** @var bool|null system Invoke at the system level? */
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isRequired: true), NotBlank]

@@ -51,10 +51,20 @@ class ImplementationGuideManifest extends BackboneElement
         )]
         public array $page = [],
         /** @var array<StringPrimitive|string> image Image within the IG */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive',
+        )]
         public array $image = [],
         /** @var array<StringPrimitive|string> other Additional linkable file in IG */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive',
+        )]
         public array $other = [],
     ) {
         parent::__construct($id, $extension, $modifierExtension);

@@ -47,7 +47,12 @@ class TestScriptMetadataCapability extends BackboneElement
         #[FhirProperty(fhirType: 'integer', propertyKind: 'scalar')]
         public ?int $destination = null,
         /** @var array<UriPrimitive> link Links to the FHIR specification */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'uri',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive',
+        )]
         public array $link = [],
         /** @var CanonicalPrimitive|null capabilities Required Capability Statement */
         #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isRequired: true), NotBlank, FHIRTargetProfile(targetProfiles: ['http://hl7.org/fhir/StructureDefinition/CapabilityStatement'])]

@@ -88,7 +88,12 @@ class SubstanceSourceMaterialResource extends DomainResourceResource
         )]
         public array $parentSubstanceId = [],
         /** @var array<StringPrimitive|string> parentSubstanceName The parent substance of the Herbal Drug, or Herbal preparation */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive',
+        )]
         public array $parentSubstanceName = [],
         /** @var array<CodeableConcept> countryOfOrigin The country where the plant material is harvested or the countries where the plasma is sourced from as laid down in accordance with the Plasma Master File. For “Plasma-derived substances” the attribute country of origin provides information about the countries used for the manufacturing of the Cryopoor plama or Crioprecipitate */
         #[FhirProperty(
@@ -99,7 +104,12 @@ class SubstanceSourceMaterialResource extends DomainResourceResource
         )]
         public array $countryOfOrigin = [],
         /** @var array<StringPrimitive|string> geographicalLocation The place/region where the plant is harvested or the places/regions where the animal source material has its habitat */
-        #[FhirProperty(fhirType: 'string', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'string',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive',
+        )]
         public array $geographicalLocation = [],
         /** @var CodeableConcept|null developmentStage Stage of life for animals, plants, insects and microorganisms. This information shall be provided only when the substance is significantly different in these stages (e.g. foetal bovine serum) */
         #[FhirProperty(fhirType: 'CodeableConcept', propertyKind: 'complex')]

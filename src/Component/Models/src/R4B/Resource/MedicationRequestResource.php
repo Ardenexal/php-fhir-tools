@@ -222,10 +222,20 @@ class MedicationRequestResource extends DomainResourceResource
         ])]
         public array $reasonReference = [],
         /** @var array<CanonicalPrimitive> instantiatesCanonical Instantiates FHIR protocol or definition */
-        #[FhirProperty(fhirType: 'canonical', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'canonical',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\CanonicalPrimitive',
+        )]
         public array $instantiatesCanonical = [],
         /** @var array<UriPrimitive> instantiatesUri Instantiates external protocol or definition */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive', isArray: true)]
+        #[FhirProperty(
+            fhirType: 'uri',
+            propertyKind: 'primitive',
+            isArray: true,
+            phpType: 'Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive',
+        )]
         public array $instantiatesUri = [],
         /** @var array<Reference> basedOn What request fulfills */
         #[FhirProperty(
