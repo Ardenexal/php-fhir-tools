@@ -130,7 +130,7 @@ final class HttpFHIRTerminologyClient implements FHIRTerminologyClientInterface
             }
 
             return $response->getContent();
-        } catch (TransportExceptionInterface | \JsonException) {
+        } catch (TransportExceptionInterface|\JsonException) {
             return null;
         }
     }

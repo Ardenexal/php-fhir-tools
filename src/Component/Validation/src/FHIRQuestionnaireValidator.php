@@ -579,6 +579,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
             if ($month < 1 || $month > 12) {
                 return substr($date, 0, 10);
             }
+
             return $date . '-' . YearMonth::parse($date)->getLengthOfMonth();
         }
 
@@ -676,8 +677,8 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
                 );
             }
 
-            if ($type                                              === 'string' && \is_object($answer->value) && $answer->value instanceof \Stringable
-                                                                                && preg_match('/[\r\n]/', (string) $answer->value) === 1
+            if ($type                                                                                                              === 'string' && \is_object($answer->value) && $answer->value instanceof \Stringable
+                                                                                                                                                && preg_match('/[\r\n]/', (string) $answer->value) === 1
             ) {
                 $violations[] = $this->violation(
                     'error',
