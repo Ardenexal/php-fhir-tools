@@ -677,8 +677,10 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
                 );
             }
 
-            if ($type                                                                                                              === 'string' && \is_object($answer->value) && $answer->value instanceof \Stringable
-                                                                                                                                                && preg_match('/[\r\n]/', (string) $answer->value) === 1
+            if ($type === 'string'
+                && \is_object($answer->value)
+                && $answer->value instanceof \Stringable
+                && preg_match('/[\r\n]/', (string) $answer->value) === 1
             ) {
                 $violations[] = $this->violation(
                     'error',
