@@ -1,0 +1,28 @@
+{
+  "resourceType": "Questionnaire",
+  "id": "q-derived-min-weakened",
+  "url": "http://example.org/Questionnaire/q-derived-min-weakened",
+  "status": "active",
+  "derivedFrom": ["http://example.org/Questionnaire/q-base-occurrences"],
+  "_derivedFrom": [{
+    "extension": [{
+      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-derivationType",
+      "valueCoding": {
+        "system": "http://hl7.org/fhir/questionnaire-derivationType",
+        "code": "compliesWith"
+      }
+    }]
+  }],
+  "item": [{
+    "linkId": "i1",
+    "text": "Item with weakened minOccurs",
+    "type": "string",
+    "extension": [{
+      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-minOccurs",
+      "valueInteger": 1
+    }, {
+      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-maxOccurs",
+      "valueInteger": 5
+    }]
+  }]
+}

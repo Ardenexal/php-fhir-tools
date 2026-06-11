@@ -134,6 +134,7 @@
         "test-ai-fhir": "php scripts/ai-test-runner.php --testsuite=fhir",
         "test-ai-fhirpath-spec": "php scripts/ai-test-runner.php --testsuite=fhirpath-spec --functional --max-batch-size=50",
         "test-ai-questionnaire-spec": "php scripts/ai-test-runner.php --testsuite=questionnaire-spec",
+        "test-ai-brianpos-spec": "php scripts/ai-test-runner.php --testsuite=brianpos-questionnaire-spec",
         "test": "php ./vendor/phpunit/phpunit/phpunit --testdox --testdox-summary",
         "test-unit": "php ./vendor/bin/paratest --testsuite=unit",
         "test-coverage": "php ./vendor/bin/paratest --coverage-html coverage --coverage-clover coverage/clover.xml",

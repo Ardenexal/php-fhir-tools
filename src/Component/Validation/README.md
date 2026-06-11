@@ -296,6 +296,58 @@ application layer.
 
 ---
 
+### CachingFHIRTerminologyClient — terminology result caching
+
+Wraps any `FHIRTerminologyClientInterface` to avoid repeated server calls for the same
+code/value-set pair. An in-process array cache is always active for the lifetime of the
+PHP request. A PSR-6 pool is optional for cross-request persistence.
+
+**No pool — in-process cache only (zero dependencies):**
+
+```php
+use Ardenexal\FHIRTools\Component\Validation\CachingFHIRTerminologyClient;
+use Ardenexal\FHIRTools\Component\Validation\HttpFHIRTerminologyClient;
+
+$terminologyClient = new CachingFHIRTerminologyClient(
+    new HttpFHIRTerminologyClient($httpClient, 'https://tx.fhir.org/r4'),
+);
+```
+
+**With a PSR-6 pool for cross-request persistence:**
+
+```php
+$terminologyClient = new CachingFHIRTerminologyClient(
+    new HttpFHIRTerminologyClient($httpClient, 'https://tx.fhir.org/r4'),
+    cache: $psrCache,
+    ttl: 3600,   // 0 = no expiry (most pools treat expiresAfter(null) as forever)
+);
+```
+
+**Composition with `PreferredServerAwareTerminologyClient`:**
+
+```php
+use Ardenexal\FHIRTools\Component\Validation\PreferredServerAwareTerminologyClient;
+
+$terminologyClient = new PreferredServerAwareTerminologyClient(
+    preferred: [
+        new CachingFHIRTerminologyClient(
+            new HttpFHIRTerminologyClient($httpClient, 'https://preferred.example.org/r4'),
+            cache: $psrCache,
+        ),
+    ],
+    fallback: new CachingFHIRTerminologyClient(
+        new HttpFHIRTerminologyClient($httpClient, 'https://tx.fhir.org/r4'),
+        cache: $psrCache,
+    ),
+);
+```
+
+> **Symfony bundle users:** set `fhir.validation.terminology_cache_pool` to a Symfony
+> cache pool service ID (e.g. `cache.app`) to enable this decorator automatically — no
+> manual wiring required. See the FHIRBundle README for details.
+
+---
+
 ### FHIRReferenceResolverInterface — in-process reference resolution
 
 Controls whether `#[FHIRTargetProfile]` constraints are enforced on `Reference`

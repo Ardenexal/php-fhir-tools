@@ -37,11 +37,11 @@ Full system context: `.goat-flow/architecture.md` · File layout: `.goat-flow/co
 | Architecture | `.goat-flow/architecture.md` |
 | File layout | `.goat-flow/code-map.md` |
 | Terminology | `.goat-flow/glossary.md` |
-| Footguns | `.goat-flow/footguns/` |
-| Lessons | `.goat-flow/lessons/` |
-| Decisions | `.goat-flow/decisions/` |
-| Skill playbooks (tools) | `.goat-flow/skill-playbooks/` (README.md index; read BEFORE declaring a tool unavailable) |
-| Test/PHPStan commands | `.goat-flow/skill-reference/testing.md` |
+| Footguns | `.goat-flow/learning-loop/footguns/` |
+| Lessons | `.goat-flow/learning-loop/lessons/` |
+| Decisions | `.goat-flow/learning-loop/decisions/` |
+| Skill playbooks (tools) | `.goat-flow/skill-docs/playbooks/` (README.md index; read BEFORE declaring a tool unavailable) |
+| Test/PHPStan commands | `.goat-flow/skill-docs/testing.md` |
 | Agent instructions | `mate/AGENT_INSTRUCTIONS.md` |
 
 ## Router Table
@@ -51,10 +51,10 @@ Full system context: `.goat-flow/architecture.md` · File layout: `.goat-flow/co
 | Architecture overview | `.goat-flow/architecture.md` |
 | Repository layout | `.goat-flow/code-map.md` |
 | Domain terminology | `.goat-flow/glossary.md` |
-| Known traps and footguns | `.goat-flow/footguns/` |
-| Lessons from past incidents | `.goat-flow/lessons/` |
-| Architecture decisions | `.goat-flow/decisions/` |
-| Skill playbooks (tools) | `.goat-flow/skill-playbooks/` (README.md index; read BEFORE declaring a tool unavailable) |
+| Known traps and footguns | `.goat-flow/learning-loop/footguns/` |
+| Lessons from past incidents | `.goat-flow/learning-loop/lessons/` |
+| Architecture decisions | `.goat-flow/learning-loop/decisions/` |
+| Skill playbooks (tools) | `.goat-flow/skill-docs/playbooks/` (README.md index; read BEFORE declaring a tool unavailable) |
 
 ## Essential Commands
 
@@ -68,8 +68,7 @@ composer phpstan-ai                # static analysis, compact output
 composer lint                      # fix code style with Pint
 ```
 
-See `.goat-flow/skill-reference/testing.md` for full flag reference, subagent usage, and
-per-component phpstan-ai variants. Always delegate test/phpstan execution to subagents.
+See `.goat-flow/skill-docs/testing.md` for full flag reference and per-component phpstan-ai variants.
 
 ## Coding Standards
 
@@ -89,7 +88,7 @@ GPG-sign when possible. Full rules: `.github/git-commit-instructions.md`.
 
 Before starting: read `.goat-flow/architecture.md` and `.goat-flow/code-map.md`.
 Before declaring any tool or capability unavailable, read the matching playbook in
-`.goat-flow/skill-playbooks/` (e.g. `browser-use.md`, `page-capture.md`) and run that
+`.goat-flow/skill-docs/playbooks/` (e.g. `browser-use.md`, `page-capture.md`) and run that
 doc's "Availability Check" section verbatim — project-local CLI tools at `~/.local/bin/`
 are valid; do not conflate "no harness/MCP tool" with "no tool".
 
@@ -109,12 +108,20 @@ Prefer MCP tools (`phpunit-run`, `phpstan-analyse`) over raw CLI commands.
 `composer phpstan-ai` clean · `composer test-ai` passes · `composer lint` passes.
 No hand-edits to generated model files. All exit criteria met with proof, not recollection.
 
+**Hallucination red-flags:**
+1. **Checks passed.** Do not claim tests pass or any check passed without showing the literal pass/fail line from this session's run. Paraphrase, cached output, or prior-session results do not count.
+2. **Completion.** Do not claim completion without listing the specific files changed in this turn. If no files were changed, say so explicitly.
+3. **Fix verification.** Do not claim a fix works without running the reproduction steps that originally demonstrated the bug. "Looks correct" is not verification.
+4. **Hedged claims.** Do not use "should work", "probably fine", "looks good" as verification. These are guesses, not evidence.
+
+Full rationalisations table: `.goat-flow/skill-docs/skill-preamble.md` (search: `Rationalisations to reject`).
+
 ## Artifact Routing
 
 - New code → `src/Component/<Name>/src/`
 - New tests → `src/Component/<Name>/tests/`
 - FHIR models → regenerate via `php demo/bin/console fhir:generate` (never hand-edit)
-- Plans/milestones → `.goat-flow/tasks/`
+- Plans/milestones → `.goat-flow/plans/<active>/`
 - Serialization context: `FHIRSerializationContext::forJson()->withValidationMode(...)`
 
 ## Definition of Done

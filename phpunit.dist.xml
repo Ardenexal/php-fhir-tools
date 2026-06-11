@@ -38,6 +38,8 @@
             <exclude>src/Component/FHIRPath/tests/Integration/FHIRPathSpecificationTest.php</exclude>
             <!-- The Questionnaire conformance cases run via the dedicated questionnaire-spec suite -->
             <exclude>src/Component/Validation/tests/Integration/FHIRQuestionnaireConformanceTest.php</exclude>
+            <!-- The brianpos corpus runs via the dedicated brianpos-questionnaire-spec suite -->
+            <exclude>src/Component/Validation/tests/Integration/FHIRBrianposConformanceTest.php</exclude>
         </testsuite>
         <!-- Per-module integration suites: CI runs these in parallel matrix legs.
              Together they must cover exactly the same tests as the "integration" suite above. -->
@@ -59,12 +61,17 @@
             <directory>src/Component/Validation/tests/Integration</directory>
             <!-- The Questionnaire conformance cases run via the dedicated questionnaire-spec suite -->
             <exclude>src/Component/Validation/tests/Integration/FHIRQuestionnaireConformanceTest.php</exclude>
+            <!-- The brianpos corpus runs via the dedicated brianpos-questionnaire-spec suite -->
+            <exclude>src/Component/Validation/tests/Integration/FHIRBrianposConformanceTest.php</exclude>
         </testsuite>
         <testsuite name="fhirpath-spec">
             <file>src/Component/FHIRPath/tests/Integration/FHIRPathSpecificationTest.php</file>
         </testsuite>
         <testsuite name="questionnaire-spec">
             <file>src/Component/Validation/tests/Integration/FHIRQuestionnaireConformanceTest.php</file>
+        </testsuite>
+        <testsuite name="brianpos-questionnaire-spec">
+            <file>src/Component/Validation/tests/Integration/FHIRBrianposConformanceTest.php</file>
         </testsuite>
     </testsuites>
 

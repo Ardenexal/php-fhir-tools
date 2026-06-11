@@ -7,6 +7,8 @@ namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\DependencyInjection;
 use Ardenexal\FHIRTools\Bundle\FHIRBundle\CacheWarmer\FHIRMetadataCacheWarmer;
 use Ardenexal\FHIRTools\Bundle\FHIRBundle\Compatibility\SymfonyVersionHelper;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider;
+use Ardenexal\FHIRTools\Component\Validation\CachingFHIRTerminologyClient;
+use Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyClientInterface;
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationMessageRegistry;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -95,6 +97,24 @@ class FHIRExtension extends Extension
             foreach ($messageOverrides as $key => $template) {
                 $registryDef->addMethodCall('setOverride', [$key, (string) $template]);
             }
+        }
+
+        // Wire CachingFHIRTerminologyClient as a decorator when a cache pool is configured
+        $terminologyCachePool = $config['validation']['terminology_cache_pool'] ?? null;
+        $terminologyCacheTtl  = $config['validation']['terminology_cache_ttl']  ?? 3600;
+
+        if ($terminologyCachePool !== null) {
+            $container->setAlias('fhir.terminology_cache', $terminologyCachePool)->setPublic(false);
+
+            $container->register('fhir.caching_terminology_client', CachingFHIRTerminologyClient::class)
+                ->setAutowired(false)
+                ->setArguments([
+                    new Reference('fhir.caching_terminology_client.inner'),
+                    new Reference('fhir.terminology_cache'),
+                    $terminologyCacheTtl,
+                ])
+                ->setDecoratedService(FHIRTerminologyClientInterface::class)
+                ->setPublic(false);
         }
     }
 

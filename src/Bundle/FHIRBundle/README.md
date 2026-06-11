@@ -37,6 +37,8 @@ fhir:
     validation:
         enabled: true
         strict_mode: false
+        terminology_cache_pool: cache.app   # PSR-6 pool for terminology results; set to ~ to disable
+        terminology_cache_ttl: 3600          # seconds; 0 = no expiry
     path:
         cache_size: 100   # max cached FHIRPath expressions
     serialization:
@@ -64,6 +66,30 @@ fhir:
         metadata_cache_pool: cache.fhir_metadata
         enable_cache_warmer: true
 ```
+
+### Terminology Result Caching
+
+When a real `FHIRTerminologyClientInterface` (e.g. `HttpFHIRTerminologyClient`) is wired,
+the bundle can wrap it with `CachingFHIRTerminologyClient` to eliminate repeated HTTP calls
+for the same code/value-set pair within a request and — optionally — across requests.
+
+- **`terminology_cache_pool`** — the Symfony cache pool service ID to use (e.g. `cache.app`).
+  When set, `CachingFHIRTerminologyClient` is registered as a decorator over
+  `FHIRTerminologyClientInterface`. Set to `~` (null, the default) to disable.
+- **`terminology_cache_ttl`** — TTL in seconds for cached results (default: `3600`).
+  `0` maps to `expiresAfter(null)`, which most PSR-6 pools treat as no expiry.
+
+```yaml
+fhir:
+    validation:
+        terminology_cache_pool: cache.app   # set to ~ to disable
+        terminology_cache_ttl: 3600
+```
+
+> Caching a `NullFHIRTerminologyClient` (the default when no terminology server is
+> configured) is harmless but pointless. The cache only adds value once a real server
+> client is wired — either via `services.yaml` or by overriding the
+> `FHIRTerminologyClientInterface` alias.
 
 ## Registered Services
 

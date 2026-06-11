@@ -137,7 +137,7 @@ docs/
 ## Coding Standards
 - **Symfony Best Practices**: Use DI, Console helpers, avoid `new` in commands.
 - **Strict Types**: Always `declare(strict_types=1);`.
-- **PSR-12 Compliance**: Run PHP-CS-Fixer after changes.
+- **PSR-12 Compliance**: Run `composer lint` (Pint) after changes.
 - **Exceptions**: Use project-specific exceptions.
 - **Docs**: Add PHPDoc for public methods.
 - **Tests**: PHPUnit 12+, use `void` return types and `self::assert*`.
@@ -207,7 +207,7 @@ Before starting any task, orient with these sources:
 
 - Read `.goat-flow/architecture.md` for system context.
 - Read `.goat-flow/code-map.md` for file layout.
-- Before declaring any tool or capability unavailable, read the matching playbook in `.goat-flow/skill-playbooks/` (e.g. `browser-use.md`, `page-capture.md`) and run that doc's "Availability Check" section verbatim — project-local CLI tools at `~/.local/bin/` are valid; do not conflate "no harness/MCP tool" with "no tool".
+- Before declaring any tool or capability unavailable, read the matching playbook in `.goat-flow/skill-docs/playbooks/` (e.g. `browser-use.md`, `page-capture.md`) and run that doc's "Availability Check" section verbatim — project-local CLI tools at `~/.local/bin/` are valid; do not conflate "no harness/MCP tool" with "no tool".
 
 ### SCOPE
 
@@ -221,6 +221,16 @@ Edit minimal files. Run `phpunit-run` (MCP) after each logical unit; fall back t
 
 `phpstan-analyse` (MCP) clean · `phpunit-run` (MCP) passes · `composer lint` passes. No hand-edits to generated model files. All exit criteria met with proof, not recollection.
 
+#### Hallucination red-flags
+
+1. "Should work now" / "Probably fixed" → re-run the original failing reproduction.
+2. "I'm confident" → confidence ≠ evidence.
+3. "Linter / typecheck passed" → linter ≠ compiler ≠ test suite.
+4. "Sub-agent said success" → re-read the diff yourself.
+5. "Looks correct to me" → structural inspection ≠ verification.
+
+Full rationalisations table: `.goat-flow/skill-docs/skill-preamble.md` (search: `Rationalisations to reject`).
+
 ## Router Table
 
 | What you need | Where to look |
@@ -228,10 +238,10 @@ Edit minimal files. Run `phpunit-run` (MCP) after each logical unit; fall back t
 | Architecture overview | `.goat-flow/architecture.md` |
 | Repository layout | `.goat-flow/code-map.md` |
 | Domain terminology | `.goat-flow/glossary.md` |
-| Known traps and footguns | `.goat-flow/footguns/` |
-| Lessons from past incidents | `.goat-flow/lessons/` |
-| Architecture decisions | `.goat-flow/decisions/` |
-| Skill playbooks (tools) | `.goat-flow/skill-playbooks/` (README.md index; read BEFORE declaring a tool unavailable) |
+| Known traps and footguns | `.goat-flow/learning-loop/footguns/` |
+| Lessons from past incidents | `.goat-flow/learning-loop/lessons/` |
+| Architecture decisions | `.goat-flow/learning-loop/decisions/` |
+| Skill playbooks (tools) | `.goat-flow/skill-docs/playbooks/` (README.md index; read BEFORE declaring a tool unavailable) |
 
 ---
 

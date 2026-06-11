@@ -43,6 +43,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\QuestionnaireResponseResour
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\FHIRPathException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Metadata\Ucum\UcumConverter;
+use Brick\DateTime\LocalDate;
+use Brick\DateTime\TimeZone;
+use Brick\DateTime\YearMonth;
 
 /**
  * Validates a QuestionnaireResponse against its source Questionnaire (R4, R4B, and R5).
@@ -151,14 +154,19 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
      * M15 quantity-answer extension URLs (ADR-007 amendment). Quantity min/max bounds are NOT the
      * generic minValue/maxValue extensions M13 handles — they are the SDC-specific
      * sdc-questionnaire-min/maxQuantity carriers, each holding a valueQuantity. `unitOption` lists
-     * the inline UCUM codings an answer's unit may take (a coded enumeration, distinct from the
-     * terminology-bound `unitValueSet` which stays deferred — #71).
+     * the inline UCUM codings an answer's unit may take (a coded enumeration). `unitValueSet` binds
+     * the unit to a terminology value set (M02, questionnaire-terminology-validation plan).
      */
     private const string EXT_MIN_QUANTITY       = 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-minQuantity';
 
     private const string EXT_MAX_QUANTITY       = 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-maxQuantity';
 
     private const string EXT_UNIT_OPTION        = 'http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption';
+
+    private const string EXT_UNIT_VALUE_SET     = 'http://hl7.org/fhir/StructureDefinition/questionnaire-unitValueSet';
+
+    /** Canonical URL for the preferred terminology server extension (R4/R4B/R5 shared). */
+    private const string EXT_PREFERRED_TERMINOLOGY_SERVER = 'http://hl7.org/fhir/StructureDefinition/preferredTerminologyServer';
 
     /** Kanta PHR enableWhenExpression variant — carries a FHIRPath expression as `valueString`. */
     private const string EXT_ENABLE_WHEN_EXPRESSION_KANTA = 'http://phr.kanta.fi/StructureDefinition/fiphr-ext-questionnaire-enablewhen';
@@ -176,9 +184,20 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
 
     private ?object $currentResponse = null;
 
+    /** @var ItemIndex */
+    private array $currentItemIndex = [];
+
+    /** @var ParentIndex */
+    private array $currentParentOf = [];
+
+    /** @var AnyQuestionnaire|null */
+    private R4Questionnaire|R4BQuestionnaire|R5Questionnaire|null $currentQuestionnaire = null;
+
     public function __construct(
         private readonly UcumConverter $ucum = new UcumConverter(),
         private readonly FHIRPathService $pathService = new FHIRPathService(),
+        private readonly ?FHIRTerminologyClientInterface $terminologyClient = null,
+        private readonly ?FHIRTerminologyClientFactoryInterface $clientFactory = null,
     ) {
     }
 
@@ -203,19 +222,26 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
             throw new \InvalidArgumentException(sprintf('Expected a QuestionnaireResponseResource (R4, R4B, or R5), got %s.', $response::class));
         }
 
-        $this->currentResponse = $response;
+        $this->currentResponse      = $response;
+        $this->currentQuestionnaire = $questionnaire;
 
         try {
             $itemIndex = [];
             $parentOf  = [];
             $this->indexQuestionnaireItems($questionnaire->item, $itemIndex, $parentOf, null);
 
+            $this->currentItemIndex = $itemIndex;
+            $this->currentParentOf  = $parentOf;
+
             $responseIndex = [];
             $this->indexResponseItems($response->item, 'item', $responseIndex);
 
             $violations = [];
 
+            $this->checkQuestionnaireStatus($questionnaire, $violations);
+
             $checkRequired = $strictStatus && \in_array((string) ($response->status ?? ''), self::ANSWERABLE_STATUSES, true);
+            $isInProgress  = (string) ($response->status ?? '') === 'in-progress';
 
             $this->walkResponseItems(
                 $response->item,
@@ -223,6 +249,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
                 null,
                 true,
                 $checkRequired,
+                $isInProgress,
                 $itemIndex,
                 $parentOf,
                 $responseIndex,
@@ -237,7 +264,10 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
 
             return new FHIRValidationReport($violations);
         } finally {
-            $this->currentResponse = null;
+            $this->currentResponse      = null;
+            $this->currentQuestionnaire = null;
+            $this->currentItemIndex     = [];
+            $this->currentParentOf      = [];
         }
     }
 
@@ -315,6 +345,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         ?string $parentLinkId,
         bool $parentKnown,
         bool $checkRequired,
+        bool $isInProgress,
         array $itemIndex,
         array $parentOf,
         array $responseIndex,
@@ -353,7 +384,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
                         );
                     }
 
-                    $this->checkAnswerCardinality($item, $questionnaireItem, $linkId, $path, $violations);
+                    $this->checkAnswerCardinality($item, $questionnaireItem, $linkId, $path, $isInProgress, $violations);
                     $this->checkAnswerTypes($item, $questionnaireItem, $linkId, $path, $violations);
                     $this->checkAnswerConstraints($item, $questionnaireItem, $linkId, $path, $violations);
                     $this->checkValueDomainRules($item, $questionnaireItem, $linkId, $path, $violations);
@@ -392,6 +423,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
                 $childParentLinkId,
                 $childParentKnown,
                 $childCheckRequired,
+                $isInProgress,
                 $itemIndex,
                 $parentOf,
                 $responseIndex,
@@ -405,6 +437,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
                     $childParentLinkId,
                     $childParentKnown,
                     $childCheckRequired,
+                    $isInProgress,
                     $itemIndex,
                     $parentOf,
                     $responseIndex,
@@ -471,6 +504,106 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
     }
 
     /**
+     * Emit warnings when the Questionnaire is not in an active published state.
+     *
+     * Checks: (1) status is draft or retired; (2) effectivePeriod.end is in the past;
+     * (3) effectivePeriod.start is in the future.
+     *
+     * @param R4Questionnaire|R4BQuestionnaire|R5Questionnaire $questionnaire
+     * @param list<FHIRValidationViolation>                    $violations
+     */
+    private function checkQuestionnaireStatus(
+        R4Questionnaire|R4BQuestionnaire|R5Questionnaire $questionnaire,
+        array &$violations,
+    ): void {
+        $id     = $questionnaire->id ?? 'unknown';
+        $status = (string) ($questionnaire->status ?? '');
+
+        if ($status === 'draft' || $status === 'retired') {
+            $violations[] = $this->violation(
+                'warning',
+                'Questionnaire.status',
+                "Questionnaire '{$id}' has status '{$status}' — responses may not reflect a published form.",
+            );
+        }
+
+        $period = $questionnaire->effectivePeriod ?? null;
+
+        if ($period === null) {
+            return;
+        }
+
+        $today = LocalDate::now(TimeZone::utc())->__toString();
+
+        $endDt = ($period->end ?? null)?->value;
+
+        if ($endDt !== null) {
+            $end = $this->normalizeFhirDateEnd((string) $endDt);
+
+            if ($end < $today) {
+                $violations[] = $this->violation(
+                    'warning',
+                    'Questionnaire.effectivePeriod.end',
+                    "Questionnaire '{$id}' effective period ended on {$end} — responses may be invalid.",
+                );
+            }
+        }
+
+        $startDt = ($period->start ?? null)?->value;
+
+        if ($startDt !== null) {
+            $start = $this->normalizeFhirDateStart((string) $startDt);
+
+            if ($start > $today) {
+                $violations[] = $this->violation(
+                    'warning',
+                    'Questionnaire.effectivePeriod.start',
+                    "Questionnaire '{$id}' effective period does not start until {$start} — responses may be premature.",
+                );
+            }
+        }
+    }
+
+    /**
+     * Pad a FHIR partial date to its latest possible Y-m-d value for end-of-period comparisons.
+     * "2021" → "2021-12-31"; "2021-12" → last day of that month; full dates are truncated to 10 chars.
+     */
+    private function normalizeFhirDateEnd(string $date): string
+    {
+        if (preg_match('/^\d{4}$/', $date) === 1) {
+            return $date . '-12-31';
+        }
+
+        if (preg_match('/^\d{4}-\d{2}$/', $date) === 1) {
+            $month = (int) substr($date, 5, 2);
+            if ($month < 1 || $month > 12) {
+                return substr($date, 0, 10);
+            }
+
+            return $date . '-' . YearMonth::parse($date)->getLengthOfMonth();
+        }
+
+        return substr($date, 0, 10);
+    }
+
+    /**
+     * Pad a FHIR partial date to its earliest possible Y-m-d value for start-of-period comparisons.
+     * "2022" → "2022-01-01"; "2022-06" → "2022-06-01"; full dates are truncated to 10 chars.
+     */
+    private function normalizeFhirDateStart(string $date): string
+    {
+        if (preg_match('/^\d{4}$/', $date) === 1) {
+            return $date . '-01-01';
+        }
+
+        if (preg_match('/^\d{4}-\d{2}$/', $date) === 1) {
+            return $date . '-01';
+        }
+
+        return substr($date, 0, 10);
+    }
+
+    /**
      * Rule 4b — a non-repeating item must carry at most one answer.
      *
      * @param R4ResponseItem|R4BResponseItem|R5ResponseItem $item
@@ -482,13 +615,14 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         object $questionnaireItem,
         string $linkId,
         string $path,
+        bool $isInProgress,
         array &$violations,
     ): void {
         $answerCount = \count($item->answer);
 
         if ($questionnaireItem->repeats !== true && $answerCount > 1) {
             $violations[] = $this->violation(
-                'error',
+                $isInProgress ? 'warning' : 'error',
                 $path . '.answer',
                 sprintf(
                     "Item '%s' does not allow multiple answers (repeats is not true) but %d answers were provided.",
@@ -538,6 +672,21 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
                         "Answer type '%s' does not match declared item type '%s' for item '%s'.",
                         $actual,
                         $type,
+                        $linkId,
+                    ),
+                );
+            }
+
+            if ($type === 'string'
+                && \is_object($answer->value)
+                && $answer->value instanceof \Stringable
+                && preg_match('/[\r\n]/', (string) $answer->value) === 1
+            ) {
+                $violations[] = $this->violation(
+                    'error',
+                    sprintf('%s.answer[%d].value', $path, $j),
+                    sprintf(
+                        "Answer of type 'string' for item '%s' must not contain line breaks (\\r or \\n) — use type 'text'.",
                         $linkId,
                     ),
                 );
@@ -749,15 +898,55 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
 
     /**
      * min/max value: emit an error when an ordered answer (date, dateTime, decimal, integer) falls
-     * outside the item's [minValue, maxValue] bound. Reuses comparableValue() so integer/decimal
-     * answers compare numerically and date/time answers compare by ISO-string ordering; an answer
-     * or bound that has no orderable scalar is skipped (never a spurious error).
+     * outside the item's [minValue, maxValue] bound. Date/dateTime values use period-extension
+     * semantics (both answer and bound normalized to the same endpoint so mixed-precision
+     * comparisons resolve symmetrically); numeric values compare via comparableValue().
      *
      * @param ItemConstraints               $constraints
      * @param list<FHIRValidationViolation> $violations
      */
     private function checkValueBounds(mixed $answerValue, array $constraints, string $linkId, string $path, array &$violations): void
     {
+        // Date/dateTime: a partial bound covers its full period (FHIR R4 §2.24.0.2). Both answer
+        // and bound are extended to the same period endpoint so a year-month answer against a
+        // year-month bound compares correctly regardless of which side has lower precision.
+        $answerDateStr = $this->dateValueString($answerValue);
+        if ($answerDateStr !== null) {
+            if (array_key_exists('minValue', $constraints)) {
+                $boundStr = $this->dateValueString($constraints['minValue']);
+                if ($boundStr !== null && $this->normalizeFhirDateStart($answerDateStr) < $this->normalizeFhirDateStart($boundStr)) {
+                    $violations[] = $this->violation(
+                        'error',
+                        $path,
+                        sprintf(
+                            "Answer '%s' for item '%s' is less than the allowed minimum of '%s'.",
+                            $this->displayValue($answerValue),
+                            $linkId,
+                            $this->displayValue($constraints['minValue']),
+                        ),
+                    );
+                }
+            }
+
+            if (array_key_exists('maxValue', $constraints)) {
+                $boundStr = $this->dateValueString($constraints['maxValue']);
+                if ($boundStr !== null && $this->normalizeFhirDateEnd($answerDateStr) > $this->normalizeFhirDateEnd($boundStr)) {
+                    $violations[] = $this->violation(
+                        'error',
+                        $path,
+                        sprintf(
+                            "Answer '%s' for item '%s' is greater than the allowed maximum of '%s'.",
+                            $this->displayValue($answerValue),
+                            $linkId,
+                            $this->displayValue($constraints['maxValue']),
+                        ),
+                    );
+                }
+            }
+
+            return;
+        }
+
         $actual = $this->comparableValue($answerValue);
         if ($actual === null) {
             return;
@@ -852,7 +1041,38 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
             return;
         }
 
-        if (!$this->hasFormalUnits($answer) || !$this->hasFormalUnits($bound)) {
+        if (!$this->hasFormalUnits($bound)) {
+            // Bound has no UCUM system — fall back to numeric magnitude comparison so that
+            // a Q author who omits system/code still gets range enforcement without unit conversion.
+            $cmp = $answer['value'] <=> $bound['value'];
+            if ($kind === 'minimum' && $cmp < 0) {
+                $violations[] = $this->violation(
+                    'error',
+                    $path,
+                    sprintf(
+                        "Answer '%s' for item '%s' is less than the allowed minimum of '%s'.",
+                        $this->quantityDisplay($answer),
+                        $linkId,
+                        $this->quantityDisplay($bound),
+                    ),
+                );
+            } elseif ($kind === 'maximum' && $cmp > 0) {
+                $violations[] = $this->violation(
+                    'error',
+                    $path,
+                    sprintf(
+                        "Answer '%s' for item '%s' is greater than the allowed maximum of '%s'.",
+                        $this->quantityDisplay($answer),
+                        $linkId,
+                        $this->quantityDisplay($bound),
+                    ),
+                );
+            }
+
+            return;
+        }
+
+        if (!$this->hasFormalUnits($answer)) {
             $violations[] = $this->violation(
                 'error',
                 $path,
@@ -1049,6 +1269,27 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
      * numerics and Quantity magnitudes, strings for date/time/string primitives (ISO formats
      * order lexicographically). Booleans, Codings, and References have no ordering.
      */
+    /**
+     * Extracts the date string from a DatePrimitive or DateTimePrimitive value (strips the
+     * time component from dateTime values). Returns null for any other type.
+     */
+    private function dateValueString(mixed $value): ?string
+    {
+        if (!$value instanceof \Stringable) {
+            return null;
+        }
+
+        $basename = $this->classBasename($value::class);
+        if ($basename !== 'DatePrimitive' && $basename !== 'DateTimePrimitive') {
+            return null;
+        }
+
+        $str  = (string) $value;
+        $tPos = strpos($str, 'T');
+
+        return $str === '' ? null : ($tPos !== false ? substr($str, 0, $tPos) : $str);
+    }
+
     private function comparableValue(mixed $value): float|string|null
     {
         if (\is_bool($value)) {
@@ -1306,6 +1547,11 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         }
 
         $this->checkAnswerOptionMembership($item, $questionnaireItem, $type, $linkId, $path, $violations);
+        $this->checkAnswerValueSetMembership($item, $questionnaireItem, $type, $linkId, $path, $violations);
+
+        if ($type === 'quantity') {
+            $this->checkUnitValueSetMembership($item, $questionnaireItem, $linkId, $path, $violations);
+        }
 
         foreach (array_values($item->answer) as $j => $answer) {
             $value = $answer->value;
@@ -1342,6 +1588,267 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         }
 
         return false;
+    }
+
+    /**
+     * answerValueSet membership (M02): when the item declares an answerValueSet and a terminology
+     * client is configured, each answer is validated against it. Coding answers call
+     * validateCoding(); StringPrimitive answers (string type) call validateCode(). For open-choice
+     * items, a StringPrimitive answer is always valid per the FHIR R4 spec — only Codings are
+     * checked. Returns immediately when no client is wired (backward-compatible, zero-config).
+     *
+     * @param R4ResponseItem|R4BResponseItem|R5ResponseItem $item
+     * @param R4Item|R4BItem|R5Item                         $questionnaireItem
+     * @param list<FHIRValidationViolation>                 $violations
+     */
+    private function checkAnswerValueSetMembership(
+        object $item,
+        object $questionnaireItem,
+        string $type,
+        string $linkId,
+        string $path,
+        array &$violations,
+    ): void {
+        if ($this->terminologyClient === null && $this->clientFactory === null) {
+            return;
+        }
+
+        $vsUrl = $questionnaireItem->answerValueSet !== null ? (string) $questionnaireItem->answerValueSet : '';
+        if ($vsUrl === '') {
+            return;
+        }
+
+        $client = $this->resolveClientForItem($linkId);
+
+        foreach (array_values($item->answer) as $j => $answer) {
+            $value = $answer->value;
+            if ($value === null) {
+                continue;
+            }
+
+            $valuePath = sprintf('%s.answer[%d].value', $path, $j);
+
+            if ($value instanceof R4Coding || $value instanceof R4BCoding || $value instanceof R5Coding) {
+                $parts  = $this->codingParts($value);
+                $system = (string) ($parts['system'] ?? '');
+                $code   = (string) ($parts['code'] ?? '');
+                if ($code === '') {
+                    $violations[] = $this->violation(
+                        'error',
+                        $valuePath,
+                        sprintf(
+                            "Answer coding for item '%s' has no code; a code is required to check value set '%s'.",
+                            $linkId,
+                            $vsUrl,
+                        ),
+                    );
+                } else {
+                    $display = $this->extensionString($value->display ?? null) ?? '';
+                    if ($display !== '') {
+                        $result = $client->validateCodingWithDisplay($vsUrl, $system, $code, $display);
+                        if (!$result->valid) {
+                            $violations[] = $this->violation(
+                                'error',
+                                $valuePath,
+                                sprintf(
+                                    "Answer coding '%s|%s' for item '%s' is not a member of value set '%s'.",
+                                    $system,
+                                    $code,
+                                    $linkId,
+                                    $vsUrl,
+                                ),
+                            );
+                        } elseif ($result->correctDisplay !== null) {
+                            $violations[] = $this->violation(
+                                'warning',
+                                $valuePath,
+                                sprintf(
+                                    "Coding display '%s' should be '%s' for system %s code %s.",
+                                    $display,
+                                    $result->correctDisplay,
+                                    $system,
+                                    $code,
+                                ),
+                            );
+                        }
+                    } elseif (!$client->validateCoding($vsUrl, $system, $code)) {
+                        $violations[] = $this->violation(
+                            'error',
+                            $valuePath,
+                            sprintf(
+                                "Answer coding '%s|%s' for item '%s' is not a member of value set '%s'.",
+                                $system,
+                                $code,
+                                $linkId,
+                                $vsUrl,
+                            ),
+                        );
+                    }
+                }
+            } elseif (
+                $type !== 'open-choice'
+                && $value instanceof \Stringable
+                && $this->classBasename($value::class) === 'StringPrimitive'
+            ) {
+                $stringValue = (string) $value;
+                if (!$client->validateCode($vsUrl, $stringValue)) {
+                    $violations[] = $this->violation(
+                        'error',
+                        $valuePath,
+                        sprintf(
+                            "Answer '%s' for item '%s' is not a member of value set '%s'.",
+                            $stringValue,
+                            $linkId,
+                            $vsUrl,
+                        ),
+                    );
+                }
+            }
+        }
+    }
+
+    /**
+     * unitValueSet membership (M02): when a quantity item carries the questionnaire-unitValueSet
+     * extension and a terminology client is configured, the answer Quantity's system+code is
+     * validated via validateCoding(). A Quantity with no coded unit (code = '') emits an error
+     * because the value set check cannot proceed without one. Returns immediately when no client
+     * is wired (backward-compatible, zero-config).
+     *
+     * @param R4ResponseItem|R4BResponseItem|R5ResponseItem $item
+     * @param R4Item|R4BItem|R5Item                         $questionnaireItem
+     * @param list<FHIRValidationViolation>                 $violations
+     */
+    private function checkUnitValueSetMembership(
+        object $item,
+        object $questionnaireItem,
+        string $linkId,
+        string $path,
+        array &$violations,
+    ): void {
+        if ($this->terminologyClient === null && $this->clientFactory === null) {
+            return;
+        }
+
+        $unitVsUrl = $this->itemStringExtension($questionnaireItem, self::EXT_UNIT_VALUE_SET);
+        if ($unitVsUrl === null || $unitVsUrl === '') {
+            return;
+        }
+
+        $client = $this->resolveClientForItem($linkId);
+
+        foreach (array_values($item->answer) as $j => $answer) {
+            $value = $answer->value;
+            if ($value === null) {
+                continue;
+            }
+
+            $parts = $this->quantityParts($value);
+            if ($parts === null) {
+                continue;
+            }
+
+            $valuePath = sprintf('%s.answer[%d].value', $path, $j);
+            $system    = (string) ($parts['system'] ?? '');
+            $code      = (string) ($parts['code'] ?? '');
+
+            if ($code === '') {
+                $violations[] = $this->violation(
+                    'error',
+                    $valuePath,
+                    sprintf(
+                        "Quantity answer for item '%s' has no unit code; a coded unit is required for value set '%s'.",
+                        $linkId,
+                        $unitVsUrl,
+                    ),
+                );
+
+                continue;
+            }
+
+            if (!$client->validateCoding($unitVsUrl, $system, $code)) {
+                $violations[] = $this->violation(
+                    'error',
+                    $valuePath,
+                    sprintf(
+                        "Quantity unit '%s|%s' for item '%s' is not a member of value set '%s'.",
+                        $system,
+                        $code,
+                        $linkId,
+                        $unitVsUrl,
+                    ),
+                );
+            }
+        }
+    }
+
+    /**
+     * Resolves the effective terminology client for a given response item linkId. When no
+     * factory is configured, returns the default client (or a NullFHIRTerminologyClient when
+     * no default client is configured either). When a factory is available, walks the item's
+     * ancestor chain and the root Questionnaire to collect preferredTerminologyServer URLs,
+     * deduplicating while preserving declaration order; returns a PreferredServerAwareTerminologyClient
+     * that tries each preferred URL before falling back to the default.
+     */
+    private function resolveClientForItem(string $linkId): FHIRTerminologyClientInterface
+    {
+        $fallback = $this->terminologyClient ?? new NullFHIRTerminologyClient();
+
+        if ($this->clientFactory === null) {
+            return $fallback;
+        }
+
+        $urls    = [];
+        $current = $linkId;
+
+        while ($current !== null && $current !== '') {
+            $item = $this->currentItemIndex[$current] ?? null;
+            if ($item !== null) {
+                foreach ($this->itemCodeExtensions($item, self::EXT_PREFERRED_TERMINOLOGY_SERVER) as $url) {
+                    if (!\in_array($url, $urls, true)) {
+                        $urls[] = $url;
+                    }
+                }
+            }
+            $current = $this->currentParentOf[$current] ?? null;
+        }
+
+        if ($this->currentQuestionnaire !== null) {
+            foreach ($this->itemCodeExtensions($this->currentQuestionnaire, self::EXT_PREFERRED_TERMINOLOGY_SERVER) as $url) {
+                if (!\in_array($url, $urls, true)) {
+                    $urls[] = $url;
+                }
+            }
+        }
+
+        if ($urls === []) {
+            return $fallback;
+        }
+
+        $preferred = array_map(
+            fn (string $url): FHIRTerminologyClientInterface => $this->clientFactory->createForServer($url),
+            $urls,
+        );
+
+        return new PreferredServerAwareTerminologyClient($preferred, $fallback);
+    }
+
+    /**
+     * Reads the first string-valued item extension matching the given URL; null when absent.
+     * Handles both raw string and Stringable extension values (e.g. CanonicalPrimitive).
+     *
+     * @param R4Item|R4BItem|R5Item $questionnaireItem
+     */
+    private function itemStringExtension(object $questionnaireItem, string $url): ?string
+    {
+        foreach ($questionnaireItem->extension as $extension) {
+            if ($extension->url !== $url || !isset($extension->value)) {
+                continue;
+            }
+
+            return $this->extensionString($extension->value);
+        }
+
+        return null;
     }
 
     /**
@@ -1561,10 +2068,10 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
     }
 
     /**
-     * Collects the valueCode strings of every item extension carrying the given URL (e.g. the
-     * repeatable referenceResource / mimeType allow-lists).
+     * Collects the string values of every extension carrying the given URL, in declaration order.
+     * Used for multi-valued extensions (referenceResource, mimeType, preferredTerminologyServer).
      *
-     * @param R4Item|R4BItem|R5Item $questionnaireItem
+     * @param AnyItem|AnyQuestionnaire $questionnaireItem
      *
      * @return list<string>
      */
