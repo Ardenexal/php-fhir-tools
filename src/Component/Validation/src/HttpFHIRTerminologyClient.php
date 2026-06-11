@@ -98,7 +98,7 @@ final class HttpFHIRTerminologyClient implements FHIRTerminologyClientInterface
             return new CodingValidationResult(false, null);
         }
 
-        return $this->parseFullResult($body);
+        return $this->parseFullResult($body, $display);
     }
 
     /**
@@ -130,7 +130,7 @@ final class HttpFHIRTerminologyClient implements FHIRTerminologyClientInterface
             }
 
             return $response->getContent();
-        } catch (TransportExceptionInterface) {
+        } catch (TransportExceptionInterface | \JsonException) {
             return null;
         }
     }
@@ -162,7 +162,7 @@ final class HttpFHIRTerminologyClient implements FHIRTerminologyClientInterface
     /**
      * Parses both the result boolean and optional display correction from a FHIR Parameters response body.
      */
-    private function parseFullResult(string $body): CodingValidationResult
+    private function parseFullResult(string $body, string $providedDisplay): CodingValidationResult
     {
         $data = json_decode($body, true);
 
@@ -181,7 +181,10 @@ final class HttpFHIRTerminologyClient implements FHIRTerminologyClientInterface
             if (($param['name'] ?? null) === 'result' && array_key_exists('valueBoolean', $param)) {
                 $valid = (bool) $param['valueBoolean'];
             } elseif (($param['name'] ?? null) === 'display' && isset($param['valueString'])) {
-                $correctDisplay = (string) $param['valueString'];
+                $serverDisplay = (string) $param['valueString'];
+                if ($serverDisplay !== $providedDisplay) {
+                    $correctDisplay = $serverDisplay;
+                }
             }
         }
 

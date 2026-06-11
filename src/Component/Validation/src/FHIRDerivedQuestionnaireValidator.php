@@ -67,12 +67,16 @@ final class FHIRDerivedQuestionnaireValidator
         QuestionnaireResource $base,
         string $derivationType = 'compliesWith',
     ): FHIRValidationReport {
-        if ($derivationType === 'inspiredBy' || $derived->derivedFrom === []) {
+        // newInstanceWithoutConstructor() bypasses constructor defaults; ?? guards uninitialized promoted arrays at runtime
+        /** @phpstan-ignore nullCoalesce.property */
+        if ($derivationType === 'inspiredBy' || ($derived->derivedFrom ?? []) === []) {
             return new FHIRValidationReport([]);
         }
 
-        $baseIndex  = $this->buildLevelIndex($base->item);
-        $violations = $this->compareItems($derived->item, $baseIndex, $derivationType, 'Questionnaire');
+        /** @phpstan-ignore nullCoalesce.property */
+        $baseIndex  = $this->buildLevelIndex($base->item ?? []);
+        /** @phpstan-ignore nullCoalesce.property */
+        $violations = $this->compareItems($derived->item ?? [], $baseIndex, $derivationType, 'Questionnaire');
 
         return new FHIRValidationReport($violations);
     }

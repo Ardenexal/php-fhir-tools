@@ -41,7 +41,9 @@ final class FHIRDerivedQuestionnaireValidationService
         QuestionnaireResource $derived,
         string $derivationType = 'compliesWith',
     ): FHIRValidationReport {
-        if ($derived->derivedFrom === []) {
+        // newInstanceWithoutConstructor() bypasses constructor defaults; ?? guards uninitialized promoted array at runtime
+        /** @phpstan-ignore nullCoalesce.property */
+        if (($derived->derivedFrom ?? []) === []) {
             return new FHIRValidationReport([]);
         }
 

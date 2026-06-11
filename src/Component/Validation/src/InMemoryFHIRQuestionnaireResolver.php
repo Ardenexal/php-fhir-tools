@@ -29,7 +29,7 @@ final class InMemoryFHIRQuestionnaireResolver implements FHIRQuestionnaireResolv
     {
         $index = [];
         foreach ($questionnaires as $q) {
-            $url = $q->url?->value;
+            $url = isset($q->url) ? $q->url->value : null;
             if ($url !== null && $url !== '') {
                 $index[$url] = $q;
             }
