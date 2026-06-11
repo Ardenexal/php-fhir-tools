@@ -46,9 +46,6 @@ final class FHIRBrianposConformanceTest extends TestCase
         // We flag non-repeating item answered twice (errors=1).
         // Dotnet flags QR in-progress leniency (warnings=1). Different rules, different severity.
         'string-draft-downgrade-qr'  => 'dotnet w=1 (QR in-progress leniency); we e=1 (non-repeating repeated) — QR status leniency not implemented',
-        // Partial-date precision: max bound "2022-06" should include all days in June 2022.
-        // We treat "2022-06-30" as > "2022-06" (errors=3). Dotnet: errors=2.
-        'date-time-min-max-qr'       => 'dotnet e=2; we e=3 — partial-date month bound includes all days in that month (not yet implemented)',
     ];
 
     /**

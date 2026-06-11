@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit;
 
+use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDate;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Attachment;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\EnableWhenBehaviorType;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\PublicationStatusType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\QuestionnaireItemOperatorType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\QuestionnaireItemTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\QuestionnaireResponseStatusType;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDateTime;
@@ -874,5 +877,105 @@ final class FHIRQuestionnaireValidatorTest extends TestCase
         $report = $this->validator->validate($questionnaire, $response);
 
         self::assertCount(0, $report->errors(), 'text type allows \\n — no error');
+    }
+
+    public function testDateUpperBoundWithYearMonthPrecisionAcceptsLastDayOfMonth(): void
+    {
+        $item = new QuestionnaireItem(
+            linkId: 'q1',
+            type: new QuestionnaireItemTypeType('date'),
+            extension: [new Extension(
+                url: 'http://hl7.org/fhir/StructureDefinition/maxValue',
+                value: new DatePrimitive(value: FHIRDate::parse('2022-06')),
+            )],
+        );
+        $response = self::response('in-progress', new QuestionnaireResponseItem(
+            linkId: 'q1',
+            answer: [new QuestionnaireResponseItemAnswer(value: new DatePrimitive(value: FHIRDate::parse('2022-06-30')))],
+        ));
+
+        $report = $this->validator->validate(new QuestionnaireResource(item: [$item]), $response);
+
+        self::assertCount(0, $report->errors(), '2022-06-30 is within maxValue 2022-06 (last day of June)');
+    }
+
+    public function testDateUpperBoundWithYearMonthPrecisionRejectsFirstDayOfNextMonth(): void
+    {
+        $item = new QuestionnaireItem(
+            linkId: 'q1',
+            type: new QuestionnaireItemTypeType('date'),
+            extension: [new Extension(
+                url: 'http://hl7.org/fhir/StructureDefinition/maxValue',
+                value: new DatePrimitive(value: FHIRDate::parse('2022-06')),
+            )],
+        );
+        $response = self::response('in-progress', new QuestionnaireResponseItem(
+            linkId: 'q1',
+            answer: [new QuestionnaireResponseItemAnswer(value: new DatePrimitive(value: FHIRDate::parse('2022-07-01')))],
+        ));
+
+        $report = $this->validator->validate(new QuestionnaireResource(item: [$item]), $response);
+
+        self::assertCount(1, $report->errors(), '2022-07-01 exceeds maxValue 2022-06 (after end of June)');
+    }
+
+    public function testDateUpperBoundWithYearPrecisionAcceptsLastDayOfYear(): void
+    {
+        $item = new QuestionnaireItem(
+            linkId: 'q1',
+            type: new QuestionnaireItemTypeType('date'),
+            extension: [new Extension(
+                url: 'http://hl7.org/fhir/StructureDefinition/maxValue',
+                value: new DatePrimitive(value: FHIRDate::parse('2022')),
+            )],
+        );
+        $response = self::response('in-progress', new QuestionnaireResponseItem(
+            linkId: 'q1',
+            answer: [new QuestionnaireResponseItemAnswer(value: new DatePrimitive(value: FHIRDate::parse('2022-12-31')))],
+        ));
+
+        $report = $this->validator->validate(new QuestionnaireResource(item: [$item]), $response);
+
+        self::assertCount(0, $report->errors(), '2022-12-31 is within maxValue 2022 (last day of year)');
+    }
+
+    public function testDateLowerBoundWithYearPrecisionAcceptsFirstDayOfYear(): void
+    {
+        $item = new QuestionnaireItem(
+            linkId: 'q1',
+            type: new QuestionnaireItemTypeType('date'),
+            extension: [new Extension(
+                url: 'http://hl7.org/fhir/StructureDefinition/minValue',
+                value: new DatePrimitive(value: FHIRDate::parse('2020')),
+            )],
+        );
+        $response = self::response('in-progress', new QuestionnaireResponseItem(
+            linkId: 'q1',
+            answer: [new QuestionnaireResponseItemAnswer(value: new DatePrimitive(value: FHIRDate::parse('2020-01-01')))],
+        ));
+
+        $report = $this->validator->validate(new QuestionnaireResource(item: [$item]), $response);
+
+        self::assertCount(0, $report->errors(), '2020-01-01 is within minValue 2020 (first day of year)');
+    }
+
+    public function testDateLowerBoundWithYearPrecisionRejectsLastDayOfPreviousYear(): void
+    {
+        $item = new QuestionnaireItem(
+            linkId: 'q1',
+            type: new QuestionnaireItemTypeType('date'),
+            extension: [new Extension(
+                url: 'http://hl7.org/fhir/StructureDefinition/minValue',
+                value: new DatePrimitive(value: FHIRDate::parse('2020')),
+            )],
+        );
+        $response = self::response('in-progress', new QuestionnaireResponseItem(
+            linkId: 'q1',
+            answer: [new QuestionnaireResponseItemAnswer(value: new DatePrimitive(value: FHIRDate::parse('2019-12-31')))],
+        ));
+
+        $report = $this->validator->validate(new QuestionnaireResource(item: [$item]), $response);
+
+        self::assertCount(1, $report->errors(), '2019-12-31 precedes minValue 2020 (before start of year)');
     }
 }

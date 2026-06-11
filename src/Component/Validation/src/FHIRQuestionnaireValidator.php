@@ -885,15 +885,55 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
 
     /**
      * min/max value: emit an error when an ordered answer (date, dateTime, decimal, integer) falls
-     * outside the item's [minValue, maxValue] bound. Reuses comparableValue() so integer/decimal
-     * answers compare numerically and date/time answers compare by ISO-string ordering; an answer
-     * or bound that has no orderable scalar is skipped (never a spurious error).
+     * outside the item's [minValue, maxValue] bound. Date/dateTime values use period-extension
+     * semantics (both answer and bound normalized to the same endpoint so mixed-precision
+     * comparisons resolve symmetrically); numeric values compare via comparableValue().
      *
      * @param ItemConstraints               $constraints
      * @param list<FHIRValidationViolation> $violations
      */
     private function checkValueBounds(mixed $answerValue, array $constraints, string $linkId, string $path, array &$violations): void
     {
+        // Date/dateTime: a partial bound covers its full period (FHIR R4 §2.24.0.2). Both answer
+        // and bound are extended to the same period endpoint so a year-month answer against a
+        // year-month bound compares correctly regardless of which side has lower precision.
+        $answerDateStr = $this->dateValueString($answerValue);
+        if ($answerDateStr !== null) {
+            if (array_key_exists('minValue', $constraints)) {
+                $boundStr = $this->dateValueString($constraints['minValue']);
+                if ($boundStr !== null && $this->normalizeFhirDateStart($answerDateStr) < $this->normalizeFhirDateStart($boundStr)) {
+                    $violations[] = $this->violation(
+                        'error',
+                        $path,
+                        sprintf(
+                            "Answer '%s' for item '%s' is less than the allowed minimum of '%s'.",
+                            $this->displayValue($answerValue),
+                            $linkId,
+                            $this->displayValue($constraints['minValue']),
+                        ),
+                    );
+                }
+            }
+
+            if (array_key_exists('maxValue', $constraints)) {
+                $boundStr = $this->dateValueString($constraints['maxValue']);
+                if ($boundStr !== null && $this->normalizeFhirDateEnd($answerDateStr) > $this->normalizeFhirDateEnd($boundStr)) {
+                    $violations[] = $this->violation(
+                        'error',
+                        $path,
+                        sprintf(
+                            "Answer '%s' for item '%s' is greater than the allowed maximum of '%s'.",
+                            $this->displayValue($answerValue),
+                            $linkId,
+                            $this->displayValue($constraints['maxValue']),
+                        ),
+                    );
+                }
+            }
+
+            return;
+        }
+
         $actual = $this->comparableValue($answerValue);
         if ($actual === null) {
             return;
@@ -1185,6 +1225,27 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
      * numerics and Quantity magnitudes, strings for date/time/string primitives (ISO formats
      * order lexicographically). Booleans, Codings, and References have no ordering.
      */
+    /**
+     * Extracts the date string from a DatePrimitive or DateTimePrimitive value (strips the
+     * time component from dateTime values). Returns null for any other type.
+     */
+    private function dateValueString(mixed $value): ?string
+    {
+        if (!$value instanceof \Stringable) {
+            return null;
+        }
+
+        $basename = $this->classBasename($value::class);
+        if ($basename !== 'DatePrimitive' && $basename !== 'DateTimePrimitive') {
+            return null;
+        }
+
+        $str  = (string) $value;
+        $tPos = strpos($str, 'T');
+
+        return $str === '' ? null : ($tPos !== false ? substr($str, 0, $tPos) : $str);
+    }
+
     private function comparableValue(mixed $value): float|string|null
     {
         if (\is_bool($value)) {
