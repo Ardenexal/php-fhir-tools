@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\EnableWhenBehaviorType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Period;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\PublicationStatusType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\QuestionnaireItemOperatorType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\QuestionnaireItemTypeType;
@@ -977,5 +978,99 @@ final class FHIRQuestionnaireValidatorTest extends TestCase
         $report = $this->validator->validate(new QuestionnaireResource(item: [$item]), $response);
 
         self::assertCount(1, $report->errors(), '2019-12-31 precedes minValue 2020 (before start of year)');
+    }
+
+    public function testQuantityBoundWithNoUcumSystemUsesNumericComparisonWhenInRange(): void
+    {
+        $item = new QuestionnaireItem(
+            linkId: 'q1',
+            type: new QuestionnaireItemTypeType('quantity'),
+            extension: [
+                new Extension(
+                    url: 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-minQuantity',
+                    value: new Quantity(value: '5', unit: 'Kg'),
+                ),
+                new Extension(
+                    url: 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-maxQuantity',
+                    value: new Quantity(value: '50', unit: 'Kg'),
+                ),
+            ],
+        );
+        $response = self::response('completed', new QuestionnaireResponseItem(
+            linkId: 'q1',
+            answer: [new QuestionnaireResponseItemAnswer(value: new Quantity(value: '10', unit: 'Kg'))],
+        ));
+
+        $report = $this->validator->validate(new QuestionnaireResource(item: [$item]), $response);
+
+        self::assertCount(0, $report->errors(), 'answer 10 is within [5, 50] — no UCUM numeric fallback still validates in-range');
+    }
+
+    public function testQuantityBoundWithNoUcumSystemUsesNumericComparisonWhenOutOfRange(): void
+    {
+        $item = new QuestionnaireItem(
+            linkId: 'q1',
+            type: new QuestionnaireItemTypeType('quantity'),
+            extension: [new Extension(
+                url: 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-minQuantity',
+                value: new Quantity(value: '50', unit: 'Kg'),
+            )],
+        );
+        $response = self::response('completed', new QuestionnaireResponseItem(
+            linkId: 'q1',
+            answer: [new QuestionnaireResponseItemAnswer(value: new Quantity(value: '10', unit: 'Kg'))],
+        ));
+
+        $report = $this->validator->validate(new QuestionnaireResource(item: [$item]), $response);
+
+        self::assertCount(1, $report->errors(), 'answer 10 is below min 50 — no-UCUM numeric fallback still catches out-of-range');
+    }
+
+    public function testNonRepeatingItemAnsweredTwiceWhenInProgressEmitsWarning(): void
+    {
+        $questionnaire = new QuestionnaireResource(item: [self::stringItem('q1')]);
+        $response      = self::response('in-progress', new QuestionnaireResponseItem(
+            linkId: 'q1',
+            answer: [self::stringAnswer('a'), self::stringAnswer('b')],
+        ));
+
+        $report = $this->validator->validate($questionnaire, $response);
+
+        self::assertCount(0, $report->errors());
+        self::assertCount(1, $report->warnings());
+        self::assertStringContainsString('2 answers were provided', $report->warnings()[0]->message);
+    }
+
+    public function testNonRepeatingItemAnsweredTwiceWhenCompletedEmitsError(): void
+    {
+        $questionnaire = new QuestionnaireResource(item: [self::stringItem('q1')]);
+        $response      = self::response('completed', new QuestionnaireResponseItem(
+            linkId: 'q1',
+            answer: [self::stringAnswer('a'), self::stringAnswer('b')],
+        ));
+
+        $report = $this->validator->validate($questionnaire, $response);
+
+        self::assertCount(1, $report->errors());
+        self::assertCount(0, $report->warnings());
+        self::assertStringContainsString('2 answers were provided', $report->errors()[0]->message);
+    }
+
+    public function testValueBoundViolationRemainsErrorWhenInProgress(): void
+    {
+        $questionnaire = new QuestionnaireResource(item: [new QuestionnaireItem(
+            linkId: 'q1',
+            type: new QuestionnaireItemTypeType('integer'),
+            extension: [new Extension(url: 'http://hl7.org/fhir/StructureDefinition/minValue', value: 10)],
+        )]);
+        $response = self::response('in-progress', new QuestionnaireResponseItem(
+            linkId: 'q1',
+            answer: [new QuestionnaireResponseItemAnswer(value: 5)],
+        ));
+
+        $report = $this->validator->validate($questionnaire, $response);
+
+        self::assertCount(1, $report->errors(), 'value-bound violations are NOT downgraded for in-progress QR');
+        self::assertStringContainsString('less than the allowed minimum', $report->errors()[0]->message);
     }
 }

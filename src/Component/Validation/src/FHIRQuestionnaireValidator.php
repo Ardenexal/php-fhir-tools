@@ -241,6 +241,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
             $this->checkQuestionnaireStatus($questionnaire, $violations);
 
             $checkRequired = $strictStatus && \in_array((string) ($response->status ?? ''), self::ANSWERABLE_STATUSES, true);
+            $isInProgress  = (string) ($response->status ?? '') === 'in-progress';
 
             $this->walkResponseItems(
                 $response->item,
@@ -248,6 +249,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
                 null,
                 true,
                 $checkRequired,
+                $isInProgress,
                 $itemIndex,
                 $parentOf,
                 $responseIndex,
@@ -343,6 +345,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         ?string $parentLinkId,
         bool $parentKnown,
         bool $checkRequired,
+        bool $isInProgress,
         array $itemIndex,
         array $parentOf,
         array $responseIndex,
@@ -381,7 +384,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
                         );
                     }
 
-                    $this->checkAnswerCardinality($item, $questionnaireItem, $linkId, $path, $violations);
+                    $this->checkAnswerCardinality($item, $questionnaireItem, $linkId, $path, $isInProgress, $violations);
                     $this->checkAnswerTypes($item, $questionnaireItem, $linkId, $path, $violations);
                     $this->checkAnswerConstraints($item, $questionnaireItem, $linkId, $path, $violations);
                     $this->checkValueDomainRules($item, $questionnaireItem, $linkId, $path, $violations);
@@ -420,6 +423,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
                 $childParentLinkId,
                 $childParentKnown,
                 $childCheckRequired,
+                $isInProgress,
                 $itemIndex,
                 $parentOf,
                 $responseIndex,
@@ -433,6 +437,7 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
                     $childParentLinkId,
                     $childParentKnown,
                     $childCheckRequired,
+                    $isInProgress,
                     $itemIndex,
                     $parentOf,
                     $responseIndex,
@@ -605,13 +610,14 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         object $questionnaireItem,
         string $linkId,
         string $path,
+        bool $isInProgress,
         array &$violations,
     ): void {
         $answerCount = \count($item->answer);
 
         if ($questionnaireItem->repeats !== true && $answerCount > 1) {
             $violations[] = $this->violation(
-                'error',
+                $isInProgress ? 'warning' : 'error',
                 $path . '.answer',
                 sprintf(
                     "Item '%s' does not allow multiple answers (repeats is not true) but %d answers were provided.",
@@ -1028,7 +1034,38 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
             return;
         }
 
-        if (!$this->hasFormalUnits($answer) || !$this->hasFormalUnits($bound)) {
+        if (!$this->hasFormalUnits($bound)) {
+            // Bound has no UCUM system — fall back to numeric magnitude comparison so that
+            // a Q author who omits system/code still gets range enforcement without unit conversion.
+            $cmp = $answer['value'] <=> $bound['value'];
+            if ($kind === 'minimum' && $cmp < 0) {
+                $violations[] = $this->violation(
+                    'error',
+                    $path,
+                    sprintf(
+                        "Answer '%s' for item '%s' is less than the allowed minimum of '%s'.",
+                        $this->quantityDisplay($answer),
+                        $linkId,
+                        $this->quantityDisplay($bound),
+                    ),
+                );
+            } elseif ($kind === 'maximum' && $cmp > 0) {
+                $violations[] = $this->violation(
+                    'error',
+                    $path,
+                    sprintf(
+                        "Answer '%s' for item '%s' is greater than the allowed maximum of '%s'.",
+                        $this->quantityDisplay($answer),
+                        $linkId,
+                        $this->quantityDisplay($bound),
+                    ),
+                );
+            }
+
+            return;
+        }
+
+        if (!$this->hasFormalUnits($answer)) {
             $violations[] = $this->violation(
                 'error',
                 $path,

@@ -42,11 +42,7 @@ final class FHIRBrianposConformanceTest extends TestCase
      *
      * @var array<string, string>
      */
-    private const KNOWN_GAPS = [
-        // We flag non-repeating item answered twice (errors=1).
-        // Dotnet flags QR in-progress leniency (warnings=1). Different rules, different severity.
-        'string-draft-downgrade-qr'  => 'dotnet w=1 (QR in-progress leniency); we e=1 (non-repeating repeated) — QR status leniency not implemented',
-    ];
+    private const KNOWN_GAPS = [];
 
     /**
      * Cases blocked on capabilities the library does not yet implement (ADR-007).
@@ -57,10 +53,6 @@ final class FHIRBrianposConformanceTest extends TestCase
     private const DEFERRED_CASES = [
         // No Q file — this tests QR validation when Q cannot be resolved; not testable in standalone harness
         'questionnaire-not-resolved-qr' => 'Q not-resolvable cannot be tested in standalone harness',
-        // SDC min/max on non-UCUM units: Q carries sdc-questionnaire-minQuantity/maxQuantity with
-        // textual units only (no UCUM system); our validator attempts comparison and emits 2 spurious
-        // errors while dotnet passes 0/0/0 — fix is to skip comparison when no UCUM system present
-        'quantity-qr'                   => 'SDC min/maxQuantity with non-UCUM units produces spurious errors — fix planned in min/max milestone',
     ];
 
     private FHIRSerializationService $serialization;
