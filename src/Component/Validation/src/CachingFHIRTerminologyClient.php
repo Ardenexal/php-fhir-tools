@@ -42,7 +42,7 @@ final class CachingFHIRTerminologyClient implements FHIRTerminologyClientInterfa
             return $this->inner->validateCode($valueSetUrl, $value);
         }
 
-        $key = md5("{$valueSetUrl}::{$valueStr}");
+        $key = md5("code::{$valueSetUrl}::{$valueStr}");
 
         return $this->remember($key, fn () => $this->inner->validateCode($valueSetUrl, $value));
     }
@@ -85,7 +85,7 @@ final class CachingFHIRTerminologyClient implements FHIRTerminologyClientInterfa
      */
     public function validateCoding(string $valueSetUrl, string $system, string $code): bool
     {
-        $key = md5("{$valueSetUrl}::{$system}|{$code}");
+        $key = md5("coding::{$valueSetUrl}::{$system}|{$code}");
 
         return $this->remember($key, fn () => $this->inner->validateCoding($valueSetUrl, $system, $code));
     }
@@ -108,7 +108,7 @@ final class CachingFHIRTerminologyClient implements FHIRTerminologyClientInterfa
         string $code,
         string $display,
     ): CodingValidationResult {
-        $key = md5("{$valueSetUrl}::display::{$system}|{$code}|{$display}");
+        $key = md5("display::{$valueSetUrl}::{$system}|{$code}|{$display}");
 
         return $this->rememberResult($key, fn () => $this->inner->validateCodingWithDisplay($valueSetUrl, $system, $code, $display));
     }
