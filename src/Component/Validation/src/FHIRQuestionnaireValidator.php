@@ -43,6 +43,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\QuestionnaireResponseResour
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\FHIRPathException;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Metadata\Ucum\UcumConverter;
+use Brick\DateTime\LocalDate;
+use Brick\DateTime\TimeZone;
+use Brick\DateTime\YearMonth;
 
 /**
  * Validates a QuestionnaireResponse against its source Questionnaire (R4, R4B, and R5).
@@ -234,6 +237,8 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
             $this->indexResponseItems($response->item, 'item', $responseIndex);
 
             $violations = [];
+
+            $this->checkQuestionnaireStatus($questionnaire, $violations);
 
             $checkRequired = $strictStatus && \in_array((string) ($response->status ?? ''), self::ANSWERABLE_STATUSES, true);
 
@@ -494,6 +499,101 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
     }
 
     /**
+     * Emit warnings when the Questionnaire is not in an active published state.
+     *
+     * Checks: (1) status is draft or retired; (2) effectivePeriod.end is in the past;
+     * (3) effectivePeriod.start is in the future.
+     *
+     * @param R4Questionnaire|R4BQuestionnaire|R5Questionnaire $questionnaire
+     * @param list<FHIRValidationViolation>                    $violations
+     */
+    private function checkQuestionnaireStatus(
+        R4Questionnaire|R4BQuestionnaire|R5Questionnaire $questionnaire,
+        array &$violations,
+    ): void {
+        $id     = $questionnaire->id ?? 'unknown';
+        $status = (string) ($questionnaire->status ?? '');
+
+        if ($status === 'draft' || $status === 'retired') {
+            $violations[] = $this->violation(
+                'warning',
+                'Questionnaire.status',
+                "Questionnaire '{$id}' has status '{$status}' — responses may not reflect a published form.",
+            );
+        }
+
+        $period = $questionnaire->effectivePeriod ?? null;
+
+        if ($period === null) {
+            return;
+        }
+
+        $today = LocalDate::now(TimeZone::utc())->__toString();
+
+        $endDt = ($period->end ?? null)?->value;
+
+        if ($endDt !== null) {
+            $end = $this->normalizeFhirDateEnd((string) $endDt);
+
+            if ($end < $today) {
+                $violations[] = $this->violation(
+                    'warning',
+                    'Questionnaire.effectivePeriod.end',
+                    "Questionnaire '{$id}' effective period ended on {$end} — responses may be invalid.",
+                );
+            }
+        }
+
+        $startDt = ($period->start ?? null)?->value;
+
+        if ($startDt !== null) {
+            $start = $this->normalizeFhirDateStart((string) $startDt);
+
+            if ($start > $today) {
+                $violations[] = $this->violation(
+                    'warning',
+                    'Questionnaire.effectivePeriod.start',
+                    "Questionnaire '{$id}' effective period does not start until {$start} — responses may be premature.",
+                );
+            }
+        }
+    }
+
+    /**
+     * Pad a FHIR partial date to its latest possible Y-m-d value for end-of-period comparisons.
+     * "2021" → "2021-12-31"; "2021-12" → last day of that month; full dates are truncated to 10 chars.
+     */
+    private function normalizeFhirDateEnd(string $date): string
+    {
+        if (preg_match('/^\d{4}$/', $date) === 1) {
+            return $date . '-12-31';
+        }
+
+        if (preg_match('/^\d{4}-\d{2}$/', $date) === 1) {
+            return $date . '-' . YearMonth::parse($date)->getLengthOfMonth();
+        }
+
+        return substr($date, 0, 10);
+    }
+
+    /**
+     * Pad a FHIR partial date to its earliest possible Y-m-d value for start-of-period comparisons.
+     * "2022" → "2022-01-01"; "2022-06" → "2022-06-01"; full dates are truncated to 10 chars.
+     */
+    private function normalizeFhirDateStart(string $date): string
+    {
+        if (preg_match('/^\d{4}$/', $date) === 1) {
+            return $date . '-01-01';
+        }
+
+        if (preg_match('/^\d{4}-\d{2}$/', $date) === 1) {
+            return $date . '-01';
+        }
+
+        return substr($date, 0, 10);
+    }
+
+    /**
      * Rule 4b — a non-repeating item must carry at most one answer.
      *
      * @param R4ResponseItem|R4BResponseItem|R5ResponseItem $item
@@ -561,6 +661,19 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
                         "Answer type '%s' does not match declared item type '%s' for item '%s'.",
                         $actual,
                         $type,
+                        $linkId,
+                    ),
+                );
+            }
+
+            if ($type                                              === 'string' && \is_object($answer->value) && $answer->value instanceof \Stringable
+                                                                                && preg_match('/[\r\n]/', (string) $answer->value) === 1
+            ) {
+                $violations[] = $this->violation(
+                    'error',
+                    sprintf('%s.answer[%d].value', $path, $j),
+                    sprintf(
+                        "Answer of type 'string' for item '%s' must not contain line breaks (\\r or \\n) — use type 'text'.",
                         $linkId,
                     ),
                 );

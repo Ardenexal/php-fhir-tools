@@ -101,7 +101,7 @@ class FHIRExtension extends Extension
 
         // Wire CachingFHIRTerminologyClient as a decorator when a cache pool is configured
         $terminologyCachePool = $config['validation']['terminology_cache_pool'] ?? null;
-        $terminologyCacheTtl  = $config['validation']['terminology_cache_ttl'] ?? 3600;
+        $terminologyCacheTtl  = $config['validation']['terminology_cache_ttl']  ?? 3600;
 
         if ($terminologyCachePool !== null) {
             $container->setAlias('fhir.terminology_cache', $terminologyCachePool)->setPublic(false);

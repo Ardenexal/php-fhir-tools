@@ -26,7 +26,9 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\QuestionnaireResource;
 final class FHIRDerivedQuestionnaireValidator
 {
     private const DERIVATION_EXT_URL = 'http://hl7.org/fhir/StructureDefinition/questionnaire-derivationType';
+
     private const EXT_MIN_OCCURS     = 'http://hl7.org/fhir/StructureDefinition/questionnaire-minOccurs';
+
     private const EXT_MAX_OCCURS     = 'http://hl7.org/fhir/StructureDefinition/questionnaire-maxOccurs';
 
     /**
@@ -211,7 +213,7 @@ final class FHIRDerivedQuestionnaireValidator
         $baseBounds    = $this->readItemOccurrenceBounds($baseItem);
 
         if ($baseBounds['minOccurs'] !== null && $derivedBounds['minOccurs'] !== null
-            && $derivedBounds['minOccurs'] < $baseBounds['minOccurs']) {
+                                              && $derivedBounds['minOccurs'] < $baseBounds['minOccurs']) {
             $violations[] = $this->violation(
                 $path . '.extension[questionnaire-minOccurs]',
                 "Item '{$linkId}' minOccurs {$derivedBounds['minOccurs']} is weaker than base {$baseBounds['minOccurs']}",
@@ -219,7 +221,7 @@ final class FHIRDerivedQuestionnaireValidator
         }
 
         if ($baseBounds['maxOccurs'] !== null && $derivedBounds['maxOccurs'] !== null
-            && $derivedBounds['maxOccurs'] > $baseBounds['maxOccurs']) {
+                                              && $derivedBounds['maxOccurs'] > $baseBounds['maxOccurs']) {
             $violations[] = $this->violation(
                 $path . '.extension[questionnaire-maxOccurs]',
                 "Item '{$linkId}' maxOccurs {$derivedBounds['maxOccurs']} is weaker than base {$baseBounds['maxOccurs']}",

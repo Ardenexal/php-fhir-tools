@@ -58,13 +58,6 @@ final class FHIRBrianposConformanceTest extends TestCase
      * @var array<string, string>
      */
     private const DEFERRED_CASES = [
-        // Questionnaire status validation not implemented (M15)
-        'questionnaire-draft-qr'          => 'Q status validation not implemented — see M15',
-        'questionnaire-retired-qr'        => 'Q status validation not implemented — see M15',
-        'questionnaire-inactive-start-qr' => 'Q status validation not implemented — see M15',
-        'questionnaire-inactive-end-qr'   => 'Q status validation not implemented — see M15',
-        // String type newline restriction not implemented (M15)
-        'string-vs-text-qr'             => 'string type must reject \\r\\n — not implemented (M15)',
         // No Q file — this tests QR validation when Q cannot be resolved; not testable in standalone harness
         'questionnaire-not-resolved-qr' => 'Q not-resolvable cannot be tested in standalone harness',
         // SDC min/max on non-UCUM units: Q carries sdc-questionnaire-minQuantity/maxQuantity with

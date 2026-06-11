@@ -7,10 +7,14 @@ namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Attachment;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\EnableWhenBehaviorType;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Period;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\PublicationStatusType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\QuestionnaireItemOperatorType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\QuestionnaireItemTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\QuestionnaireResponseStatusType;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDateTime;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\Questionnaire\QuestionnaireItem;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\Questionnaire\QuestionnaireItemEnableWhen;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\QuestionnaireResource;
@@ -719,5 +723,156 @@ final class FHIRQuestionnaireValidatorTest extends TestCase
         $report = $this->validator->validate($questionnaire, $response);
 
         self::assertSame([], $report->errors(), 'incomparable != operand must not enable & require q2');
+    }
+
+    // M15 — Questionnaire status warnings
+
+    public function testDraftQuestionnaireEmitsWarning(): void
+    {
+        $questionnaire = new QuestionnaireResource(
+            status: new PublicationStatusType('draft'),
+            item: [self::stringItem('q1')],
+        );
+        $response = self::response('in-progress', new QuestionnaireResponseItem(
+            linkId: 'q1',
+            answer: [self::stringAnswer('x')],
+        ));
+
+        $report = $this->validator->validate($questionnaire, $response);
+
+        self::assertCount(1, $report->warnings(), 'draft status → 1 warning');
+        self::assertStringContainsString('draft', $report->warnings()[0]->message);
+    }
+
+    public function testRetiredQuestionnaireEmitsWarning(): void
+    {
+        $questionnaire = new QuestionnaireResource(
+            status: new PublicationStatusType('retired'),
+            item: [self::stringItem('q1')],
+        );
+        $response = self::response('in-progress', new QuestionnaireResponseItem(
+            linkId: 'q1',
+            answer: [self::stringAnswer('x')],
+        ));
+
+        $report = $this->validator->validate($questionnaire, $response);
+
+        self::assertCount(1, $report->warnings(), 'retired status → 1 warning');
+        self::assertStringContainsString('retired', $report->warnings()[0]->message);
+    }
+
+    public function testActiveQuestionnaireEmitsNoStatusWarning(): void
+    {
+        $questionnaire = new QuestionnaireResource(
+            status: new PublicationStatusType('active'),
+            item: [self::stringItem('q1')],
+        );
+        $response = self::response('in-progress', new QuestionnaireResponseItem(
+            linkId: 'q1',
+            answer: [self::stringAnswer('x')],
+        ));
+
+        $report = $this->validator->validate($questionnaire, $response);
+
+        self::assertCount(0, $report->warnings(), 'active status → no warning');
+    }
+
+    public function testExpiredEffectivePeriodEmitsWarning(): void
+    {
+        $questionnaire = new QuestionnaireResource(
+            status: new PublicationStatusType('active'),
+            effectivePeriod: new Period(
+                end: new DateTimePrimitive(value: FHIRDateTime::parse('2021-12-11')),
+            ),
+            item: [self::stringItem('q1')],
+        );
+        $response = self::response('in-progress', new QuestionnaireResponseItem(
+            linkId: 'q1',
+            answer: [self::stringAnswer('x')],
+        ));
+
+        $report = $this->validator->validate($questionnaire, $response);
+
+        self::assertCount(1, $report->warnings(), 'past end date → 1 warning');
+        self::assertStringContainsString('effectivePeriod.end', $report->warnings()[0]->path);
+    }
+
+    public function testFutureEffectivePeriodStartEmitsWarning(): void
+    {
+        $futureYear    = (string) (date('Y') + 2);
+        $questionnaire = new QuestionnaireResource(
+            status: new PublicationStatusType('active'),
+            effectivePeriod: new Period(
+                start: new DateTimePrimitive(value: FHIRDateTime::parse($futureYear)),
+            ),
+            item: [self::stringItem('q1')],
+        );
+        $response = self::response('in-progress', new QuestionnaireResponseItem(
+            linkId: 'q1',
+            answer: [self::stringAnswer('x')],
+        ));
+
+        $report = $this->validator->validate($questionnaire, $response);
+
+        self::assertCount(1, $report->warnings(), 'future start date → 1 warning');
+        self::assertStringContainsString('effectivePeriod.start', $report->warnings()[0]->path);
+    }
+
+    // M15 — String type \r\n restriction
+
+    public function testStringAnswerWithNewlineEmitsError(): void
+    {
+        $questionnaire = new QuestionnaireResource(item: [self::stringItem('q1')]);
+        $response      = self::response('in-progress', new QuestionnaireResponseItem(
+            linkId: 'q1',
+            answer: [self::stringAnswer("hello\nworld")],
+        ));
+
+        $report = $this->validator->validate($questionnaire, $response);
+
+        self::assertCount(1, $report->errors(), 'string answer with \\n → 1 error');
+        self::assertStringContainsString('line breaks', $report->errors()[0]->message);
+    }
+
+    public function testStringAnswerWithCarriageReturnEmitsError(): void
+    {
+        $questionnaire = new QuestionnaireResource(item: [self::stringItem('q1')]);
+        $response      = self::response('in-progress', new QuestionnaireResponseItem(
+            linkId: 'q1',
+            answer: [self::stringAnswer("hello\rworld")],
+        ));
+
+        $report = $this->validator->validate($questionnaire, $response);
+
+        self::assertCount(1, $report->errors(), 'string answer with \\r → 1 error');
+        self::assertStringContainsString('line breaks', $report->errors()[0]->message);
+    }
+
+    public function testStringAnswerWithoutNewlineIsValid(): void
+    {
+        $questionnaire = new QuestionnaireResource(item: [self::stringItem('q1')]);
+        $response      = self::response('in-progress', new QuestionnaireResponseItem(
+            linkId: 'q1',
+            answer: [self::stringAnswer('hello world')],
+        ));
+
+        $report = $this->validator->validate($questionnaire, $response);
+
+        self::assertCount(0, $report->errors(), 'clean string answer → no error');
+    }
+
+    public function testTextAnswerWithNewlineIsValid(): void
+    {
+        $questionnaire = new QuestionnaireResource(item: [
+            new QuestionnaireItem(linkId: 'q1', type: new QuestionnaireItemTypeType('text')),
+        ]);
+        $response = self::response('in-progress', new QuestionnaireResponseItem(
+            linkId: 'q1',
+            answer: [self::stringAnswer("hello\nworld")],
+        ));
+
+        $report = $this->validator->validate($questionnaire, $response);
+
+        self::assertCount(0, $report->errors(), 'text type allows \\n — no error');
     }
 }
