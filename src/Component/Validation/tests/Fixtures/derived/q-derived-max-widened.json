@@ -1,0 +1,28 @@
+{
+  "resourceType": "Questionnaire",
+  "id": "q-derived-max-widened",
+  "url": "http://example.org/Questionnaire/q-derived-max-widened",
+  "status": "active",
+  "derivedFrom": ["http://example.org/Questionnaire/q-base-occurrences"],
+  "_derivedFrom": [{
+    "extension": [{
+      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-derivationType",
+      "valueCoding": {
+        "system": "http://hl7.org/fhir/questionnaire-derivationType",
+        "code": "compliesWith"
+      }
+    }]
+  }],
+  "item": [{
+    "linkId": "i1",
+    "text": "Item with widened maxOccurs",
+    "type": "string",
+    "extension": [{
+      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-minOccurs",
+      "valueInteger": 2
+    }, {
+      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-maxOccurs",
+      "valueInteger": 10
+    }]
+  }]
+}

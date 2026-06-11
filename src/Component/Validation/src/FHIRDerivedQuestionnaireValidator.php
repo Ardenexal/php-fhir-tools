@@ -26,6 +26,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\QuestionnaireResource;
 final class FHIRDerivedQuestionnaireValidator
 {
     private const DERIVATION_EXT_URL = 'http://hl7.org/fhir/StructureDefinition/questionnaire-derivationType';
+    private const EXT_MIN_OCCURS     = 'http://hl7.org/fhir/StructureDefinition/questionnaire-minOccurs';
+    private const EXT_MAX_OCCURS     = 'http://hl7.org/fhir/StructureDefinition/questionnaire-maxOccurs';
 
     /**
      * Extract the derivation type code from a decoded JSON array of a Questionnaire.
@@ -204,6 +206,26 @@ final class FHIRDerivedQuestionnaireValidator
             }
         }
 
+        // Rule: minOccurs cannot be weakened; maxOccurs cannot be widened.
+        $derivedBounds = $this->readItemOccurrenceBounds($item);
+        $baseBounds    = $this->readItemOccurrenceBounds($baseItem);
+
+        if ($baseBounds['minOccurs'] !== null && $derivedBounds['minOccurs'] !== null
+            && $derivedBounds['minOccurs'] < $baseBounds['minOccurs']) {
+            $violations[] = $this->violation(
+                $path . '.extension[questionnaire-minOccurs]',
+                "Item '{$linkId}' minOccurs {$derivedBounds['minOccurs']} is weaker than base {$baseBounds['minOccurs']}",
+            );
+        }
+
+        if ($baseBounds['maxOccurs'] !== null && $derivedBounds['maxOccurs'] !== null
+            && $derivedBounds['maxOccurs'] > $baseBounds['maxOccurs']) {
+            $violations[] = $this->violation(
+                $path . '.extension[questionnaire-maxOccurs]',
+                "Item '{$linkId}' maxOccurs {$derivedBounds['maxOccurs']} is weaker than base {$baseBounds['maxOccurs']}",
+            );
+        }
+
         return $violations;
     }
 
@@ -223,6 +245,57 @@ final class FHIRDerivedQuestionnaireValidator
         }
 
         return false;
+    }
+
+    /**
+     * @return array{minOccurs: int|null, maxOccurs: int|null}
+     */
+    private function readItemOccurrenceBounds(QuestionnaireItem $item): array
+    {
+        $min = null;
+        $max = null;
+
+        foreach ($item->extension as $extension) {
+            $url   = $extension->url;
+            $value = $extension->value ?? null;
+
+            if ($url === null || $value === null) {
+                continue;
+            }
+
+            $int = $this->toInt($value);
+
+            if ($int === null) {
+                continue;
+            }
+
+            if ($url === self::EXT_MIN_OCCURS) {
+                $min = $int;
+            } elseif ($url === self::EXT_MAX_OCCURS) {
+                $max = $int;
+            }
+        }
+
+        return ['minOccurs' => $min, 'maxOccurs' => $max];
+    }
+
+    private function toInt(mixed $value): ?int
+    {
+        if (\is_int($value)) {
+            return $value;
+        }
+
+        if (\is_string($value)) {
+            return is_numeric($value) ? (int) $value : null;
+        }
+
+        if ($value instanceof \Stringable) {
+            $string = (string) $value;
+
+            return is_numeric($string) ? (int) $string : null;
+        }
+
+        return null;
     }
 
     private function violation(string $path, string $message): FHIRValidationViolation

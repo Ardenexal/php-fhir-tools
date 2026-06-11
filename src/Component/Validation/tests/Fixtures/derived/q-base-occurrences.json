@@ -1,0 +1,18 @@
+{
+  "resourceType": "Questionnaire",
+  "id": "q-base-occurrences",
+  "url": "http://example.org/Questionnaire/q-base-occurrences",
+  "status": "active",
+  "item": [{
+    "linkId": "i1",
+    "text": "Item with occurrence bounds",
+    "type": "string",
+    "extension": [{
+      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-minOccurs",
+      "valueInteger": 2
+    }, {
+      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-maxOccurs",
+      "valueInteger": 5
+    }]
+  }]
+}

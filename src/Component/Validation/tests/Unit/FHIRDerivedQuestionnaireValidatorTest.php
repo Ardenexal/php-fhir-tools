@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit;
 
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Coding;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\QuestionnaireItemTypeType;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CanonicalPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\CodePrimitive;
@@ -198,6 +199,68 @@ final class FHIRDerivedQuestionnaireValidatorTest extends TestCase
         self::assertSame('compliesWith', FHIRDerivedQuestionnaireValidator::extractDerivationTypeFromJson([]));
     }
 
+    public function testMinOccursWeakeningProducesError(): void
+    {
+        $base    = $this->questionnaire([$this->itemWithBounds('i1', minOccurs: 2)]);
+        $derived = $this->questionnaire([$this->itemWithBounds('i1', minOccurs: 1)], hasDerivedFrom: true);
+
+        $report = $this->validator->validate($derived, $base, 'compliesWith');
+
+        self::assertCount(1, $report->errors());
+        self::assertStringContainsString('minOccurs', $report->errors()[0]->message);
+    }
+
+    public function testMinOccursTighteningNoError(): void
+    {
+        $base    = $this->questionnaire([$this->itemWithBounds('i1', minOccurs: 2)]);
+        $derived = $this->questionnaire([$this->itemWithBounds('i1', minOccurs: 3)], hasDerivedFrom: true);
+
+        $report = $this->validator->validate($derived, $base, 'compliesWith');
+
+        self::assertCount(0, $report->errors());
+    }
+
+    public function testMaxOccursWideningProducesError(): void
+    {
+        $base    = $this->questionnaire([$this->itemWithBounds('i1', maxOccurs: 5)]);
+        $derived = $this->questionnaire([$this->itemWithBounds('i1', maxOccurs: 10)], hasDerivedFrom: true);
+
+        $report = $this->validator->validate($derived, $base, 'compliesWith');
+
+        self::assertCount(1, $report->errors());
+        self::assertStringContainsString('maxOccurs', $report->errors()[0]->message);
+    }
+
+    public function testMaxOccursNarrowingNoError(): void
+    {
+        $base    = $this->questionnaire([$this->itemWithBounds('i1', maxOccurs: 5)]);
+        $derived = $this->questionnaire([$this->itemWithBounds('i1', maxOccurs: 4)], hasDerivedFrom: true);
+
+        $report = $this->validator->validate($derived, $base, 'compliesWith');
+
+        self::assertCount(0, $report->errors());
+    }
+
+    public function testBaseHasNoBoundDerivedSetsOneNoError(): void
+    {
+        $base    = $this->questionnaire([$this->item('i1', 'string')]);
+        $derived = $this->questionnaire([$this->itemWithBounds('i1', minOccurs: 1, maxOccurs: 3)], hasDerivedFrom: true);
+
+        $report = $this->validator->validate($derived, $base, 'compliesWith');
+
+        self::assertCount(0, $report->errors());
+    }
+
+    public function testBothBoundsAbsentNoError(): void
+    {
+        $base    = $this->questionnaire([$this->item('i1', 'string')]);
+        $derived = $this->questionnaire([$this->item('i1', 'string')], hasDerivedFrom: true);
+
+        $report = $this->validator->validate($derived, $base, 'compliesWith');
+
+        self::assertCount(0, $report->errors());
+    }
+
     // --- Helpers ---
 
     /**
@@ -242,6 +305,31 @@ final class FHIRDerivedQuestionnaireValidatorTest extends TestCase
                 system: new UriPrimitive(value: $system),
                 code: new CodePrimitive(value: $code),
             ),
+        );
+    }
+
+    private function itemWithBounds(string $linkId, ?int $minOccurs = null, ?int $maxOccurs = null): QuestionnaireItem
+    {
+        $extensions = [];
+
+        if ($minOccurs !== null) {
+            $extensions[] = new Extension(
+                url: 'http://hl7.org/fhir/StructureDefinition/questionnaire-minOccurs',
+                value: $minOccurs,
+            );
+        }
+
+        if ($maxOccurs !== null) {
+            $extensions[] = new Extension(
+                url: 'http://hl7.org/fhir/StructureDefinition/questionnaire-maxOccurs',
+                value: $maxOccurs,
+            );
+        }
+
+        return new QuestionnaireItem(
+            linkId: $linkId,
+            type: new QuestionnaireItemTypeType('string'),
+            extension: $extensions,
         );
     }
 }
