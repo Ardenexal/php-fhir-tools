@@ -89,6 +89,10 @@ final class InMemoryFHIRTerminologyClient implements FHIRTerminologyClientInterf
         $valid          = $this->lookup($valueSetUrl, $key);
         $correctDisplay = $this->displayMap[$valueSetUrl][$key] ?? null;
 
+        if ($correctDisplay !== null && $correctDisplay === $display) {
+            $correctDisplay = null;
+        }
+
         return new CodingValidationResult($valid, $correctDisplay);
     }
 

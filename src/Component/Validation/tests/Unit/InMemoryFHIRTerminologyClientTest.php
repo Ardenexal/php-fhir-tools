@@ -136,4 +136,17 @@ final class InMemoryFHIRTerminologyClientTest extends TestCase
         self::assertTrue($result->valid);
         self::assertNull($result->correctDisplay);
     }
+
+    public function testValidateCodingWithDisplayReturnsNullCorrectDisplayWhenDisplayMatchesMap(): void
+    {
+        $client = new InMemoryFHIRTerminologyClient(
+            map: [self::VS_URL => ['http://loinc.org|8867-4' => true]],
+            displayMap: [self::VS_URL => ['http://loinc.org|8867-4' => 'Heart rate']],
+        );
+
+        $result = $client->validateCodingWithDisplay(self::VS_URL, 'http://loinc.org', '8867-4', 'Heart rate');
+
+        self::assertTrue($result->valid);
+        self::assertNull($result->correctDisplay);
+    }
 }

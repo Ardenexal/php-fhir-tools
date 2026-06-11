@@ -575,6 +575,10 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         }
 
         if (preg_match('/^\d{4}-\d{2}$/', $date) === 1) {
+            $month = (int) substr($date, 5, 2);
+            if ($month < 1 || $month > 12) {
+                return substr($date, 0, 10);
+            }
             return $date . '-' . YearMonth::parse($date)->getLengthOfMonth();
         }
 
