@@ -16,7 +16,6 @@
         "ext-zip": "*",
         "amphp/http-client": "^5.3.4",
         "ardenexal/fhir-metadata": "^0.4",
-        "ardenexal/fhir-serialization": "^0.4",
         "composer/semver": "^3.4.4",
         "nette/php-generator": "^4.1",
         "nette/utils": "^4.0",

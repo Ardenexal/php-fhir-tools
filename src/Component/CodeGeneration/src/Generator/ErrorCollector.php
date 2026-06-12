@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CodeGeneration\Generator;
 
-use Ardenexal\FHIRTools\Component\Serialization\Exception\ValidationException;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\GenerationException;
 
 /**
  * Collects and aggregates validation errors with detailed context
@@ -319,14 +319,14 @@ class ErrorCollector
     }
 
     /**
-     * Throw a ValidationException if there are any errors
+     * Throw a GenerationException if there are any errors
      *
-     * @throws ValidationException
+     * @throws GenerationException
      */
     public function throwIfErrors(): void
     {
         if ($this->hasErrors()) {
-            throw ValidationException::multipleValidationErrors($this->errors);
+            throw GenerationException::multipleValidationErrors($this->errors);
         }
     }
 }

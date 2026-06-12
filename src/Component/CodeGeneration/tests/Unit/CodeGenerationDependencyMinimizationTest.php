@@ -44,12 +44,12 @@ class CodeGenerationDependencyMinimizationTest extends TestCase
         self::assertIsArray($composerData, 'composer.json should contain valid JSON');
 
         // Define maximum allowed dependencies for CodeGeneration component.
-        // Current set (18): php, ext-zip, amphp/http-client, ardenexal/fhir-metadata,
-        // ardenexal/fhir-serialization, composer/semver, nette/php-generator, nette/utils,
-        // psr/log, symfony/console, symfony/dependency-injection, symfony/filesystem,
-        // symfony/finder, symfony/http-client-contracts, symfony/intl, symfony/polyfill-php84,
+        // Current set (17): php, ext-zip, amphp/http-client, ardenexal/fhir-metadata,
+        // composer/semver, nette/php-generator, nette/utils, psr/log, symfony/console,
+        // symfony/dependency-injection, symfony/filesystem, symfony/finder,
+        // symfony/http-client-contracts, symfony/intl, symfony/polyfill-php84,
         // symfony/string, symfony/validator.
-        $maxAllowedDependencies = 18;
+        $maxAllowedDependencies = 17;
 
         $dependencies    = $composerData['require'] ?? [];
         $dependencyCount = count($dependencies);

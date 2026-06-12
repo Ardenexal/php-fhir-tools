@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Component\CodeGeneration\tests\Unit\Package;
 
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector;
-use Ardenexal\FHIRTools\Component\Serialization\Exception\ValidationException;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\GenerationException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -159,7 +159,7 @@ class ErrorCollectorTest extends TestCase
         // Should throw when errors exist
         $this->errorCollector->addError('Test error');
 
-        $this->expectException(ValidationException::class);
+        $this->expectException(GenerationException::class);
         $this->errorCollector->throwIfErrors();
     }
 

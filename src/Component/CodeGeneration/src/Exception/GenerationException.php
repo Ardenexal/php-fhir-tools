@@ -169,4 +169,25 @@ class GenerationException extends \Exception
             ['version' => $version],
         );
     }
+
+    /**
+     * Create exception for multiple collected validation errors
+     *
+     * @param array<mixed> $errors Array of validation errors collected during generation
+     *
+     * @return self
+     */
+    public static function multipleValidationErrors(array $errors): self
+    {
+        $errorCount = count($errors);
+
+        return new self(
+            "Validation failed with {$errorCount} error(s)",
+            [
+                'errors'      => $errors,
+                'error_count' => $errorCount,
+                'error_type'  => 'multiple_validation_errors',
+            ],
+        );
+    }
 }
