@@ -35,7 +35,7 @@ class Configuration implements ConfigurationInterface
                     ->info('Directory for FHIR package cache and metadata')
                 ->end()
                 ->scalarNode('default_version')
-                    ->defaultValue('R4B')
+                    ->defaultValue('R4')
                     ->info('Default FHIR version to use when not specified')
                     ->validate()
                         ->ifNotInArray(['R4', 'R4B', 'R5'])

@@ -154,7 +154,7 @@ class FHIRModelGeneratorCommand extends Command
         OutputInterface $output,
         #[Option(description: 'Implementation Guide packages to include.', name: 'package')]
         #[Ask(question: 'Which FHIR Implementation Guide packages do you want to include?')]
-        array $packages = self::DEFAULT_IG_PACKAGES['R4B'],
+        array $packages = self::DEFAULT_IG_PACKAGES['R4'],
         #[Option(description: 'Work offline using only cached packages', name: 'offline')]
         bool $offlineMode = false,
     ): int {

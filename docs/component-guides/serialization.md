@@ -40,7 +40,7 @@ composer require ardenexal/fhir-bundle
 ### Creating the service
 
 Outside a Symfony container, build a fully-wired service with the static factory. It defaults to
-FHIR R4B; pass a different `FhirVersion` for R4 or R5.
+FHIR R4; pass a different `FhirVersion` for R4B or R5.
 
 ```php
 <?php
@@ -48,7 +48,7 @@ FHIR R4B; pass a different `FhirVersion` for R4 or R5.
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 
-$serializer = FHIRSerializationService::createDefault();           // R4B
+$serializer = FHIRSerializationService::createDefault();           // R4
 // $serializer = FHIRSerializationService::createDefault(FhirVersion::R5);
 ```
 

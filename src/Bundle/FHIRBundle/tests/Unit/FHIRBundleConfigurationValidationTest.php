@@ -171,7 +171,7 @@ class FHIRBundleConfigurationValidationTest extends TestCase
         $processedConfig = $processor->processConfiguration($configuration, [$config]);
 
         // Verify default values are applied
-        self::assertEquals('R4B', $processedConfig['default_version']);
+        self::assertEquals('R4', $processedConfig['default_version']);
         self::assertTrue($processedConfig['validation']['enabled']);
         self::assertFalse($processedConfig['validation']['strict_mode']);
         self::assertEquals('%kernel.project_dir%/output', $processedConfig['output_directory']);

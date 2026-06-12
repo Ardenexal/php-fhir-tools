@@ -49,7 +49,7 @@ class FHIRSerializationService
      * available. Uses a two-phase construction to inject the Serializer back into
      * normalizers that need it for recursive object handling.
      */
-    public static function createDefault(FhirVersion $version = FhirVersion::R4B): self
+    public static function createDefault(FhirVersion $version = FhirVersion::R4): self
     {
         return self::createWithIG(version: $version);
     }
@@ -69,7 +69,7 @@ class FHIRSerializationService
     public static function createWithIG(
         string $igOutputDirectory = '',
         string $igNamespace = '',
-        FhirVersion $version = FhirVersion::R4B
+        FhirVersion $version = FhirVersion::R4
     ): self {
         $metadataExtractor = new FHIRMetadataExtractor();
         $registry          = FHIRIGTypeRegistryFactory::create($igOutputDirectory, $igNamespace);

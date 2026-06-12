@@ -43,7 +43,7 @@ fhir:
     cache_directory: '%kernel.cache_dir%/fhir'
 
     # Default FHIR version: R4, R4B, or R5
-    default_version: 'R4B'
+    default_version: 'R4'
 
     validation:
         enabled: true            # enable FHIR validation during code generation

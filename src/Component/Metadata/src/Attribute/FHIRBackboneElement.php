@@ -15,12 +15,12 @@ class FHIRBackboneElement
     /**
      * @param string $parentResource The parent FHIR resource type (e.g., 'Patient', 'Observation')
      * @param string $elementPath    The path to this element within the parent resource (e.g., 'Patient.contact')
-     * @param string $fhirVersion    The FHIR version (default: 'R4B')
+     * @param string $fhirVersion    The FHIR version (default: 'R4')
      */
     public function __construct(
         public readonly string $parentResource,
         public readonly string $elementPath,
-        public readonly string $fhirVersion = 'R4B'
+        public readonly string $fhirVersion = 'R4'
     ) {
     }
 }
