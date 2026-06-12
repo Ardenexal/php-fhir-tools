@@ -42,11 +42,7 @@ trait FHIRExtensionsTrait
      */
     public function findExtension(string $extensionClass): ?object
     {
-        if (!isset($this->extension)) {
-            return null;
-        }
-
-        foreach ($this->extension as $ext) {
+        foreach ($this->extensionList() as $ext) {
             if ($ext instanceof $extensionClass) {
                 return $ext;
             }
@@ -66,12 +62,8 @@ trait FHIRExtensionsTrait
      */
     public function findExtensions(string $extensionClass): array
     {
-        if (!isset($this->extension)) {
-            return [];
-        }
-
         $found = [];
-        foreach ($this->extension as $ext) {
+        foreach ($this->extensionList() as $ext) {
             if ($ext instanceof $extensionClass) {
                 $found[] = $ext;
             }
@@ -87,11 +79,7 @@ trait FHIRExtensionsTrait
      */
     public function hasExtension(string $extensionClass): bool
     {
-        if (!isset($this->extension)) {
-            return false;
-        }
-
-        foreach ($this->extension as $ext) {
+        foreach ($this->extensionList() as $ext) {
             if ($ext instanceof $extensionClass) {
                 return true;
             }
@@ -111,11 +99,7 @@ trait FHIRExtensionsTrait
      */
     public function findExtensionByUrl(string $url): ?FHIRExtensionInterface
     {
-        if (!isset($this->extension)) {
-            return null;
-        }
-
-        foreach ($this->extension as $ext) {
+        foreach ($this->extensionList() as $ext) {
             if ($ext->getExtensionUrl() === $url) {
                 return $ext;
             }
@@ -131,12 +115,8 @@ trait FHIRExtensionsTrait
      */
     public function findExtensionsByUrl(string $url): array
     {
-        if (!isset($this->extension)) {
-            return [];
-        }
-
         $found = [];
-        foreach ($this->extension as $ext) {
+        foreach ($this->extensionList() as $ext) {
             if ($ext->getExtensionUrl() === $url) {
                 $found[] = $ext;
             }
@@ -152,6 +132,27 @@ trait FHIRExtensionsTrait
      */
     public function getExtensions(): array
     {
-        return isset($this->extension) ? $this->extension : [];
+        return $this->extensionList();
+    }
+
+    /**
+     * Return this element's extensions as a safe list.
+     *
+     * The generated `$extension` property is a non-nullable typed array, but the
+     * deserializer instantiates objects via `newInstanceWithoutConstructor()` and only
+     * assigns properties present in the payload — so on a resource that carries no
+     * `extension` key the property is left *uninitialized*. Reading it directly then
+     * throws `Error: Typed property ... must not be accessed before initialization`.
+     * This mirrors the constructor-bypass guard used by `FHIRValidationService::readExtensionUrl()`.
+     *
+     * @return list<FHIRExtensionInterface>
+     */
+    private function extensionList(): array
+    {
+        try {
+            return array_values($this->extension);
+        } catch (\Error) {
+            return [];
+        }
     }
 }
