@@ -1003,11 +1003,14 @@ final class FHIRQuestionnaireValidatorTest extends TestCase
 
         $report = $this->validator->validate(new QuestionnaireResource(item: [$item]), $response);
 
-        self::assertCount(0, $report->errors(), 'answer 10 is within [5, 50] — no UCUM numeric fallback still validates in-range');
+        self::assertCount(0, $report->errors(), 'answer 10 is within [5, 50] — no-UCUM numeric magnitude comparison validates in-range');
     }
 
     public function testQuantityBoundWithNoUcumSystemUsesNumericComparisonWhenOutOfRange(): void
     {
+        // The brianpos reference (ADR-008) magnitude-compares display-unit bounds: quantity-min-max-qr
+        // emits "Expected the minimum value 50 Kg, received 10 Kg". So a bound without a UCUM system
+        // still enforces by numeric magnitude.
         $item = new QuestionnaireItem(
             linkId: 'q1',
             type: new QuestionnaireItemTypeType('quantity'),
