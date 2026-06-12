@@ -226,71 +226,117 @@ jobs:
             -   name: Test FHIR Model Generation
                 id: fhir-test
                 run: |
-                    echo "🧪 Testing FHIR Model Generation..." >> fhir_output.txt
-                    echo "=================================" >> fhir_output.txt
-                    echo "" >> fhir_output.txt
+                    {
+                      echo "🧪 Testing FHIR Model Generation..."
+                      echo "================================="
+                      echo ""
+                      echo "📦 Regenerating R4B FHIR models (hl7.fhir.r4b.core + hl7.fhir.uv.extensions.r4b)..."
+                      echo ""
+                    } >> fhir_output.txt
 
-                    # Test with a smaller FHIR package for faster execution
-                    echo "📦 Generating FHIR models from hl7.fhir.r4b.core package..." >> fhir_output.txt
-                    echo "" >> fhir_output.txt
-
-                    # Capture both stdout and stderr, and measure execution time
+                    # Regenerate the full R4B set so the git-drift check below is meaningful:
+                    # generating only the core package would delete the extension models and
+                    # produce a spurious diff. Must match `composer run generate-models-r4b`.
                     start_time=$(date +%s)
 
-                    if timeout 300 php demo/bin/console fhir:generate --package=hl7.fhir.r4b.core -v >> fhir_output.txt 2>&1; then
+                    if timeout 540 php demo/bin/console fhir:generate \
+                        --package=hl7.fhir.r4b.core \
+                        --package=hl7.fhir.uv.extensions.r4b -v >> fhir_output.txt 2>&1; then
                       end_time=$(date +%s)
                       execution_time=$((end_time - start_time))
 
-                      echo "" >> fhir_output.txt
-                      echo "✅ **FHIR Generation Successful!**" >> fhir_output.txt
-                      echo "⏱️ Execution time: ${execution_time} seconds" >> fhir_output.txt
-                      echo "" >> fhir_output.txt
+                      {
+                        echo ""
+                        echo "✅ **FHIR Generation Successful!**"
+                        echo "⏱️ Execution time: ${execution_time} seconds"
+                        echo ""
+                        file_count=$(find src/Component/Models/src/R4B -name "*.php" | wc -l)
+                        echo "📁 Generated ${file_count} R4B PHP model files"
+                      } >> fhir_output.txt
 
-                      # Count generated files
-                      if [ -d "output" ]; then
-                        file_count=$(find output -name "*.php" | wc -l)
-                        echo "📁 Generated ${file_count} PHP model files" >> fhir_output.txt
-
-                        # Show some example generated files
-                        echo "" >> fhir_output.txt
-                        echo "📋 **Sample Generated Files:**" >> fhir_output.txt
-                        find output -name "*.php" | head -10 | while read file; do
-                          echo "- $(basename "$file")" >> fhir_output.txt
-                        done
-
-                        if [ $file_count -gt 10 ]; then
-                          echo "- ... and $((file_count - 10)) more files" >> fhir_output.txt
-                        fi
-                      fi
-
-                      echo "FHIR_SUCCESS=true" >> $GITHUB_OUTPUT
+                      echo "FHIR_SUCCESS=true" >> "$GITHUB_OUTPUT"
                     else
                       end_time=$(date +%s)
                       execution_time=$((end_time - start_time))
 
-                      echo "" >> fhir_output.txt
-                      echo "❌ **FHIR Generation Failed**" >> fhir_output.txt
-                      echo "⏱️ Execution time: ${execution_time} seconds (timed out at 300s)" >> fhir_output.txt
-                      echo "" >> fhir_output.txt
-                      echo "Please check the error output above for details." >> fhir_output.txt
+                      {
+                        echo ""
+                        echo "❌ **FHIR Generation Failed**"
+                        echo "⏱️ Execution time: ${execution_time} seconds (timed out at 540s)"
+                        echo ""
+                        echo "Please check the error output above for details."
+                      } >> fhir_output.txt
 
-                      echo "FHIR_SUCCESS=false" >> $GITHUB_OUTPUT
+                      echo "FHIR_SUCCESS=false" >> "$GITHUB_OUTPUT"
                     fi
 
-                    # Add system information
-                    echo "" >> fhir_output.txt
-                    echo "🖥️ **System Information:**" >> fhir_output.txt
-                    echo "- PHP Version: $(php -v | head -n1)" >> fhir_output.txt
-                    echo "- Memory Limit: $(php -r 'echo ini_get("memory_limit");')" >> fhir_output.txt
-                    echo "- OS: $(uname -s) $(uname -r)" >> fhir_output.txt
+                    {
+                      echo ""
+                      echo "🖥️ **System Information:**"
+                      echo "- PHP Version: $(php -v | head -n1)"
+                      echo "- Memory Limit: $(php -r 'echo ini_get("memory_limit");')"
+                      echo "- OS: $(uname -s) $(uname -r)"
+                    } >> fhir_output.txt
+
+            -   name: Normalise generated models with Pint
+                if: steps.fhir-test.outputs.FHIR_SUCCESS == 'true'
+                # Generated output must be run through Pint before diffing, otherwise the
+                # committed (already-linted) models differ from raw generation by formatting alone.
+                run: composer run lint:models
+
+            -   name: Check for uncommitted model drift
+                id: model-drift
+                if: steps.fhir-test.outputs.FHIR_SUCCESS == 'true'
+                run: |
+                    drift="$(git status --porcelain -- src/Component/Models/src)"
+                    if [ -n "$drift" ]; then
+                      {
+                        echo ""
+                        echo "❌ **Generated models are out of date**"
+                        echo ""
+                        echo "Regenerating the R4B models produced changes that are not committed."
+                        echo "Run \`composer run generate-models-r4b\` locally and commit the result."
+                        echo ""
+                        echo "<details>"
+                        echo "<summary>📝 git status</summary>"
+                        echo ""
+                        echo '```'
+                        echo "$drift"
+                        echo '```'
+                        echo ""
+                        echo "</details>"
+                        echo ""
+                        echo "<details>"
+                        echo "<summary>🔍 git diff (truncated to 300 lines)</summary>"
+                        echo ""
+                        echo '```diff'
+                        git add -A -- src/Component/Models/src
+                        git diff --cached -- src/Component/Models/src | head -300
+                        echo '```'
+                        echo ""
+                        echo "</details>"
+                      } >> fhir_output.txt
+
+                      echo "MODELS_DRIFT=true" >> "$GITHUB_OUTPUT"
+                    else
+                      {
+                        echo ""
+                        echo "✅ **Generated models are up to date** — no git differences after regeneration."
+                      } >> fhir_output.txt
+
+                      echo "MODELS_DRIFT=false" >> "$GITHUB_OUTPUT"
+                    fi
 
             -   name: Comment PR with FHIR Generation Results
+                if: ${{ !cancelled() }}
                 uses: actions/github-script@v7
                 with:
                     script: |
                         const fs = require('fs');
+                        // Stable marker so we can update this PR's existing comment in place
+                        // instead of posting a fresh one on every commit.
+                        const MARKER = '<!-- fhir-model-generation-test -->';
 
-                        // Read the FHIR generation output
                         let fhirOutput;
                         try {
                           fhirOutput = fs.readFileSync('fhir_output.txt', 'utf8');
@@ -298,41 +344,80 @@ jobs:
                           fhirOutput = '❌ Could not read FHIR generation output file.';
                         }
 
-                        // Determine if this is a success or failure
-                        const isSuccess = '${{ steps.fhir-test.outputs.FHIR_SUCCESS }}' === 'true';
-                        const emoji = isSuccess ? '✅' : '❌';
-                        const status = isSuccess ? 'SUCCESS' : 'FAILED';
+                        const genSucceeded = '${{ steps.fhir-test.outputs.FHIR_SUCCESS }}' === 'true';
+                        const drift = '${{ steps.model-drift.outputs.MODELS_DRIFT }}' === 'true';
+                        const ok = genSucceeded && !drift;
 
-                        // Create the comment body
-                        const commentBody = `## ${emoji} FHIR Model Generation Test ${status}
-
-                        This automated test validates that the FHIR model generation functionality works correctly with the changes in this PR.
-
-                        <details>
-                        <summary>📋 Click to view detailed output</summary>
-
-                        \`\`\`
-                        ${fhirOutput}
-                        \`\`\`
-
-                        </details>
-
-                        ---
-
-                        ${isSuccess ?
-                          '🎉 The FHIR model generation completed successfully! The enhanced package management system is working correctly.' :
-                          '⚠️ The FHIR model generation encountered issues. Please review the output above and fix any problems before merging.'
+                        const emoji = ok ? '✅' : '❌';
+                        let status;
+                        let footer;
+                        if (!genSucceeded) {
+                          status = 'FAILED';
+                          footer = '⚠️ The FHIR model generation encountered issues. Please review the output above and fix any problems before merging.';
+                        } else if (drift) {
+                          status = 'OUT OF DATE';
+                          footer = '⚠️ Regenerating the FHIR models produced uncommitted changes. Run `composer run generate-models-r4b` locally and commit the result before merging.';
+                        } else {
+                          status = 'SUCCESS';
+                          footer = '🎉 The FHIR model generation completed successfully and the committed models are up to date.';
                         }
 
-                        *This comment was automatically generated by the GitHub Actions workflow.*`;
+                        // Build with an array join to avoid leaking YAML/JS indentation into the
+                        // rendered markdown (leading spaces would otherwise become code blocks).
+                        const commentBody = [
+                          MARKER,
+                          `## ${emoji} FHIR Model Generation Test ${status}`,
+                          '',
+                          'This automated test regenerates the R4B FHIR models and verifies that the generation functionality works correctly with the changes in this PR, then checks that the committed models are up to date.',
+                          '',
+                          '<details>',
+                          '<summary>📋 Click to view detailed output</summary>',
+                          '',
+                          '```',
+                          fhirOutput,
+                          '```',
+                          '',
+                          '</details>',
+                          '',
+                          '---',
+                          '',
+                          footer,
+                          '',
+                          '*This comment was automatically generated by the GitHub Actions workflow.*',
+                        ].join('\n');
 
-                        // Post the comment
-                        github.rest.issues.createComment({
+                        // Find this workflow's previous comment (by marker) and update it; else create one.
+                        const comments = await github.paginate(github.rest.issues.listComments, {
                           issue_number: context.issue.number,
                           owner: context.repo.owner,
                           repo: context.repo.repo,
-                          body: commentBody
+                          per_page: 100,
                         });
+                        const prior = comments.find(
+                          (c) => c.user?.type === 'Bot' && c.body?.includes(MARKER),
+                        );
+
+                        if (prior) {
+                          await github.rest.issues.updateComment({
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            comment_id: prior.id,
+                            body: commentBody,
+                          });
+                        } else {
+                          await github.rest.issues.createComment({
+                            issue_number: context.issue.number,
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            body: commentBody,
+                          });
+                        }
+
+            -   name: Fail if generation failed or models are out of date
+                if: steps.fhir-test.outputs.FHIR_SUCCESS != 'true' || steps.model-drift.outputs.MODELS_DRIFT == 'true'
+                run: |
+                    echo "FHIR model generation check failed (success=${{ steps.fhir-test.outputs.FHIR_SUCCESS }}, drift=${{ steps.model-drift.outputs.MODELS_DRIFT }})."
+                    exit 1
 
     benchmarks:
         runs-on: ubuntu-latest
