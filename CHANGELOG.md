@@ -30,6 +30,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [Metadata] `FHIRExtensionsTrait` lookup helpers no longer error on uninitialized `extension` properties
 
 ### Changed
+- [Core] **BREAKING:** The default FHIR version changed from R4B to R4 across all runtime and codegen entry points (`FHIRSerializationService::createDefault()`/`createWithIG()`, the `fhir.default_version` config node, `fhir:generate` default IG packages, and the `FHIRPrimitive`/`FHIRComplexType`/`FHIRBackboneElement` attribute defaults). Pass `FhirVersion::R4B` (or `default_version: 'R4B'`) explicitly to retain the previous behaviour
+- [Models] **BREAKING:** Abstract resource base classes are no longer generated with a doubled `Resource` suffix; they now use an `Abstract` prefix: `ResourceResource` → `AbstractResource`, `DomainResourceResource` → `AbstractDomainResource`, and (R5 only) `CanonicalResourceResource` → `AbstractCanonicalResource`, `MetadataResourceResource` → `AbstractMetadataResource`. Concrete resource classes are unchanged (e.g. `PatientResource`)
 - [Serialization] Normalizers split into `Normalizer\Json\*` and `Normalizer\Xml\*` namespaces
 - [Validation] Conformance semantics aligned with the dotnet/brianpos reference for partial-date bounds, quantity bounds, and draft/in-progress leniency (ADR-008)
 - [Docs] Rewrote the Serialization and FHIRBundle component guides to match the real public API (`FHIRSerializationService::createDefault()`, `serializeToJson`/`deserializeFromJson`, immutable `FHIRSerializationContext`)
