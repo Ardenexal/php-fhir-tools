@@ -282,7 +282,9 @@ jobs:
                 if: steps.fhir-test.outputs.FHIR_SUCCESS == 'true'
                 # Generated output must be run through Pint before diffing, otherwise the
                 # committed (already-linted) models differ from raw generation by formatting alone.
-                run: composer run lint:models
+                # Invoke Pint directly (not `composer run lint:models`) so we can run it silently
+                # and in parallel — lint:models bakes in `-v`, which conflicts with --silent.
+                run: ./vendor/bin/pint src/Component/Models --silent --parallel
 
             -   name: Check for uncommitted model drift
                 id: model-drift
