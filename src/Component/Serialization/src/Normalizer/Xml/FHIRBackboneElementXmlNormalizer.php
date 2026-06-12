@@ -151,15 +151,12 @@ class FHIRBackboneElementXmlNormalizer extends AbstractFHIRNormalizer
                         if (is_array($denormalizedValue) && isset($denormalizedValue['@value'])) {
                             $denormalizedValue = $denormalizedValue['@value'];
                         }
-
-                        $scalarPhpType = $meta?->phpItemClass;
-                        if ($scalarPhpType === 'int') {
-                            $denormalizedValue = (int) $denormalizedValue;
-                        } elseif ($scalarPhpType === 'float') {
-                            $denormalizedValue = (float) $denormalizedValue;
-                        } elseif ($scalarPhpType === 'bool') {
-                            $denormalizedValue = filter_var($denormalizedValue, FILTER_VALIDATE_BOOLEAN);
-                        }
+                        // NOTE: a scalar int/float/bool coercion using $meta->phpItemClass formerly lived
+                        // here, but it was unreachable dead code — any property with a non-null
+                        // phpItemClass is intercepted by the earlier `phpItemClass !== null` branch, so
+                        // $meta?->phpItemClass is always null at this point (verified: PHPStan + runtime
+                        // probe across the round-trip suite). Removed. See M02b backlog note re: whether
+                        // backbone scalar primitives need coercion on this XML path at all.
                     }
                 } else {
                     $propertyType      = $this->getPropertyType($property);
