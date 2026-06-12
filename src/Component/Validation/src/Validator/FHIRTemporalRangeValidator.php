@@ -30,7 +30,16 @@ final class FHIRTemporalRangeValidator extends ConstraintValidator
             return;
         }
 
-        if (!is_string($value)) {
+        // FHIR model properties hold primitive wrapper objects (e.g. DatePrimitive), which are
+        // \Stringable, not raw strings. Accept those and compare their string form — otherwise the
+        // constraint silently no-ops on every real model object.
+        if (!is_string($value) && !$value instanceof \Stringable) {
+            return;
+        }
+
+        $value = (string) $value;
+
+        if ($value === '') {
             return;
         }
 

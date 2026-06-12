@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit\Validator;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRTemporalRange;
+use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDate;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Validation\FHIRViolationCode;
 use Ardenexal\FHIRTools\Component\Validation\Validator\FHIRTemporalRangeValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -207,5 +209,42 @@ final class FHIRTemporalRangeValidatorTest extends ConstraintValidatorTestCase
             ->setParameters(['{{ side }}' => 'maximum', '{{ bound }}' => 'BAD-BOUND', '{{ type }}' => 'date'])
             ->setCode(FHIRViolationCode::WARNING)
             ->assertRaised();
+    }
+
+    // --- B4: real \Stringable model objects (the production path) must be enforced, not no-op'd ---
+
+    public function testStringableModelObjectBelowMinProducesError(): void
+    {
+        // A real primitive wrapper (\Stringable), as a deserialized model property would hold —
+        // NOT a raw string. Pre-fix the validator no-op'd on this and the constraint went unenforced.
+        $value = new DatePrimitive(value: FHIRDate::parse('1999-12-31'));
+
+        $this->validator->validate($value, new FHIRTemporalRange(minValue: '2000-01-01', maxValue: null, temporalType: 'date'));
+
+        $this->buildViolation('The value {{ value }} is before the minimum {{ min }}.')
+            ->setParameters(['{{ value }}' => '1999-12-31', '{{ min }}' => '2000-01-01'])
+            ->setCode(FHIRViolationCode::ERROR)
+            ->assertRaised();
+    }
+
+    public function testStringableModelObjectAboveMaxProducesError(): void
+    {
+        $value = new DatePrimitive(value: FHIRDate::parse('2100-01-01'));
+
+        $this->validator->validate($value, new FHIRTemporalRange(minValue: null, maxValue: '2099-12-31', temporalType: 'date'));
+
+        $this->buildViolation('The value {{ value }} is after the maximum {{ max }}.')
+            ->setParameters(['{{ value }}' => '2100-01-01', '{{ max }}' => '2099-12-31'])
+            ->setCode(FHIRViolationCode::ERROR)
+            ->assertRaised();
+    }
+
+    public function testStringableModelObjectWithinBoundsProducesNoViolation(): void
+    {
+        $value = new DatePrimitive(value: FHIRDate::parse('2023-06-15'));
+
+        $this->validator->validate($value, new FHIRTemporalRange(minValue: '2000-01-01', maxValue: '2099-12-31', temporalType: 'date'));
+
+        $this->assertNoViolation();
     }
 }
