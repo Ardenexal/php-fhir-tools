@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [Validation] Constraint validators for profile constraints, fixed values, pattern values, slices, value-set bindings (required/extensible/preferred + `maxValueSet`), `mustSupport`, obligations, target profiles, and FHIRPath invariants
 - [Validation] Terminology validation: pluggable terminology client (`NullFHIRTerminologyClient` and HTTP client with `$validate-code` POST support), strict mode, and PSR-6 caching of terminology results with configurable TTL
 - [Validation] Questionnaire and QuestionnaireResponse validation: `FHIRQuestionnaireValidator` and `FHIRDerivedQuestionnaireValidator` covering min/max occurs, `enableWhen` expressions, status/`effectivePeriod`, and preferred terminology server resolution; seeded with the brianpos and ardenexal R4/R4B/R5 conformance corpora
-- [Validation] `FHIRTemporalRange` and `FHIRQuantityRange` constraints and validators, with UCUM unit conversion for quantity bounds
+- [Validation] `FHIRTemporalRange` and `FHIRQuantityRange` constraints and validators; quantity bounds are compared only when the instance and bound share the same unit (system+code), with cross-unit bounds surfaced as warnings (no UCUM conversion)
 - [Validation] Extension context validation via `FHIRExtensionContext` and `FHIRContextInvariant` attributes, including recursive/nested context evaluation through FHIRPath
 - [Metadata] `ardenexal/fhir-metadata` is now standalone-installable; `FHIRIGTypeRegistry` and its factory moved here from Serialization
 - [Serialization] All primitive types now implement `Stringable`

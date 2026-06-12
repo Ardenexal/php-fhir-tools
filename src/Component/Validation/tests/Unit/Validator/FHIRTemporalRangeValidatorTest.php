@@ -125,6 +125,56 @@ final class FHIRTemporalRangeValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    // --- partial MAX BOUND expansion (the bound itself is partial) ---
+
+    public function testPartialYearMaxBoundExpandsToEndOfYear(): void
+    {
+        // max bound '2099' expands to 2099-12-31; value 2099-06-15 <= 2099-12-31 → ok
+        $this->validator->validate('2099-06-15', new FHIRTemporalRange(minValue: null, maxValue: '2099', temporalType: 'date'));
+
+        $this->assertNoViolation();
+    }
+
+    public function testWholeYearValueWithinWholeYearMaxBoundProducesNoViolation(): void
+    {
+        // both bound and value '2099' expand to 2099-12-31; 2099-12-31 <= 2099-12-31 → ok
+        $this->validator->validate('2099', new FHIRTemporalRange(minValue: null, maxValue: '2099', temporalType: 'date'));
+
+        $this->assertNoViolation();
+    }
+
+    public function testValueAfterPartialYearMaxBoundProducesError(): void
+    {
+        // max bound '2099' expands to 2099-12-31; value 2100-01-01 > 2099-12-31 → error
+        $this->validator->validate('2100-01-01', new FHIRTemporalRange(minValue: null, maxValue: '2099', temporalType: 'date'));
+
+        $this->buildViolation('The value {{ value }} is after the maximum {{ max }}.')
+            ->setParameters(['{{ value }}' => '2100-01-01', '{{ max }}' => '2099'])
+            ->setCode(FHIRViolationCode::ERROR)
+            ->assertRaised();
+    }
+
+    public function testValueAfterPartialMonthMaxBoundProducesError(): void
+    {
+        // max bound '2022-06' expands to 2022-06-30; value 2022-07-01 > 2022-06-30 → error
+        $this->validator->validate('2022-07-01', new FHIRTemporalRange(minValue: null, maxValue: '2022-06', temporalType: 'date'));
+
+        $this->buildViolation('The value {{ value }} is after the maximum {{ max }}.')
+            ->setParameters(['{{ value }}' => '2022-07-01', '{{ max }}' => '2022-06'])
+            ->setCode(FHIRViolationCode::ERROR)
+            ->assertRaised();
+    }
+
+    public function testLastDayOfMonthWithinPartialMonthMaxBoundProducesNoViolation(): void
+    {
+        // max bound '2022-06' expands to 2022-06-30; value 2022-06-30 <= 2022-06-30 → ok.
+        // Pre-fix this was non-deterministic: the full-date value parsed at the current
+        // wall-clock time, so on the same calendar day it could exceed the midnight max bound.
+        $this->validator->validate('2022-06-30', new FHIRTemporalRange(minValue: null, maxValue: '2022-06', temporalType: 'date'));
+
+        $this->assertNoViolation();
+    }
+
     // --- time ---
 
     public function testTimeWithinBoundsProducesNoViolation(): void

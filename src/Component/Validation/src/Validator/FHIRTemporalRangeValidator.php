@@ -98,7 +98,9 @@ final class FHIRTemporalRangeValidator extends ConstraintValidator
         }
 
         if ($constraint->maxValue !== null) {
-            $maxDt = $this->parseBound($constraint->maxValue, $constraint->temporalType);
+            // max bound must use the SAME end-of-period expansion as the max-side value, so a
+            // partial bound like '2099' becomes 2099-12-31 (not 2099-01-01) — see ADR-006.
+            $maxDt = $this->expandForMaxComparison($constraint->maxValue, $constraint->temporalType);
 
             if ($maxDt === null) {
                 $this->context->buildViolation(self::MSG_INVALID_BOUND)
@@ -188,8 +190,11 @@ final class FHIRTemporalRangeValidator extends ConstraintValidator
             return new \DateTimeImmutable($value . '-01');
         }
 
-        // Full date or dateTime with optional timezone — let PHP parse it
-        $dt = \DateTimeImmutable::createFromFormat('Y-m-d', substr($value, 0, 10));
+        // Full date or dateTime with optional timezone — let PHP parse it.
+        // Anchor to midnight with the `!` reset modifier so unspecified fields (H:i:s) are
+        // zeroed instead of inheriting the current wall-clock time; this keeps same-calendar-day
+        // comparisons deterministic.
+        $dt = \DateTimeImmutable::createFromFormat('!Y-m-d', substr($value, 0, 10));
 
         if ($dt === false) {
             return null;
