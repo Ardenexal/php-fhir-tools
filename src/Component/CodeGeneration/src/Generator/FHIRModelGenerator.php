@@ -827,7 +827,7 @@ class FHIRModelGenerator implements GeneratorInterface
                 if ($countMin > 0) {
                     $countArgs['min'] = $countMin;
                 }
-                if ($countMax !== '*' && is_numeric($countMax)) {
+                if (is_numeric($countMax)) {
                     $countArgs['max'] = (int) $countMax;
                 }
                 if ($countArgs !== []) {

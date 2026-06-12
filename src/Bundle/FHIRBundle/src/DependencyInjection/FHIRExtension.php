@@ -58,8 +58,8 @@ class FHIRExtension extends Extension
         $container->setParameter('fhir.ig.namespace', $config['ig']['namespace']);
 
         // Serialization metadata cache pool
-        $cachePool         = $config['serialization']['metadata_cache_pool'] ?? null;
-        $enableCacheWarmer = $config['serialization']['enable_cache_warmer'] ?? false;
+        $cachePool         = $config['serialization']['metadata_cache_pool'];
+        $enableCacheWarmer = $config['serialization']['enable_cache_warmer'];
         $container->setParameter('fhir.serialization.metadata_cache_pool', $cachePool);
 
         if ($cachePool !== null) {
@@ -100,8 +100,8 @@ class FHIRExtension extends Extension
         }
 
         // Wire CachingFHIRTerminologyClient as a decorator when a cache pool is configured
-        $terminologyCachePool = $config['validation']['terminology_cache_pool'] ?? null;
-        $terminologyCacheTtl  = $config['validation']['terminology_cache_ttl']  ?? 3600;
+        $terminologyCachePool = $config['validation']['terminology_cache_pool'];
+        $terminologyCacheTtl  = $config['validation']['terminology_cache_ttl'];
 
         if ($terminologyCachePool !== null) {
             $container->setAlias('fhir.terminology_cache', $terminologyCachePool)->setPublic(false);

@@ -2024,30 +2024,6 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     }
 
     /**
-     * Evaluate comparison operation
-     *
-     * @param callable(mixed, mixed): bool $operation
-     */
-    private function evaluateComparison(Collection $left, Collection $right, callable $operation): Collection
-    {
-        if ($left->isEmpty() || $right->isEmpty()) {
-            return Collection::empty();
-        }
-
-        if (!$left->isSingle() || !$right->isSingle()) {
-            return Collection::empty();
-        }
-
-        // Normalize values to handle FHIR primitives and enums
-        $leftValue  = $this->normalizeValue($left->first());
-        $rightValue = $this->normalizeValue($right->first());
-
-        $result = $operation($leftValue, $rightValue);
-
-        return Collection::single($result);
-    }
-
-    /**
      * Evaluate string concatenation
      *
      * Per FHIRPath spec §6.7: unlike +, the & operator treats empty collections as

@@ -105,7 +105,7 @@ final class FHIRTemporalRangeValidator extends ConstraintValidator
         }
 
         // min-side: expand partial date to start of period
-        $valueDtForMin = $this->expandForMinComparison($value, $constraint->temporalType);
+        $valueDtForMin = $this->parseBound($value, $constraint->temporalType);
 
         if ($valueDtForMin === null) {
             $this->context->buildViolation(self::MSG_INVALID_VALUE)
@@ -139,14 +139,6 @@ final class FHIRTemporalRangeValidator extends ConstraintValidator
         return match ($temporalType) {
             'instant' => \DateTimeImmutable::createFromFormat(\DateTimeInterface::RFC3339, $bound) ?: null,
             default   => $this->parsePartialOrFullDate($bound, forMax: false),
-        };
-    }
-
-    private function expandForMinComparison(string $value, string $temporalType): ?\DateTimeImmutable
-    {
-        return match ($temporalType) {
-            'instant' => \DateTimeImmutable::createFromFormat(\DateTimeInterface::RFC3339, $value) ?: null,
-            default   => $this->parsePartialOrFullDate($value, forMax: false),
         };
     }
 

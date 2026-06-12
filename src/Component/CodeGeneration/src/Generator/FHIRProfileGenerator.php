@@ -310,9 +310,9 @@ class FHIRProfileGenerator
             if ($sliceName !== null && $sliceName !== '') {
                 // A named slice definition (e.g. "Patient.identifier" with sliceName "ihiNumber")
                 // The path equals the parent path (e.g. both are "Patient.identifier")
-                // Use the base property path (without slice name suffix if any)
-                $basePath                      = $this->resolveBasePropertyPath($propertyPath);
-                $slicesByProperty[$basePath][] = $element;
+                // In FHIR differential, sliced elements share the same path (e.g. "Patient.identifier")
+                // and differ only by sliceName, so the base path is the property path unchanged.
+                $slicesByProperty[$propertyPath][] = $element;
             }
         }
 
@@ -462,17 +462,6 @@ class FHIRProfileGenerator
         // (not standard practice to put it in the differential, so return null for resolution)
 
         return null;
-    }
-
-    /**
-     * Resolve the base property path from a possibly slice-name-qualified path.
-     * e.g. "identifier" stays "identifier" (sliceName is in the element, not the path)
-     */
-    private function resolveBasePropertyPath(string $propertyPath): string
-    {
-        // In FHIR differential, sliced elements share the same path (e.g. "Patient.identifier")
-        // and differ only by sliceName. No transformation needed here.
-        return $propertyPath;
     }
 
     /**

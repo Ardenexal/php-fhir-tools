@@ -221,9 +221,6 @@ class FHIRExtensionGenerator
 
                 if ($phpType !== 'bool' && $phpType !== 'int' && $phpType !== 'string') {
                     $namespace->addUse(ltrim($phpType, '\\'));
-                    $shortType = (string) u($phpType)->afterLast('\\');
-                } else {
-                    $shortType = $phpType;
                 }
 
                 $param = $constructor->addPromotedParameter($paramName)
@@ -324,11 +321,7 @@ class FHIRExtensionGenerator
             ];
         }
 
-        $unionType  = implode('|', array_unique($phpTypes)) . '|null';
-        $shortTypes = implode('|', array_map(
-            static fn (string $t): string => (string) u($t)->afterLast('\\'),
-            array_unique($phpTypes),
-        ));
+        $unionType = implode('|', array_unique($phpTypes)) . '|null';
 
         // Use a regular (non-promoted) parameter to avoid redeclaring the parent Extension::$value
         // property with a narrower type, which PHP rejects as a property type invariance violation.
@@ -404,8 +397,7 @@ class FHIRExtensionGenerator
             $shortDesc  = $sliceData['shortDesc'];
 
             if ($isArray) {
-                $shortType = $phpType !== null ? (string) u($phpType)->afterLast('\\') : 'mixed';
-                $param     = $constructor->addPromotedParameter($paramName)
+                $param = $constructor->addPromotedParameter($paramName)
                     ->setPublic()
                     ->setType('array')
                     ->setNullable(false)
@@ -427,7 +419,6 @@ class FHIRExtensionGenerator
                 $bodyLines[] = '}';
             } else {
                 $resolvedType = $phpType ?? 'string';
-                $shortType    = (string) u($resolvedType)->afterLast('\\');
                 $nullability  = !$isRequired;
 
                 $param = $constructor->addPromotedParameter($paramName)
