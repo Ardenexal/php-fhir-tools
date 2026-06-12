@@ -17,11 +17,11 @@ class FHIRPrimitive
 {
     /**
      * @param string $primitiveType The FHIR primitive type name (e.g., 'string', 'integer', 'boolean')
-     * @param string $fhirVersion   The FHIR version (default: 'R4B')
+     * @param string $fhirVersion   The FHIR version (default: 'R4')
      */
     public function __construct(
         public readonly string $primitiveType,
-        public readonly string $fhirVersion = 'R4B'
+        public readonly string $fhirVersion = 'R4'
     ) {
     }
 

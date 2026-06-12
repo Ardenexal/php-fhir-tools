@@ -1265,11 +1265,6 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
     }
 
     /**
-     * Maps an answer value to an orderable scalar for the relational operators: floats for
-     * numerics and Quantity magnitudes, strings for date/time/string primitives (ISO formats
-     * order lexicographically). Booleans, Codings, and References have no ordering.
-     */
-    /**
      * Extracts the date string from a DatePrimitive or DateTimePrimitive value (strips the
      * time component from dateTime values). Returns null for any other type.
      */
@@ -1290,6 +1285,11 @@ final class FHIRQuestionnaireValidator implements FHIRQuestionnaireValidatorInte
         return $str === '' ? null : ($tPos !== false ? substr($str, 0, $tPos) : $str);
     }
 
+    /**
+     * Maps an answer value to an orderable scalar for the relational operators: floats for
+     * numerics and Quantity magnitudes, strings for date/time/string primitives (ISO formats
+     * order lexicographically). Booleans, Codings, and References have no ordering.
+     */
     private function comparableValue(mixed $value): float|string|null
     {
         if (\is_bool($value)) {

@@ -32,7 +32,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description An occurrence of information being transmitted; e.g. an alert that was sent to a responsible provider, a public health agency that was notified about a reportable condition.
  */
 #[FhirResource(type: 'Communication', version: '4.0.1', url: 'http://hl7.org/fhir/StructureDefinition/Communication', fhirVersion: 'R4')]
-class CommunicationResource extends DomainResourceResource
+class CommunicationResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -55,7 +55,7 @@ class CommunicationResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

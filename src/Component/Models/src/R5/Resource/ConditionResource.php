@@ -49,7 +49,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     expression: 'abatement.exists() implies (clinicalStatus.coding.where(system=\'http://terminology.hl7.org/CodeSystem/condition-clinical\' and (code=\'inactive\' or code=\'resolved\' or code=\'remission\')).exists())',
     human: 'If condition is abated, then clinicalStatus must be either inactive, resolved, or remission.',
 )]
-class ConditionResource extends DomainResourceResource
+class ConditionResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -67,7 +67,7 @@ class ConditionResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

@@ -23,7 +23,7 @@ use PHPUnit\Framework\TestCase;
  * - Primitive extensions (_birthDate, _family)
  *
  * Background: The original bug caused XML deserialization to fail with
- * "Cannot instantiate abstract class ResourceResource" because it tried to
+ * "Cannot instantiate abstract class AbstractResource" because it tried to
  * instantiate the base class instead of resolving to concrete types.
  */
 class BundleXmlToJsonConversionTest extends TestCase

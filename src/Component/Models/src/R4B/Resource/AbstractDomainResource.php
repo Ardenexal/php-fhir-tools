@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Models\R4\Resource;
+namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
@@ -10,10 +10,10 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Metadata\Traits\FHIRExtensionsTrait;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Meta;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\Narrative;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Meta;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Narrative;
+use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 
 /**
  * @author Health Level Seven International (FHIR Infrastructure)
@@ -24,9 +24,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
  */
 #[FhirResource(
     type: 'DomainResource',
-    version: '4.0.1',
+    version: '4.3.0',
     url: 'http://hl7.org/fhir/StructureDefinition/DomainResource',
-    fhirVersion: 'R4',
+    fhirVersion: 'R4B',
 )]
 #[FHIRPathInvariant(
     key: 'dom-2',
@@ -37,7 +37,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 #[FHIRPathInvariant(
     key: 'dom-3',
     severity: 'error',
-    expression: 'contained.where(((\'#\'+id in (%resource.descendants().reference | %resource.descendants().as(canonical) | %resource.descendants().as(uri) | %resource.descendants().as(url))) or descendants().where(reference = \'#\').exists() or descendants().where(as(canonical) = \'#\').exists() or descendants().where(as(canonical) = \'#\').exists()).not()).trace(\'unmatched\', id).empty()',
+    expression: 'contained.where(((id.exists() and (\'#\'+id in (%resource.descendants().reference | %resource.descendants().as(canonical) | %resource.descendants().as(uri) | %resource.descendants().as(url)))) or descendants().where(reference = \'#\').exists() or descendants().where(as(canonical) = \'#\').exists() or descendants().where(as(uri) = \'#\').exists()).not()).trace(\'unmatched\', id).empty()',
     human: 'If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource',
 )]
 #[FHIRPathInvariant(
@@ -58,7 +58,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
     expression: 'text.`div`.exists()',
     human: 'A resource should have narrative for robust management',
 )]
-abstract class DomainResourceResource extends ResourceResource
+abstract class AbstractDomainResource extends AbstractResource
 {
     use FHIRExtensionsTrait;
 
@@ -83,7 +83,7 @@ abstract class DomainResourceResource extends ResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

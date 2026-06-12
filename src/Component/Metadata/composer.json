@@ -12,7 +12,8 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.3",
+        "symfony/finder": "^6.4|^7.4",
         "symfony/validator": "^6.4|^7.4"
     },
     "autoload": {
@@ -34,5 +35,10 @@
     "support": {
         "issues": "https://github.com/ardenexal/fhir-tools/issues",
         "source": "https://github.com/ardenexal/fhir-tools"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "0.4.x-dev"
+        }
     }
 }

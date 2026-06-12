@@ -13,6 +13,15 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+/**
+ * Evaluates a FHIRPath invariant expression against the validated value.
+ *
+ * Enforces a #[FHIRPathInvariant] constraint by running its expression through the FHIRPath
+ * engine; the invariant passes only when the result is the single boolean true. A failing
+ * invariant raises a WARNING or ERROR violation depending on the constraint's severity, while
+ * an expression the engine cannot evaluate is surfaced separately as an eval-error rather than
+ * a conformance failure.
+ */
 final class FHIRPathInvariantValidator extends ConstraintValidator
 {
     public function __construct(

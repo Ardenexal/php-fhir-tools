@@ -51,7 +51,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     expression: 'name.matches(\'[A-Z]([A-Za-z0-9_]){0,254}\')',
     human: 'Name should be usable as an identifier for the module by machine processing applications such as code generation',
 )]
-class RiskEvidenceSynthesisResource extends DomainResourceResource
+class RiskEvidenceSynthesisResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -74,7 +74,7 @@ class RiskEvidenceSynthesisResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

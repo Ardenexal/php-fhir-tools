@@ -36,7 +36,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description Describes the event of a patient being administered a vaccine or a record of an immunization as reported by a patient, a clinician or another party.
  */
 #[FhirResource(type: 'Immunization', version: '4.3.0', url: 'http://hl7.org/fhir/StructureDefinition/Immunization', fhirVersion: 'R4B')]
-class ImmunizationResource extends DomainResourceResource
+class ImmunizationResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -59,7 +59,7 @@ class ImmunizationResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

@@ -1705,6 +1705,11 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             }
         } elseif ($operator === TokenType::DIVIDE) {
             // Don't convert to base units - preserve original units in result
+            // FHIRPath: division by zero yields empty, not a fatal error (match scalar/bc paths).
+            if ($right['value'] == 0.0) {
+                return Collection::empty();
+            }
+
             $resultValue = $left['value'] / $right['value'];
 
             if ($leftCode === $rightCode) {
@@ -1721,10 +1726,31 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             ]);
         }
 
-        // For addition/subtraction, just compute the result with the left unit
-        // (ideally we'd convert right to left's unit first)
-        $resultValue = $operation($left['value'], $right['value']);
-        $resultCode  = $leftCode;
+        // Addition/subtraction: units must be dimensionally compatible.
+        // Same code → operate directly. Otherwise re-express the right operand in the left operand's
+        // unit before operating. If either unit is unknown, or the base dimensions differ, the result
+        // is empty (FHIRPath spec) — never fabricate a wrong-unit answer (e.g. 1 'mg' + 1 'cm').
+        if ($leftCode === $rightCode) {
+            $resultValue = $operation($left['value'], $right['value']);
+        } else {
+            $leftBase  = $this->tryConvertToBaseUnit($leftCode, $left['value']);
+            $rightBase = $this->tryConvertToBaseUnit($rightCode, $right['value']);
+
+            if ($leftBase === null || $rightBase === null || $leftBase['base'] !== $rightBase['base']) {
+                return Collection::empty();
+            }
+
+            $leftUnitFactor = $this->tryConvertToBaseUnit($leftCode, 1.0);
+            if ($leftUnitFactor === null || $leftUnitFactor['value'] == 0.0) {
+                return Collection::empty();
+            }
+
+            // right expressed in the left operand's unit = (right in base units) / (left unit's factor)
+            $rightInLeftUnit = $rightBase['value'] / $leftUnitFactor['value'];
+            $resultValue     = $operation($left['value'], $rightInLeftUnit);
+        }
+
+        $resultCode = $leftCode;
 
         return Collection::single([
             'value'  => $resultValue,
@@ -1995,30 +2021,6 @@ final class FHIRPathEvaluator implements ExpressionVisitor
             'base'  => $definition['base'],
             'value' => $value * $definition['factor'],
         ];
-    }
-
-    /**
-     * Evaluate comparison operation
-     *
-     * @param callable(mixed, mixed): bool $operation
-     */
-    private function evaluateComparison(Collection $left, Collection $right, callable $operation): Collection
-    {
-        if ($left->isEmpty() || $right->isEmpty()) {
-            return Collection::empty();
-        }
-
-        if (!$left->isSingle() || !$right->isSingle()) {
-            return Collection::empty();
-        }
-
-        // Normalize values to handle FHIR primitives and enums
-        $leftValue  = $this->normalizeValue($left->first());
-        $rightValue = $this->normalizeValue($right->first());
-
-        $result = $operation($leftValue, $rightValue);
-
-        return Collection::single($result);
     }
 
     /**

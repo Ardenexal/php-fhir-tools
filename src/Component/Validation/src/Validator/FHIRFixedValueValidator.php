@@ -11,6 +11,13 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+/**
+ * Validates that a property exactly equals the fixed value declared in a StructureDefinition.
+ *
+ * Enforces a #[FHIRFixedValue] constraint: the instance value must match the fixed scalar
+ * exactly. FHIR primitive wrapper objects (which are \Stringable) are coerced to string before
+ * comparison so correctly-valued wrappers are not flagged. A mismatch raises an ERROR violation.
+ */
 final class FHIRFixedValueValidator extends ConstraintValidator
 {
     public const string DEFAULT_MESSAGE = 'The value {{ value }} does not match the required fixed value {{ fixed }}.';

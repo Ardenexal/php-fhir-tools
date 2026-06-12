@@ -171,7 +171,7 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                 $meta = $metaMap[$elementName] ?? null;
 
                 if ($this->denormalizer !== null) {
-                    if ($meta !== null && $meta->fhirType === 'xhtml' && is_array($value)) {
+                    if (is_array($value) && $meta !== null && $meta->fhirType === 'xhtml') {
                         $xhtmlClass = $this->getFirstNonBuiltinTypeFromProperty($property);
                         if ($xhtmlClass !== null) {
                             /** @var class-string $xhtmlClass */
@@ -188,13 +188,13 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                         }
                     } elseif ($meta !== null && $meta->propertyKind === 'primitive') {
                         $denormalizedValue = $this->denormalizePrimitiveProperty($meta, $property, $reflection, $value, 'xml', $context, $metaMap);
-                    } elseif ($meta !== null
+                    } elseif (is_array($value)
+                        && $meta !== null
                         && ($meta->propertyKind === 'extension' || $meta->propertyKind === 'modifierExtension')
-                        && is_array($value)
                     ) {
                         $items             = !array_is_list($value) ? [$value] : $value;
                         $denormalizedValue = $this->denormalizeExtensionArray($items, 'xml', $context);
-                    } elseif ($meta !== null && $meta->phpItemClass !== null && is_array($value)) {
+                    } elseif (is_array($value) && $meta !== null && $meta->phpItemClass !== null) {
                         $phpItemClass = $meta->phpItemClass;
                         $items        = $this->unwrapXmlValue($value, 'array');
                         if (is_array($items) && !array_is_list($items)) {
@@ -205,7 +205,7 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                             /** @var class-string $phpItemClass */
                             $denormalizedValue[] = $this->denormalizer->denormalize($item, $phpItemClass, 'xml', $context);
                         }
-                    } elseif ($meta !== null && $meta->propertyKind === 'resource' && is_array($value)) {
+                    } elseif (is_array($value) && $meta !== null && $meta->propertyKind === 'resource') {
                         $resourceElementName = $this->extractResourceElementName($value);
                         if ($resourceElementName !== null) {
                             $resolvedClass = $this->typeResolver->resolveResourceType(['resourceType' => $resourceElementName]);

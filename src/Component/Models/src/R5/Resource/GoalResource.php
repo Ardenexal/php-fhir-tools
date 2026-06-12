@@ -33,7 +33,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description Describes the intended objective(s) for a patient, group or organization care, for example, weight loss, restoring an activity of daily living, obtaining herd immunity via immunization, meeting a process improvement objective, etc.
  */
 #[FhirResource(type: 'Goal', version: '5.0.0', url: 'http://hl7.org/fhir/StructureDefinition/Goal', fhirVersion: 'R5')]
-class GoalResource extends DomainResourceResource
+class GoalResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -51,7 +51,7 @@ class GoalResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

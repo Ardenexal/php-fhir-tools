@@ -35,7 +35,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A record of a healthcare consumer’s  choices  or choices made on their behalf by a third party, which permits or denies identified recipient(s) or recipient role(s) to perform one or more actions within a given policy context, for specific purposes and periods of time.
  */
 #[FhirResource(type: 'Consent', version: '5.0.0', url: 'http://hl7.org/fhir/StructureDefinition/Consent', fhirVersion: 'R5')]
-class ConsentResource extends DomainResourceResource
+class ConsentResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -53,7 +53,7 @@ class ConsentResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

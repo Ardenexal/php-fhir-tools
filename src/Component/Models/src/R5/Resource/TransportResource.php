@@ -38,7 +38,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description Record of transport of item.
  */
 #[FhirResource(type: 'Transport', version: '5.0.0', url: 'http://hl7.org/fhir/StructureDefinition/Transport', fhirVersion: 'R5')]
-class TransportResource extends DomainResourceResource
+class TransportResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -56,7 +56,7 @@ class TransportResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

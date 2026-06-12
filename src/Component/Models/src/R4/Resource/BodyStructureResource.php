@@ -28,7 +28,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description Record details about an anatomical structure.  This resource may be used when a coded concept does not provide the necessary detail needed for the use case.
  */
 #[FhirResource(type: 'BodyStructure', version: '4.0.1', url: 'http://hl7.org/fhir/StructureDefinition/BodyStructure', fhirVersion: 'R4')]
-class BodyStructureResource extends DomainResourceResource
+class BodyStructureResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -51,7 +51,7 @@ class BodyStructureResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

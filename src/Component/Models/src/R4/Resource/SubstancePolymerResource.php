@@ -30,7 +30,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\SubstancePolymer\SubstanceP
     url: 'http://hl7.org/fhir/StructureDefinition/SubstancePolymer',
     fhirVersion: 'R4',
 )]
-class SubstancePolymerResource extends DomainResourceResource
+class SubstancePolymerResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -53,7 +53,7 @@ class SubstancePolymerResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

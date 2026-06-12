@@ -31,7 +31,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\CareTeam\CareTeamParticipan
  * @description The Care Team includes all the people and organizations who plan to participate in the coordination and delivery of care for a patient.
  */
 #[FhirResource(type: 'CareTeam', version: '4.0.1', url: 'http://hl7.org/fhir/StructureDefinition/CareTeam', fhirVersion: 'R4')]
-class CareTeamResource extends DomainResourceResource
+class CareTeamResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -54,7 +54,7 @@ class CareTeamResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

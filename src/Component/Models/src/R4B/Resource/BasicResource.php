@@ -27,7 +27,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description Basic is used for handling concepts not yet defined in FHIR, narrative-only resources that don't map to an existing resource, and custom resources not appropriate for inclusion in the FHIR specification.
  */
 #[FhirResource(type: 'Basic', version: '4.3.0', url: 'http://hl7.org/fhir/StructureDefinition/Basic', fhirVersion: 'R4B')]
-class BasicResource extends DomainResourceResource
+class BasicResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -50,7 +50,7 @@ class BasicResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

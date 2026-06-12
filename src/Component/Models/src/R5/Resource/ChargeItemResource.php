@@ -37,7 +37,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description The resource ChargeItem describes the provision of healthcare provider products for a certain patient, therefore referring not only to the product, but containing in addition details of the provision, like date, time, amounts and participating organizations and persons. Main Usage of the ChargeItem is to enable the billing process and internal cost allocation.
  */
 #[FhirResource(type: 'ChargeItem', version: '5.0.0', url: 'http://hl7.org/fhir/StructureDefinition/ChargeItem', fhirVersion: 'R5')]
-class ChargeItemResource extends DomainResourceResource
+class ChargeItemResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -55,7 +55,7 @@ class ChargeItemResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

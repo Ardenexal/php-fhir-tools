@@ -2,19 +2,34 @@
 
 ## Overview
 
-The Serialization component provides comprehensive FHIR JSON serialization and deserialization capabilities. It can be used standalone or integrated with Symfony applications through the FHIRBundle.
+The Serialization component converts FHIR model objects to and from JSON and XML. It can be used
+standalone (no framework) or wired automatically through the FHIRBundle in a Symfony application.
+
+The public surface is small and stable:
+
+- `FHIRSerializationService` — the high-level entry point (`serializeToJson`, `serializeToXml`,
+  `deserializeFromJson`, `deserializeFromXml`, `deserialize`).
+- `FHIRSerializationContext` — an **immutable** value object describing serialization options.
+- `Validator\FHIRValidator` — business-rule validation of model objects.
+
+Everything else (the per-format normalizers, the type resolver, the metadata extractor) is an
+internal detail that the service or the Symfony container wires for you. You normally never
+instantiate those directly.
 
 ## Installation
 
-### Standalone Installation
+### Standalone
 
 ```bash
-composer require ardenexal/fhir-serialization
+composer require ardenexal/fhir-serialization ardenexal/fhir-models
 ```
+
+`ardenexal/fhir-models` provides the generated R4/R4B/R5 model classes the serializer reads and
+writes. Without it there is nothing to serialize.
 
 ### With FHIRBundle
 
-The Serialization component is automatically included when you install the FHIRBundle:
+The Serialization component is pulled in automatically with the bundle:
 
 ```bash
 composer require ardenexal/fhir-bundle
@@ -22,26 +37,99 @@ composer require ardenexal/fhir-bundle
 
 ## Basic Usage
 
-### Standalone Usage
+### Creating the service
+
+Outside a Symfony container, build a fully-wired service with the static factory. It defaults to
+FHIR R4; pass a different `FhirVersion` for R4B or R5.
 
 ```php
 <?php
 
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 
-// Create serialization service
-$serializer = new FHIRSerializationService();
+$serializer = FHIRSerializationService::createDefault();           // R4
+// $serializer = FHIRSerializationService::createDefault(FhirVersion::R5);
+```
 
-// Serialize FHIR resource to JSON
-$patient = new FHIRPatient();
-$patient->setId('example-123');
-$json = $serializer->serialize($patient, 'json');
+> **Do not** call `new FHIRSerializationService()` directly — the constructor requires a fully
+> assembled `Serializer`, context factory, and debug-info collector. `createDefault()` (and
+> `createWithIG()`, below) perform that wiring for you.
 
-// Deserialize JSON to FHIR resource
-$deserializedPatient = $serializer->deserialize($json, FHIRPatient::class, 'json');
+### Serialize and deserialize JSON
+
+FHIR model classes use promoted public properties — set values via the constructor's named
+arguments or by assigning the public property. There are no `setX()` setters.
+
+```php
+<?php
+
+use Ardenexal\FHIRTools\Component\Models\R4B\Resource\PatientResource;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\HumanName;
+
+$patient = new PatientResource(
+    id: 'example-123',
+    active: true,
+    name: [new HumanName(family: 'Doe', given: ['John'])],
+);
+
+// Serialize to JSON
+$json = $serializer->serializeToJson($patient);
+// {"resourceType":"Patient","id":"example-123","active":true,"name":[{"family":"Doe","given":["John"]}]}
+
+// Deserialize JSON back to a model object
+$restored = $serializer->deserializeFromJson($json, PatientResource::class);
+echo $restored->id;                       // "example-123" (a plain string)
+echo $restored->name[0]->family;          // "Doe"
+```
+
+> **Primitive typing on round-trip:** simple resource fields such as `id` stay plain PHP scalars,
+> but typed primitive fields (e.g. `HumanName::$family`, `$given[]`) come back as
+> `...\Primitive\StringPrimitive` objects after deserialization. These implement `Stringable`, so
+> `echo`/string interpolation work directly — but a strict comparison needs a cast:
+> `(string) $restored->name[0]->family === 'Doe'`.
+
+### Serialize and deserialize XML
+
+```php
+<?php
+
+use Ardenexal\FHIRTools\Component\Models\R4B\Resource\PatientResource;
+
+$patient = new PatientResource(id: 'example-123', active: true);
+
+$xml = $serializer->serializeToXml($patient);
+// <?xml version="1.0"?>
+// <Patient xmlns="http://hl7.org/fhir"><id value="example-123"/><active value="true"/></Patient>
+
+$restored = $serializer->deserializeFromXml($xml, PatientResource::class);
+echo $restored->id; // "example-123"
+```
+
+XML deserialization strips `DOCTYPE` declarations (XXE protection) and preserves attribute values
+as strings so numeric-looking primitives keep their precision on round-trip.
+
+> **Known limitation (XML, single-element repeating fields):** a repeating element that contains
+> exactly one value (for example a `HumanName` whose `given` is `['John']`) currently fails to
+> deserialize back from XML, because XML collapses the lone element to a scalar. Two-or-more values
+> (`given: ['John', 'James']`) round-trip correctly, as does omitting the field. JSON is unaffected.
+
+### Auto-detecting format and resource type
+
+`deserialize()` sniffs JSON vs XML from the payload and resolves the target class from the
+`resourceType` (JSON) or root element (XML), so you can omit the target class:
+
+```php
+<?php
+
+$resource = $serializer->deserialize($json);          // format + class auto-detected
+$resource = $serializer->deserialize($xml, PatientResource::class); // explicit class
 ```
 
 ### With Symfony DI
+
+When the FHIRBundle is installed, inject the service by type — the `fhir.serialization_service`
+alias points at it:
 
 ```php
 <?php
@@ -49,933 +137,207 @@ $deserializedPatient = $serializer->deserialize($json, FHIRPatient::class, 'json
 namespace App\Service;
 
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Models\R4B\Resource\PatientResource;
 
-class PatientService
+final class PatientService
 {
     public function __construct(
-        private readonly FHIRSerializationService $serializer
+        private readonly FHIRSerializationService $serializer,
     ) {}
 
-    public function processPatientJson(string $json): FHIRPatient
+    public function toJson(PatientResource $patient): string
     {
-        return $this->serializer->deserialize($json, FHIRPatient::class, 'json');
+        return $this->serializer->serializeToJson($patient);
     }
 
-    public function patientToJson(FHIRPatient $patient): string
+    public function fromJson(string $json): PatientResource
     {
-        return $this->serializer->serialize($patient, 'json');
+        return $this->serializer->deserializeFromJson($json, PatientResource::class);
     }
 }
 ```
 
-## Core Components
+## Serialization Context
 
-### FHIRSerializationService
+`FHIRSerializationContext` is an **immutable** value object. Start from a format factory
+(`forJson()` / `forXml()`) and chain `with*()` calls — each returns a new instance. Pass the
+result to a serialize/deserialize method via `toSymfonyContext()`.
 
-The main service for FHIR serialization operations.
+```php
+<?php
+
+use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
+
+$context = FHIRSerializationContext::forJson()
+    ->withValidationMode(FHIRSerializationContext::VALIDATION_STRICT)
+    ->withUnknownElementPolicy(FHIRSerializationContext::UNKNOWN_POLICY_ERROR)
+    ->withDebugInfo(true);
+
+$json = $serializer->serializeToJson($patient, $context->toSymfonyContext());
+```
+
+### Available factories and modifiers
+
+| Member | Effect |
+|--------|--------|
+| `FHIRSerializationContext::forJson()` | Base context for JSON. |
+| `FHIRSerializationContext::forXml()` | Base context for XML. |
+| `withValidationMode(string)` | `VALIDATION_STRICT` or `VALIDATION_LENIENT`. |
+| `withUnknownElementPolicy(string)` | `UNKNOWN_POLICY_IGNORE`, `UNKNOWN_POLICY_ERROR`, or `UNKNOWN_POLICY_PRESERVE`. |
+| `withFormat(string)` | `FORMAT_JSON` or `FORMAT_XML`. |
+| `withDebugInfo(bool)` | Toggle debug-info collection. |
+| `withPerformanceOptimization(bool)` | Skip non-essential validation for speed. |
+| `withCustomOptions(array)` | Merge arbitrary Symfony serializer options. |
+| `toSymfonyContext()` | Convert to the `array` accepted by the serialize/deserialize methods. |
+
+There are also convenience constructors that bundle common combinations:
+`withStrictValidation()`, `withLenientValidation()`, `withDebugging()`,
+`preservingUnknownElements()`, `erroringOnUnknownElements()`.
+
+After a serialize/deserialize call you can inspect what happened:
+
+```php
+<?php
+
+$debug = $serializer->getDebugInfo(); // array<string, mixed>
+```
+
+## IG-Aware Serialization
+
+To deserialize Implementation Guide extensions and profile subclasses into their typed PHP
+classes, build the service with `createWithIG()`, pointing it at your generated IG output
+directory and its PSR-4 namespace:
 
 ```php
 <?php
 
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
-use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
+use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 
-$service = new FHIRSerializationService();
-
-// Basic serialization
-$json = $service->serialize($fhirResource, 'json');
-
-// Serialization with context
-$context = new FHIRSerializationContext();
-$context->setStrictValidation(true);
-$context->setPrettyPrint(true);
-
-$json = $service->serialize($fhirResource, 'json', $context);
-
-// Deserialization
-$resource = $service->deserialize($json, FHIRPatient::class, 'json');
-
-// Validation
-$errors = $service->validate($fhirResource);
-if (!empty($errors)) {
-    foreach ($errors as $error) {
-        echo "Validation error: {$error}\n";
-    }
-}
+$serializer = FHIRSerializationService::createWithIG(
+    igOutputDirectory: '/app/src/FHIRIG',
+    igNamespace: 'App\\FHIR\\IG',
+    version: FhirVersion::R4B,
+);
 ```
 
-### Normalizers
+With no IG arguments, `createWithIG()` (and therefore `createDefault()`) still registers the base
+model extensions, so standard typed extensions resolve out of the box. See the
+[FHIRBundle guide](fhir-bundle.md) for generating IG classes with `fhir:generate-ig`.
 
-The component includes specialized normalizers for different FHIR types:
+## Validation
 
-#### FHIRResourceNormalizer
-
-Handles FHIR resources (Patient, Observation, etc.):
-
-```php
-<?php
-
-use Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRResourceNormalizer;
-
-$normalizer = new FHIRResourceNormalizer();
-
-// Check if can normalize
-if ($normalizer->supportsNormalization($patient)) {
-    $data = $normalizer->normalize($patient);
-}
-
-// Check if can denormalize
-if ($normalizer->supportsDenormalization($data, FHIRPatient::class)) {
-    $patient = $normalizer->denormalize($data, FHIRPatient::class);
-}
-```
-
-#### FHIRComplexTypeNormalizer
-
-Handles complex FHIR types (HumanName, Address, etc.):
-
-```php
-<?php
-
-use Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRComplexTypeNormalizer;
-
-$normalizer = new FHIRComplexTypeNormalizer();
-
-$humanName = new FHIRHumanName();
-$humanName->setFamily('Doe');
-$humanName->setGiven(['John']);
-
-$data = $normalizer->normalize($humanName);
-// Result: ['family' => 'Doe', 'given' => ['John']]
-
-$denormalized = $normalizer->denormalize($data, FHIRHumanName::class);
-```
-
-#### FHIRPrimitiveTypeNormalizer
-
-Handles FHIR primitive types (string, boolean, decimal, etc.):
-
-```php
-<?php
-
-use Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRPrimitiveTypeNormalizer;
-
-$normalizer = new FHIRPrimitiveTypeNormalizer();
-
-$fhirString = new FHIRString('Hello World');
-$data = $normalizer->normalize($fhirString);
-// Result: 'Hello World'
-
-$denormalized = $normalizer->denormalize('Hello World', FHIRString::class);
-```
-
-### Validation
-
-#### FHIRValidator
-
-Validates FHIR resources against business rules:
+`Validator\FHIRValidator` checks a model object against its FHIR business rules. Its constructor
+requires a `FHIRMetadataExtractor`, and `validate()` returns a **list of error message strings**
+(empty when the object is valid).
 
 ```php
 <?php
 
 use Ardenexal\FHIRTools\Component\Serialization\Validator\FHIRValidator;
+use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor;
 
-$validator = new FHIRValidator();
+$validator = new FHIRValidator(new FHIRMetadataExtractor());
 
-$patient = new FHIRPatient();
-// ... set patient properties
-
-$violations = $validator->validate($patient);
-
-foreach ($violations as $violation) {
-    echo "Property: {$violation->getPropertyPath()}\n";
-    echo "Message: {$violation->getMessage()}\n";
-    echo "Invalid value: {$violation->getInvalidValue()}\n";
-}
-```
-
-#### FHIRSchemaValidator
-
-Validates FHIR resources against JSON schema:
-
-```php
-<?php
-
-use Ardenexal\FHIRTools\Component\Serialization\Validator\FHIRSchemaValidator;
-
-$validator = new FHIRSchemaValidator();
-
-$json = '{"resourceType": "Patient", "id": "example"}';
-$isValid = $validator->validateJson($json, 'Patient');
-
-if (!$isValid) {
-    $errors = $validator->getErrors();
-    foreach ($errors as $error) {
-        echo "Schema error: {$error}\n";
+$errors = $validator->validate($patient); // array<string>
+if ($errors !== []) {
+    foreach ($errors as $message) {
+        echo "Validation error: {$message}\n";
     }
 }
 ```
 
-### Type Resolution
-
-#### FHIRTypeResolver
-
-Resolves FHIR types for serialization:
+To fail fast instead of collecting errors, use `validateOrThrow()`, which throws a
+`ValidationException` when any rule fails:
 
 ```php
 <?php
 
-use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolver;
+use Ardenexal\FHIRTools\Component\Serialization\Exception\ValidationException;
 
-$resolver = new FHIRTypeResolver();
-
-// Resolve resource type from JSON
-$resourceType = $resolver->resolveResourceType($json);
-echo "Resource type: {$resourceType}\n"; // e.g., "Patient"
-
-// Get class name for resource type
-$className = $resolver->getClassForResourceType('Patient');
-echo "Class: {$className}\n"; // e.g., "FHIRPatient"
-
-// Check if type is supported
-if ($resolver->supportsType('Observation')) {
-    echo "Observation is supported\n";
+try {
+    $validator->validateOrThrow($patient);
+} catch (ValidationException $e) {
+    echo "Invalid: {$e->getMessage()}";
 }
 ```
 
-## Advanced Usage
+> For full resource conformance against profiles, terminology bindings, invariants, and
+> Questionnaire/QuestionnaireResponse rules, use the dedicated **Validation** component
+> (`ardenexal/fhir-validation`) and its `FHIRValidationService`, which produces an
+> `OperationOutcome`. `FHIRValidator` covers structural/business-rule checks only.
 
-### Custom Serialization Context
+## Error Handling
 
-```php
-<?php
-
-use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
-
-$context = new FHIRSerializationContext();
-
-// Validation settings
-$context->setStrictValidation(true);
-$context->setValidateSchema(true);
-$context->setValidateBusinessRules(true);
-
-// Output formatting
-$context->setPrettyPrint(true);
-$context->setIndentation('  '); // 2 spaces
-$context->setEscapeUnicode(false);
-
-// Performance settings
-$context = new FHIRSerializationContext(
-    skipNonEssentialValidation: true,
-    omitNullValues: true,
-    omitEmptyArrays: true
-);
-
-// Debug settings
-$context->setDebugMode(true);
-$context->setIncludeDebugInfo(true);
-
-// Use context in serialization
-$json = $serializer->serialize($patient, 'json', $context);
-```
-
-### Batch Operations
+All serialize/deserialize failures are wrapped in `FHIRSerializationException`; validation
+failures from `validateOrThrow()` raise `ValidationException`. Both extend the component base
+`FHIRToolsException`.
 
 ```php
 <?php
 
-class FHIRBatchProcessor
-{
-    public function __construct(
-        private readonly FHIRSerializationService $serializer
-    ) {}
+use Ardenexal\FHIRTools\Component\Serialization\Exception\FHIRSerializationException;
 
-    public function processBatch(array $jsonResources): array
-    {
-        $results = [];
-        
-        foreach ($jsonResources as $json) {
-            try {
-                // Determine resource type
-                $data = json_decode($json, true);
-                $resourceType = $data['resourceType'] ?? null;
-                
-                if (!$resourceType) {
-                    throw new \InvalidArgumentException('Missing resourceType');
-                }
-                
-                // Get appropriate class
-                $className = "FHIR{$resourceType}";
-                
-                // Deserialize
-                $resource = $this->serializer->deserialize($json, $className, 'json');
-                
-                // Validate
-                $errors = $this->serializer->validate($resource);
-                
-                $results[] = [
-                    'resource' => $resource,
-                    'valid' => empty($errors),
-                    'errors' => $errors
-                ];
-                
-            } catch (\Exception $e) {
-                $results[] = [
-                    'resource' => null,
-                    'valid' => false,
-                    'errors' => [$e->getMessage()]
-                ];
-            }
-        }
-        
-        return $results;
-    }
-}
-```
-
-### Custom Normalizers
-
-Create custom normalizers for specific needs:
-
-```php
-<?php
-
-namespace App\Serialization\Normalizer;
-
-use Ardenexal\FHIRTools\Component\Serialization\Normalizer\FHIRNormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-
-class CustomPatientNormalizer implements FHIRNormalizerInterface, NormalizerInterface, DenormalizerInterface
-{
-    public function normalize($object, string $format = null, array $context = []): array
-    {
-        if (!$object instanceof FHIRPatient) {
-            throw new \InvalidArgumentException('Expected FHIRPatient');
-        }
-
-        $data = [
-            'resourceType' => 'Patient',
-            'id' => $object->getId(),
-            'name' => $this->normalizeName($object->getName()),
-            // Add custom normalization logic
-            'customField' => $this->getCustomField($object),
-        ];
-
-        return array_filter($data); // Remove null values
-    }
-
-    public function denormalize($data, string $type, string $format = null, array $context = []): FHIRPatient
-    {
-        $patient = new FHIRPatient();
-        
-        if (isset($data['id'])) {
-            $patient->setId($data['id']);
-        }
-        
-        if (isset($data['name'])) {
-            $patient->setName($this->denormalizeName($data['name']));
-        }
-        
-        // Handle custom field
-        if (isset($data['customField'])) {
-            $this->setCustomField($patient, $data['customField']);
-        }
-
-        return $patient;
-    }
-
-    public function supportsNormalization($data, string $format = null): bool
-    {
-        return $data instanceof FHIRPatient;
-    }
-
-    public function supportsDenormalization($data, string $type, string $format = null): bool
-    {
-        return $type === FHIRPatient::class;
-    }
-
-    private function normalizeName(?FHIRHumanName $name): ?array
-    {
-        if (!$name) {
-            return null;
-        }
-
-        return [
-            'family' => $name->getFamily(),
-            'given' => $name->getGiven(),
-            'use' => $name->getUse(),
-        ];
-    }
-
-    private function denormalizeName(array $data): FHIRHumanName
-    {
-        $name = new FHIRHumanName();
-        
-        if (isset($data['family'])) {
-            $name->setFamily($data['family']);
-        }
-        
-        if (isset($data['given'])) {
-            $name->setGiven($data['given']);
-        }
-        
-        if (isset($data['use'])) {
-            $name->setUse($data['use']);
-        }
-
-        return $name;
-    }
-}
-```
-
-### Performance Optimization
-
-#### Metadata Caching
-
-```php
-<?php
-
-use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataCache;
-
-// Configure caching
-$cache = new FHIRMetadataCache();
-$cache->setCacheDirectory('/path/to/cache');
-$cache->setTtl(3600); // 1 hour
-
-$serializer = new FHIRSerializationService();
-$serializer->setMetadataCache($cache);
-
-// Metadata will be cached automatically
-$json = $serializer->serialize($patient, 'json');
-```
-
-#### Performance Optimization
-
-```php
-<?php
-
-// Use performance-optimized context
-$context = new FHIRSerializationContext(
-    skipNonEssentialValidation: true,
-    omitNullValues: true,
-    omitEmptyArrays: true
-);
-
-// Only perform essential operations
-$serializer->serialize($patient, 'json', $context->toSymfonyContext());
-```
-
-#### Memory Management
-
-```php
-<?php
-
-class LargeFHIRProcessor
-{
-    private FHIRSerializationService $serializer;
-    private int $batchSize = 100;
-
-    public function processLargeDataset(array $resources): void
-    {
-        $batches = array_chunk($resources, $this->batchSize);
-        
-        foreach ($batches as $batch) {
-            $this->processBatch($batch);
-            
-            // Force garbage collection
-            gc_collect_cycles();
-            
-            // Monitor memory usage
-            $memory = memory_get_usage(true);
-            if ($memory > 500 * 1024 * 1024) { // 500MB
-                throw new \RuntimeException('Memory limit exceeded');
-            }
-        }
-    }
-
-    private function processBatch(array $batch): void
-    {
-        foreach ($batch as $resource) {
-            $json = $this->serializer->serialize($resource, 'json');
-            // Process JSON...
-            
-            // Clear reference to help GC
-            unset($json);
-        }
-    }
-}
-```
-
-## Symfony Integration
-
-### Service Configuration
-
-```yaml
-# config/services.yaml
-services:
-    # Custom normalizer
-    App\Serialization\Normalizer\CustomPatientNormalizer:
-        tags:
-            - { name: fhir.normalizer, priority: 100 }
-
-    # Custom validator
-    App\Serialization\Validator\CustomFHIRValidator:
-        tags:
-            - { name: fhir.validator }
-```
-
-### Event Listeners
-
-```php
-<?php
-
-namespace App\EventListener;
-
-use Ardenexal\FHIRTools\Component\Serialization\Event\FHIRSerializationEvent;
-use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
-
-class FHIRSerializationListener
-{
-    #[AsEventListener(event: 'fhir.serialization.before')]
-    public function onBeforeSerialization(FHIRSerializationEvent $event): void
-    {
-        $resource = $event->getResource();
-        
-        // Add custom logic before serialization
-        if ($resource instanceof FHIRPatient) {
-            // Log patient serialization
-            // $this->logger->info('Serializing patient', ['id' => $resource->getId()]);
-        }
-    }
-
-    #[AsEventListener(event: 'fhir.serialization.after')]
-    public function onAfterSerialization(FHIRSerializationEvent $event): void
-    {
-        $json = $event->getResult();
-        
-        // Validate serialized JSON
-        if (!json_decode($json)) {
-            throw new \RuntimeException('Invalid JSON produced');
-        }
-    }
-}
-```
-
-### Controller Integration
-
-```php
-<?php
-
-namespace App\Controller\Api;
-
-use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-
-#[Route('/api/fhir')]
-class FHIRApiController extends AbstractController
-{
-    public function __construct(
-        private readonly FHIRSerializationService $serializer
-    ) {}
-
-    #[Route('/patient', methods: ['POST'])]
-    public function createPatient(Request $request): JsonResponse
-    {
-        try {
-            // Deserialize request body
-            $patient = $this->serializer->deserialize(
-                $request->getContent(),
-                FHIRPatient::class,
-                'json'
-            );
-
-            // Validate
-            $errors = $this->serializer->validate($patient);
-            if (!empty($errors)) {
-                return new JsonResponse([
-                    'error' => 'Validation failed',
-                    'details' => $errors
-                ], 400);
-            }
-
-            // Save patient (implement your logic)
-            // $this->patientRepository->save($patient);
-
-            // Return serialized patient
-            $json = $this->serializer->serialize($patient, 'json');
-            
-            return new JsonResponse(
-                json_decode($json),
-                201,
-                ['Content-Type' => 'application/fhir+json']
-            );
-
-        } catch (\Exception $e) {
-            return new JsonResponse([
-                'error' => 'Serialization error',
-                'message' => $e->getMessage()
-            ], 400);
-        }
-    }
-
-    #[Route('/patient/{id}', methods: ['GET'])]
-    public function getPatient(string $id): JsonResponse
-    {
-        // Load patient from database
-        // $patient = $this->patientRepository->find($id);
-        
-        // For demo, create sample patient
-        $patient = new FHIRPatient();
-        $patient->setId($id);
-        
-        $name = new FHIRHumanName();
-        $name->setFamily('Doe');
-        $name->setGiven(['John']);
-        $patient->setName([$name]);
-
-        try {
-            $json = $this->serializer->serialize($patient, 'json');
-            
-            return new JsonResponse(
-                json_decode($json),
-                200,
-                ['Content-Type' => 'application/fhir+json']
-            );
-
-        } catch (\Exception $e) {
-            return new JsonResponse([
-                'error' => 'Serialization error',
-                'message' => $e->getMessage()
-            ], 500);
-        }
-    }
+try {
+    $patient = $serializer->deserializeFromJson($maybeInvalidJson, PatientResource::class);
+} catch (FHIRSerializationException $e) {
+    // Wraps the underlying decode/denormalize error; inspect $e->getPrevious() for detail.
+    error_log('FHIR deserialization failed: ' . $e->getMessage());
 }
 ```
 
 ## Testing
 
-### Unit Testing
+A round-trip assertion is the most useful unit test for the serializer:
 
 ```php
 <?php
 
-namespace Tests\Serialization;
+namespace App\Tests\Serialization;
 
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Models\R4B\Resource\PatientResource;
+use Ardenexal\FHIRTools\Component\Models\R4B\DataType\HumanName;
 use PHPUnit\Framework\TestCase;
 
-class FHIRSerializationServiceTest extends TestCase
+final class PatientRoundTripTest extends TestCase
 {
-    private FHIRSerializationService $serializer;
-
-    protected function setUp(): void
+    public function testJsonRoundTripPreservesData(): void
     {
-        $this->serializer = new FHIRSerializationService();
-    }
+        $serializer = FHIRSerializationService::createDefault();
 
-    public function testPatientSerialization(): void
-    {
-        $patient = new FHIRPatient();
-        $patient->setId('test-123');
-        
-        $name = new FHIRHumanName();
-        $name->setFamily('Doe');
-        $name->setGiven(['John']);
-        $patient->setName([$name]);
+        $patient = new PatientResource(
+            id: 'rt-1',
+            name: [new HumanName(family: 'Smith', given: ['Jane', 'Q'])],
+        );
 
-        $json = $this->serializer->serialize($patient, 'json');
-        
-        self::assertJson($json);
-        
-        $data = json_decode($json, true);
-        self::assertEquals('Patient', $data['resourceType']);
-        self::assertEquals('test-123', $data['id']);
-        self::assertEquals('Doe', $data['name'][0]['family']);
-        self::assertEquals(['John'], $data['name'][0]['given']);
-    }
+        $json     = $serializer->serializeToJson($patient);
+        $restored = $serializer->deserializeFromJson($json, PatientResource::class);
 
-    public function testPatientDeserialization(): void
-    {
-        $json = json_encode([
-            'resourceType' => 'Patient',
-            'id' => 'test-456',
-            'name' => [
-                [
-                    'family' => 'Smith',
-                    'given' => ['Jane']
-                ]
-            ]
-        ]);
-
-        $patient = $this->serializer->deserialize($json, FHIRPatient::class, 'json');
-
-        self::assertInstanceOf(FHIRPatient::class, $patient);
-        self::assertEquals('test-456', $patient->getId());
-        self::assertEquals('Smith', $patient->getName()[0]->getFamily());
-        self::assertEquals(['Jane'], $patient->getName()[0]->getGiven());
-    }
-
-    public function testRoundTripSerialization(): void
-    {
-        $originalPatient = new FHIRPatient();
-        $originalPatient->setId('round-trip-test');
-        
-        // Serialize
-        $json = $this->serializer->serialize($originalPatient, 'json');
-        
-        // Deserialize
-        $deserializedPatient = $this->serializer->deserialize($json, FHIRPatient::class, 'json');
-        
-        // Verify round trip
-        self::assertEquals($originalPatient->getId(), $deserializedPatient->getId());
-    }
-
-    public function testValidation(): void
-    {
-        $patient = new FHIRPatient();
-        // Don't set required fields to trigger validation errors
-        
-        $errors = $this->serializer->validate($patient);
-        
-        self::assertNotEmpty($errors);
-        // Add specific validation assertions based on your FHIR model requirements
+        // `id` stays a plain string; primitive sub-fields return as Stringable objects, so cast.
+        self::assertSame('rt-1', $restored->id);
+        self::assertSame('Smith', (string) $restored->name[0]->family);
+        self::assertSame(['Jane', 'Q'], array_map('strval', $restored->name[0]->given));
     }
 }
 ```
 
-### Property-Based Testing
+In a Symfony test, fetch the configured service from the container instead of constructing it:
 
 ```php
 <?php
 
-namespace Tests\Property;
-
-use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
-use Eris\Generator;
-use Eris\TestTrait;
-use PHPUnit\Framework\TestCase;
-
-class SerializationPropertyTest extends TestCase
-{
-    use TestTrait;
-
-    private FHIRSerializationService $serializer;
-
-    protected function setUp(): void
-    {
-        $this->serializer = new FHIRSerializationService();
-    }
-
-    /**
-     * **Feature: repository-reorganization, Property 21: Serialization round trip**
-     * **Validates: Requirements 8.2**
-     */
-    public function testSerializationRoundTrip(): void
-    {
-        $this->forAll(
-            Generator\string(),
-            Generator\seq(Generator\string())
-        )->then(function (string $id, array $givenNames) {
-            // Create patient with random data
-            $patient = new FHIRPatient();
-            $patient->setId($id);
-            
-            if (!empty($givenNames)) {
-                $name = new FHIRHumanName();
-                $name->setGiven($givenNames);
-                $patient->setName([$name]);
-            }
-
-            // Serialize and deserialize
-            $json = $this->serializer->serialize($patient, 'json');
-            $deserialized = $this->serializer->deserialize($json, FHIRPatient::class, 'json');
-
-            // Verify round trip preserves data
-            self::assertEquals($patient->getId(), $deserialized->getId());
-            
-            if ($patient->getName()) {
-                self::assertEquals(
-                    $patient->getName()[0]->getGiven(),
-                    $deserialized->getName()[0]->getGiven()
-                );
-            }
-        });
-    }
-}
-```
-
-### Integration Testing
-
-```php
-<?php
-
-namespace Tests\Integration;
-
-use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-
-class SerializationIntegrationTest extends KernelTestCase
-{
-    private FHIRSerializationService $serializer;
-
-    protected function setUp(): void
-    {
-        self::bootKernel();
-        $this->serializer = static::getContainer()->get('fhir.serialization_service');
-    }
-
-    public function testSymfonyIntegration(): void
-    {
-        // Test that the service is properly configured in Symfony
-        self::assertInstanceOf(FHIRSerializationService::class, $this->serializer);
-        
-        // Test basic functionality
-        $patient = new FHIRPatient();
-        $patient->setId('integration-test');
-        
-        $json = $this->serializer->serialize($patient, 'json');
-        self::assertJson($json);
-        
-        $deserialized = $this->serializer->deserialize($json, FHIRPatient::class, 'json');
-        self::assertEquals('integration-test', $deserialized->getId());
-    }
-
-    public function testRealWorldFHIRData(): void
-    {
-        // Load real FHIR example
-        $exampleJson = file_get_contents(__DIR__ . '/../../Fixtures/OfficialFHIR/patient-example.json');
-        
-        // Test deserialization
-        $patient = $this->serializer->deserialize($exampleJson, FHIRPatient::class, 'json');
-        self::assertInstanceOf(FHIRPatient::class, $patient);
-        
-        // Test re-serialization
-        $reserializedJson = $this->serializer->serialize($patient, 'json');
-        self::assertJson($reserializedJson);
-        
-        // Verify data integrity
-        $originalData = json_decode($exampleJson, true);
-        $reserializedData = json_decode($reserializedJson, true);
-        
-        self::assertEquals($originalData['resourceType'], $reserializedData['resourceType']);
-        self::assertEquals($originalData['id'], $reserializedData['id']);
-    }
-}
-```
-
-## Error Handling
-
-### Exception Types
-
-```php
-<?php
-
-use Ardenexal\FHIRTools\Component\Serialization\Exception\SerializationException;
-use Ardenexal\FHIRTools\Component\Serialization\Exception\ValidationException;
-
-try {
-    $patient = $serializer->deserialize($invalidJson, FHIRPatient::class, 'json');
-} catch (SerializationException $e) {
-    echo "Serialization error: " . $e->getMessage();
-} catch (ValidationException $e) {
-    echo "Validation error: " . $e->getMessage();
-    
-    // Get detailed validation errors
-    $violations = $e->getViolations();
-    foreach ($violations as $violation) {
-        echo "Field: {$violation->getPropertyPath()}, Error: {$violation->getMessage()}\n";
-    }
-}
-```
-
-### Error Recovery
-
-```php
-<?php
-
-class RobustFHIRProcessor
-{
-    public function __construct(
-        private readonly FHIRSerializationService $serializer
-    ) {}
-
-    public function processWithErrorRecovery(string $json): ?FHIRPatient
-    {
-        try {
-            return $this->serializer->deserialize($json, FHIRPatient::class, 'json');
-        } catch (SerializationException $e) {
-            // Try to recover by fixing common issues
-            $fixedJson = $this->attemptJsonFix($json);
-            
-            if ($fixedJson !== $json) {
-                try {
-                    return $this->serializer->deserialize($fixedJson, FHIRPatient::class, 'json');
-                } catch (SerializationException $e2) {
-                    // Log both errors
-                    error_log("Original error: " . $e->getMessage());
-                    error_log("Recovery error: " . $e2->getMessage());
-                }
-            }
-            
-            return null;
-        }
-    }
-
-    private function attemptJsonFix(string $json): string
-    {
-        // Fix common JSON issues
-        $data = json_decode($json, true);
-        
-        if (!$data) {
-            return $json; // Can't fix invalid JSON
-        }
-        
-        // Ensure resourceType is present
-        if (!isset($data['resourceType'])) {
-            $data['resourceType'] = 'Patient';
-        }
-        
-        // Fix common field issues
-        if (isset($data['name']) && !is_array($data['name'])) {
-            $data['name'] = [$data['name']];
-        }
-        
-        return json_encode($data);
-    }
-}
+self::bootKernel();
+$serializer = static::getContainer()->get('fhir.serialization_service');
 ```
 
 ## Best Practices
 
-### Performance
-
-1. **Enable Caching**: Use metadata caching for better performance
-2. **Batch Processing**: Process multiple resources efficiently
-3. **Memory Management**: Monitor memory usage with large datasets
-4. **Lazy Loading**: Use lazy loading for better resource utilization
-
-### Security
-
-1. **Input Validation**: Always validate FHIR data before processing
-2. **Schema Validation**: Use schema validation for additional security
-3. **Error Handling**: Don't expose sensitive information in error messages
-4. **Resource Limits**: Set appropriate limits for resource processing
-
-### Maintainability
-
-1. **Custom Normalizers**: Create custom normalizers for specific needs
-2. **Event Listeners**: Use events for cross-cutting concerns
-3. **Testing**: Implement comprehensive testing including property-based tests
-4. **Documentation**: Document custom serialization logic
-
-### Integration
-
-1. **Symfony Services**: Use dependency injection for better testability
-2. **Configuration**: Make serialization behavior configurable
-3. **Monitoring**: Monitor serialization performance and errors
-4. **Logging**: Add appropriate logging for debugging and auditing
+- **Pick the right FHIR version once.** Build the service with the matching `FhirVersion` and
+  reuse it; the model classes (`...\Models\R4`, `R4B`, `R5`) must match the service version.
+- **Treat the context as immutable.** Capture the result of each `with*()` call; the original
+  instance is unchanged.
+- **Validate before persisting.** Run `FHIRValidator` (or the full Validation component) on
+  inbound data rather than trusting deserialization to reject it.
+- **Reuse the service.** `createDefault()` builds the full normalizer stack; construct it once
+  and inject it, rather than per request.

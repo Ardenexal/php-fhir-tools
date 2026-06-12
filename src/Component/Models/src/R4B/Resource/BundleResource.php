@@ -82,7 +82,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     expression: 'type = \'message\' implies entry.first().resource.is(MessageHeader)',
     human: 'A message must have a MessageHeader as the first resource',
 )]
-class BundleResource extends ResourceResource
+class BundleResource extends AbstractResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */

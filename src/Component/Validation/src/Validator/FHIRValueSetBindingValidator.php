@@ -13,6 +13,16 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+/**
+ * Validates that a coded value conforms to the value set bound to a property.
+ *
+ * Enforces a #[FHIRValueSetBinding] constraint, branching on binding strength. `required`
+ * bindings are checked against the generated backed-enum for the value set (falling back to the
+ * terminology client when no enum exists); `extensible`/`preferred` bindings are checked via the
+ * terminology client. `example` bindings are ignored. When no real terminology client is
+ * configured, non-required checks are skipped and surfaced as a single fhir:unchecked-binding
+ * INFO violation (issue #71) that does not affect overall validity.
+ */
 final class FHIRValueSetBindingValidator extends ConstraintValidator
 {
     public const string DEFAULT_MISSING_ENUM_MESSAGE = 'Required binding for value set {{ url }} could not be validated: no enum class generated.';

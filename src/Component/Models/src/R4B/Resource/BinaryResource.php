@@ -24,7 +24,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A resource that represents the data of a single raw artifact as digital content accessible in its native format.  A Binary resource can contain any content, whether text, image, pdf, zip archive, etc.
  */
 #[FhirResource(type: 'Binary', version: '4.3.0', url: 'http://hl7.org/fhir/StructureDefinition/Binary', fhirVersion: 'R4B')]
-class BinaryResource extends ResourceResource
+class BinaryResource extends AbstractResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */

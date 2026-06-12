@@ -20,7 +20,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\Parameters\ParametersParam
  * @description This resource is a non-persisted resource used to pass information into and back from an [operation](operations.html). It has no other use, and there is no RESTful endpoint associated with it.
  */
 #[FhirResource(type: 'Parameters', version: '4.3.0', url: 'http://hl7.org/fhir/StructureDefinition/Parameters', fhirVersion: 'R4B')]
-class ParametersResource extends ResourceResource
+class ParametersResource extends AbstractResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */

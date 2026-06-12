@@ -107,7 +107,7 @@ final class ComparisonService
      */
     public function tryExtractQuantity(mixed $value): ?array
     {
-        [$quantity, $isQuantity] = $this->extractQuantity($value);
+        [$quantity] = $this->extractQuantity($value);
 
         return $quantity;
     }

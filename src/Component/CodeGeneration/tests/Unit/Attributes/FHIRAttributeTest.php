@@ -88,7 +88,7 @@ class FHIRAttributeTest extends TestCase
 
             // Verify the attribute contains correct type name information
             self::assertSame($typeName, $attribute->typeName);
-            self::assertSame('R4B', $attribute->fhirVersion); // Default version
+            self::assertSame('R4', $attribute->fhirVersion); // Default version
 
             // Verify attribute is properly configured for class targeting
             $reflection = new \ReflectionClass(FHIRComplexType::class);
@@ -118,7 +118,7 @@ class FHIRAttributeTest extends TestCase
             // Verify the attribute contains correct parent resource information
             self::assertSame($parentResource, $attribute->parentResource);
             self::assertSame($elementPath, $attribute->elementPath);
-            self::assertSame('R4B', $attribute->fhirVersion); // Default version
+            self::assertSame('R4', $attribute->fhirVersion); // Default version
 
             // Verify attribute is properly configured for class targeting
             $reflection = new \ReflectionClass(FHIRBackboneElement::class);
@@ -146,7 +146,7 @@ class FHIRAttributeTest extends TestCase
 
             // Verify the attribute contains correct primitive type information
             self::assertSame($primitiveType, $attribute->primitiveType);
-            self::assertSame('R4B', $attribute->fhirVersion); // Default version
+            self::assertSame('R4', $attribute->fhirVersion); // Default version
             self::assertTrue($attribute->supportsExtensions()); // All FHIR primitives support extensions
 
             // Verify attribute is properly configured for class targeting

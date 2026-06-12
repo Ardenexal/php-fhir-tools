@@ -74,7 +74,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     expression: 'CodeSystem.content = \'supplement\' implies CodeSystem.supplements.exists()',
     human: 'If the code system content = supplement, it must nominate what it\'s a supplement for',
 )]
-class CodeSystemResource extends DomainResourceResource
+class CodeSystemResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -92,7 +92,7 @@ class CodeSystemResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

@@ -10,6 +10,14 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+/**
+ * Validates a FHIR date/dateTime/instant/time value against declared min/max bounds.
+ *
+ * Enforces a #[FHIRTemporalRange] constraint. `time` values are compared as plain strings;
+ * date-like values are parsed, with partial dates (YYYY or YYYY-MM) expanded to the start of
+ * their period for the min check and the end for the max check (see ADR-006). An out-of-range
+ * value raises an ERROR, while an unparseable configured bound is surfaced as a WARNING.
+ */
 final class FHIRTemporalRangeValidator extends ConstraintValidator
 {
     private const string MSG_BELOW_MIN = 'The value {{ value }} is before the minimum {{ min }}.';
@@ -30,7 +38,16 @@ final class FHIRTemporalRangeValidator extends ConstraintValidator
             return;
         }
 
-        if (!is_string($value)) {
+        // FHIR model properties hold primitive wrapper objects (e.g. DatePrimitive), which are
+        // \Stringable, not raw strings. Accept those and compare their string form — otherwise the
+        // constraint silently no-ops on every real model object.
+        if (!is_string($value) && !$value instanceof \Stringable) {
+            return;
+        }
+
+        $value = (string) $value;
+
+        if ($value === '') {
             return;
         }
 
@@ -81,7 +98,9 @@ final class FHIRTemporalRangeValidator extends ConstraintValidator
         }
 
         if ($constraint->maxValue !== null) {
-            $maxDt = $this->parseBound($constraint->maxValue, $constraint->temporalType);
+            // max bound must use the SAME end-of-period expansion as the max-side value, so a
+            // partial bound like '2099' becomes 2099-12-31 (not 2099-01-01) — see ADR-006.
+            $maxDt = $this->expandForMaxComparison($constraint->maxValue, $constraint->temporalType);
 
             if ($maxDt === null) {
                 $this->context->buildViolation(self::MSG_INVALID_BOUND)
@@ -96,7 +115,7 @@ final class FHIRTemporalRangeValidator extends ConstraintValidator
         }
 
         // min-side: expand partial date to start of period
-        $valueDtForMin = $this->expandForMinComparison($value, $constraint->temporalType);
+        $valueDtForMin = $this->parseBound($value, $constraint->temporalType);
 
         if ($valueDtForMin === null) {
             $this->context->buildViolation(self::MSG_INVALID_VALUE)
@@ -130,14 +149,6 @@ final class FHIRTemporalRangeValidator extends ConstraintValidator
         return match ($temporalType) {
             'instant' => \DateTimeImmutable::createFromFormat(\DateTimeInterface::RFC3339, $bound) ?: null,
             default   => $this->parsePartialOrFullDate($bound, forMax: false),
-        };
-    }
-
-    private function expandForMinComparison(string $value, string $temporalType): ?\DateTimeImmutable
-    {
-        return match ($temporalType) {
-            'instant' => \DateTimeImmutable::createFromFormat(\DateTimeInterface::RFC3339, $value) ?: null,
-            default   => $this->parsePartialOrFullDate($value, forMax: false),
         };
     }
 
@@ -179,8 +190,11 @@ final class FHIRTemporalRangeValidator extends ConstraintValidator
             return new \DateTimeImmutable($value . '-01');
         }
 
-        // Full date or dateTime with optional timezone — let PHP parse it
-        $dt = \DateTimeImmutable::createFromFormat('Y-m-d', substr($value, 0, 10));
+        // Full date or dateTime with optional timezone — let PHP parse it.
+        // Anchor to midnight with the `!` reset modifier so unspecified fields (H:i:s) are
+        // zeroed instead of inheriting the current wall-clock time; this keeps same-calendar-day
+        // comparisons deterministic.
+        $dt = \DateTimeImmutable::createFromFormat('!Y-m-d', substr($value, 0, 10));
 
         if ($dt === false) {
             return null;

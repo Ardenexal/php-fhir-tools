@@ -21,7 +21,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\Parameters\ParametersParame
  * @description This resource is used to pass information into and back from an operation (whether invoked directly from REST or within a messaging environment).  It is not persisted or allowed to be referenced by other resources.
  */
 #[FhirResource(type: 'Parameters', version: '5.0.0', url: 'http://hl7.org/fhir/StructureDefinition/Parameters', fhirVersion: 'R5')]
-class ParametersResource extends ResourceResource
+class ParametersResource extends AbstractResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */

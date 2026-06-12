@@ -69,7 +69,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     expression: '(kind = \'query\') implies ((parameter.where(use = \'out\').count() = 1) and (parameter.where(use = \'out\').all(name = \'result\' and type = \'Bundle\')))',
     human: 'Named queries always have a single output parameter named \'result\' of type Bundle',
 )]
-class OperationDefinitionResource extends DomainResourceResource
+class OperationDefinitionResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -87,7 +87,7 @@ class OperationDefinitionResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

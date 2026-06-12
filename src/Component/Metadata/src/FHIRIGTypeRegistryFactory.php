@@ -90,7 +90,7 @@ final class FHIRIGTypeRegistryFactory
 
         foreach ($finder as $file) {
             $relativePath = $file->getRelativePathname();
-            $classSuffix  = str_replace(['/', '\\', DIRECTORY_SEPARATOR], '\\', $relativePath);
+            $classSuffix  = str_replace(['/', '\\'], '\\', $relativePath);
             $classSuffix  = preg_replace('/\.php$/i', '', $classSuffix) ?? $classSuffix;
             $className    = rtrim($namespace, '\\') . '\\' . ltrim($classSuffix, '\\');
 

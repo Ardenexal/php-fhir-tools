@@ -33,7 +33,7 @@ return [
 fhir:
     output_directory: '%kernel.project_dir%/output'   # where generated models are written
     cache_directory: '%kernel.cache_dir%/fhir'
-    default_version: R4B   # R4 | R4B | R5
+    default_version: R4   # R4 | R4B | R5
     validation:
         enabled: true
         strict_mode: false

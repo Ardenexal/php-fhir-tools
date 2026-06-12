@@ -6,6 +6,10 @@ namespace Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation;
 
 use Symfony\Component\Validator\Constraint;
 
+/**
+ * Declares a FHIR invariant (StructureDefinition element.constraint) as a FHIRPath expression
+ * that must hold on instances of the annotated class.
+ */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class FHIRPathInvariant extends Constraint
 {

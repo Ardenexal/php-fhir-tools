@@ -208,9 +208,8 @@ final class HttpFHIRTerminologyClient implements FHIRTerminologyClientInterface
             }
 
             $parameters[] = match ($name) {
-                'url', 'system' => ['name' => $name, 'valueUri'    => $value],
-                'code'          => ['name' => $name, 'valueCode'   => $value],
-                'display'       => ['name' => $name, 'valueString' => $value],
+                'url', 'system' => ['name' => $name, 'valueUri'  => $value],
+                'code'          => ['name' => $name, 'valueCode' => $value],
                 default         => ['name' => $name, 'valueString' => $value],
             };
         }

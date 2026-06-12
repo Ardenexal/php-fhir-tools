@@ -13,10 +13,14 @@
     "prefer-stable": true,
     "require": {
         "php": ">=8.3",
-        "symfony/validator": "^6.4|^7.4",
+        "ardenexal/fhir-metadata": "^0.4",
+        "ardenexal/fhir-models": "^0.4",
+        "ardenexal/fhir-path": "^0.4",
+        "brick/date-time": "^0.9.0",
+        "psr/cache": "^3.0",
+        "symfony/http-client-contracts": "^3.4",
         "symfony/property-access": "^6.4|^7.4",
-        "ardenexal/fhir-metadata": "^0.3",
-        "ardenexal/fhir-path": "^0.3"
+        "symfony/validator": "^6.4|^7.4"
     },
     "autoload": {
         "psr-4": {
@@ -40,5 +44,10 @@
     "support": {
         "issues": "https://github.com/ardenexal/fhir-tools/issues",
         "source": "https://github.com/ardenexal/fhir-tools"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "0.4.x-dev"
+        }
     }
 }

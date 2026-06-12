@@ -28,7 +28,7 @@ use Symfony\Component\Validator\Constraints\Count;
  * @description A container for slots of time that may be available for booking appointments.
  */
 #[FhirResource(type: 'Schedule', version: '4.0.1', url: 'http://hl7.org/fhir/StructureDefinition/Schedule', fhirVersion: 'R4')]
-class ScheduleResource extends DomainResourceResource
+class ScheduleResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -51,7 +51,7 @@ class ScheduleResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

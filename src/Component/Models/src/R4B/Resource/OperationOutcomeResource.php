@@ -28,7 +28,7 @@ use Symfony\Component\Validator\Constraints\Count;
     url: 'http://hl7.org/fhir/StructureDefinition/OperationOutcome',
     fhirVersion: 'R4B',
 )]
-class OperationOutcomeResource extends DomainResourceResource
+class OperationOutcomeResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -51,7 +51,7 @@ class OperationOutcomeResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

@@ -14,11 +14,11 @@ class FHIRComplexType
 {
     /**
      * @param string $typeName    The FHIR complex type name (e.g., 'Address', 'HumanName')
-     * @param string $fhirVersion The FHIR version (default: 'R4B')
+     * @param string $fhirVersion The FHIR version (default: 'R4')
      */
     public function __construct(
         public readonly string $typeName,
-        public readonly string $fhirVersion = 'R4B'
+        public readonly string $fhirVersion = 'R4'
     ) {
     }
 }

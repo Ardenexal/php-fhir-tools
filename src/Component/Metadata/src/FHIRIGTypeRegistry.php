@@ -221,12 +221,19 @@ class FHIRIGTypeRegistry
      */
     private function matchesValue(mixed $dataValue, mixed $discriminatorValue): bool
     {
-        // Unwrap primitive wrapper objects (UriPrimitive, StringPrimitive, etc.)
-        if (is_object($dataValue) && property_exists($dataValue, 'value')) {
-            $dataValue = $dataValue->value;
+        return $this->unwrapPrimitiveValue($dataValue) === $discriminatorValue;
+    }
+
+    /**
+     * Unwrap a primitive wrapper object (UriPrimitive, StringPrimitive, etc.) to its scalar value.
+     */
+    private function unwrapPrimitiveValue(mixed $value): mixed
+    {
+        if (is_object($value) && property_exists($value, 'value')) {
+            return $value->value;
         }
 
-        return $dataValue === $discriminatorValue;
+        return $value;
     }
 
     /**
@@ -300,12 +307,7 @@ class FHIRIGTypeRegistry
                 return false;
             }
 
-            $actualValue = $superset[$key];
-
-            // Unwrap primitive wrapper objects
-            if (is_object($actualValue) && property_exists($actualValue, 'value')) {
-                $actualValue = $actualValue->value;
-            }
+            $actualValue = $this->unwrapPrimitiveValue($superset[$key]);
 
             if ($actualValue !== $expectedValue) {
                 return false;

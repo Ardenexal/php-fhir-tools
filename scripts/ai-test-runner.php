@@ -55,6 +55,20 @@ foreach (array_slice($argv, 1) as $arg) {
     }
 }
 
+// When no --testsuite is given, select the canonical non-overlapping set rather than letting the
+// runner load EVERY suite. The aggregate "integration" suite and the per-module "integration-*"
+// suites (used by the CI matrix) cover the same files, so loading all of them double-adds each
+// integration test, emitting "already added to test suite" runner warnings that trip
+// failOnWarning="true" and force a non-zero exit even when 0 tests fail. "unit" + "integration"
+// + the three dedicated spec suites cover every test exactly once.
+$hasTestsuite = (bool) array_filter(
+    $userArgs,
+    static fn (string $arg): bool => str_starts_with($arg, '--testsuite'),
+);
+if (!$hasTestsuite) {
+    $userArgs[] = '--testsuite=unit,integration,fhirpath-spec,questionnaire-spec,brianpos-questionnaire-spec';
+}
+
 if ($aiSerial) {
     // ParaTest-only flags would be rejected by plain PHPUnit - drop them
     $userArgs = array_values(array_filter(

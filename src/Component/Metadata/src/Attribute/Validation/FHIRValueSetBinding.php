@@ -6,6 +6,10 @@ namespace Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation;
 
 use Symfony\Component\Validator\Constraint;
 
+/**
+ * Binds a coded property to a FHIR ValueSet (StructureDefinition element.binding), recording the
+ * binding strength so its value can be checked for membership.
+ */
 #[\Attribute(\Attribute::TARGET_PARAMETER | \Attribute::TARGET_PROPERTY)]
 final class FHIRValueSetBinding extends Constraint
 {

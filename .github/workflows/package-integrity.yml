@@ -1,0 +1,126 @@
+name: Package Integrity
+
+# Guards the split-package contract that the monorepo's local autoload hides:
+#  - undeclared-deps  (B7-class): each split component must declare in its OWN composer.json
+#                      every third-party/sibling package its source uses. Locally the root
+#                      autoload + root vendor mask missing requires; this installs each
+#                      component in isolation and statically checks for used-but-undeclared symbols.
+#  - php-matrix       (B6-class): the suite must run on the declared PHP floor (8.3) AND the
+#                      latest (8.4), so a too-low floor or version-specific syntax fails CI.
+
+on:
+    pull_request:
+    push:
+        branches: [ main ]
+
+permissions:
+    contents: read
+
+jobs:
+    undeclared-deps:
+        name: Undeclared deps (${{ matrix.repo }})
+        runs-on: ubuntu-latest
+        env:
+            COMPOSER_NO_INTERACTION: 1
+        strategy:
+            fail-fast: false
+            matrix:
+                # Generated Models/ is intentionally excluded (regenerated, not hand-authored).
+                include:
+                    -   path: src/Component/Metadata
+                        repo: fhir-metadata
+                    -   path: src/Component/Serialization
+                        repo: fhir-serialization
+                    -   path: src/Component/FHIRPath
+                        repo: fhir-path
+                    -   path: src/Component/CodeGeneration
+                        repo: fhir-code-generation
+                    -   path: src/Component/Validation
+                        repo: fhir-validation
+                    -   path: src/Bundle/FHIRBundle
+                        repo: fhir-bundle
+        steps:
+            -   uses: actions/checkout@v4
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: '8.3'
+                    extensions: ctype, iconv, zip
+                    tools: composer-require-checker
+
+            # Sibling ardenexal/* packages are released together and the new (0.4.x) versions are
+            # not on Packagist yet, so resolve them from the in-repo source via path repositories.
+            # Each sibling carries a dev-main -> 0.4.x-dev branch-alias, so relax stability for this
+            # isolation install only (the edits below land on the ephemeral CI checkout, never the
+            # committed manifest). Once 0.4.0 is tagged, siblings resolve as stable and these are no-ops.
+            -   name: Wire sibling path repositories
+                working-directory: ${{ matrix.path }}
+                run: |
+                    composer config minimum-stability dev
+                    composer config prefer-stable true
+                    self=$(jq -r '.name' composer.json)
+                    for dir in "$GITHUB_WORKSPACE"/src/Component/* "$GITHUB_WORKSPACE"/src/Bundle/*; do
+                        [ -f "$dir/composer.json" ] || continue
+                        name=$(jq -r '.name // empty' "$dir/composer.json")
+                        [ -z "$name" ] && continue
+                        [ "$name" = "$self" ] && continue
+                        key=$(echo "$name" | tr '/' '-')
+                        composer config "repositories.$key" path "$dir"
+                        # Pin an explicit dev version on the sibling so detached-HEAD CI checkouts
+                        # don't fall back to dev-<sha> (which the dev-main branch-alias can't match)
+                        # and the ^0.4 sibling constraints resolve. No-op once 0.4.0 is tagged.
+                        composer config version 0.4.x-dev --working-dir="$dir"
+                    done
+
+            -   name: Install in isolation (declared production deps only)
+                working-directory: ${{ matrix.path }}
+                run: composer install --no-dev --no-progress --prefer-dist
+
+            -   name: Check for undeclared dependencies
+                working-directory: ${{ matrix.path }}
+                run: composer-require-checker check --config-file="$GITHUB_WORKSPACE/.github/composer-require-checker.json"
+
+    php-matrix:
+        name: PHP ${{ matrix.php }}
+        runs-on: ubuntu-latest
+        env:
+            XDEBUG_MODE: off
+            COMPOSER_NO_INTERACTION: 1
+        strategy:
+            fail-fast: false
+            matrix:
+                php: [ '8.3', '8.4' ]
+        steps:
+            -   uses: actions/checkout@v4
+                with:
+                    fetch-depth: 0
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: ${{ matrix.php }}
+                    extensions: ctype, iconv, zip
+
+            -   name: Install dependencies
+                run: composer install --prefer-dist --no-progress
+
+            -   name: Validate composer manifests
+                run: composer validate --strict
+
+            -   name: Run unit suite
+                run: composer run test-ai-unit
+
+    # Fan-in gate for branch protection: require this single check instead of the
+    # individual matrix legs so the ruleset survives future matrix changes.
+    package-integrity-passed:
+        runs-on: ubuntu-latest
+        needs: [ undeclared-deps, php-matrix ]
+        if: ${{ always() }}
+        steps:
+            -   name: Check matrix results
+                run: |
+                    if [ "${{ needs.undeclared-deps.result }}" != "success" ] || [ "${{ needs.php-matrix.result }}" != "success" ]; then
+                      echo "undeclared-deps: ${{ needs.undeclared-deps.result }}, php-matrix: ${{ needs.php-matrix.result }}"
+                      exit 1
+                    fi

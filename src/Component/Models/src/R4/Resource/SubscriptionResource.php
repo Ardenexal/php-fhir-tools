@@ -27,7 +27,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description The subscription resource is used to define a push-based subscription from a server to another system. Once a subscription is registered with the server, the server checks every resource that is created or updated, and if the resource matches the given criteria, it sends a message on the defined "channel" so that another system can take an appropriate action.
  */
 #[FhirResource(type: 'Subscription', version: '4.0.1', url: 'http://hl7.org/fhir/StructureDefinition/Subscription', fhirVersion: 'R4')]
-class SubscriptionResource extends DomainResourceResource
+class SubscriptionResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -50,7 +50,7 @@ class SubscriptionResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

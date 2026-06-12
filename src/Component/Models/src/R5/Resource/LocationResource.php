@@ -36,7 +36,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\Location\LocationPosition;
  * @description Details and position information for a place where services are provided and resources and participants may be stored, found, contained, or accommodated.
  */
 #[FhirResource(type: 'Location', version: '5.0.0', url: 'http://hl7.org/fhir/StructureDefinition/Location', fhirVersion: 'R5')]
-class LocationResource extends DomainResourceResource
+class LocationResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -54,7 +54,7 @@ class LocationResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
