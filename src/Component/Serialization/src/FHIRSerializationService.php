@@ -229,9 +229,9 @@ class FHIRSerializationService
         }
 
         return match ($format) {
-            /** @phpstan-ignore argument.type */
+            /** @phpstan-ignore argument.type, argument.templateType */
             'json'  => $this->deserializeFromJson($data, $targetClass, $context),
-            /** @phpstan-ignore argument.type */
+            /** @phpstan-ignore argument.type, argument.templateType */
             'xml'   => $this->deserializeFromXml($data, $targetClass, $context),
             default => throw new FHIRSerializationException("Unsupported format: {$format}")
         };

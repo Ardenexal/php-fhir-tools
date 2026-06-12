@@ -155,12 +155,12 @@ class FHIRComplexTypeJsonNormalizer extends AbstractFHIRNormalizer
                             $denormalizedValue = $this->denormalizePrimitiveProperty($meta, $property, $reflection, $value, 'json', $context, $metaMap);
                         } else {
                             $phpItemClass = $meta?->phpItemClass;
-                            if ($meta !== null
+                            if (is_array($value)
+                                && $meta !== null
                                 && ($meta->propertyKind === 'extension' || $meta->propertyKind === 'modifierExtension')
-                                && is_array($value)
                             ) {
                                 $denormalizedValue = $this->denormalizeExtensionArray($value, 'json', $context);
-                            } elseif ($phpItemClass !== null && is_array($value)) {
+                            } elseif (is_array($value) && $phpItemClass !== null) {
                                 $denormalizedValue = [];
                                 foreach ($value as $item) {
                                     /** @var class-string $phpItemClass */

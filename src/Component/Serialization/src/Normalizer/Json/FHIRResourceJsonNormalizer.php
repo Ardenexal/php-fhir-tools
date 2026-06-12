@@ -327,12 +327,14 @@ class FHIRResourceJsonNormalizer extends AbstractFHIRNormalizer
                     $meta         = $metaMap[$elementName] ?? null;
                     $phpItemClass = $meta?->phpItemClass;
 
-                    if ($meta !== null
+                    // is_array($value) leads each array branch so PHPStan keeps $value's array type for
+                    // the later array branches (trailing is_array would narrow it to mixed~array there).
+                    if (is_array($value)
+                        && $meta !== null
                         && ($meta->propertyKind === 'extension' || $meta->propertyKind === 'modifierExtension')
-                        && is_array($value)
                     ) {
                         $denormalizedValue = $this->denormalizeExtensionArray($value, 'json', $context);
-                    } elseif ($phpItemClass !== null && $this->denormalizer !== null && is_array($value)) {
+                    } elseif (is_array($value) && $phpItemClass !== null && $this->denormalizer !== null) {
                         $denormalizedValue = [];
                         foreach ($value as $item) {
                             $denormalizedValue[] = $this->denormalizer->denormalize($item, $phpItemClass, 'json', $context);
