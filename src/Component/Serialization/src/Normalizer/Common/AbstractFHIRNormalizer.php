@@ -694,6 +694,13 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         }
     }
 
+    /**
+     * Coerce a raw primitive value to the PHP representation its FHIR primitive type requires.
+     *
+     * Reads the FHIRPrimitive attribute on $type and dispatches to the matching validator/parser
+     * (string, integer, decimal, boolean, or temporal). Returns the value unchanged when $type
+     * carries no FHIRPrimitive attribute or its primitiveType is unrecognised.
+     */
     protected function validateAndConvertValue(mixed $value, string $type): mixed
     {
         if ($value === null) {
@@ -1037,6 +1044,13 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         return null;
     }
 
+    /**
+     * Resolve the first class/interface type a property declares, ignoring builtins and null.
+     *
+     * For a named type, returns its name when it is not a builtin. For a union type (e.g.
+     * FHIRString|null), returns the first non-builtin, non-null member. Returns null when the
+     * property has no usable class type — typically a primitive whose value cannot hold extensions.
+     */
     protected function getFirstNonBuiltinTypeFromProperty(\ReflectionProperty $property): ?string
     {
         $type = $property->getType();
@@ -1125,6 +1139,12 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         }
     }
 
+    /**
+     * Decide whether a value should be dropped from serialized output.
+     *
+     * Omits nulls and empty arrays only when the context opts in (omitNullValues / omitEmptyArrays),
+     * but always omits empty strings since FHIR has no representation for an empty primitive value.
+     */
     protected function shouldOmitValue(mixed $value, FHIRSerializationContext $context): bool
     {
         if ($value === null && $context->omitNullValues) {
@@ -1142,6 +1162,13 @@ abstract class AbstractFHIRNormalizer implements FHIRNormalizerInterface, Serial
         return false;
     }
 
+    /**
+     * Re-type a numeric-string scalar to the native JSON number its FHIR type requires.
+     *
+     * FHIR JSON represents decimals as JSON numbers and integers as JSON integers, so a value
+     * carried internally as a numeric string is cast to float or int based on the property's
+     * FHIR type. Non-scalar, non-numeric, or non-'scalar'-kind values are returned untouched.
+     */
     protected function castNumericScalarForJson(mixed $value, ?PropertyMetadata $meta): mixed
     {
         if ($meta === null || $meta->propertyKind !== 'scalar' || !is_string($value) || !is_numeric($value)) {

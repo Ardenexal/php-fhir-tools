@@ -11,6 +11,13 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+/**
+ * Validates that a property contains the partial pattern declared in a StructureDefinition.
+ *
+ * Enforces a #[FHIRPatternValue] constraint: every key in the pattern must be present in the
+ * instance with an equal value, applied recursively. Unlike a fixed value, the instance may
+ * carry additional keys. A value that does not contain the pattern raises an ERROR violation.
+ */
 final class FHIRPatternValueValidator extends ConstraintValidator
 {
     public const string DEFAULT_MESSAGE = 'The value does not match the required pattern.';

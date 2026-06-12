@@ -6,6 +6,10 @@ namespace Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation;
 
 use Symfony\Component\Validator\Constraint;
 
+/**
+ * Marks a property with a FHIR pattern (StructureDefinition element.pattern[x]) whose key/value
+ * pairs the instance value must contain as a subset.
+ */
 #[\Attribute(\Attribute::TARGET_PARAMETER | \Attribute::TARGET_PROPERTY)]
 final class FHIRPatternValue extends Constraint
 {

@@ -10,6 +10,14 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+/**
+ * Validates a FHIR Quantity value against the min/max bounds declared in a StructureDefinition.
+ *
+ * Enforces a #[FHIRQuantityRange] constraint. A value below min or above max raises an ERROR.
+ * Because units cannot be safely converted here, comparison only proceeds when the instance and
+ * bound share the same system+code; an approximate value (one carrying a comparator), a missing
+ * unit, a malformed bound, or a unit mismatch is surfaced as a WARNING rather than a hard failure.
+ */
 final class FHIRQuantityRangeValidator extends ConstraintValidator
 {
     private const string MSG_BELOW_MIN = 'The value {{ value }} is below the minimum {{ min }} {{ unit }}.';

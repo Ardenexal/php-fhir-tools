@@ -10,6 +10,14 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+/**
+ * Validates a FHIR date/dateTime/instant/time value against declared min/max bounds.
+ *
+ * Enforces a #[FHIRTemporalRange] constraint. `time` values are compared as plain strings;
+ * date-like values are parsed, with partial dates (YYYY or YYYY-MM) expanded to the start of
+ * their period for the min check and the end for the max check (see ADR-006). An out-of-range
+ * value raises an ERROR, while an unparseable configured bound is surfaced as a WARNING.
+ */
 final class FHIRTemporalRangeValidator extends ConstraintValidator
 {
     private const string MSG_BELOW_MIN = 'The value {{ value }} is before the minimum {{ min }}.';

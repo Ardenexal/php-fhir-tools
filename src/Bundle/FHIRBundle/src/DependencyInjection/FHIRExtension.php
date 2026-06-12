@@ -26,6 +26,18 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class FHIRExtension extends Extension
 {
+    /**
+     * Process the bundle configuration and register FHIR services into the container.
+     *
+     * Beyond loading service definitions from services.yaml, this method also:
+     * - Exposes the resolved config (versions, directories, IG settings) as container parameters.
+     * - When a serialization metadata cache pool is configured, aliases it as
+     *   fhir.metadata_cache, injects it into PropertyMetadataProvider, and registers the
+     *   FHIRMetadataCacheWarmer only when the cache warmer is explicitly enabled.
+     * - Wires any validation message overrides into FHIRValidationMessageRegistry.
+     * - When a terminology cache pool is configured, registers CachingFHIRTerminologyClient
+     *   as a decorator around the terminology client.
+     */
     public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = new Configuration();

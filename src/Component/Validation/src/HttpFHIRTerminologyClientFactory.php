@@ -7,6 +7,13 @@ namespace Ardenexal\FHIRTools\Component\Validation;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
+/**
+ * Builds HTTP-backed terminology clients for a given server base URL.
+ *
+ * Use this when terminology validation should hit a live FHIR terminology server. When a
+ * PSR-6 cache pool is supplied, each created client is wrapped in a CachingFHIRTerminologyClient
+ * so repeated lookups are served from cache.
+ */
 final class HttpFHIRTerminologyClientFactory implements FHIRTerminologyClientFactoryInterface
 {
     public function __construct(
