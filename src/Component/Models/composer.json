@@ -13,7 +13,7 @@
     "prefer-stable": true,
     "require": {
         "php": ">=8.3",
-        "ardenexal/fhir-metadata": "^0.3",
+        "ardenexal/fhir-metadata": "^0.4",
         "brick/date-time": "^0.9.0"
     },
     "require-dev": {
@@ -48,5 +48,10 @@
     "support": {
         "issues": "https://github.com/ardenexal/fhir-tools/issues",
         "source": "https://github.com/ardenexal/fhir-tools"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "0.4.x-dev"
+        }
     }
 }

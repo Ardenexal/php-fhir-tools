@@ -11,9 +11,9 @@
         "symfony/config": "^6.4|^7.4",
         "symfony/dependency-injection": "^6.4|^7.4",
         "symfony/yaml": "^6.4|^7.4",
-        "ardenexal/fhir-code-generation": "^0.3",
-        "ardenexal/fhir-serialization": "^0.3",
-        "ardenexal/fhir-path": "^0.3"
+        "ardenexal/fhir-code-generation": "^0.4",
+        "ardenexal/fhir-serialization": "^0.4",
+        "ardenexal/fhir-path": "^0.4"
     },
     "require-dev": {
         "phpunit/phpunit": "^12.5",
@@ -34,6 +34,9 @@
         "symfony": {
             "allow-contrib": false,
             "require": "^6.4|^7.4"
+        },
+        "branch-alias": {
+            "dev-main": "0.4.x-dev"
         }
     }
 }

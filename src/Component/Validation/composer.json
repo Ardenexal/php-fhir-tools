@@ -15,8 +15,8 @@
         "php": ">=8.3",
         "symfony/validator": "^6.4|^7.4",
         "symfony/property-access": "^6.4|^7.4",
-        "ardenexal/fhir-metadata": "^0.3",
-        "ardenexal/fhir-path": "^0.3"
+        "ardenexal/fhir-metadata": "^0.4",
+        "ardenexal/fhir-path": "^0.4"
     },
     "autoload": {
         "psr-4": {
@@ -40,5 +40,10 @@
     "support": {
         "issues": "https://github.com/ardenexal/fhir-tools/issues",
         "source": "https://github.com/ardenexal/fhir-tools"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "0.4.x-dev"
+        }
     }
 }
