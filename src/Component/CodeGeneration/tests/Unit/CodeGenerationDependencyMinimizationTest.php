@@ -59,7 +59,7 @@ class CodeGenerationDependencyMinimizationTest extends TestCase
 
         // Verify essential dependencies are present
         $essentialDependencies = [
-            'php'                 => '>=8.2',
+            'php'                 => '>=8.3',
             'nette/php-generator' => '^4.1',
             'symfony/string'      => '^6.4|^7.0',
         ];
