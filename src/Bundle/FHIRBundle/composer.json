@@ -8,8 +8,10 @@
     "require": {
         "php": ">=8.3",
         "ardenexal/fhir-code-generation": "^0.4",
+        "ardenexal/fhir-metadata": "^0.4",
         "ardenexal/fhir-path": "^0.4",
         "ardenexal/fhir-serialization": "^0.4",
+        "ardenexal/fhir-validation": "^0.4",
         "psr/cache": "^3.0",
         "symfony/config": "^6.4|^7.4",
         "symfony/console": "^6.4|^7.4",

@@ -16,8 +16,10 @@
         "ext-zip": "*",
         "amphp/http-client": "^5.3.4",
         "ardenexal/fhir-metadata": "^0.4",
+        "ardenexal/fhir-serialization": "^0.4",
         "composer/semver": "^3.4.4",
         "nette/php-generator": "^4.1",
+        "nette/utils": "^4.0",
         "psr/log": "^1|^2|^3",
         "symfony/console": "^6.4|^7.4",
         "symfony/dependency-injection": "^6.4|^7.4",
@@ -25,6 +27,7 @@
         "symfony/finder": "^6.4|^7.4",
         "symfony/http-client-contracts": "^3.4",
         "symfony/intl": "^6.4|^7.0",
+        "symfony/polyfill-php84": "^1.33",
         "symfony/string": "^6.4|^7.0",
         "symfony/validator": "^6.4|^7.0"
     },

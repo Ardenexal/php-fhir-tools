@@ -8,6 +8,7 @@
     "require": {
         "php": ">=8.3",
         "ardenexal/fhir-metadata": "^0.4",
+        "ardenexal/fhir-models": "^0.4",
         "brick/date-time": "^0.9.0",
         "psr/cache": "^3.0",
         "symfony/property-access": "^6.4|^7.4",

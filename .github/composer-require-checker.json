@@ -16,7 +16,8 @@
         "void",
         "object",
         "mixed",
-        "never"
+        "never",
+        "Composer\\Autoload\\ClassLoader"
     ],
     "php-core-extensions": [
         "Core",
@@ -39,7 +40,9 @@
         "xmlwriter",
         "bcmath",
         "Phar",
-        "zip"
+        "zip",
+        "hash",
+        "random"
     ],
     "scan-files": []
 }

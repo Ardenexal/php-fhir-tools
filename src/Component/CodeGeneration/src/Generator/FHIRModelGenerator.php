@@ -1550,7 +1550,7 @@ class FHIRModelGenerator implements GeneratorInterface
     private function convertToMethodName(string $path): string
     {
         $pathParts = u($path)->split('.');
-        $lastPart  = array_last($pathParts);
+        $lastPart  = $pathParts === [] ? null : $pathParts[array_key_last($pathParts)];
         if ($lastPart === null) {
             throw GenerationException::invalidElementPath($path);
         }
