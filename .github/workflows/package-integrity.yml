@@ -67,6 +67,10 @@ jobs:
                         [ "$name" = "$self" ] && continue
                         key=$(echo "$name" | tr '/' '-')
                         composer config "repositories.$key" path "$dir"
+                        # Pin an explicit dev version on the sibling so detached-HEAD CI checkouts
+                        # don't fall back to dev-<sha> (which the dev-main branch-alias can't match)
+                        # and the ^0.4 sibling constraints resolve. No-op once 0.4.0 is tagged.
+                        composer config version 0.4.x-dev --working-dir="$dir"
                     done
 
             -   name: Install in isolation (declared production deps only)
