@@ -34,7 +34,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A record of a device being used by a patient where the record is the result of a report from the patient or a clinician.
  */
 #[FhirResource(type: 'DeviceUsage', version: '5.0.0', url: 'http://hl7.org/fhir/StructureDefinition/DeviceUsage', fhirVersion: 'R5')]
-class DeviceUsageResource extends DomainResourceResource
+class DeviceUsageResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -52,7 +52,7 @@ class DeviceUsageResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

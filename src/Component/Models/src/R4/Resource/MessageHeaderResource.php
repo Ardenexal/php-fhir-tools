@@ -30,7 +30,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description The header for a message exchange that is either requesting or responding to an action.  The reference(s) that are the subject of the action as well as other information related to the action are typically transmitted in a bundle in which the MessageHeader resource instance is the first resource in the bundle.
  */
 #[FhirResource(type: 'MessageHeader', version: '4.0.1', url: 'http://hl7.org/fhir/StructureDefinition/MessageHeader', fhirVersion: 'R4')]
-class MessageHeaderResource extends DomainResourceResource
+class MessageHeaderResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -53,7 +53,7 @@ class MessageHeaderResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

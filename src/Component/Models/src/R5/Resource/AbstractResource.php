@@ -2,14 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
+namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Meta;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Base;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Meta;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 
 /**
  * @author Health Level Seven International (FHIR Infrastructure)
@@ -18,8 +20,8 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
  *
  * @description This is the base resource type for everything.
  */
-#[FhirResource(type: 'Resource', version: '4.3.0', url: 'http://hl7.org/fhir/StructureDefinition/Resource', fhirVersion: 'R4B')]
-abstract class ResourceResource
+#[FhirResource(type: 'Resource', version: '5.0.0', url: 'http://hl7.org/fhir/StructureDefinition/Resource', fhirVersion: 'R5')]
+abstract class AbstractResource extends Base
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -29,16 +31,11 @@ abstract class ResourceResource
         #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies it\'s meaning or interpretation')]
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
         public ?UriPrimitive $implicitRules = null,
-        /** @var string|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
-        #[FHIRValueSetBinding(
-            valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
-            strength: 'preferred',
-            maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
-        )]
-        public ?string $language = null,
+        /** @var AllLanguagesType|null language Language of the resource content */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
+        public ?AllLanguagesType $language = null,
     ) {
     }
 }

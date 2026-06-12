@@ -74,7 +74,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     expression: '(kind!=\'requirements\') or (implementation.exists().not() and software.exists().not())',
     human: 'If kind = requirements, implementation and software must be absent',
 )]
-class TerminologyCapabilitiesResource extends DomainResourceResource
+class TerminologyCapabilitiesResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -97,7 +97,7 @@ class TerminologyCapabilitiesResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

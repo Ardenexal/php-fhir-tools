@@ -31,7 +31,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\Person\PersonLink;
  * @description Demographics and administrative information about a person independent of a specific health-related context.
  */
 #[FhirResource(type: 'Person', version: '4.0.1', url: 'http://hl7.org/fhir/StructureDefinition/Person', fhirVersion: 'R4')]
-class PersonResource extends DomainResourceResource
+class PersonResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -54,7 +54,7 @@ class PersonResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

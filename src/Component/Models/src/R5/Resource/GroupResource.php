@@ -34,7 +34,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description Represents a defined collection of entities that may be discussed or acted upon collectively but which are not expected to act collectively, and are not formally or legally recognized; i.e. a collection of entities that isn't an Organization.
  */
 #[FhirResource(type: 'Group', version: '5.0.0', url: 'http://hl7.org/fhir/StructureDefinition/Group', fhirVersion: 'R5')]
-class GroupResource extends DomainResourceResource
+class GroupResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -52,7 +52,7 @@ class GroupResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

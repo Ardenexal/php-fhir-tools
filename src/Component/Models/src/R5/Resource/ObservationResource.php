@@ -63,7 +63,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     expression: 'bodySite.exists() implies bodyStructure.empty()',
     human: 'bodyStructure SHALL only be present if Observation.bodySite is not present',
 )]
-class ObservationResource extends DomainResourceResource
+class ObservationResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -81,7 +81,7 @@ class ObservationResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

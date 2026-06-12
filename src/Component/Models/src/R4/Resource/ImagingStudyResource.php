@@ -33,7 +33,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description Representation of the content produced in a DICOM imaging study. A study comprises a set of series, each of which includes a set of Service-Object Pair Instances (SOP Instances - images or other data) acquired or produced in a common context.  A series is of only one modality (e.g. X-ray, CT, MR, ultrasound), but a study may have multiple series of different modalities.
  */
 #[FhirResource(type: 'ImagingStudy', version: '4.0.1', url: 'http://hl7.org/fhir/StructureDefinition/ImagingStudy', fhirVersion: 'R4')]
-class ImagingStudyResource extends DomainResourceResource
+class ImagingStudyResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -56,7 +56,7 @@ class ImagingStudyResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

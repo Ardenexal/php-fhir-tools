@@ -36,7 +36,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\Organization\OrganizationCo
     expression: '(identifier.count() + name.count()) > 0',
     human: 'The organization SHALL at least have a name or an identifier, and possibly more than one',
 )]
-class OrganizationResource extends DomainResourceResource
+class OrganizationResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -59,7 +59,7 @@ class OrganizationResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

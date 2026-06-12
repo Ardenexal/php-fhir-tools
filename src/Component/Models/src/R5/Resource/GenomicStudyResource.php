@@ -34,7 +34,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A GenomicStudy is a set of analyses performed to analyze and generate genomic data.
  */
 #[FhirResource(type: 'GenomicStudy', version: '5.0.0', url: 'http://hl7.org/fhir/StructureDefinition/GenomicStudy', fhirVersion: 'R5')]
-class GenomicStudyResource extends DomainResourceResource
+class GenomicStudyResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -52,7 +52,7 @@ class GenomicStudyResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

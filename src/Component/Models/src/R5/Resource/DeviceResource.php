@@ -46,7 +46,7 @@ use Ardenexal\FHIRTools\Component\Models\R5\Resource\Device\DeviceVersion;
     expression: 'name.where(display=true).count() <= 1',
     human: 'only one Device.name.display SHALL be true when there is more than one Device.name',
 )]
-class DeviceResource extends DomainResourceResource
+class DeviceResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -64,7 +64,7 @@ class DeviceResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

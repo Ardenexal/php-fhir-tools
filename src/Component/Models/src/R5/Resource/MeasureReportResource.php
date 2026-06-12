@@ -47,7 +47,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     expression: 'group.stratifier.stratum.all(value.exists() xor component.exists())',
     human: 'Stratifiers SHALL be either a single criteria or a set of criteria components',
 )]
-class MeasureReportResource extends DomainResourceResource
+class MeasureReportResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -65,7 +65,7 @@ class MeasureReportResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

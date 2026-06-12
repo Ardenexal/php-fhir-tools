@@ -37,7 +37,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Resource\BiologicallyDerivedProduct
     url: 'http://hl7.org/fhir/StructureDefinition/BiologicallyDerivedProduct',
     fhirVersion: 'R4B',
 )]
-class BiologicallyDerivedProductResource extends DomainResourceResource
+class BiologicallyDerivedProductResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -60,7 +60,7 @@ class BiologicallyDerivedProductResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

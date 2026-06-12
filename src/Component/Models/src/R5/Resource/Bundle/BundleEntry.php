@@ -11,7 +11,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvarian
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\BackboneElement;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
-use Ardenexal\FHIRTools\Component\Models\R5\Resource\ResourceResource;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\AbstractResource;
 
 /**
  * @description An entry in a bundle resource - will either contain a resource or information about a resource (transactions and history only).
@@ -52,9 +52,9 @@ class BundleEntry extends BackboneElement
         /** @var UriPrimitive|null fullUrl URI for resource (e.g. the absolute URL server address, URI for UUID/OID, etc.) */
         #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive')]
         public ?UriPrimitive $fullUrl = null,
-        /** @var ResourceResource|null resource A resource in the bundle */
+        /** @var AbstractResource|null resource A resource in the bundle */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource')]
-        public ?ResourceResource $resource = null,
+        public ?AbstractResource $resource = null,
         /** @var BundleEntrySearch|null search Search related information */
         #[FhirProperty(fhirType: 'BackboneElement', propertyKind: 'backbone')]
         public ?BundleEntrySearch $search = null,

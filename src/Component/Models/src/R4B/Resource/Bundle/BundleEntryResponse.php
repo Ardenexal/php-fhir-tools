@@ -12,7 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\InstantPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
-use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ResourceResource;
+use Ardenexal\FHIRTools\Component\Models\R4B\Resource\AbstractResource;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -43,9 +43,9 @@ class BundleEntryResponse extends BackboneElement
         /** @var InstantPrimitive|null lastModified Server's date time modified */
         #[FhirProperty(fhirType: 'instant', propertyKind: 'primitive')]
         public ?InstantPrimitive $lastModified = null,
-        /** @var ResourceResource|null outcome OperationOutcome with hints and warnings (for batch/transaction) */
+        /** @var AbstractResource|null outcome OperationOutcome with hints and warnings (for batch/transaction) */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource')]
-        public ?ResourceResource $outcome = null,
+        public ?AbstractResource $outcome = null,
     ) {
         parent::__construct($id, $extension, $modifierExtension);
     }

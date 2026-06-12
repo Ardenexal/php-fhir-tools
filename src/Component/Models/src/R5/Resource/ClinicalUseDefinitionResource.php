@@ -46,7 +46,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     expression: '(ClinicalUseDefinition.indication.count() + ClinicalUseDefinition.contraindication.count() + ClinicalUseDefinition.interaction.count() + ClinicalUseDefinition.undesirableEffect.count() + ClinicalUseDefinition.warning.count())  < 2',
     human: 'Indication, Contraindication, Interaction, UndesirableEffect and Warning cannot be used in the same instance',
 )]
-class ClinicalUseDefinitionResource extends DomainResourceResource
+class ClinicalUseDefinitionResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -64,7 +64,7 @@ class ClinicalUseDefinitionResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

@@ -57,7 +57,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UnsignedIntPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UrlPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UuidPrimitive;
-use Ardenexal\FHIRTools\Component\Models\R4B\Resource\ResourceResource;
+use Ardenexal\FHIRTools\Component\Models\R4B\Resource\AbstractResource;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -379,9 +379,9 @@ class ParametersParameter extends BackboneElement
             ],
         )]
         public Base64BinaryPrimitive|bool|CanonicalPrimitive|CodePrimitive|DatePrimitive|DateTimePrimitive|string|IdPrimitive|InstantPrimitive|int|MarkdownPrimitive|OidPrimitive|PositiveIntPrimitive|StringPrimitive|TimePrimitive|UnsignedIntPrimitive|UriPrimitive|UrlPrimitive|UuidPrimitive|Address|Age|Annotation|Attachment|CodeableConcept|Coding|ContactPoint|Count|Distance|Duration|HumanName|Identifier|Money|Period|Quantity|Range|Ratio|Reference|SampledData|Signature|Timing|ContactDetail|Contributor|DataRequirement|Expression|ParameterDefinition|RelatedArtifact|TriggerDefinition|UsageContext|Dosage|Meta|null $value = null,
-        /** @var ResourceResource|null resource If parameter is a whole resource */
+        /** @var AbstractResource|null resource If parameter is a whole resource */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource')]
-        public ?ResourceResource $resource = null,
+        public ?AbstractResource $resource = null,
         /** @var array<ParametersParameter> part Named part of a multi-part parameter */
         #[FhirProperty(
             fhirType: 'unknown',

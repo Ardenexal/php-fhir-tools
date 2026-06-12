@@ -161,7 +161,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     expression: '((kind in \'resource\' | \'complex-type\') and (derivation = \'specialization\')) implies differential.element.where((min != 0 and min != 1) or (max != \'1\' and max != \'*\')).empty()',
     human: 'Elements in Resources must have a min cardinality or 0 or 1 and a max cardinality of 1 or *',
 )]
-class StructureDefinitionResource extends DomainResourceResource
+class StructureDefinitionResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -179,7 +179,7 @@ class StructureDefinitionResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

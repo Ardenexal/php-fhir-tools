@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
+use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept;
@@ -16,11 +17,8 @@ use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Identifier;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Meta;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\Narrative;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\Period;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\PublicationStatusType;
-use Ardenexal\FHIRTools\Component\Models\R5\DataType\RelatedArtifact;
 use Ardenexal\FHIRTools\Component\Models\R5\DataType\UsageContext;
-use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DatePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\MarkdownPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R5\Primitive\StringPrimitive;
@@ -30,17 +28,23 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @author Health Level Seven International (FHIR Infrastructure)
  *
- * @see http://hl7.org/fhir/StructureDefinition/MetadataResource
+ * @see http://hl7.org/fhir/StructureDefinition/CanonicalResource
  *
  * @description Common Interface declaration for conformance and knowledge artifact resources.
  */
 #[FhirResource(
-    type: 'MetadataResource',
+    type: 'CanonicalResource',
     version: '5.0.0',
-    url: 'http://hl7.org/fhir/StructureDefinition/MetadataResource',
+    url: 'http://hl7.org/fhir/StructureDefinition/CanonicalResource',
     fhirVersion: 'R5',
 )]
-abstract class MetadataResourceResource extends DomainResourceResource
+#[FHIRPathInvariant(
+    key: 'cnl-0',
+    severity: 'warning',
+    expression: 'name.exists() implies name.matches(\'^[A-Z]([A-Za-z0-9_]){1,254}$\')',
+    human: 'Name should be usable as an identifier for the module by machine processing applications such as code generation',
+)]
+abstract class AbstractCanonicalResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -58,7 +62,7 @@ abstract class MetadataResourceResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */
@@ -158,63 +162,6 @@ abstract class MetadataResourceResource extends DomainResourceResource
         /** @var StringPrimitive|string|null copyrightLabel Copyright holder and year(s) */
         #[FhirProperty(fhirType: 'string', propertyKind: 'primitive')]
         public StringPrimitive|string|null $copyrightLabel = null,
-        /** @var DatePrimitive|null approvalDate When the {{title}} was approved by publisher */
-        #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
-        public ?DatePrimitive $approvalDate = null,
-        /** @var DatePrimitive|null lastReviewDate When the {{title}} was last reviewed by the publisher */
-        #[FhirProperty(fhirType: 'date', propertyKind: 'primitive')]
-        public ?DatePrimitive $lastReviewDate = null,
-        /** @var Period|null effectivePeriod When the {{title}} is expected to be used */
-        #[FhirProperty(fhirType: 'Period', propertyKind: 'complex')]
-        public ?Period $effectivePeriod = null,
-        /** @var array<CodeableConcept> topic E.g. Education, Treatment, Assessment, etc */
-        #[FhirProperty(
-            fhirType: 'CodeableConcept',
-            propertyKind: 'complex',
-            isArray: true,
-            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\CodeableConcept',
-        )]
-        public array $topic = [],
-        /** @var array<ContactDetail> author Who authored the {{title}} */
-        #[FhirProperty(
-            fhirType: 'ContactDetail',
-            propertyKind: 'complex',
-            isArray: true,
-            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
-        )]
-        public array $author = [],
-        /** @var array<ContactDetail> editor Who edited the {{title}} */
-        #[FhirProperty(
-            fhirType: 'ContactDetail',
-            propertyKind: 'complex',
-            isArray: true,
-            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
-        )]
-        public array $editor = [],
-        /** @var array<ContactDetail> reviewer Who reviewed the {{title}} */
-        #[FhirProperty(
-            fhirType: 'ContactDetail',
-            propertyKind: 'complex',
-            isArray: true,
-            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
-        )]
-        public array $reviewer = [],
-        /** @var array<ContactDetail> endorser Who endorsed the {{title}} */
-        #[FhirProperty(
-            fhirType: 'ContactDetail',
-            propertyKind: 'complex',
-            isArray: true,
-            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\ContactDetail',
-        )]
-        public array $endorser = [],
-        /** @var array<RelatedArtifact> relatedArtifact Additional documentation, citations, etc */
-        #[FhirProperty(
-            fhirType: 'RelatedArtifact',
-            propertyKind: 'complex',
-            isArray: true,
-            phpType: 'Ardenexal\FHIRTools\Component\Models\R5\DataType\RelatedArtifact',
-        )]
-        public array $relatedArtifact = [],
     ) {
         parent::__construct($id, $meta, $implicitRules, $language, $text, $contained, $extension, $modifierExtension);
     }

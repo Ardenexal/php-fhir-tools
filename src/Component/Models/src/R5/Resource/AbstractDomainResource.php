@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Models\R4B\Resource;
+namespace Ardenexal\FHIRTools\Component\Models\R5\Resource;
 
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirResource;
@@ -10,10 +10,11 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRIsModifier;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBinding;
 use Ardenexal\FHIRTools\Component\Metadata\Traits\FHIRExtensionsTrait;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Extension;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Meta;
-use Ardenexal\FHIRTools\Component\Models\R4B\DataType\Narrative;
-use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\AllLanguagesType;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Extension;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Meta;
+use Ardenexal\FHIRTools\Component\Models\R5\DataType\Narrative;
+use Ardenexal\FHIRTools\Component\Models\R5\Primitive\UriPrimitive;
 
 /**
  * @author Health Level Seven International (FHIR Infrastructure)
@@ -24,9 +25,9 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
  */
 #[FhirResource(
     type: 'DomainResource',
-    version: '4.3.0',
+    version: '5.0.0',
     url: 'http://hl7.org/fhir/StructureDefinition/DomainResource',
-    fhirVersion: 'R4B',
+    fhirVersion: 'R5',
 )]
 #[FHIRPathInvariant(
     key: 'dom-2',
@@ -37,7 +38,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
 #[FHIRPathInvariant(
     key: 'dom-3',
     severity: 'error',
-    expression: 'contained.where(((id.exists() and (\'#\'+id in (%resource.descendants().reference | %resource.descendants().as(canonical) | %resource.descendants().as(uri) | %resource.descendants().as(url)))) or descendants().where(reference = \'#\').exists() or descendants().where(as(canonical) = \'#\').exists() or descendants().where(as(uri) = \'#\').exists()).not()).trace(\'unmatched\', id).empty()',
+    expression: 'contained.where(((\'#\'+id in (%resource.descendants().reference | %resource.descendants().ofType(canonical) | %resource.descendants().ofType(uri) | %resource.descendants().ofType(url))) or descendants().where(reference = \'#\').exists() or descendants().where(ofType(canonical) = \'#\').exists() or descendants().where(ofType(canonical) = \'#\').exists()).not()).trace(\'unmatched\', id).empty()',
     human: 'If the resource is contained in another resource, it SHALL be referred to from elsewhere in the resource or SHALL refer to the containing resource',
 )]
 #[FHIRPathInvariant(
@@ -58,7 +59,7 @@ use Ardenexal\FHIRTools\Component\Models\R4B\Primitive\UriPrimitive;
     expression: 'text.`div`.exists()',
     human: 'A resource should have narrative for robust management',
 )]
-abstract class DomainResourceResource extends ResourceResource
+abstract class AbstractDomainResource extends AbstractResource
 {
     use FHIRExtensionsTrait;
 
@@ -70,20 +71,15 @@ abstract class DomainResourceResource extends ResourceResource
         #[FhirProperty(fhirType: 'Meta', propertyKind: 'complex')]
         public ?Meta $meta = null,
         /** @var UriPrimitive|null implicitRules A set of rules under which this content was created */
-        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies it\'s meaning or interpretation')]
+        #[FhirProperty(fhirType: 'uri', propertyKind: 'primitive'), FHIRIsModifier(reason: 'This element is labeled as a modifier because the implicit rules may provide additional knowledge about the resource that modifies its meaning or interpretation')]
         public ?UriPrimitive $implicitRules = null,
-        /** @var string|null language Language of the resource content */
-        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive')]
-        #[FHIRValueSetBinding(
-            valueSetUrl: 'http://hl7.org/fhir/ValueSet/languages',
-            strength: 'preferred',
-            maxValueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages',
-        )]
-        public ?string $language = null,
+        /** @var AllLanguagesType|null language Language of the resource content */
+        #[FhirProperty(fhirType: 'code', propertyKind: 'primitive'), FHIRValueSetBinding(valueSetUrl: 'http://hl7.org/fhir/ValueSet/all-languages|5.0.0', strength: 'required')]
+        public ?AllLanguagesType $language = null,
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

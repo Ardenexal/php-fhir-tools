@@ -131,7 +131,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     expression: 'type in (\'transaction-response\' | \'batch-response\') implies entry.all(response.exists())',
     human: 'For collections of type transaction-response or batch-response, all entries must contain response elements',
 )]
-class BundleResource extends ResourceResource
+class BundleResource extends AbstractResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -177,9 +177,9 @@ class BundleResource extends ResourceResource
         /** @var Signature|null signature Digital Signature */
         #[FhirProperty(fhirType: 'Signature', propertyKind: 'complex')]
         public ?Signature $signature = null,
-        /** @var ResourceResource|null issues Issues with the Bundle */
+        /** @var AbstractResource|null issues Issues with the Bundle */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource')]
-        public ?ResourceResource $issues = null,
+        public ?AbstractResource $issues = null,
     ) {
         parent::__construct($id, $meta, $implicitRules, $language);
     }

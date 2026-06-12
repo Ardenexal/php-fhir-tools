@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Integration test for XML Bundle deserialization with polymorphic resource properties.
  *
- * Tests the fix for issue where abstract ResourceResource was being instantiated
+ * Tests the fix for issue where the abstract AbstractResource base was being instantiated
  * instead of resolving concrete resource types from XML element names.
  */
 class BundleXmlPolymorphicResourceTest extends TestCase

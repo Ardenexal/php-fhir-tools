@@ -34,7 +34,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A photo, video, or audio recording acquired or used in healthcare. The actual content may be inline or provided by direct reference.
  */
 #[FhirResource(type: 'Media', version: '4.0.1', url: 'http://hl7.org/fhir/StructureDefinition/Media', fhirVersion: 'R4')]
-class MediaResource extends DomainResourceResource
+class MediaResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -57,7 +57,7 @@ class MediaResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

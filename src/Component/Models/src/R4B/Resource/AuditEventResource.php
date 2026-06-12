@@ -33,7 +33,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @description A record of an event made for purposes of maintaining a security log. Typical uses include detection of intrusion attempts and monitoring for inappropriate usage.
  */
 #[FhirResource(type: 'AuditEvent', version: '4.3.0', url: 'http://hl7.org/fhir/StructureDefinition/AuditEvent', fhirVersion: 'R4B')]
-class AuditEventResource extends DomainResourceResource
+class AuditEventResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -56,7 +56,7 @@ class AuditEventResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

@@ -58,7 +58,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     expression: 'definition.resource.fhirVersion.all(%context.fhirVersion contains $this)',
     human: 'If a resource has a fhirVersion, it must be one of the versions defined for the Implementation Guide',
 )]
-class ImplementationGuideResource extends DomainResourceResource
+class ImplementationGuideResource extends AbstractDomainResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
@@ -76,7 +76,7 @@ class ImplementationGuideResource extends DomainResourceResource
         /** @var Narrative|null text Text summary of the resource, for human interpretation */
         #[FhirProperty(fhirType: 'Narrative', propertyKind: 'complex')]
         public ?Narrative $text = null,
-        /** @var array<ResourceResource> contained Contained, inline Resources */
+        /** @var array<AbstractResource> contained Contained, inline Resources */
         #[FhirProperty(fhirType: 'Resource', propertyKind: 'resource', isArray: true)]
         public array $contained = [],
         /** @var array<Extension> extension Additional content defined by implementations */

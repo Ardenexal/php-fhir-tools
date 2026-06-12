@@ -258,7 +258,15 @@ class FHIRModelGenerator implements GeneratorInterface
         $kind = $structureDefinition['kind'] ?? 'unknown';
         switch ($kind) {
             case 'resource':
-                $className .= 'Resource';
+                // Abstract resource bases (Resource, DomainResource, and R5's CanonicalResource /
+                // MetadataResource) are named with an `Abstract` prefix instead of the concrete
+                // `Resource` suffix. This avoids the doubled-word "ResourceResource" while keeping
+                // the suffix convention for concrete resources (e.g. Patient -> PatientResource).
+                if (($structureDefinition['abstract'] ?? false) === true) {
+                    $className = 'Abstract' . $className;
+                } else {
+                    $className .= 'Resource';
+                }
                 $namespace = $builderContext->getElementNamespace($version);
                 break;
             case 'complex-type':
@@ -389,7 +397,7 @@ class FHIRModelGenerator implements GeneratorInterface
         $parentParameters = [];
 
         // Build a set of param names the PHP parent constructor actually accepts.
-        // This prevents passing CanonicalResource-inherited params to DomainResourceResource
+        // This prevents passing CanonicalResource-inherited params to AbstractDomainResource
         // when a FHIR type (e.g. MetadataResource) lists both as ancestors via base.path.
         $validParentParamNames = [];
         if (isset($parentClass) && $parentClass->class instanceof ClassType) {

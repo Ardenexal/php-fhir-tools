@@ -19,7 +19,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
  * @description This is the base resource type for everything.
  */
 #[FhirResource(type: 'Resource', version: '4.0.1', url: 'http://hl7.org/fhir/StructureDefinition/Resource', fhirVersion: 'R4')]
-abstract class ResourceResource
+abstract class AbstractResource
 {
     public function __construct(
         /** @var string|null id Logical id of this artifact */
