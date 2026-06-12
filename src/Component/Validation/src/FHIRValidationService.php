@@ -196,7 +196,10 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                 continue;
             }
 
-            $value = $property->getValue($resource);
+            // Deserializers bypass the constructor, so an absent field is uninitialized (not null).
+            // Treat uninitialized as not-populated so the must-support info still fires (and we never
+            // call getValue() on an uninitialized typed property, which would throw \Error).
+            $value = $property->isInitialized($resource) ? $property->getValue($resource) : null;
 
             if ($value !== null && $value !== []) {
                 continue;
@@ -742,7 +745,9 @@ final class FHIRValidationService implements FHIRValidationServiceInterface
                 continue;
             }
 
-            $value   = $property->getValue($resource);
+            // Uninitialized (constructor-bypassed deserialization) counts as absent → empty, so the
+            // obligation still fires; never call getValue() on an uninitialized typed property (\Error).
+            $value   = $property->isInitialized($resource) ? $property->getValue($resource) : null;
             $isEmpty = $value === null || $value === [];
 
             foreach ($attrs as $attr) {
