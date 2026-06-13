@@ -67,34 +67,155 @@ the pages where the difference actually matters. Treating each FHIR version as a
 would roughly triple maintenance for content that is ~90% duplicated, and would multiply against the
 library-version axis (a version matrix) for no reader benefit.
 
-## Proposed source layout (for the follow-up implementation)
+## Information architecture
 
-```
-docs/
-├── SUMMARY.md                 # GitBook table of contents (drives the sidebar)
-├── README.md                  # docs landing page (introduction)
-├── getting-started/
-│   └── installation.md
-├── components/
-│   ├── code-generation.md
-│   ├── serialization.md
-│   ├── fhir-path.md
-│   └── fhir-bundle.md
-├── models/                    # the one place FHIR R4/R4B/R5 differences live
-│   ├── overview.md
-│   └── versions.md            # R4 / R4B / R5 differences as sections or tabs
-└── reference/
-    └── console-commands.md
+The structure below is the recommended GitBook table of contents. It applies a few documentation
+best practices:
+
+- **One concern per page.** Large multi-topic pages are split. The current
+  `Validation/README.md`, for example, covers five separable domains in one file; each becomes its
+  own page (and Questionnaire validation, which uses a *different* validator, is its own page).
+- **Organise by reader journey, not by repository folder.** Readers arrive wanting to *do* something
+  (install, serialize, validate), so the top level is task-oriented, not a mirror of `src/`.
+- **Progressive disclosure.** Each component opens with an overview + quick start, then drills into
+  detail and reference. A reader can stop as soon as they have what they need.
+- **Separate user-facing docs from internal/contributor docs.** Requirement specs, refactor plans,
+  and gap-analysis trackers are valuable but are *not* product documentation — they live in a
+  Contributor section (or stay in the repo, unpublished) so they don't dilute the user-facing docs.
+- **Reference is generated/derived where possible.** The per-component `src/Component/*/README.md`
+  files stay canonical at the package level; GitBook pages summarise and link to them rather than
+  duplicating, to prevent drift.
+
+### Top-level sections
+
+1. **Introduction** — what the library is, the monorepo/package map, when to use which package.
+2. **Getting Started** — installation (standalone vs. Symfony), a first end-to-end example.
+3. **Code Generation** — generating base models, generating Implementation Guides, generated output.
+4. **Models** — using generated models; the one place FHIR R4/R4B/R5 differences are documented.
+5. **Serialization** — JSON, XML, context/options, IG-aware serialization.
+6. **Validation** — split into focused pages (see below); Questionnaire validation is its own page.
+7. **FHIRPath** — overview, expressions/operators, a per-category function reference, advanced.
+8. **Symfony Bundle** — bundle config, services/DI, console commands, the Flex recipe.
+9. **Reference** — console command reference, configuration reference.
+10. **Contributing** — dev setup, testing, commit standards, and internal design/roadmap docs.
+
+### Proposed `SUMMARY.md` (GitBook table of contents)
+
+```markdown
+# Table of contents
+
+* [Introduction](README.md)
+
+## Getting Started
+* [Installation](getting-started/installation.md)
+* [Quick Start](getting-started/quick-start.md)
+* [Choosing the Right Package](getting-started/packages.md)
+
+## Code Generation
+* [Overview](code-generation/overview.md)
+* [Generating Base FHIR Models](code-generation/base-models.md)
+* [Generating Implementation Guides](code-generation/implementation-guides.md)
+* [Generated Output Structure](code-generation/output-structure.md)
+
+## Models
+* [Using Generated Models](models/usage.md)
+* [Namespace Organization](models/namespaces.md)
+* [FHIR Versions: R4 / R4B / R5](models/fhir-versions.md)   # the only version-specific page
+
+## Serialization
+* [Overview](serialization/overview.md)
+* [JSON Serialization](serialization/json.md)
+* [XML Serialization](serialization/xml.md)
+* [Serialization Context & Options](serialization/context.md)
+* [IG-Aware Serialization](serialization/ig-aware.md)
+* [Round-Trip Testing](serialization/round-trip.md)
+
+## Validation
+* [Overview & Architecture](validation/overview.md)
+* [Structural & Profile Validation](validation/structural.md)   # cardinality, slices, fixed/pattern
+* [FHIRPath Invariant Validation](validation/invariants.md)
+* [Terminology & Binding Validation](validation/terminology.md)
+* [Reference & Target Profile Validation](validation/references.md)
+* [Quantity & Temporal Range Validation](validation/ranges.md)
+* [Extensions, Modifiers & Obligations](validation/extensions.md)
+* [Questionnaire Validation](validation/questionnaire.md)       # distinct validator
+* [The $validate Operation (OperationOutcome)](validation/operation-outcome.md)
+* [Configuration](validation/configuration.md)                  # terminology clients, resolvers
+* [Validation Reports & Violation Codes](validation/reports.md)
+
+## FHIRPath
+* [Overview & Quick Start](fhirpath/overview.md)
+* [Expressions & Operators](fhirpath/expressions.md)
+* [Function Reference](fhirpath/functions/README.md)
+  * [Existence & Collection](fhirpath/functions/existence.md)
+  * [Filtering & Subsetting](fhirpath/functions/filtering.md)
+  * [String](fhirpath/functions/string.md)
+  * [Math](fhirpath/functions/math.md)
+  * [Date & Time](fhirpath/functions/datetime.md)
+  * [Type Conversion & Checking](fhirpath/functions/types.md)
+  * [Tree Navigation & Utility](fhirpath/functions/navigation.md)
+  * [FHIR-Specific](fhirpath/functions/fhir.md)
+* [Compilation, Caching & Performance](fhirpath/performance.md)
+* [Implementation Status & Known Issues](fhirpath/status.md)
+
+## Symfony Bundle
+* [Installation & Configuration](bundle/configuration.md)
+* [Services & Dependency Injection](bundle/services.md)
+* [Console Commands](bundle/console-commands.md)
+* [Flex Recipe](bundle/flex-recipe.md)
+
+## Reference
+* [Console Command Reference](reference/commands.md)
+* [Configuration Reference](reference/configuration.md)
+
+## Contributing
+* [Development Setup](contributing/setup.md)
+* [Testing](contributing/testing.md)
+* [Commit Standards](contributing/commit-standards.md)
+* [Design Notes & Roadmap](contributing/design-notes.md)   # internal specs/refactor plans/gap analysis
 ```
 
-The existing per-component `README.md` files under `src/Component/*` remain the canonical
-package-level docs; the GitBook `components/*` pages can summarise and link to them (or be generated
-from them) to avoid duplication.
+### Source-to-page mapping (where today's content goes)
+
+| Existing source | Destination page(s) |
+|-----------------|---------------------|
+| `src/Component/CodeGeneration/README.md` | Code Generation → Base Models + Implementation Guides + Output Structure |
+| `src/Component/Models/README.md` | Models → Usage + Namespaces + FHIR Versions |
+| `src/Component/Serialization/README.md` + `docs/component-guides/serialization.md` | Serialization → all pages (merge the two overlapping sources) |
+| `src/Component/Validation/README.md` | Validation → split across the 11 pages above |
+| `src/Component/FHIRPath/README.md` | FHIRPath → Overview, Expressions, Function Reference, Performance, Status |
+| `src/Bundle/FHIRBundle/README.md` + `docs/component-guides/fhir-bundle.md` | Symfony Bundle → Configuration + Services + Console Commands |
+| `recipe/README.md`, `recipe/fhir-bundle/1.0/*.md` | Symfony Bundle → Flex Recipe (consolidate the four recipe docs) |
+| `tests/README.md` | Contributing → Testing |
+| `docs/coding-standards/git-commit.md` | Contributing → Commit Standards |
+| `docs/component-guides/fhir-path.md` (requirements spec) | Contributing → Design Notes & Roadmap (internal) |
+| `docs/component-guides/fhirpath-gap-analysis-tasks.md` | Contributing → Design Notes & Roadmap (internal) |
+| `docs/normalizer-refactor-plan.md` | Contributing → Design Notes & Roadmap (internal) |
+
+### Notable splits (the "break it up" work)
+
+- **Validation** (1 file → 11 pages). The README mixes general structural validation, terminology,
+  references, ranges, extensions/obligations, questionnaire validation, the `$validate` operation,
+  configuration, and report structure. Questionnaire validation uses a dedicated
+  `FHIRQuestionnaireValidator` (plus derived-questionnaire variants) and is genuinely a separate
+  workflow, so it gets its own page as you suggested.
+- **FHIRPath functions** (1 long table → category pages). ~100 functions across 13 categories is a
+  classic reference-overload page; grouping by category makes it navigable and searchable.
+- **Serialization** (2 overlapping sources → one set of format-oriented pages). The component README
+  and the component guide largely duplicate each other; merge, then split by format (JSON/XML) plus
+  context and IG-aware serialization.
+- **Code Generation** (1 file → base vs. IG). Base-model generation and IG generation are distinct
+  workflows with distinct generator classes; separating them avoids one page that serves two jobs.
+- **Internal docs pulled out of the user path.** The FHIRPath requirements spec, the gap-analysis
+  tracker, and the normalizer refactor plan are development artifacts, not product docs — grouped
+  under Contributing → Design Notes so they remain available without cluttering user navigation.
 
 ## Next steps (not done in this doc)
 
 1. Confirm which release branches should be published as variants.
-2. Restructure `docs/` to match the proposed layout and add `SUMMARY.md`.
-3. Connect the GitBook space to this repo via Git Sync (`docs/` subdirectory, `main` branch).
-4. Add a variant per supported release branch.
-5. Add a docs badge/link to the root `README.md`.
+2. Restructure `docs/` to match the information architecture above and add `SUMMARY.md`.
+3. Decide whether GitBook pages embed/transclude the `src/Component/*/README.md` content or summarise
+   and link, to keep a single source of truth.
+4. Connect the GitBook space to this repo via Git Sync (`docs/` subdirectory, `main` branch).
+5. Add a variant per supported release branch.
+6. Add a docs badge/link to the root `README.md`.
