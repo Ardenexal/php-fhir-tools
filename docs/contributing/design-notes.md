@@ -15,8 +15,6 @@ already shipped. Where a plan is complete, the code is authoritative.
 
 ### Component requirements specification
 
-Source: `docs/component-guides/fhir-path.md`.
-
 The requirements spec for the `ardenexal/fhir-path` library (`src/Component/FHIRPath/`). It
 describes the FHIRPath 2.0 language features the evaluator targets — path navigation,
 collection semantics, the function library, operators, the type system, and polymorphism — and
@@ -24,8 +22,6 @@ lays out the component's architecture (parser, evaluator, function registry, typ
 a phased implementation plan.
 
 ### Gap analysis tracker
-
-Source: `docs/component-guides/fhirpath-gap-analysis-tasks.md`.
 
 Tracks the implementation against the FHIRPath 2.0 spec and the FHIR R4 FHIRPath extensions as
 tasks #1–#42. **Status (per the doc, as of 2026-02-24): tasks #1–#32 complete; #33–#42 remain.**
@@ -38,8 +34,7 @@ progress with `composer test:fhir-path` and the spec suites.
 
 ### Normalizer refactor plan
 
-Source: `docs/normalizer-refactor-plan.md` (tracking
-[issue #59](https://github.com/Ardenexal/php-fhir-tools/issues/59)).
+Tracked in [issue #59](https://github.com/Ardenexal/php-fhir-tools/issues/59).
 
 Plan to split `src/Component/Serialization/src/Normalizer/` into `Common/`, `Json/`, and `Xml/`
 subfolders so a new serialization format needs only a new folder plus compiler-pass wiring,

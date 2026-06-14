@@ -1,210 +1,22 @@
 # FHIR Bundle
 
-Symfony Bundle for integrating FHIR Tools components into Symfony applications. Provides automatic service registration, console commands, and semantic configuration.
-
-## Features
-
-- Automatic service registration in the Symfony container
-- Console commands for FHIR generation and FHIRPath evaluation
-- Semantic configuration through YAML
-- Symfony Flex recipe for automatic setup
-
-## Installation
-
-This bundle is part of the [PHP FHIR Tools](../../README.md) monorepo. It is registered automatically when the project is set up.
-
-### Manual Registration
-
-If needed, register the bundle in `config/bundles.php`:
-
-```php
-return [
-    // ...
-    \Ardenexal\FHIRTools\Bundle\FHIRBundle\src\FHIRBundle::class => ['all' => true],
-];
-```
-
-## Configuration
-
-### Basic Configuration
-
-```yaml
-# config/packages/fhir.yaml
-fhir:
-    output_directory: '%kernel.project_dir%/output'   # where generated models are written
-    cache_directory: '%kernel.cache_dir%/fhir'
-    default_version: R4   # R4 | R4B | R5
-    validation:
-        enabled: true
-        strict_mode: false
-        terminology_cache_pool: cache.app   # PSR-6 pool for terminology results; set to ~ to disable
-        terminology_cache_ttl: 3600          # seconds; 0 = no expiry
-    path:
-        cache_size: 100   # max cached FHIRPath expressions
-    serialization:
-        metadata_cache_pool: cache.app   # PSR-6 pool for property metadata; set to ~ to disable
-        enable_cache_warmer: false        # set to true to pre-populate metadata cache on cache:warmup
-    ig:
-        namespace: 'App\FHIR\IG'                      # must match PSR-4 autoload in composer.json
-        output_directory: '%kernel.project_dir%/src/FHIRIG'
-        offline: false
-        packages:                                      # specify in dependency order
-            - hl7.fhir.us.core
-```
-
-### Metadata Caching
-
-The bundle uses a PSR-6 cache pool to store FHIR property metadata so it doesn't need to be resolved via reflection on every request.
-
-- **`metadata_cache_pool`** — the Symfony cache pool service ID to use (default: `cache.app`). Set to `~` (null) to disable persistent caching and always resolve from attributes at runtime.
-- **`enable_cache_warmer`** — when `true`, registers a `kernel.cache_warmer` that pre-populates the pool for all discovered FHIR model classes during `bin/console cache:warmup`. Defaults to `false` to avoid slowing down deployments when not needed. Only takes effect when `metadata_cache_pool` is set.
-
-```yaml
-# To pre-warm a dedicated pool:
-fhir:
-    serialization:
-        metadata_cache_pool: cache.fhir_metadata
-        enable_cache_warmer: true
-```
-
-### Terminology Result Caching
-
-When a real `FHIRTerminologyClientInterface` (e.g. `HttpFHIRTerminologyClient`) is wired,
-the bundle can wrap it with `CachingFHIRTerminologyClient` to eliminate repeated HTTP calls
-for the same code/value-set pair within a request and — optionally — across requests.
-
-- **`terminology_cache_pool`** — the Symfony cache pool service ID to use (e.g. `cache.app`).
-  When set, `CachingFHIRTerminologyClient` is registered as a decorator over
-  `FHIRTerminologyClientInterface`. Set to `~` (null, the default) to disable.
-- **`terminology_cache_ttl`** — TTL in seconds for cached results (default: `3600`).
-  `0` maps to `expiresAfter(null)`, which most PSR-6 pools treat as no expiry.
-
-```yaml
-fhir:
-    validation:
-        terminology_cache_pool: cache.app   # set to ~ to disable
-        terminology_cache_ttl: 3600
-```
-
-> Caching a `NullFHIRTerminologyClient` (the default when no terminology server is
-> configured) is harmless but pointless. The cache only adds value once a real server
-> client is wired — either via `services.yaml` or by overriding the
-> `FHIRTerminologyClientInterface` alias.
-
-## Registered Services
-
-| Service ID | Class | Description |
-|------------|-------|-------------|
-| `fhir.model_generator` | `FHIRModelGenerator` | Generates FHIR model classes |
-| `fhir.valueset_generator` | `FHIRValueSetGenerator` | Generates FHIR value set enums |
-| `fhir.serialization_service` | `FHIRSerializationService` | FHIR serialization and deserialization |
-| `fhir.package_loader` | `PackageLoader` | Loads FHIR packages from registries |
-| `fhir.builder_context` | `BuilderContext` | Code generation context |
-| `fhir.path_service` | `FHIRPathService` | Evaluates FHIRPath expressions |
-
-### Using Services
-
-```php
-use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
-use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
-
-class FHIRController extends AbstractController
-{
-    public function __construct(
-        private readonly FHIRSerializationService $serializer,
-        private readonly FHIRPathService $pathService,
-    ) {}
-
-    public function serializePatient(object $patient): JsonResponse
-    {
-        $json = $this->serializer->serializeToJson($patient);
-
-        return new JsonResponse($json, json: true);
-    }
-
-    public function queryPatient(object $patient): JsonResponse
-    {
-        $result = $this->pathService->evaluate('name.given', $patient);
-
-        return new JsonResponse($result->toArray());
-    }
-}
-```
-
-## Console Commands
-
-### Generate Base FHIR Models
+Symfony bundle for integrating the FHIR Tools components into a Symfony application. Provides
+automatic service registration, console commands, and semantic configuration.
 
 ```bash
-# Generate models from a specific FHIR package
-php bin/console fhir:generate --package=hl7.fhir.r4.core -vvv
-
-# Generate using only cached packages (no network)
-php bin/console fhir:generate --package=hl7.fhir.r4.core --offline -vvv
+composer require ardenexal/fhir-bundle
 ```
 
-### Generate Implementation Guide Classes
+## Documentation
 
-The `fhir:generate-ig` command generates typed PHP classes for a FHIR Implementation Guide — named extension subclasses and resource profile subclasses — into an isolated namespace separate from the base models.
+Full documentation lives in the centralised [documentation site](../../../docs/README.md):
 
-```bash
-# Use packages configured in fhir.ig.packages (no arguments needed)
-php bin/console fhir:generate-ig
-
-# Override packages at runtime (bypasses config)
-php bin/console fhir:generate-ig --package=hl7.fhir.us.core
-
-# Pin a specific version
-php bin/console fhir:generate-ig --package=hl7.fhir.us.core#6.1.0
-
-# Multi-level chain — list in dependency order
-php bin/console fhir:generate-ig --package=hl7.fhir.au.base#1.0.0 --package=hl7.fhir.au.core#1.0.0
-```
-
-Configure the packages in `config/packages/fhir.yaml` under `fhir.ig` so the command needs no arguments in CI or deploy scripts:
-
-```yaml
-fhir:
-    ig:
-        namespace: 'App\FHIR\IG'
-        output_directory: '%kernel.project_dir%/src/FHIRIG'
-        packages:
-            - hl7.fhir.au.base#1.0.0
-            - hl7.fhir.au.core#1.0.0   # extends au.base — listed after it
-```
-
-Add the generated directory to your `composer.json` autoloader:
-
-```json
-"autoload": {
-    "psr-4": {
-        "App\\FHIR\\IG\\": "src/FHIRIG/"
-    }
-}
-```
-
-### FHIRPath Commands
-
-```bash
-# Evaluate FHIRPath expression
-php bin/console fhir:path:evaluate "Patient.name.given" patient.json
-
-# Output formats
-php bin/console fhir:path:evaluate "name.given" patient.json --format=json --pretty
-php bin/console fhir:path:evaluate "name.given" patient.json --format=count
-
-# Show cache statistics
-php bin/console fhir:path:evaluate "name" patient.json -v
-
-# Validate FHIRPath expression syntax
-php bin/console fhir:path:validate "name.where(use = 'official').given.first()"
-```
-
-## Requirements
-
-- **PHP**: 8.3 or higher
-- **Symfony**: 6.4+
+- [Installation & Configuration](../../../docs/bundle/configuration.md)
+- [Services & Dependency Injection](../../../docs/bundle/services.md)
+- [Console Commands](../../../docs/bundle/console-commands.md)
+- [Flex Recipe](../../../docs/bundle/flex-recipe.md)
+- [Configuration Reference](../../../docs/reference/configuration.md)
 
 ## License
 
-This bundle is released under the MIT License. See the [LICENSE](../../LICENSE) file for details.
+Released under the MIT License. See [LICENSE](../../../LICENSE).
