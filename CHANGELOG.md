@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - [Docs] Removed the stale "single-element repeating fields" XML limitation note from the serialization guide; single-value repeating fields (e.g. a `HumanName` with one `given`) already round-trip correctly through XML, and a regression test now guards this
+- [Docs] Corrected the Questionnaire validation guide: `enableWhenExpression` (SDC + Kanta variants) and `regex` constraints are now documented as covered, the implementation-rules table lists the enforced constraint/value-domain/quantity `error` rules, and the conformance-coverage section reflects that all 78 eligible R4 cases are seeded and asserted (only SDC `answerExpression`/`calculatedExpression` and R5 `answerConstraint` remain uncovered)
 
 ## [0.4.0] - 2026-06-12
 

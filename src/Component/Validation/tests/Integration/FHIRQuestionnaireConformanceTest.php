@@ -25,19 +25,16 @@ use PHPUnit\Framework\TestCase;
  * the validator, and assert the
  * violation counts against our own seeded outcomes in outcomes/questionnaire/.
  *
- * Why seeded (not Java-parity) outcomes: the validator implements a documented SUBSET of the
- * spec rules (linkId, placement, required, repeats, answer-type WARNING, basic enableWhen —
- * ADR-007). Many corpus cases test rules we deliberately do not cover (answerOption, min/max,
- * regex, units, SDC expressions, R5 answerConstraint); for those the Java error count cannot
- * match ours. Triage (M12.1) classified the 78 eligible R4 cases as:
- *   - 48 "meaningful": error-presence matches Java, or we flag the answer-type mismatch as a
- *     warning — these are SEEDED here and asserted.
- *   - 30 "out-of-scope": Java errors on a rule we do not implement — left markTestIncomplete
- *     (visible, not silently green) and recorded in the plan backlog.
+ * Why seeded (not Java-parity) outcomes: the validator's error/warning verdict does not always
+ * match the HL7 Java validator's — answer-type mismatches are reported at `warning` rather than
+ * `error` by design, and a few SDC/R5 rules remain uncovered (SDC `answerExpression`,
+ * `calculatedExpression`, R5 `answerConstraint`). Seeding pins each case to the validator's own
+ * correct output instead. All 78 eligible R4 cases are now seeded and asserted (156 assertions);
+ * none are left markTestIncomplete or skipped.
  *
  * Seeded outcomes capture the validator's CURRENT correct output, so this suite is a
- * regression guard. For the 48 seeded cases triage confirmed zero gaps (our error count never
- * exceeds Java's). Any future divergence that IS a known bug must be registered in KNOWN_GAPS.
+ * regression guard. Triage confirmed zero gaps (our error count never exceeds Java's). Any
+ * future divergence that IS a known bug must be registered in KNOWN_GAPS.
  */
 #[CoversClass(FHIRQuestionnaireValidator::class)]
 final class FHIRQuestionnaireConformanceTest extends TestCase
