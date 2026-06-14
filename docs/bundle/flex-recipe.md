@@ -16,8 +16,9 @@ manifest performs the following:
 - **Registers the bundle** in `config/bundles.php` for all environments — the FQCN is
   `Ardenexal\FHIRTools\Bundle\FHIRBundle\FHIRBundle` (there is **no** `\src` segment, even though the
   file lives under `src/`).
-- **Copies configuration** into `config/packages/fhir.yaml`, plus per-environment overrides for
-  `dev`, `prod`, and `test`.
+- **Copies configuration** — the main `config/packages/fhir.yaml` plus separate per-environment
+  override files `config/packages/dev/fhir.yaml`, `config/packages/prod/fhir.yaml`, and
+  `config/packages/test/fhir.yaml`.
 - **Adds environment variables** to `.env` (see below).
 - **Adds `.gitignore` entries** for generated output and cache: `/output/` and `/var/cache/fhir/`.
 
@@ -48,8 +49,11 @@ fhir:
             auto_update: false
 ```
 
-The recipe also ships `when@prod` (strict validation on) and `when@test` (separate output/cache
-directories) overrides in the same file.
+The main `fhir.yaml` also carries inline `when@dev`, `when@prod`, and `when@test` blocks (dev and
+test keep strict mode off; prod turns it on). The separate per-environment files layer package
+tweaks on top: `dev` enables `auto_update` for the R4B and R5 packages, `prod` pins every package
+with `auto_update: false`, and `test` redirects output/cache to `tests/output` and `test_fhir` and
+narrows the package set to R4B core plus terminology.
 
 ## Environment variables
 
