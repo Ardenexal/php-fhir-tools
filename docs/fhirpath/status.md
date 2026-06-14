@@ -59,8 +59,3 @@ than evaluator defects.
 Exact pass/fail/skip counts shift as work continues, so they are intentionally not quoted here.
 Run the spec suite locally to get current numbers.
 {% endhint %}
-
-{% hint style="info" %}
-Detailed gap analysis and roadmap live under
-[Contributing → Design Notes & Roadmap](../contributing/design-notes.md).
-{% endhint %}

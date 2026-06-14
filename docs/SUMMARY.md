@@ -77,4 +77,3 @@
 * [Development Setup](contributing/setup.md)
 * [Testing](contributing/testing.md)
 * [Commit Standards](contributing/commit-standards.md)
-* [Design Notes & Roadmap](contributing/design-notes.md)
