@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- [Docs] Removed the stale "single-element repeating fields" XML limitation note from the serialization guide; single-value repeating fields (e.g. a `HumanName` with one `given`) already round-trip correctly through XML, and a regression test now guards this
+
 ## [0.4.0] - 2026-06-12
 
 ### Added
