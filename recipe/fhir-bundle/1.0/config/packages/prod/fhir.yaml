@@ -7,11 +7,7 @@ fhir:
     
     # Disable auto-update in production for stability
     packages:
-        'hl7.fhir.r4.core':
-            auto_update: false
         'hl7.fhir.r4b.core':
             auto_update: false
         'hl7.fhir.r5.core':
-            auto_update: false
-        'hl7.terminology':
             auto_update: false
