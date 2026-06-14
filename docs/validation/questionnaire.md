@@ -59,14 +59,21 @@ after merging.
 | Required, enabled items must be answered when status is `completed`/`amended`, checked per parent instance | `error` |
 | A required group needs at least one answered descendant question | `error` |
 | Non-repeating items: at most one occurrence per parent and one answer | `error` |
+| Answer must satisfy item constraint extensions: `minValue`/`maxValue`, `minLength`/`maxLength`, `maxDecimalPlaces`, `regex`, `minOccurs`/`maxOccurs` | `error` |
+| `answerOption` membership, including the exclusive-option (`optionExclusive`) rule | `error` |
+| Non-answerable item types (`display`, abstract `question`) must not carry an answer | `error` |
+| `Reference` answers must match the constrained target resource type and be a well-formed URL | `error` |
+| `Attachment` answers must satisfy content-type / size / data-size constraints | `error` |
+| `Quantity` answers must satisfy `minQuantity`/`maxQuantity` bounds and unit-option constraints | `error` |
 | Answer value type must match the declared item type | `warning` |
 | Items present while their `enableWhen` conditions are unsatisfied | `warning` |
 | `enableWhen.question` must reference a known `linkId` | `warning` |
 
 {% hint style="warning" %}
-SDC extensions (`enableWhenExpression`, `answerExpression`, calculated expressions, regex
-constraints) and R5 `answerConstraint` are not yet covered. `enableWhen` answers are looked
-up response-globally — a documented approximation of the spec's nearest-occurrence
+SDC `answerExpression`, calculated expressions (`calculatedExpression`), and R5
+`answerConstraint` are not yet covered. (`enableWhenExpression` — both the canonical SDC and
+Kanta PHR variants — and `regex` constraints are now validated.) `enableWhen` answers are
+looked up response-globally — a documented approximation of the spec's nearest-occurrence
 resolution that is exact whenever the referenced question occurs once.
 {% endhint %}
 
@@ -74,18 +81,13 @@ resolution that is exact whenever the referenced question occurs once.
 
 The validator is exercised against the official `fhir/fhir-test-cases` QuestionnaireResponse
 corpus via `FHIRQuestionnaireConformanceTest` (run with `composer test-ai-questionnaire-spec`).
-Of the 78 eligible R4 cross-resource cases:
+All 78 eligible R4 cross-resource cases are seeded and asserted (156 assertions): each case's
+error and warning counts are pinned to the validator's current output, so the suite acts as a
+regression guard. No cases remain out of scope or skipped. Answer-type mismatches are asserted
+at `warning` rather than `error`, by design.
 
-* **41 are asserted** — error/warning counts match seeded expectations and the verdict agrees
-  with the HL7 Java validator's error-presence (answer-type mismatches are reported at
-  `warning` rather than `error`, by design).
-* **36 are out of scope** and left incomplete (not silently passing) — they test rules this
-  validator does not implement (answerOption/value-set membership, min/max, regex, Quantity
-  units, Attachment constraints, Reference target types, SDC `enableWhenExpression`).
-* **1 is skipped** — its supporting resource is not a Questionnaire.
-
-The validator reports no false-positive errors across the corpus (its error count never
-exceeds the reference validator's).
+The validator reports no false-positive errors across the corpus (its error count never exceeds
+the HL7 Java reference validator's); `FHIRQuestionnaireConformanceTest::KNOWN_GAPS` is empty.
 
 ## Derived Questionnaires
 
