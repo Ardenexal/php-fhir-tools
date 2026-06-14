@@ -56,4 +56,42 @@ JSON;
         self::assertIsArray($names);
         self::assertCount(2, $names, 'both HumanName entries must survive a JSON→object→XML→object trip');
     }
+
+    /**
+     * Regression guard: a repeating field with exactly ONE value must survive an XML round-trip.
+     * XmlEncoder collapses a lone element to a scalar/assoc array rather than a list, so single-element
+     * arrays must be re-wrapped on deserialization. Covers both a repeating primitive (`given`) and a
+     * repeating complex type (`identifier`). The 2+-element case is covered above; this guards the tail.
+     */
+    public function testSingleElementRepeatingFieldsXmlRoundTrip(): void
+    {
+        $service = FHIRSerializationService::createDefault();
+
+        $json = <<<'JSON'
+{
+  "resourceType": "Patient",
+  "id": "single",
+  "identifier": [ { "system": "urn:x", "value": "123" } ],
+  "name": [ { "family": "Smith", "given": ["John"] } ]
+}
+JSON;
+
+        $patient = $service->deserialize($json);
+        $xml     = $service->serializeToXml($patient);
+        $back    = $service->deserialize($xml);
+
+        $refl = new \ReflectionClass($back);
+
+        $names = $refl->getProperty('name')->getValue($back);
+        self::assertIsArray($names);
+        self::assertCount(1, $names, 'single HumanName must survive an XML round-trip');
+
+        $given = (new \ReflectionClass($names[0]))->getProperty('given')->getValue($names[0]);
+        self::assertIsArray($given, 'single-element repeating primitive `given` must stay an array');
+        self::assertCount(1, $given, 'lone `given` value must not be lost when XML collapses it');
+
+        $identifiers = $refl->getProperty('identifier')->getValue($back);
+        self::assertIsArray($identifiers);
+        self::assertCount(1, $identifiers, 'single complex `identifier` must survive an XML round-trip');
+    }
 }
