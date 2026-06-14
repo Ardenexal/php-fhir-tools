@@ -11,13 +11,21 @@ This is a library monorepo. Each component is published as a standalone Composer
 | --- | --- |
 | `ardenexal/fhir-bundle` | Integrate with a Symfony application (wires everything + console commands) |
 | `ardenexal/fhir-code-generation` | Generate PHP classes from FHIR definitions / Implementation Guides |
-| `ardenexal/fhir-serialization` | Read/write FHIR JSON or XML (and validate) |
-| `ardenexal/fhir-path` | Evaluate FHIRPath expressions |
+| `ardenexal/fhir-serialization` | Read/write FHIR JSON or XML |
+| `ardenexal/fhir-validation` | Validate resources against base and profile constraints |
+| `ardenexal/fhir-path` | Evaluate FHIRPath 2.0 expressions |
 | `ardenexal/fhir-models` | Use the pre-generated R4 / R4B / R5 model classes |
+| `ardenexal/fhir-metadata` | Shared FHIR attributes and interfaces (a dependency of the others) |
 
 {% hint style="info" %}
-`ardenexal/fhir-serialization` needs model classes to read and write. Either install
-`ardenexal/fhir-models` or generate your own with `ardenexal/fhir-code-generation`.
+`ardenexal/fhir-serialization` needs model classes to read and write — it already depends on
+`ardenexal/fhir-models`, so they come together. Generate your own classes instead with
+`ardenexal/fhir-code-generation` when you need versions or Implementation Guides that the
+pre-generated models do not cover.
 {% endhint %}
 
-<!-- MIGRATION SOURCE: root README.md (Monorepo Structure table) -->
+{% hint style="info" %}
+Validation lives in its own package, `ardenexal/fhir-validation`, not in `ardenexal/fhir-serialization`.
+The `ardenexal/fhir-bundle` brings in serialization, validation, FHIRPath, code generation, and
+metadata together.
+{% endhint %}

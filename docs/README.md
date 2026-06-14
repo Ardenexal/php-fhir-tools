@@ -8,12 +8,12 @@ icon: book-medical
 PHP FHIR Tools is a PHP 8.3+ library monorepo for working with
 [FHIR](https://www.hl7.org/fhir/) (Fast Healthcare Interoperability Resources). It generates PHP
 model classes from FHIR Structure Definitions, serializes resources to and from JSON and XML,
-validates resources against the specification and Implementation Guides, and evaluates FHIRPath
+validates resources against the specification and Implementation Guides, and evaluates FHIRPath 2.0
 expressions.
 
 {% hint style="info" %}
 The packages can be used independently or together. If you only need serialization, install
-`ardenexal/fhir-serialization`; if you are building a Symfony app, the `ardenexal/fhir-bundle`
+`ardenexal/fhir-serialization`; if you are building a Symfony application, `ardenexal/fhir-bundle`
 wires everything for you.
 {% endhint %}
 
@@ -40,7 +40,7 @@ wires everything for you.
     </tr>
     <tr>
       <td>Resource & profile validation</td>
-      <td><code>ardenexal/fhir-serialization</code></td>
+      <td><code>ardenexal/fhir-validation</code></td>
       <td><a href="validation/overview.md">Validation</a></td>
     </tr>
     <tr>
@@ -61,5 +61,3 @@ wires everything for you.
 * New to the library? Start with [Installation](getting-started/installation.md) and the
   [Quick Start](getting-started/quick-start.md).
 * Not sure which package you need? See [Choosing the Right Package](getting-started/packages.md).
-
-<!-- MIGRATION SOURCE: root README.md (overview + package table). Keep this page canonical. -->
