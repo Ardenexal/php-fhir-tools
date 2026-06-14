@@ -35,13 +35,6 @@ definitions are never processed. Attribute values are also preserved as strings
 their precision on round-trip rather than being cast to float/int.
 {% endhint %}
 
-{% hint style="info" %}
-**Known limitation (XML, single-element repeating fields):** a repeating element that contains
-exactly one value (for example a `HumanName` whose `given` is `['John']`) currently fails to
-deserialize back from XML, because XML collapses the lone element to a scalar. Two-or-more values
-(`given: ['John', 'James']`) round-trip correctly, as does omitting the field. JSON is unaffected.
-{% endhint %}
-
 ## Error handling
 
 Like JSON, all failures are wrapped in `FHIRSerializationException`:
