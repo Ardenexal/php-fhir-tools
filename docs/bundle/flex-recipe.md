@@ -35,6 +35,9 @@ fhir:
         enabled: '%env(bool:FHIR_VALIDATION_ENABLED)%'
         strict_mode: '%env(bool:FHIR_VALIDATION_STRICT_MODE)%'
     packages:
+        'hl7.fhir.r4.core':
+            version: '4.0.1'
+            auto_update: false
         'hl7.fhir.r4b.core':
             version: '4.3.0'
             auto_update: false
@@ -45,7 +48,7 @@ fhir:
 
 The main `fhir.yaml` also carries inline `when@dev`, `when@prod`, and `when@test` blocks (dev and
 test keep strict mode off; prod turns it on). The separate per-environment files layer package
-tweaks on top: `dev` enables `auto_update` for the R4B and R5 packages, `prod` pins both with
+tweaks on top: `dev` enables `auto_update` for the R4B and R5 packages, `prod` pins all three with
 `auto_update: false`, and `test` redirects output/cache to `tests/output` and `test_fhir` while
 pinning the R4B and R5 core versions.
 

@@ -6,6 +6,9 @@ fhir:
         enabled: true
         strict_mode: false
     packages:
+        'hl7.fhir.r4.core':
+            version: '4.0.1'
+            auto_update: false
         'hl7.fhir.r4b.core':
             version: '4.3.0'
             auto_update: false
