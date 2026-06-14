@@ -6,7 +6,7 @@ icon: clipboard-question
 # Questionnaire Validation
 
 Questionnaire and QuestionnaireResponse validation is a distinct workflow with its own
-validators, separate from the general `FHIRValidationService` (see ADR-007). Run both and
+validators, separate from the general `FHIRValidationService`. Run both and
 merge the reports for complete coverage.
 
 | Class | Responsibility |
