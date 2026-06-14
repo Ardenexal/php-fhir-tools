@@ -99,4 +99,3 @@ final class PatientService
 * [XML Serialization](xml.md)
 * [Context & Options](context.md)
 * [IG-Aware Serialization](ig-aware.md)
-* [Round-Trip Testing](round-trip.md)

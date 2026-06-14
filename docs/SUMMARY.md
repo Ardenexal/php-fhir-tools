@@ -28,7 +28,6 @@
 * [XML Serialization](serialization/xml.md)
 * [Serialization Context & Options](serialization/context.md)
 * [IG-Aware Serialization](serialization/ig-aware.md)
-* [Round-Trip Testing](serialization/round-trip.md)
 
 ## Validation
 

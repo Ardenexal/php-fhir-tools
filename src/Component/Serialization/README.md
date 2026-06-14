@@ -15,7 +15,6 @@ Full documentation lives in the centralised [documentation site](../../../docs/R
 - [XML Serialization](../../../docs/serialization/xml.md)
 - [Serialization Context & Options](../../../docs/serialization/context.md)
 - [IG-Aware Serialization](../../../docs/serialization/ig-aware.md)
-- [Round-Trip Testing](../../../docs/serialization/round-trip.md)
 
 ## License
 
