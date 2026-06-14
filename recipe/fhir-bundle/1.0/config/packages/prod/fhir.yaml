@@ -13,5 +13,3 @@ fhir:
             auto_update: false
         'hl7.fhir.r5.core':
             auto_update: false
-        'hl7.terminology':
-            auto_update: false

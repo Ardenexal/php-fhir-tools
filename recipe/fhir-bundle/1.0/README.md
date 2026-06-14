@@ -61,9 +61,8 @@ After installation, you can:
 The recipe includes configuration for common FHIR packages:
 
 - `hl7.fhir.r4.core`: FHIR R4 core specification
-- `hl7.fhir.r4b.core`: FHIR R4B core specification  
+- `hl7.fhir.r4b.core`: FHIR R4B core specification
 - `hl7.fhir.r5.core`: FHIR R5 core specification
-- `hl7.terminology`: HL7 terminology resources
 
 You can add additional packages or modify versions in the configuration file.
 
