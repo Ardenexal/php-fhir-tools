@@ -25,3 +25,17 @@ Math functions operate on numeric values. Single-value functions (`abs()`,
 | `min()` | Smallest item in the collection. | `(3 \| 1 \| 2).min()` → `1` |
 | `max()` | Largest item in the collection. | `(3 \| 1 \| 2).max()` → `3` |
 | `avg()` | Arithmetic mean of the collection. | `(2 \| 4 \| 6).avg()` → `4` |
+
+## Precision & boundaries
+
+These three functions report or derive the precision of a value. They accept a
+decimal, integer, date, dateTime, or time, using FHIRPath positional precision
+numbers (e.g. `YYYY`=4, `YYYY-MM`=6, `YYYY-MM-DD`=8 for dates; digits after the
+decimal point for numbers). `lowBoundary()` and `highBoundary()` take an optional
+output-precision argument.
+
+| Function | Description | Example |
+|----------|-------------|---------|
+| `precision()` | Number of significant positions in the input. Trailing zeros on a decimal are preserved. | `(1.58700).precision()` → `5` |
+| `lowBoundary([precision])` | Lowest value in the natural range the input represents. For numbers, `value - 0.5×10^-precision`; for dates/times, fills unspecified components with their minimum. | `(1.587).lowBoundary()` → `1.5865...` |
+| `highBoundary([precision])` | Highest value in the natural range the input represents. For numbers, `value + 0.5×10^-precision`; for dates/times, fills unspecified components with their maximum. | `(1.587).highBoundary()` → `1.5875...` |

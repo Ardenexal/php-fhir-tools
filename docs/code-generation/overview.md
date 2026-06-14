@@ -6,9 +6,11 @@ icon: gears
 # Overview
 
 The Code Generation component loads FHIR packages from the registry and generates strongly-typed PHP
-classes — Resources, DataTypes, Primitives, and Enums — from their Structure Definitions and
-ValueSets. It is the engine behind the [`fhir:generate`](base-models.md) and
-[`fhir:generate-ig`](implementation-guides.md) console commands.
+classes from their definitions. A `StructureDefinition` is FHIR's machine-readable description of a
+resource or data type, and a `ValueSet` is a named set of permitted codes. The generator turns them
+into Resources, DataTypes, Primitives, and Enums. It is the engine behind the
+[`fhir:generate`](base-models.md) and [`fhir:generate-ig`](implementation-guides.md) console
+commands.
 
 Namespace: `Ardenexal\FHIRTools\Component\CodeGeneration\`.
 

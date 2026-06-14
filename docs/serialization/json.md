@@ -5,7 +5,11 @@ icon: brackets-curly
 
 # JSON Serialization
 
-FHIR model classes use promoted public properties — set values via the constructor's named
+`serializeToJson()` turns a FHIR model object into a JSON string. `deserializeFromJson()` reads JSON
+back into a typed model object. The round-trip below builds a `PatientResource`, serializes it, and
+deserializes it back.
+
+FHIR model classes use promoted public properties, so you set values through the constructor's named
 arguments or by assigning the public property. There are no `setX()` setters.
 
 ```php
@@ -56,8 +60,8 @@ $resource = $serializer->deserialize($json);          // format + class auto-det
 $resource = $serializer->deserialize($json, PatientResource::class); // explicit class
 ```
 
-Class resolution delegates to the type resolver, so `meta.profile` and the IG type registry are
-applied when available (see [IG-Aware Serialization](ig-aware.md)).
+Class resolution delegates to the type resolver, so it applies `meta.profile` and the IG type
+registry when available (see [IG-Aware Serialization](ig-aware.md)).
 
 ## Error handling
 

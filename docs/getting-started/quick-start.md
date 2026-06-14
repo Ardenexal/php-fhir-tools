@@ -27,10 +27,11 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
 
 $service = FHIRSerializationService::createDefault();
 
+$json = file_get_contents('patient.json');
 $patient = $service->deserializeFromJson($json, PatientResource::class);
 
 // Round-trip back to JSON (or use serializeToXml() for XML):
-$json = $service->serializeToJson($patient);
+$roundTripped = $service->serializeToJson($patient);
 ```
 
 {% hint style="info" %}
@@ -49,6 +50,7 @@ to also evaluate profile constraints; with none, only base constraints run.
 ```php
 use Ardenexal\FHIRTools\Component\Validation\FHIRValidationService;
 
+// $validationService is autowired from the container (see the note below)
 /** @var FHIRValidationService $validationService */
 $report = $validationService->validate($patient);
 

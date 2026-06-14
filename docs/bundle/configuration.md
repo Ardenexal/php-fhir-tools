@@ -3,7 +3,7 @@ description: Install and configure the FHIR Symfony bundle.
 icon: gear
 ---
 
-# Installation & Configuration
+# Install and configure the bundle
 
 The bundle (`Ardenexal\FHIRTools\Bundle\FHIRBundle\FHIRBundle`) registers all FHIR Tools services
 automatically in a Symfony application: serialization, validation, code generation, and FHIRPath.
@@ -57,6 +57,7 @@ fhir:
     cache_directory: '%kernel.cache_dir%/fhir'
 
     # Default FHIR version: R4, R4B, or R5
+    # (the Flex recipe overrides this to R4B via the FHIR_DEFAULT_VERSION env var)
     default_version: 'R4'
 
     validation:

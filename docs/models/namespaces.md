@@ -31,8 +31,9 @@ use Ardenexal\FHIRTools\Component\Models\R4\Enum\AdministrativeGender;
 
 ## Backbone elements
 
-Backbone elements are nested in a sub-namespace named after their parent resource, so they
-never collide with same-named backbones on other resources:
+A backbone element is an inline nested structure defined within a single resource (for example
+`Patient.contact`). Generated backbone classes are nested in a sub-namespace named after their
+parent resource, so they never collide with same-named backbones on other resources:
 
 ```
 R4/Resource/

@@ -3,7 +3,7 @@ description: Serialize typed extension and profile classes from Implementation G
 icon: sitemap
 ---
 
-# IG-Aware Serialization
+# Serializing Implementation Guide extensions and profiles
 
 When you generate typed classes for an [Implementation Guide](../code-generation/implementation-guides.md),
 the serializer must be IG-aware to deserialize those typed extensions and profile subclasses into
@@ -24,8 +24,9 @@ $serializer = FHIRSerializationService::createWithIG(
 ```
 
 `createWithIG()` scans the base model `Extension` directories plus the optional IG output directory,
-building an IG type registry that enables typed extension deserialization, `meta.profile` URL
-resolution, and discriminator-based slice resolution.
+building an IG type registry. The registry deserializes typed extensions into their PHP classes,
+resolves `meta.profile` URLs to their profile classes, and picks the right class for a sliced
+element using the discriminator (the field an IG names to tell sliced entries apart).
 
 {% hint style="info" %}
 With no IG arguments, `createWithIG()` (and therefore `createDefault()`, which delegates to it)

@@ -38,12 +38,18 @@ Provides the Symfony Validator constraints and `FHIRValidationService`. It depen
 ```bash
 composer require ardenexal/fhir-path
 ```
+
+Provides the FHIRPath 2.0 engine (`FHIRPathService`). Depends only on `ardenexal/fhir-metadata`,
+not on the model classes.
 {% endtab %}
 
 {% tab title="Code Generation" %}
 ```bash
 composer require ardenexal/fhir-code-generation
 ```
+
+Generates model classes from FHIR packages. Needs the `zip` extension and pulls in
+`nette/php-generator` for code emission.
 {% endtab %}
 {% endtabs %}
 

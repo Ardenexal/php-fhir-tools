@@ -77,18 +77,6 @@ looked up response-globally — a documented approximation of the spec's nearest
 resolution that is exact whenever the referenced question occurs once.
 {% endhint %}
 
-## Conformance coverage
-
-The validator is exercised against the official `fhir/fhir-test-cases` QuestionnaireResponse
-corpus via `FHIRQuestionnaireConformanceTest` (run with `composer test-ai-questionnaire-spec`).
-All 78 eligible R4 cross-resource cases are seeded and asserted (156 assertions): each case's
-error and warning counts are pinned to the validator's current output, so the suite acts as a
-regression guard. No cases remain out of scope or skipped. Answer-type mismatches are asserted
-at `warning` rather than `error`, by design.
-
-The validator reports no false-positive errors across the corpus (its error count never exceeds
-the HL7 Java reference validator's); `FHIRQuestionnaireConformanceTest::KNOWN_GAPS` is empty.
-
 ## Derived Questionnaires
 
 A derived `Questionnaire` declares a base via `derivedFrom`. The rules applied depend on the

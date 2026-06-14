@@ -26,9 +26,8 @@ membership, and type operators.
 | **Type** | `is`, `as` | Type testing and casting |
 
 {% hint style="info" %}
-Equivalence (`~` / `!~`) is implemented: it is recognised by the lexer, parsed as a binary
-operator, and dispatched in the evaluator to the comparison service. (Earlier drafts described
-it as unimplemented — that is no longer accurate.)
+`~` tests equivalence and `!~` its negation. Equivalence differs from `=` by ignoring collection
+order and, for strings, case and whitespace.
 {% endhint %}
 
 ### Examples
@@ -67,10 +66,9 @@ The parser and evaluator support the core FHIRPath 2.0 syntax:
 
 ### Type system
 
-Types are resolved through `FHIRTypeResolver` and exposed as `TypeInfo`. The `is` operator tests
-whether an item conforms to a named type; `as` filters the collection to items of that type.
-Temporal values use dedicated types (`FHIRPathDate`, `FHIRPathDateTime`, `FHIRPathTime`) and
-decimals use `FHIRPathDecimal` to preserve precision.
+The `is` operator tests whether an item conforms to a named type, and `as` filters the collection
+to items of that type. Temporal values use dedicated types (`FHIRPathDate`, `FHIRPathDateTime`,
+`FHIRPathTime`), and decimals use `FHIRPathDecimal` to preserve precision.
 
 See the [Function Reference](functions/README.md) for the full library of built-in functions,
 including type-conversion helpers such as `toInteger()`, `toQuantity()`, and `ofType()`.

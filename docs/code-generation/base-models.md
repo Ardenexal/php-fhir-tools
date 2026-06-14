@@ -64,7 +64,13 @@ composer run generate-models-all   # R4 + R4B + R5
 composer run generate-models       # fhir:generate with default (R4) packages
 ```
 
-## Core classes
+## Advanced: the programmatic API
+
+{% hint style="info" %}
+Most integrators only need the `fhir:generate` command above. This section documents the
+internal generator classes for people embedding code generation in their own tooling. Skip it if
+you are running the command.
+{% endhint %}
 
 The command orchestrates these generators (all under
 `Ardenexal\FHIRTools\Component\CodeGeneration\`):

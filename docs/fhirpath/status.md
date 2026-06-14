@@ -24,10 +24,8 @@ and conversion expressions work, while a small number of spec edge cases remain 
   reserved identifiers (`$this`, `$index`, `$total`), and expression compilation/caching.
 
 {% hint style="info" %}
-Every function in the registry is registered through `FunctionRegistry`. The previously
-documented "98 functions" figure has drifted from the code (for example `sort()` is registered
-but was absent from the old table). Treat the [Function Reference](functions/README.md) as the
-authoritative inventory rather than a fixed count.
+Treat the [Function Reference](functions/README.md) as the authoritative inventory of registered
+functions rather than a fixed count.
 {% endhint %}
 
 ## Known issues

@@ -10,6 +10,19 @@ attributes on the generated model classes: structural rules, FHIRPath invariants
 bindings, profiles, extension contexts, ranges, and obligations. It supports R4, R4B, and R5,
 and produces a structured [validation report](reports.md).
 
+## In this section
+
+* [Structural & Profile Validation](structural.md) — cardinality, slices, fixed and pattern values.
+* [FHIRPath Invariant Validation](invariants.md) — constraint expressions such as `obs-7`.
+* [Terminology & Binding Validation](terminology.md) — codes against ValueSet bindings.
+* [Reference & Target Profile Validation](references.md) — what a `Reference` may point to.
+* [Quantity & Temporal Range Validation](ranges.md) — `minValue` / `maxValue` bounds.
+* [Extensions, Modifiers & Obligations](extensions.md) — context, modifier, must-support, and obligation checks.
+* [Questionnaire Validation](questionnaire.md) — a separate validator for questionnaires and responses.
+* [The $validate Operation](operation-outcome.md) — producing an `OperationOutcome`.
+* [Configuration](configuration.md) — wiring terminology clients, resolvers, and obligation contexts.
+* [Validation Reports & Violation Codes](reports.md) — report structure and severity codes.
+
 ## Quick start
 
 ```php

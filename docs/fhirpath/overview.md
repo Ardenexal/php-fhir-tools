@@ -5,8 +5,10 @@ icon: magnifying-glass
 
 # Overview & Quick Start
 
-A FHIRPath 2.0 expression evaluator: path navigation, filtering, aggregation, a broad library
-of built-in functions, and a FHIR-aligned type system with `is`/`as` support.
+FHIRPath is a query language for FHIR data, much like XPath for the resource tree. Use it to pull
+fields, filter collections, and test conditions without walking PHP objects by hand. This component
+is a FHIRPath 2.0 evaluator: path navigation, filtering, aggregation, a library of built-in
+functions, and a FHIR-aligned type system with `is`/`as` support.
 
 The public entry point is `FHIRPathService`
 (`Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService`), which wraps lexing, parsing,

@@ -5,9 +5,9 @@ icon: gear
 
 # Configuration
 
-Several validation concerns rely on pluggable services you wire yourself. Each ships with a
-null object so the feature degrades gracefully (silently skipped, or surfaced as an INFO
-violation) until you provide a real implementation.
+Several validation concerns rely on pluggable services you wire yourself. Each ships with a null
+object, so until you provide a real implementation the feature is skipped or surfaced as an INFO
+violation rather than failing.
 
 ## Terminology clients
 
@@ -21,6 +21,7 @@ flag plus an optional corrected display string).
 | `HttpFHIRTerminologyClient` | Calls a terminology server's `ValueSet/$validate-code` operation (GET by default, POST optional). Returns `false` / invalid on any HTTP, transport, or parse error (graceful degradation). |
 | `CachingFHIRTerminologyClient` | Decorator caching results. An in-process array cache is always active; a PSR-6 pool is optional for cross-request persistence. |
 | `NullFHIRTerminologyClient` | Null object — treats every code as valid. Equivalent to having no client: extensible/preferred checks are skipped. |
+| `InMemoryFHIRTerminologyClient` | Validates against a pre-loaded code map for offline and test use. Codes not in the map fall back to a configurable default (allow or deny). |
 | `PreferredServerAwareTerminologyClient` | Tries an ordered list of preferred clients, failing over to a fallback. Only a `\Throwable` triggers failover — a definitive `false` is final. |
 | `HttpFHIRTerminologyClientFactory` | Builds `HttpFHIRTerminologyClient` instances per server base URL (`createForServer()`), wrapping in a caching decorator when a pool is configured. |
 
@@ -88,17 +89,9 @@ $terminologyClient = new PreferredServerAwareTerminologyClient(
 
 When the client is `null` or a `NullFHIRTerminologyClient`, no violation is raised for invalid
 codes against extensible or preferred value sets. Instead each skipped check emits a single
-`fhir:unchecked-binding` INFO violation surfacing the coverage gap:
-
-```php
-$report = $service->validate($patient);
-
-if ($report->hasUncheckedBindings()) {
-    foreach ($report->uncheckedBindings() as $unchecked) {
-        echo $unchecked->message . "\n";
-    }
-}
-```
+`fhir:unchecked-binding` INFO violation surfacing the coverage gap. Query these via
+`FHIRValidationReport::hasUncheckedBindings()` — see
+[Terminology & Binding Validation](terminology.md) for the example.
 
 {% hint style="info" %}
 The `HttpClientInterface` is Symfony's HTTP client contract

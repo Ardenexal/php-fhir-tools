@@ -5,9 +5,11 @@ icon: list-check
 
 # Terminology & Binding Validation
 
-Validates coded values against their ValueSet bindings using `FHIRValueSetBindingValidator`,
-driven by the `#[FHIRValueSetBinding]` attribute. Binding strength determines how strictly codes
-are checked.
+A coded element in FHIR binds to a *ValueSet* — a named set of permitted codes. The binding's
+*strength* says how strictly that set is enforced: `required` (the code must be a member),
+`extensible` or `preferred` (membership is expected, other codes are allowed), or `example`
+(illustrative only). This page validates coded values against those bindings using
+`FHIRValueSetBindingValidator`, driven by the `#[FHIRValueSetBinding]` attribute.
 
 {% hint style="info" %}
 Extensible and preferred bindings may call an external terminology server. Configure the
@@ -23,7 +25,7 @@ The validator branches on the constraint's `strength`:
 | `required` | Checked against the generated backed enum for the value set. If no enum class exists, falls back to the terminology client; with no client, emits a WARNING (`Required binding ... could not be validated: no enum class generated`). |
 | `extensible` | Checked via the terminology client. Without a real client → `fhir:unchecked-binding` INFO. |
 | `preferred` | Same as extensible. |
-| `example` | Never validated and never surfaced as unchecked (documentation only, per ADR-004). |
+| `example` | Never validated and never surfaced as unchecked (documentation only). |
 
 ### Required bindings
 

@@ -3,7 +3,7 @@ description: Configure serialization with the immutable FHIRSerializationContext
 icon: sliders
 ---
 
-# Serialization Context & Options
+# Configuring serialization behavior
 
 `FHIRSerializationContext` is an immutable, chainable value object that configures how serialization
 behaves — validation mode, unknown-element policy, debug info, and more. Start from a format factory
@@ -27,6 +27,9 @@ $json = $serializer->serializeToJson($patient, $context->toSymfonyContext());
 The context is immutable — every `with*()` call returns a **new** instance and leaves the original
 unchanged. Always capture the return value.
 {% endhint %}
+
+If the snippet above covers your needs — strict validation, rejecting unknown elements — you can
+stop here. The sections below document the full option surface.
 
 ## Factories and modifiers
 

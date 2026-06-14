@@ -45,8 +45,8 @@ string form. Empty strings are skipped.
 * **`time`** values are compared as plain strings.
 * **Date-like** values (`date` / `dateTime` / `instant`) are parsed. Partial dates (`YYYY` or
   `YYYY-MM`) are expanded to the **start** of their period for the `min` check and the **end** for
-  the `max` check (see ADR-006), so `2024` satisfies a `min` of `2024-06-01` only if the whole year
-  could fall on or after the bound.
+  the `max` check, so `2024` satisfies a `min` of `2024-06-01` only if the whole year could fall on
+  or after the bound.
 
 An out-of-range value raises an ERROR:
 

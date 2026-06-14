@@ -82,8 +82,10 @@ foreach ($report->info() as $info) {
 
 ## Obligations
 
-Obligation validation is opt-in and actor-scoped via `FHIRObligationContext`. When a context is
-provided, `collectObligationViolations()` enforces matching populate obligations
+An *obligation* is a statement in a profile that a particular actor (a system playing a role, such
+as a data producer or consumer) SHALL or SHOULD do something with an element — most commonly
+populate it. Obligation validation is opt-in and actor-scoped via `FHIRObligationContext`. When a
+context is provided, `collectObligationViolations()` enforces matching populate obligations
 (`SHALL`/`SHOULD:populate`) at ERROR/WARNING/INFO severity, and `applyNoErrorSuppression()`
 suppresses errors for `SHALL:no-error` obligations.
 

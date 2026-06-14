@@ -47,6 +47,10 @@ class PatientBirthPlaceExtension extends Extension
 }
 ```
 
+In FHIR, `value[x]` is an extension's polymorphic value element: it can hold one of several types
+(`valueString`, `valueAddress`, and so on). A *slice* is a named constraint that pins one entry of a
+repeating element to a specific shape.
+
 `FHIRExtensionGenerator` detects simple vs. complex extensions automatically: simple extensions
 narrow the `value[x]` type to a concrete PHP type, complex extensions map sub-extension slices to
 typed properties.

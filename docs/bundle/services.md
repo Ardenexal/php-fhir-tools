@@ -3,7 +3,7 @@ description: Inject and use FHIR Tools services in a Symfony application.
 icon: diagram-project
 ---
 
-# Services & Dependency Injection
+# Inject and use FHIR services
 
 When the bundle is enabled, it registers the serialization, validation, code-generation, and
 FHIRPath services in the Symfony container. Each public service is available both by a `fhir.*`

@@ -3,7 +3,7 @@ description: Console commands provided by the FHIR bundle.
 icon: terminal
 ---
 
-# Console Commands
+# Run the bundle's console commands
 
 The bundle adds these commands to a Symfony application:
 

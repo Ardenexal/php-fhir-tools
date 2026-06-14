@@ -5,7 +5,8 @@ icon: function
 
 # FHIRPath Invariant Validation
 
-Validates FHIRPath invariant expressions defined on Structure Definitions, via
+An *invariant* is a rule a FHIR resource must satisfy, written as a FHIRPath expression and
+identified by a `key` such as `obs-7`. This validator evaluates those expressions via
 `FHIRPathInvariantValidator` (backed by the [FHIRPath](../fhirpath/overview.md) engine). Each
 invariant is emitted as a `#[FHIRPathInvariant]` attribute carrying the invariant `key` (e.g.
 `obs-7`), `expression`, `human` message, and `severity`.

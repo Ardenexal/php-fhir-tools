@@ -6,10 +6,11 @@ icon: book-medical
 # Introduction
 
 PHP FHIR Tools is a PHP 8.3+ library monorepo for working with
-[FHIR](https://www.hl7.org/fhir/) (Fast Healthcare Interoperability Resources). It generates PHP
-model classes from FHIR Structure Definitions, serializes resources to and from JSON and XML,
-validates resources against the specification and Implementation Guides, and evaluates FHIRPath 2.0
-expressions.
+[FHIR](https://www.hl7.org/fhir/) (Fast Healthcare Interoperability Resources). FHIR is the HL7
+standard for exchanging healthcare data as structured resources such as `Patient`, `Observation`,
+and `Questionnaire`. This toolkit generates PHP model classes from FHIR Structure Definitions,
+serializes resources to and from JSON and XML, validates resources against the specification and
+Implementation Guides, and evaluates FHIRPath 2.0 expressions.
 
 {% hint style="info" %}
 The packages can be used independently or together. If you only need serialization, install

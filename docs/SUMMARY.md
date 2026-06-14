@@ -26,8 +26,8 @@
 * [Overview](serialization/overview.md)
 * [JSON Serialization](serialization/json.md)
 * [XML Serialization](serialization/xml.md)
-* [Serialization Context & Options](serialization/context.md)
-* [IG-Aware Serialization](serialization/ig-aware.md)
+* [Configuring Serialization Behavior](serialization/context.md)
+* [Serializing IG Extensions & Profiles](serialization/ig-aware.md)
 
 ## Validation
 
@@ -61,9 +61,9 @@
 
 ## Symfony Bundle
 
-* [Installation & Configuration](bundle/configuration.md)
-* [Services & Dependency Injection](bundle/services.md)
-* [Console Commands](bundle/console-commands.md)
+* [Install and Configure the Bundle](bundle/configuration.md)
+* [Inject and Use FHIR Services](bundle/services.md)
+* [Run the Console Commands](bundle/console-commands.md)
 * [Flex Recipe](bundle/flex-recipe.md)
 
 ## Reference
