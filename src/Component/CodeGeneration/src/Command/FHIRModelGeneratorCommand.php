@@ -109,13 +109,19 @@ class FHIRModelGeneratorCommand extends Command
     private Filesystem $filesystem;
 
     /**
-     * One BuilderContext per FHIR version. Each context holds the loaded StructureDefinitions,
-     * generated classes, pending enums, and namespace registrations for that version.
+     * One BuilderContext per FHIR version (or pseudo-version for logical model IGs).
+     * Each context holds the loaded StructureDefinitions, generated classes, pending enums,
+     * and namespace registrations for that version.
+     *
+     * 'CDA' is a pseudo-version key for CDA logical model packages (hl7.cda.*, au.digitalhealth.cda.*).
+     * CDA packages report fhirVersion 5.0.0 but must be isolated from the R5 context because
+     * CDA types and FHIR R5 types share no namespace and must not cross-reference each other.
      *
      * @var array{
      *  R4: BuilderContext,
      *  R4B: BuilderContext,
-     *  R5:  BuilderContext
+     *  R5:  BuilderContext,
+     *  CDA: BuilderContext
      * }
      */
     private array $context;
@@ -132,6 +138,7 @@ class FHIRModelGeneratorCommand extends Command
             'R4'  => new BuilderContext(),
             'R4B' => new BuilderContext(),
             'R5'  => new BuilderContext(),
+            'CDA' => new BuilderContext(),
         ];
         $this->packageLoader  = $packageLoader;
         $this->errorCollector = new ErrorCollector();
@@ -287,6 +294,13 @@ class FHIRModelGeneratorCommand extends Command
         // Load definitions once — the same set applies to all FHIR versions of this package.
         $definitions = $this->packageLoader->loadPackageStructureDefinitions($packageMetaData);
 
+        // CDA packages (hl7.cda.*, au.digitalhealth.cda.*) are routed to the dedicated CDA
+        // context by package name, not by fhirVersion. Both CDA and FHIR R5 report
+        // fhirVersion: 5.0.0, so the package name is the only reliable discriminant.
+        if ($this->isCdaPackage($package)) {
+            return $this->loadCdaPackageDefinitions($definitions);
+        }
+
         // Determine upfront whether this package contributes any generatable StructureDefinitions.
         // We mirror the same filter used in buildClasses: skip logical models and constraint
         // derivations (e.g. Extension profiles in the terminology package). A package that only
@@ -323,6 +337,41 @@ class FHIRModelGeneratorCommand extends Command
     }
 
     /**
+     * Load CDA package definitions into the dedicated CDA BuilderContext.
+     * Returns ['CDA'] if the package contains generatable logical model SDs,
+     * or [] if the package contains only ValueSets/CodeSystems (terminology-only).
+     *
+     * @param array<array<string, mixed>> $definitions
+     *
+     * @return array<string>
+     */
+    private function loadCdaPackageDefinitions(array $definitions): array
+    {
+        $this->context['CDA']->loadDefinitions($definitions);
+
+        foreach ($definitions as $def) {
+            if (($def['resourceType'] ?? '') !== 'StructureDefinition') {
+                continue;
+            }
+            if (($def['kind'] ?? '') === 'logical' && ($def['derivation'] ?? '') === 'specialization') {
+                return ['CDA'];
+            }
+        }
+
+        return [];
+    }
+
+    /**
+     * Return true if the package name belongs to a CDA logical model IG.
+     * Routing is by name prefix because CDA and FHIR R5 both report fhirVersion: 5.0.0.
+     */
+    private function isCdaPackage(string $packageName): bool
+    {
+        return str_starts_with($packageName, 'hl7.cda.')
+            || str_starts_with($packageName, 'au.digitalhealth.cda.');
+    }
+
+    /**
      * Detect which FHIR versions are represented in the package list and prepend
      * the matching terminology packages if not already present.
      *
@@ -330,12 +379,29 @@ class FHIRModelGeneratorCommand extends Command
      * (e.g. "hl7.fhir.r5.core" → prepend R5 terminology). Falls back to R4
      * terminology for packages whose names don't match a known version pattern.
      *
+     * CDA packages are excluded from this check — CDA has its own ValueSets
+     * (NullFlavor, ActClass, etc.) bundled in the CDA package itself and does
+     * not depend on HL7 FHIR terminology packages.
+     *
      * @param array<string> $packages
      *
      * @return array<string>
      */
     private function ensureTerminologyPackages(array $packages): array
     {
+        // Strip the version suffix for name-only matching
+        $packageNames = array_map(static fn (string $p) => explode('#', $p)[0], $packages);
+
+        // If every package in the list is a CDA package, skip FHIR terminology injection entirely.
+        $allCda = $packageNames !== [] && array_reduce(
+            $packageNames,
+            fn (bool $carry, string $name): bool => $carry && $this->isCdaPackage($name),
+            true,
+        );
+        if ($allCda) {
+            return $packages;
+        }
+
         $needed = [];
 
         foreach (self::TERMINOLOGY_PACKAGES as $version => $terminologyPackage) {
@@ -346,18 +412,21 @@ class FHIRModelGeneratorCommand extends Command
                 continue;
             }
 
-            // Check if any package targets this FHIR version (e.g. ".r5." in "hl7.fhir.r5.core")
+            // Check if any non-CDA package targets this FHIR version (e.g. ".r5." in "hl7.fhir.r5.core")
             $versionSegment = ".{$version}.";
             foreach ($packages as $package) {
-                if (str_contains(strtolower($package), $versionSegment)) {
+                $name = explode('#', $package)[0];
+                if (!$this->isCdaPackage($name) && str_contains(strtolower($package), $versionSegment)) {
                     $needed[] = $terminologyPackage;
                     break;
                 }
             }
         }
 
-        // If no version-specific terminology was detected, fall back to R4 terminology
-        if ($needed === []) {
+        // If no version-specific terminology was detected (and there are non-CDA packages),
+        // fall back to R4 terminology.
+        $hasNonCdaPackages = array_filter($packageNames, fn (string $name): bool => !$this->isCdaPackage($name)) !== [];
+        if ($needed === [] && $hasNonCdaPackages) {
             $needed[] = self::TERMINOLOGY_PACKAGES['r4'];
         }
 
@@ -407,6 +476,12 @@ class FHIRModelGeneratorCommand extends Command
      */
     private function generateClassesForPackage(OutputInterface $output, string $fhirVersion): void
     {
+        if ($fhirVersion === 'CDA') {
+            $output->writeln('<comment>CDA logical model generation is not yet supported.</comment>');
+
+            return;
+        }
+
         // All generated classes live under this base namespace, e.g.
         // "Ardenexal\FHIRTools\Component\Models\R4"
         $baseNamespace = "Ardenexal\\FHIRTools\\Component\\Models\\{$fhirVersion}";
