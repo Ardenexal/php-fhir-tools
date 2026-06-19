@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass;
 
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\CE;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\IVLTS;
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\ParticipationType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 
@@ -18,8 +19,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 class Participant2 extends InfrastructureRoot
 {
     public function __construct(
-        #[FhirProperty(fhirType: 'code', propertyKind: 'scalar', isArray: false, isRequired: true, xmlSerializedName: '@typeCode')]
-        public ?string $typeCode = null,
+        #[FhirProperty(fhirType: 'code', propertyKind: 'enum', isArray: false, isRequired: true, xmlSerializedName: '@typeCode')]
+        public ?ParticipationType $typeCode = null,
         #[FhirProperty(fhirType: 'code', propertyKind: 'scalar', isArray: false, isRequired: false, xmlSerializedName: '@contextControlCode')]
         public string $contextControlCode = 'OP',
         #[FhirProperty(

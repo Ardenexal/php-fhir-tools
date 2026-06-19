@@ -8,6 +8,7 @@ use Ardenexal\FHIRTools\Component\CdaModels\DataType\AD;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\CE;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\IVLTS;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\TEL;
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\RoleClassMutualRelationship;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 
@@ -24,8 +25,8 @@ class RelatedEntity extends InfrastructureRoot
      * @param list<TEL> $telecom
      */
     public function __construct(
-        #[FhirProperty(fhirType: 'code', propertyKind: 'scalar', isArray: false, isRequired: true, xmlSerializedName: '@classCode')]
-        public ?string $classCode = null,
+        #[FhirProperty(fhirType: 'code', propertyKind: 'enum', isArray: false, isRequired: true, xmlSerializedName: '@classCode')]
+        public ?RoleClassMutualRelationship $classCode = null,
         #[FhirProperty(
             fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/CE',
             propertyKind: 'complex',

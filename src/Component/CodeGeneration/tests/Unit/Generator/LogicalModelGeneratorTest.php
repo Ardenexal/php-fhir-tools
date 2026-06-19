@@ -31,8 +31,9 @@ final class LogicalModelGeneratorTest extends TestCase
      * @param array<string, mixed>  $definition
      * @param array<string, string> $urlToFqcn
      * @param list<string>          $inheritedNames
+     * @param array<string, string> $valueSetToEnumFqcn
      */
-    private function generate(array $definition, array $urlToFqcn = [], array $inheritedNames = []): ClassType
+    private function generate(array $definition, array $urlToFqcn = [], array $inheritedNames = [], array $valueSetToEnumFqcn = []): ClassType
     {
         return $this->generator->generate(
             $definition,
@@ -40,6 +41,8 @@ final class LogicalModelGeneratorTest extends TestCase
             'urn:hl7-org:v3',
             $urlToFqcn,
             $inheritedNames,
+            [],
+            $valueSetToEnumFqcn,
         );
     }
 
@@ -127,6 +130,137 @@ final class LogicalModelGeneratorTest extends TestCase
 
         $args = $this->fhirPropertyArgs($class, 'classCode');
         self::assertSame('@classCode', $args['xmlSerializedName']);
+    }
+
+    public function testCodePropertyWithBindingIsTypedToEnum(): void
+    {
+        $enumFqcn = '\\Ardenexal\\FHIRTools\\Component\\CdaModels\\Enum\\NullFlavor';
+        $class    = $this->generate(
+            [
+                'url'        => 'http://hl7.org/cda/stds/core/StructureDefinition/ANY',
+                'name'       => 'ANY',
+                'kind'       => 'logical',
+                'derivation' => 'specialization',
+                'snapshot'   => ['element' => [
+                    ['path' => 'ANY'],
+                    [
+                        'path'           => 'ANY.nullFlavor',
+                        'min'            => 0,
+                        'max'            => '1',
+                        'representation' => ['xmlAttr'],
+                        'type'           => [['code' => 'code']],
+                        'binding'        => ['strength' => 'required', 'valueSet' => 'http://hl7.org/cda/stds/core/ValueSet/CDANullFlavor'],
+                    ],
+                ]],
+            ],
+            [],
+            [],
+            ['http://hl7.org/cda/stds/core/ValueSet/CDANullFlavor' => $enumFqcn],
+        );
+
+        $parameter = $class->getMethod('__construct')->getParameters()['nullFlavor'];
+        self::assertSame($enumFqcn, '\\' . ltrim((string) $parameter->getType(), '\\'));
+        self::assertTrue($parameter->isNullable());
+        self::assertNull($parameter->getDefaultValue());
+
+        $args = $this->fhirPropertyArgs($class, 'nullFlavor');
+        self::assertSame('enum', $args['propertyKind']);
+        self::assertSame('code', $args['fhirType']);
+        self::assertSame('@nullFlavor', $args['xmlSerializedName']);
+    }
+
+    public function testArrayCodePropertyWithBindingIsTypedToEnumList(): void
+    {
+        $enumFqcn = '\\Ardenexal\\FHIRTools\\Component\\CdaModels\\Enum\\PostalAddressUse';
+        $class    = $this->generate(
+            [
+                'url'        => 'http://hl7.org/cda/stds/core/StructureDefinition/AD',
+                'name'       => 'AD',
+                'kind'       => 'logical',
+                'derivation' => 'specialization',
+                'snapshot'   => ['element' => [
+                    ['path' => 'AD'],
+                    [
+                        'path'    => 'AD.use',
+                        'min'     => 0,
+                        'max'     => '*',
+                        'type'    => [['code' => 'code']],
+                        'binding' => ['strength' => 'required', 'valueSet' => 'http://hl7.org/cda/stds/core/ValueSet/CDAPostalAddressUse'],
+                    ],
+                ]],
+            ],
+            [],
+            [],
+            ['http://hl7.org/cda/stds/core/ValueSet/CDAPostalAddressUse' => $enumFqcn],
+        );
+
+        $parameter = $class->getMethod('__construct')->getParameters()['use'];
+        self::assertSame('array', (string) $parameter->getType());
+
+        $args = $this->fhirPropertyArgs($class, 'use');
+        self::assertTrue($args['isArray']);
+        self::assertSame('enum', $args['propertyKind']);
+        self::assertSame($enumFqcn, $args['phpType']);
+    }
+
+    public function testFixedCodePropertyKeepsScalarDefaultEvenWithBinding(): void
+    {
+        // A coded attribute with a fixed value keeps its string default; the fixed code is the
+        // source of truth, so it is NOT re-typed to the enum (mapping fixed code → case deferred).
+        $class = $this->generate(
+            [
+                'url'        => 'http://hl7.org/cda/stds/core/StructureDefinition/ClinicalDocument',
+                'name'       => 'ClinicalDocument',
+                'kind'       => 'logical',
+                'derivation' => 'specialization',
+                'snapshot'   => ['element' => [
+                    ['path' => 'ClinicalDocument'],
+                    [
+                        'path'      => 'ClinicalDocument.classCode',
+                        'min'       => 0,
+                        'max'       => '1',
+                        'type'      => [['code' => 'code']],
+                        'fixedCode' => 'DOCCLIN',
+                        'binding'   => ['strength' => 'required', 'valueSet' => 'http://hl7.org/cda/stds/core/ValueSet/CDAActClass'],
+                    ],
+                ]],
+            ],
+            [],
+            [],
+            ['http://hl7.org/cda/stds/core/ValueSet/CDAActClass' => '\\Ardenexal\\FHIRTools\\Component\\CdaModels\\Enum\\ActClass'],
+        );
+
+        $parameter = $class->getMethod('__construct')->getParameters()['classCode'];
+        self::assertSame('DOCCLIN', $parameter->getDefaultValue());
+        self::assertSame('string', (string) $parameter->getType());
+        self::assertSame('scalar', $this->fhirPropertyArgs($class, 'classCode')['propertyKind']);
+    }
+
+    public function testCodePropertyWithUnbundledBindingStaysString(): void
+    {
+        // Binding to a ValueSet that is not in the generated-enum map (e.g. external v3
+        // terminology) → property stays a plain nullable string.
+        $class = $this->generate([
+            'url'        => 'http://hl7.org/cda/stds/core/StructureDefinition/X',
+            'name'       => 'X',
+            'kind'       => 'logical',
+            'derivation' => 'specialization',
+            'snapshot'   => ['element' => [
+                ['path' => 'X'],
+                [
+                    'path'    => 'X.code',
+                    'min'     => 0,
+                    'max'     => '1',
+                    'type'    => [['code' => 'code']],
+                    'binding' => ['strength' => 'required', 'valueSet' => 'http://terminology.hl7.org/ValueSet/v3-ActCode'],
+                ],
+            ]],
+        ]);
+
+        $parameter = $class->getMethod('__construct')->getParameters()['code'];
+        self::assertSame('string', (string) $parameter->getType());
+        self::assertTrue($parameter->isNullable());
+        self::assertSame('scalar', $this->fhirPropertyArgs($class, 'code')['propertyKind']);
     }
 
     public function testArrayComplexPropertyIsTypedAsArrayWithItemFqcn(): void

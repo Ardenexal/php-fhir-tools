@@ -20,6 +20,8 @@ namespace Ardenexal\FHIRTools\Component\Metadata\Attribute;
  *   'extension'         — Extension array (named 'extension')
  *   'modifierExtension' — ModifierExtension array (named 'modifierExtension')
  *   'choice'            — Polymorphic value[x] / deceased[x] — must set isChoice: true and variants
+ *   'enum'              — Backed enum (CDA coded property bound to a generated enum, e.g. NullFlavor);
+ *                         the property type IS the enum and its ->value is the code string
  *
  * @author Ardenexal
  */

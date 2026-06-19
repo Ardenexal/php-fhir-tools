@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\DataType;
 
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\NullFlavor;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 
@@ -16,8 +17,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 abstract class ANY
 {
     public function __construct(
-        #[FhirProperty(fhirType: 'code', propertyKind: 'scalar', isArray: false, isRequired: false, xmlSerializedName: '@nullFlavor')]
-        public ?string $nullFlavor = null,
+        #[FhirProperty(fhirType: 'code', propertyKind: 'enum', isArray: false, isRequired: false, xmlSerializedName: '@nullFlavor')]
+        public ?NullFlavor $nullFlavor = null,
     ) {
     }
 }

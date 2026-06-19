@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\CdaModels\DataType\II;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\IVLINT;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\IVLTS;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\ST;
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\ActClassObservation;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 
@@ -43,8 +44,8 @@ class Observation extends InfrastructureRoot
      * @param list<InFulfillmentOf1>   $sdtcInFulfillmentOf1
      */
     public function __construct(
-        #[FhirProperty(fhirType: 'code', propertyKind: 'scalar', isArray: false, isRequired: true, xmlSerializedName: '@classCode')]
-        public ?string $classCode = null,
+        #[FhirProperty(fhirType: 'code', propertyKind: 'enum', isArray: false, isRequired: true, xmlSerializedName: '@classCode')]
+        public ?ActClassObservation $classCode = null,
         #[FhirProperty(fhirType: 'code', propertyKind: 'scalar', isArray: false, isRequired: true, xmlSerializedName: '@moodCode')]
         public ?string $moodCode = null,
         #[FhirProperty(fhirType: 'boolean', propertyKind: 'scalar', isArray: false, isRequired: false, xmlSerializedName: '@negationInd')]

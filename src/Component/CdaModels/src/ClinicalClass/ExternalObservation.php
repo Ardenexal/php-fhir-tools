@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\CD;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\ED;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\II;
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\ActClassObservation;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 
@@ -23,8 +24,8 @@ class ExternalObservation extends InfrastructureRoot
      * @param list<Author> $sdtcAuthor
      */
     public function __construct(
-        #[FhirProperty(fhirType: 'code', propertyKind: 'scalar', isArray: false, isRequired: false, xmlSerializedName: '@classCode')]
-        public ?string $classCode = null,
+        #[FhirProperty(fhirType: 'code', propertyKind: 'enum', isArray: false, isRequired: false, xmlSerializedName: '@classCode')]
+        public ?ActClassObservation $classCode = null,
         #[FhirProperty(fhirType: 'code', propertyKind: 'scalar', isArray: false, isRequired: false, xmlSerializedName: '@moodCode')]
         public string $moodCode = 'EVN',
         #[FhirProperty(

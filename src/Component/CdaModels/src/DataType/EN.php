@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\DataType;
 
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\EntityNameUse;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 
@@ -16,11 +17,18 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 class EN extends ANY
 {
     /**
-     * @param list<string> $use
-     * @param list<string> $item
+     * @param list<EntityNameUse> $use
+     * @param list<string>        $item
      */
     public function __construct(
-        #[FhirProperty(fhirType: 'code', propertyKind: 'scalar', isArray: true, isRequired: false, xmlSerializedName: '@use')]
+        #[FhirProperty(
+            fhirType: 'code',
+            propertyKind: 'enum',
+            isArray: true,
+            isRequired: false,
+            xmlSerializedName: '@use',
+            phpType: '\Ardenexal\FHIRTools\Component\CdaModels\Enum\EntityNameUse',
+        )]
         public array $use = [],
         #[FhirProperty(fhirType: 'http://hl7.org/fhir/StructureDefinition/Base', propertyKind: 'scalar', isArray: true, isRequired: false)]
         public array $item = [],

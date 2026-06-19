@@ -42,4 +42,26 @@ class ClassNameResolver
 
         return $name;
     }
+
+    /**
+     * Class name for a CDA ValueSet enum: the resolved name with a leading `CDA` qualifier
+     * stripped (the bundled CDA ValueSets are named `CDANullFlavor`, `CDAActClass`, … but the
+     * generated enums live in the CDA-specific `CdaModels\Enum\` namespace, so the prefix is
+     * redundant — e.g. `CDANullFlavor` → `NullFlavor`). The reserved-word `Type` suffix from
+     * {@see logicalModelClassName()} still applies (e.g. a hypothetical `CDAInt` → `IntType`).
+     */
+    public static function cdaEnumClassName(string $definitionUrl, string $definitionName): string
+    {
+        $name = self::logicalModelClassName($definitionUrl, $definitionName);
+
+        // Strip the redundant `CDA` qualifier when the remainder still starts a valid PascalCase
+        // class name (e.g. `CDANullFlavor` → `NullFlavor`). All 26 bundled CDA ValueSet names are
+        // `CDA` + an uppercase word, so this is exact; the guard keeps a hypothetical non-prefixed
+        // name like `Cdash...` untouched.
+        if (str_starts_with($name, 'CDA') && strlen($name) > 3 && ctype_upper($name[3])) {
+            $name = substr($name, 3);
+        }
+
+        return $name;
+    }
 }

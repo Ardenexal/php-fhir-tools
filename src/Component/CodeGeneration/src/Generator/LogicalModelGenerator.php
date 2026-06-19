@@ -66,6 +66,9 @@ final class LogicalModelGenerator
      * @param list<string>          $inheritedConstraintKeys Invariant keys already carried by an
      *                                                       ancestor (CDA flattens them into child snapshots);
      *                                                       skipped to avoid double-emitting inherited invariants
+     * @param array<string, string> $valueSetToEnumFqcn      Canonical ValueSet URL → leading-backslash
+     *                                                       enum FQCN; a `code`/`cs` property whose binding
+     *                                                       resolves here is typed to the enum
      */
     public function generate(
         array $definition,
@@ -74,6 +77,7 @@ final class LogicalModelGenerator
         array $urlToFqcn,
         array $inheritedNames = [],
         array $inheritedConstraintKeys = [],
+        array $valueSetToEnumFqcn = [],
     ): ClassType {
         $url  = (string) ($definition['url'] ?? '');
         $name = (string) ($definition['name'] ?? '');
@@ -123,7 +127,7 @@ final class LogicalModelGenerator
                 if (in_array(self::propertyNameFromPath($path), $inheritedNames, true)) {
                     continue;
                 }
-                $this->addProperty($constructor, $element, $urlToFqcn);
+                $this->addProperty($constructor, $element, $urlToFqcn, $valueSetToEnumFqcn);
             }
         }
 
@@ -178,11 +182,13 @@ final class LogicalModelGenerator
     /**
      * @param array<string, mixed>  $element
      * @param array<string, string> $urlToFqcn
+     * @param array<string, string> $valueSetToEnumFqcn ValueSet URL → enum FQCN (leading backslash)
      */
     private function addProperty(
         Method $constructor,
         array $element,
         array $urlToFqcn,
+        array $valueSetToEnumFqcn = [],
     ): void {
         $path          = (string) ($element['path'] ?? '');
         $parameterName = self::propertyNameFromPath($path);
@@ -215,6 +221,19 @@ final class LogicalModelGenerator
             $fixedScalar = $fixed['value'];
         }
 
+        // Coded property (code/cs) with a binding to a generated CDA enum, and no fixed value →
+        // type the property to the enum. Fixed-valued coded attributes keep their scalar default
+        // (the fixed code is the source of truth; mapping it back to an enum case is deferred).
+        if (
+            $fixedScalar === null
+            && in_array($typeCode, ['code', 'cs'], true)
+            && ($enumFqcn = $this->resolveBoundEnum($element, $valueSetToEnumFqcn)) !== null
+        ) {
+            $phpType      = $enumFqcn;
+            $propertyKind = 'enum';
+            $itemFqcn     = $isArray ? $enumFqcn : null;
+        }
+
         $attributeArgs = [
             'fhirType'     => $typeCode !== '' ? $typeCode : 'string',
             'propertyKind' => $propertyKind,
@@ -240,6 +259,30 @@ final class LogicalModelGenerator
         }
 
         $param->addAttribute(FhirProperty::class, $attributeArgs);
+    }
+
+    /**
+     * Resolve the enum FQCN bound to an element, or null. Reads `binding.valueSet`, strips any
+     * `|version` suffix, and looks it up in the generated-enum map. Returns null when the element
+     * has no binding or the bound ValueSet is not one generated for this package (e.g. an external
+     * v3 terminology ValueSet that is not bundled).
+     *
+     * @param array<string, mixed>  $element
+     * @param array<string, string> $valueSetToEnumFqcn
+     */
+    private function resolveBoundEnum(array $element, array $valueSetToEnumFqcn): ?string
+    {
+        $binding = $element['binding'] ?? null;
+        if (!is_array($binding)) {
+            return null;
+        }
+        $valueSet = $binding['valueSet'] ?? null;
+        if (!is_string($valueSet) || $valueSet === '') {
+            return null;
+        }
+        $valueSet = explode('|', $valueSet)[0];
+
+        return $valueSetToEnumFqcn[$valueSet] ?? null;
     }
 
     /**

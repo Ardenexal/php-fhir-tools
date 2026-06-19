@@ -601,6 +601,13 @@ class FHIRModelGeneratorCommand extends Command
         // Clear and regenerate the CDA output directories.
         $this->clearCdaOutputDirectories($output);
 
+        // Generate enums for every ValueSet bundled in the CDA package and build a
+        // valueSet-URL → enum-FQCN map. Enums are generated before classes so coded properties
+        // can be typed to them during class generation. (Generation is driven by the bundled
+        // ValueSets, not by bindings: several CDA ValueSets — e.g. CDAActMood, CDARoleClass — are
+        // referenced only through fixed coded attributes and would otherwise be missed.)
+        $valueSetToEnumFqcn = $this->generateCdaEnums($output);
+
         $generator = new LogicalModelGenerator();
         $generated = 0;
         foreach ($definitions as $url => $sd) {
@@ -612,7 +619,7 @@ class FHIRModelGeneratorCommand extends Command
             $inheritedNames          = ($base !== '' && isset($ownPropNames[$base])) ? $ownPropNames[$base] : [];
             $inheritedConstraintKeys = ($base !== '' && isset($ownConstraints[$base])) ? $ownConstraints[$base] : [];
             try {
-                $class = $generator->generate($sd, $namespace, $xmlNamespace, $urlToFqcn, $inheritedNames, $inheritedConstraintKeys);
+                $class = $generator->generate($sd, $namespace, $xmlNamespace, $urlToFqcn, $inheritedNames, $inheritedConstraintKeys, $valueSetToEnumFqcn);
             } catch (\Throwable $e) {
                 $this->errorCollector->addError(
                     "CDA class generation failed for {$url}: {$e->getMessage()}",
@@ -637,6 +644,61 @@ class FHIRModelGeneratorCommand extends Command
                 $output->writeln($this->errorCollector->getDetailedOutput());
             }
         }
+    }
+
+    /**
+     * Generate a PHP enum for every ValueSet bundled in the CDA package and register the CDA enum
+     * namespace (`Ardenexal\FHIRTools\Component\CdaModels\Enum`). Returns a map of
+     * canonical ValueSet URL → leading-backslash enum FQCN so coded properties can be typed to the
+     * enum during class generation.
+     *
+     * The bundled CDA ValueSets inline their concepts (`compose.include[].concept`), so no external
+     * `hl7.terminology.*` package is required — the existing {@see FHIRValueSetGenerator} consumes
+     * them via its inline-concept path. Enum class names drop the redundant `CDA` prefix
+     * ({@see ClassNameResolver::cdaEnumClassName()}); the same stripped name feeds both the emitted
+     * file and this map so the property type and the generated enum agree.
+     *
+     * @return array<string, string> ValueSet URL → enum FQCN (leading backslash)
+     */
+    private function generateCdaEnums(OutputInterface $output): array
+    {
+        $context       = $this->context['CDA'];
+        $enumNamespace = new PhpNamespace(self::CDA_BASE_NAMESPACE . '\\Enum');
+        $context->addEnumNamespace('CDA', $enumNamespace);
+
+        $enumGenerator      = new FHIRValueSetGenerator();
+        $valueSetToEnumFqcn = [];
+        foreach ($context->getDefinitions() as $valueSet) {
+            if (($valueSet['resourceType'] ?? '') !== 'ValueSet') {
+                continue;
+            }
+            $url  = (string) ($valueSet['url'] ?? '');
+            $name = (string) ($valueSet['name'] ?? '');
+            if ($url === '' || $name === '') {
+                continue;
+            }
+
+            $className = ClassNameResolver::cdaEnumClassName($url, $name);
+            try {
+                $enumType = $enumGenerator->generateEnum($valueSet, 'CDA', $context, $className);
+            } catch (\Throwable $e) {
+                $this->errorCollector->addError(
+                    "CDA enum generation failed for {$url}: {$e->getMessage()}",
+                    'CDA',
+                    'CDA_ENUM_GENERATION_FAILURE',
+                    'error',
+                    ['exception_class' => get_class($e), 'url' => $url],
+                );
+
+                continue;
+            }
+
+            $context->addEnum($url, $enumNamespace->getName(), $enumType);
+            $valueSetToEnumFqcn[$url] = '\\' . $enumNamespace->getName() . '\\' . $className;
+            $output->writeln("Generated CDA enum {$className}");
+        }
+
+        return $valueSetToEnumFqcn;
     }
 
     /**
@@ -813,6 +875,19 @@ class FHIRModelGeneratorCommand extends Command
             }
             $this->filesystem->dumpFile($outputPath, $contents);
             $output->writeln("Generated CDA class {$className}");
+        }
+
+        foreach ($this->context['CDA']->getEnums() as $type) {
+            $className   = $type->getClassName();
+            $contents    = self::asPhpFile($type->asEnumType(), $type->namespace);
+            $outputPath  = Path::canonicalize("{$basePath}/Enum/{$className}.php");
+
+            $directory = dirname($outputPath);
+            if (!$this->filesystem->exists($directory)) {
+                $this->filesystem->mkdir($directory, 0755);
+            }
+            $this->filesystem->dumpFile($outputPath, $contents);
+            $output->writeln("Generated CDA enum {$className}");
         }
     }
 

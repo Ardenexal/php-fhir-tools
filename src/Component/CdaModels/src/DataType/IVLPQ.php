@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\DataType;
 
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\SetOperator;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
@@ -23,8 +24,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvarian
 class IVLPQ extends PQ
 {
     public function __construct(
-        #[FhirProperty(fhirType: 'code', propertyKind: 'scalar', isArray: false, isRequired: false, xmlSerializedName: '@operator')]
-        public ?string $operator = null,
+        #[FhirProperty(fhirType: 'code', propertyKind: 'enum', isArray: false, isRequired: false, xmlSerializedName: '@operator')]
+        public ?SetOperator $operator = null,
         #[FhirProperty(
             fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/IVXB-PQ',
             propertyKind: 'complex',

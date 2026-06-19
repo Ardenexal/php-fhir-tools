@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\DataType;
 
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\EntityNamePartQualifier;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 
@@ -16,12 +17,19 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 class ENXP extends ST
 {
     /**
-     * @param list<string> $qualifier
+     * @param list<EntityNamePartQualifier> $qualifier
      */
     public function __construct(
         #[FhirProperty(fhirType: 'code', propertyKind: 'scalar', isArray: false, isRequired: false, xmlSerializedName: '@partType')]
         public ?string $partType = null,
-        #[FhirProperty(fhirType: 'code', propertyKind: 'scalar', isArray: true, isRequired: false, xmlSerializedName: '@qualifier')]
+        #[FhirProperty(
+            fhirType: 'code',
+            propertyKind: 'enum',
+            isArray: true,
+            isRequired: false,
+            xmlSerializedName: '@qualifier',
+            phpType: '\Ardenexal\FHIRTools\Component\CdaModels\Enum\EntityNamePartQualifier',
+        )]
         public array $qualifier = [],
     ) {
     }

@@ -8,6 +8,7 @@ use Ardenexal\FHIRTools\Component\CdaModels\DataType\AD;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\II;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\IdentifiedBy;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\TEL;
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\InformationRecipientRole;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 
@@ -26,8 +27,8 @@ class IntendedRecipient extends InfrastructureRoot
      * @param list<TEL>          $telecom
      */
     public function __construct(
-        #[FhirProperty(fhirType: 'code', propertyKind: 'scalar', isArray: false, isRequired: false, xmlSerializedName: '@classCode')]
-        public ?string $classCode = null,
+        #[FhirProperty(fhirType: 'code', propertyKind: 'enum', isArray: false, isRequired: false, xmlSerializedName: '@classCode')]
+        public ?InformationRecipientRole $classCode = null,
         #[FhirProperty(
             fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/II',
             propertyKind: 'complex',
