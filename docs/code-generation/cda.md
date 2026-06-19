@@ -117,27 +117,32 @@ descriptive exception.
 
 ## Generated Output Structure
 
-CDA output is isolated from all FHIR versions under `Models/src/CDA/`:
+CDA output ships as a **separate Composer package `ardenexal/fhir-cda-models`** (a new monorepo
+component), isolated from the `ardenexal/fhir-models` package that holds R4/R4B/R5 — see
+[ADR-009](../../.goat-flow/learning-loop/decisions/ADR-009-cda-models-package-boundary.md):
 
 ```
-src/Component/Models/src/
-├── R4/
-├── R4B/
-├── R5/
-└── CDA/
-    ├── DataType/     ← V3 data types: II, TS, CS, CE, CD, ST, EN, AD, TEL, IVL_TS …
-    │                    Base types: ANY, InfrastructureRoot
-    ├── Class/        ← CDA act/role/entity/participation classes: ClinicalDocument, Section …
-    │                    AU extensions: AuClinicalDocument, AuSubstanceAdministration …
-    └── Enum/         ← ValueSet enums: NullFlavor, ActClass, ActMood …
+src/Component/
+├── Models/        ← ardenexal/fhir-models  (R4, R4B, R5)
+│   └── src/{R4,R4B,R5}/
+└── CdaModels/     ← ardenexal/fhir-cda-models  (CDA core + AU)
+    └── src/
+        ├── DataType/        ← V3 data types: II, TS, CS, CE, CD, ST, EN, AD, TEL, IVL_TS …
+        │                       Base types: ANY (abstract), InfrastructureRoot
+        ├── ClinicalClass/   ← CDA act/role/entity/participation classes: ClinicalDocument, Section …
+        │                       AU extensions: AuClinicalDocument, AuSubstanceAdministration …
+        └── Enum/             ← ValueSet enums: NullFlavor, ActClass, ActMood …
 ```
+
+> The class segment is `ClinicalClass`, not `Class` — `Class` is a PHP reserved word and is
+> invalid as a namespace segment.
 
 PHP namespaces:
 
 ```
-Ardenexal\FHIRTools\Component\Models\CDA\DataType\
-Ardenexal\FHIRTools\Component\Models\CDA\Class\
-Ardenexal\FHIRTools\Component\Models\CDA\Enum\
+Ardenexal\FHIRTools\Component\CdaModels\DataType\
+Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\
+Ardenexal\FHIRTools\Component\CdaModels\Enum\
 ```
 
 ---
@@ -186,8 +191,8 @@ CDA packages do not require FHIR terminology packages (`hl7.terminology.*`). CDA
 | Milestone | Status | Description |
 |---|---|---|
 | M1 — Foundation | ✅ Done | `#[LogicalModel]` attribute; CDA BuilderContext slot; package routing |
-| M2 — Core Generator | Planned | `LogicalModelGenerator`; PHP class files under `CDA/DataType/` and `CDA/Class/` |
-| M3 — Enums | Planned | PHP enums under `CDA/Enum/` for NullFlavor, ActClass, ActMood, etc. |
+| M2 — Core Generator | Planned | `LogicalModelGenerator`; new `ardenexal/fhir-cda-models` package; class files under `CdaModels/src/DataType/` and `CdaModels/src/ClinicalClass/` |
+| M3 — Enums | Planned | PHP enums under `CdaModels/src/Enum/` for NullFlavor, ActClass, ActMood, etc. |
 | M4 — AU CDA Schema | Planned | `au.digitalhealth.cda.schema` support; AU classes extend core CDA classes |
 | M5 — Serializer | Planned | `urn:hl7-org:v3` namespace on XML root; JSON exception for CDA classes |
 | M6 — Quality Gate | Planned | Full integration tests; PHPStan level 8 clean; documentation |
@@ -201,8 +206,10 @@ CDA packages do not require FHIR terminology packages (`hl7.terminology.*`). CDA
 | `#[LogicalModel]` not `#[CDAClass]` | Applies to any logical model IG without duplication |
 | Separate `'CDA'` BuilderContext | Prevents CDA types polluting the R5 namespace |
 | Route by package name, not `fhirVersion` | CDA and FHIR R5 both report `fhirVersion: 5.0.0`; the package name is the only reliable discriminant |
+| CDA *identity* = package/canonical URL; *generatability* = generic `kind:logical`+`derivation:specialization` ([ADR-008](../../.goat-flow/learning-loop/decisions/ADR-008-cda-detection-vs-logical-model-generatability.md)) | Keeps `LogicalModelGenerator` IG-agnostic; CDA behaviour layers on top |
+| Separate package `ardenexal/fhir-cda-models` ([ADR-009](../../.goat-flow/learning-loop/decisions/ADR-009-cda-models-package-boundary.md)) | Independent (draft/CI) release cadence vs frozen FHIR; disjoint audience; zero type coupling to R4/R5 |
 | Reuse `FhirProperty` unchanged | CDA elements use the same SD element structure; `xmlAttr → xmlSerializedName` already works |
-| Output to `CDA/Class/` not `CDA/Resource/` | CDA has no concept of FHIR resources |
+| Output to `ClinicalClass/` not `Class/` or `Resource/` | CDA has no concept of FHIR resources; `Class` is a PHP reserved word |
 
 ---
 
@@ -213,5 +220,5 @@ CDA packages do not require FHIR terminology packages (`hl7.terminology.*`). CDA
 | CDA V3 type hierarchy has circular `baseDefinition` refs | Low | High | Cycle detection in `LogicalModelGenerator` |
 | AU package depends on a core version not yet generated | Medium | Medium | Enforce load/generate ordering; validate parent presence |
 | CDA ValueSets use different `compose` structure | Low | Medium | Verify against a real `NullFlavor` ValueSet before M3 |
-| `Class` as a PHP namespace segment (reserved word) | Medium | Low | Rename to `CDA\ClinicalClass\` if nette/php-generator rejects it |
+| `Class` as a PHP namespace segment (reserved word) | — | — | Resolved (ADR-009): the segment is `ClinicalClass`, namespace `…\Component\CdaModels\ClinicalClass\` |
 | `au.digitalhealth.cda.schema` not on `packages.fhir.org` | Low | Medium | Fall back to local package path option in `PackageLoader` |

@@ -7,11 +7,13 @@ namespace Ardenexal\FHIRTools\Component\CodeGeneration\Command;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Context\BuilderContext;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\GenerationException;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Exception\PackageException;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ClassNameResolver;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\ErrorCollector;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRExtensionGenerator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRModelGenerator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRProfileGenerator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\FHIRValueSetGenerator;
+use Ardenexal\FHIRTools\Component\CodeGeneration\Generator\LogicalModelGenerator;
 use Ardenexal\FHIRTools\Component\CodeGeneration\Package\PackageLoader;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\EnumType;
@@ -78,6 +80,17 @@ class FHIRModelGeneratorCommand extends Command
         'r4b' => 'hl7.terminology.r4b#6.0.2',
         'r5'  => 'hl7.terminology.r5#7.0.0',
     ];
+
+    /**
+     * Base namespace for the separate CDA models package (ardenexal/fhir-cda-models, ADR-009).
+     */
+    private const string CDA_BASE_NAMESPACE = 'Ardenexal\\FHIRTools\\Component\\CdaModels';
+
+    /**
+     * Canonical URL of the CDA InfrastructureRoot base type. Any logical model whose
+     * baseDefinition chain reaches this is an act/role/entity class (→ ClinicalClass\).
+     */
+    private const string CDA_INFRASTRUCTURE_ROOT_URL = 'http://hl7.org/cda/stds/core/StructureDefinition/InfrastructureRoot';
 
     /**
      * Pre-configured package sets for each FHIR version. Used as the default value
@@ -477,7 +490,7 @@ class FHIRModelGeneratorCommand extends Command
     private function generateClassesForPackage(OutputInterface $output, string $fhirVersion): void
     {
         if ($fhirVersion === 'CDA') {
-            $output->writeln('<comment>CDA logical model generation is not yet supported.</comment>');
+            $this->generateCdaPackage($output);
 
             return;
         }
@@ -530,6 +543,277 @@ class FHIRModelGeneratorCommand extends Command
 
         // Phase 5: Write all generated classes and enums to disk
         $this->outputGeneratedFiles($output, $fhirVersion);
+    }
+
+    /**
+     * Generate the CDA logical-model classes (kind=logical, derivation=specialization) from the
+     * loaded CDA package into the separate `ardenexal/fhir-cda-models` package (ADR-009).
+     *
+     * Classes are split into two namespaces: the V3 datatype lattice → CdaModels\DataType\, and the
+     * act/role/entity classes (InfrastructureRoot + descendants, plus ClinicalDocument) →
+     * CdaModels\ClinicalClass\. Parent and property types are resolved from a pre-computed
+     * url → FQCN map so generation order is irrelevant (CDA references every type by canonical URL).
+     */
+    private function generateCdaPackage(OutputInterface $output): void
+    {
+        $context         = $this->context['CDA'];
+        $dataTypeNs      = new PhpNamespace(self::CDA_BASE_NAMESPACE . '\\DataType');
+        $clinicalClassNs = new PhpNamespace(self::CDA_BASE_NAMESPACE . '\\ClinicalClass');
+
+        // Collect the generatable logical models, keyed by canonical URL.
+        $definitions = [];
+        foreach ($context->getDefinitions() as $sd) {
+            if (($sd['resourceType'] ?? '') !== 'StructureDefinition') {
+                continue;
+            }
+            if (($sd['kind'] ?? '') !== 'logical' || ($sd['derivation'] ?? '') !== 'specialization') {
+                continue;
+            }
+            $url = (string) ($sd['url'] ?? '');
+            if ($url !== '') {
+                $definitions[$url] = $sd;
+            }
+        }
+
+        // Pre-pass: base-definition map, directly-declared xml namespaces, own property/constraint sets.
+        $baseOf          = [];
+        $xmlNsDirect     = [];
+        $ownPropNames    = [];
+        $ownConstraints  = [];
+        foreach ($definitions as $url => $sd) {
+            $baseOf[$url]          = isset($sd['baseDefinition']) ? (string) $sd['baseDefinition'] : null;
+            $xmlNsDirect[$url]     = $this->readXmlNamespace($sd);
+            $ownPropNames[$url]    = $this->cdaDirectPropertyNames($sd);
+            $ownConstraints[$url]  = $this->cdaConstraintKeys($sd);
+        }
+
+        $urlToFqcn  = [];
+        $urlToNs    = [];
+        foreach ($definitions as $url => $sd) {
+            $name        = (string) ($sd['name'] ?? '');
+            $isClinical  = $name === 'ClinicalDocument'
+                || $this->cdaChainContains($url, self::CDA_INFRASTRUCTURE_ROOT_URL, $baseOf);
+            $namespace        = $isClinical ? $clinicalClassNs : $dataTypeNs;
+            $urlToNs[$url]    = $namespace;
+            $urlToFqcn[$url]  = '\\' . $namespace->getName() . '\\' . ClassNameResolver::logicalModelClassName($url, $name);
+        }
+
+        // Clear and regenerate the CDA output directories.
+        $this->clearCdaOutputDirectories($output);
+
+        $generator = new LogicalModelGenerator();
+        $generated = 0;
+        foreach ($definitions as $url => $sd) {
+            $namespace    = $urlToNs[$url];
+            $xmlNamespace = $this->resolveCdaXmlNamespace($url, $xmlNsDirect, $baseOf);
+            // Properties declared by the immediate parent (whose flattened snapshot already
+            // includes everything it inherits) are skipped here and come via `extends`.
+            $base                    = $baseOf[$url] ?? '';
+            $inheritedNames          = ($base !== '' && isset($ownPropNames[$base])) ? $ownPropNames[$base] : [];
+            $inheritedConstraintKeys = ($base !== '' && isset($ownConstraints[$base])) ? $ownConstraints[$base] : [];
+            try {
+                $class = $generator->generate($sd, $namespace, $xmlNamespace, $urlToFqcn, $inheritedNames, $inheritedConstraintKeys);
+            } catch (\Throwable $e) {
+                $this->errorCollector->addError(
+                    "CDA class generation failed for {$url}: {$e->getMessage()}",
+                    'CDA',
+                    'CDA_CLASS_GENERATION_FAILURE',
+                    'error',
+                    ['exception_class' => get_class($e), 'url' => $url],
+                );
+
+                continue;
+            }
+            $context->addType($url, $namespace->getName(), $class);
+            ++$generated;
+        }
+
+        $this->outputCdaFiles($output);
+        $output->writeln("<info>Generated {$generated} CDA logical model classes</info>");
+
+        if ($this->errorCollector->hasErrors()) {
+            $output->writeln('<error>' . $this->errorCollector->getSummary() . '</error>');
+            if ($output->isVerbose()) {
+                $output->writeln($this->errorCollector->getDetailedOutput());
+            }
+        }
+    }
+
+    /**
+     * Collect the direct-child (depth-1) property names of a StructureDefinition's flattened
+     * snapshot. Because the snapshot inlines inherited elements, a type's set is a superset of its
+     * parent's — used to skip inherited properties when generating a subclass.
+     *
+     * @param array<string, mixed> $sd
+     *
+     * @return list<string>
+     */
+    private function cdaDirectPropertyNames(array $sd): array
+    {
+        $names    = [];
+        $elements = $sd['snapshot']['element'] ?? [];
+        if (!is_array($elements)) {
+            return [];
+        }
+        foreach ($elements as $element) {
+            if (!is_array($element)) {
+                continue;
+            }
+            $path = (string) ($element['path'] ?? '');
+            if (substr_count($path, '.') !== 1) {
+                continue;
+            }
+            $name = LogicalModelGenerator::propertyNameFromPath($path);
+            if ($name !== '' && !in_array($name, $names, true)) {
+                $names[] = $name;
+            }
+        }
+
+        return $names;
+    }
+
+    /**
+     * Collect the root-element constraint keys (those with a FHIRPath `expression`) of a
+     * StructureDefinition's flattened snapshot. Used to skip inherited invariants on subclasses,
+     * since CDA inlines a parent's constraints into each child's snapshot.
+     *
+     * @param array<string, mixed> $sd
+     *
+     * @return list<string>
+     */
+    private function cdaConstraintKeys(array $sd): array
+    {
+        $keys        = [];
+        $rootElement = $sd['snapshot']['element'][0] ?? null;
+        if (!is_array($rootElement)) {
+            return [];
+        }
+        $constraints = $rootElement['constraint'] ?? [];
+        if (!is_array($constraints)) {
+            return [];
+        }
+        foreach ($constraints as $constraint) {
+            if (!is_array($constraint)) {
+                continue;
+            }
+            $key = (string) ($constraint['key'] ?? '');
+            if ($key !== '' && (string) ($constraint['expression'] ?? '') !== '' && !in_array($key, $keys, true)) {
+                $keys[] = $key;
+            }
+        }
+
+        return $keys;
+    }
+
+    /**
+     * Read the urn:hl7-org:v3 XML namespace from the FHIR tooling xml-namespace extension on a
+     * StructureDefinition, or null if the SD does not carry it directly.
+     *
+     * @param array<string, mixed> $sd
+     */
+    private function readXmlNamespace(array $sd): ?string
+    {
+        $extensions = $sd['extension'] ?? [];
+        if (!is_array($extensions)) {
+            return null;
+        }
+        foreach ($extensions as $extension) {
+            if (!is_array($extension)) {
+                continue;
+            }
+            if (str_contains((string) ($extension['url'] ?? ''), 'xml-namespace')) {
+                $value = $extension['valueUri'] ?? $extension['valueString'] ?? null;
+
+                return $value !== null ? (string) $value : null;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Resolve a type's XML namespace: its own declaration, else the nearest ancestor's via the
+     * baseDefinition chain, else the CDA default (urn:hl7-org:v3). A non-null value is guaranteed so
+     * the serializer never wrongly permits JSON for a CDA class (1/124 SDs lacks a direct value).
+     *
+     * @param array<string, string|null> $xmlNsDirect
+     * @param array<string, string|null> $baseOf
+     */
+    private function resolveCdaXmlNamespace(string $url, array $xmlNsDirect, array $baseOf): string
+    {
+        $seen    = [];
+        $current = $url;
+        while ($current !== '' && !isset($seen[$current])) {
+            $seen[$current] = true;
+            if (($xmlNsDirect[$current] ?? null) !== null) {
+                return (string) $xmlNsDirect[$current];
+            }
+            $current = $baseOf[$current] ?? '';
+        }
+
+        return 'urn:hl7-org:v3';
+    }
+
+    /**
+     * Walk the baseDefinition chain from $url and return true if $targetUrl is encountered
+     * (inclusive of $url itself). Cycle-safe.
+     *
+     * @param array<string, string|null> $baseOf
+     */
+    private function cdaChainContains(string $url, string $targetUrl, array $baseOf): bool
+    {
+        $seen    = [];
+        $current = $url;
+        while ($current !== '' && !isset($seen[$current])) {
+            if ($current === $targetUrl) {
+                return true;
+            }
+            $seen[$current] = true;
+            $current        = $baseOf[$current] ?? '';
+        }
+
+        return false;
+    }
+
+    /**
+     * Remove the previously generated CDA output directories so a regen does not leave stale files.
+     */
+    private function clearCdaOutputDirectories(OutputInterface $output): void
+    {
+        $basePath = Path::canonicalize(__DIR__ . '/../../../CdaModels/src');
+        foreach (['DataType', 'ClinicalClass', 'Enum'] as $category) {
+            $dir = "{$basePath}/{$category}";
+            if ($this->filesystem->exists($dir)) {
+                $output->writeln("<comment>Clearing CDA {$category} directory...</comment>");
+                $this->filesystem->remove($dir);
+            }
+        }
+    }
+
+    /**
+     * Write the generated CDA classes to src/Component/CdaModels/src/{DataType,ClinicalClass}/.
+     */
+    private function outputCdaFiles(OutputInterface $output): void
+    {
+        $basePath = Path::canonicalize(__DIR__ . '/../../../CdaModels/src');
+
+        foreach ($this->context['CDA']->getTypes() as $type) {
+            if (!$type->isClass()) {
+                continue;
+            }
+            $namespaceParts  = explode('\\', $type->namespace);
+            $category        = end($namespaceParts);
+            $className       = $type->getClassName();
+            $contents        = self::asPhpFile($type->asClassType(), $type->namespace);
+            $outputPath      = Path::canonicalize("{$basePath}/{$category}/{$className}.php");
+
+            $directory = dirname($outputPath);
+            if (!$this->filesystem->exists($directory)) {
+                $this->filesystem->mkdir($directory, 0755);
+            }
+            $this->filesystem->dumpFile($outputPath, $contents);
+            $output->writeln("Generated CDA class {$className}");
+        }
     }
 
     /**
