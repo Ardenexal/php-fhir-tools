@@ -491,12 +491,7 @@ class PackageLoader
         $actual      = $this->integrityManager->generateChecksum($packageFile);
 
         if (!hash_equals($known['sha256'], $actual)) {
-            throw PackageException::invalidPackageFormat(
-                $packageName,
-                "pinned sha256 mismatch: expected {$known['sha256']}, got {$actual} "
-                . "(the build artifact at {$known['tarball']} has changed; verify the new build "
-                . 'and update the pin in KNOWN_PACKAGES)',
-            );
+            throw PackageException::invalidPackageFormat($packageName, "pinned sha256 mismatch: expected {$known['sha256']}, got {$actual} (the build artifact at {$known['tarball']} has changed; verify the new build " . 'and update the pin in KNOWN_PACKAGES)');
         }
 
         $this->logger->info("Verified pinned checksum for {$packageName}@{$known['version']}");
