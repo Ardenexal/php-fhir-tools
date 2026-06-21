@@ -81,4 +81,32 @@ final class FHIRValueSetGeneratorTest extends TestCase
         $values = array_map(static fn ($c) => $c->getValue(), $cases);
         self::assertEqualsCanonicalizing(['N', '<', '>'], $values);
     }
+
+    public function testDuplicateBackingValuesAreDeduplicated(): void
+    {
+        // The AU dh-entitynameuse ValueSet lists a single code under two display names (e.g.
+        // 'enterprise name' and the bare code 'ORGE'), which would otherwise emit two enum cases
+        // sharing the backing value 'ORGE' — invalid for a PHP backed enum.
+        $enum = $this->generator->generateEnum(
+            [
+                'resourceType' => 'ValueSet',
+                'url'          => 'http://ns.electronichealth.net.au/cda/ValueSet/dh-entitynameuse',
+                'name'         => 'Entity Name Use',
+                'compose'      => ['include' => [[
+                    'system'  => 'http://terminology.hl7.org/CodeSystem/v3-EntityNameUse',
+                    'concept' => [
+                        ['code' => 'ORGE', 'display' => 'enterprise name'],
+                        ['code' => 'ORGE', 'display' => 'ORGE'],
+                        ['code' => 'ORGL', 'display' => 'locally used name'],
+                    ],
+                ]]],
+            ],
+            'CDA',
+            $this->context,
+            'AuDhEntitynameuse',
+        );
+
+        $values = array_values(array_map(static fn ($c) => $c->getValue(), $enum->getCases()));
+        self::assertSame(['ORGE', 'ORGL'], $values, 'duplicate backing values must collapse to one case each');
+    }
 }

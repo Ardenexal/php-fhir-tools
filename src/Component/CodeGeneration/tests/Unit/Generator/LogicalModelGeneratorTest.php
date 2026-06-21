@@ -414,4 +414,97 @@ final class LogicalModelGeneratorTest extends TestCase
         self::assertSame('root', LogicalModelGenerator::propertyNameFromPath('II.root'));
         self::assertSame('value', LogicalModelGenerator::propertyNameFromPath('Observation.value[x]'));
     }
+
+    public function testResolvesParentFromTypeWhenTypeNamesADifferentClass(): void
+    {
+        // AU au-ClinicalDocument: `type` points at the core ClinicalDocument it specializes while
+        // `baseDefinition` points at the abstract ANY root. The PHP parent must come from `type`.
+        $class = $this->generate(
+            [
+                'url'            => 'http://ns.electronichealth.net.au/cda/StructureDefinition/au-ClinicalDocument',
+                'name'           => 'au-ClinicalDocument',
+                'kind'           => 'logical',
+                'derivation'     => 'specialization',
+                'type'           => 'http://hl7.org/cda/stds/core/StructureDefinition/ClinicalDocument',
+                'baseDefinition' => 'http://hl7.org/cda/stds/core/StructureDefinition/ANY',
+                'snapshot'       => ['element' => [['path' => 'au-ClinicalDocument']]],
+            ],
+            [
+                'http://hl7.org/cda/stds/core/StructureDefinition/ClinicalDocument' => '\\' . self::DT_NS . '\\ClinicalDocument',
+                'http://hl7.org/cda/stds/core/StructureDefinition/ANY'              => '\\' . self::DT_NS . '\\ANY',
+            ],
+        );
+
+        self::assertSame(self::DT_NS . '\\ClinicalDocument', ltrim((string) $class->getExtends(), '\\'));
+    }
+
+    public function testTypeSeparatorMismatchFallsBackToBaseDefinition(): void
+    {
+        // Core's `type != url` cases are hyphen/underscore separator mismatches that name the SAME
+        // type (not a different generatable class), so the parent must still come from baseDefinition.
+        $class = $this->generate(
+            [
+                'url'            => 'http://hl7.org/cda/stds/core/StructureDefinition/IVL-TS',
+                'name'           => 'IVL_TS',
+                'kind'           => 'logical',
+                'derivation'     => 'specialization',
+                'type'           => 'http://hl7.org/cda/stds/core/StructureDefinition/IVL_TS',
+                'baseDefinition' => 'http://hl7.org/cda/stds/core/StructureDefinition/SXCM-TS',
+                'snapshot'       => ['element' => [['path' => 'IVL-TS']]],
+            ],
+            ['http://hl7.org/cda/stds/core/StructureDefinition/SXCM-TS' => '\\' . self::DT_NS . '\\SXCMTS'],
+        );
+
+        self::assertSame(self::DT_NS . '\\SXCMTS', ltrim((string) $class->getExtends(), '\\'));
+    }
+
+    public function testForwardsInheritedParametersViaParentConstructor(): void
+    {
+        // A subclass must re-declare its parent's params as NON-promoted passthroughs and forward
+        // them via parent::__construct() — otherwise the parent's promoted properties are never
+        // initialised and throw on access.
+        $parentSd = [
+            'url'        => 'http://hl7.org/cda/stds/core/StructureDefinition/ANY',
+            'name'       => 'ANY',
+            'kind'       => 'logical',
+            'derivation' => 'specialization',
+            'snapshot'   => ['element' => [
+                ['path' => 'ANY'],
+                ['path' => 'ANY.nullFlavor', 'min' => 0, 'max' => '1', 'representation' => ['xmlAttr'], 'type' => [['code' => 'code']]],
+            ]],
+        ];
+        $inheritedParams = $this->generator->collectOwnParameters($parentSd, [], 'urn:hl7-org:v3');
+
+        $child = $this->generator->generate(
+            [
+                'url'            => 'http://hl7.org/cda/stds/core/StructureDefinition/II',
+                'name'           => 'II',
+                'kind'           => 'logical',
+                'derivation'     => 'specialization',
+                'baseDefinition' => 'http://hl7.org/cda/stds/core/StructureDefinition/ANY',
+                'snapshot'       => ['element' => [
+                    ['path' => 'II'],
+                    ['path' => 'II.nullFlavor', 'min' => 0, 'max' => '1', 'representation' => ['xmlAttr'], 'type' => [['code' => 'code']]],
+                    ['path' => 'II.root', 'min' => 0, 'max' => '1', 'representation' => ['xmlAttr'], 'type' => [['code' => 'string']]],
+                ]],
+            ],
+            new PhpNamespace(self::DT_NS),
+            'urn:hl7-org:v3',
+            ['http://hl7.org/cda/stds/core/StructureDefinition/ANY' => '\\' . self::DT_NS . '\\ANY'],
+            ['nullFlavor'],
+            [],
+            [],
+            $inheritedParams,
+        );
+
+        $parameters = $child->getMethod('__construct')->getParameters();
+        // Own property is promoted; inherited property is a non-promoted passthrough.
+        self::assertInstanceOf(PromotedParameter::class, $parameters['root']);
+        self::assertArrayHasKey('nullFlavor', $parameters);
+        self::assertNotInstanceOf(PromotedParameter::class, $parameters['nullFlavor']);
+
+        $body = (string) $child->getMethod('__construct')->getBody();
+        self::assertStringContainsString('parent::__construct(', $body);
+        self::assertStringContainsString('nullFlavor: $nullFlavor', $body);
+    }
 }

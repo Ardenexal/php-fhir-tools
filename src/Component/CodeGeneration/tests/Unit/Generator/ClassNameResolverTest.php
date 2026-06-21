@@ -79,4 +79,51 @@ class ClassNameResolverTest extends TestCase
 
         self::assertEquals('ClaimUse', $className);
     }
+
+    /**
+     * AU CDA additions are named from the URL id and `Au`-prefixed (their `name` fields collide
+     * with core classes — e.g. au-Address is named `AD` — or are typos / non-identifiers).
+     *
+     * @param string $url
+     * @param string $name
+     * @param string $expected
+     */
+    #[DataProvider('auLogicalModelNameProvider')]
+    public function testAuLogicalModelClassNameIsAuPrefixedAndCollisionFree(string $url, string $name, string $expected): void
+    {
+        self::assertSame($expected, ClassNameResolver::logicalModelClassName($url, $name));
+    }
+
+    /**
+     * @return array<string, array{string, string, string}>
+     */
+    public static function auLogicalModelNameProvider(): array
+    {
+        return [
+            'au- prefix folded into Au'      => ['http://ns.electronichealth.net.au/cda/StructureDefinition/au-ClinicalDocument', 'au-ClinicalDocument', 'AuClinicalDocument'],
+            'name collides with core AD'     => ['http://ns.electronichealth.net.au/cda/StructureDefinition/au-Address', 'AD', 'AuAddress'],
+            'typo name ignored, id wins'     => ['http://ns.electronichealth.net.au/cda/StructureDefinition/addr', 'addrress', 'AuAddr'],
+            'brand-new au type from id'      => ['http://ns.electronichealth.net.au/cda/StructureDefinition/asEntityIdentifier', 'asEntityIdentifier', 'AuAsEntityIdentifier'],
+        ];
+    }
+
+    public function testCoreLogicalModelClassNameUnaffectedByAuRule(): void
+    {
+        self::assertSame('II', ClassNameResolver::logicalModelClassName('http://hl7.org/cda/stds/core/StructureDefinition/II', 'II'));
+        self::assertSame('ClinicalDocument', ClassNameResolver::logicalModelClassName('http://hl7.org/cda/stds/core/StructureDefinition/ClinicalDocument', 'ClinicalDocument'));
+    }
+
+    public function testAuValueSetEnumNameIsAuPrefixedWhileCoreStripsCdaPrefix(): void
+    {
+        // AU ValueSet → derived from id, Au-prefixed (avoids case-collision with core EntityNameUse).
+        self::assertSame(
+            'AuDhEntitynameuse',
+            ClassNameResolver::cdaEnumClassName('http://ns.electronichealth.net.au/cda/ValueSet/dh-entitynameuse', 'Entity Name Use'),
+        );
+        // Core ValueSet → unchanged: the redundant CDA qualifier is stripped.
+        self::assertSame(
+            'EntityNameUse',
+            ClassNameResolver::cdaEnumClassName('http://hl7.org/cda/stds/core/ValueSet/CDAEntityNameUse', 'CDAEntityNameUse'),
+        );
+    }
 }
