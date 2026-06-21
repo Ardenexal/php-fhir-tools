@@ -89,12 +89,23 @@ final class LogicalModelGenerator
             $class->setAbstract();
         }
 
-        // Parent: resolve baseDefinition through the map. ANY's base is the FHIR `Base` type, which
-        // is not a generated CDA class, so it resolves to no parent (the abstract root).
+        // Parent resolution. For core CDA types the immediate parent is `baseDefinition`
+        // (ANY's base is the FHIR `Base` type, not a generated CDA class, so it resolves to no
+        // parent — the abstract root). AU specializations, however, set `type` to the core class
+        // they refine (e.g. au-ClinicalDocument.type = .../ClinicalDocument) while `baseDefinition`
+        // points at the shared abstract root (ANY / InfrastructureRoot). When `type` names a
+        // *different* generatable class, it is the real parent (M2-deferred rule, confirmed
+        // against the AU package in M4). Core's own `type != url` cases are hyphen/underscore
+        // separator mismatches (url=.../IVL-TS, type=.../IVL_TS) that name the SAME type; those
+        // `type` values never key the url-keyed map, so they correctly fall through to
+        // `baseDefinition` and core generation is unaffected.
         // Types are referenced as leading-backslash FQCNs (Nette prints them fully-qualified);
         // no `use` management is needed because each class is printed in a fresh namespace.
+        $type           = (string) ($definition['type'] ?? '');
         $baseDefinition = isset($definition['baseDefinition']) ? (string) $definition['baseDefinition'] : null;
-        if ($baseDefinition !== null && isset($urlToFqcn[$baseDefinition])) {
+        if ($type !== '' && $type !== $url && isset($urlToFqcn[$type])) {
+            $class->setExtends($urlToFqcn[$type]);
+        } elseif ($baseDefinition !== null && isset($urlToFqcn[$baseDefinition])) {
             $class->setExtends($urlToFqcn[$baseDefinition]);
         }
 
