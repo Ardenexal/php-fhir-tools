@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass;
 
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\CE;
+use Ardenexal\FHIRTools\Component\CdaModels\DataType\CS;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\II;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\IVLTS;
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\NullFlavor;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 
@@ -21,6 +23,8 @@ class EncompassingEncounter extends InfrastructureRoot
     /**
      * @param list<II>                   $id
      * @param list<EncounterParticipant> $encounterParticipant
+     * @param list<CS>                   $realmCode
+     * @param list<II>                   $templateId
      */
     public function __construct(
         #[FhirProperty(fhirType: 'code', propertyKind: 'scalar', isArray: false, isRequired: false, xmlSerializedName: '@classCode')]
@@ -54,6 +58,7 @@ class EncompassingEncounter extends InfrastructureRoot
             propertyKind: 'complex',
             isArray: false,
             isRequired: false,
+            xmlNamespace: 'urn:hl7-org:sdtc',
         )]
         public ?CE $sdtcAdmissionReferralSourceCode = null,
         #[FhirProperty(
@@ -85,6 +90,16 @@ class EncompassingEncounter extends InfrastructureRoot
             isRequired: false,
         )]
         public ?InfrastructureRoot $location = null,
+        array $realmCode = [],
+        ?II $typeId = null,
+        array $templateId = [],
+        ?NullFlavor $nullFlavor = null,
     ) {
+        parent::__construct(
+            realmCode: $realmCode,
+            typeId: $typeId,
+            templateId: $templateId,
+            nullFlavor: $nullFlavor,
+        );
     }
 }

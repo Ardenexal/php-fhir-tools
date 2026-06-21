@@ -63,6 +63,14 @@ final class FhirProperty
          * Used by the serializer to denormalize array items into typed objects.
          */
         public readonly ?string $phpType = null,
+        /**
+         * XML namespace URI for this element when it differs from its owning class's namespace.
+         * Null means inherit the class namespace. CDA AU extension elements carry the ADHA
+         * extension namespace (e.g. 'http://ns.electronichealth.net.au/Ci/Cda/Extensions/3.0')
+         * here, sourced from the element's FHIR-tooling xml-namespace extension. The XML serializer
+         * applies it when emitting the element (serialization wiring is CDA M5).
+         */
+        public readonly ?string $xmlNamespace = null,
     ) {
     }
 }

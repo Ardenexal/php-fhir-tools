@@ -16,7 +16,14 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 class IdentifiedBy
 {
     public function __construct(
-        #[FhirProperty(fhirType: 'code', propertyKind: 'scalar', isArray: false, isRequired: true, xmlSerializedName: '@typeCode')]
+        #[FhirProperty(
+            fhirType: 'code',
+            propertyKind: 'scalar',
+            isArray: false,
+            isRequired: true,
+            xmlSerializedName: '@typeCode',
+            xmlNamespace: 'urn:hl7-org:v3',
+        )]
         public string $typeCode = 'REL',
         #[FhirProperty(
             fhirType: 'http://hl7.org/cda/stds/core/StructureDefinition/AlternateIdentification',

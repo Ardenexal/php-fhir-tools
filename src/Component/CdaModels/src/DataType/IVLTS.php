@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\DataType;
 
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\NullFlavor;
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\SetOperator;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
@@ -51,6 +53,14 @@ class IVLTS extends SXCMTS
             isRequired: false,
         )]
         public ?IVXBTS $high = null,
+        ?SetOperator $operator = null,
+        ?string $value = null,
+        ?NullFlavor $nullFlavor = null,
     ) {
+        parent::__construct(
+            operator: $operator,
+            value: $value,
+            nullFlavor: $nullFlavor,
+        );
     }
 }

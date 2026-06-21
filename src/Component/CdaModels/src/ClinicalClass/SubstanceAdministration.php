@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\CdaModels\DataType\IVLINT;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\IVLPQ;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\RTOPQPQ;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\SXCMTS;
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\NullFlavor;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 
@@ -37,6 +38,8 @@ class SubstanceAdministration extends InfrastructureRoot
      * @param list<Reference>         $reference
      * @param list<Precondition>      $precondition
      * @param list<InFulfillmentOf1>  $sdtcInFulfillmentOf1
+     * @param list<CS>                $realmCode
+     * @param list<II>                $templateId
      */
     public function __construct(
         #[FhirProperty(fhirType: 'code', propertyKind: 'scalar', isArray: false, isRequired: true, xmlSerializedName: '@classCode')]
@@ -223,8 +226,19 @@ class SubstanceAdministration extends InfrastructureRoot
             isArray: true,
             isRequired: false,
             phpType: '\Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\InFulfillmentOf1',
+            xmlNamespace: 'urn:hl7-org:sdtc',
         )]
         public array $sdtcInFulfillmentOf1 = [],
+        array $realmCode = [],
+        ?II $typeId = null,
+        array $templateId = [],
+        ?NullFlavor $nullFlavor = null,
     ) {
+        parent::__construct(
+            realmCode: $realmCode,
+            typeId: $typeId,
+            templateId: $templateId,
+            nullFlavor: $nullFlavor,
+        );
     }
 }

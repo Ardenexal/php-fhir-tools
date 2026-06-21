@@ -170,8 +170,11 @@ class FHIRValueSetGenerator implements GeneratorInterface
                 if (is_numeric($enumName[0])) {
                     $enumName = 'CODE_' . $enumName;
                 }
-                // Skip if already exists
-                if (array_any($enum->getCases(), fn ($case) => $case->getName() === $enumName)) {
+                // Skip if a case with this name OR backing value already exists. PHP backed enums
+                // require unique values; some ValueSets (e.g. the AU dh-entitynameuse) list a single
+                // code under multiple display names, which would otherwise emit two cases sharing a
+                // value.
+                if (array_any($enum->getCases(), fn ($case) => $case->getName() === $enumName || $case->getValue() === $code)) {
                     continue;
                 }
                 $enum->addCase($enumName, $code)
@@ -200,8 +203,9 @@ class FHIRValueSetGenerator implements GeneratorInterface
                     // Still unrepresentable — skip this one concept rather than abort the enum.
                     continue;
                 }
-                // Skip if already exists
-                if (array_any($enum->getCases(), fn ($case) => $case->getName() === $enumName)) {
+                // Skip if a case with this name OR backing value already exists (see note above —
+                // PHP backed enums require unique values).
+                if (array_any($enum->getCases(), fn ($case) => $case->getName() === $enumName || $case->getValue() === $concept['code'])) {
                     continue;
                 }
 

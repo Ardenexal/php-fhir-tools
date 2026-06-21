@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass;
 
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\CE;
+use Ardenexal\FHIRTools\Component\CdaModels\DataType\CS;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\ED;
+use Ardenexal\FHIRTools\Component\CdaModels\DataType\II;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\PN;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\PQ;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\TS;
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\NullFlavor;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 
@@ -23,6 +26,8 @@ class PlayingEntity extends InfrastructureRoot
     /**
      * @param list<PQ> $quantity
      * @param list<PN> $name
+     * @param list<CS> $realmCode
+     * @param list<II> $templateId
      */
     public function __construct(
         #[FhirProperty(fhirType: 'code', propertyKind: 'scalar', isArray: false, isRequired: false, xmlSerializedName: '@classCode')]
@@ -57,6 +62,7 @@ class PlayingEntity extends InfrastructureRoot
             propertyKind: 'complex',
             isArray: false,
             isRequired: false,
+            xmlNamespace: 'urn:hl7-org:sdtc',
         )]
         public ?TS $sdtcBirthTime = null,
         #[FhirProperty(
@@ -66,6 +72,16 @@ class PlayingEntity extends InfrastructureRoot
             isRequired: false,
         )]
         public ?ED $desc = null,
+        array $realmCode = [],
+        ?II $typeId = null,
+        array $templateId = [],
+        ?NullFlavor $nullFlavor = null,
     ) {
+        parent::__construct(
+            realmCode: $realmCode,
+            typeId: $typeId,
+            templateId: $templateId,
+            nullFlavor: $nullFlavor,
+        );
     }
 }

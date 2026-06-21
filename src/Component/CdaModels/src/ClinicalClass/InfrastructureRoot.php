@@ -7,6 +7,7 @@ namespace Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\ANY;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\CS;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\II;
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\NullFlavor;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 
@@ -46,6 +47,10 @@ abstract class InfrastructureRoot extends ANY
             phpType: '\Ardenexal\FHIRTools\Component\CdaModels\DataType\II',
         )]
         public array $templateId = [],
+        ?NullFlavor $nullFlavor = null,
     ) {
+        parent::__construct(
+            nullFlavor: $nullFlavor,
+        );
     }
 }

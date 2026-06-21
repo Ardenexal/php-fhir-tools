@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\DataType;
 
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\NullFlavor;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
@@ -31,6 +32,10 @@ class ST extends ANY
         public ?string $language = null,
         #[FhirProperty(fhirType: 'string', propertyKind: 'scalar', isArray: false, isRequired: false)]
         public ?string $xmlText = null,
+        ?NullFlavor $nullFlavor = null,
     ) {
+        parent::__construct(
+            nullFlavor: $nullFlavor,
+        );
     }
 }

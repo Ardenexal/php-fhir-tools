@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\DataType;
 
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\NullFlavor;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
@@ -39,6 +40,10 @@ class TEL extends ANY
         public array $useablePeriod = [],
         #[FhirProperty(fhirType: 'code', propertyKind: 'scalar', isArray: true, isRequired: false, xmlSerializedName: '@use')]
         public array $use = [],
+        ?NullFlavor $nullFlavor = null,
     ) {
+        parent::__construct(
+            nullFlavor: $nullFlavor,
+        );
     }
 }

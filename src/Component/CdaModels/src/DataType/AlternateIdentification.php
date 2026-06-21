@@ -23,6 +23,7 @@ class AlternateIdentification
             propertyKind: 'complex',
             isArray: false,
             isRequired: true,
+            xmlNamespace: 'urn:hl7-org:sdtc',
         )]
         public ?II $id = null,
         #[FhirProperty(
@@ -30,6 +31,7 @@ class AlternateIdentification
             propertyKind: 'complex',
             isArray: false,
             isRequired: false,
+            xmlNamespace: 'urn:hl7-org:sdtc',
         )]
         public ?CD $code = null,
         #[FhirProperty(
@@ -37,6 +39,7 @@ class AlternateIdentification
             propertyKind: 'complex',
             isArray: false,
             isRequired: false,
+            xmlNamespace: 'urn:hl7-org:sdtc',
         )]
         public ?CS $statusCode = null,
         #[FhirProperty(
@@ -44,6 +47,7 @@ class AlternateIdentification
             propertyKind: 'complex',
             isArray: false,
             isRequired: false,
+            xmlNamespace: 'urn:hl7-org:sdtc',
         )]
         public ?IVLTS $effectiveTime = null,
     ) {

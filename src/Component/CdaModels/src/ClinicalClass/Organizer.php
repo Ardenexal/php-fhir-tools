@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\CdaModels\DataType\CS;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\ED;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\II;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\IVLTS;
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\NullFlavor;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 
@@ -32,6 +33,8 @@ class Organizer extends InfrastructureRoot
      * @param list<Precondition>       $precondition
      * @param list<Precondition2>      $sdtcPrecondition2
      * @param list<OrganizerComponent> $component
+     * @param list<CS>                 $realmCode
+     * @param list<II>                 $templateId
      */
     public function __construct(
         #[FhirProperty(fhirType: 'code', propertyKind: 'scalar', isArray: false, isRequired: true, xmlSerializedName: '@classCode')]
@@ -52,6 +55,7 @@ class Organizer extends InfrastructureRoot
             isArray: true,
             isRequired: false,
             phpType: '\Ardenexal\FHIRTools\Component\CdaModels\DataType\CD',
+            xmlNamespace: 'urn:hl7-org:sdtc',
         )]
         public array $sdtcCategory = [],
         #[FhirProperty(
@@ -66,6 +70,7 @@ class Organizer extends InfrastructureRoot
             propertyKind: 'complex',
             isArray: false,
             isRequired: false,
+            xmlNamespace: 'urn:hl7-org:sdtc',
         )]
         public ?ED $sdtcText = null,
         #[FhirProperty(
@@ -151,6 +156,7 @@ class Organizer extends InfrastructureRoot
             isArray: true,
             isRequired: false,
             phpType: '\Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\Precondition2',
+            xmlNamespace: 'urn:hl7-org:sdtc',
         )]
         public array $sdtcPrecondition2 = [],
         #[FhirProperty(
@@ -161,6 +167,16 @@ class Organizer extends InfrastructureRoot
             phpType: '\Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\OrganizerComponent',
         )]
         public array $component = [],
+        array $realmCode = [],
+        ?II $typeId = null,
+        array $templateId = [],
+        ?NullFlavor $nullFlavor = null,
     ) {
+        parent::__construct(
+            realmCode: $realmCode,
+            typeId: $typeId,
+            templateId: $templateId,
+            nullFlavor: $nullFlavor,
+        );
     }
 }

@@ -6,8 +6,10 @@ namespace Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass;
 
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\AD;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\CE;
+use Ardenexal\FHIRTools\Component\CdaModels\DataType\CS;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\II;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\TEL;
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\NullFlavor;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 
@@ -23,6 +25,8 @@ class RelatedSubject extends InfrastructureRoot
      * @param list<II>  $sdtcId
      * @param list<AD>  $addr
      * @param list<TEL> $telecom
+     * @param list<CS>  $realmCode
+     * @param list<II>  $templateId
      */
     public function __construct(
         #[FhirProperty(fhirType: 'code', propertyKind: 'scalar', isArray: false, isRequired: false, xmlSerializedName: '@classCode')]
@@ -33,6 +37,7 @@ class RelatedSubject extends InfrastructureRoot
             isArray: true,
             isRequired: false,
             phpType: '\Ardenexal\FHIRTools\Component\CdaModels\DataType\II',
+            xmlNamespace: 'urn:hl7-org:sdtc',
         )]
         public array $sdtcId = [],
         #[FhirProperty(
@@ -65,6 +70,16 @@ class RelatedSubject extends InfrastructureRoot
             isRequired: false,
         )]
         public ?SubjectPerson $subject = null,
+        array $realmCode = [],
+        ?II $typeId = null,
+        array $templateId = [],
+        ?NullFlavor $nullFlavor = null,
     ) {
+        parent::__construct(
+            realmCode: $realmCode,
+            typeId: $typeId,
+            templateId: $templateId,
+            nullFlavor: $nullFlavor,
+        );
     }
 }

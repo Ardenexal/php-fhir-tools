@@ -6,6 +6,7 @@ namespace Ardenexal\FHIRTools\Component\CdaModels\DataType;
 
 use Ardenexal\FHIRTools\Component\CdaModels\Enum\BinaryDataEncoding;
 use Ardenexal\FHIRTools\Component\CdaModels\Enum\CompressionAlgorithm;
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\NullFlavor;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRPathInvariant;
@@ -65,6 +66,10 @@ class ED extends ANY
             isRequired: false,
         )]
         public ?ED $thumbnail = null,
+        ?NullFlavor $nullFlavor = null,
     ) {
+        parent::__construct(
+            nullFlavor: $nullFlavor,
+        );
     }
 }

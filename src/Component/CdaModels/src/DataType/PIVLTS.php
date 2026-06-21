@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\DataType;
 
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\NullFlavor;
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\SetOperator;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 
@@ -40,6 +42,14 @@ class PIVLTS extends SXCMTS
             xmlSerializedName: '@institutionSpecified',
         )]
         public ?bool $institutionSpecified = null,
+        ?SetOperator $operator = null,
+        ?string $value = null,
+        ?NullFlavor $nullFlavor = null,
     ) {
+        parent::__construct(
+            operator: $operator,
+            value: $value,
+            nullFlavor: $nullFlavor,
+        );
     }
 }

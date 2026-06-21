@@ -10,6 +10,7 @@ use Ardenexal\FHIRTools\Component\CdaModels\DataType\CS;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\ED;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\II;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\IVLTS;
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\NullFlavor;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 
@@ -33,6 +34,8 @@ class Act extends InfrastructureRoot
      * @param list<Precondition>      $precondition
      * @param list<Precondition2>     $sdtcPrecondition2
      * @param list<InFulfillmentOf1>  $sdtcInFulfillmentOf1
+     * @param list<CS>                $realmCode
+     * @param list<II>                $templateId
      */
     public function __construct(
         #[FhirProperty(fhirType: 'code', propertyKind: 'scalar', isArray: false, isRequired: true, xmlSerializedName: '@classCode')]
@@ -168,6 +171,7 @@ class Act extends InfrastructureRoot
             isArray: true,
             isRequired: false,
             phpType: '\Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\Precondition2',
+            xmlNamespace: 'urn:hl7-org:sdtc',
         )]
         public array $sdtcPrecondition2 = [],
         #[FhirProperty(
@@ -176,8 +180,19 @@ class Act extends InfrastructureRoot
             isArray: true,
             isRequired: false,
             phpType: '\Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\InFulfillmentOf1',
+            xmlNamespace: 'urn:hl7-org:sdtc',
         )]
         public array $sdtcInFulfillmentOf1 = [],
+        array $realmCode = [],
+        ?II $typeId = null,
+        array $templateId = [],
+        ?NullFlavor $nullFlavor = null,
     ) {
+        parent::__construct(
+            realmCode: $realmCode,
+            typeId: $typeId,
+            templateId: $templateId,
+            nullFlavor: $nullFlavor,
+        );
     }
 }

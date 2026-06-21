@@ -360,9 +360,24 @@ class FHIRModelGeneratorCommand extends Command
      */
     private function loadCdaPackageDefinitions(array $definitions): array
     {
-        $this->context['CDA']->loadDefinitions($definitions);
+        // First-wins for duplicate canonical URLs: the AU package bundles structurally-identical
+        // copies of the core CDA StructureDefinitions AND ValueSets under the same URLs (e.g.
+        // CDAActClass). Skipping any resource whose URL is already loaded keeps the pinned
+        // hl7.cda.uv.core authoritative for both core classes and core terminology (callers load
+        // core before AU) and guards against a future AU build drifting from it — the AU package
+        // then contributes only its own AU-namespace additions (M4 decision).
+        $existing = $this->context['CDA']->getDefinitions();
+        $filtered = [];
+        foreach ($definitions as $url => $def) {
+            if (isset($existing[$url])) {
+                continue;
+            }
+            $filtered[$url] = $def;
+        }
 
-        foreach ($definitions as $def) {
+        $this->context['CDA']->loadDefinitions($filtered);
+
+        foreach ($filtered as $def) {
             if (($def['resourceType'] ?? '') !== 'StructureDefinition') {
                 continue;
             }
@@ -575,13 +590,27 @@ class FHIRModelGeneratorCommand extends Command
             }
         }
 
-        // Pre-pass: base-definition map, directly-declared xml namespaces, own property/constraint sets.
+        // Pre-pass: parent maps, names, directly-declared xml namespaces, own property/constraint
+        // sets. Two parent notions are tracked: `baseOf` (raw `baseDefinition`, drives the
+        // xml-namespace inheritance walk) and `parentOf` (the EFFECTIVE PHP parent — `type` when it
+        // names a *different* generatable class, else `baseDefinition`). AU specializations set
+        // `type` to the core class they refine while `baseDefinition` points at the abstract root
+        // (ANY / InfrastructureRoot), so clinical-vs-datatype routing and inherited-member skipping
+        // must follow `parentOf`, matching {@see LogicalModelGenerator}'s `extends` rule. For core
+        // SDs `parentOf == baseOf` (type==url, or the 12 separator-mismatch cases that don't name a
+        // different generatable class), so core generation is unaffected.
+        $names           = [];
         $baseOf          = [];
+        $parentOf        = [];
         $xmlNsDirect     = [];
         $ownPropNames    = [];
         $ownConstraints  = [];
         foreach ($definitions as $url => $sd) {
-            $baseOf[$url]          = isset($sd['baseDefinition']) ? (string) $sd['baseDefinition'] : null;
+            $base                  = isset($sd['baseDefinition']) ? (string) $sd['baseDefinition'] : null;
+            $type                  = (string) ($sd['type'] ?? '');
+            $names[$url]           = (string) ($sd['name'] ?? '');
+            $baseOf[$url]          = $base;
+            $parentOf[$url]        = ($type !== '' && $type !== $url && isset($definitions[$type])) ? $type : $base;
             $xmlNsDirect[$url]     = $this->readXmlNamespace($sd);
             $ownPropNames[$url]    = $this->cdaDirectPropertyNames($sd);
             $ownConstraints[$url]  = $this->cdaConstraintKeys($sd);
@@ -590,9 +619,8 @@ class FHIRModelGeneratorCommand extends Command
         $urlToFqcn  = [];
         $urlToNs    = [];
         foreach ($definitions as $url => $sd) {
-            $name        = (string) ($sd['name'] ?? '');
-            $isClinical  = $name === 'ClinicalDocument'
-                || $this->cdaChainContains($url, self::CDA_INFRASTRUCTURE_ROOT_URL, $baseOf);
+            $name             = $names[$url];
+            $isClinical       = $this->cdaIsClinicalClass($url, $parentOf, $names);
             $namespace        = $isClinical ? $clinicalClassNs : $dataTypeNs;
             $urlToNs[$url]    = $namespace;
             $urlToFqcn[$url]  = '\\' . $namespace->getName() . '\\' . ClassNameResolver::logicalModelClassName($url, $name);
@@ -609,17 +637,41 @@ class FHIRModelGeneratorCommand extends Command
         $valueSetToEnumFqcn = $this->generateCdaEnums($output);
 
         $generator = new LogicalModelGenerator();
+
+        // Pre-compute each class's OWN constructor parameters, then memoise each class's FULL ordered
+        // parameter list (own ++ parent's full, walked through `parentOf`). A child is handed its
+        // parent's full list so it can re-declare those params and forward them via
+        // parent::__construct() — without which inherited promoted properties are never initialised
+        // (PHP runs no parent constructor implicitly) and throw on access.
+        $ownParams = [];
+        foreach ($definitions as $url => $sd) {
+            $parent          = $parentOf[$url] ?? '';
+            $inheritedNames  = ($parent !== '' && isset($ownPropNames[$parent])) ? $ownPropNames[$parent] : [];
+            $classXmlNs      = $this->resolveCdaXmlNamespace($url, $xmlNsDirect, $baseOf);
+            $ownParams[$url] = $generator->collectOwnParameters($sd, $urlToFqcn, $classXmlNs, $inheritedNames, $valueSetToEnumFqcn);
+        }
+
+        /** @var array<string, list<array<string, mixed>>> $fullParams */
+        $fullParams = [];
+        foreach (array_keys($definitions) as $url) {
+            $this->resolveFullCdaParameters((string) $url, $parentOf, $ownParams, $fullParams);
+        }
+
         $generated = 0;
         foreach ($definitions as $url => $sd) {
             $namespace    = $urlToNs[$url];
             $xmlNamespace = $this->resolveCdaXmlNamespace($url, $xmlNsDirect, $baseOf);
-            // Properties declared by the immediate parent (whose flattened snapshot already
-            // includes everything it inherits) are skipped here and come via `extends`.
-            $base                    = $baseOf[$url] ?? '';
-            $inheritedNames          = ($base !== '' && isset($ownPropNames[$base])) ? $ownPropNames[$base] : [];
-            $inheritedConstraintKeys = ($base !== '' && isset($ownConstraints[$base])) ? $ownConstraints[$base] : [];
+            // Properties/constraints declared by the EFFECTIVE parent (whose flattened snapshot
+            // already includes everything it inherits) are skipped here and come via `extends`.
+            // Uses `parentOf` (type-wins-else-baseDefinition) so an AU specialization skips the
+            // members of the core class it extends — not just those of its abstract `baseDefinition`
+            // root — which would otherwise re-declare the whole inherited surface.
+            $parent                  = $parentOf[$url] ?? '';
+            $inheritedNames          = ($parent !== '' && isset($ownPropNames[$parent])) ? $ownPropNames[$parent] : [];
+            $inheritedConstraintKeys = ($parent !== '' && isset($ownConstraints[$parent])) ? $ownConstraints[$parent] : [];
+            $inheritedParams         = ($parent !== '' && isset($fullParams[$parent])) ? $fullParams[$parent] : [];
             try {
-                $class = $generator->generate($sd, $namespace, $xmlNamespace, $urlToFqcn, $inheritedNames, $inheritedConstraintKeys, $valueSetToEnumFqcn);
+                $class = $generator->generate($sd, $namespace, $xmlNamespace, $urlToFqcn, $inheritedNames, $inheritedConstraintKeys, $valueSetToEnumFqcn, $inheritedParams);
             } catch (\Throwable $e) {
                 $this->errorCollector->addError(
                     "CDA class generation failed for {$url}: {$e->getMessage()}",
@@ -817,21 +869,58 @@ class FHIRModelGeneratorCommand extends Command
     }
 
     /**
-     * Walk the baseDefinition chain from $url and return true if $targetUrl is encountered
-     * (inclusive of $url itself). Cycle-safe.
+     * Resolve a class's FULL ordered constructor-parameter list (own ++ parent's full), memoised
+     * through the `parentOf` chain so it is order-independent. A class is handed its parent's full
+     * list as the set to re-declare and forward via parent::__construct(). Cycle-safe via a
+     * placeholder written before recursing.
      *
-     * @param array<string, string|null> $baseOf
+     * @param array<string, string|null>                $parentOf
+     * @param array<string, list<array<string, mixed>>> $ownParams
+     * @param array<string, list<array<string, mixed>>> $memo      Accumulates results (by reference)
+     *
+     * @return list<array<string, mixed>>
      */
-    private function cdaChainContains(string $url, string $targetUrl, array $baseOf): bool
+    private function resolveFullCdaParameters(string $url, array $parentOf, array $ownParams, array &$memo): array
+    {
+        if (array_key_exists($url, $memo)) {
+            return $memo[$url];
+        }
+        $memo[$url] = []; // cycle guard
+        $parent     = $parentOf[$url] ?? '';
+        $inherited  = ($parent !== '' && isset($ownParams[$parent]))
+            ? $this->resolveFullCdaParameters($parent, $parentOf, $ownParams, $memo)
+            : [];
+
+        return $memo[$url] = array_merge($ownParams[$url] ?? [], $inherited);
+    }
+
+    /**
+     * Decide whether a CDA logical model is a ClinicalClass (act/role/entity) rather than a V3
+     * datatype, by walking its EFFECTIVE-parent chain (`parentOf` = type-wins-else-baseDefinition).
+     * Clinical iff the chain reaches `InfrastructureRoot` (the act/role/entity root) or a node named
+     * `ClinicalDocument` (which extends `ANY`, not `InfrastructureRoot`, so it is matched by name).
+     *
+     * Walking `parentOf` makes AU specializations inherit their core parent's classification:
+     * `au-ClinicalDocument` → `ClinicalDocument` (clinical), `au-Act` → `Act` → `InfrastructureRoot`
+     * (clinical), `addr` → `AD` (datatype). Cycle-safe. For core SDs this is equivalent to the
+     * previous name-or-`baseDefinition`-chain rule, so core routing is unchanged.
+     *
+     * @param array<string, string|null> $parentOf
+     * @param array<string, string>      $names
+     */
+    private function cdaIsClinicalClass(string $url, array $parentOf, array $names): bool
     {
         $seen    = [];
         $current = $url;
         while ($current !== '' && !isset($seen[$current])) {
-            if ($current === $targetUrl) {
+            if (($names[$current] ?? '') === 'ClinicalDocument') {
+                return true;
+            }
+            if ($current === self::CDA_INFRASTRUCTURE_ROOT_URL) {
                 return true;
             }
             $seen[$current] = true;
-            $current        = $baseOf[$current] ?? '';
+            $current        = $parentOf[$current] ?? '';
         }
 
         return false;

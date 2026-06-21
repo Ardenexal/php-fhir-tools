@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\DataType;
 
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\NullFlavor;
 use Ardenexal\FHIRTools\Component\CdaModels\Enum\PostalAddressUse;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
@@ -43,6 +44,10 @@ class AD extends ANY
             phpType: '\Ardenexal\FHIRTools\Component\CdaModels\DataType\IVLTS',
         )]
         public array $useablePeriod = [],
+        ?NullFlavor $nullFlavor = null,
     ) {
+        parent::__construct(
+            nullFlavor: $nullFlavor,
+        );
     }
 }

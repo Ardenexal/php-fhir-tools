@@ -27,14 +27,37 @@ class ClassNameResolver
     }
 
     /**
+     * Canonical URL infix for the AU CDA schema's own (non-core) definitions — both
+     * StructureDefinitions (`.../cda/StructureDefinition/au-*`) and ValueSets
+     * (`.../cda/ValueSet/dh-*`). Matching the shared `/cda/` segment covers both so AU classes AND
+     * AU enums are `Au`-prefixed and never case-collide with their core counterparts (PHP class
+     * names are case-insensitive, e.g. AU `Entitynameuse` vs core `EntityNameUse`).
+     */
+    private const string AU_CDA_NAMESPACE = 'ns.electronichealth.net.au/cda/';
+
+    /**
      * Class name for a logical-model (CDA) type: the standard resolved name, with a `Type` suffix
      * appended when it would otherwise be a PHP reserved word (e.g. `INT` → `INTType`). Kept
      * separate from {@see resolveClassName()} so FHIR primitive naming (e.g. `StringPrimitive`)
      * is unaffected.
+     *
+     * AU CDA additions are named from the URL id, not the `name` field, and prefixed `Au`: their
+     * `name` fields collide with core CDA classes (e.g. `au-Address` is named `AD`, `au-Telecom`
+     * is named `TEL`) and several are typos or non-identifiers (`addr` → name `addrress`,
+     * `PolicyOrAccount` → name `Policy or Account`). Deriving from the id and prefixing `Au`
+     * yields a stable, collision-free name (`au-ClinicalDocument` → `AuClinicalDocument`,
+     * `au-Address` → `AuAddress`, `addr` → `AuAddr`); a leading `au-` in the id is folded into the
+     * prefix rather than doubled.
      */
     public static function logicalModelClassName(string $definitionUrl, string $definitionName): string
     {
-        $name = self::resolveClassName($definitionUrl, $definitionName);
+        if (str_contains($definitionUrl, self::AU_CDA_NAMESPACE)) {
+            $id   = substr($definitionUrl, (int) strrpos($definitionUrl, '/') + 1);
+            $id   = (string) preg_replace('/^au-/i', '', $id);
+            $name = 'Au' . u($id)->pascal()->toString();
+        } else {
+            $name = self::resolveClassName($definitionUrl, $definitionName);
+        }
 
         if (in_array(strtolower($name), self::RESERVED_CLASS_NAMES, true)) {
             $name .= 'Type';

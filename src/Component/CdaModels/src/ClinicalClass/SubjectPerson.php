@@ -6,11 +6,13 @@ namespace Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass;
 
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\BL;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\CE;
+use Ardenexal\FHIRTools\Component\CdaModels\DataType\CS;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\ED;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\II;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\INTPOS;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\PN;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\TS;
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\NullFlavor;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 
@@ -25,6 +27,8 @@ class SubjectPerson extends InfrastructureRoot
     /**
      * @param list<II> $sdtcId
      * @param list<PN> $name
+     * @param list<CS> $realmCode
+     * @param list<II> $templateId
      */
     public function __construct(
         #[FhirProperty(fhirType: 'code', propertyKind: 'scalar', isArray: false, isRequired: false, xmlSerializedName: '@classCode')]
@@ -37,6 +41,7 @@ class SubjectPerson extends InfrastructureRoot
             isArray: true,
             isRequired: false,
             phpType: '\Ardenexal\FHIRTools\Component\CdaModels\DataType\II',
+            xmlNamespace: 'urn:hl7-org:sdtc',
         )]
         public array $sdtcId = [],
         #[FhirProperty(
@@ -52,6 +57,7 @@ class SubjectPerson extends InfrastructureRoot
             propertyKind: 'complex',
             isArray: false,
             isRequired: false,
+            xmlNamespace: 'urn:hl7-org:sdtc',
         )]
         public ?ED $sdtcDesc = null,
         #[FhirProperty(
@@ -73,6 +79,7 @@ class SubjectPerson extends InfrastructureRoot
             propertyKind: 'complex',
             isArray: false,
             isRequired: false,
+            xmlNamespace: 'urn:hl7-org:sdtc',
         )]
         public ?BL $sdtcDeceasedInd = null,
         #[FhirProperty(
@@ -80,6 +87,7 @@ class SubjectPerson extends InfrastructureRoot
             propertyKind: 'complex',
             isArray: false,
             isRequired: false,
+            xmlNamespace: 'urn:hl7-org:sdtc',
         )]
         public ?TS $sdtcDeceasedTime = null,
         #[FhirProperty(
@@ -87,6 +95,7 @@ class SubjectPerson extends InfrastructureRoot
             propertyKind: 'complex',
             isArray: false,
             isRequired: false,
+            xmlNamespace: 'urn:hl7-org:sdtc',
         )]
         public ?BL $sdtcMultipleBirthInd = null,
         #[FhirProperty(
@@ -94,8 +103,19 @@ class SubjectPerson extends InfrastructureRoot
             propertyKind: 'complex',
             isArray: false,
             isRequired: false,
+            xmlNamespace: 'urn:hl7-org:sdtc',
         )]
         public ?INTPOS $sdtcMultipleBirthOrderNumber = null,
+        array $realmCode = [],
+        ?II $typeId = null,
+        array $templateId = [],
+        ?NullFlavor $nullFlavor = null,
     ) {
+        parent::__construct(
+            realmCode: $realmCode,
+            typeId: $typeId,
+            templateId: $templateId,
+            nullFlavor: $nullFlavor,
+        );
     }
 }

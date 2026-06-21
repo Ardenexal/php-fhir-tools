@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\CdaModels\DataType\IVLINT;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\IVLTS;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\ST;
 use Ardenexal\FHIRTools\Component\CdaModels\Enum\ActClassObservation;
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\NullFlavor;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 
@@ -42,6 +43,8 @@ class Observation extends InfrastructureRoot
      * @param list<Precondition2>      $sdtcPrecondition2
      * @param list<InfrastructureRoot> $referenceRange
      * @param list<InFulfillmentOf1>   $sdtcInFulfillmentOf1
+     * @param list<CS>                 $realmCode
+     * @param list<II>                 $templateId
      */
     public function __construct(
         #[FhirProperty(fhirType: 'code', propertyKind: 'enum', isArray: false, isRequired: true, xmlSerializedName: '@classCode')]
@@ -64,6 +67,7 @@ class Observation extends InfrastructureRoot
             isArray: true,
             isRequired: false,
             phpType: '\Ardenexal\FHIRTools\Component\CdaModels\DataType\CD',
+            xmlNamespace: 'urn:hl7-org:sdtc',
         )]
         public array $sdtcCategory = [],
         #[FhirProperty(
@@ -231,6 +235,7 @@ class Observation extends InfrastructureRoot
             isArray: true,
             isRequired: false,
             phpType: '\Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\Precondition2',
+            xmlNamespace: 'urn:hl7-org:sdtc',
         )]
         public array $sdtcPrecondition2 = [],
         #[FhirProperty(
@@ -247,8 +252,19 @@ class Observation extends InfrastructureRoot
             isArray: true,
             isRequired: false,
             phpType: '\Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\InFulfillmentOf1',
+            xmlNamespace: 'urn:hl7-org:sdtc',
         )]
         public array $sdtcInFulfillmentOf1 = [],
+        array $realmCode = [],
+        ?II $typeId = null,
+        array $templateId = [],
+        ?NullFlavor $nullFlavor = null,
     ) {
+        parent::__construct(
+            realmCode: $realmCode,
+            typeId: $typeId,
+            templateId: $templateId,
+            nullFlavor: $nullFlavor,
+        );
     }
 }

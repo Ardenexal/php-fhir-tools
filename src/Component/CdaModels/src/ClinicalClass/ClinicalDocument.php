@@ -12,6 +12,7 @@ use Ardenexal\FHIRTools\Component\CdaModels\DataType\II;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\INTType;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\ST;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\TS;
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\NullFlavor;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 
@@ -79,6 +80,7 @@ class ClinicalDocument extends ANY
             isArray: true,
             isRequired: false,
             phpType: '\Ardenexal\FHIRTools\Component\CdaModels\DataType\CD',
+            xmlNamespace: 'urn:hl7-org:sdtc',
         )]
         public array $sdtcCategory = [],
         #[FhirProperty(
@@ -100,6 +102,7 @@ class ClinicalDocument extends ANY
             propertyKind: 'complex',
             isArray: false,
             isRequired: false,
+            xmlNamespace: 'urn:hl7-org:sdtc',
         )]
         public ?CS $sdtcStatusCode = null,
         #[FhirProperty(
@@ -259,6 +262,10 @@ class ClinicalDocument extends ANY
             isRequired: true,
         )]
         public ?Component $component = null,
+        ?NullFlavor $nullFlavor = null,
     ) {
+        parent::__construct(
+            nullFlavor: $nullFlavor,
+        );
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\DataType;
 
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\NullFlavor;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 
 #[LogicalModel(
@@ -14,7 +15,13 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 )]
 class INTPOS extends INTType
 {
-    public function __construct()
-    {
+    public function __construct(
+        ?int $value = null,
+        ?NullFlavor $nullFlavor = null,
+    ) {
+        parent::__construct(
+            value: $value,
+            nullFlavor: $nullFlavor,
+        );
     }
 }

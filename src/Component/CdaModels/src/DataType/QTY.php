@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\CdaModels\DataType;
 
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\NullFlavor;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 
 #[LogicalModel(
@@ -14,7 +15,10 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 )]
 abstract class QTY extends ANY
 {
-    public function __construct()
+    public function __construct(?NullFlavor $nullFlavor = null)
     {
+        parent::__construct(
+            nullFlavor: $nullFlavor,
+        );
     }
 }

@@ -8,6 +8,7 @@ use Ardenexal\FHIRTools\Component\CdaModels\DataType\CE;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\CS;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\II;
 use Ardenexal\FHIRTools\Component\CdaModels\DataType\ST;
+use Ardenexal\FHIRTools\Component\CdaModels\Enum\NullFlavor;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\LogicalModel;
 
@@ -24,6 +25,8 @@ class Section extends InfrastructureRoot
      * @param list<Informant>          $informant
      * @param list<Entry>              $entry
      * @param list<InfrastructureRoot> $component
+     * @param list<CS>                 $realmCode
+     * @param list<II>                 $templateId
      */
     public function __construct(
         #[FhirProperty(fhirType: 'id', propertyKind: 'scalar', isArray: false, isRequired: false, xmlSerializedName: '@ID')]
@@ -108,6 +111,16 @@ class Section extends InfrastructureRoot
             phpType: '\Ardenexal\FHIRTools\Component\CdaModels\ClinicalClass\InfrastructureRoot',
         )]
         public array $component = [],
+        array $realmCode = [],
+        ?II $typeId = null,
+        array $templateId = [],
+        ?NullFlavor $nullFlavor = null,
     ) {
+        parent::__construct(
+            realmCode: $realmCode,
+            typeId: $typeId,
+            templateId: $templateId,
+            nullFlavor: $nullFlavor,
+        );
     }
 }

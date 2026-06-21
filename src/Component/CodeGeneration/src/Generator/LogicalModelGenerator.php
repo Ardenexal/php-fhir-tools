@@ -57,18 +57,27 @@ final class LogicalModelGenerator
     }
 
     /**
-     * @param array<string, mixed>  $definition              The logical-model StructureDefinition
-     * @param array<string, string> $urlToFqcn               Canonical SD URL → leading-backslash PHP FQCN,
-     *                                                       for every generatable logical model in the package
-     * @param list<string>          $inheritedNames          Property names already declared by an ancestor;
-     *                                                       skipped here so PHP property-type invariance holds
-     *                                                       (CDA subclasses re-narrow inherited element types)
-     * @param list<string>          $inheritedConstraintKeys Invariant keys already carried by an
-     *                                                       ancestor (CDA flattens them into child snapshots);
-     *                                                       skipped to avoid double-emitting inherited invariants
-     * @param array<string, string> $valueSetToEnumFqcn      Canonical ValueSet URL → leading-backslash
-     *                                                       enum FQCN; a `code`/`cs` property whose binding
-     *                                                       resolves here is typed to the enum
+     * @param array<string, mixed>       $definition              The logical-model StructureDefinition
+     * @param array<string, string>      $urlToFqcn               Canonical SD URL → leading-backslash PHP FQCN,
+     *                                                            for every generatable logical model in the package
+     * @param list<string>               $inheritedNames          Property names already declared by an ancestor;
+     *                                                            skipped here so PHP property-type invariance holds
+     *                                                            (CDA subclasses re-narrow inherited element types)
+     * @param list<string>               $inheritedConstraintKeys Invariant keys already carried by an
+     *                                                            ancestor (CDA flattens them into child snapshots);
+     *                                                            skipped to avoid double-emitting inherited invariants
+     * @param array<string, string>      $valueSetToEnumFqcn      Canonical ValueSet URL → leading-backslash
+     *                                                            enum FQCN; a `code`/`cs` property whose binding
+     *                                                            resolves here is typed to the enum
+     * @param list<array<string, mixed>> $inheritedParams         The parent class's full, ordered constructor
+     *                                                            parameter descriptors (from
+     *                                                            {@see collectOwnParameters()} threaded through the
+     *                                                            parent chain). Re-declared here as non-promoted
+     *                                                            params and forwarded via `parent::__construct()`
+     *                                                            so inherited promoted properties are initialised —
+     *                                                            PHP does NOT run a parent constructor automatically,
+     *                                                            so without this every inherited typed property is
+     *                                                            uninitialised and throws on access.
      */
     public function generate(
         array $definition,
@@ -78,6 +87,7 @@ final class LogicalModelGenerator
         array $inheritedNames = [],
         array $inheritedConstraintKeys = [],
         array $valueSetToEnumFqcn = [],
+        array $inheritedParams = [],
     ): ClassType {
         $url  = (string) ($definition['url'] ?? '');
         $name = (string) ($definition['name'] ?? '');
@@ -120,26 +130,23 @@ final class LogicalModelGenerator
 
         $constructor = $class->addMethod('__construct');
 
-        $elements = $definition['snapshot']['element'] ?? [];
-        if (is_array($elements)) {
-            foreach ($elements as $element) {
-                if (!is_array($element)) {
-                    continue;
-                }
-                $path = (string) ($element['path'] ?? '');
-                // Direct children only (exactly one dot). Deeper paths (e.g. typeId.root) are
-                // cardinality/fixed refinements of an already-typed property and are deferred.
-                if (substr_count($path, '.') !== 1) {
-                    continue;
-                }
-                // Skip elements already declared by an ancestor — they are inherited via `extends`.
-                // Re-promoting them would violate PHP property-type invariance where a CDA subclass
-                // re-narrows an inherited element (e.g. CV.translation vs CE.translation).
-                if (in_array(self::propertyNameFromPath($path), $inheritedNames, true)) {
-                    continue;
-                }
-                $this->addProperty($constructor, $element, $urlToFqcn, $valueSetToEnumFqcn);
-            }
+        // Own (non-inherited) properties → promoted constructor params carrying the FhirProperty
+        // attribute. Inherited elements are skipped here (declared on the parent) and instead
+        // forwarded to the parent constructor below.
+        $ownParams = $this->collectOwnParameters($definition, $urlToFqcn, $xmlNamespace, $inheritedNames, $valueSetToEnumFqcn);
+        foreach ($ownParams as $descriptor) {
+            $this->promoteParameter($constructor, $descriptor);
+        }
+
+        // Inherited properties → non-promoted passthrough params + parent::__construct(), so the
+        // parent's promoted properties are actually initialised (PHP runs no parent constructor
+        // implicitly). Named arguments keep the call order-independent. Roots (no resolvable
+        // parent) have no inherited params and emit no call.
+        foreach ($inheritedParams as $descriptor) {
+            $this->declareInheritedParameter($constructor, $descriptor);
+        }
+        if ($inheritedParams !== []) {
+            $constructor->addBody($this->parentConstructorCall($inheritedParams));
         }
 
         return $class;
@@ -191,20 +198,78 @@ final class LogicalModelGenerator
     }
 
     /**
+     * Collect the ordered constructor-parameter descriptors for a class's OWN (non-inherited)
+     * direct-child elements. Pure (no class mutation) so the caller can both promote them onto this
+     * class AND thread the parent chain's descriptors into children for `parent::__construct()`
+     * forwarding. Deep paths (>1 dot) and elements already declared by an ancestor are skipped.
+     *
+     * @param array<string, mixed>  $definition
+     * @param array<string, string> $urlToFqcn
+     * @param list<string>          $inheritedNames
+     * @param array<string, string> $valueSetToEnumFqcn
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function collectOwnParameters(
+        array $definition,
+        array $urlToFqcn,
+        string $classXmlNamespace,
+        array $inheritedNames = [],
+        array $valueSetToEnumFqcn = [],
+    ): array {
+        $params   = [];
+        $elements = $definition['snapshot']['element'] ?? [];
+        if (!is_array($elements)) {
+            return [];
+        }
+        foreach ($elements as $element) {
+            if (!is_array($element)) {
+                continue;
+            }
+            $path = (string) ($element['path'] ?? '');
+            // Direct children only (exactly one dot). Deeper paths (e.g. typeId.root) are
+            // cardinality/fixed refinements of an already-typed property and are deferred.
+            if (substr_count($path, '.') !== 1) {
+                continue;
+            }
+            // Skip elements already declared by an ancestor — they are forwarded to the parent
+            // constructor instead. Re-promoting them would violate PHP property-type invariance
+            // where a CDA subclass re-narrows an inherited element (e.g. CV.translation vs
+            // CE.translation).
+            if (in_array(self::propertyNameFromPath($path), $inheritedNames, true)) {
+                continue;
+            }
+            $descriptor = $this->deriveParameter($element, $urlToFqcn, $classXmlNamespace, $valueSetToEnumFqcn);
+            if ($descriptor !== null) {
+                $params[] = $descriptor;
+            }
+        }
+
+        return $params;
+    }
+
+    /**
+     * Derive a single constructor-parameter descriptor from an element, or null when the element
+     * has no usable property name. The descriptor carries everything needed to either promote the
+     * parameter (own property, with the FhirProperty attribute) or re-declare it as a non-promoted
+     * passthrough (inherited property, no attribute).
+     *
      * @param array<string, mixed>  $element
      * @param array<string, string> $urlToFqcn
-     * @param array<string, string> $valueSetToEnumFqcn ValueSet URL → enum FQCN (leading backslash)
+     * @param array<string, string> $valueSetToEnumFqcn
+     *
+     * @return array<string, mixed>|null
      */
-    private function addProperty(
-        Method $constructor,
+    private function deriveParameter(
         array $element,
         array $urlToFqcn,
+        string $classXmlNamespace,
         array $valueSetToEnumFqcn = [],
-    ): void {
+    ): ?array {
         $path          = (string) ($element['path'] ?? '');
         $parameterName = self::propertyNameFromPath($path);
         if ($parameterName === '') {
-            return;
+            return null;
         }
 
         $max     = (string) ($element['max'] ?? '1');
@@ -245,6 +310,15 @@ final class LogicalModelGenerator
             $itemFqcn     = $isArray ? $enumFqcn : null;
         }
 
+        // Per-element XML namespace, recorded ONLY when it differs from the class namespace (AU CDA
+        // extension elements carry the ADHA extension namespace; core elements just repeat the
+        // class's urn:hl7-org:v3 and must NOT emit a redundant override — that would churn core
+        // output). Recorded for the serializer; wiring is CDA M5.
+        $elementXmlNamespace = $this->readElementXmlNamespace($element);
+        if ($elementXmlNamespace === $classXmlNamespace) {
+            $elementXmlNamespace = null;
+        }
+
         $attributeArgs = [
             'fhirType'     => $typeCode !== '' ? $typeCode : 'string',
             'propertyKind' => $propertyKind,
@@ -257,19 +331,78 @@ final class LogicalModelGenerator
         if ($isArray && $itemFqcn !== null) {
             $attributeArgs['phpType'] = $itemFqcn;
         }
-
-        if ($isArray) {
-            $param = $constructor->addPromotedParameter($parameterName, [])->setType('array');
-            // PHPStan level 8 requires a value type for iterables.
-            $itemType = $itemFqcn ?? $phpType;
-            $constructor->addComment("@param list<{$itemType}> \${$parameterName}");
-        } elseif ($fixedScalar !== null) {
-            $param = $constructor->addPromotedParameter($parameterName, $fixedScalar)->setType($phpType);
-        } else {
-            $param = $constructor->addPromotedParameter($parameterName, null)->setType($phpType)->setNullable(true);
+        if ($elementXmlNamespace !== null) {
+            $attributeArgs['xmlNamespace'] = $elementXmlNamespace;
         }
 
-        $param->addAttribute(FhirProperty::class, $attributeArgs);
+        return [
+            'name'        => $parameterName,
+            'phpType'     => $phpType,
+            'isArray'     => $isArray,
+            'itemType'    => $itemFqcn ?? $phpType,
+            'fixedScalar' => $fixedScalar,
+            'fhirArgs'    => $attributeArgs,
+        ];
+    }
+
+    /**
+     * Add an own property as a promoted constructor parameter carrying its FhirProperty attribute.
+     *
+     * @param array<string, mixed> $descriptor
+     */
+    private function promoteParameter(Method $constructor, array $descriptor): void
+    {
+        $name = (string) $descriptor['name'];
+        if ($descriptor['isArray'] === true) {
+            $param = $constructor->addPromotedParameter($name, [])->setType('array');
+            // PHPStan level 8 requires a value type for iterables.
+            $constructor->addComment("@param list<{$descriptor['itemType']}> \${$name}");
+        } elseif ($descriptor['fixedScalar'] !== null) {
+            $param = $constructor->addPromotedParameter($name, $descriptor['fixedScalar'])->setType((string) $descriptor['phpType']);
+        } else {
+            $param = $constructor->addPromotedParameter($name, null)->setType((string) $descriptor['phpType'])->setNullable(true);
+        }
+
+        /** @var array<string, mixed> $fhirArgs */
+        $fhirArgs = $descriptor['fhirArgs'];
+        $param->addAttribute(FhirProperty::class, $fhirArgs);
+    }
+
+    /**
+     * Re-declare an inherited property as a NON-promoted constructor parameter (no FhirProperty
+     * attribute — that metadata lives on the parent's promoted property). Its value is forwarded to
+     * the parent constructor; see {@see parentConstructorCall()}.
+     *
+     * @param array<string, mixed> $descriptor
+     */
+    private function declareInheritedParameter(Method $constructor, array $descriptor): void
+    {
+        $name      = (string) $descriptor['name'];
+        $parameter = $constructor->addParameter($name);
+        if ($descriptor['isArray'] === true) {
+            $parameter->setType('array')->setDefaultValue([]);
+            $constructor->addComment("@param list<{$descriptor['itemType']}> \${$name}");
+        } elseif ($descriptor['fixedScalar'] !== null) {
+            $parameter->setType((string) $descriptor['phpType'])->setDefaultValue($descriptor['fixedScalar']);
+        } else {
+            $parameter->setType((string) $descriptor['phpType'])->setNullable(true)->setDefaultValue(null);
+        }
+    }
+
+    /**
+     * Build the `parent::__construct(...)` call body forwarding every inherited parameter by name.
+     * Named arguments make the call independent of parameter order.
+     *
+     * @param list<array<string, mixed>> $inheritedParams
+     */
+    private function parentConstructorCall(array $inheritedParams): string
+    {
+        $arguments = array_map(
+            static fn (array $descriptor): string => '    ' . $descriptor['name'] . ': $' . $descriptor['name'] . ',',
+            $inheritedParams,
+        );
+
+        return "parent::__construct(\n" . implode("\n", $arguments) . "\n);";
     }
 
     /**
@@ -294,6 +427,34 @@ final class LogicalModelGenerator
         $valueSet = explode('|', $valueSet)[0];
 
         return $valueSetToEnumFqcn[$valueSet] ?? null;
+    }
+
+    /**
+     * Read an element's FHIR-tooling xml-namespace extension, or null if absent. AU CDA extension
+     * elements declare the ADHA extension namespace (e.g.
+     * `http://ns.electronichealth.net.au/Ci/Cda/Extensions/3.0`) this way; core CDA elements
+     * inherit the class namespace and carry no per-element override.
+     *
+     * @param array<string, mixed> $element
+     */
+    private function readElementXmlNamespace(array $element): ?string
+    {
+        $extensions = $element['extension'] ?? [];
+        if (!is_array($extensions)) {
+            return null;
+        }
+        foreach ($extensions as $extension) {
+            if (!is_array($extension)) {
+                continue;
+            }
+            if (str_contains((string) ($extension['url'] ?? ''), 'xml-namespace')) {
+                $value = $extension['valueUri'] ?? $extension['valueString'] ?? null;
+
+                return $value !== null ? (string) $value : null;
+            }
+        }
+
+        return null;
     }
 
     /**
