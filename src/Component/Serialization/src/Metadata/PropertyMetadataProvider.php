@@ -146,6 +146,7 @@ class PropertyMetadataProvider implements PropertyMetadataProviderInterface
                         $attr->jsonKey,
                         $attr->phpType,
                         $attr->xmlSerializedName,
+                        $attr->xmlNamespace,
                     );
                 }
             }

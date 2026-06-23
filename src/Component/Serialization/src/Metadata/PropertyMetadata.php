@@ -27,6 +27,9 @@ final class PropertyMetadata
      *                                                              null for primitives, scalars, and choice elements
      * @param string|null                        $xmlSerializedName XmlEncoder key when the property is an XML attribute (e.g. '@id', '@url');
      *                                                              null for normal child-element serialization
+     * @param string|null                        $xmlNamespace      XML namespace URI for this element when it differs from the owning class
+     *                                                              namespace (e.g. 'urn:hl7-org:sdtc' for sdtc-prefixed CDA properties, or the
+     *                                                              ADHA extension namespace for AU CDA elements); null = inherit class namespace
      */
     public function __construct(
         public readonly string $fhirType,
@@ -38,6 +41,7 @@ final class PropertyMetadata
         public readonly ?string $jsonKey,
         public readonly ?string $phpItemClass = null,
         public readonly ?string $xmlSerializedName = null,
+        public readonly ?string $xmlNamespace = null,
     ) {
     }
 }

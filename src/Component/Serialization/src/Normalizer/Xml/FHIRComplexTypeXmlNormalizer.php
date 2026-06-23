@@ -13,6 +13,7 @@ use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
+use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadata;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Common\AbstractFHIRNormalizer;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
@@ -298,7 +299,7 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
      *
      * @return array<string, mixed>
      */
-    private function normalizeForXML(object $object, FHIRSerializationContext $fhirContext, array $context): array
+    protected function normalizeForXML(object $object, FHIRSerializationContext $fhirContext, array $context): array
     {
         $data              = [];
         $metaMap           = $this->getPropertyMetadataMap($object);
@@ -391,6 +392,24 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                 continue;
             }
 
+            // CDA elements in a non-default namespace (sdtc extensions, AU/ADHA extensions): emit
+            // under the element's own namespace, stripping the sdtc prefix from the local name
+            // where present (e.g. sdtcTelecom -> <telecom xmlns="urn:hl7-org:sdtc">). Inert for
+            // standard FHIR, where xmlNamespace is always null.
+            if ($meta !== null && $meta->xmlNamespace !== null) {
+                $localKey        = $this->cdaLocalElementName($propertyName, $meta);
+                $normalizedValue = is_scalar($value)
+                    ? $this->wrapScalarForXml($value)
+                    : ($this->normalizer !== null
+                        ? $this->normalizer->normalize($value, 'xml', $context)
+                        : $this->normalizeBasicValue($value, 'xml', $context));
+                $normalizedValue = $this->applyElementNamespace($normalizedValue, $meta->xmlNamespace);
+                if ($normalizedValue !== null) {
+                    $data[$localKey] = $normalizedValue;
+                }
+                continue;
+            }
+
             // Polymorphic resource: wrap with resource type element name
             if ($meta !== null && $meta->propertyKind === 'resource') {
                 $wrapped = $this->normalizePolymorphicResourcesXml($value, $meta, $context);
@@ -418,6 +437,42 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
         }
 
         return $data;
+    }
+
+    /**
+     * Resolve the local XML element name for a namespaced CDA property. An explicit jsonKey wins;
+     * otherwise an sdtc-prefixed property name is stripped to its bare local name (sdtcTelecom ->
+     * telecom). AU/ADHA extension elements keep their property name.
+     */
+    private function cdaLocalElementName(string $propertyName, PropertyMetadata $meta): string
+    {
+        if ($meta->jsonKey !== null) {
+            return $meta->jsonKey;
+        }
+
+        if (str_starts_with($propertyName, 'sdtc') && strlen($propertyName) > 4) {
+            return lcfirst(substr($propertyName, 4));
+        }
+
+        return $propertyName;
+    }
+
+    /**
+     * Declare an element's XML namespace by injecting an @xmlns key. For a list of elements the
+     * namespace is applied to each item. Callers wrap scalar values with wrapScalarForXml() first,
+     * so the input is always an array (single element or list) on the namespaced path.
+     */
+    private function applyElementNamespace(mixed $normalized, string $namespace): mixed
+    {
+        if (is_array($normalized)) {
+            if (array_is_list($normalized)) {
+                return array_map(fn (mixed $item): mixed => $this->applyElementNamespace($item, $namespace), $normalized);
+            }
+
+            $normalized['@xmlns'] = $namespace;
+        }
+
+        return $normalized;
     }
 
     /**
