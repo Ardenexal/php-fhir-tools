@@ -20,6 +20,15 @@ namespace Ardenexal\FHIRTools\Component\Metadata\Attribute;
  *   'extension'         — Extension array (named 'extension')
  *   'modifierExtension' — ModifierExtension array (named 'modifierExtension')
  *   'choice'            — Polymorphic value[x] / deceased[x] — must set isChoice: true and variants
+ *   'choiceGroup'       — Transparent (wrapper-less) XML choice group (FHIR tooling extension
+ *                         xml-choice-group). The property is an ordered list<ChoiceGroupItem> whose
+ *                         heterogeneous children emit directly under the parent, in document order
+ *                         (e.g. CDA AD: streetAddressLine, city, streetAddressLine). Set
+ *                         isArray: true, phpType: ChoiceGroupItem::class, and variants keyed by
+ *                         child element name (jsonKey = element name, phpType = the item value's
+ *                         FQCN or 'string'). Unlike 'choice', isChoice stays FALSE — every variant
+ *                         maps to the one list property and appends, rather than selecting a single
+ *                         value[x] slot.
  *   'enum'              — Backed enum (CDA coded property bound to a generated enum, e.g. NullFlavor);
  *                         the property type IS the enum and its ->value is the code string
  *
@@ -30,7 +39,9 @@ final class FhirProperty
 {
     /**
      * @param list<array{fhirType: string, propertyKind: string, phpType: string, jsonKey: string}>|null $variants
-     *                                                                                                             Populated only when isChoice is true. Each variant describes one concrete type in the union.
+     *                                                                                                             Per-variant metadata. Populated when isChoice is true (one entry per value[x] type) OR
+     *                                                                                                             when propertyKind is 'choiceGroup' (one entry per allowed child element name, jsonKey =
+     *                                                                                                             element name, phpType = the item value's FQCN or 'string'). Null otherwise.
      */
     public function __construct(
         /** FHIR type code: 'date', 'HumanName', 'BackboneElement', 'choice', etc. */
@@ -43,7 +54,7 @@ final class FhirProperty
         public readonly bool $isRequired = false,
         /** True for choice elements (value[x], deceased[x]). Requires variants to be set. */
         public readonly bool $isChoice = false,
-        /** Per-variant metadata for choice elements; null for non-choice properties. */
+        /** Per-variant metadata for 'choice' (value[x]) and 'choiceGroup' properties; null otherwise. */
         public readonly ?array $variants = null,
         /**
          * JSON/XML key override. Null means use the PHP property name as-is.

@@ -59,7 +59,12 @@ class FHIRLogicalModelXmlNormalizer extends FHIRComplexTypeXmlNormalizer
         $data = $this->normalizeForXML($object, FHIRSerializationContext::fromSymfonyContext($childContext), $childContext);
 
         if ($isRoot && $xmlNamespace !== null) {
-            $data['@xmlns'] = $xmlNamespace;
+            // Declare the root namespace FIRST so XmlEncoder sets it on the root element before it
+            // imports any pre-namespaced DOM children (e.g. an xml-choice-group DOMDocumentFragment
+            // emitted under the '#' key). If @xmlns were appended last, those children would be
+            // imported into a not-yet-namespaced root and libxml would redundantly re-declare
+            // xmlns on each one. Prepending keeps the namespace declared exactly once, on the root.
+            $data = ['@xmlns' => $xmlNamespace] + $data;
         }
 
         return $data;
@@ -79,12 +84,18 @@ class FHIRLogicalModelXmlNormalizer extends FHIRComplexTypeXmlNormalizer
     }
 
     /**
-     * Deserialization of CDA logical models is out of scope for this normalizer (round-trip lands
-     * in a later milestone); never claim denormalization support.
+     * Route #[LogicalModel] types (CDA datatypes and clinical classes) through the inherited
+     * complex-type XML denormalize loop. Enabled in M7 to support XML round-tripping of CDA logical
+     * models, in particular transparent xml-choice-group properties whose document order the
+     * denormalizer recovers from the source DOM element.
      */
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
-        return false;
+        if ($format !== 'xml' || !is_array($data)) {
+            return false;
+        }
+
+        return $this->findLogicalModelAttribute($type) !== null;
     }
 
     /**

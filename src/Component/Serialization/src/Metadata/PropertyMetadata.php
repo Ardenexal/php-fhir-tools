@@ -21,7 +21,7 @@ final class PropertyMetadata
      * @param bool                               $isArray           True when the property holds a list
      * @param bool                               $isRequired        True when cardinality is 1..*
      * @param bool                               $isChoice          True for choice elements (value[x])
-     * @param list<PropertyVariantMetadata>|null $variants          Non-null only when isChoice is true
+     * @param list<PropertyVariantMetadata>|null $variants          Non-null for 'choice' (value[x]) and 'choiceGroup' properties; null otherwise
      * @param string|null                        $jsonKey           Key override; null = use PHP property name
      * @param string|null                        $phpItemClass      FQCN for complex/backbone array item class (e.g. HumanName::class);
      *                                                              null for primitives, scalars, and choice elements

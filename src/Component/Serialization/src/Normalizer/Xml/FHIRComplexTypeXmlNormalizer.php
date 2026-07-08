@@ -8,12 +8,14 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRBackboneElement;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRComplexType;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRExtensionDefinition;
 use Ardenexal\FHIRTools\Component\Metadata\Attribute\FHIRPrimitive;
+use Ardenexal\FHIRTools\Component\Metadata\ChoiceGroupItem;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRComplexExtensionInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Context\FHIRSerializationContext;
 use Ardenexal\FHIRTools\Component\Metadata\FHIRIGTypeRegistry;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRTypeResolverInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractorInterface;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadata;
+use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyVariantMetadata;
 use Ardenexal\FHIRTools\Component\Serialization\Normalizer\Common\AbstractFHIRNormalizer;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
@@ -28,6 +30,16 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
 {
+    /**
+     * Context key under which deserializeFromXml stashes the source document element, so the
+     * denormalizer can recover document order for transparent xml-choice-group properties (the
+     * XmlEncoder-decoded array regroups same-named siblings and loses the interleaving). Each
+     * denormalize() consumes the element for its own object and re-resolves the matching child
+     * element for every complex child it recurses into (arrays paired by document order), so a
+     * choice group nested at any depth still receives its own source element.
+     */
+    public const SOURCE_ELEMENT_CONTEXT_KEY = '__cda_source_element';
+
     private readonly XmlEncoder $xmlEncoder;
 
     public function __construct(
@@ -84,6 +96,16 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
             throw new NotNormalizableValueException('Expected array, got ' . gettype($data));
         }
 
+        // Consume the source DOM element (stashed by deserializeFromXml for the root, or threaded in
+        // by the parent for a nested object) — it lets a transparent xml-choice-group property
+        // recover its document order below. It is unset here so the base context carries no stale
+        // element into children; each complex child instead receives its own re-resolved element.
+        $sourceElement = null;
+        if (isset($context[self::SOURCE_ELEMENT_CONTEXT_KEY]) && $context[self::SOURCE_ELEMENT_CONTEXT_KEY] instanceof \DOMElement) {
+            $sourceElement = $context[self::SOURCE_ELEMENT_CONTEXT_KEY];
+            unset($context[self::SOURCE_ELEMENT_CONTEXT_KEY]);
+        }
+
         $resolvedType = $this->typeResolver->resolveComplexType($data, $context) ?? $type;
 
         if ($resolvedType !== $type && !is_subclass_of($resolvedType, $type)) {
@@ -133,6 +155,14 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                 }
 
                 if (str_starts_with($elementName, '#')) {
+                    // Inverse of the xmlText-as-text-content rule (see normalizeForXML): when an
+                    // element's character data decodes under '#'/'#text' and the target type carries
+                    // a scalar `xmlText` property (ST and its subtypes ED, ADXP, ENXP, …), restore
+                    // it. Other '#' artifacts (e.g. empty text on attribute-only elements) are
+                    // ignored.
+                    if (($elementName === '#' || $elementName === '#text') && is_string($value) && $value !== '') {
+                        self::reflProp($resolvedType, 'xmlText')?->setValue($object, $value);
+                    }
                     continue;
                 }
 
@@ -201,10 +231,20 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                         if (is_array($items) && !array_is_list($items)) {
                             $items = [$items];
                         }
+                        // Pair each decoded item with its source child element (same-named siblings
+                        // decode in document order, so index alignment holds) and thread it down, so
+                        // a choiceGroup nested inside this array item can recover its order.
+                        $sourceChildren    = $sourceElement !== null ? $this->childElementsByLocalName($sourceElement, $elementName) : [];
                         $denormalizedValue = [];
+                        $itemIndex         = 0;
                         foreach ((array) $items as $item) {
                             /** @var class-string $phpItemClass */
-                            $denormalizedValue[] = $this->denormalizer->denormalize($item, $phpItemClass, 'xml', $context);
+                            $itemContext = $context;
+                            if (isset($sourceChildren[$itemIndex])) {
+                                $itemContext[self::SOURCE_ELEMENT_CONTEXT_KEY] = $sourceChildren[$itemIndex];
+                            }
+                            $denormalizedValue[] = $this->denormalizer->denormalize($item, $phpItemClass, 'xml', $itemContext);
+                            ++$itemIndex;
                         }
                     } elseif (is_array($value) && $meta !== null && $meta->propertyKind === 'resource') {
                         $resourceElementName = $this->extractResourceElementName($value);
@@ -221,7 +261,14 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                     } else {
                         $propertyType = $this->getPropertyType($property);
                         if ($propertyType !== null && !$this->isBuiltinType($propertyType)) {
-                            $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, 'xml', $context);
+                            // Thread this child's source element down so a choiceGroup nested inside
+                            // it can recover its document order.
+                            $childContext = $context;
+                            $sourceChild  = $sourceElement !== null ? ($this->childElementsByLocalName($sourceElement, $elementName)[0] ?? null) : null;
+                            if ($sourceChild !== null) {
+                                $childContext[self::SOURCE_ELEMENT_CONTEXT_KEY] = $sourceChild;
+                            }
+                            $denormalizedValue = $this->denormalizer->denormalize($value, $propertyType, 'xml', $childContext);
                         } else {
                             $denormalizedValue = $this->unwrapXmlValue($value, $propertyType);
                             if (is_array($denormalizedValue) && isset($denormalizedValue['@value'])) {
@@ -234,6 +281,23 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
                 }
 
                 $property->setValue($object, $denormalizedValue);
+            }
+
+            // Transparent xml-choice-group: rebuild the ordered list<ChoiceGroupItem> from the
+            // source element's children in document order. The XmlEncoder-decoded $data regrouped
+            // same-named siblings and lost the interleaving, so this read replaces it. The source
+            // element is the root for a top-level object, or the element threaded in by the parent
+            // for a nested one — so this works at any depth.
+            if ($sourceElement !== null) {
+                foreach ($metaMap as $choicePropertyName => $choiceMeta) {
+                    if ($choiceMeta->propertyKind !== 'choiceGroup' || $choiceMeta->variants === null) {
+                        continue;
+                    }
+                    self::reflProp($resolvedType, $choicePropertyName)?->setValue(
+                        $object,
+                        $this->denormalizeChoiceGroup($sourceElement, $choiceMeta->variants, $context),
+                    );
+                }
             }
 
             if (!$object instanceof FHIRComplexExtensionInterface
@@ -326,6 +390,30 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
 
             $meta   = $metaMap[$propertyName] ?? null;
             $xmlKey = $meta !== null ? ($meta->jsonKey ?? $propertyName) : $propertyName;
+
+            // CDA text-carrying types (ST and its subtypes ED, ADXP, ENXP, …) hold the element's
+            // character data in a scalar property named `xmlText`. It must serialize as the
+            // element's text content, NOT as a <xmlText value="…"/> child. Keyed on the convention
+            // name (no standard FHIR primitive uses `xmlText` — they use `value`), and only when it
+            // is not itself an xmlAttr.
+            if ($propertyName === 'xmlText' && is_scalar($value) && ($meta === null || $meta->xmlSerializedName === null)) {
+                $data['#'] = is_bool($value) ? ($value ? 'true' : 'false') : (string) $value;
+                continue;
+            }
+
+            // Transparent xml-choice-group (FHIR tooling extension xml-choice-group): the property
+            // is an ordered list<ChoiceGroupItem> whose heterogeneous children must serialize in
+            // true document order, directly under the parent with no wrapper element (e.g. AD:
+            // streetAddressLine, city, streetAddressLine). Symfony's XmlEncoder regroups keyed
+            // siblings by kind and CDATA-escapes raw strings, so the children are built as a
+            // DOMDocumentFragment and injected under the '#' key — XmlEncoder imports a DOMNode
+            // verbatim (Encoder/XmlEncoder.php::selectNodeType), preserving order and bypassing
+            // escaping, and '#' appends the fragment's children directly to the parent. Root @xmlns
+            // and @attributes from M5 are sibling array keys and coexist.
+            if ($meta !== null && $meta->propertyKind === 'choiceGroup' && is_array($value)) {
+                $data['#'] = $this->buildChoiceGroupFragment($value, $context);
+                continue;
+            }
 
             $isChoice = ($meta !== null && $meta->isChoice && !empty($meta->variants))
                         || ($meta === null && $this->isChoiceElement($propertyName));
@@ -473,6 +561,146 @@ class FHIRComplexTypeXmlNormalizer extends AbstractFHIRNormalizer
         }
 
         return $normalized;
+    }
+
+    /**
+     * Build the ordered children of a transparent xml-choice-group as a DOMDocumentFragment, to be
+     * injected under the '#' key so XmlEncoder emits them verbatim and in document order. Each
+     * ChoiceGroupItem becomes <{elementName}>{normalized value}</{elementName}>: a string value is
+     * the element's text content; an object value is normalized through the serializer and built
+     * into the element via buildDomFromArray (attributes + text content + any child elements),
+     * interleaved with the other items in list order.
+     *
+     * Children are created WITHOUT an explicit namespace so that, once XmlEncoder imports the
+     * fragment, they inherit the in-scope default namespace (e.g. urn:hl7-org:v3 declared on the
+     * CDA root) — matching published CDA. Creating them with createElementNS() instead makes libxml
+     * redundantly re-declare xmlns on every child once the element is nested (the nested parent does
+     * not re-declare the namespace), breaking byte-level round-trips.
+     *
+     * @param array<int, mixed>    $items   The choiceGroup property value (a list of ChoiceGroupItem)
+     * @param array<string, mixed> $context Serialization context for normalizing object values
+     */
+    private function buildChoiceGroupFragment(array $items, array $context): \DOMDocumentFragment
+    {
+        $document = new \DOMDocument();
+        $fragment = $document->createDocumentFragment();
+
+        foreach ($items as $item) {
+            if (!$item instanceof ChoiceGroupItem) {
+                continue;
+            }
+
+            $element = $document->createElement($item->elementName);
+            $value   = $item->value;
+
+            if (is_string($value)) {
+                if ($value !== '') {
+                    $element->appendChild($document->createTextNode($value));
+                }
+            } else {
+                $normalized = $this->normalizer !== null
+                    ? $this->normalizer->normalize($value, 'xml', $context)
+                    : $this->normalizeBasicValue($value, 'xml', $context);
+
+                if (is_array($normalized)) {
+                    $this->buildDomFromArray($document, $element, $normalized);
+                } elseif (is_scalar($normalized)) {
+                    $element->appendChild($document->createTextNode((string) $normalized));
+                }
+            }
+
+            $fragment->appendChild($element);
+        }
+
+        return $fragment;
+    }
+
+    /**
+     * Rebuild a transparent xml-choice-group property from the parent's source DOM element: walk its
+     * child elements in document order and, for each whose local name matches a variant, append a
+     * ChoiceGroupItem with the value denormalized to that variant's phpType. All element names map
+     * to the one list property and append (no key-based dispatch) — this is the ordered read the
+     * XmlEncoder-decoded array cannot provide.
+     *
+     * @param list<PropertyVariantMetadata> $variants
+     * @param array<string, mixed>          $context
+     *
+     * @return list<ChoiceGroupItem>
+     */
+    private function denormalizeChoiceGroup(\DOMElement $element, array $variants, array $context): array
+    {
+        $variantByName = [];
+        foreach ($variants as $variant) {
+            $variantByName[$variant->jsonKey] = $variant;
+        }
+
+        $items = [];
+        foreach ($element->childNodes as $child) {
+            if (!$child instanceof \DOMElement) {
+                continue;
+            }
+
+            $localName = $child->localName;
+            $variant   = $localName !== null ? ($variantByName[$localName] ?? null) : null;
+            if ($localName === null || $variant === null) {
+                continue;
+            }
+
+            $items[] = new ChoiceGroupItem($localName, $this->denormalizeChoiceGroupValue($child, $variant, $context));
+        }
+
+        return $items;
+    }
+
+    /**
+     * Denormalize a single choice-group child element to its variant value: a builtin variant
+     * yields the element's text content; a class variant decodes the element and denormalizes it to
+     * the variant phpType (e.g. ADXP), reusing the standard XML denormalization — including the
+     * xmlText and @attribute inverses.
+     *
+     * @param array<string, mixed> $context
+     */
+    private function denormalizeChoiceGroupValue(\DOMElement $child, PropertyVariantMetadata $variant, array $context): object|string
+    {
+        if ($variant->isBuiltin) {
+            return $child->textContent;
+        }
+
+        $xml     = $child->ownerDocument?->saveXML($child);
+        $decoded = is_string($xml) ? $this->xmlEncoder->decode($xml, 'xml') : null;
+        if (!is_array($decoded)) {
+            return $child->textContent;
+        }
+
+        /** @var class-string $phpType */
+        $phpType = $variant->phpType;
+        if ($this->denormalizer !== null) {
+            $value = $this->denormalizer->denormalize($decoded, $phpType, 'xml', $context);
+            if (is_object($value)) {
+                return $value;
+            }
+        }
+
+        return $child->textContent;
+    }
+
+    /**
+     * Direct child elements of $parent with the given local name, in document order. Used to
+     * re-resolve the source DOM element for each complex child during denormalization, so the
+     * choice-group document-order read keeps working at any nesting depth.
+     *
+     * @return list<\DOMElement>
+     */
+    private function childElementsByLocalName(\DOMElement $parent, string $localName): array
+    {
+        $matches = [];
+        foreach ($parent->childNodes as $child) {
+            if ($child instanceof \DOMElement && $child->localName === $localName) {
+                $matches[] = $child;
+            }
+        }
+
+        return $matches;
     }
 
     /**

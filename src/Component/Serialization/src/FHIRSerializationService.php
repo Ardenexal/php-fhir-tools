@@ -216,6 +216,16 @@ class FHIRSerializationService
             // "2002") are not cast to float/int, which would lose precision on round-trip.
             $xmlContext[XmlEncoder::TYPE_CAST_ATTRIBUTES] = false;
 
+            // Stash the source document element so the denormalizer can recover document order for
+            // transparent xml-choice-group properties — Symfony's XmlEncoder decode regroups
+            // same-named siblings and loses the interleaving (CDA M7). LIBXML_NONET disables network
+            // access; DOCTYPE entities are not expanded. The denormalizer threads the element down to
+            // each complex child, so a choice group nested at any depth recovers its order.
+            $sourceDocument = new \DOMDocument();
+            if (@$sourceDocument->loadXML($xmlData, \LIBXML_NONET) && $sourceDocument->documentElement !== null) {
+                $xmlContext[FHIRComplexTypeXmlNormalizer::SOURCE_ELEMENT_CONTEXT_KEY] = $sourceDocument->documentElement;
+            }
+
             $result = $this->serializer->deserialize($xmlData, $targetClass, 'xml', $xmlContext);
 
             if (!is_object($result)) {

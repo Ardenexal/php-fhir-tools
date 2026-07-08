@@ -122,8 +122,12 @@ class PropertyMetadataProvider implements PropertyMetadataProviderInterface
                     /** @var FhirProperty $attr */
                     $attr = $attributes[0]->newInstance();
 
+                    // Build variants for value[x] choices (isChoice) AND for transparent
+                    // xml-choice-group properties (propertyKind 'choiceGroup'), which reuse the
+                    // same per-variant shape keyed by child element name. value[x] semantics are
+                    // unchanged; choiceGroup keeps isChoice false (see FhirProperty propertyKind doc).
                     $variants = null;
-                    if ($attr->isChoice && $attr->variants !== null) {
+                    if ($attr->variants !== null && ($attr->isChoice || $attr->propertyKind === 'choiceGroup')) {
                         $variants = array_map(
                             static fn (array $v): PropertyVariantMetadata => PropertyVariantMetadata::fromArray(
                                 $v['fhirType'],
