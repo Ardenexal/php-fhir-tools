@@ -14,6 +14,7 @@
 * [Generating Base FHIR Models](code-generation/base-models.md)
 * [Generating Implementation Guides](code-generation/implementation-guides.md)
 * [Generated Output Structure](code-generation/output-structure.md)
+* [Generating CDA Logical Models](code-generation/cda.md)
 
 ## Models
 

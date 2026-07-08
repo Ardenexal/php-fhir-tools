@@ -103,12 +103,19 @@ class FHIRValueSetGenerator implements GeneratorInterface
      * @param array<string,mixed>     $valueSet
      * @param string                  $version
      * @param BuilderContextInterface $builderContext
+     * @param string|null             $classNameOverride When set, used verbatim as the enum class
+     *                                                   name instead of deriving it from the
+     *                                                   ValueSet name. The CDA path passes a
+     *                                                   prefix-stripped name (see
+     *                                                   {@see ClassNameResolver::cdaEnumClassName()})
+     *                                                   so the emitted file name and the
+     *                                                   URL → FQCN binding map agree.
      *
      * @return EnumType
      */
-    public function generateEnum(array $valueSet, string $version, BuilderContextInterface $builderContext): EnumType
+    public function generateEnum(array $valueSet, string $version, BuilderContextInterface $builderContext, ?string $classNameOverride = null): EnumType
     {
-        $className = ClassNameResolver::resolveClassName($valueSet['url'], $valueSet['name']);
+        $className = $classNameOverride ?? ClassNameResolver::resolveClassName($valueSet['url'], $valueSet['name']);
         $enumType  = new EnumType($className, $builderContext->getEnumNamespace($version));
         $enumType->addComment('ValueSet: ' . ($valueSet['title'] ?? $valueSet['name']));
         $enumType->addComment('URL: ' . ($valueSet['url'] ?? 'unknown'));
@@ -163,8 +170,11 @@ class FHIRValueSetGenerator implements GeneratorInterface
                 if (is_numeric($enumName[0])) {
                     $enumName = 'CODE_' . $enumName;
                 }
-                // Skip if already exists
-                if (array_any($enum->getCases(), fn ($case) => $case->getName() === $enumName)) {
+                // Skip if a case with this name OR backing value already exists. PHP backed enums
+                // require unique values; some ValueSets (e.g. the AU dh-entitynameuse) list a single
+                // code under multiple display names, which would otherwise emit two cases sharing a
+                // value.
+                if (array_any($enum->getCases(), fn ($case) => $case->getName() === $enumName || $case->getValue() === $code)) {
                     continue;
                 }
                 $enum->addCase($enumName, $code)
@@ -179,8 +189,23 @@ class FHIRValueSetGenerator implements GeneratorInterface
                 }
                 $display  = $concept['display'] ?? $concept['code'];
                 $enumName = u($display)->upper()->snake()->toString();
-                // Skip if already exists
-                if (array_any($enum->getCases(), fn ($case) => $case->getName() === $enumName)) {
+                // Codes that reduce to an empty or numeric-leading identifier (e.g. the symbolic
+                // CDA ObservationInterpretation codes '<' and '>', which snake() strips to '')
+                // fall back to the slugger, which maps '<','>','=','&' to words. Only the broken
+                // cases change name, so existing FHIR enum case names are unaffected.
+                if ($enumName === '' || is_numeric($enumName[0])) {
+                    $enumName = $this->getEnumName($concept);
+                    if ($enumName !== '' && is_numeric($enumName[0])) {
+                        $enumName = 'CODE_' . $enumName;
+                    }
+                }
+                if ($enumName === '') {
+                    // Still unrepresentable — skip this one concept rather than abort the enum.
+                    continue;
+                }
+                // Skip if a case with this name OR backing value already exists (see note above —
+                // PHP backed enums require unique values).
+                if (array_any($enum->getCases(), fn ($case) => $case->getName() === $enumName || $case->getValue() === $concept['code'])) {
                     continue;
                 }
 

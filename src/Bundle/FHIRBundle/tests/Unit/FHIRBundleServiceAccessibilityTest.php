@@ -120,13 +120,15 @@ class FHIRBundleServiceAccessibilityTest extends TestCase
                 }
             }
 
-            // Verify that FHIRVersionedSerializerPass registers all 8 format-specific normalizer
+            // Verify that FHIRVersionedSerializerPass registers all 10 format-specific normalizer
             // services for the configured FHIR version. Normalizers are injected directly into
             // the Serializer constructor (not tagged), so we call the pass directly and check IDs.
             (new FHIRVersionedSerializerPass())->process($container);
 
             $v                     = strtolower($fhirVersion);
             $expectedNormalizerIds = [
+                "fhir.normalizer.logical_model.json.{$v}",
+                "fhir.normalizer.logical_model.xml.{$v}",
                 "fhir.normalizer.resource.json.{$v}",
                 "fhir.normalizer.resource.xml.{$v}",
                 "fhir.normalizer.complex_type.json.{$v}",
@@ -146,9 +148,9 @@ class FHIRBundleServiceAccessibilityTest extends TestCase
 
             $normalizerRefs = $container->getDefinition("fhir.serializer.{$v}")->getArgument(0);
             self::assertCount(
-                8,
+                10,
                 $normalizerRefs,
-                "fhir.serializer.{$v} should reference exactly 8 normalizers",
+                "fhir.serializer.{$v} should reference exactly 10 normalizers",
             );
         });
     }
