@@ -27,6 +27,7 @@
             <directory>src/Component/Serialization/tests/Unit</directory>
             <directory>src/Component/FHIRPath/tests/Unit</directory>
             <directory>src/Component/Validation/tests/Unit</directory>
+            <directory>src/Component/Sdc/tests/Unit</directory>
         </testsuite>
         <testsuite name="integration">
             <directory>tests/Integration</directory>
@@ -34,12 +35,18 @@
             <directory>src/Component/CodeGeneration/tests/Integration</directory>
             <directory>src/Component/FHIRPath/tests/Integration</directory>
             <directory>src/Component/Validation/tests/Integration</directory>
+            <directory>src/Component/Sdc/tests/Integration</directory>
             <!-- The FHIRPath specification cases run via the dedicated fhirpath-spec suite -->
             <exclude>src/Component/FHIRPath/tests/Integration/FHIRPathSpecificationTest.php</exclude>
             <!-- The Questionnaire conformance cases run via the dedicated questionnaire-spec suite -->
             <exclude>src/Component/Validation/tests/Integration/FHIRQuestionnaireConformanceTest.php</exclude>
             <!-- The brianpos corpus runs via the dedicated brianpos-questionnaire-spec suite -->
             <exclude>src/Component/Validation/tests/Integration/FHIRBrianposConformanceTest.php</exclude>
+            <!-- SDC conformance cases run via the dedicated sdc-extract-spec / sdc-populate-spec suites -->
+            <exclude>src/Component/Sdc/tests/Integration/Extract</exclude>
+            <exclude>src/Component/Sdc/tests/Integration/Populate</exclude>
+            <!-- The oracle harness base is abstract; scanning it directly trips ParaTest's failOnWarning -->
+            <exclude>src/Component/Sdc/tests/Integration/AbstractSdcConformanceTest.php</exclude>
         </testsuite>
         <!-- Per-module integration suites: CI runs these in parallel matrix legs.
              Together they must cover exactly the same tests as the "integration" suite above. -->
@@ -73,6 +80,12 @@
         <testsuite name="brianpos-questionnaire-spec">
             <file>src/Component/Validation/tests/Integration/FHIRBrianposConformanceTest.php</file>
         </testsuite>
+        <testsuite name="sdc-extract-spec">
+            <directory>src/Component/Sdc/tests/Integration/Extract</directory>
+        </testsuite>
+        <testsuite name="sdc-populate-spec">
+            <directory>src/Component/Sdc/tests/Integration/Populate</directory>
+        </testsuite>
     </testsuites>
 
     <source ignoreSuppressionOfDeprecations="true"
@@ -88,6 +101,7 @@
             <directory>src/Component/Serialization/src</directory>
             <directory>src/Component/FHIRPath/src</directory>
             <directory>src/Component/Validation/src</directory>
+            <directory>src/Component/Sdc/src</directory>
         </include>
         <exclude>
             <directory>src/Exception</directory>

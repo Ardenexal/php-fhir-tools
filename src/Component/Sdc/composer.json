@@ -1,0 +1,52 @@
+{
+    "name": "ardenexal/fhir-sdc",
+    "description": "Structured Data Capture (SDC) operations for FHIR: Questionnaire $populate and QuestionnaireResponse $extract",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "FHIR Tools Contributors",
+            "email": "contributors@fhirtools.dev"
+        }
+    ],
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=8.3",
+        "ardenexal/fhir-metadata": "^0.4",
+        "ardenexal/fhir-models": "^0.4",
+        "ardenexal/fhir-path": "^0.4",
+        "ardenexal/fhir-serialization": "^0.4",
+        "ardenexal/fhir-validation": "^0.4",
+        "symfony/property-access": "^6.4|^7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ardenexal\\FHIRTools\\Component\\Sdc\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ardenexal\\FHIRTools\\Component\\Sdc\\Tests\\": "tests/"
+        }
+    },
+    "keywords": [
+        "fhir",
+        "healthcare",
+        "hl7",
+        "sdc",
+        "questionnaire",
+        "populate",
+        "extract"
+    ],
+    "homepage": "https://github.com/ardenexal/fhir-tools",
+    "support": {
+        "issues": "https://github.com/ardenexal/fhir-tools/issues",
+        "source": "https://github.com/ardenexal/fhir-tools"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "0.4.x-dev"
+        }
+    }
+}

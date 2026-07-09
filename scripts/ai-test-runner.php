@@ -66,7 +66,7 @@ $hasTestsuite = (bool) array_filter(
     static fn (string $arg): bool => str_starts_with($arg, '--testsuite'),
 );
 if (!$hasTestsuite) {
-    $userArgs[] = '--testsuite=unit,integration,fhirpath-spec,questionnaire-spec,brianpos-questionnaire-spec';
+    $userArgs[] = '--testsuite=unit,integration,fhirpath-spec,questionnaire-spec,brianpos-questionnaire-spec,sdc-extract-spec,sdc-populate-spec';
 }
 
 if ($aiSerial) {
