@@ -127,26 +127,116 @@ final class DefinitionPathWriter
      */
     private function reflectPropertyClass(object $object, string $property): ?string
     {
-        if (!property_exists($object, $property)) {
-            return null;
-        }
-
-        $type = (new \ReflectionProperty($object, $property))->getType();
-        if ($type instanceof \ReflectionNamedType) {
-            $candidates = [$type];
-        } elseif ($type instanceof \ReflectionUnionType) {
-            $candidates = $type->getTypes();
-        } else {
-            return null;
-        }
-
-        foreach ($candidates as $candidate) {
-            if ($candidate instanceof \ReflectionNamedType && !$candidate->isBuiltin() && class_exists($candidate->getName())) {
+        foreach ($this->namedTypesOf($object, $property) as $candidate) {
+            if (!$candidate->isBuiltin() && class_exists($candidate->getName())) {
                 return $candidate->getName();
             }
         }
 
         return null;
+    }
+
+    /**
+     * The declared PHP types of a property (a single named type, or each member of a union type).
+     *
+     * @return list<\ReflectionNamedType>
+     */
+    private function namedTypesOf(object $object, string $property): array
+    {
+        if (!property_exists($object, $property)) {
+            return [];
+        }
+
+        $type = (new \ReflectionProperty($object, $property))->getType();
+        if ($type instanceof \ReflectionNamedType) {
+            return [$type];
+        }
+        if ($type instanceof \ReflectionUnionType) {
+            return array_values(array_filter(
+                $type->getTypes(),
+                static fn (\ReflectionType $t): bool => $t instanceof \ReflectionNamedType,
+            ));
+        }
+
+        return [];
+    }
+
+    /**
+     * Coerce a raw scalar (a calculated `definitionExtractValue` result) into the primitive wrapper its
+     * target property declares, so a computed `'http://…'` lands in a `?UriPrimitive` etc. Values that
+     * are already objects, or scalars the declared type accepts directly (e.g. `StringPrimitive|string`),
+     * pass through untouched — so pre-wrapped answers are never disturbed.
+     */
+    private function coerceScalar(mixed $value, string $targetClass): mixed
+    {
+        if (!is_scalar($value)) {
+            return $value;
+        }
+
+        if (!class_exists($targetClass) || !$this->constructorAcceptsValue($targetClass)) {
+            return $value;
+        }
+
+        return new $targetClass(value: $value);
+    }
+
+    /**
+     * Given a property's declared types, resolve the primitive class to wrap a raw scalar into, or null
+     * when the declaration already accepts the scalar directly (a builtin match) or offers no wrapper.
+     */
+    private function primitiveWrapperFor(object $current, string $property, mixed $value): ?string
+    {
+        if (!is_scalar($value)) {
+            return null;
+        }
+
+        $named = $this->namedTypesOf($current, $property);
+
+        foreach ($named as $type) {
+            if ($type->isBuiltin() && $this->scalarMatchesBuiltin($value, $type->getName())) {
+                return null; // declared type accepts the raw scalar as-is
+            }
+        }
+
+        foreach ($named as $type) {
+            $name = $type->getName();
+            if (!$type->isBuiltin() && class_exists($name) && $this->constructorAcceptsValue($name)) {
+                return $name;
+            }
+        }
+
+        return null;
+    }
+
+    private function scalarMatchesBuiltin(mixed $value, string $type): bool
+    {
+        return match ($type) {
+            'string' => is_string($value),
+            'int'    => is_int($value),
+            'float'  => is_float($value) || is_int($value),
+            'bool'   => is_bool($value),
+            'mixed'  => true,
+            default  => false,
+        };
+    }
+
+    /**
+     * @param class-string $class
+     */
+    private function constructorAcceptsValue(string $class): bool
+    {
+        $constructor = (new \ReflectionClass($class))->getConstructor();
+        if ($constructor === null) {
+            return false;
+        }
+
+        foreach ($constructor->getParameters() as $parameter) {
+            if ($parameter->getName() === 'value') {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function setLeaf(object $current, string $property, mixed $value): void
@@ -164,13 +254,14 @@ final class DefinitionPathWriter
 
         if ($meta->isArray) {
             $list               = $this->readArray($current, $property);
-            $list[]             = $value;
+            $list[]             = $meta->phpItemClass !== null ? $this->coerceScalar($value, $meta->phpItemClass) : $value;
             $current->$property = $list;
 
             return;
         }
 
-        $current->$property = $value;
+        $wrapper            = $this->primitiveWrapperFor($current, $property, $value);
+        $current->$property = $wrapper !== null ? $this->coerceScalar($value, $wrapper) : $value;
     }
 
     /**

@@ -65,10 +65,12 @@ use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvide
  * FHIRPath references the same variable writes it into a cross-resource `reference` — so two extracted
  * resources point at each other via matching `urn:uuid:`.
  *
- * Out of scope here (later M02 / M03 / M04): `PUT` directives (all entries are `POST`), the full
- * `fhirType`→primitive-class map for strictly-typed calculated leaves (only string-valued
- * `definitionExtractValue` writes are supported), template-based extraction, provenance, and R4B/R5
- * parity. Definition extraction is R4-only.
+ * A `definitionExtractValue` evaluates a FHIRPath expression and writes the result to its `definition`
+ * path; a raw scalar result is coerced by {@see DefinitionPathWriter} into the target property's
+ * declared primitive wrapper, and a malformed expression surfaces a diagnostic issue.
+ *
+ * Out of scope here (later M02 / M03 / M04): `PUT` directives (all entries are `POST`), template-based
+ * extraction, provenance, and R4B/R5 parity. Definition extraction is R4-only.
  */
 final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInterface
 {
@@ -522,8 +524,16 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
                 return null;
             }
             $expression = $this->stringifyPrimitive($this->extensionReader->readValue($fullUrl));
+            if ($expression === null) {
+                return null;
+            }
 
-            return $expression === null ? null : $this->stringifyPrimitive($this->evaluateToScalar($expression, $evalContext));
+            try {
+                return $this->stringifyPrimitive($this->evaluateToScalar($expression, $evalContext));
+            } catch (\Throwable) {
+                // A malformed fullUrl expression falls back to a freshly-minted urn:uuid.
+                return null;
+            }
         }
 
         return null;
@@ -531,10 +541,9 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
 
     /**
      * Apply every `definitionExtractValue` on a source item: evaluate its FHIRPath `expression` and
-     * write the result to its `definition` path, taken as absolute from the resource root.
-     *
-     * Only string-valued results are supported here (sufficient for `reference` cross-links); typed
-     * primitive coercion for other calculated leaves is deferred (see class docblock).
+     * write the result to its `definition` path, taken as absolute from the resource root. A raw scalar
+     * result is coerced by {@see DefinitionPathWriter} into the target property's primitive wrapper
+     * (e.g. a computed uri into a `?UriPrimitive`); a failed expression surfaces a diagnostic issue.
      *
      * @param list<OperationOutcomeIssue> $issues accumulated by reference
      */
@@ -572,15 +581,28 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
                 continue;
             }
 
-            $value = $this->evaluateToScalar($expression, $evalContext);
-            if (!is_string($value)) {
-                // Only string-valued calculated writes are supported in M02 (e.g. references).
+            try {
+                $value = $this->evaluateToScalar($expression, $evalContext);
+            } catch (\Throwable $e) {
+                $issues[] = $this->issue(
+                    IssueType::processingfailure,
+                    \sprintf('definitionExtractValue expression "%s" failed to evaluate: %s', $expression, $e->getMessage()),
+                );
+                continue;
+            }
+
+            if ($value === null) {
+                // An empty result set is not an error — nothing to write for this field.
                 continue;
             }
 
             try {
+                // The writer coerces a raw string scalar into the target property's primitive wrapper.
+                // Catch \Throwable (not just \RuntimeException): a calculated value whose type does not
+                // match a strictly-typed leaf (e.g. a computed number for a string-typed primitive) would
+                // otherwise raise a \TypeError and abort the whole extraction — surface it as an issue.
                 $this->writer->writeLeaf($rootResource, $relative, $value);
-            } catch (\RuntimeException $e) {
+            } catch (\Throwable $e) {
                 $issues[] = $this->issue(IssueType::processingfailure, $e->getMessage());
             }
         }
@@ -588,22 +610,21 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
 
     /**
      * Evaluate a FHIRPath expression against the run's context (QR root + allocated-id external
-     * constants) and return its first result item, or null on error / empty result.
+     * constants) and return its first result item, or null when the result collection is empty.
+     *
+     * Propagates evaluation failures so callers can surface a diagnostic issue for a malformed
+     * expression rather than silently dropping the calculated value.
+     *
+     * @throws \Throwable when the expression cannot be parsed or evaluated
      */
     private function evaluateToScalar(string $expression, EvaluationContext $evalContext): mixed
     {
-        try {
-            $result = $this->fhirPath->evaluate(
-                $expression,
-                $evalContext->getRootResource(),
-                $evalContext,
-                FhirVersion::R4->value,
-            );
-        } catch (\Throwable) {
-            return null;
-        }
-
-        return $result->first();
+        return $this->fhirPath->evaluate(
+            $expression,
+            $evalContext->getRootResource(),
+            $evalContext,
+            FhirVersion::R4->value,
+        )->first();
     }
 
     /**

@@ -120,6 +120,24 @@ final class FHIRExtractConformanceTest extends AbstractSdcConformanceTest
     }
 
     /**
+     * `definitionExtractValue` typed coercion: a calculated `Patient.identifier.system` (a FHIRPath
+     * string literal written into a `?UriPrimitive`) merged with an answered `Patient.identifier.value`
+     * into one `identifier`, compared to the frozen forms-lab reference Bundle. Exercises the writer's
+     * scalar→primitive wrapping and hierarchical merge of a calculated field with an answered sibling.
+     */
+    public function testDefinitionExtractValueTypedConformsToReferenceOracle(): void
+    {
+        $expectedPath = self::FIXTURE_DIR . '/definition-extract-value.expected-bundle.json';
+        if (!is_file($expectedPath)) {
+            self::markTestSkipped('No vendored reference oracle for definitionExtractValue typed writes yet.');
+        }
+
+        [$actual, $expected] = $this->extractAndExpected('definition-extract-value');
+
+        $this->assertSdcConformance($expected, $actual);
+    }
+
+    /**
      * The milestone kill criterion, asserted directly on our own output (independent of the oracle's
      * random UUIDs): the two extracted resources reference each other via a single, non-empty
      * `urn:uuid:` — the Patient's `fullUrl` equals the RelatedPerson's `patient.reference`.

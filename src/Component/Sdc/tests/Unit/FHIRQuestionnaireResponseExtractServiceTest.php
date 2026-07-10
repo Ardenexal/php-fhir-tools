@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ardenexal\FHIRTools\Component\Sdc\Tests\Unit;
 
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Expression;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Extension;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
@@ -267,6 +268,55 @@ final class FHIRQuestionnaireResponseExtractServiceTest extends TestCase
         self::assertInstanceOf(OperationOutcomeResource::class, $issues);
         $outcome = $this->decode($issues);
         self::assertSame('warning', $outcome['issue'][0]['severity'] ?? null);
+    }
+
+    public function testMalformedDefinitionExtractValueExpressionReportsIssueWithoutCrashing(): void
+    {
+        $definitionExtractValueUrl = 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-definitionExtractValue';
+
+        $questionnaire = new QuestionnaireResource(
+            item: [
+                new QuestionnaireItem(
+                    extension: [new Extension(
+                        url: 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-definitionExtract',
+                        extension: [new Extension(url: 'definition', value: new UriPrimitive(value: 'http://hl7.org/fhir/StructureDefinition/Patient'))],
+                    )],
+                    linkId: 'patient',
+                    item: [
+                        new QuestionnaireItem(
+                            extension: [new Extension(
+                                url: $definitionExtractValueUrl,
+                                extension: [
+                                    new Extension(url: 'definition', value: new UriPrimitive(value: 'http://hl7.org/fhir/StructureDefinition/Patient#Patient.identifier.system')),
+                                    // Malformed FHIRPath (unbalanced paren) — must surface an issue, not crash.
+                                    new Extension(url: 'expression', value: new Expression(language: 'text/fhirpath', expression: '(1 +')),
+                                ],
+                            )],
+                            linkId: 'mrn',
+                        ),
+                    ],
+                ),
+            ],
+        );
+        $response = new QuestionnaireResponseResource(
+            item: [new QuestionnaireResponseItem(
+                linkId: 'patient',
+                item: [new QuestionnaireResponseItem(linkId: 'mrn')],
+            )],
+        );
+
+        $result = $this->service->extract($response, new ExtractContext(questionnaire: $questionnaire));
+
+        // Run completes and still produces the Patient entry.
+        $bundle = $this->decode($result->getResource());
+        self::assertSame('Patient', $bundle['entry'][0]['resource']['resourceType'] ?? null);
+
+        // The malformed expression is reported as a warning issue.
+        $issues = $result->getIssues();
+        self::assertInstanceOf(OperationOutcomeResource::class, $issues);
+        $outcome = $this->decode($issues);
+        self::assertSame('warning', $outcome['issue'][0]['severity'] ?? null);
+        self::assertStringContainsString('failed to evaluate', (string) ($outcome['issue'][0]['diagnostics'] ?? ''));
     }
 
     /**

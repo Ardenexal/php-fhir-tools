@@ -115,3 +115,22 @@ other via the same `urn:uuid:`. The `FHIRExtractConformanceTest` proves this thr
 comparison, a **direct** equality assertion on our own output (`entry[0].fullUrl === entry[1].resource.patient.reference`,
 independent of the oracle's random UUIDs), and a linkage-mutation guard (breaking the reference makes
 the oracle comparison fail, so `tokenizeUuids` verifies topology, not mere `urn:uuid:` presence).
+
+### Typed `definitionExtractValue` oracle (M02) — VENDORED
+
+| Field | Value |
+|-------|-------|
+| Input Questionnaire | `tests/Fixtures/Extract/definition-extract-value.questionnaire.json` (authored — a `Patient` group; a `mrn` leaf answering `Patient.identifier.value` and carrying a `definitionExtractValue` writing the FHIRPath literal `'http://example.org/mrn'` into `Patient.identifier.system`) |
+| Input QuestionnaireResponse | `tests/Fixtures/Extract/definition-extract-value.response.json` (authored) |
+| Expected Bundle | `tests/Fixtures/Extract/definition-extract-value.expected-bundle.json` (frozen forms-lab output) |
+| Engine / Endpoint | fhirpath-lab / forms-lab — `POST https://fhir.forms-lab.com/QuestionnaireResponse/$extract` (no `model` param) |
+| Captured | 2026-07-10 |
+
+**Finding:** a calculated `definitionExtractValue` merges with an answered sibling into **one** element
+instance — forms-lab emits `identifier: [{system, value}]`, not two separate identifiers. The calculated
+`system` (a `?UriPrimitive`) is written from a FHIRPath string literal. This drove the
+`DefinitionPathWriter` scalar→primitive coercion: a raw scalar result is wrapped into the target
+property's declared primitive class (reflection-based, no hardcoded `fhirType` map), while a union type
+that already accepts the scalar (`StringPrimitive|string` for `identifier.value`) is left raw. A
+malformed expression surfaces a warning `OperationOutcome` issue rather than silently vanishing
+(`FHIRQuestionnaireResponseExtractServiceTest::testMalformedDefinitionExtractValueExpressionReportsIssueWithoutCrashing`).
