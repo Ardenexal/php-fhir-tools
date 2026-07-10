@@ -243,6 +243,66 @@ final class FHIRQuestionnaireResponseExtractServiceTest extends TestCase
         self::assertNull($result->getIssues());
     }
 
+    /**
+     * A definition-extracted resource whose logical `id` is written during extraction (here via a hidden
+     * item mapped to `Patient.id`, the SDC-recommended mechanism for retaining an id for update) yields a
+     * `PUT Type/id` request directive rather than the `POST Type` used for id-less creates. The
+     * conformance harness drops `request.url`, so this is the RUNTIME proof of the PUT branch.
+     *
+     * @see https://build.fhir.org/ig/HL7/sdc/en/extraction.html — POST when no id, PUT (to Type/id) when id present.
+     */
+    public function testDefinitionExtractWithLogicalIdProducesPutDirective(): void
+    {
+        $definitionExtractUrl = 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-definitionExtract';
+
+        $questionnaire = new QuestionnaireResource(
+            item: [
+                new QuestionnaireItem(
+                    extension: [new Extension(
+                        url: $definitionExtractUrl,
+                        extension: [new Extension(url: 'definition', value: new UriPrimitive(value: 'http://hl7.org/fhir/StructureDefinition/Patient'))],
+                    )],
+                    linkId: 'patient',
+                    item: [
+                        // Hidden item carrying the existing resource id → the entry becomes an update (PUT).
+                        new QuestionnaireItem(
+                            definition: new UriPrimitive(value: 'http://hl7.org/fhir/StructureDefinition/Patient#Patient.id'),
+                            linkId: 'patient-id',
+                        ),
+                        new QuestionnaireItem(
+                            definition: new UriPrimitive(value: 'http://hl7.org/fhir/StructureDefinition/Patient#Patient.name.family'),
+                            linkId: 'family',
+                        ),
+                    ],
+                ),
+            ],
+        );
+
+        $response = new QuestionnaireResponseResource(
+            item: [new QuestionnaireResponseItem(
+                linkId: 'patient',
+                item: [
+                    new QuestionnaireResponseItem(linkId: 'patient-id', answer: [new QuestionnaireResponseItemAnswer(value: 'existing-123')]),
+                    new QuestionnaireResponseItem(linkId: 'family', answer: [new QuestionnaireResponseItemAnswer(value: 'Chalmers')]),
+                ],
+            )],
+        );
+
+        $result = $this->service->extract($response, new ExtractContext(questionnaire: $questionnaire));
+        $bundle = $this->decode($result->getResource());
+
+        self::assertCount(1, $bundle['entry'] ?? []);
+        $entry = $bundle['entry'][0];
+        self::assertIsArray($entry);
+        self::assertSame('PUT', $entry['request']['method'] ?? null, 'A resource with a logical id must be a PUT (update).');
+        self::assertSame('Patient/existing-123', $entry['request']['url'] ?? null);
+
+        $patient = $entry['resource'];
+        self::assertIsArray($patient);
+        self::assertSame('existing-123', $patient['id'] ?? null);
+        self::assertSame('Chalmers', $patient['name'][0]['family'] ?? null);
+    }
+
     public function testUnresolvableDefinitionCanonicalReportsIssueWithoutCrashing(): void
     {
         $questionnaire = new QuestionnaireResource(

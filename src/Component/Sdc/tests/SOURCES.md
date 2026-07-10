@@ -134,3 +134,32 @@ property's declared primitive class (reflection-based, no hardcoded `fhirType` m
 that already accepts the scalar (`StringPrimitive|string` for `identifier.value`) is left raw. A
 malformed expression surfaces a warning `OperationOutcome` issue rather than silently vanishing
 (`FHIRQuestionnaireResponseExtractServiceTest::testMalformedDefinitionExtractValueExpressionReportsIssueWithoutCrashing`).
+
+### `POST`/`PUT` request directive (M02) — VENDORED
+
+| Field | Value |
+|-------|-------|
+| Input Questionnaire | `tests/Fixtures/Extract/definition-extract-put.questionnaire.json` (authored — a `Patient` group with a hidden `Patient.id` item + a `Patient.name.family` leaf) |
+| Input QuestionnaireResponse | `tests/Fixtures/Extract/definition-extract-put.response.json` (authored — `id = pat-42`, `family = Chalmers`) |
+| Expected Bundle | `tests/Fixtures/Extract/definition-extract-put.expected-bundle.json` (frozen forms-lab output) |
+| Engine / Endpoint | fhirpath-lab / forms-lab — `POST https://fhir.forms-lab.com/QuestionnaireResponse/$extract` (no `model` param) |
+| Captured | 2026-07-10 |
+
+**Finding:** per [extraction.html](https://build.fhir.org/ig/HL7/sdc/en/extraction.html), *"if the resource
+has no id property set the value to POST … otherwise set the value to PUT"* — url is the resource type
+for a create (`Patient`) or `Type/id` for an update (`Patient/123`); the trigger is the presence of a
+logical `id` (set via a hidden item or `definitionExtractValue`), **not** any explicit extension. The
+forms-lab probe **confirmed this end-to-end**: given a hidden `Patient.id = pat-42`, it returned
+`request.method: PUT`, `request.url: Patient/pat-42`, and a fresh `urn:uuid:` `fullUrl` (the spec sets
+`fullUrl` from the expression regardless of create-vs-update). `extract-complex-defn3`, the richest IG
+example, only exercises the POST branch (`fullUrl: %NewPatientId`, no logical id), so this case was
+authored to reach PUT. The harness compares `request.method` (not `url`), so
+`FHIRExtractConformanceTest::testDefinitionExtractPutConformsToReferenceOracle` independently verifies
+the `PUT` directive against the oracle; the exact `url = Patient/pat-42` and `resource.id` (both dropped
+by the ignore-list) are asserted directly in `testDefinitionExtractWithLogicalIdProducesPutDirective`,
+with `testDefinitionExtractWithoutLogicalIdStaysPost` guarding the id-less create → POST branch.
+
+**The deserialized-fixture integration test caught a real bug the programmatic unit test masked:** a
+deserialized answer arrives as a `StringPrimitive`, which cannot assign to the bare `?string`
+`Patient.id` leaf — fixed by `DefinitionPathWriter::unwrapForBuiltinLeaf` (see footgun
+`model-object-initialization`, "bare builtin-scalar leaves reject deserializer-wrapped primitive answers").

@@ -138,6 +138,68 @@ final class FHIRExtractConformanceTest extends AbstractSdcConformanceTest
     }
 
     /**
+     * `POST`/`PUT` request directive, asserted directly on our own output through the real deserializer
+     * (constructor-bypassed inputs — the model-init footgun) rather than a vendored oracle: no corpus
+     * case exercises PUT, and the conformance ignore-list drops `request.url`. A definition-extracted
+     * Patient whose logical `id` is written from a hidden `Patient.id` item must be a `PUT Type/id`
+     * (update), while an id-less extraction stays a `POST Type` (create).
+     *
+     * @see https://build.fhir.org/ig/HL7/sdc/en/extraction.html — id present ⇒ PUT to Type/id, else POST.
+     */
+    /**
+     * `POST`/`PUT` conformance against the frozen forms-lab oracle: the reference engine emits
+     * `request.method: PUT` for a resource carrying a logical `id`, which the harness compares (unlike
+     * `request.url`, which it ignores). Independently corroborates the request-directive switch; the
+     * exact `url = Patient/pat-42` is asserted directly in {@see testDefinitionExtractWithLogicalIdProducesPutDirective}.
+     */
+    public function testDefinitionExtractPutConformsToReferenceOracle(): void
+    {
+        $expectedPath = self::FIXTURE_DIR . '/definition-extract-put.expected-bundle.json';
+        if (!is_file($expectedPath)) {
+            self::markTestSkipped('No vendored reference oracle for the PUT request directive yet.');
+        }
+
+        [$actual, $expected] = $this->extractAndExpected('definition-extract-put');
+
+        $this->assertSdcConformance($expected, $actual);
+    }
+
+    public function testDefinitionExtractWithLogicalIdProducesPutDirective(): void
+    {
+        $actual = $this->extractOnly('definition-extract-put');
+
+        $entries = $actual['entry'];
+        self::assertIsArray($entries);
+        self::assertCount(1, $entries);
+
+        $entry = $entries[0];
+        self::assertIsArray($entry);
+        self::assertIsArray($entry['request']);
+        self::assertSame('PUT', $entry['request']['method'] ?? null, 'A resource carrying a logical id must be an update (PUT).');
+        self::assertSame('Patient/pat-42', $entry['request']['url'] ?? null);
+
+        self::assertIsArray($entry['resource']);
+        self::assertSame('pat-42', $entry['resource']['id'] ?? null);
+        self::assertSame('Chalmers', $entry['resource']['name'][0]['family'] ?? null);
+    }
+
+    /**
+     * The id-less counterpart of the PUT case: a definition-extracted resource with no logical `id`
+     * stays a `POST Type` (create). Guards the false branch of the request-directive switch through the
+     * real deserializer, so a regression that emitted PUT unconditionally would fail here.
+     */
+    public function testDefinitionExtractWithoutLogicalIdStaysPost(): void
+    {
+        $actual = $this->extractOnly('definition-extract-basic');
+
+        $entry = $actual['entry'][0];
+        self::assertIsArray($entry);
+        self::assertIsArray($entry['request']);
+        self::assertSame('POST', $entry['request']['method'] ?? null);
+        self::assertSame('Patient', $entry['request']['url'] ?? null);
+    }
+
+    /**
      * The milestone kill criterion, asserted directly on our own output (independent of the oracle's
      * random UUIDs): the two extracted resources reference each other via a single, non-empty
      * `urn:uuid:` — the Patient's `fullUrl` equals the RelatedPerson's `patient.reference`.
@@ -216,6 +278,32 @@ final class FHIRExtractConformanceTest extends AbstractSdcConformanceTest
             $this->normalizeInstants($this->decode($serializer->serializeToJson($result->getResource()))),
             $this->normalizeInstants($this->decode($this->fixture($case . '.expected-bundle.json'))),
         ];
+    }
+
+    /**
+     * Deserialize a case's Questionnaire + QuestionnaireResponse from JSON fixtures (exercising the real
+     * constructor-bypassed deserializer path), run `$extract`, and return only the decoded actual Bundle.
+     * For direct-assertion tests that have no vendored oracle to compare against.
+     *
+     * @return array<string, mixed>
+     */
+    private function extractOnly(string $case): array
+    {
+        $serializer = FHIRSerializationService::createDefault(FhirVersion::R4);
+
+        $questionnaire = $serializer->deserializeFromJson(
+            $this->fixture($case . '.questionnaire.json'),
+            QuestionnaireResource::class,
+        );
+        $response = $serializer->deserializeFromJson(
+            $this->fixture($case . '.response.json'),
+            QuestionnaireResponseResource::class,
+        );
+
+        $result = (new FHIRQuestionnaireResponseExtractService())
+            ->extract($response, new ExtractContext(questionnaire: $questionnaire));
+
+        return $this->normalizeInstants($this->decode($serializer->serializeToJson($result->getResource())));
     }
 
     /**

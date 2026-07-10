@@ -260,8 +260,46 @@ final class DefinitionPathWriter
             return;
         }
 
+        // A bare builtin-scalar leaf (e.g. `Resource.id` is `?string`, modeled as System.String rather
+        // than a primitive wrapper) cannot hold a `StringPrimitive` answer object from the deserializer;
+        // unwrap it to its scalar first (the inverse of the wrap coercion below).
+        $value = $this->unwrapForBuiltinLeaf($current, $property, $value);
+
         $wrapper            = $this->primitiveWrapperFor($current, $property, $value);
         $current->$property = $wrapper !== null ? $this->coerceScalar($value, $wrapper) : $value;
+    }
+
+    /**
+     * When a leaf's declared type is a bare builtin scalar but the incoming answer is a primitive-wrapper
+     * object (a `StringPrimitive`/`CodePrimitive`/… from the deserializer), unwrap it to its inner scalar
+     * so the assignment type-checks — the inverse of {@see coerceScalar}. Only applies when NO declared
+     * type accepts the wrapper object, so union leaves like `StringPrimitive|string` keep their value
+     * untouched.
+     */
+    private function unwrapForBuiltinLeaf(object $current, string $property, mixed $value): mixed
+    {
+        if (!is_object($value) || !property_exists($value, 'value')) {
+            return $value;
+        }
+
+        $named = $this->namedTypesOf($current, $property);
+
+        foreach ($named as $type) {
+            $name = $type->getName();
+            if (!$type->isBuiltin() && $value instanceof $name) {
+                return $value; // the property accepts the wrapper object as declared — leave it wrapped
+            }
+        }
+
+        // `??` reads an uninitialized typed `value` (deserializer-origin) as absent rather than throwing.
+        $inner = $value->value ?? null;
+        foreach ($named as $type) {
+            if ($type->isBuiltin() && $this->scalarMatchesBuiltin($inner, $type->getName())) {
+                return $inner;
+            }
+        }
+
+        return $value;
     }
 
     /**

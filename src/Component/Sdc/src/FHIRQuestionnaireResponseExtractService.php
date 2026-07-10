@@ -69,8 +69,11 @@ use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvide
  * path; a raw scalar result is coerced by {@see DefinitionPathWriter} into the target property's
  * declared primitive wrapper, and a malformed expression surfaces a diagnostic issue.
  *
- * Out of scope here (later M02 / M03 / M04): `PUT` directives (all entries are `POST`), template-based
- * extraction, provenance, and R4B/R5 parity. Definition extraction is R4-only.
+ * Each entry's `request` is `POST Type` for a resource with no logical `id` and `PUT Type/id` for one
+ * whose `id` was written during extraction (a hidden item or `definitionExtractValue` targeting `.id`).
+ *
+ * Out of scope here (later M03 / M04): template-based extraction, provenance, and R4B/R5 parity.
+ * Definition extraction is R4-only.
  */
 final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInterface
 {
@@ -762,9 +765,16 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
     }
 
     /**
-     * Assemble the extracted resources into a transaction Bundle — one `POST` entry per resource,
-     * with `request.url` = the resource type. Each entry's `fullUrl` is the resource's allocated
-     * `urn:uuid:` (when a `fullUrl` expression resolved one) or a freshly-minted `urn:uuid:` otherwise.
+     * Assemble the extracted resources into a transaction Bundle. Per SDC definition-based extraction,
+     * an entry's `request` directive is derived from whether the resource carries a logical `id`:
+     * no id → `POST` (create) to the resource type (`Patient`); an id → `PUT` (update) to `Type/id`
+     * (`Patient/123`). An id is present when a hidden item or `definitionExtractValue` wrote `Resource.id`.
+     * Each entry's `fullUrl` is the resource's allocated `urn:uuid:` (when a `fullUrl` expression resolved
+     * one) or a freshly-minted `urn:uuid:` otherwise — the spec sets `fullUrl` from the expression
+     * regardless of create-vs-update.
+     *
+     * @see https://build.fhir.org/ig/HL7/sdc/en/extraction.html — "if the resource has no id property
+     *      set the value to POST … otherwise set the value to PUT".
      *
      * @param list<array{resource: AbstractResource, fullUrl: string|null}> $entries
      */
@@ -772,13 +782,20 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
     {
         $bundleEntries = [];
         foreach ($entries as $entry) {
-            $resource        = $entry['resource'];
+            $resource  = $entry['resource'];
+            $type      = $this->resourceTypeOf($resource);
+            $logicalId = $this->logicalIdOf($resource);
+
+            [$method, $url] = $logicalId === null
+                ? [HTTPVerb::post, $type]
+                : [HTTPVerb::put, $type . '/' . $logicalId];
+
             $bundleEntries[] = new BundleEntry(
                 fullUrl: new UriPrimitive(value: $entry['fullUrl'] ?? $this->uuidUrn()),
                 resource: $resource,
                 request: new BundleEntryRequest(
-                    method: new HTTPVerbType(HTTPVerb::post->value),
-                    url: new UriPrimitive(value: $this->resourceTypeOf($resource)),
+                    method: new HTTPVerbType($method->value),
+                    url: new UriPrimitive(value: $url),
                 ),
             );
         }
@@ -787,6 +804,20 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
             type: new BundleTypeType(BundleType::transaction->value),
             entry: $bundleEntries,
         );
+    }
+
+    /**
+     * The extracted resource's logical `id` when one was written during extraction (a hidden item or a
+     * `definitionExtractValue` targeting `.id`), or null when absent/blank — which keeps the entry a
+     * create (`POST`) rather than an update (`PUT`).
+     */
+    private function logicalIdOf(object $resource): ?string
+    {
+        // `??` uses isset() semantics so an uninitialized typed `id` (deserializer-origin) reads as
+        // absent rather than throwing (the model-init footgun); our extracted resources default it to null.
+        $id = property_exists($resource, 'id') ? ($resource->id ?? null) : null;
+
+        return is_string($id) && $id !== '' ? $id : null;
     }
 
     /**
