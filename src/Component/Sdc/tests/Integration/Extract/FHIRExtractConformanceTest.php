@@ -1,0 +1,226 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Sdc\Tests\Integration\Extract;
+
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\QuestionnaireResource;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\QuestionnaireResponseResource;
+use Ardenexal\FHIRTools\Component\Sdc\ExtractContext;
+use Ardenexal\FHIRTools\Component\Sdc\FHIRQuestionnaireResponseExtractService;
+use Ardenexal\FHIRTools\Component\Sdc\Tests\Integration\AbstractSdcConformanceTest;
+use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
+use PHPUnit\Framework\ExpectationFailedException;
+
+/**
+ * Reference-seeded conformance for observation-based `QuestionnaireResponse/$extract` (R4).
+ *
+ * Feeds a vendored input case (Questionnaire + QuestionnaireResponse) through the extract service and
+ * structurally compares the produced transaction Bundle against a **frozen expected Bundle vendored
+ * from an independent SDC reference engine** — via {@see AbstractSdcConformanceTest}, which tolerates
+ * spec-legal divergence (ordering, ids, `urn:uuid:` topology).
+ *
+ * ## Why this may skip
+ *
+ * The expected Bundle must be produced by an independent reference engine — never by this toolkit and
+ * never hand-authored — or it degenerates into a circular snapshot of our own output (see
+ * `tests/SOURCES.md` and the `questionnaire-conformance-seed-truth` discipline). The SDC IG ships no
+ * observation-extract example output, and the M00-proven engine (`sqlonfhir`) is flagged untrustworthy
+ * for seeding. Until a trustworthy engine (HAPI / Firely) is selected and its output frozen at
+ * {@see EXPECTED_BUNDLE}, this test **skips** rather than asserting against a self-made baseline.
+ *
+ * The extraction logic itself is covered deterministically by the unit test
+ * `FHIRQuestionnaireResponseExtractServiceTest`; this test adds independent-oracle conformance on top.
+ */
+final class FHIRExtractConformanceTest extends AbstractSdcConformanceTest
+{
+    /**
+     * Extract-only additions to the shared ignore-list. Kept in this subclass — NOT the shared base —
+     * because `canonicalize()` reads `static::IGNORED_KEYS`, and dropping `url` globally would collapse
+     * distinct `extension.url`s and gut the `$populate` oracle.
+     *
+     *  - `url`: an extract Bundle entry's `request.url` (the POST target). The forms-lab reference engine
+     *    emits only `request.method`; the harness's own contract compares `request.method`, not `url`
+     *    (our output's `url: "Observation"` is verified deterministically in the unit test instead).
+     *    Safe here: the observation-extract output carries no other meaningful `url` element.
+     *
+     * @var list<string>
+     */
+    protected const IGNORED_KEYS = ['id', 'text', 'display', 'authored', 'lastUpdated', 'url'];
+
+    private const string FIXTURE_DIR = __DIR__ . '/../../Fixtures/Extract';
+
+    private const string EXPECTED_BUNDLE = self::FIXTURE_DIR . '/observation-extract-basic.expected-bundle.json';
+
+    public function testObservationExtractBasicConformsToReferenceOracle(): void
+    {
+        if (!is_file(self::EXPECTED_BUNDLE)) {
+            self::markTestSkipped(
+                'No vendored reference oracle for observation-based $extract yet. Freeze an expected '
+                . 'Bundle from an independent SDC reference engine (HAPI/Firely) at '
+                . basename(self::EXPECTED_BUNDLE) . ' and record the engine + version in tests/SOURCES.md. '
+                . 'Do NOT seed it from this toolkit\'s own output (circular).',
+            );
+        }
+
+        $serializer = FHIRSerializationService::createDefault(FhirVersion::R4);
+
+        $questionnaire = $serializer->deserializeFromJson(
+            $this->fixture('observation-extract-basic.questionnaire.json'),
+            QuestionnaireResource::class,
+        );
+        $response = $serializer->deserializeFromJson(
+            $this->fixture('observation-extract-basic.response.json'),
+            QuestionnaireResponseResource::class,
+        );
+
+        $result = (new FHIRQuestionnaireResponseExtractService())
+            ->extract($response, new ExtractContext(questionnaire: $questionnaire));
+
+        $actual   = $this->normalizeInstants($this->decode($serializer->serializeToJson($result->getResource())));
+        $expected = $this->normalizeInstants($this->decode($this->fixture('observation-extract-basic.expected-bundle.json')));
+
+        $this->assertSdcConformance($expected, $actual);
+    }
+
+    /**
+     * Definition-based extraction: a `definitionExtract` Patient group with a `Patient.name` sub-group
+     * and `birthDate`, compared to the frozen forms-lab reference Bundle. Exercises hierarchical
+     * writing (one merged `name` element) and canonical→resource-class resolution.
+     */
+    public function testDefinitionExtractBasicConformsToReferenceOracle(): void
+    {
+        $expectedPath = self::FIXTURE_DIR . '/definition-extract-basic.expected-bundle.json';
+        if (!is_file($expectedPath)) {
+            self::markTestSkipped('No vendored reference oracle for definition-based $extract yet.');
+        }
+
+        [$actual, $expected] = $this->extractAndExpected('definition-extract-basic');
+
+        $this->assertSdcConformance($expected, $actual);
+    }
+
+    /**
+     * Deserialize a case's Questionnaire + QuestionnaireResponse, run `$extract`, and return the
+     * normalised [actual, expected] decoded Bundles for structural comparison.
+     *
+     * @return array{0: array<string, mixed>, 1: array<string, mixed>}
+     */
+    private function extractAndExpected(string $case): array
+    {
+        $serializer = FHIRSerializationService::createDefault(FhirVersion::R4);
+
+        $questionnaire = $serializer->deserializeFromJson(
+            $this->fixture($case . '.questionnaire.json'),
+            QuestionnaireResource::class,
+        );
+        $response = $serializer->deserializeFromJson(
+            $this->fixture($case . '.response.json'),
+            QuestionnaireResponseResource::class,
+        );
+
+        $result = (new FHIRQuestionnaireResponseExtractService())
+            ->extract($response, new ExtractContext(questionnaire: $questionnaire));
+
+        return [
+            $this->normalizeInstants($this->decode($serializer->serializeToJson($result->getResource()))),
+            $this->normalizeInstants($this->decode($this->fixture($case . '.expected-bundle.json'))),
+        ];
+    }
+
+    /**
+     * Normalise a UTC timezone offset (`+00:00` / `-00:00`) to `Z` in `instant`/`dateTime` strings.
+     *
+     * forms-lab serialises `Observation.issued` (an `instant`) with an explicit `+00:00` offset while
+     * this toolkit uses `Z`; both denote the identical instant, so this collapses a spec-legal
+     * serialization divergence before comparison. It does NOT touch the actual instant value — a real
+     * difference (a different time, or a missing `issued`) still fails.
+     *
+     * @return array<string, mixed>
+     */
+    private function normalizeInstants(mixed $value): array
+    {
+        /** @var array<string, mixed> $walked */
+        $walked = $this->walkInstants($value);
+
+        return $walked;
+    }
+
+    private function walkInstants(mixed $value): mixed
+    {
+        if (is_string($value)) {
+            return (string) preg_replace(
+                '/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?)[+-]00:00$/',
+                '$1Z',
+                $value,
+            );
+        }
+
+        if (is_array($value)) {
+            $out = [];
+            foreach ($value as $key => $element) {
+                $out[$key] = $this->walkInstants($element);
+            }
+
+            return $out;
+        }
+
+        return $value;
+    }
+
+    /**
+     * Guards against a vacuous oracle: the ignore-list + instant-normalisation must not have made the
+     * comparison blind to real content. A mutated expected `code` (LOINC 29463-7 → a bogus code) MUST
+     * make {@see assertSdcConformance()} fail against our unchanged actual output.
+     */
+    public function testOracleComparisonDetectsSemanticDifferences(): void
+    {
+        if (!is_file(self::EXPECTED_BUNDLE)) {
+            self::markTestSkipped('No vendored reference oracle yet.');
+        }
+
+        $serializer = FHIRSerializationService::createDefault(FhirVersion::R4);
+
+        $questionnaire = $serializer->deserializeFromJson(
+            $this->fixture('observation-extract-basic.questionnaire.json'),
+            QuestionnaireResource::class,
+        );
+        $response = $serializer->deserializeFromJson(
+            $this->fixture('observation-extract-basic.response.json'),
+            QuestionnaireResponseResource::class,
+        );
+
+        $result = (new FHIRQuestionnaireResponseExtractService())
+            ->extract($response, new ExtractContext(questionnaire: $questionnaire));
+        $actual = $this->normalizeInstants($this->decode($serializer->serializeToJson($result->getResource())));
+
+        $mutated = $this->normalizeInstants($this->decode($this->fixture('observation-extract-basic.expected-bundle.json')));
+        // Corrupt a compared field the ignore-list does NOT drop.
+        $mutated['entry'][0]['resource']['code']['coding'][0]['code'] = 'BOGUS-9999';
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->assertSdcConformance($mutated, $actual);
+    }
+
+    private function fixture(string $name): string
+    {
+        $path = self::FIXTURE_DIR . '/' . $name;
+        $json = file_get_contents($path);
+        self::assertIsString($json, "Missing fixture: {$path}");
+
+        return $json;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function decode(string $json): array
+    {
+        $decoded = json_decode($json, true);
+        self::assertIsArray($decoded);
+
+        /** @var array<string, mixed> $decoded */
+        return $decoded;
+    }
+}

@@ -1,0 +1,589 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Ardenexal\FHIRTools\Component\Sdc;
+
+use Ardenexal\FHIRTools\Component\Metadata\Extension\SafeExtensionReader;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
+use Ardenexal\FHIRTools\Component\Models\R4\Enum\BundleType;
+use Ardenexal\FHIRTools\Component\Models\R4\Enum\HTTPVerb;
+use Ardenexal\FHIRTools\Component\Models\R4\Enum\IssueSeverity;
+use Ardenexal\FHIRTools\Component\Models\R4\Enum\IssueType;
+use Ardenexal\FHIRTools\Component\Models\R4\Enum\ObservationStatus;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\BundleTypeType;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\HTTPVerbType;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\IssueSeverityType;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\IssueTypeType;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\ObservationStatusType;
+use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRInstant;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\InstantPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\TimePrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\Bundle\BundleEntry;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\Bundle\BundleEntryRequest;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\AbstractResource;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\BundleResource;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\ObservationResource;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\OperationOutcome\OperationOutcomeIssue;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\OperationOutcomeResource;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\Questionnaire\QuestionnaireItem;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\QuestionnaireResource;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\QuestionnaireResponse\QuestionnaireResponseItem;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\QuestionnaireResponseResource;
+use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider;
+
+/**
+ * R4 observation- and definition-based `QuestionnaireResponse/$extract`.
+ *
+ * For each response item whose **source Questionnaire item** carries the SDC `observationExtract`
+ * flag and an `item.code`, this builds one `Observation` per answer and assembles them into a
+ * transaction `Bundle` (always a Bundle — even for a single Observation — per the SDC extraction
+ * spec). Each Observation copies its `code` from the Questionnaire item, its `value[x]` from the
+ * answer, and its `subject`/`effectiveDateTime`/`performer` from the response's
+ * `subject`/`authored`/`author`, and links back to the response via `derivedFrom`.
+ *
+ * Definition-based extraction builds an arbitrary resource per `definitionExtract`-flagged item by
+ * matching `Questionnaire.item.definition` canonical paths to typed properties via
+ * {@see DefinitionPathWriter}, honouring item grouping so a group item establishes one intermediate
+ * element that its children populate.
+ *
+ * Extension reads route exclusively through {@see SafeExtensionReader} so that constructor-bypassed
+ * (deserializer-origin) objects with uninitialized typed properties degrade to "absent" rather than
+ * throwing — the model-initialization footgun.
+ *
+ * Out of scope here (later M02 / M03 / M04): `extractAllocateId` cross-resource references,
+ * `definitionExtractValue` (FHIRPath-calculated values), `PUT` directives, template-based extraction,
+ * provenance, and R4B/R5 parity. Definition extraction is currently single-resource and R4-only.
+ */
+final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInterface
+{
+    /**
+     * SDC flag extension marking a Questionnaire item whose answers extract to an Observation.
+     *
+     * @see https://build.fhir.org/ig/HL7/sdc/en/extraction.html#observation-based-extraction
+     */
+    private const string OBSERVATION_EXTRACT_URL = 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract';
+
+    /**
+     * SDC extension marking a Questionnaire item that extracts to an arbitrary resource by
+     * `definition` canonical paths.
+     *
+     * @see https://build.fhir.org/ig/HL7/sdc/en/extraction.html#definition-based-extraction
+     */
+    private const string DEFINITION_EXTRACT_URL = 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-definitionExtract';
+
+    public function __construct(
+        private readonly SafeExtensionReader $extensionReader = new SafeExtensionReader(),
+        private readonly DefinitionPathWriter $writer = new DefinitionPathWriter(new PropertyMetadataProvider()),
+    ) {
+    }
+
+    public function extract(object $questionnaireResponse, ExtractContext $context): ExtractResult
+    {
+        if (!$questionnaireResponse instanceof QuestionnaireResponseResource) {
+            throw new \InvalidArgumentException(\sprintf('%s extracts R4 QuestionnaireResponse only; got %s', self::class, $questionnaireResponse::class));
+        }
+
+        $questionnaire = $context->questionnaire;
+        $itemIndex     = $questionnaire instanceof QuestionnaireResource
+            ? $this->indexQuestionnaireItems($questionnaire->item)
+            : [];
+
+        /** @var list<OperationOutcomeIssue> $issues */
+        $issues = [];
+
+        $observations = [];
+        $this->collectObservations($questionnaireResponse->item, $itemIndex, $questionnaireResponse, $observations);
+
+        $definitionResources = [];
+        $this->collectDefinitionResources($questionnaireResponse->item, $itemIndex, $definitionResources, $issues);
+
+        /** @var list<AbstractResource> $resources */
+        $resources = [...$observations, ...$definitionResources];
+
+        $bundle  = $this->assembleTransactionBundle($resources);
+        $outcome = $this->buildOutcome($resources, $issues);
+
+        return new ExtractResult($bundle, $outcome);
+    }
+
+    /**
+     * Index every Questionnaire item (recursively) by its linkId.
+     *
+     * @param array<int, QuestionnaireItem> $items
+     *
+     * @return array<string, QuestionnaireItem>
+     */
+    private function indexQuestionnaireItems(array $items): array
+    {
+        $index = [];
+        foreach ($items as $item) {
+            $linkId = $this->linkIdString($item->linkId);
+            if ($linkId !== null) {
+                $index[$linkId] = $item;
+            }
+            $index += $this->indexQuestionnaireItems($item->item);
+        }
+
+        return $index;
+    }
+
+    /**
+     * Walk the response item tree, appending an Observation for each answer under an extract-flagged item.
+     *
+     * @param array<int, QuestionnaireResponseItem> $responseItems
+     * @param array<string, QuestionnaireItem>      $itemIndex
+     * @param list<ObservationResource>             $observations  accumulated by reference
+     */
+    private function collectObservations(
+        array $responseItems,
+        array $itemIndex,
+        QuestionnaireResponseResource $response,
+        array &$observations,
+    ): void {
+        foreach ($responseItems as $responseItem) {
+            $linkId       = $this->linkIdString($responseItem->linkId);
+            $sourceItem   = $linkId     !== null ? ($itemIndex[$linkId] ?? null) : null;
+            $extractsHere = $sourceItem !== null
+                && $this->hasObservationExtract($sourceItem)
+                && $sourceItem->code !== [];
+
+            if ($extractsHere) {
+                // $sourceItem is non-null here — implied by $extractsHere.
+                $code = new CodeableConcept(coding: $sourceItem->code);
+                foreach ($responseItem->answer as $answer) {
+                    $observations[] = $this->buildObservation($code, $answer->value, $response);
+                    // Nested answer.item may itself carry extract-flagged questions.
+                    $this->collectObservations($answer->item, $itemIndex, $response, $observations);
+                }
+            } else {
+                foreach ($responseItem->answer as $answer) {
+                    $this->collectObservations($answer->item, $itemIndex, $response, $observations);
+                }
+            }
+
+            $this->collectObservations($responseItem->item, $itemIndex, $response, $observations);
+        }
+    }
+
+    /**
+     * True when the Questionnaire item carries a truthy `observationExtract` flag extension.
+     */
+    private function hasObservationExtract(QuestionnaireItem $item): bool
+    {
+        foreach ($item->extension as $extension) {
+            if ($this->extensionReader->readUrl($extension) !== self::OBSERVATION_EXTRACT_URL) {
+                continue;
+            }
+
+            $value = $this->extensionReader->readValue($extension);
+
+            // `observationExtract` is a boolean flag; a present extension with a non-false value extracts.
+            return $value !== false;
+        }
+
+        return false;
+    }
+
+    /**
+     * Walk the response tree, building one resource per `definitionExtract`-flagged source item.
+     *
+     * @param array<int, QuestionnaireResponseItem> $responseItems
+     * @param array<string, QuestionnaireItem>      $itemIndex
+     * @param list<AbstractResource>                $resources     accumulated by reference
+     * @param list<OperationOutcomeIssue>           $issues        accumulated by reference
+     */
+    private function collectDefinitionResources(
+        array $responseItems,
+        array $itemIndex,
+        array &$resources,
+        array &$issues,
+    ): void {
+        foreach ($responseItems as $responseItem) {
+            $linkId     = $this->linkIdString($responseItem->linkId);
+            $sourceItem = $linkId     !== null ? ($itemIndex[$linkId] ?? null) : null;
+            $canonical  = $sourceItem !== null ? $this->definitionExtractCanonical($sourceItem) : null;
+
+            if ($canonical === null) {
+                // Not an extraction root — descend looking for nested definitionExtract roots.
+                $this->collectDefinitionResources($responseItem->item, $itemIndex, $resources, $issues);
+                continue;
+            }
+
+            $class = $this->resolveResourceClass($canonical);
+            if ($class === null) {
+                $issues[] = $this->issue(
+                    IssueType::processingfailure,
+                    \sprintf('definitionExtract target canonical "%s" does not resolve to an R4 resource type.', $canonical),
+                );
+                continue;
+            }
+
+            $resource = new $class();
+            $this->walkDefinitionItems($responseItem->item, $itemIndex, $resource, [$this->canonicalResourceType($canonical)], $issues);
+            $resources[] = $resource;
+        }
+    }
+
+    /**
+     * Populate `$context` from the response subtree, honouring item grouping: a group item whose
+     * `definition` names a complex element creates one intermediate instance that its children fill;
+     * leaf items write their answers relative to the enclosing context.
+     *
+     * @param array<int, QuestionnaireResponseItem> $responseItems
+     * @param array<string, QuestionnaireItem>      $itemIndex
+     * @param non-empty-list<string>                $basePath      the element path `$context` represents (e.g. ['Patient'] or ['Patient','name'])
+     * @param list<OperationOutcomeIssue>           $issues        accumulated by reference
+     */
+    private function walkDefinitionItems(
+        array $responseItems,
+        array $itemIndex,
+        object $context,
+        array $basePath,
+        array &$issues,
+    ): void {
+        foreach ($responseItems as $responseItem) {
+            $linkId     = $this->linkIdString($responseItem->linkId);
+            $sourceItem = $linkId     !== null ? ($itemIndex[$linkId] ?? null) : null;
+            $segments   = $sourceItem !== null ? $this->definitionSegments($sourceItem->definition) : null;
+
+            // No definition (logical group) — recurse in the same context.
+            if ($segments === null) {
+                $this->walkDefinitionItems($responseItem->item, $itemIndex, $context, $basePath, $issues);
+                continue;
+            }
+
+            $relative = $this->relativeSegments($segments, $basePath);
+            if ($relative === null) {
+                $issues[] = $this->issue(
+                    IssueType::processingfailure,
+                    \sprintf('definition path "%s" is not within the enclosing extraction context %s.', implode('.', $segments), implode('.', $basePath)),
+                );
+                continue;
+            }
+
+            if ($relative === []) {
+                // Definition equals the context path — nothing to write here, just descend.
+                $this->walkDefinitionItems($responseItem->item, $itemIndex, $context, $basePath, $issues);
+                continue;
+            }
+
+            $hasAnswers = $responseItem->answer !== [];
+
+            if (!$hasAnswers && $responseItem->item !== []) {
+                // Group item: establish one intermediate element and recurse into it.
+                try {
+                    $child = $this->writer->createIntermediate($context, $relative);
+                } catch (\RuntimeException $e) {
+                    $issues[] = $this->issue(IssueType::processingfailure, $e->getMessage());
+                    continue;
+                }
+                $this->walkDefinitionItems($responseItem->item, $itemIndex, $child, $segments, $issues);
+                continue;
+            }
+
+            // Leaf item: write each answer relative to the current context.
+            foreach ($responseItem->answer as $answer) {
+                try {
+                    $this->writer->writeLeaf($context, $relative, $answer->value);
+                } catch (\RuntimeException $e) {
+                    $issues[] = $this->issue(IssueType::processingfailure, $e->getMessage());
+                }
+            }
+            if ($responseItem->item !== []) {
+                $this->walkDefinitionItems($responseItem->item, $itemIndex, $context, $basePath, $issues);
+            }
+        }
+    }
+
+    /**
+     * Read a Questionnaire item's `definitionExtract` target canonical (the `definition` sub-extension),
+     * or null when the item is not an extraction root.
+     */
+    private function definitionExtractCanonical(QuestionnaireItem $item): ?string
+    {
+        foreach ($item->extension as $extension) {
+            if ($this->extensionReader->readUrl($extension) !== self::DEFINITION_EXTRACT_URL) {
+                continue;
+            }
+            $definition = $this->extensionReader->findExtension($extension, 'definition');
+            if ($definition === null) {
+                return null;
+            }
+
+            return $this->stringifyPrimitive($this->extensionReader->readValue($definition));
+        }
+
+        return null;
+    }
+
+    /**
+     * Resolve a base-type `StructureDefinition/{Type}` canonical to its generated R4 resource class,
+     * or null when no such class exists (profiles / unknown types are unsupported here — M02 stub).
+     *
+     * @return class-string<AbstractResource>|null
+     */
+    private function resolveResourceClass(string $canonical): ?string
+    {
+        $type = $this->canonicalResourceType($canonical);
+        $fqcn = 'Ardenexal\\FHIRTools\\Component\\Models\\R4\\Resource\\' . $type . 'Resource';
+
+        if (!class_exists($fqcn) || !is_subclass_of($fqcn, AbstractResource::class)) {
+            return null;
+        }
+
+        return $fqcn;
+    }
+
+    /**
+     * The bare resource type from a canonical: the last path segment before any `#fragment`/`|version`.
+     */
+    private function canonicalResourceType(string $canonical): string
+    {
+        $base  = strtok($canonical, '#|');
+        $base  = $base === false ? $canonical : $base;
+        $slash = strrpos($base, '/');
+
+        return $slash === false ? $base : substr($base, $slash + 1);
+    }
+
+    /**
+     * Split an item `definition`'s element path into segments (`…Patient#Patient.name.given` → the
+     * `#`-fragment `Patient.name.given` → `['Patient','name','given']`), or null when absent.
+     *
+     * @return non-empty-list<string>|null
+     */
+    private function definitionSegments(?UriPrimitive $definition): ?array
+    {
+        $raw = $definition instanceof UriPrimitive ? ($definition->value ?? null) : null;
+        if ($raw === null || $raw === '') {
+            return null;
+        }
+
+        $hash     = strpos($raw, '#');
+        $fragment = $hash === false ? $raw : substr($raw, $hash + 1);
+        $segments = array_values(array_filter(explode('.', $fragment), static fn (string $s): bool => $s !== ''));
+
+        return $segments === [] ? null : $segments;
+    }
+
+    /**
+     * The portion of `$segments` beneath `$basePath` (which must be a prefix), or null when `$segments`
+     * does not sit within `$basePath` (e.g. a cross-resource path — out of scope for single-resource M02).
+     *
+     * @param non-empty-list<string> $segments
+     * @param non-empty-list<string> $basePath
+     *
+     * @return list<string>|null
+     */
+    private function relativeSegments(array $segments, array $basePath): ?array
+    {
+        if (array_slice($segments, 0, count($basePath)) !== $basePath) {
+            return null;
+        }
+
+        return array_slice($segments, count($basePath));
+    }
+
+    /**
+     * Coerce a primitive-wrapper-or-string value to a plain string, or null when unreadable.
+     */
+    private function stringifyPrimitive(mixed $value): ?string
+    {
+        if (is_string($value)) {
+            return $value === '' ? null : $value;
+        }
+        if (is_object($value) && property_exists($value, 'value')) {
+            $inner = $value->value ?? null;
+
+            return is_string($inner) && $inner !== '' ? $inner : null;
+        }
+
+        return null;
+    }
+
+    private function issue(IssueType $code, string $diagnostics): OperationOutcomeIssue
+    {
+        return new OperationOutcomeIssue(
+            severity: new IssueSeverityType(IssueSeverity::warning->value),
+            code: new IssueTypeType($code->value),
+            diagnostics: $diagnostics,
+        );
+    }
+
+    private function buildObservation(
+        CodeableConcept $code,
+        mixed $answerValue,
+        QuestionnaireResponseResource $response,
+    ): ObservationResource {
+        $author   = $response->author   ?? null;
+        $qrId     = $response->id       ?? null;
+        $authored = $response->authored ?? null;
+
+        return new ObservationResource(
+            status: new ObservationStatusType(ObservationStatus::final->value),
+            code: $code,
+            subject: $response->subject ?? null,
+            // Per SDC observation-based extraction, both effectiveDateTime and issued map from QR.authored.
+            effective: $authored,
+            issued: $this->authoredAsInstant($authored),
+            performer: $author instanceof Reference ? [$author] : [],
+            value: $this->mapAnswerToObservationValue($answerValue),
+            derivedFrom: $qrId !== null
+                ? [new Reference(reference: 'QuestionnaireResponse/' . $qrId)]
+                : [],
+        );
+    }
+
+    /**
+     * Convert QR.authored (a `dateTime`) to an `instant` for `Observation.issued`, per the SDC mapping.
+     *
+     * Returns null when authored is absent or too low-precision to be a valid instant (which requires
+     * full date+time+timezone).
+     */
+    private function authoredAsInstant(?DateTimePrimitive $authored): ?InstantPrimitive
+    {
+        if ($authored === null) {
+            return null;
+        }
+
+        $raw = (string) $authored;
+        if ($raw === '') {
+            return null;
+        }
+
+        try {
+            return new InstantPrimitive(value: FHIRInstant::parse($raw));
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * Map a QuestionnaireResponse answer value onto an `Observation.value[x]` variant.
+     *
+     * `Coding` answers become a single-coding `CodeableConcept`; types the choice does not accept
+     * (e.g. `date`, `uri`, `Attachment`, `Reference`) yield null (the Observation carries no value).
+     */
+    private function mapAnswerToObservationValue(
+        mixed $answerValue,
+    ): Quantity|CodeableConcept|StringPrimitive|DateTimePrimitive|TimePrimitive|string|bool|int|null {
+        if ($answerValue instanceof Coding) {
+            return new CodeableConcept(coding: [$answerValue]);
+        }
+
+        if (
+            is_bool($answerValue)
+            || is_int($answerValue)
+            || is_string($answerValue)
+            || $answerValue instanceof Quantity
+            || $answerValue instanceof CodeableConcept
+            || $answerValue instanceof StringPrimitive
+            || $answerValue instanceof DateTimePrimitive
+            || $answerValue instanceof TimePrimitive
+        ) {
+            return $answerValue;
+        }
+
+        return null;
+    }
+
+    /**
+     * Assemble the extracted resources into a transaction Bundle — one `POST` entry per resource,
+     * with `request.url` = the resource type and a fresh `urn:uuid:` fullUrl.
+     *
+     * @param list<AbstractResource> $resources
+     */
+    private function assembleTransactionBundle(array $resources): BundleResource
+    {
+        $entries = [];
+        foreach ($resources as $resource) {
+            $entries[] = new BundleEntry(
+                fullUrl: new UriPrimitive(value: $this->uuidUrn()),
+                resource: $resource,
+                request: new BundleEntryRequest(
+                    method: new HTTPVerbType(HTTPVerb::post->value),
+                    url: new UriPrimitive(value: $this->resourceTypeOf($resource)),
+                ),
+            );
+        }
+
+        return new BundleResource(
+            type: new BundleTypeType(BundleType::transaction->value),
+            entry: $entries,
+        );
+    }
+
+    /**
+     * Build the companion `OperationOutcome`: any collected `$issues`, plus an informational note when
+     * nothing was extracted. Returns null when there is nothing to report.
+     *
+     * @param list<AbstractResource>      $resources
+     * @param list<OperationOutcomeIssue> $issues
+     */
+    private function buildOutcome(array $resources, array $issues): ?OperationOutcomeResource
+    {
+        if ($resources === []) {
+            $issues[] = new OperationOutcomeIssue(
+                severity: new IssueSeverityType(IssueSeverity::information->value),
+                code: new IssueTypeType(IssueType::informationalnote->value),
+                diagnostics: 'No resources were extracted from the QuestionnaireResponse.',
+            );
+        }
+
+        return $issues === [] ? null : new OperationOutcomeResource(issue: $issues);
+    }
+
+    /**
+     * The FHIR resource type name for a generated resource (e.g. `PatientResource` → `Patient`).
+     */
+    private function resourceTypeOf(object $resource): string
+    {
+        $short = (new \ReflectionClass($resource))->getShortName();
+
+        return str_ends_with($short, 'Resource') ? substr($short, 0, -8) : $short;
+    }
+
+    /**
+     * Normalise a `linkId` (which may be a StringPrimitive wrapper or a raw string) to a plain string.
+     */
+    private function linkIdString(StringPrimitive|string|null $linkId): ?string
+    {
+        if ($linkId === null) {
+            return null;
+        }
+        if (is_string($linkId)) {
+            return $linkId === '' ? null : $linkId;
+        }
+
+        $value = $linkId->value ?? null;
+
+        return $value === null || $value === '' ? null : $value;
+    }
+
+    /**
+     * Generate an RFC 4122 v4 `urn:uuid:` for a Bundle entry fullUrl.
+     */
+    private function uuidUrn(): string
+    {
+        $bytes    = random_bytes(16);
+        $bytes[6] = chr((ord($bytes[6]) & 0x0F) | 0x40); // version 4
+        $bytes[8] = chr((ord($bytes[8]) & 0x3F) | 0x80); // variant 10
+        $hex      = bin2hex($bytes);
+
+        return \sprintf(
+            'urn:uuid:%s-%s-%s-%s-%s',
+            substr($hex, 0, 8),
+            substr($hex, 8, 4),
+            substr($hex, 12, 4),
+            substr($hex, 16, 4),
+            substr($hex, 20, 12),
+        );
+    }
+}

@@ -1,0 +1,46 @@
+{
+  "resourceType": "Bundle",
+  "type": "transaction",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:46cf0a91-0e5c-4ddb-b2ee-efe0cac20357",
+      "resource": {
+        "resourceType": "Observation",
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "29463-7",
+              "display": "Body weight"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/example"
+        },
+        "effectiveDateTime": "2026-07-09T10:00:00Z",
+        "issued": "2026-07-09T10:00:00+00:00",
+        "performer": [
+          {
+            "reference": "Practitioner/example"
+          }
+        ],
+        "valueQuantity": {
+          "value": 72.5,
+          "unit": "kg",
+          "system": "http://unitsofmeasure.org",
+          "code": "kg"
+        },
+        "derivedFrom": [
+          {
+            "reference": "QuestionnaireResponse/observation-extract-basic-qr"
+          }
+        ]
+      },
+      "request": {
+        "method": "POST"
+      }
+    }
+  ]
+}

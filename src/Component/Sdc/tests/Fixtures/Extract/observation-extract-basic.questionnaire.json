@@ -1,0 +1,26 @@
+{
+    "resourceType": "Questionnaire",
+    "id": "observation-extract-basic",
+    "url": "http://fhirtools.dev/Questionnaire/observation-extract-basic",
+    "status": "active",
+    "item": [
+        {
+            "linkId": "body-weight",
+            "text": "Body weight",
+            "type": "quantity",
+            "code": [
+                {
+                    "system": "http://loinc.org",
+                    "code": "29463-7",
+                    "display": "Body weight"
+                }
+            ],
+            "extension": [
+                {
+                    "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract",
+                    "valueBoolean": true
+                }
+            ]
+        }
+    ]
+}
