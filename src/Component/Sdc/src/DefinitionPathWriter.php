@@ -89,8 +89,13 @@ final class DefinitionPathWriter
      */
     private function descend(object $current, string $property, bool $reuseExisting): object
     {
-        $meta  = $this->metaFor($current, $property);
+        $meta = $this->metaFor($current, $property);
+        // `phpItemClass` carries the item class for array-valued complex properties, but the generated
+        // models leave it null for single-valued complex ones (e.g. `RelatedPerson.patient`). Fall back
+        // to the property's declared PHP type so a scalar-holding intermediate (a `Reference` whose
+        // `.reference` we set) can still be instantiated.
         $class = $meta->phpItemClass
+            ?? $this->reflectPropertyClass($current, $property)
             ?? throw new \RuntimeException(\sprintf('Intermediate %s::$%s has no phpType to instantiate', $current::class, $property));
 
         if ($meta->isArray) {
@@ -112,6 +117,36 @@ final class DefinitionPathWriter
         }
 
         return $child;
+    }
+
+    /**
+     * Resolve the concrete class of a single-valued complex property from its PHP type declaration,
+     * used when `#[FhirProperty]` metadata carries no `phpItemClass` (single-valued complex elements).
+     *
+     * @return class-string|null the first non-builtin declared type that is an instantiable class, or null
+     */
+    private function reflectPropertyClass(object $object, string $property): ?string
+    {
+        if (!property_exists($object, $property)) {
+            return null;
+        }
+
+        $type = (new \ReflectionProperty($object, $property))->getType();
+        if ($type instanceof \ReflectionNamedType) {
+            $candidates = [$type];
+        } elseif ($type instanceof \ReflectionUnionType) {
+            $candidates = $type->getTypes();
+        } else {
+            return null;
+        }
+
+        foreach ($candidates as $candidate) {
+            if ($candidate instanceof \ReflectionNamedType && !$candidate->isBuiltin() && class_exists($candidate->getName())) {
+                return $candidate->getName();
+            }
+        }
+
+        return null;
     }
 
     private function setLeaf(object $current, string $property, mixed $value): void

@@ -94,3 +94,24 @@ normalisation did not make the comparison vacuous (a mutated `code` still fails)
 makes forms-lab emit a **separate `name` per path**. The M02 service must follow the item tree with a
 per-group write context, not write absolute paths independently. Unlike observation-based, forms-lab
 **does** emit `entry.request.url` here.
+
+### `extractAllocateId` cross-reference oracle (M02) — VENDORED
+
+| Field | Value |
+|-------|-------|
+| Input Questionnaire | `tests/Fixtures/Extract/definition-extract-allocateid.questionnaire.json` (authored — a root `extractAllocateId` "NewPatientId"; a `Patient` group with a `fullUrl` sub-expression `%NewPatientId`; a `RelatedPerson` group with a `definitionExtractValue` writing `%NewPatientId` into `RelatedPerson.patient.reference`) |
+| Input QuestionnaireResponse | `tests/Fixtures/Extract/definition-extract-allocateid.response.json` (authored) |
+| Expected Bundle | `tests/Fixtures/Extract/definition-extract-allocateid.expected-bundle.json` (frozen forms-lab output) |
+| Engine / Endpoint | fhirpath-lab / forms-lab — `POST https://fhir.forms-lab.com/QuestionnaireResponse/$extract` (no `model` param) |
+| Captured | 2026-07-10 |
+
+**Finding (proves the M02 kill criterion):** `extractAllocateId` allocates a UUID and binds it to a
+FHIRPath **external constant** (`%NewPatientId`). The bound value is the **full `urn:uuid:<uuid>`
+string** (not the bare UUID) — proven because the Patient's `fullUrl` (from the `fullUrl`
+sub-expression `%NewPatientId`) and the `RelatedPerson.patient.reference` (from a `definitionExtractValue`
+expression `%NewPatientId`) are **byte-identical**. `request.method` stays **POST** even with an
+allocated `fullUrl` — allocateId does not imply `PUT`. Two extracted resources therefore point at each
+other via the same `urn:uuid:`. The `FHIRExtractConformanceTest` proves this three ways: an oracle
+comparison, a **direct** equality assertion on our own output (`entry[0].fullUrl === entry[1].resource.patient.reference`,
+independent of the oracle's random UUIDs), and a linkage-mutation guard (breaking the reference makes
+the oracle comparison fail, so `tokenizeUuids` verifies topology, not mere `urn:uuid:` presence).

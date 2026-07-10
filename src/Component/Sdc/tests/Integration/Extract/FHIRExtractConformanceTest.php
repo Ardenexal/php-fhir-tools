@@ -102,6 +102,77 @@ final class FHIRExtractConformanceTest extends AbstractSdcConformanceTest
     }
 
     /**
+     * `extractAllocateId` cross-reference: a Patient and a RelatedPerson linked by a single allocated
+     * `urn:uuid:` (the Patient's `fullUrl` and the RelatedPerson's `patient.reference`), compared to the
+     * frozen forms-lab reference Bundle. Exercises id allocation, `fullUrl` FHIRPath resolution, and a
+     * `definitionExtractValue` writing the allocated id into a cross-resource reference.
+     */
+    public function testAllocateIdCrossReferenceConformsToReferenceOracle(): void
+    {
+        $expectedPath = self::FIXTURE_DIR . '/definition-extract-allocateid.expected-bundle.json';
+        if (!is_file($expectedPath)) {
+            self::markTestSkipped('No vendored reference oracle for allocateId cross-reference $extract yet.');
+        }
+
+        [$actual, $expected] = $this->extractAndExpected('definition-extract-allocateid');
+
+        $this->assertSdcConformance($expected, $actual);
+    }
+
+    /**
+     * The milestone kill criterion, asserted directly on our own output (independent of the oracle's
+     * random UUIDs): the two extracted resources reference each other via a single, non-empty
+     * `urn:uuid:` — the Patient's `fullUrl` equals the RelatedPerson's `patient.reference`.
+     */
+    public function testAllocateIdProducesResolvableCrossReference(): void
+    {
+        [$actual] = $this->extractAndExpected('definition-extract-allocateid');
+
+        $entries = $actual['entry'];
+        self::assertIsArray($entries);
+        self::assertCount(2, $entries);
+
+        $patientEntry      = $entries[0];
+        $relatedEntry      = $entries[1];
+        self::assertIsArray($patientEntry);
+        self::assertIsArray($relatedEntry);
+
+        $patientFullUrl = $patientEntry['fullUrl'] ?? null;
+        self::assertIsArray($relatedEntry['resource']);
+        self::assertIsArray($relatedEntry['resource']['patient']);
+        $crossReference = $relatedEntry['resource']['patient']['reference'] ?? null;
+
+        self::assertIsString($patientFullUrl);
+        self::assertMatchesRegularExpression('/^urn:uuid:[0-9a-fA-F-]{36}$/', $patientFullUrl);
+        self::assertSame($patientFullUrl, $crossReference, 'RelatedPerson.patient.reference must resolve to the Patient entry fullUrl.');
+    }
+
+    /**
+     * Guards against a vacuous oracle for the linkage itself: if the cross-reference is broken (points
+     * at a different UUID), the reference-topology comparison MUST fail against the frozen oracle. Proves
+     * `tokenizeUuids` verifies linkage, not just that a `urn:uuid:` is present.
+     */
+    public function testAllocateIdOracleDetectsBrokenLinkage(): void
+    {
+        $expectedPath = self::FIXTURE_DIR . '/definition-extract-allocateid.expected-bundle.json';
+        if (!is_file($expectedPath)) {
+            self::markTestSkipped('No vendored reference oracle for allocateId cross-reference $extract yet.');
+        }
+
+        [$actual, $expected] = $this->extractAndExpected('definition-extract-allocateid');
+
+        // Break the linkage: repoint the RelatedPerson at an unrelated UUID.
+        $relatedEntry = $actual['entry'][1];
+        self::assertIsArray($relatedEntry);
+        self::assertIsArray($relatedEntry['resource']);
+        self::assertIsArray($relatedEntry['resource']['patient']);
+        $actual['entry'][1]['resource']['patient']['reference'] = 'urn:uuid:00000000-0000-4000-8000-000000000000';
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->assertSdcConformance($expected, $actual);
+    }
+
+    /**
      * Deserialize a case's Questionnaire + QuestionnaireResponse, run `$extract`, and return the
      * normalised [actual, expected] decoded Bundles for structural comparison.
      *
