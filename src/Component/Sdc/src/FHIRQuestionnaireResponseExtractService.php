@@ -108,6 +108,12 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
     private const string EXTRACT_ALLOCATE_ID_URL = 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-extractAllocateId';
 
     /**
+     * `Provenance.agent.who.display` for the emitted extraction Provenance. The toolkit is the acting
+     * software; it mints no Device resource, so the agent is named textually (see ADR-010).
+     */
+    private const string PROVENANCE_AGENT_DISPLAY = 'Ardenexal FHIR Tools — QuestionnaireResponse/$extract';
+
+    /**
      * All collaborators default to standalone instances so the service is usable without a container.
      */
     public function __construct(
@@ -195,18 +201,30 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
         // them via FHIRPath. Version-generic like the definition path. Runs at the array level (see
         // TemplateExtractor), so the Questionnaire is re-serialized to a decoded array here.
         if (is_object($questionnaire)) {
-            $serializer         = FHIRSerializationService::createDefault($version);
+            $serializer = FHIRSerializationService::createDefault($version);
+            /** @var array<string, mixed>|null $questionnaireArray */
             $questionnaireArray = json_decode($serializer->serializeToJson($questionnaire), true);
             if (is_array($questionnaireArray)) {
-                /** @var array<string, mixed> $questionnaireArray */
                 foreach ($this->templateExtractor->extract($questionnaireArray, $questionnaireResponse, $factory, $evalContext, $serializer, $issues) as $templateEntry) {
                     $entries[] = $templateEntry;
                 }
             }
         }
 
+        // Resolve every entry's fullUrl once, up front. Provenance.target must reference the *same*
+        // fullUrls the entries ship with, so minting cannot be deferred to bundle assembly (which would
+        // hand Provenance a different urn than the entry it attests).
+        $entries = $this->resolveEntryFullUrls($entries);
+
+        $extractedCount = count($entries);
+        if ($context->emitProvenance && $entries !== []) {
+            $entries[] = $this->buildProvenanceEntry($entries, $questionnaireResponse, $factory);
+        }
+
         $bundle  = $this->assembleTransactionBundle($entries, $factory);
-        $outcome = $this->buildOutcome($entries, $issues, $factory);
+        // The informational "nothing extracted" note keys off extracted resources, not the Provenance
+        // entry we may have appended above.
+        $outcome = $this->buildOutcome($extractedCount === 0 ? [] : $entries, $issues, $factory);
 
         return new ExtractResult($bundle, $outcome);
     }
@@ -910,6 +928,56 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
         }
 
         return null;
+    }
+
+    /**
+     * Ensure every entry carries a concrete `fullUrl`, minting a fresh `urn:uuid:` for any that resolved
+     * none. Resolving once, before Provenance assembly, keeps `Provenance.target` references byte-identical
+     * to the entries they attest.
+     *
+     * @param list<array{resource: object, fullUrl: string|null}> $entries
+     *
+     * @return list<array{resource: object, fullUrl: string}>
+     */
+    private function resolveEntryFullUrls(array $entries): array
+    {
+        $resolved = [];
+        foreach ($entries as $entry) {
+            $resolved[] = [
+                'resource' => $entry['resource'],
+                'fullUrl'  => $entry['fullUrl'] ?? $this->uuidUrn(),
+            ];
+        }
+
+        return $resolved;
+    }
+
+    /**
+     * Build the opt-in `Provenance` Bundle entry attesting the extraction: `target` references every
+     * extracted resource by its resolved `fullUrl`, and `entity` (`role = source`) references the source
+     * QuestionnaireResponse. Only called when at least one resource was extracted (a `Provenance.target`
+     * is 1..*).
+     *
+     * @param list<array{resource: object, fullUrl: string}> $entries the already-fullUrl-resolved extracted entries
+     *
+     * @return array{resource: object, fullUrl: string|null}
+     */
+    private function buildProvenanceEntry(array $entries, object $questionnaireResponse, ExtractModelFactory $factory): array
+    {
+        $targetFullUrls = array_map(static fn (array $entry): string => $entry['fullUrl'], $entries);
+
+        $qrId            = property_exists($questionnaireResponse, 'id') ? ($questionnaireResponse->id ?? null) : null;
+        $qrIdString      = $this->stringifyPrimitive($qrId);
+        $sourceReference = $qrIdString !== null ? 'QuestionnaireResponse/' . $qrIdString : 'QuestionnaireResponse';
+
+        $provenance = $factory->provenance(
+            $targetFullUrls,
+            $sourceReference,
+            (new \DateTimeImmutable('now'))->format('Y-m-d\TH:i:sP'),
+            self::PROVENANCE_AGENT_DISPLAY,
+        );
+
+        return ['resource' => $provenance, 'fullUrl' => null];
     }
 
     /**

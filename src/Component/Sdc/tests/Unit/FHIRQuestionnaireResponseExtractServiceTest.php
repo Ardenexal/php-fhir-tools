@@ -23,6 +23,10 @@ use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\ObservationStatusType;
+use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
+use Ardenexal\FHIRTools\Component\Models\R4\Resource\ObservationResource;
 
 /**
  * Deterministic unit coverage for observation-based `$extract`: asserts the produced transaction
@@ -390,6 +394,174 @@ final class FHIRQuestionnaireResponseExtractServiceTest extends TestCase
         $outcome = $this->decode($issues);
         self::assertSame('warning', $outcome['issue'][0]['severity'] ?? null);
         self::assertStringContainsString('failed to evaluate', (string) ($outcome['issue'][0]['diagnostics'] ?? ''));
+    }
+
+    /**
+     * A single Questionnaire mixing observation-, definition-, and template-based extraction produces
+     * ONE merged transaction Bundle carrying an entry from each method. There is no reference oracle
+     * that implements all three methods, so this is a composition test of the service's merge — each
+     * method's extraction fidelity is proven separately against its own vendored oracle.
+     */
+    public function testMixedMethodQuestionnaireYieldsOneMergedBundle(): void
+    {
+        $dir           = __DIR__ . '/../Fixtures/Extract';
+        $questionnaire = $this->serializer->deserializeFromJson(
+            (string) file_get_contents($dir . '/extract-mixed-methods.questionnaire.json'),
+            QuestionnaireResource::class,
+        );
+        $response = $this->serializer->deserializeFromJson(
+            (string) file_get_contents($dir . '/extract-mixed-methods.response.json'),
+            QuestionnaireResponseResource::class,
+        );
+
+        $result = $this->service->extract($response, new ExtractContext(questionnaire: $questionnaire));
+        $bundle = $this->decode($result->getResource());
+
+        self::assertSame('transaction', $bundle['type'] ?? null);
+        $entries = $bundle['entry'] ?? [];
+        self::assertIsArray($entries);
+
+        // One Bundle, entries from all three methods: the observation-based Observation (LOINC 29463-7),
+        // the definition-based Patient (family Chalmers), and the template-based Observation (the note).
+        $byType = [];
+        foreach ($entries as $entry) {
+            self::assertIsArray($entry);
+            $resource = $entry['resource'] ?? [];
+            self::assertIsArray($resource);
+            $byType[] = $resource['resourceType'] ?? null;
+        }
+
+        self::assertContains('Patient', $byType, 'definition-based Patient missing from the merged Bundle');
+        self::assertSame(2, array_sum(array_map(static fn ($t): int => $t === 'Observation' ? 1 : 0, $byType)), 'expected exactly two Observations: one observation-based, one template-based');
+        self::assertCount(3, $entries, 'the merged Bundle must contain exactly the three extracted resources');
+
+        // The definition-based Patient carries the answered family name.
+        $patient = null;
+        foreach ($entries as $entry) {
+            if (($entry['resource']['resourceType'] ?? null) === 'Patient') {
+                $patient = $entry['resource'];
+            }
+        }
+        self::assertIsArray($patient);
+        self::assertSame('Chalmers', $patient['name'][0]['family'] ?? null);
+
+        // The template-based Observation carries the note answer substituted via templateExtractValue.
+        $noteValues = [];
+        foreach ($entries as $entry) {
+            if (($entry['resource']['resourceType'] ?? null) === 'Observation') {
+                $noteValues[] = $entry['resource']['valueString'] ?? null;
+            }
+        }
+        self::assertContains('Patient reports feeling well.', $noteValues, 'template-based Observation note missing');
+    }
+
+    /**
+     * With `emitProvenance`, the transaction Bundle carries an extra cardinality-complete `Provenance`
+     * entry: `target` references every extracted resource by its shipped `fullUrl`, `entity` (`role =
+     * source`) references the source QuestionnaireResponse, and the required `recorded` + `agent.who`
+     * are populated. Opt-out by default (asserted by every other test seeing no Provenance).
+     */
+    public function testProvenanceEntryEmittedWhenRequested(): void
+    {
+        $questionnaire = new QuestionnaireResource(
+            item: [
+                new QuestionnaireItem(
+                    extension: [new Extension(url: self::OBSERVATION_EXTRACT_URL, value: true)],
+                    linkId: 'weight',
+                    code: [new Coding(system: new UriPrimitive(value: 'http://loinc.org'), code: new CodePrimitive(value: '29463-7'))],
+                ),
+            ],
+        );
+        $response = new QuestionnaireResponseResource(
+            id: 'qr1',
+            item: [new QuestionnaireResponseItem(
+                linkId: 'weight',
+                answer: [new QuestionnaireResponseItemAnswer(value: new Quantity(value: '72.5', unit: 'kg'))],
+            )],
+        );
+
+        $result = $this->service->extract($response, new ExtractContext(questionnaire: $questionnaire, emitProvenance: true));
+        $bundle = $this->decode($result->getResource());
+
+        $entries = $bundle['entry'] ?? [];
+        self::assertIsArray($entries);
+        self::assertCount(2, $entries, 'expected the extracted Observation plus a Provenance entry');
+
+        $observationFullUrl = null;
+        $provenance         = null;
+        foreach ($entries as $entry) {
+            self::assertIsArray($entry);
+            $type = $entry['resource']['resourceType'] ?? null;
+            if ($type === 'Observation') {
+                $observationFullUrl = $entry['fullUrl'] ?? null;
+            } elseif ($type === 'Provenance') {
+                $provenance = $entry['resource'];
+            }
+        }
+
+        self::assertIsString($observationFullUrl);
+        self::assertIsArray($provenance);
+
+        // target references the extracted resource by the SAME fullUrl the entry ships with.
+        self::assertSame($observationFullUrl, $provenance['target'][0]['reference'] ?? null);
+        // entity: role = source, what → the source QuestionnaireResponse.
+        self::assertSame('source', $provenance['entity'][0]['role'] ?? null);
+        self::assertSame('QuestionnaireResponse/qr1', $provenance['entity'][0]['what']['reference'] ?? null);
+        // Required cardinality: recorded (instant) + agent.who are present.
+        self::assertIsString($provenance['recorded'] ?? null);
+        self::assertNotSame('', $provenance['recorded']);
+        self::assertNotNull($provenance['agent'][0]['who'] ?? null);
+    }
+
+    /**
+     * The malformed-expression contract (warning + skip + continue, never crash) holds on the
+     * template path too, not just the definition path: a template whose `templateExtractValue` carries
+     * broken FHIRPath surfaces a warning and is skipped rather than aborting the run.
+     */
+    public function testMalformedTemplateExtractValueExpressionReportsIssueWithoutCrashing(): void
+    {
+        $templateExtractUrl      = 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-templateExtract';
+        $templateExtractValueUrl = 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-templateExtractValue';
+
+        $template = new ObservationResource(
+            id: 'obsTmpl',
+            status: new ObservationStatusType('final'),
+            code: new CodeableConcept(text: 'note'),
+            value: new StringPrimitive(
+                value: 'placeholder',
+                // Malformed FHIRPath (unbalanced paren) on the value's templateExtractValue. Wrapped in a
+                // StringPrimitive so it serialises as `valueString` (a raw PHP string guesses `valueDecimal`).
+                extension: [new Extension(url: $templateExtractValueUrl, value: new StringPrimitive(value: '(1 +'))],
+            ),
+        );
+
+        $questionnaire = new QuestionnaireResource(
+            contained: [$template],
+            item: [
+                new QuestionnaireItem(
+                    extension: [new Extension(
+                        url: $templateExtractUrl,
+                        extension: [new Extension(url: 'template', value: new Reference(reference: '#obsTmpl'))],
+                    )],
+                    linkId: 'note',
+                ),
+            ],
+        );
+        $response = new QuestionnaireResponseResource(
+            item: [new QuestionnaireResponseItem(
+                linkId: 'note',
+                answer: [new QuestionnaireResponseItemAnswer(value: 'a note')],
+            )],
+        );
+
+        // Must not throw.
+        $result = $this->service->extract($response, new ExtractContext(questionnaire: $questionnaire));
+
+        $issues = $result->getIssues();
+        self::assertInstanceOf(OperationOutcomeResource::class, $issues);
+        $outcome    = $this->decode($issues);
+        $severities = array_map(static fn (array $i): mixed => $i['severity'] ?? null, $outcome['issue'] ?? []);
+        self::assertContains('warning', $severities, 'a malformed templateExtractValue must surface a warning issue');
     }
 
     /**

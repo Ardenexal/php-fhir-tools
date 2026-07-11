@@ -264,3 +264,36 @@ RelatedPerson `patient.reference` == each Observation `subject`), a `Coding` val
 3. **Bundle `meta.tag` + `timestamp`** — the `@aehrc/sdc-template-extract:generated` provenance tag and the
    generation `timestamp` are engine-specific/non-deterministic; the subclass drops Bundle-level `meta`
    and `timestamp` before comparison.
+
+## `sdc-extract` M04 — Conformance corpus finalisation (full SDC-IG triage)
+
+Authoritative upstream list captured `2026-07-11` from
+`gh api repos/HL7/sdc/contents/input/resources?ref=master` (every `input/resources` entry matching
+`extract`). Every SDC-IG `$extract` example is triaged below — covered by a vendored oracle, or deferred
+with a reason and a `backlog.md` pointer. No SDC-IG example is silently unaccounted for.
+
+| SDC-IG example (`HL7/sdc` `input/resources/`) | Method | Status |
+|---|---|---|
+| `extract-complex-defn3.json` | definition | **Covered** — M02, vendored forms-lab oracle (`extract-complex-defn3.expected-bundle.json`), R4/R4B/R5. |
+| `extract-complex-template.json` | template | **Covered** — M03, vendored `@aehrc/sdc-template-extract` oracle (`extract-complex-template.expected-bundle.json`). |
+| `extract-complex-template2.json` | template (`templateExtractBundle`, a `#contained` `Bundle` template) | **Deferred** — Bundle templates are skipped with a `warning` diagnostic (`TemplateExtractor::extractTemplate`). No `templateExtractBundle` oracle vendored yet. → `backlog.md` (Next). |
+| `extract-complex-smap.json` (+ `StructureMap-extract-complex-smap.xml`) | StructureMap (`targetStructureMap`) | **Deferred** — requires a FHIR Mapping Language engine, absent from the toolkit. Largest deferred item. → `backlog.md` (Maybe). |
+
+**Non-IG oracle (no SDC-IG example exists):** observation-based extraction is proven against an
+**authored** forms-lab oracle (`observation-extract-basic.*`) — the SDC IG ships no observation-based
+`$extract` example, so the input QR/Questionnaire were authored and only the expected Bundle is vendored
+(see the M01 observation oracle entry above).
+
+**Cross-method merge (no vendorable oracle):** a single Questionnaire mixing observation-, definition-,
+and template-based extraction (`extract-mixed-methods.*`) is a **hand-authored composition test**, not a
+conformance oracle — no reachable engine implements all three methods, and each method's fidelity is
+already oracle-proven separately, so `FHIRQuestionnaireResponseExtractServiceTest::testMixedMethodQuestionnaireYieldsOneMergedBundle`
+tests only the service's *merge* into one transaction Bundle. This is the sanctioned exception to the
+vendor-only rule (the `questionnaire-conformance-seed-truth` discipline), documented here because it is a
+hand-authored fixture.
+
+**Provenance (opt-in, `ExtractContext::$emitProvenance`):** the emitted `Provenance` is asserted by
+field checks (`testProvenanceEntryEmittedWhenRequested`) and its cardinality was runtime-validated via the
+toolkit validator (`isValid: true`, 0 errors; only the `dom-6` narrative best-practice warning). It is
+**never** part of a byte-compared oracle fixture — the existing oracle Bundles stay Provenance-free so
+they need no re-vendoring.

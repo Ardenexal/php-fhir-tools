@@ -1,0 +1,43 @@
+{
+    "resourceType": "QuestionnaireResponse",
+    "id": "extract-mixed-methods-qr",
+    "status": "completed",
+    "authored": "2026-07-11T10:00:00Z",
+    "subject": {
+        "reference": "Patient/example"
+    },
+    "item": [
+        {
+            "linkId": "weight",
+            "answer": [
+                {
+                    "valueQuantity": {
+                        "value": 72.5,
+                        "unit": "kg"
+                    }
+                }
+            ]
+        },
+        {
+            "linkId": "patient",
+            "item": [
+                {
+                    "linkId": "family",
+                    "answer": [
+                        {
+                            "valueString": "Chalmers"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "linkId": "note",
+            "answer": [
+                {
+                    "valueString": "Patient reports feeling well."
+                }
+            ]
+        }
+    ]
+}

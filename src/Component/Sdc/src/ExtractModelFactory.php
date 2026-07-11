@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Sdc;
 
+use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRInstant;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider;
 
@@ -132,6 +133,46 @@ final class ExtractModelFactory
         $outcomeClass = $this->fqcn('Resource\\OperationOutcomeResource');
 
         return new $outcomeClass(issue: $issues);
+    }
+
+    /**
+     * Build the extraction `Provenance`: a cardinality-complete record attesting the run.
+     *
+     * Per the SDC extraction spec, the produced resources' provenance points back at the source
+     * QuestionnaireResponse. This builds `target` 1..* (one Reference per extracted resource fullUrl),
+     * the required `recorded` instant, a single `agent` (`who.display` naming the extractor software —
+     * see ADR-010, the toolkit is the acting device and mints no Device resource), and a single `entity`
+     * with `role = source` whose `what` references the QR. FHIR *codes* (`'source'`) are version-stable
+     * literals; only the wrapper classes are per-version.
+     *
+     * @param list<string> $targetFullUrls  the `fullUrl` of each extracted Bundle entry (Provenance.target)
+     * @param string       $sourceReference a reference to the source QuestionnaireResponse (Provenance.entity.what)
+     * @param string       $recordedInstant an ISO-8601 instant (full date+time+timezone) for Provenance.recorded
+     * @param string       $agentDisplay    human-readable name of the extracting software (Provenance.agent.who.display)
+     */
+    public function provenance(array $targetFullUrls, string $sourceReference, string $recordedInstant, string $agentDisplay): object
+    {
+        $refClass     = $this->fqcn('DataType\\Reference');
+        $instantClass = $this->fqcn('Primitive\\InstantPrimitive');
+        $roleClass    = $this->fqcn('DataType\\ProvenanceEntityRoleType');
+        $agentClass   = $this->fqcn('Resource\\Provenance\\ProvenanceAgent');
+        $entityClass  = $this->fqcn('Resource\\Provenance\\ProvenanceEntity');
+        $provClass    = $this->fqcn('Resource\\ProvenanceResource');
+
+        $targets = [];
+        foreach ($targetFullUrls as $fullUrl) {
+            $targets[] = new $refClass(reference: $fullUrl);
+        }
+
+        return new $provClass(
+            target: $targets,
+            recorded: new $instantClass(value: FHIRInstant::parse($recordedInstant)),
+            agent: [new $agentClass(who: new $refClass(display: $agentDisplay))],
+            entity: [new $entityClass(
+                role: new $roleClass('source'),
+                what: new $refClass(reference: $sourceReference),
+            )],
+        );
     }
 
     /**

@@ -26,6 +26,13 @@ final class ExtractContext
          * observation-based extraction has nothing to key off and yields an empty transaction Bundle.
          */
         public readonly ?object $questionnaire = null,
+        /**
+         * When true, append a `Provenance` entry to the transaction Bundle attesting the extraction:
+         * its `target` references every extracted resource and its `entity` (`role = source`) references
+         * the source QuestionnaireResponse. Opt-in so the default output stays oracle-comparable. No
+         * Provenance is emitted when nothing was extracted (a `Provenance.target` is 1..*).
+         */
+        public readonly bool $emitProvenance = false,
     ) {
     }
 }

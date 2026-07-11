@@ -203,7 +203,16 @@ final class TemplateExtractor
         ExtractModelFactory $factory,
         array &$issues,
     ): ?array {
-        $populated = $this->transformValue($templateArray, $focus);
+        try {
+            // Substitution evaluates every templateExtractValue/templateExtractContext FHIRPath
+            // expression on the template. A malformed expression must surface a warning and skip this
+            // instance, not abort the whole extraction run (parity with the definition path).
+            $populated = $this->transformValue($templateArray, $focus);
+        } catch (\Throwable $e) {
+            $issues[] = $this->warning($factory, \sprintf('templateExtract template "#%s" failed to evaluate an expression and was skipped: %s', $template['templateId'], $e->getMessage()));
+
+            return null;
+        }
         if (!is_array($populated)) {
             return null;
         }
@@ -523,6 +532,7 @@ final class TemplateExtractor
      * a scalar onto another complex root element.
      *
      * @param array<string, mixed> $resource
+     * @param class-string         $class
      *
      * @return array<string, mixed>
      */
@@ -607,12 +617,12 @@ final class TemplateExtractor
      */
     private function evaluate(string $expression, mixed $focus): array
     {
-        return $this->fhirPath->evaluate(
+        return array_values($this->fhirPath->evaluate(
             $expression,
             $focus,
             $this->evalContext,
             $this->factory->fhirVersionValue(),
-        )->toArray();
+        )->toArray());
     }
 
     // -- Small tolerant readers ---------------------------------------------
