@@ -59,6 +59,10 @@
 * [Compilation, Caching & Performance](fhirpath/performance.md)
 * [Implementation Status & Known Issues](fhirpath/status.md)
 
+## SDC
+
+* [Overview](sdc/overview.md)
+
 ## Symfony Bundle
 
 * [Install and Configure the Bundle](bundle/configuration.md)

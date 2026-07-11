@@ -50,6 +50,11 @@ wires everything for you.
       <td><a href="fhirpath/overview.md">FHIRPath</a></td>
     </tr>
     <tr>
+      <td>SDC — extract resources from a QuestionnaireResponse (<code>$extract</code>)</td>
+      <td><code>ardenexal/fhir-sdc</code></td>
+      <td><a href="sdc/overview.md">SDC</a></td>
+    </tr>
+    <tr>
       <td>Symfony integration</td>
       <td><code>ardenexal/fhir-bundle</code></td>
       <td><a href="bundle/configuration.md">Symfony Bundle</a></td>

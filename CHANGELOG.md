@@ -7,9 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- [SDC] New `ardenexal/fhir-sdc` component: `FHIRQuestionnaireResponseExtractService::extract($qr, new ExtractContext(...))` implements `QuestionnaireResponse/$extract` (observation-, definition-, and template-based), returning an `ExtractResult` with a transaction `Bundle` plus an optional companion `OperationOutcome`
+- [SDC] `$extract` supports version-agnostic definition/template extraction (R4/R4B/R5), `extractAllocateId` cross-resource references, fixed-value + FHIRPath calculated values, and choice slices; observation-based extraction is R4-only (non-R4 runs warn and skip)
+- [SDC] `$extract` output is always a `transaction` Bundle — `entry.request` is `POST Type` (no id) or `PUT Type/id` (id present), create/update only; mixed-method Questionnaires merge into one Bundle; empty extraction yields an empty Bundle plus an `information` `OperationOutcome`, and a malformed expression warns and skips that entry
+- [SDC] Opt-in `Provenance` generation via `ExtractContext(emitProvenance: true)`: when resources are extracted, the Bundle gains a `Provenance` entry targeting them and referencing the source `QuestionnaireResponse` (default output omits it)
+- [Metadata] New `SafeExtensionReader` for tolerant extension traversal (`url`, `value[x]`, nested `extension[]`, find-by-url) that degrades to absent instead of throwing on constructor-bypassed (deserialized) objects
+- [FHIRPath] `EvaluationContext::withResourceNode()`/`getResourceNode()` bind `%resource`/`%rootResource` to a resource distinct from the evaluation focus
+
+### Changed
+- [FHIRPath] `%resource`/`%rootResource` now resolve to a bound resource node when set, falling back to the focus otherwise; `%context` always resolves to the focus node (single-node evaluation where focus == resource is unchanged)
+
 ### Fixed
 - [Docs] Removed the stale "single-element repeating fields" XML limitation note from the serialization guide; single-value repeating fields (e.g. a `HumanName` with one `given`) already round-trip correctly through XML, and a regression test now guards this
 - [Docs] Corrected the Questionnaire validation guide: `enableWhenExpression` (SDC + Kanta variants) and `regex` constraints are now documented as covered, the implementation-rules table lists the enforced constraint/value-domain/quantity `error` rules, and the conformance-coverage section reflects that all 78 eligible R4 cases are seeded and asserted (only SDC `answerExpression`/`calculatedExpression` and R5 `answerConstraint` remain uncovered)
+
+### Infrastructure
+- [SDC] `ardenexal/fhir-sdc` wired into the workspace: root `composer.json` autoload (src + tests), `phpunit.dist.xml` unit/integration + dedicated `sdc-extract-spec`/`sdc-populate-spec` suites, and `test-ai-sdc-extract-spec`/`test-ai-sdc-populate-spec` scripts
+- [CI] Added `blundergoat/gruff-php` dev dependency and `.gruff-php.yaml` config; `.gruff-cache/` gitignored
 
 ## [0.4.0] - 2026-06-12
 
