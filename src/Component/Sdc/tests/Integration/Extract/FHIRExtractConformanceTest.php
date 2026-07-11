@@ -240,15 +240,14 @@ final class FHIRExtractConformanceTest extends AbstractSdcConformanceTest
      * (`code.coding`/`category.coding`/`identifier.type`), a `Coding` answer reduced to a `code`
      * (`gender`), temporal coercion (`effectiveDateTime`/`issued`), and cross-resource reference topology.
      *
-     * ## Known gap (documented)
+     * ## Focus-node `definitionExtractValue` (M05)
      *
-     * `Patient.name.text` (a `definitionExtractValue` whose FHIRPath `item.where(...)` requires the current
-     * QuestionnaireResponse item as the evaluation focus while `%resource` stays the QR root) is NOT
-     * produced: the FHIRPath evaluator binds `%resource` to the focus node, so focus and `%resource`
-     * cannot yet differ (separating them is a shared-FHIRPath change out of scope for this stretch).
-     * `HumanName.text` is a **data-bearing** element the reference engine computed on purpose — the oracle
-     * comparison only stays green because `text` is in the shared `IGNORED_KEYS`; this assertion documents
-     * the gap explicitly and trips if the focus-node limitation is later lifted.
+     * `Patient.name.text` is produced by a `definitionExtractValue` whose FHIRPath
+     * `item.where(linkId='given' or linkId='family').answer.value.join(' ')` requires the current
+     * QuestionnaireResponse item as the evaluation focus while `%resource` stays the QR root. The
+     * FHIRPath evaluator now models that focus/`%resource` split, so this case asserts the computed
+     * `HumanName.text` directly (it is a data-bearing element the oracle comparison itself drops via
+     * `IGNORED_KEYS`, so the explicit assertion below is what actually guards it).
      */
     public function testComplexDefn3ExtractsTypedResources(): void
     {
@@ -299,8 +298,47 @@ final class FHIRExtractConformanceTest extends AbstractSdcConformanceTest
         self::assertIsArray($related);
         self::assertSame($patientFullUrl, $related['patient']['reference'] ?? null);
 
-        // Documented known gap: name.text (focus-node FHIRPath) is not produced.
-        self::assertArrayNotHasKey('text', is_array($patient['name'][0] ?? null) ? $patient['name'][0] : [], 'name.text is a known gap (see docblock); update this guard if the focus-node limitation is lifted.');
+        // Focus-node definitionExtractValue (M05): name.text is computed by joining the given/family
+        // answers of the current QR item while %resource stays the QR root.
+        $name = is_array($patient['name'][0] ?? null) ? $patient['name'][0] : [];
+        self::assertSame('Peter Chalmers', $name['text'] ?? null, 'name.text must be the focus-node join of the given/family answers.');
+    }
+
+    /**
+     * @return iterable<string, array{0: FhirVersion}>
+     */
+    public static function focusNodeVersions(): iterable
+    {
+        yield 'R4B' => [FhirVersion::R4B];
+        yield 'R5'  => [FhirVersion::R5];
+    }
+
+    /**
+     * Focus-node `definitionExtractValue` (M05) across model versions: the computed `Patient.name.text`
+     * (`item.where(linkId='given' or linkId='family').answer.value.join(' ')`, focus = the QR item,
+     * `%resource` = the QR root) is produced identically under both R4B and R5. Asserted directly because
+     * `text` is in `IGNORED_KEYS`, so the oracle-comparison corpus tests do not cover it.
+     */
+    #[DataProvider('focusNodeVersions')]
+    public function testComplexDefn3ComputesNameTextAcrossVersions(FhirVersion $version): void
+    {
+        $actual  = $this->extractForVersion('extract-complex-defn3', $version);
+        $entries = $actual['entry'];
+        self::assertIsArray($entries);
+
+        $patient = null;
+        foreach ($entries as $entry) {
+            self::assertIsArray($entry);
+            self::assertIsArray($entry['resource']);
+            if (($entry['resource']['resourceType'] ?? null) === 'Patient') {
+                $patient = $entry['resource'];
+                break;
+            }
+        }
+
+        self::assertIsArray($patient, 'Expected a Patient entry in the ' . $version->value . ' Bundle.');
+        $name = is_array($patient['name'][0] ?? null) ? $patient['name'][0] : [];
+        self::assertSame('Peter Chalmers', $name['text'] ?? null, 'name.text must be the focus-node join under ' . $version->value . '.');
     }
 
     /**

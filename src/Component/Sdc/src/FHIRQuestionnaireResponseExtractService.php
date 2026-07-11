@@ -147,9 +147,14 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
         // FHIRPath expression in this run as external constants (`%name`). Scope is treated as global
         // (names are unique across the corpus); item-scoped shadowing is not modelled.
         $allocatedIds = $this->collectAllocatedIds($questionnaire);
-        $evalContext  = new EvaluationContext(
+        // Bind %resource/%rootResource to the QR root once, up front. `definitionExtractValue`
+        // expressions are then evaluated with the current QR response *item* as focus (%context)
+        // while %resource stays the QR root. resourceNode is never mutated by the evaluator's
+        // per-call setRootResource(), so it remains a stable QR-root handle for the whole walk.
+        $evalContext = new EvaluationContext(
             rootResource: $questionnaireResponse,
             externalConstants: $allocatedIds,
+            resourceNode: $questionnaireResponse,
         );
 
         /** @var list<array{resource: object, fullUrl: string|null}> $entries */
@@ -315,7 +320,7 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
 
             // Calculated (`definitionExtractValue`) fields declared on the extraction root itself
             // (e.g. `RelatedPerson.patient.reference ← %NewPatientId`).
-            $this->applyDefinitionExtractValues($sourceItem, $resource, $rootType, $factory, $evalContext, $issues);
+            $this->applyDefinitionExtractValues($sourceItem, $responseItem, $resource, $rootType, $factory, $evalContext, $issues);
             // The extraction root may itself be an answer-bearing leaf (e.g. an Observation whose own
             // `definition` is `value[x]:valueQuantity.value` carrying a decimal answer) — its answers are
             // written relative to the resource, in addition to its calculated fields and child items.
@@ -389,7 +394,7 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
             // Calculated fields declared on this item are written to their absolute path from the
             // resource root, independent of the hierarchical answer-write context.
             if ($sourceItem !== null) {
-                $this->applyDefinitionExtractValues($sourceItem, $rootResource, $rootType, $factory, $evalContext, $issues);
+                $this->applyDefinitionExtractValues($sourceItem, $responseItem, $rootResource, $rootType, $factory, $evalContext, $issues);
             }
 
             // No definition (logical group) — recurse in the same context.
@@ -635,7 +640,9 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
             }
 
             try {
-                return $this->stringifyPrimitive($this->evaluateToScalar($expression, $factory, $evalContext));
+                // A `fullUrl` sub-expression is resolved against the QR root (its historical focus),
+                // taken from the stable resourceNode handle rather than the evaluator-mutated root.
+                return $this->stringifyPrimitive($this->evaluateToScalar($expression, $evalContext->getResourceNode(), $factory, $evalContext));
             } catch (\Throwable) {
                 // A malformed fullUrl expression falls back to a freshly-minted urn:uuid.
                 return null;
@@ -651,10 +658,15 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
      * result is coerced by {@see DefinitionPathWriter} into the target property's primitive wrapper
      * (e.g. a computed uri into a `?UriPrimitive`); a failed expression surfaces a diagnostic issue.
      *
+     * Each `definitionExtractValue` FHIRPath `expression` is evaluated with `$responseItem` (the QR
+     * response item carrying the extension) as focus, so relative navigation such as
+     * `item.where(linkId=…)` resolves against that item's children while `%resource` stays the QR root.
+     *
      * @param list<object> $issues accumulated by reference
      */
     private function applyDefinitionExtractValues(
         object $item,
+        object $responseItem,
         object $rootResource,
         string $rootType,
         ExtractModelFactory $factory,
@@ -698,7 +710,7 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
                     continue;
                 }
                 try {
-                    $value = $this->evaluateToScalar($expression, $factory, $evalContext);
+                    $value = $this->evaluateToScalar($expression, $responseItem, $factory, $evalContext);
                 } catch (\Throwable $e) {
                     $issues[] = $factory->issue(
                         IssueSeverity::warning->value,
@@ -730,19 +742,20 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
     }
 
     /**
-     * Evaluate a FHIRPath expression against the run's context (QR root + allocated-id external
-     * constants) and return its first result item, or null when the result collection is empty.
+     * Evaluate a FHIRPath expression with `$focus` as the evaluation focus (`%context`/`$this`), the
+     * run's context supplying the allocated-id external constants and the QR-root `%resource` binding.
+     * Returns its first result item, or null when the result collection is empty.
      *
      * Propagates evaluation failures so callers can surface a diagnostic issue for a malformed
      * expression rather than silently dropping the calculated value.
      *
      * @throws \Throwable when the expression cannot be parsed or evaluated
      */
-    private function evaluateToScalar(string $expression, ExtractModelFactory $factory, EvaluationContext $evalContext): mixed
+    private function evaluateToScalar(string $expression, mixed $focus, ExtractModelFactory $factory, EvaluationContext $evalContext): mixed
     {
         return $this->fhirPath->evaluate(
             $expression,
-            $evalContext->getRootResource(),
+            $focus,
             $evalContext,
             $factory->fhirVersionValue(),
         )->first();

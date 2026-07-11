@@ -187,17 +187,18 @@ malformed expression surfaces a warning `OperationOutcome` issue rather than sil
    `definitionExtract` flag, so forms-lab yields **4 entries** (Patient, RelatedPerson, 2 Observations),
    not 5.
 
-**Documented KNOWN GAP — `Patient.name.text`:** the `name` group's `definitionExtractValue` expression
+**Focus-node `definitionExtractValue` — `Patient.name.text` (RESOLVED M05):** the `name` group's
+`definitionExtractValue` expression
 `item.where(linkId='given' or linkId='family').answer.value.join(' ')` requires the **current QR item**
-as the FHIRPath focus while `%resource` stays the QR root. The evaluator binds `%resource` to the focus
-node (`FHIRPathEvaluator::evaluate` sets root = focus), so focus and `%resource` cannot yet differ —
-separating them is a shared-FHIRPath change out of scope for this stretch. **`HumanName.text` is a
-data-bearing element the reference engine computed on purpose — NOT narrative.** The conformance
-comparison only stays green because `text` is in the shared `IGNORED_KEYS` (an entry that exists for
-`Narrative.text`/`CodeableConcept.text` divergences and here also masks this real field). So defn3 is
-faithfully reproduced *except* `name.text`; do not read the green as a clean end-to-end pass.
-`FHIRExtractConformanceTest::testComplexDefn3ExtractsTypedResources` documents the gap and guards the
-mappings the uuid-tokenised comparison could mask.
+as the FHIRPath focus while `%resource` stays the QR root. The FHIRPath evaluator now models this
+focus/`%resource` split (`EvaluationContext::withResourceNode` + the `%context` vs `%resource`
+resolution in `FHIRPathEvaluator::resolveEnvironmentVariable`; wired in
+`FHIRQuestionnaireResponseExtractService` — see `M05-fhirpath-focus-context.md`), so defn3 now
+reproduces `name.text = "Peter Chalmers"`. **`HumanName.text` is a data-bearing element the reference
+engine computed on purpose — NOT narrative**, and though the oracle comparison drops `text` via the
+shared `IGNORED_KEYS`, it is now asserted directly:
+`FHIRExtractConformanceTest::testComplexDefn3ExtractsTypedResources` (R4B) and
+`testComplexDefn3ComputesNameTextAcrossVersions` (R4B & R5). defn3 is now a clean end-to-end pass.
 
 ### `POST`/`PUT` request directive (M02) — VENDORED
 

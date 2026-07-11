@@ -49,6 +49,7 @@
         "symfony/yaml": "^6.4|^7.4"
     },
     "require-dev": {
+        "blundergoat/gruff-php": "^0.5",
         "brianium/paratest": "^7.20",
         "fhir/fhir-test-cases": "1.7.49",
         "giorgiosironi/eris": "^1.0",

@@ -22,6 +22,11 @@ final class EvaluationContext
      *                                                visitFunctionCall receives the full collection as input
      *                                                instead of a per-item single-item collection
      * @param bool                 $strictMode        When true, runtime semantic validation is enabled
+     * @param mixed                $resourceNode      The node bound to `%resource`/`%rootResource` — the
+     *                                                resource containing the evaluation focus. When null,
+     *                                                these variables fall back to the root resource
+     *                                                (the focus), preserving single-node evaluation where
+     *                                                focus == resource.
      */
     public function __construct(
         private mixed $rootResource = null,
@@ -32,6 +37,7 @@ final class EvaluationContext
         private ?string $fhirVersion = null,
         private ?Collection $collectionInput = null,
         private bool $strictMode = false,
+        private mixed $resourceNode = null,
     ) {
     }
 
@@ -61,6 +67,31 @@ final class EvaluationContext
     public function setRootResource(mixed $resource): void
     {
         $this->rootResource = $resource;
+    }
+
+    /**
+     * Get the node bound to `%resource`/`%rootResource` (the resource containing the focus),
+     * or null when unset (callers should then fall back to the root resource).
+     */
+    public function getResourceNode(): mixed
+    {
+        return $this->resourceNode;
+    }
+
+    /**
+     * Return an immutable copy of this context with the given `%resource`/`%rootResource` node.
+     *
+     * Lets a caller evaluate an expression against a focus node (e.g. a QuestionnaireResponse item)
+     * while binding `%resource` to a different containing resource (the QR root). Cloning — rather than
+     * a positional `new self(...)` — keeps the node stable across the mutating `setRootResource()`
+     * that {@see FHIRPathEvaluator::evaluate()} applies when it installs the focus.
+     */
+    public function withResourceNode(mixed $node): self
+    {
+        $clone               = clone $this;
+        $clone->resourceNode = $node;
+
+        return $clone;
     }
 
     /**
@@ -112,6 +143,7 @@ final class EvaluationContext
             $this->fhirVersion,
             $input,
             $this->strictMode,
+            $this->resourceNode,
         );
     }
 
@@ -167,6 +199,7 @@ final class EvaluationContext
             $this->fhirVersion,
             null,
             $this->strictMode,
+            $this->resourceNode,
         );
     }
 
@@ -219,6 +252,7 @@ final class EvaluationContext
             $this->fhirVersion,
             null,
             $this->strictMode,
+            $this->resourceNode,
         );
     }
 
@@ -263,6 +297,7 @@ final class EvaluationContext
             $this->fhirVersion,
             null,
             $this->strictMode,
+            $this->resourceNode,
         );
     }
 
@@ -285,6 +320,7 @@ final class EvaluationContext
             $this->fhirVersion,
             null,
             $this->strictMode,
+            $this->resourceNode,
         );
     }
 }

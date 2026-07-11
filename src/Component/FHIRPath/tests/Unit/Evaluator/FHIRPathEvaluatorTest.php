@@ -42,6 +42,14 @@ final class FHIRPathEvaluatorTest extends TestCase
         return $this->evaluator->evaluate($ast, $resource);
     }
 
+    private function evaluateWith(string $expression, mixed $focus, EvaluationContext $context): Collection
+    {
+        $tokens = $this->lexer->tokenize($expression);
+        $ast    = $this->parser->parse($tokens);
+
+        return $this->evaluator->evaluate($ast, $focus, $context);
+    }
+
     public function testEvaluateLiteralString(): void
     {
         $result = $this->evaluate("'hello'", null);
@@ -109,6 +117,49 @@ final class FHIRPathEvaluatorTest extends TestCase
         $result   = $this->evaluate('age', $resource);
 
         self::assertTrue($result->isEmpty());
+    }
+
+    /**
+     * A bound %resource node (the resource containing the focus) makes %resource/%rootResource
+     * distinct from %context (the focus). Exercises the SDC extraction case where a
+     * QuestionnaireResponse item is the focus while %resource stays the QR root.
+     */
+    public function testResourceNodeSeparatesContextFromContainingResource(): void
+    {
+        $qrRoot  = ['resourceType' => 'QuestionnaireResponse', 'id' => 'qr1'];
+        $focus   = ['linkId' => 'name'];
+        $context = (new EvaluationContext())->withResourceNode($qrRoot);
+
+        self::assertSame($focus, $this->evaluateWith('%context', $focus, $context)->first());
+        self::assertSame($qrRoot, $this->evaluateWith('%resource', $focus, $context)->first());
+        self::assertSame($qrRoot, $this->evaluateWith('%rootResource', $focus, $context)->first());
+    }
+
+    /**
+     * With a distinct %resource bound, navigation from %resource reaches the containing resource's
+     * fields even though the focus is a different node.
+     */
+    public function testResourceVariableNavigatesContainingResource(): void
+    {
+        $qrRoot  = ['resourceType' => 'QuestionnaireResponse', 'authored' => '2024-01-01'];
+        $focus   = ['linkId' => 'name'];
+        $context = (new EvaluationContext())->withResourceNode($qrRoot);
+
+        self::assertSame('2024-01-01', $this->evaluateWith('%resource.authored', $focus, $context)->first());
+    }
+
+    /**
+     * Backward compatibility: with no distinct resource node bound, %context, %resource, and
+     * %rootResource all resolve to the focus — the single-node evaluation every existing caller relies on.
+     */
+    public function testWithoutResourceNodeAllVariablesResolveToFocus(): void
+    {
+        $focus   = ['resourceType' => 'Patient', 'id' => 'p1'];
+        $context = new EvaluationContext();
+
+        self::assertSame($focus, $this->evaluateWith('%context', $focus, $context)->first());
+        self::assertSame($focus, $this->evaluateWith('%resource', $focus, $context)->first());
+        self::assertSame($focus, $this->evaluateWith('%rootResource', $focus, $context)->first());
     }
 
     public function testEmptyPropagation(): void

@@ -737,17 +737,32 @@ final class FHIRPathEvaluator implements ExpressionVisitor
      *   - FHIR R4 FHIRPath supplement: %resource, %rootResource, %sct, %loinc,
      *     %vs-<name>, %ext-<name>
      *
-     * Note: %resource differs from %rootResource when navigating contained
-     * resources via resolve() — for now both return rootResource since contained
-     * resource navigation is not yet implemented.
+     * Per FHIRPath semantics %context is the original focus node, while %resource is the
+     * resource containing it and %rootResource the container of %resource. This evaluator models
+     * the focus/resource split via EvaluationContext::getResourceNode(): when a distinct resource
+     * node is bound (e.g. SDC extraction evaluating a QuestionnaireResponse item as focus while
+     * %resource stays the QR root), %resource/%rootResource resolve to it; otherwise they fall back
+     * to the focus, so single-node evaluation where focus == resource is unchanged.
+     *
+     * Note: %resource still differs from %rootResource only when navigating contained resources via
+     * resolve(); both return the bound resource node for now since contained-resource navigation is
+     * not yet implemented.
      */
     private function resolveEnvironmentVariable(string $name): Collection|string|null
     {
-        // Node references
-        if ($name === 'context' || $name === 'resource' || $name === 'rootResource') {
-            $root = $this->context->getRootResource();
+        // %context — the original evaluation focus node.
+        if ($name === 'context') {
+            $focus = $this->context->getRootResource();
 
-            return $root !== null ? Collection::single($root) : Collection::empty();
+            return $focus !== null ? Collection::single($focus) : Collection::empty();
+        }
+
+        // %resource / %rootResource — the resource containing the focus. Falls back to the focus
+        // when no distinct resource node is bound (preserving single-node evaluation).
+        if ($name === 'resource' || $name === 'rootResource') {
+            $resource = $this->context->getResourceNode() ?? $this->context->getRootResource();
+
+            return $resource !== null ? Collection::single($resource) : Collection::empty();
         }
 
         // Static URL constants
