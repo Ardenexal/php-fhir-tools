@@ -11,6 +11,7 @@ use Ardenexal\FHIRTools\Component\Sdc\FHIRQuestionnaireResponseExtractService;
 use Ardenexal\FHIRTools\Component\Sdc\Tests\Integration\AbstractSdcConformanceTest;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\ExpectationFailedException;
 
 /**
@@ -99,6 +100,150 @@ final class FHIRExtractConformanceTest extends AbstractSdcConformanceTest
         [$actual, $expected] = $this->extractAndExpected('definition-extract-basic');
 
         $this->assertSdcConformance($expected, $actual);
+    }
+
+    /**
+     * R4B parity across the full definition-based corpus: each case driven through the **R4B** model
+     * namespace, compared to the frozen forms-lab Bundle. This is a genuine independent oracle for R4B —
+     * forms-lab's capability statement declares `fhirVersion 4.3.0` (R4B), so the frozen expected Bundles
+     * were produced by an R4B-native engine (the R4 cases reuse them via R4↔R4B wire-compatibility).
+     * See tests/SOURCES.md.
+     */
+    #[DataProvider('definitionCorpus')]
+    public function testDefinitionCorpusR4BConformsToReferenceOracle(string $case): void
+    {
+        $expectedPath = self::FIXTURE_DIR . '/' . $case . '.expected-bundle.json';
+        if (!is_file($expectedPath)) {
+            self::markTestSkipped('No vendored reference oracle for ' . $case . ' yet.');
+        }
+
+        $actual   = $this->extractForVersion($case, FhirVersion::R4B);
+        $expected = $this->normalizeInstants($this->decode($this->fixture($case . '.expected-bundle.json')));
+
+        $this->assertSdcConformance($expected, $actual);
+    }
+
+    /**
+     * R5 parity across the full definition-based corpus: each case driven through the **R5** model
+     * namespace.
+     *
+     * ## Oracle caveat — structural parity, NOT an independent R5 oracle
+     *
+     * No independent SDC `$extract` engine for R5 is reachable (forms-lab is R4B-native; HAPI exposes no
+     * `$extract`; sqlonfhir is untrustworthy — see tests/SOURCES.md). These cases therefore assert that the
+     * R5 model path produces a Bundle **structurally equivalent** to the frozen R4B/R4 oracle — legitimate
+     * here because the extracted resources (Patient/RelatedPerson name/identifier/reference topology) and
+     * the transaction envelope are byte-identical across R4→R4B→R5. It is a cross-version structural-parity
+     * guard, documented as a plan deviation in the M02 milestone, and MUST be reseeded from a real R5
+     * engine if one becomes available.
+     */
+    #[DataProvider('definitionCorpus')]
+    public function testDefinitionCorpusR5StructurallyMatchesReferenceOracle(string $case): void
+    {
+        $expectedPath = self::FIXTURE_DIR . '/' . $case . '.expected-bundle.json';
+        if (!is_file($expectedPath)) {
+            self::markTestSkipped('No vendored reference oracle for ' . $case . ' yet.');
+        }
+
+        $actual   = $this->extractForVersion($case, FhirVersion::R5);
+        $expected = $this->normalizeInstants($this->decode($this->fixture($case . '.expected-bundle.json')));
+
+        $this->assertSdcConformance($expected, $actual);
+    }
+
+    /**
+     * Observation-based extraction is R4-only (M01 scope): the produced `Observation` and its datatypes
+     * are R4. A non-R4 run carrying `observationExtract` items must therefore report a diagnostic issue
+     * and skip those items — never emit a wrong-version Observation into the Bundle. Drives the R4-only
+     * observation fixture through the R4B model path and asserts the guard fires.
+     */
+    public function testObservationExtractUnderNonR4ReportsIssueAndSkips(): void
+    {
+        $serializer = FHIRSerializationService::createDefault(FhirVersion::R4B);
+        $namespace  = 'Ardenexal\\FHIRTools\\Component\\Models\\R4B\\Resource\\';
+
+        $questionnaire = $serializer->deserializeFromJson(
+            $this->fixture('observation-extract-basic.questionnaire.json'),
+            $namespace . 'QuestionnaireResource',
+        );
+        $response = $serializer->deserializeFromJson(
+            $this->fixture('observation-extract-basic.response.json'),
+            $namespace . 'QuestionnaireResponseResource',
+        );
+
+        $result = (new FHIRQuestionnaireResponseExtractService())
+            ->extract($response, new ExtractContext(fhirVersion: FhirVersion::R4B, questionnaire: $questionnaire));
+
+        $bundle = $this->decode($serializer->serializeToJson($result->getResource()));
+        self::assertSame([], $bundle['entry'] ?? [], 'No Observation entries may be emitted for a non-R4 run.');
+
+        $issues = $result->getIssues();
+        self::assertNotNull($issues, 'A non-R4 observationExtract run must surface a diagnostic issue.');
+        $diagnostics = $this->decode($serializer->serializeToJson($issues));
+        $texts       = array_map(
+            static fn (mixed $i): string => is_array($i) && is_string($i['diagnostics'] ?? null) ? $i['diagnostics'] : '',
+            is_array($diagnostics['issue'] ?? null) ? $diagnostics['issue'] : [],
+        );
+        self::assertNotEmpty(
+            array_filter($texts, static fn (string $t): bool => str_contains($t, 'Observation-based extraction is only supported for R4')),
+            'Expected an issue explaining observation-based extraction is R4-only.',
+        );
+    }
+
+    /**
+     * When the QuestionnaireResponse's own model version disagrees with the requested extraction version,
+     * the service refuses cleanly: the extracted values are version-specific model objects that cannot be
+     * grafted across versions (an R4 `DatePrimitive` will not assign to an R5 `?DatePrimitive` property),
+     * so it returns an empty transaction Bundle plus a diagnostic issue rather than emitting a malformed
+     * cross-version Bundle or crashing. Guards that mismatch branch: an R4 `definition-extract-basic`
+     * response run under an R5 context yields no entries and an issue naming the disagreement.
+     */
+    public function testResponseVersionMismatchRefusesWithDiagnostic(): void
+    {
+        $r4Serializer  = FHIRSerializationService::createDefault(FhirVersion::R4);
+        $questionnaire = $r4Serializer->deserializeFromJson(
+            $this->fixture('definition-extract-basic.questionnaire.json'),
+            QuestionnaireResource::class,
+        );
+        $response = $r4Serializer->deserializeFromJson(
+            $this->fixture('definition-extract-basic.response.json'),
+            QuestionnaireResponseResource::class,
+        );
+
+        // Request R5 output for an R4-typed response.
+        $result     = (new FHIRQuestionnaireResponseExtractService())
+            ->extract($response, new ExtractContext(fhirVersion: FhirVersion::R5, questionnaire: $questionnaire));
+        $r5Serializer = FHIRSerializationService::createDefault(FhirVersion::R5);
+
+        $bundle = $this->decode($r5Serializer->serializeToJson($result->getResource()));
+        self::assertSame('Bundle', $bundle['resourceType'] ?? null);
+        self::assertSame('transaction', $bundle['type'] ?? null);
+        self::assertSame([], $bundle['entry'] ?? [], 'A version mismatch must extract nothing.');
+
+        $issues = $result->getIssues();
+        self::assertNotNull($issues, 'A version mismatch must surface a diagnostic issue.');
+        $decoded = $this->decode($r5Serializer->serializeToJson($issues));
+        $texts   = array_map(
+            static fn (mixed $i): string => is_array($i) && is_string($i['diagnostics'] ?? null) ? $i['diagnostics'] : '',
+            is_array($decoded['issue'] ?? null) ? $decoded['issue'] : [],
+        );
+        self::assertNotEmpty(
+            array_filter($texts, static fn (string $t): bool => str_contains($t, 'differs from the requested extraction version')),
+            'Expected an issue naming the QuestionnaireResponse/extraction version disagreement.',
+        );
+    }
+
+    /**
+     * The definition-based extraction cases vendored from the forms-lab oracle, exercised across versions.
+     *
+     * @return iterable<string, array{0: string}>
+     */
+    public static function definitionCorpus(): iterable
+    {
+        yield 'basic'       => ['definition-extract-basic'];
+        yield 'allocateId'  => ['definition-extract-allocateid'];
+        yield 'value'       => ['definition-extract-value'];
+        yield 'put'         => ['definition-extract-put'];
     }
 
     /**
@@ -278,6 +423,34 @@ final class FHIRExtractConformanceTest extends AbstractSdcConformanceTest
             $this->normalizeInstants($this->decode($serializer->serializeToJson($result->getResource()))),
             $this->normalizeInstants($this->decode($this->fixture($case . '.expected-bundle.json'))),
         ];
+    }
+
+    /**
+     * Deserialize a case's Questionnaire + QuestionnaireResponse into a specific FHIR version's model
+     * namespace, run `$extract` for that version, and return the normalised decoded actual Bundle. Backs
+     * the R4B/R5 parity cases — the version-neutral input JSON is deserialized into the requested version's
+     * generated classes so the version-generic extraction path is exercised end-to-end per version.
+     *
+     * @return array<string, mixed>
+     */
+    private function extractForVersion(string $case, FhirVersion $version): array
+    {
+        $serializer = FHIRSerializationService::createDefault($version);
+        $namespace  = 'Ardenexal\\FHIRTools\\Component\\Models\\' . $version->value . '\\Resource\\';
+
+        $questionnaire = $serializer->deserializeFromJson(
+            $this->fixture($case . '.questionnaire.json'),
+            $namespace . 'QuestionnaireResource',
+        );
+        $response = $serializer->deserializeFromJson(
+            $this->fixture($case . '.response.json'),
+            $namespace . 'QuestionnaireResponseResource',
+        );
+
+        $result = (new FHIRQuestionnaireResponseExtractService())
+            ->extract($response, new ExtractContext(fhirVersion: $version, questionnaire: $questionnaire));
+
+        return $this->normalizeInstants($this->decode($serializer->serializeToJson($result->getResource())));
     }
 
     /**

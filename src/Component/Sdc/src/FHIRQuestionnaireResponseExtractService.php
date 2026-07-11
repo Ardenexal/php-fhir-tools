@@ -9,40 +9,26 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\CodeableConcept;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
-use Ardenexal\FHIRTools\Component\Models\R4\Enum\BundleType;
 use Ardenexal\FHIRTools\Component\Models\R4\Enum\HTTPVerb;
 use Ardenexal\FHIRTools\Component\Models\R4\Enum\IssueSeverity;
 use Ardenexal\FHIRTools\Component\Models\R4\Enum\IssueType;
 use Ardenexal\FHIRTools\Component\Models\R4\Enum\ObservationStatus;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\BundleTypeType;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\HTTPVerbType;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\IssueSeverityType;
-use Ardenexal\FHIRTools\Component\Models\R4\DataType\IssueTypeType;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\ObservationStatusType;
 use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRInstant;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\DateTimePrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\InstantPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\TimePrimitive;
-use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\Bundle\BundleEntry;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\Bundle\BundleEntryRequest;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\AbstractResource;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\BundleResource;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\ObservationResource;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\OperationOutcome\OperationOutcomeIssue;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\OperationOutcomeResource;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\Questionnaire\QuestionnaireItem;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\QuestionnaireResource;
-use Ardenexal\FHIRTools\Component\Models\R4\Resource\QuestionnaireResponse\QuestionnaireResponseItem;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\QuestionnaireResponseResource;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
+use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider;
 
 /**
- * R4 observation- and definition-based `QuestionnaireResponse/$extract`.
+ * Observation- and definition-based `QuestionnaireResponse/$extract` across R4/R4B/R5.
  *
  * For each response item whose **source Questionnaire item** carries the SDC `observationExtract`
  * flag and an `item.code`, this builds one `Observation` per answer and assembles them into a
@@ -55,6 +41,16 @@ use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvide
  * matching `Questionnaire.item.definition` canonical paths to typed properties via
  * {@see DefinitionPathWriter}, honouring item grouping so a group item establishes one intermediate
  * element that its children populate.
+ *
+ * **Version handling.** The produced Bundle/OperationOutcome/target-resource objects are constructed
+ * from the model namespace named by {@see ExtractContext::$fhirVersion} through {@see ExtractModelFactory},
+ * and inputs are read tolerantly (property-existence / {@see SafeExtensionReader}) so the structural walk
+ * is version-agnostic. The response's own model version MUST match the requested version, though — the
+ * extracted values are version-specific model objects that cannot be grafted across versions — so a
+ * mismatched response is refused with a diagnostic issue and an empty Bundle. **Definition-based
+ * extraction is version-generic (R4/R4B/R5); observation-based extraction remains R4-only** — its
+ * `Observation` assembly builds R4 datatypes, so a non-R4 response carrying `observationExtract` items
+ * yields a diagnostic issue rather than a wrong-version Observation.
  *
  * Extension reads route exclusively through {@see SafeExtensionReader} so that constructor-bypassed
  * (deserializer-origin) objects with uninitialized typed properties degrade to "absent" rather than
@@ -72,8 +68,7 @@ use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvide
  * Each entry's `request` is `POST Type` for a resource with no logical `id` and `PUT Type/id` for one
  * whose `id` was written during extraction (a hidden item or `definitionExtractValue` targeting `.id`).
  *
- * Out of scope here (later M03 / M04): template-based extraction, provenance, and R4B/R5 parity.
- * Definition extraction is R4-only.
+ * Out of scope here (later M03 / M04): template-based extraction and provenance.
  */
 final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInterface
 {
@@ -112,22 +107,41 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
         private readonly SafeExtensionReader $extensionReader = new SafeExtensionReader(),
         private readonly DefinitionPathWriter $writer = new DefinitionPathWriter(new PropertyMetadataProvider()),
         private readonly FHIRPathService $fhirPath = new FHIRPathService(),
+        private readonly FHIRMetadataExtractor $metadata = new FHIRMetadataExtractor(),
     ) {
     }
 
     public function extract(object $questionnaireResponse, ExtractContext $context): ExtractResult
     {
-        if (!$questionnaireResponse instanceof QuestionnaireResponseResource) {
-            throw new \InvalidArgumentException(\sprintf('%s extracts R4 QuestionnaireResponse only; got %s', self::class, $questionnaireResponse::class));
+        $version = $context->fhirVersion;
+        $factory = new ExtractModelFactory($version);
+
+        /** @var list<object> $issues */
+        $issues = [];
+
+        // The output version is governed by the context. Extraction grafts values read from the response
+        // into freshly-built resources of the requested version; those values are version-specific model
+        // objects (e.g. an R4 `DatePrimitive` cannot assign to an R5 `?DatePrimitive` property), so a
+        // response whose own model version disagrees cannot be coherently extracted. Refuse cleanly with a
+        // diagnostic rather than attempt a cross-version graft that would emit a malformed Bundle or crash.
+        $qrVersion = $this->metadata->extractFHIRVersion($questionnaireResponse);
+        if ($qrVersion !== null && $qrVersion !== $version->value) {
+            $issues[] = $factory->issue(
+                IssueSeverity::warning->value,
+                IssueType::processingfailure->value,
+                \sprintf('QuestionnaireResponse model version "%s" differs from the requested extraction version "%s"; no resources were extracted.', $qrVersion, $version->value),
+            );
+
+            return new ExtractResult(
+                $this->assembleTransactionBundle([], $factory),
+                $this->buildOutcome([], $issues, $factory),
+            );
         }
 
         $questionnaire = $context->questionnaire;
-        $itemIndex     = $questionnaire instanceof QuestionnaireResource
-            ? $this->indexQuestionnaireItems($questionnaire->item)
+        $itemIndex     = is_object($questionnaire)
+            ? $this->indexQuestionnaireItems($this->childItems($questionnaire))
             : [];
-
-        /** @var list<OperationOutcomeIssue> $issues */
-        $issues = [];
 
         // Allocate one urn:uuid per declared `extractAllocateId` variable and expose them to every
         // FHIRPath expression in this run as external constants (`%name`). Scope is treated as global
@@ -138,18 +152,30 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
             externalConstants: $allocatedIds,
         );
 
-        $observations = [];
-        $this->collectObservations($questionnaireResponse->item, $itemIndex, $questionnaireResponse, $observations);
-
-        /** @var list<array{resource: AbstractResource, fullUrl: string|null}> $entries */
+        /** @var list<array{resource: object, fullUrl: string|null}> $entries */
         $entries = [];
-        foreach ($observations as $observation) {
-            $entries[] = ['resource' => $observation, 'fullUrl' => null];
-        }
-        $this->collectDefinitionResources($questionnaireResponse->item, $itemIndex, $evalContext, $entries, $issues);
 
-        $bundle  = $this->assembleTransactionBundle($entries);
-        $outcome = $this->buildOutcome($entries, $issues);
+        // Observation-based extraction is R4-only: it builds R4 datatypes directly. For a non-R4 run,
+        // report (rather than silently drop) any observationExtract items instead of emitting the wrong
+        // model version into the Bundle.
+        if ($version === FhirVersion::R4 && $questionnaireResponse instanceof QuestionnaireResponseResource) {
+            $observations = [];
+            $this->collectObservations($questionnaireResponse->item, $itemIndex, $questionnaireResponse, $observations);
+            foreach ($observations as $observation) {
+                $entries[] = ['resource' => $observation, 'fullUrl' => null];
+            }
+        } elseif ($this->hasAnyObservationExtract($itemIndex)) {
+            $issues[] = $factory->issue(
+                IssueSeverity::warning->value,
+                IssueType::processingfailure->value,
+                \sprintf('Observation-based extraction is only supported for R4; observationExtract items were skipped for %s.', $version->value),
+            );
+        }
+
+        $this->collectDefinitionResources($this->childItems($questionnaireResponse), $itemIndex, $factory, $evalContext, $entries, $issues);
+
+        $bundle  = $this->assembleTransactionBundle($entries, $factory);
+        $outcome = $this->buildOutcome($entries, $issues, $factory);
 
         return new ExtractResult($bundle, $outcome);
     }
@@ -157,19 +183,19 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
     /**
      * Index every Questionnaire item (recursively) by its linkId.
      *
-     * @param array<int, QuestionnaireItem> $items
+     * @param list<object> $items
      *
-     * @return array<string, QuestionnaireItem>
+     * @return array<string, object>
      */
     private function indexQuestionnaireItems(array $items): array
     {
         $index = [];
         foreach ($items as $item) {
-            $linkId = $this->linkIdString($item->linkId);
+            $linkId = $this->linkIdOf($item);
             if ($linkId !== null) {
                 $index[$linkId] = $item;
             }
-            $index += $this->indexQuestionnaireItems($item->item);
+            $index += $this->indexQuestionnaireItems($this->childItems($item));
         }
 
         return $index;
@@ -177,10 +203,11 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
 
     /**
      * Walk the response item tree, appending an Observation for each answer under an extract-flagged item.
+     * R4-only: the produced `Observation` and its datatypes are R4.
      *
-     * @param array<int, QuestionnaireResponseItem> $responseItems
-     * @param array<string, QuestionnaireItem>      $itemIndex
-     * @param list<ObservationResource>             $observations  accumulated by reference
+     * @param array<int, object>        $responseItems
+     * @param array<string, object>     $itemIndex
+     * @param list<ObservationResource> $observations  accumulated by reference
      */
     private function collectObservations(
         array $responseItems,
@@ -189,36 +216,52 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
         array &$observations,
     ): void {
         foreach ($responseItems as $responseItem) {
-            $linkId       = $this->linkIdString($responseItem->linkId);
+            $linkId       = $this->linkIdOf($responseItem);
             $sourceItem   = $linkId     !== null ? ($itemIndex[$linkId] ?? null) : null;
+            $codings      = $sourceItem !== null ? $this->itemCodings($sourceItem) : [];
             $extractsHere = $sourceItem !== null
                 && $this->hasObservationExtract($sourceItem)
-                && $sourceItem->code !== [];
+                && $codings !== [];
 
             if ($extractsHere) {
-                // $sourceItem is non-null here — implied by $extractsHere.
-                $code = new CodeableConcept(coding: $sourceItem->code);
-                foreach ($responseItem->answer as $answer) {
-                    $observations[] = $this->buildObservation($code, $answer->value, $response);
+                $code = new CodeableConcept(coding: $codings);
+                foreach ($this->answersOf($responseItem) as $answer) {
+                    $observations[] = $this->buildObservation($code, $this->answerValue($answer), $response);
                     // Nested answer.item may itself carry extract-flagged questions.
-                    $this->collectObservations($answer->item, $itemIndex, $response, $observations);
+                    $this->collectObservations($this->childItems($answer), $itemIndex, $response, $observations);
                 }
             } else {
-                foreach ($responseItem->answer as $answer) {
-                    $this->collectObservations($answer->item, $itemIndex, $response, $observations);
+                foreach ($this->answersOf($responseItem) as $answer) {
+                    $this->collectObservations($this->childItems($answer), $itemIndex, $response, $observations);
                 }
             }
 
-            $this->collectObservations($responseItem->item, $itemIndex, $response, $observations);
+            $this->collectObservations($this->childItems($responseItem), $itemIndex, $response, $observations);
         }
+    }
+
+    /**
+     * True when any indexed Questionnaire item carries a truthy `observationExtract` flag.
+     *
+     * @param array<string, object> $itemIndex
+     */
+    private function hasAnyObservationExtract(array $itemIndex): bool
+    {
+        foreach ($itemIndex as $item) {
+            if ($this->hasObservationExtract($item)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
      * True when the Questionnaire item carries a truthy `observationExtract` flag extension.
      */
-    private function hasObservationExtract(QuestionnaireItem $item): bool
+    private function hasObservationExtract(object $item): bool
     {
-        foreach ($item->extension as $extension) {
+        foreach ($this->extensionReader->readSubExtensions($item) as $extension) {
             if ($this->extensionReader->readUrl($extension) !== self::OBSERVATION_EXTRACT_URL) {
                 continue;
             }
@@ -235,47 +278,47 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
     /**
      * Walk the response tree, building one resource per `definitionExtract`-flagged source item.
      *
-     * @param array<int, QuestionnaireResponseItem>                         $responseItems
-     * @param array<string, QuestionnaireItem>                              $itemIndex
-     * @param list<array{resource: AbstractResource, fullUrl: string|null}> $entries       accumulated by reference
-     * @param list<OperationOutcomeIssue>                                   $issues        accumulated by reference
+     * @param list<object>                                        $responseItems
+     * @param array<string, object>                               $itemIndex
+     * @param list<array{resource: object, fullUrl: string|null}> $entries       accumulated by reference
+     * @param list<object>                                        $issues        accumulated by reference
      */
     private function collectDefinitionResources(
         array $responseItems,
         array $itemIndex,
+        ExtractModelFactory $factory,
         EvaluationContext $evalContext,
         array &$entries,
         array &$issues,
     ): void {
         foreach ($responseItems as $responseItem) {
-            $linkId     = $this->linkIdString($responseItem->linkId);
+            $linkId     = $this->linkIdOf($responseItem);
             $sourceItem = $linkId     !== null ? ($itemIndex[$linkId] ?? null) : null;
             $canonical  = $sourceItem !== null ? $this->definitionExtractCanonical($sourceItem) : null;
 
             if ($canonical === null || $sourceItem === null) {
                 // Not an extraction root — descend looking for nested definitionExtract roots.
-                $this->collectDefinitionResources($responseItem->item, $itemIndex, $evalContext, $entries, $issues);
+                $this->collectDefinitionResources($this->childItems($responseItem), $itemIndex, $factory, $evalContext, $entries, $issues);
                 continue;
             }
 
-            $class = $this->resolveResourceClass($canonical);
-            if ($class === null) {
-                $issues[] = $this->issue(
-                    IssueType::processingfailure,
-                    \sprintf('definitionExtract target canonical "%s" does not resolve to an R4 resource type.', $canonical),
+            $rootType = $this->canonicalResourceType($canonical);
+            $resource = $factory->newResource($rootType);
+            if ($resource === null) {
+                $issues[] = $factory->issue(
+                    IssueSeverity::warning->value,
+                    IssueType::processingfailure->value,
+                    \sprintf('definitionExtract target canonical "%s" does not resolve to a %s resource type.', $canonical, $factory->fhirVersionValue()),
                 );
                 continue;
             }
 
-            $resource = new $class();
-            $rootType = $this->canonicalResourceType($canonical);
-
             // Calculated (`definitionExtractValue`) fields declared on the extraction root itself
             // (e.g. `RelatedPerson.patient.reference ← %NewPatientId`).
-            $this->applyDefinitionExtractValues($sourceItem, $resource, $rootType, $evalContext, $issues);
-            $this->walkDefinitionItems($responseItem->item, $itemIndex, $resource, [$rootType], $resource, $rootType, $evalContext, $issues);
+            $this->applyDefinitionExtractValues($sourceItem, $resource, $rootType, $factory, $evalContext, $issues);
+            $this->walkDefinitionItems($this->childItems($responseItem), $itemIndex, $resource, [$rootType], $resource, $rootType, $factory, $evalContext, $issues);
 
-            $fullUrl   = $this->resolveFullUrl($sourceItem, $evalContext);
+            $fullUrl   = $this->resolveFullUrl($sourceItem, $factory, $evalContext);
             $entries[] = ['resource' => $resource, 'fullUrl' => $fullUrl];
         }
     }
@@ -285,12 +328,12 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
      * `definition` names a complex element creates one intermediate instance that its children fill;
      * leaf items write their answers relative to the enclosing context.
      *
-     * @param array<int, QuestionnaireResponseItem> $responseItems
-     * @param array<string, QuestionnaireItem>      $itemIndex
-     * @param non-empty-list<string>                $basePath      the element path `$context` represents (e.g. ['Patient'] or ['Patient','name'])
-     * @param object                                $rootResource  the resource being built (target for absolute `definitionExtractValue` paths)
-     * @param string                                $rootType      the resource type name (prefix stripped from `definitionExtractValue` paths)
-     * @param list<OperationOutcomeIssue>           $issues        accumulated by reference
+     * @param list<object>           $responseItems
+     * @param array<string, object>  $itemIndex
+     * @param non-empty-list<string> $basePath      the element path `$context` represents (e.g. ['Patient'] or ['Patient','name'])
+     * @param object                 $rootResource  the resource being built (target for absolute `definitionExtractValue` paths)
+     * @param string                 $rootType      the resource type name (prefix stripped from `definitionExtractValue` paths)
+     * @param list<object>           $issues        accumulated by reference
      */
     private function walkDefinitionItems(
         array $responseItems,
@@ -299,30 +342,32 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
         array $basePath,
         object $rootResource,
         string $rootType,
+        ExtractModelFactory $factory,
         EvaluationContext $evalContext,
         array &$issues,
     ): void {
         foreach ($responseItems as $responseItem) {
-            $linkId     = $this->linkIdString($responseItem->linkId);
+            $linkId     = $this->linkIdOf($responseItem);
             $sourceItem = $linkId     !== null ? ($itemIndex[$linkId] ?? null) : null;
-            $segments   = $sourceItem !== null ? $this->definitionSegments($sourceItem->definition) : null;
+            $segments   = $sourceItem !== null ? $this->definitionSegments($sourceItem) : null;
 
             // Calculated fields declared on this item are written to their absolute path from the
             // resource root, independent of the hierarchical answer-write context.
             if ($sourceItem !== null) {
-                $this->applyDefinitionExtractValues($sourceItem, $rootResource, $rootType, $evalContext, $issues);
+                $this->applyDefinitionExtractValues($sourceItem, $rootResource, $rootType, $factory, $evalContext, $issues);
             }
 
             // No definition (logical group) — recurse in the same context.
             if ($segments === null) {
-                $this->walkDefinitionItems($responseItem->item, $itemIndex, $context, $basePath, $rootResource, $rootType, $evalContext, $issues);
+                $this->walkDefinitionItems($this->childItems($responseItem), $itemIndex, $context, $basePath, $rootResource, $rootType, $factory, $evalContext, $issues);
                 continue;
             }
 
             $relative = $this->relativeSegments($segments, $basePath);
             if ($relative === null) {
-                $issues[] = $this->issue(
-                    IssueType::processingfailure,
+                $issues[] = $factory->issue(
+                    IssueSeverity::warning->value,
+                    IssueType::processingfailure->value,
                     \sprintf('definition path "%s" is not within the enclosing extraction context %s.', implode('.', $segments), implode('.', $basePath)),
                 );
                 continue;
@@ -330,34 +375,35 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
 
             if ($relative === []) {
                 // Definition equals the context path — nothing to write here, just descend.
-                $this->walkDefinitionItems($responseItem->item, $itemIndex, $context, $basePath, $rootResource, $rootType, $evalContext, $issues);
+                $this->walkDefinitionItems($this->childItems($responseItem), $itemIndex, $context, $basePath, $rootResource, $rootType, $factory, $evalContext, $issues);
                 continue;
             }
 
-            $hasAnswers = $responseItem->answer !== [];
+            $answers    = $this->answersOf($responseItem);
+            $childItems = $this->childItems($responseItem);
 
-            if (!$hasAnswers && $responseItem->item !== []) {
+            if ($answers === [] && $childItems !== []) {
                 // Group item: establish one intermediate element and recurse into it.
                 try {
                     $child = $this->writer->createIntermediate($context, $relative);
                 } catch (\RuntimeException $e) {
-                    $issues[] = $this->issue(IssueType::processingfailure, $e->getMessage());
+                    $issues[] = $factory->issue(IssueSeverity::warning->value, IssueType::processingfailure->value, $e->getMessage());
                     continue;
                 }
-                $this->walkDefinitionItems($responseItem->item, $itemIndex, $child, $segments, $rootResource, $rootType, $evalContext, $issues);
+                $this->walkDefinitionItems($childItems, $itemIndex, $child, $segments, $rootResource, $rootType, $factory, $evalContext, $issues);
                 continue;
             }
 
             // Leaf item: write each answer relative to the current context.
-            foreach ($responseItem->answer as $answer) {
+            foreach ($answers as $answer) {
                 try {
-                    $this->writer->writeLeaf($context, $relative, $answer->value);
+                    $this->writer->writeLeaf($context, $relative, $this->answerValue($answer));
                 } catch (\RuntimeException $e) {
-                    $issues[] = $this->issue(IssueType::processingfailure, $e->getMessage());
+                    $issues[] = $factory->issue(IssueSeverity::warning->value, IssueType::processingfailure->value, $e->getMessage());
                 }
             }
-            if ($responseItem->item !== []) {
-                $this->walkDefinitionItems($responseItem->item, $itemIndex, $context, $basePath, $rootResource, $rootType, $evalContext, $issues);
+            if ($childItems !== []) {
+                $this->walkDefinitionItems($childItems, $itemIndex, $context, $basePath, $rootResource, $rootType, $factory, $evalContext, $issues);
             }
         }
     }
@@ -366,9 +412,9 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
      * Read a Questionnaire item's `definitionExtract` target canonical (the `definition` sub-extension),
      * or null when the item is not an extraction root.
      */
-    private function definitionExtractCanonical(QuestionnaireItem $item): ?string
+    private function definitionExtractCanonical(object $item): ?string
     {
-        foreach ($item->extension as $extension) {
+        foreach ($this->extensionReader->readSubExtensions($item) as $extension) {
             if ($this->extensionReader->readUrl($extension) !== self::DEFINITION_EXTRACT_URL) {
                 continue;
             }
@@ -384,24 +430,6 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
     }
 
     /**
-     * Resolve a base-type `StructureDefinition/{Type}` canonical to its generated R4 resource class,
-     * or null when no such class exists (profiles / unknown types are unsupported here — M02 stub).
-     *
-     * @return class-string<AbstractResource>|null
-     */
-    private function resolveResourceClass(string $canonical): ?string
-    {
-        $type = $this->canonicalResourceType($canonical);
-        $fqcn = 'Ardenexal\\FHIRTools\\Component\\Models\\R4\\Resource\\' . $type . 'Resource';
-
-        if (!class_exists($fqcn) || !is_subclass_of($fqcn, AbstractResource::class)) {
-            return null;
-        }
-
-        return $fqcn;
-    }
-
-    /**
      * The bare resource type from a canonical: the last path segment before any `#fragment`/`|version`.
      */
     private function canonicalResourceType(string $canonical): string
@@ -414,14 +442,14 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
     }
 
     /**
-     * Split an item `definition`'s element path into segments (`…Patient#Patient.name.given` → the
+     * Split an item's `definition` element path into segments (`…Patient#Patient.name.given` → the
      * `#`-fragment `Patient.name.given` → `['Patient','name','given']`), or null when absent.
      *
      * @return non-empty-list<string>|null
      */
-    private function definitionSegments(?UriPrimitive $definition): ?array
+    private function definitionSegments(object $item): ?array
     {
-        $raw = $definition instanceof UriPrimitive ? ($definition->value ?? null) : null;
+        $raw = property_exists($item, 'definition') ? $this->stringifyPrimitive($item->definition ?? null) : null;
 
         return $raw === null ? null : $this->segmentsFromDefinition($raw);
     }
@@ -454,14 +482,14 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
     private function collectAllocatedIds(?object $questionnaire): array
     {
         $ids = [];
-        if (!$questionnaire instanceof QuestionnaireResource) {
+        if (!is_object($questionnaire)) {
             return $ids;
         }
 
         // Root extensions/items are read tolerantly: a constructor-bypassed deserializer object leaves
         // untouched typed properties uninitialized (the model-init footgun), so direct access throws.
         $this->collectAllocateNames($this->extensionReader->readSubExtensions($questionnaire), $ids);
-        $this->collectAllocateNamesFromItems($this->safeChildItems($questionnaire), $ids);
+        $this->collectAllocateNamesFromItems($this->childItems($questionnaire), $ids);
 
         return $ids;
     }
@@ -484,24 +512,25 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
     }
 
     /**
-     * @param array<int, QuestionnaireItem> $items
-     * @param array<string, string>         $ids   accumulated by reference
+     * @param list<object>          $items
+     * @param array<string, string> $ids   accumulated by reference
      */
     private function collectAllocateNamesFromItems(array $items, array &$ids): void
     {
         foreach ($items as $item) {
             $this->collectAllocateNames($this->extensionReader->readSubExtensions($item), $ids);
-            $this->collectAllocateNamesFromItems($this->safeChildItems($item), $ids);
+            $this->collectAllocateNamesFromItems($this->childItems($item), $ids);
         }
     }
 
     /**
      * Read a model object's `item` array tolerantly — a constructor-bypassed deserializer object leaves
      * an untouched `item` property uninitialized, so direct access throws (the model-init footgun).
+     * Version-agnostic: returns whatever object children are present, of any model version.
      *
-     * @return list<QuestionnaireItem>
+     * @return list<object>
      */
-    private function safeChildItems(object $object): array
+    private function childItems(object $object): array
     {
         // `??` uses isset() semantics, reading an uninitialized typed property as "absent" not \Error.
         $items = property_exists($object, 'item') ? ($object->item ?? []) : [];
@@ -509,14 +538,53 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
             return [];
         }
 
-        return array_values(array_filter($items, static fn (mixed $v): bool => $v instanceof QuestionnaireItem));
+        return array_values(array_filter($items, static fn (mixed $v): bool => is_object($v)));
+    }
+
+    /**
+     * Read a response/Questionnaire item's `answer` array tolerantly.
+     *
+     * @return list<object>
+     */
+    private function answersOf(object $item): array
+    {
+        $answers = property_exists($item, 'answer') ? ($item->answer ?? []) : [];
+        if (!is_array($answers)) {
+            return [];
+        }
+
+        return array_values(array_filter($answers, static fn (mixed $v): bool => is_object($v)));
+    }
+
+    /**
+     * Read a QuestionnaireResponse answer's `value` (a choice property) tolerantly, or null when absent.
+     */
+    private function answerValue(object $answer): mixed
+    {
+        return property_exists($answer, 'value') ? ($answer->value ?? null) : null;
+    }
+
+    /**
+     * Read a Questionnaire item's `code` (a list of `Coding`) tolerantly. R4-only path — the codings
+     * feed an R4 `CodeableConcept`, so only R4 `Coding` instances are kept.
+     *
+     * @return list<Coding>
+     */
+    private function itemCodings(object $item): array
+    {
+        $codes = property_exists($item, 'code') ? ($item->code ?? []) : [];
+        if (!is_array($codes)) {
+            return [];
+        }
+
+        return array_values(array_filter($codes, static fn (mixed $v): bool => $v instanceof Coding));
     }
 
     /**
      * Resolve an extraction root's `fullUrl` sub-expression (a FHIRPath string on the `definitionExtract`
      * extension) to the entry `fullUrl`, or null when absent — leaving a fresh `urn:uuid:` to be minted.
      */
-    private function resolveFullUrl(QuestionnaireItem $item, EvaluationContext $evalContext): ?string
+    private function resolveFullUrl(object $item, ExtractModelFactory $factory, EvaluationContext $evalContext): ?string
     {
         foreach ($this->extensionReader->readSubExtensions($item) as $extension) {
             if ($this->extensionReader->readUrl($extension) !== self::DEFINITION_EXTRACT_URL) {
@@ -532,7 +600,7 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
             }
 
             try {
-                return $this->stringifyPrimitive($this->evaluateToScalar($expression, $evalContext));
+                return $this->stringifyPrimitive($this->evaluateToScalar($expression, $factory, $evalContext));
             } catch (\Throwable) {
                 // A malformed fullUrl expression falls back to a freshly-minted urn:uuid.
                 return null;
@@ -548,12 +616,13 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
      * result is coerced by {@see DefinitionPathWriter} into the target property's primitive wrapper
      * (e.g. a computed uri into a `?UriPrimitive`); a failed expression surfaces a diagnostic issue.
      *
-     * @param list<OperationOutcomeIssue> $issues accumulated by reference
+     * @param list<object> $issues accumulated by reference
      */
     private function applyDefinitionExtractValues(
-        QuestionnaireItem $item,
+        object $item,
         object $rootResource,
         string $rootType,
+        ExtractModelFactory $factory,
         EvaluationContext $evalContext,
         array &$issues,
     ): void {
@@ -577,18 +646,20 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
             $segments = $this->segmentsFromDefinition($definition);
             $relative = $segments !== null ? $this->relativeSegments($segments, [$rootType]) : null;
             if ($relative === null || $relative === []) {
-                $issues[] = $this->issue(
-                    IssueType::processingfailure,
+                $issues[] = $factory->issue(
+                    IssueSeverity::warning->value,
+                    IssueType::processingfailure->value,
                     \sprintf('definitionExtractValue path "%s" is not within the resource type %s.', $definition, $rootType),
                 );
                 continue;
             }
 
             try {
-                $value = $this->evaluateToScalar($expression, $evalContext);
+                $value = $this->evaluateToScalar($expression, $factory, $evalContext);
             } catch (\Throwable $e) {
-                $issues[] = $this->issue(
-                    IssueType::processingfailure,
+                $issues[] = $factory->issue(
+                    IssueSeverity::warning->value,
+                    IssueType::processingfailure->value,
                     \sprintf('definitionExtractValue expression "%s" failed to evaluate: %s', $expression, $e->getMessage()),
                 );
                 continue;
@@ -606,7 +677,7 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
                 // otherwise raise a \TypeError and abort the whole extraction — surface it as an issue.
                 $this->writer->writeLeaf($rootResource, $relative, $value);
             } catch (\Throwable $e) {
-                $issues[] = $this->issue(IssueType::processingfailure, $e->getMessage());
+                $issues[] = $factory->issue(IssueSeverity::warning->value, IssueType::processingfailure->value, $e->getMessage());
             }
         }
     }
@@ -620,13 +691,13 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
      *
      * @throws \Throwable when the expression cannot be parsed or evaluated
      */
-    private function evaluateToScalar(string $expression, EvaluationContext $evalContext): mixed
+    private function evaluateToScalar(string $expression, ExtractModelFactory $factory, EvaluationContext $evalContext): mixed
     {
         return $this->fhirPath->evaluate(
             $expression,
             $evalContext->getRootResource(),
             $evalContext,
-            FhirVersion::R4->value,
+            $factory->fhirVersionValue(),
         )->first();
     }
 
@@ -676,15 +747,6 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
         }
 
         return null;
-    }
-
-    private function issue(IssueType $code, string $diagnostics): OperationOutcomeIssue
-    {
-        return new OperationOutcomeIssue(
-            severity: new IssueSeverityType(IssueSeverity::warning->value),
-            code: new IssueTypeType($code->value),
-            diagnostics: $diagnostics,
-        );
     }
 
     private function buildObservation(
@@ -776,9 +838,9 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
      * @see https://build.fhir.org/ig/HL7/sdc/en/extraction.html — "if the resource has no id property
      *      set the value to POST … otherwise set the value to PUT".
      *
-     * @param list<array{resource: AbstractResource, fullUrl: string|null}> $entries
+     * @param list<array{resource: object, fullUrl: string|null}> $entries
      */
-    private function assembleTransactionBundle(array $entries): BundleResource
+    private function assembleTransactionBundle(array $entries, ExtractModelFactory $factory): object
     {
         $bundleEntries = [];
         foreach ($entries as $entry) {
@@ -787,23 +849,18 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
             $logicalId = $this->logicalIdOf($resource);
 
             [$method, $url] = $logicalId === null
-                ? [HTTPVerb::post, $type]
-                : [HTTPVerb::put, $type . '/' . $logicalId];
+                ? [HTTPVerb::post->value, $type]
+                : [HTTPVerb::put->value, $type . '/' . $logicalId];
 
-            $bundleEntries[] = new BundleEntry(
-                fullUrl: new UriPrimitive(value: $entry['fullUrl'] ?? $this->uuidUrn()),
-                resource: $resource,
-                request: new BundleEntryRequest(
-                    method: new HTTPVerbType($method->value),
-                    url: new UriPrimitive(value: $url),
-                ),
+            $bundleEntries[] = $factory->bundleEntry(
+                $entry['fullUrl'] ?? $this->uuidUrn(),
+                $resource,
+                $method,
+                $url,
             );
         }
 
-        return new BundleResource(
-            type: new BundleTypeType(BundleType::transaction->value),
-            entry: $bundleEntries,
-        );
+        return $factory->transactionBundle($bundleEntries);
     }
 
     /**
@@ -824,20 +881,20 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
      * Build the companion `OperationOutcome`: any collected `$issues`, plus an informational note when
      * nothing was extracted. Returns null when there is nothing to report.
      *
-     * @param list<array{resource: AbstractResource, fullUrl: string|null}> $entries
-     * @param list<OperationOutcomeIssue>                                   $issues
+     * @param list<array{resource: object, fullUrl: string|null}> $entries
+     * @param list<object>                                        $issues
      */
-    private function buildOutcome(array $entries, array $issues): ?OperationOutcomeResource
+    private function buildOutcome(array $entries, array $issues, ExtractModelFactory $factory): ?object
     {
         if ($entries === []) {
-            $issues[] = new OperationOutcomeIssue(
-                severity: new IssueSeverityType(IssueSeverity::information->value),
-                code: new IssueTypeType(IssueType::informationalnote->value),
-                diagnostics: 'No resources were extracted from the QuestionnaireResponse.',
+            $issues[] = $factory->issue(
+                IssueSeverity::information->value,
+                IssueType::informationalnote->value,
+                'No resources were extracted from the QuestionnaireResponse.',
             );
         }
 
-        return $issues === [] ? null : new OperationOutcomeResource(issue: $issues);
+        return $issues === [] ? null : $factory->operationOutcome($issues);
     }
 
     /**
@@ -851,20 +908,14 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
     }
 
     /**
-     * Normalise a `linkId` (which may be a StringPrimitive wrapper or a raw string) to a plain string.
+     * Normalise an item's `linkId` (a StringPrimitive wrapper or raw string, of any version) to a plain
+     * string, or null when absent/blank. Read tolerantly for constructor-bypassed objects.
      */
-    private function linkIdString(StringPrimitive|string|null $linkId): ?string
+    private function linkIdOf(object $item): ?string
     {
-        if ($linkId === null) {
-            return null;
-        }
-        if (is_string($linkId)) {
-            return $linkId === '' ? null : $linkId;
-        }
+        $linkId = property_exists($item, 'linkId') ? ($item->linkId ?? null) : null;
 
-        $value = $linkId->value ?? null;
-
-        return $value === null || $value === '' ? null : $value;
+        return $this->stringifyPrimitive($linkId);
     }
 
     /**

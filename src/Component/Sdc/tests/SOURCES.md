@@ -4,6 +4,28 @@ Golden expected outputs for SDC `$populate`/`$extract` conformance MUST be vendo
 recognized reference implementation and frozen as the seeded baseline — never hand-authored
 (see the `questionnaire-conformance-seed-truth` discipline).
 
+## `$extract` cross-version oracle status (M02 — R4/R4B/R5 parity)
+
+The forms-lab extract engine's capability statement declares **`fhirVersion: 4.3.0` (R4B)**
+(captured `GET https://fhir.forms-lab.com/metadata`, 2026-07-11). Consequences for the vendored
+definition-based `$extract` oracles:
+
+- **R4B — genuine independent oracle.** The frozen `definition-extract-*.expected-bundle.json`
+  Bundles were produced by an R4B-native engine, so they *are* R4B oracles. `FHIRExtractConformanceTest::testDefinitionCorpusR4BConformsToReferenceOracle`
+  drives each case through the R4B model namespace against them.
+- **R4 — same bytes, wire-compatibility.** R4 (4.0.1) and R4B (4.3.0) are wire-compatible for the
+  resources these cases exercise (Patient/RelatedPerson name/identifier/reference), so the R4 cases
+  reuse the identical frozen Bundles.
+- **R5 — structural parity, NOT an independent oracle.** No independent SDC `$extract` engine for
+  R5 is reachable (forms-lab is R4B; HAPI exposes no `$extract`; sqlonfhir is untrustworthy).
+  `testDefinitionCorpusR5StructurallyMatchesReferenceOracle` asserts the R5 model path yields a
+  Bundle **structurally equivalent** to the frozen R4B/R4 oracle — legitimate only because the
+  extracted resources and the transaction envelope are byte-identical across R4→R4B→R5 for these
+  cases. This is a documented M02 deviation; reseed from a real R5 engine if one becomes available.
+- **Observation-based extraction stays R4-only** (M01 scope). The version-generic service emits a
+  warning `OperationOutcome` issue for any `observationExtract` item under a non-R4 run rather than
+  producing a wrong-version Observation.
+
 ## Reference implementation runnability (proven — M00 spike)
 
 | Field | Value |

@@ -162,10 +162,23 @@ final class FHIRQuestionnaireResponseExtractServiceTest extends TestCase
         self::assertSame('information', $outcome['issue'][0]['severity'] ?? null);
     }
 
-    public function testRejectsNonR4QuestionnaireResponse(): void
+    /**
+     * The service is version-generic and input-tolerant: it no longer type-guards its input to an R4
+     * QuestionnaireResponse (that guard blocked R4B/R5 parity). An unrecognised object simply yields
+     * nothing to extract — an empty transaction Bundle plus an informational "nothing extracted"
+     * outcome — rather than throwing.
+     */
+    public function testUnrecognisedInputYieldsEmptyBundleWithoutThrowing(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->service->extract(new \stdClass(), new ExtractContext());
+        $result = $this->service->extract(new \stdClass(), new ExtractContext());
+
+        $bundle = $this->decode($result->getResource());
+        self::assertSame('Bundle', $bundle['resourceType'] ?? null);
+        self::assertSame('transaction', $bundle['type'] ?? null);
+        self::assertSame([], $bundle['entry'] ?? []);
+
+        $issues = $result->getIssues();
+        self::assertInstanceOf(OperationOutcomeResource::class, $issues);
     }
 
     /**
