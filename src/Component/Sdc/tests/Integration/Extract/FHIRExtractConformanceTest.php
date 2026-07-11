@@ -507,6 +507,209 @@ final class FHIRExtractConformanceTest extends AbstractSdcConformanceTest
     }
 
     /**
+     * Template-based extraction against the frozen `@aehrc/sdc-template-extract` oracle (R4). Drives the
+     * SDC IG `extract-complex-template` form (5 `contained` templates) and structurally compares the
+     * produced transaction Bundle to the vendored reference Bundle. See `tests/SOURCES.md` for the engine
+     * and the three reconciled fidelity caveats ({@see reconcileTemplateBundle}).
+     */
+    public function testTemplateExtractConformsToReferenceOracle(): void
+    {
+        $expectedPath = self::FIXTURE_DIR . '/extract-complex-template.expected-bundle.json';
+        if (!is_file($expectedPath)) {
+            self::markTestSkipped('No vendored reference oracle for template-based $extract yet.');
+        }
+
+        $actual   = $this->extractForVersion('extract-complex-template', FhirVersion::R4);
+        $expected = $this->normalizeInstants($this->decode($this->fixture('extract-complex-template.expected-bundle.json')));
+
+        $this->assertSdcConformance(
+            $this->reconcileTemplateBundle($expected),
+            $this->reconcileTemplateBundle($actual),
+        );
+    }
+
+    /**
+     * R4B / R5 parity for template-based extraction: the vendored `@aehrc/sdc-template-extract` oracle is
+     * version-neutral on the wire (Patient / RelatedPerson / Observation topology is byte-identical across
+     * R4 → R4B → R5), so driving the version-generic template path through each model namespace must
+     * produce a structurally-equivalent Bundle. A cross-version structural-parity guard — the engine
+     * itself is version-agnostic JSON, so no separate per-version oracle exists (mirrors the M02
+     * definition-corpus R5 caveat in `tests/SOURCES.md`).
+     */
+    #[DataProvider('templateParityVersions')]
+    public function testTemplateExtractParityAcrossVersions(FhirVersion $version): void
+    {
+        $expectedPath = self::FIXTURE_DIR . '/extract-complex-template.expected-bundle.json';
+        if (!is_file($expectedPath)) {
+            self::markTestSkipped('No vendored reference oracle for template-based $extract yet.');
+        }
+
+        $actual   = $this->extractForVersion('extract-complex-template', $version);
+        $expected = $this->normalizeInstants($this->decode($this->fixture('extract-complex-template.expected-bundle.json')));
+
+        $this->assertSdcConformance(
+            $this->reconcileTemplateBundle($expected),
+            $this->reconcileTemplateBundle($actual),
+        );
+    }
+
+    /**
+     * @return iterable<string, array{0: FhirVersion}>
+     */
+    public static function templateParityVersions(): iterable
+    {
+        yield 'R4B' => [FhirVersion::R4B];
+        yield 'R5'  => [FhirVersion::R5];
+    }
+
+    /**
+     * Direct assertions on the template-extract output that the uuid-tokenised oracle comparison masks or
+     * that guard the trickiest template semantics: the `Observation.subject` written as a valid `Reference`
+     * (the engine emits a malformed bare string), context-empty removal (`%resource.id`/`.authored`/`.author`
+     * are empty in this QR, so `derivedFrom`/`issued`/`performer` are absent), the `templateExtractValue`
+     * that overrides a static placeholder (`gender: "unknown"` → `"male"`) while an empty value keeps its
+     * static (`effectiveDateTime: "1900-01-01"`), a `Coding` result reduced to `{system,code,display}`
+     * (`relationship`), and numeric coercion (`answer.value * 100` → 17300).
+     */
+    public function testTemplateExtractSemantics(): void
+    {
+        $actual  = $this->extractForVersion('extract-complex-template', FhirVersion::R4);
+        $entries = $actual['entry'];
+        self::assertIsArray($entries);
+        self::assertCount(5, $entries, 'Expected Patient + RelatedPerson + 3 Observations.');
+
+        $byType = [];
+        foreach ($entries as $entry) {
+            self::assertIsArray($entry);
+            self::assertIsArray($entry['resource']);
+            $resource = $entry['resource'];
+            $type     = $resource['resourceType'];
+            self::assertIsString($type);
+            $key          = $type === 'Observation' ? 'Observation:' . ($resource['code']['coding'][0]['code'] ?? '?') : $type;
+            $byType[$key] = $entry;
+        }
+
+        // Patient: fan-out contexts (identifier/name/telecom), gender override, given replicate.
+        $patient = $byType['Patient']['resource'] ?? null;
+        self::assertIsArray($patient);
+        self::assertSame('92304872038472', $patient['identifier'][0]['value'] ?? null, 'identifier.value from a scalar-context fan-out.');
+        self::assertSame('National Identifier (IHI)', $patient['identifier'][0]['type']['text'] ?? null, 'static identifier.type.text survives.');
+        self::assertSame('Carlos Ramirez', $patient['name'][0]['text'] ?? null, 'name.text is the given/family join under a name-group context.');
+        self::assertSame('Ramirez', $patient['name'][0]['family'] ?? null);
+        self::assertSame(['Carlos'], $patient['name'][0]['given'] ?? null, 'given is an array-shaped _field replicate.');
+        self::assertSame('male', $patient['gender'] ?? null, 'a non-empty templateExtractValue overrides the static "unknown" placeholder.');
+        self::assertSame('109348180293810', $patient['telecom'][0]['value'] ?? null);
+
+        $patientFullUrl = $byType['Patient']['fullUrl'] ?? null;
+        self::assertIsString($patientFullUrl);
+        self::assertMatchesRegularExpression('/^urn:uuid:[0-9a-fA-F-]{36}$/', $patientFullUrl, 'fullUrl slice resolved %NewPatientId to the allocated urn:uuid.');
+
+        // RelatedPerson: Coding value reduced to {system,code,display} (source Coding carried an extension).
+        $related = $byType['RelatedPerson']['resource'] ?? null;
+        self::assertIsArray($related);
+        self::assertSame($patientFullUrl, $related['patient']['reference'] ?? null, 'patient.reference == the Patient fullUrl (%NewPatientId).');
+        self::assertSame(
+            ['system' => 'http://terminology.hl7.org/CodeSystem/v2-0131', 'code' => 'CP', 'display' => 'Contact person'],
+            $related['relationship'][0]['coding'][0] ?? null,
+            'a Coding value result is reduced to {system,code,display} — the source answer extension is dropped.',
+        );
+        self::assertSame('Alex', $related['name'][0]['text'] ?? null);
+
+        // Height Observation: subject as a valid Reference, numeric coercion, static-vs-empty value rules.
+        $height = $byType['Observation:8302-2']['resource'] ?? null;
+        self::assertIsArray($height);
+        self::assertSame(['reference' => $patientFullUrl], $height['subject'] ?? null, 'subject is emitted as a valid Reference, not a bare string.');
+        self::assertEqualsWithDelta(17300, $height['valueQuantity']['value'] ?? null, 0.0001, 'answer.value * 100 numeric coercion.');
+        self::assertSame('cm', $height['valueQuantity']['unit'] ?? null, 'static valueQuantity.unit survives alongside the calculated value.');
+        self::assertSame('1900-01-01', $height['effectiveDateTime'] ?? null, 'an empty %resource.authored value expression keeps the static placeholder.');
+        self::assertArrayNotHasKey('issued', $height, 'an empty value with no static sibling → absent.');
+        self::assertArrayNotHasKey('performer', $height, 'empty %resource.author → performer removed.');
+        self::assertArrayNotHasKey('derivedFrom', $height, 'empty %resource.id context → derivedFrom removed.');
+
+        // Complication Observation: a false boolean value is preserved (not pruned as empty).
+        $complication = $byType['Observation:sigmoidoscopy-complication']['resource'] ?? null;
+        self::assertIsArray($complication);
+        self::assertFalse($complication['valueBoolean'] ?? null, 'a false valueBoolean is a real answer, not an empty result.');
+        self::assertArrayNotHasKey('category', $complication, 'the obsTemplate carries no category.');
+    }
+
+    /**
+     * Reconcile the three spec-legal / engine-specific divergences between this toolkit's template output
+     * and the `@aehrc/sdc-template-extract` oracle, on BOTH operands, before the shared structural
+     * comparison (see `tests/SOURCES.md`):
+     *
+     *  1. Drop Bundle-level `meta` (the engine's `@aehrc/...:generated` provenance tag) and `timestamp`.
+     *  2. Normalise a bare-uuid string → `urn:uuid:<uuid>` (the engine emits the Patient `fullUrl` bare
+     *     while minting `urn:uuid:` elsewhere; this toolkit uses `urn:uuid:` throughout). Doing this before
+     *     {@see canonicalize()} also keeps `sortKey()` entry ordering aligned across the two documents.
+     *  3. Unwrap a sole-key `{"reference": X}` → `X` (the engine emits a malformed bare-string
+     *     `Observation.subject`; this toolkit emits a valid `Reference`). Unwrapping only a sole-key object
+     *     is deliberate — a Reference carrying `type`/`identifier` would lose data (none in this corpus).
+     *
+     * After this, the existing `tokenizeUuids` collapses the (now uniformly `urn:uuid:`) reference
+     * topology to positional tokens, so Patient `fullUrl` == RelatedPerson `patient` == each `subject`.
+     *
+     * @param array<string, mixed> $bundle
+     *
+     * @return array<string, mixed>
+     */
+    private function reconcileTemplateBundle(array $bundle): array
+    {
+        unset($bundle['meta'], $bundle['timestamp']);
+
+        /** @var array<string, mixed> $reconciled */
+        $reconciled = $this->unwrapSoleReference($this->normalizeBareUuids($bundle));
+
+        return $reconciled;
+    }
+
+    /**
+     * Rewrite every bare v4-uuid string to `urn:uuid:<uuid>` so the two documents (one of which emits a
+     * bare Patient fullUrl) share a single uuid form before tokenisation and sort-key ordering.
+     */
+    private function normalizeBareUuids(mixed $value): mixed
+    {
+        if (is_string($value)) {
+            return preg_match('/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/', $value) === 1
+                ? 'urn:uuid:' . $value
+                : $value;
+        }
+
+        if (is_array($value)) {
+            $out = [];
+            foreach ($value as $key => $element) {
+                $out[$key] = $this->normalizeBareUuids($element);
+            }
+
+            return $out;
+        }
+
+        return $value;
+    }
+
+    /**
+     * Collapse a sole-key `{"reference": X}` object to the bare string `X` so a valid `Reference` and the
+     * engine's malformed bare-string reference compare equal (sole-key only — never lose `type`/`identifier`).
+     */
+    private function unwrapSoleReference(mixed $value): mixed
+    {
+        if (!is_array($value)) {
+            return $value;
+        }
+
+        if (!array_is_list($value) && array_keys($value) === ['reference'] && is_string($value['reference'])) {
+            return $value['reference'];
+        }
+
+        $out = [];
+        foreach ($value as $key => $element) {
+            $out[$key] = $this->unwrapSoleReference($element);
+        }
+
+        return $out;
+    }
+
+    /**
      * Deserialize a case's Questionnaire + QuestionnaireResponse, run `$extract`, and return the
      * normalised [actual, expected] decoded Bundles for structural comparison.
      *

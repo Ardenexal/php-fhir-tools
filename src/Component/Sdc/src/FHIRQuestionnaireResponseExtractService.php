@@ -24,6 +24,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\QuestionnaireResponseResour
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
+use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider;
 
@@ -68,7 +69,10 @@ use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvide
  * Each entry's `request` is `POST Type` for a resource with no logical `id` and `PUT Type/id` for one
  * whose `id` was written during extraction (a hidden item or `definitionExtractValue` targeting `.id`).
  *
- * Out of scope here (later M03 / M04): template-based extraction and provenance.
+ * Template-based extraction (`templateExtract`) is delegated to {@see TemplateExtractor}: contained
+ * template resources are cloned and populated via `templateExtractContext`/`templateExtractValue`
+ * FHIRPath expressions and merged into the same transaction Bundle. Out of scope (M04 / backlog):
+ * StructureMap-based extraction and provenance.
  */
 final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInterface
 {
@@ -103,14 +107,22 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
      */
     private const string EXTRACT_ALLOCATE_ID_URL = 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-extractAllocateId';
 
+    /**
+     * All collaborators default to standalone instances so the service is usable without a container.
+     */
     public function __construct(
         private readonly SafeExtensionReader $extensionReader = new SafeExtensionReader(),
         private readonly DefinitionPathWriter $writer = new DefinitionPathWriter(new PropertyMetadataProvider()),
         private readonly FHIRPathService $fhirPath = new FHIRPathService(),
         private readonly FHIRMetadataExtractor $metadata = new FHIRMetadataExtractor(),
+        private readonly TemplateExtractor $templateExtractor = new TemplateExtractor(new FHIRPathService(), new PropertyMetadataProvider()),
     ) {
     }
 
+    /**
+     * Run observation-, definition-, and template-based extraction over a QuestionnaireResponse and
+     * assemble the results into a single transaction Bundle (plus an optional companion OperationOutcome).
+     */
     public function extract(object $questionnaireResponse, ExtractContext $context): ExtractResult
     {
         $version = $context->fhirVersion;
@@ -178,6 +190,20 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
         }
 
         $this->collectDefinitionResources($this->childItems($questionnaireResponse), $itemIndex, $factory, $evalContext, $entries, $issues);
+
+        // Template-based extraction: clone `contained` templates flagged by `templateExtract` and populate
+        // them via FHIRPath. Version-generic like the definition path. Runs at the array level (see
+        // TemplateExtractor), so the Questionnaire is re-serialized to a decoded array here.
+        if (is_object($questionnaire)) {
+            $serializer         = FHIRSerializationService::createDefault($version);
+            $questionnaireArray = json_decode($serializer->serializeToJson($questionnaire), true);
+            if (is_array($questionnaireArray)) {
+                /** @var array<string, mixed> $questionnaireArray */
+                foreach ($this->templateExtractor->extract($questionnaireArray, $questionnaireResponse, $factory, $evalContext, $serializer, $issues) as $templateEntry) {
+                    $entries[] = $templateEntry;
+                }
+            }
+        }
 
         $bundle  = $this->assembleTransactionBundle($entries, $factory);
         $outcome = $this->buildOutcome($entries, $issues, $factory);
