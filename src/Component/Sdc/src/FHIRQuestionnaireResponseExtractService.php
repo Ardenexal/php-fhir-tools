@@ -316,10 +316,45 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
             // Calculated (`definitionExtractValue`) fields declared on the extraction root itself
             // (e.g. `RelatedPerson.patient.reference ← %NewPatientId`).
             $this->applyDefinitionExtractValues($sourceItem, $resource, $rootType, $factory, $evalContext, $issues);
+            // The extraction root may itself be an answer-bearing leaf (e.g. an Observation whose own
+            // `definition` is `value[x]:valueQuantity.value` carrying a decimal answer) — its answers are
+            // written relative to the resource, in addition to its calculated fields and child items.
+            $this->writeItemOwnAnswers($responseItem, $sourceItem, $resource, $rootType, $factory, $issues);
             $this->walkDefinitionItems($this->childItems($responseItem), $itemIndex, $resource, [$rootType], $resource, $rootType, $factory, $evalContext, $issues);
 
             $fullUrl   = $this->resolveFullUrl($sourceItem, $factory, $evalContext);
             $entries[] = ['resource' => $resource, 'fullUrl' => $fullUrl];
+        }
+    }
+
+    /**
+     * Write an extraction root's own answers, when the root item is itself an answer-bearing leaf (its
+     * `definition` addresses a property on the resource, e.g. `Observation.value[x]:valueQuantity.value`).
+     * A no-op for root items that carry no `definition` of their own (a plain `Patient`/`RelatedPerson`
+     * group whose fields all come from child items and calculated values).
+     *
+     * @param list<object> $issues accumulated by reference
+     */
+    private function writeItemOwnAnswers(
+        object $responseItem,
+        object $sourceItem,
+        object $resource,
+        string $rootType,
+        ExtractModelFactory $factory,
+        array &$issues,
+    ): void {
+        $segments = $this->definitionSegments($sourceItem);
+        $relative = $segments !== null ? $this->relativeSegments($segments, [$rootType]) : null;
+        if ($relative === null || $relative === []) {
+            return;
+        }
+
+        foreach ($this->answersOf($responseItem) as $answer) {
+            try {
+                $this->writer->writeLeaf($resource, $relative, $this->answerValue($answer));
+            } catch (\Throwable $e) {
+                $issues[] = $factory->issue(IssueSeverity::warning->value, IssueType::processingfailure->value, $e->getMessage());
+            }
         }
     }
 
@@ -631,15 +666,18 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
                 continue;
             }
 
+            // A `definitionExtractValue` sources its value from EITHER a FHIRPath `expression` (evaluated
+            // against the QR) OR a `fixed-value` sub-extension carrying a literal (a `code`, `uri`,
+            // `Coding`, `CodeableConcept`, …). Both target the same absolute `definition` path.
             $definitionExt = $this->extensionReader->findExtension($extension, 'definition');
             $expressionExt = $this->extensionReader->findExtension($extension, 'expression');
-            if ($definitionExt === null || $expressionExt === null) {
+            $fixedExt      = $this->extensionReader->findExtension($extension, 'fixed-value');
+            if ($definitionExt === null || ($expressionExt === null && $fixedExt === null)) {
                 continue;
             }
 
             $definition = $this->stringifyPrimitive($this->extensionReader->readValue($definitionExt));
-            $expression = $this->expressionString($this->extensionReader->readValue($expressionExt));
-            if ($definition === null || $expression === null) {
+            if ($definition === null) {
                 continue;
             }
 
@@ -654,19 +692,28 @@ final class FHIRQuestionnaireResponseExtractService implements ExtractServiceInt
                 continue;
             }
 
-            try {
-                $value = $this->evaluateToScalar($expression, $factory, $evalContext);
-            } catch (\Throwable $e) {
-                $issues[] = $factory->issue(
-                    IssueSeverity::warning->value,
-                    IssueType::processingfailure->value,
-                    \sprintf('definitionExtractValue expression "%s" failed to evaluate: %s', $expression, $e->getMessage()),
-                );
-                continue;
+            if ($expressionExt !== null) {
+                $expression = $this->expressionString($this->extensionReader->readValue($expressionExt));
+                if ($expression === null) {
+                    continue;
+                }
+                try {
+                    $value = $this->evaluateToScalar($expression, $factory, $evalContext);
+                } catch (\Throwable $e) {
+                    $issues[] = $factory->issue(
+                        IssueSeverity::warning->value,
+                        IssueType::processingfailure->value,
+                        \sprintf('definitionExtractValue expression "%s" failed to evaluate: %s', $expression, $e->getMessage()),
+                    );
+                    continue;
+                }
+            } else {
+                // $fixedExt is non-null here (guaranteed by the guard above).
+                $value = $this->extensionReader->readValue($fixedExt);
             }
 
             if ($value === null) {
-                // An empty result set is not an error — nothing to write for this field.
+                // An empty result set / absent fixed value is not an error — nothing to write.
                 continue;
             }
 

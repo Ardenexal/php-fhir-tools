@@ -157,6 +157,48 @@ that already accepts the scalar (`StringPrimitive|string` for `identifier.value`
 malformed expression surfaces a warning `OperationOutcome` issue rather than silently vanishing
 (`FHIRQuestionnaireResponseExtractServiceTest::testMalformedDefinitionExtractValueExpressionReportsIssueWithoutCrashing`).
 
+### `extract-complex-defn3` full-form oracle (M02 stretch) — VENDORED
+
+| Field | Value |
+|-------|-------|
+| Input Questionnaire | `tests/Fixtures/Extract/extract-complex-defn3.questionnaire.json` (HL7 SDC IG, vendored M01) |
+| Input QuestionnaireResponse | `tests/Fixtures/Extract/extract-complex-defn3.response.json` (**authored** — the IG ships none; carries `id`, `authored`, `author` so the temporal/derivedFrom/performer calculated values are deterministic) |
+| Expected Bundle | `tests/Fixtures/Extract/extract-complex-defn3.expected-bundle.json` (frozen forms-lab output, verbatim) |
+| Engine / Endpoint | fhirpath-lab / forms-lab (R4B-native, 4.3.0) — `POST https://fhir.forms-lab.com/QuestionnaireResponse/$extract` (no `model` param) |
+| Captured | 2026-07-11 |
+
+**Findings (drove the M02 stretch — choice/complex calculated-value coercion):**
+
+1. **`definitionExtractValue` has two value sources** — a FHIRPath `expression` (M02) **and** a
+   `fixed-value` sub-extension carrying a literal (`code`/`uri`/`Coding`/`CodeableConcept`). The service
+   now reads both. Complex fixed values (`code.coding`←`Coding`, `identifier.type`←`CodeableConcept`)
+   flow through the writer's array/complex paths.
+2. **Choice-slice `value[x]:valueQuantity`** — the `DefinitionPathWriter` resolves the slice to its
+   variant class via `#[FhirProperty]` variant metadata (`jsonKey`), creating/reusing the `Quantity`
+   the child `.value`/`.unit` leaves populate.
+3. **A `definitionExtract` root can itself be an answer leaf** — `height`/`weight` are Observation roots
+   whose own `definition` is `value[x]:valueQuantity.value` with a decimal answer; that answer is now
+   written to the resource (previously dropped).
+4. **Coded answer → code leaf** — a `Coding` answer for `Patient.gender` (a `code`) is reduced to its
+   `.code` (`"male"`). **Temporal coercion** — a computed datetime string is `parse()`d into the leaf's
+   FHIR value-object (`Observation.issued` = `InstantPrimitive(FHIRInstant)`), and a choice `effective[x]`
+   scalar is wrapped into its declared `dateTime` variant.
+5. **`complication` is NOT its own Observation** — it carries `definitionExtractValue`s but no
+   `definitionExtract` flag, so forms-lab yields **4 entries** (Patient, RelatedPerson, 2 Observations),
+   not 5.
+
+**Documented KNOWN GAP — `Patient.name.text`:** the `name` group's `definitionExtractValue` expression
+`item.where(linkId='given' or linkId='family').answer.value.join(' ')` requires the **current QR item**
+as the FHIRPath focus while `%resource` stays the QR root. The evaluator binds `%resource` to the focus
+node (`FHIRPathEvaluator::evaluate` sets root = focus), so focus and `%resource` cannot yet differ —
+separating them is a shared-FHIRPath change out of scope for this stretch. **`HumanName.text` is a
+data-bearing element the reference engine computed on purpose — NOT narrative.** The conformance
+comparison only stays green because `text` is in the shared `IGNORED_KEYS` (an entry that exists for
+`Narrative.text`/`CodeableConcept.text` divergences and here also masks this real field). So defn3 is
+faithfully reproduced *except* `name.text`; do not read the green as a clean end-to-end pass.
+`FHIRExtractConformanceTest::testComplexDefn3ExtractsTypedResources` documents the gap and guards the
+mappings the uuid-tokenised comparison could mask.
+
 ### `POST`/`PUT` request directive (M02) — VENDORED
 
 | Field | Value |

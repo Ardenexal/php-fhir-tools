@@ -1,0 +1,137 @@
+{
+  "resourceType": "QuestionnaireResponse",
+  "id": "extract-complex-defn3-response",
+  "questionnaire": "http://hl7.org/fhir/uv/sdc/Questionnaire/extract-complex-defn3",
+  "status": "completed",
+  "authored": "2024-01-15T10:30:00+00:00",
+  "author": {
+    "reference": "Practitioner/dr-example",
+    "display": "Dr Example"
+  },
+  "item": [
+    {
+      "linkId": "patient",
+      "item": [
+        {
+          "linkId": "name",
+          "item": [
+            {
+              "linkId": "given",
+              "answer": [
+                {
+                  "valueString": "Peter"
+                }
+              ]
+            },
+            {
+              "linkId": "family",
+              "answer": [
+                {
+                  "valueString": "Chalmers"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "gender",
+          "answer": [
+            {
+              "valueCoding": {
+                "system": "http://hl7.org/fhir/administrative-gender",
+                "code": "male",
+                "display": "Male"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "dob",
+          "answer": [
+            {
+              "valueDate": "1974-12-25"
+            }
+          ]
+        },
+        {
+          "linkId": "ihi",
+          "answer": [
+            {
+              "valueString": "8003608833357361"
+            }
+          ]
+        },
+        {
+          "linkId": "mobile-phone",
+          "answer": [
+            {
+              "valueString": "0412345678"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "contacts",
+      "item": [
+        {
+          "linkId": "contact-name",
+          "answer": [
+            {
+              "valueString": "Jane Doe"
+            }
+          ]
+        },
+        {
+          "linkId": "relationship",
+          "answer": [
+            {
+              "valueCoding": {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0131",
+                "code": "N",
+                "display": "Next-of-Kin"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "phone",
+          "answer": [
+            {
+              "valueString": "0498765432"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "obs",
+      "item": [
+        {
+          "linkId": "height",
+          "answer": [
+            {
+              "valueDecimal": 180
+            }
+          ]
+        },
+        {
+          "linkId": "weight",
+          "answer": [
+            {
+              "valueDecimal": 75
+            }
+          ]
+        },
+        {
+          "linkId": "complication",
+          "answer": [
+            {
+              "valueBoolean": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

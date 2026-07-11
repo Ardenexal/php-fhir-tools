@@ -234,6 +234,76 @@ final class FHIRExtractConformanceTest extends AbstractSdcConformanceTest
     }
 
     /**
+     * Direct assertions on the `extract-complex-defn3` output (R4B), guarding the complex mappings the
+     * uuid-tokenised oracle comparison could mask: choice-slice `value[x]:valueQuantity` (an
+     * answer-bearing `definitionExtract` root), `fixed-value` complex/coded calculated values
+     * (`code.coding`/`category.coding`/`identifier.type`), a `Coding` answer reduced to a `code`
+     * (`gender`), temporal coercion (`effectiveDateTime`/`issued`), and cross-resource reference topology.
+     *
+     * ## Known gap (documented)
+     *
+     * `Patient.name.text` (a `definitionExtractValue` whose FHIRPath `item.where(...)` requires the current
+     * QuestionnaireResponse item as the evaluation focus while `%resource` stays the QR root) is NOT
+     * produced: the FHIRPath evaluator binds `%resource` to the focus node, so focus and `%resource`
+     * cannot yet differ (separating them is a shared-FHIRPath change out of scope for this stretch).
+     * `HumanName.text` is a **data-bearing** element the reference engine computed on purpose — the oracle
+     * comparison only stays green because `text` is in the shared `IGNORED_KEYS`; this assertion documents
+     * the gap explicitly and trips if the focus-node limitation is later lifted.
+     */
+    public function testComplexDefn3ExtractsTypedResources(): void
+    {
+        $actual  = $this->extractForVersion('extract-complex-defn3', FhirVersion::R4B);
+        $entries = $actual['entry'];
+        self::assertIsArray($entries);
+        self::assertCount(4, $entries, 'Expected Patient + RelatedPerson + 2 Observations (complication is not its own Observation).');
+
+        // Index entries by resourceType (+ Observation code) — order is not asserted.
+        $byType = [];
+        foreach ($entries as $entry) {
+            self::assertIsArray($entry);
+            self::assertIsArray($entry['resource']);
+            $resource = $entry['resource'];
+            $type     = $resource['resourceType'] ?? null;
+            self::assertIsString($type);
+            $key          = $type === 'Observation' ? 'Observation:' . ($resource['code']['coding'][0]['code'] ?? '?') : $type;
+            $byType[$key] = $entry;
+        }
+
+        $patient = $byType['Patient']['resource'] ?? null;
+        self::assertIsArray($patient);
+        self::assertSame('male', $patient['gender'] ?? null, 'A Coding answer must reduce to the code leaf Patient.gender.');
+        self::assertSame('1974-12-25', $patient['birthDate'] ?? null);
+        self::assertSame('http://example.org/nhio', $patient['identifier'][0]['system'] ?? null);
+        self::assertSame('8003608833357361', $patient['identifier'][0]['value'] ?? null);
+
+        $patientFullUrl = $byType['Patient']['fullUrl'] ?? null;
+        self::assertIsString($patientFullUrl);
+
+        // Choice-slice value[x]:valueQuantity on the answer-bearing definitionExtract root, plus fixed-value
+        // complex/coded calculated fields and temporal coercion.
+        $height = $byType['Observation:8302-2']['resource'] ?? null;
+        self::assertIsArray($height);
+        self::assertSame('final', $height['status'] ?? null);
+        self::assertSame('vital-signs', $height['category'][0]['coding'][0]['code'] ?? null);
+        self::assertEqualsWithDelta(180, $height['valueQuantity']['value'] ?? null, 0.0001);
+        self::assertSame('m', $height['valueQuantity']['unit'] ?? null);
+        // `+00:00` is normalised to `Z` by extractForVersion()'s instant normalisation (same instant).
+        self::assertSame('2024-01-15T10:30:00Z', $height['effectiveDateTime'] ?? null);
+        self::assertSame('2024-01-15T10:30:00Z', $height['issued'] ?? null);
+        self::assertSame('Practitioner/dr-example', $height['performer'][0]['reference'] ?? null);
+        self::assertSame($patientFullUrl, $height['subject']['reference'] ?? null, 'Observation.subject must resolve to the Patient fullUrl.');
+        self::assertSame('QuestionnaireResponse/extract-complex-defn3-response', $height['derivedFrom'][0]['reference'] ?? null);
+
+        // Cross-resource reference topology: RelatedPerson.patient → the Patient entry.
+        $related = $byType['RelatedPerson']['resource'] ?? null;
+        self::assertIsArray($related);
+        self::assertSame($patientFullUrl, $related['patient']['reference'] ?? null);
+
+        // Documented known gap: name.text (focus-node FHIRPath) is not produced.
+        self::assertArrayNotHasKey('text', is_array($patient['name'][0] ?? null) ? $patient['name'][0] : [], 'name.text is a known gap (see docblock); update this guard if the focus-node limitation is lifted.');
+    }
+
+    /**
      * The definition-based extraction cases vendored from the forms-lab oracle, exercised across versions.
      *
      * @return iterable<string, array{0: string}>
@@ -244,6 +314,7 @@ final class FHIRExtractConformanceTest extends AbstractSdcConformanceTest
         yield 'allocateId'  => ['definition-extract-allocateid'];
         yield 'value'       => ['definition-extract-value'];
         yield 'put'         => ['definition-extract-put'];
+        yield 'complexDefn3' => ['extract-complex-defn3'];
     }
 
     /**

@@ -42,13 +42,13 @@ final class DefinitionPathWriter
         $last    = count($segments) - 1;
 
         foreach ($segments as $i => $segment) {
-            $property = $this->normalizeSegment($segment);
+            [$property, $slice] = $this->parseSegment($segment);
             if ($i === $last) {
                 $this->setLeaf($current, $property, $value);
 
                 return;
             }
-            $current = $this->descend($current, $property, reuseExisting: true);
+            $current = $this->descend($current, $property, $slice, reuseExisting: true);
         }
     }
 
@@ -66,8 +66,8 @@ final class DefinitionPathWriter
         $last    = count($segments) - 1;
 
         foreach ($segments as $i => $segment) {
-            $property = $this->normalizeSegment($segment);
-            $current  = $this->descend($current, $property, reuseExisting: $i !== $last);
+            [$property, $slice] = $this->parseSegment($segment);
+            $current            = $this->descend($current, $property, $slice, reuseExisting: $i !== $last);
         }
 
         return $current;
@@ -87,9 +87,17 @@ final class DefinitionPathWriter
      * For array properties, `reuseExisting` reuses the first element when present; otherwise a fresh
      * instance is appended. For single-valued complex properties the existing value is reused.
      */
-    private function descend(object $current, string $property, bool $reuseExisting): object
+    private function descend(object $current, string $property, ?string $slice, bool $reuseExisting): object
     {
         $meta = $this->metaFor($current, $property);
+
+        // A choice element addressed by a slice (`value[x]:valueQuantity`) descends into the sliced
+        // variant instance held by the single backing property (e.g. `Observation.value` holding a
+        // `Quantity` whose `.value`/`.unit` the child leaves then set).
+        if ($meta->isChoice) {
+            return $this->descendChoice($current, $property, $meta, $slice);
+        }
+
         // `phpItemClass` carries the item class for array-valued complex properties, but the generated
         // models leave it null for single-valued complex ones (e.g. `RelatedPerson.patient`). Fall back
         // to the property's declared PHP type so a scalar-holding intermediate (a `Reference` whose
@@ -117,6 +125,48 @@ final class DefinitionPathWriter
         }
 
         return $child;
+    }
+
+    /**
+     * Descend into a choice element's sliced variant: resolve the concrete variant class from the slice
+     * (`valueQuantity` → the `Quantity` variant, via `#[FhirProperty]` variant metadata), reuse the
+     * variant instance already held by the single backing property, or instantiate and store one.
+     */
+    private function descendChoice(object $current, string $property, PropertyMetadata $meta, ?string $slice): object
+    {
+        $class = $this->choiceVariantClass($meta, $slice)
+            ?? throw new \RuntimeException(\sprintf('Cannot resolve choice variant "%s" for %s::$%s', $slice ?? '(none)', $current::class, $property));
+
+        $existing = $current->$property ?? null;
+        if ($existing instanceof $class) {
+            return $existing;
+        }
+
+        $child              = new $class();
+        $current->$property = $child;
+
+        return $child;
+    }
+
+    /**
+     * The FQCN of a choice element's variant selected by a definition slice name (e.g. `valueQuantity`),
+     * matched against the variant metadata's `jsonKey`, or null when the slice names no complex variant.
+     *
+     * @return class-string|null
+     */
+    private function choiceVariantClass(PropertyMetadata $meta, ?string $slice): ?string
+    {
+        if ($slice === null) {
+            return null;
+        }
+
+        foreach ($meta->variants ?? [] as $variant) {
+            if ($variant->jsonKey === $slice && !$variant->isBuiltin && class_exists($variant->phpType)) {
+                return $variant->phpType;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -173,11 +223,85 @@ final class DefinitionPathWriter
             return $value;
         }
 
-        if (!class_exists($targetClass) || !$this->constructorAcceptsValue($targetClass)) {
+        if (!class_exists($targetClass)) {
             return $value;
         }
 
-        return new $targetClass(value: $value);
+        $paramType = $this->valueParamType($targetClass);
+        if ($paramType === null) {
+            return $value;
+        }
+
+        // A string-based primitive (`?string $value`) takes the scalar directly. A temporal primitive
+        // wraps a FHIR value-object (`InstantPrimitive::$value` is `?FHIRInstant`), so a raw datetime
+        // string must be `parse()`d into that object first (e.g. a computed `Observation.issued`).
+        if ($paramType->isBuiltin()) {
+            return new $targetClass(value: $value);
+        }
+
+        $inner = $paramType->getName();
+        if (class_exists($inner) && method_exists($inner, 'parse')) {
+            return new $targetClass(value: $inner::parse((string) $value));
+        }
+
+        return $value;
+    }
+
+    /**
+     * Wrap a raw scalar into whichever of a choice element's variants can hold it, so a computed value
+     * (e.g. a datetime string for `Observation.effective[x]`) becomes the concrete variant primitive its
+     * union declares. Returns the value untouched when it is not a scalar or no variant can wrap it (the
+     * subsequent {@see resolveChoiceVariant()} then reports the mismatch). Variants are tried in
+     * declaration order, so `effective[x]` (`dateTime|Period|Timing|instant`) resolves to `dateTime`.
+     */
+    private function coerceScalarToChoiceVariant(PropertyMetadata $meta, mixed $value): mixed
+    {
+        if (!is_scalar($value)) {
+            return $value;
+        }
+
+        foreach ($meta->variants ?? [] as $variant) {
+            if ($variant->isBuiltin && $this->scalarMatchesBuiltin($value, $variant->phpType)) {
+                return $value; // a builtin variant accepts the raw scalar as-is
+            }
+        }
+
+        foreach ($meta->variants ?? [] as $variant) {
+            if ($variant->isBuiltin || !class_exists($variant->phpType)) {
+                continue;
+            }
+            $wrapped = $this->coerceScalar($value, $variant->phpType);
+            if ($wrapped instanceof $variant->phpType) {
+                return $wrapped;
+            }
+        }
+
+        return $value;
+    }
+
+    /**
+     * The declared type of a class's constructor `value` parameter, or null when it has none.
+     */
+    private function valueParamType(string $class): ?\ReflectionNamedType
+    {
+        if (!class_exists($class)) {
+            return null;
+        }
+
+        $constructor = (new \ReflectionClass($class))->getConstructor();
+        if ($constructor === null) {
+            return null;
+        }
+
+        foreach ($constructor->getParameters() as $parameter) {
+            if ($parameter->getName() === 'value') {
+                $type = $parameter->getType();
+
+                return $type instanceof \ReflectionNamedType ? $type : null;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -244,8 +368,11 @@ final class DefinitionPathWriter
         $meta = $this->metaFor($current, $property);
 
         if ($meta->isChoice) {
-            // Resolve which polymorphic variant this value is (metadata-driven); the single backing
-            // property holds the union, so the assignment itself is type-agnostic.
+            // A raw scalar (a computed datetime string for `effective[x]`) is first wrapped into the
+            // variant primitive its union declares; then resolve which variant this value is
+            // (metadata-driven) — the single backing property holds the union, so the assignment itself
+            // is type-agnostic.
+            $value = $this->coerceScalarToChoiceVariant($meta, $value);
             $this->resolveChoiceVariant($meta, $value);
             $current->$property = $value;
 
@@ -265,8 +392,42 @@ final class DefinitionPathWriter
         // unwrap it to its scalar first (the inverse of the wrap coercion below).
         $value = $this->unwrapForBuiltinLeaf($current, $property, $value);
 
+        // A complex/primitive object the leaf does not accept (a `Coding` answer for a `code` leaf like
+        // `Patient.gender`, or a `dateTime` primitive for an `instant` leaf like `Observation.issued`)
+        // is reduced to its assignable scalar so the wrapping below can re-wrap it into the leaf's type.
+        $value = $this->reduceToAssignableScalar($current, $property, $value);
+
         $wrapper            = $this->primitiveWrapperFor($current, $property, $value);
         $current->$property = $wrapper !== null ? $this->coerceScalar($value, $wrapper) : $value;
+    }
+
+    /**
+     * Reduce an object value the target leaf cannot hold to the scalar its declared type can wrap:
+     *  - a `Coding` (has `code`) written to a code/string leaf → the `code`'s scalar;
+     *  - a primitive-wrapper of the wrong class (a `dateTime` for an `instant` leaf) → its inner scalar.
+     * A value any declared type already accepts (a `Coding` into a `Coding` leaf, a matching wrapper) is
+     * returned untouched, so accepted complex writes are never disturbed.
+     */
+    private function reduceToAssignableScalar(object $current, string $property, mixed $value): mixed
+    {
+        if (!is_object($value)) {
+            return $value;
+        }
+
+        foreach ($this->namedTypesOf($current, $property) as $type) {
+            $name = $type->getName();
+            if (!$type->isBuiltin() && $value instanceof $name) {
+                return $value; // a declared type accepts the object as-is
+            }
+        }
+
+        // Prefer a `Coding.code` when present (coded answer → code leaf); else an inner primitive scalar.
+        $source = property_exists($value, 'code') ? ($value->code ?? null) : $value;
+        if (is_object($source) && property_exists($source, 'value')) {
+            $source = $source->value ?? null;
+        }
+
+        return is_scalar($source) ? $source : $value;
     }
 
     /**
@@ -337,10 +498,25 @@ final class DefinitionPathWriter
     }
 
     /**
-     * Strip a choice element's `[x]` marker so it maps to the backing PHP property (`value[x]` → `value`).
+     * Split a definition path segment into its backing PHP property name and an optional choice slice.
+     *
+     * A choice element carries an `[x]` marker (`value[x]` → property `value`) and may be sliced to a
+     * concrete variant (`value[x]:valueQuantity` → property `value`, slice `valueQuantity`). The slice is
+     * the FHIR element-slice name, matched against a variant's `jsonKey` by {@see choiceVariantClass()}.
+     *
+     * @return array{0: string, 1: string|null} [property, slice]
      */
-    private function normalizeSegment(string $segment): string
+    private function parseSegment(string $segment): array
     {
-        return str_ends_with($segment, '[x]') ? substr($segment, 0, -3) : $segment;
+        $slice = null;
+        $colon = strpos($segment, ':');
+        if ($colon !== false) {
+            $slice   = substr($segment, $colon + 1);
+            $segment = substr($segment, 0, $colon);
+        }
+
+        $property = str_ends_with($segment, '[x]') ? substr($segment, 0, -3) : $segment;
+
+        return [$property, $slice];
     }
 }
