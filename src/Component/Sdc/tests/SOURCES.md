@@ -297,3 +297,39 @@ field checks (`testProvenanceEntryEmittedWhenRequested`) and its cardinality was
 toolkit validator (`isValid: true`, 0 errors; only the `dom-6` narrative best-practice warning). It is
 **never** part of a byte-compared oracle fixture — the existing oracle Bundles stay Provenance-free so
 they need no re-vendoring.
+
+---
+
+## `$populate` conformance oracle (sdc-populate M01 — expression-based, R4)
+
+**Working oracle engine for `$populate`: `fhir.forms-lab.com` (fhirVersion 4.3.0 = R4B).**
+The M00 spike had flagged the fhirpath-lab *R4* backend (`sqlonfhir 4.0.16`,
+`sqlonfhir-r4.azurewebsites.net`) as **unable to evaluate `initialExpression`** and too fragile to
+seed. Re-probed on 2026-07-12 against `fhir.forms-lab.com` — the R4B engine that already seeds the
+`$extract` oracles — and it **does** evaluate `initialExpression` end-to-end:
+
+| Field | Value |
+|-------|-------|
+| Engine | forms-lab (`fhir.forms-lab.com`) |
+| FHIR version | 4.3.0 (R4B; wire-compatible with R4 for the primitives this case exercises) |
+| Operation | `POST Questionnaire/$populate` (type-level) |
+| Input shape | FHIR `Parameters`: `questionnaire` (resource) + `subject` (valueReference) + `context` (parts `name`=valueString, `content`=resource) |
+| Captured | 2026-07-12, HTTP 200 |
+
+**Case `populate-launchcontext-initial` (minimal, M01-scoped):** a Questionnaire carrying ONLY a
+`launchContext` (`patient` → `Patient`) and two leaf items with `initialExpression`
+(`%patient.name.first().given.first()` → `"Peter"`, `%patient.name.first().family` → `"Chalmers"`).
+The form deliberately uses no mechanism M01 does not implement, so a subset implementation matches the
+reference output. Fixtures:
+
+- `Fixtures/Populate/populate-launchcontext-initial.questionnaire.json` — **input**, authored (input-side
+  artifacts may be authored; only expected output must be vendored).
+- `Fixtures/Populate/populate-launchcontext-initial.patient.json` — **input** launch-context Patient.
+- `Fixtures/Populate/populate-launchcontext-initial.expected-qr.json` — **frozen forms-lab output**
+  (the vendored oracle; never hand-authored, never seeded from this toolkit).
+
+**Spec-legal divergences to tolerate in the test subclass (not the shared harness):** forms-lab omits
+`QuestionnaireResponse.subject` from its output (subject is 0..1 optional). This toolkit sets `subject`
+per the SDC populate guidance, so `FHIRPopulateConformanceTest` adds `subject` to its local
+`IGNORED_KEYS` (mirroring how the extract subclass drops `url`) — dropping it in the shared base would
+weaken the `$extract` oracle. `authored`/`id`/`lastUpdated`/`text` are already dropped by the shared base.
