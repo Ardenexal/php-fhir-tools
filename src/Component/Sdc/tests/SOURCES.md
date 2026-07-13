@@ -368,6 +368,38 @@ Probe payloads: kept out of the repo (synthetic, reproducible from the descripti
 
 ---
 
+## `$populate` M02 oracle fixtures — per-file provenance
+
+The six M02 `$populate` oracle cases below share this provenance (recorded per-file here so the audit
+trail matches the `$extract` corpus, rather than living only in the prose above):
+
+| Field | Value |
+|-------|-------|
+| Engine | forms-lab (`fhir.forms-lab.com`) — the same R4B-native engine that seeds the `$extract` oracles and the M01 `populate-launchcontext-initial` oracle |
+| FHIR version | 4.3.0 (R4B; wire-compatible with R4 for the content these cases exercise) |
+| Operation / Endpoint | `POST https://fhir.forms-lab.com/Questionnaire/$populate` (type-level) |
+| Captured | 2026-07-13, HTTP 200 |
+| Input fixtures (`.questionnaire.json` / `.patient.json` / `.observation.json`) | **authored** — input-side artifacts may be authored; only the expected output must be vendored |
+| `*.expected-qr.json` | **frozen forms-lab output** — vendored verbatim, never hand-authored, never seeded from this toolkit |
+| Probe request payloads | **not retained** in the repo (reproducible from the input fixtures + the `Parameters` input shape documented in the M01 oracle entry above) |
+
+Per-case files and what each locks against regression:
+
+| Case (`Fixtures/Populate/<case>.*`) | Input fixtures | Expected oracle | Mechanism frozen |
+|---|---|---|---|
+| `populate-variables-coercion` | `.questionnaire.json`, `.patient.json` | `.expected-qr.json` | root `variable` (`%pName`) reused by a later item expression; primitive coercion (date/boolean/integer) |
+| `populate-itempopulationcontext` | `.questionnaire.json`, `.patient.json` | `.expected-qr.json` | repeating group: one group repetition per `itemPopulationContext` result, `%ctx` bound per repetition |
+| `populate-enablewhen-notsuppressed` | `.questionnaire.json`, `.patient.json` | `.expected-qr.json` | the `enableWhen` non-suppression reversal — a disabled dependent item is still populated |
+| `populate-coercion-quantity` | `.questionnaire.json`, `.patient.json`, `.observation.json` | `.expected-qr.json` | `Quantity` datatype pass-through → `valueQuantity`; **two** launch contexts (`patient` + `obs`) |
+| `populate-coercion-reference` | `.questionnaire.json`, `.patient.json` | `.expected-qr.json` | `Reference` datatype pass-through → `valueReference` |
+| `populate-coercion-coding-marital` | `.questionnaire.json`, `.patient.json` | `.expected-qr.json` | `Coding` datatype pass-through → `valueCoding` (`display` asserted directly in `testCodingCoercionPreservesDisplay`, since the harness ignores it) |
+
+The frozen bytes carry the forms-lab serialization signature (a `meta.lastUpdated` with an explicit
+`+00:00` offset and .NET-style fractional seconds, e.g. `2026-07-12T23:26:32.6618845+00:00`), consistent
+with the genuine engine origin above rather than a toolkit-produced output.
+
+---
+
 ## `$populate` M02 coercion + observation findings — 2026-07-13
 
 **Answer-value coercion is strict-by-source-datatype (forms-lab, confirmed by probe).** The expression

@@ -536,7 +536,7 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
             return [];
         }
 
-        [$windowStart, $windowEnd] = $this->observationWindow($item);
+        [$windowStart, $windowEnd] = $this->observationWindow($item, $linkId, $factory, $issues);
 
         $best   = null;
         $bestTs = null;
@@ -586,11 +586,15 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
 
     /**
      * The `[start, end]` Unix-timestamp bounds of an item's `observationLinkPeriod`, either bound null when
-     * unbounded. A `Period` gives explicit start/end; a `Duration` gives `[now - duration, now]`.
+     * unbounded. A `Period` gives explicit start/end; a `Duration` gives `[now - duration, now]`. When a
+     * `Duration` amount or UCUM unit cannot be mapped, the look-back is treated as unbounded and a warning
+     * issue is recorded, so the widened window is observable rather than a silent stale-value selection.
+     *
+     * @param list<object> $issues
      *
      * @return array{0: int|null, 1: int|null}
      */
-    private function observationWindow(object $item): array
+    private function observationWindow(object $item, string $linkId, PopulateModelFactory $factory, array &$issues): array
     {
         $value = null;
         foreach ($this->extensionsOf($item) as $ext) {
@@ -615,6 +619,13 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
         // Duration (has value/unit/code) → look back from now.
         if (property_exists($value, 'value')) {
             $seconds = $this->durationSeconds($value);
+            if ($seconds === null) {
+                $issues[] = $factory->issue(
+                    IssueSeverity::warning->value,
+                    IssueType::processingfailure->value,
+                    \sprintf("Item '%s' observationLinkPeriod Duration has an unrecognised amount or unit; the look-back window was treated as unbounded (the most recent eligible Observation is still used).", $linkId),
+                );
+            }
 
             return [$seconds !== null ? time() - $seconds : null, time()];
         }

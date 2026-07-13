@@ -127,8 +127,10 @@ final class FHIRPopulateConformanceTest extends AbstractSdcConformanceTest
 
     /**
      * `Reference` answer coercion: a `reference` item populated from `%patient.managingOrganization` (a
-     * `Reference` datatype) yields `valueReference` verbatim. A bare string / whole resource would be a
-     * mismatch (the engine rejects it); only a genuine `Reference` node is accepted.
+     * `Reference` datatype) yields `valueReference` — its `reference`/`type` are compared against the
+     * oracle; only `display` is harness-ignored ({@see IGNORED_KEYS}, a human-readable label). A bare
+     * string / whole resource would be a mismatch (the engine rejects it); only a genuine `Reference`
+     * node is accepted.
      */
     public function testReferenceCoercionConformsToReferenceOracle(): void
     {
@@ -137,13 +139,56 @@ final class FHIRPopulateConformanceTest extends AbstractSdcConformanceTest
 
     /**
      * `Coding` answer coercion: a `choice` item populated from `%patient.maritalStatus.coding.first()` (a
-     * `Coding` datatype) yields `valueCoding` with system/code/display intact — the object passed through.
-     * (Binding-driven `code`→`Coding` promotion — a bare `code` systematised via the item's value-set — is
-     * a documented deferral; see tests/SOURCES.md and the backlog.)
+     * `Coding` datatype) yields `valueCoding` with system/code intact — the object passed through. The
+     * harness drops `display` via {@see IGNORED_KEYS}, so the populated `display` is asserted directly in
+     * {@see testCodingCoercionPreservesDisplay}, not by this structural comparison. (Binding-driven
+     * `code`→`Coding` promotion — a bare `code` systematised via the item's value-set — is a documented
+     * deferral; see tests/SOURCES.md and the backlog.)
      */
     public function testCodingCoercionConformsToReferenceOracle(): void
     {
         $this->assertCaseConformsToOracle('populate-coercion-coding-marital');
+    }
+
+    /**
+     * `Coding.display` is data-bearing (passed through verbatim from the source `Coding`), but the shared
+     * harness drops `display` via {@see IGNORED_KEYS} as a human-readable label, so
+     * {@see testCodingCoercionConformsToReferenceOracle} cannot see it. Assert it directly here — guarding
+     * against a regression that drops or corrupts the populated `display`. Mirrors the `$extract`
+     * precedent, `FHIRExtractConformanceTest::testComplexDefn3ComputesNameTextAcrossVersions`.
+     */
+    public function testCodingCoercionPreservesDisplay(): void
+    {
+        $serializer = FHIRSerializationService::createDefault(FhirVersion::R4);
+
+        $questionnaire = $serializer->deserializeFromJson(
+            $this->fixture('populate-coercion-coding-marital.questionnaire.json'),
+            QuestionnaireResource::class,
+        );
+        $patient = $serializer->deserializeFromJson(
+            $this->fixture('populate-coercion-coding-marital.patient.json'),
+            PatientResource::class,
+        );
+
+        $result = (new FHIRQuestionnairePopulateService())->populate(
+            $questionnaire,
+            new PopulateContext(
+                fhirVersion: FhirVersion::R4,
+                launchContextResources: ['patient' => $patient],
+                subject: 'Patient/pt',
+            ),
+        );
+
+        $actual = $this->decode($serializer->serializeToJson($result->getResponse()));
+        $items  = $actual['item'];
+        self::assertIsArray($items);
+        self::assertIsArray($items[0]);
+        $answers = $items[0]['answer'];
+        self::assertIsArray($answers);
+        self::assertIsArray($answers[0]);
+        $coding = $answers[0]['valueCoding'];
+        self::assertIsArray($coding);
+        self::assertSame('Married', $coding['display'] ?? null, 'The populated Coding must retain its display label.');
     }
 
     /**

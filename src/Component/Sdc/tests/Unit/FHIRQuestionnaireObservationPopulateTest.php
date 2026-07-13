@@ -9,6 +9,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Resource\QuestionnaireResource;
 use Ardenexal\FHIRTools\Component\Sdc\BundlePopulationDataProvider;
 use Ardenexal\FHIRTools\Component\Sdc\FHIRQuestionnairePopulateService;
 use Ardenexal\FHIRTools\Component\Sdc\PopulateContext;
+use Ardenexal\FHIRTools\Component\Sdc\PopulateResult;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use PHPUnit\Framework\TestCase;
@@ -115,9 +116,34 @@ final class FHIRQuestionnaireObservationPopulateTest extends TestCase
     {
         // Bundle whose only Observation uses a non-matching code.
         $bundleJson = str_replace('29463-7', 'NO-MATCH', self::DATA_BUNDLE);
-        $answer     = $this->populateWeightAnswer(self::WEIGHT_QUESTIONNAIRE, $bundleJson);
+        $result     = $this->populateWeight(self::WEIGHT_QUESTIONNAIRE, $bundleJson);
 
-        self::assertNull($answer, 'No code-matching Observation → item omitted.');
+        self::assertNull($this->weightAnswer($result), 'No code-matching Observation → item omitted.');
+        // The name promises "WithIssue": the no-match diagnostic must actually be emitted, not just the
+        // answer omitted — otherwise a regression that silently drops the OperationOutcome passes.
+        self::assertNotNull($result->getIssues(), 'A no-match Observation must record a diagnostic issue.');
+        self::assertContains('information', $this->issueSeverities($result->getIssues()));
+    }
+
+    public function testUnmappableDurationUnitWidensWindowToUnboundedWithWarning(): void
+    {
+        // A Duration look-back whose unit is not in the service's UCUM-mappable set ("ms"). The window
+        // can't be computed, so it is treated as unbounded — the most recent eligible Observation is still
+        // populated (best-effort), but the widening MUST surface a warning so it is not a silent stale read.
+        $questionnaire = str_replace(
+            '"valuePeriod": { "start": "2020-01-01", "end": "2027-01-01" }',
+            '"valueDuration": { "value": 5, "unit": "millisecond", "code": "ms" }',
+            self::WEIGHT_QUESTIONNAIRE,
+        );
+
+        $result = $this->populateWeight($questionnaire);
+
+        $answer = $this->weightAnswer($result);
+        self::assertNotNull($answer, 'Best-effort: the most recent eligible Observation is still populated.');
+        self::assertEquals(80, $answer['valueQuantity']['value']);
+
+        self::assertNotNull($result->getIssues(), 'An unmappable Duration unit must be observable.');
+        self::assertContains('warning', $this->issueSeverities($result->getIssues()));
     }
 
     /**
@@ -128,17 +154,36 @@ final class FHIRQuestionnaireObservationPopulateTest extends TestCase
      */
     private function populateWeightAnswer(string $questionnaireJson, ?string $bundleJson = null): ?array
     {
+        return $this->weightAnswer($this->populateWeight($questionnaireJson, $bundleJson));
+    }
+
+    /**
+     * Populate the `weight` questionnaire against the data Bundle and return the full result (so callers
+     * can inspect both the answer and the `OperationOutcome` issues).
+     */
+    private function populateWeight(string $questionnaireJson, ?string $bundleJson = null): PopulateResult
+    {
         $serializer    = FHIRSerializationService::createDefault(FhirVersion::R4);
         $questionnaire = $serializer->deserializeFromJson($questionnaireJson, QuestionnaireResource::class);
         $bundle        = $serializer->deserializeFromJson($bundleJson ?? self::DATA_BUNDLE, BundleResource::class);
 
-        $result = (new FHIRQuestionnairePopulateService())->populate(
+        return (new FHIRQuestionnairePopulateService())->populate(
             $questionnaire,
             new PopulateContext(
                 fhirVersion: FhirVersion::R4,
                 dataProvider: new BundlePopulationDataProvider($bundle),
             ),
         );
+    }
+
+    /**
+     * The `weight` item's first answer as a decoded JSON map, or null when the item was omitted.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function weightAnswer(PopulateResult $result): ?array
+    {
+        $serializer = FHIRSerializationService::createDefault(FhirVersion::R4);
 
         /** @var array<string, mixed> $decoded */
         $decoded = json_decode($serializer->serializeToJson($result->getResponse()), true, 512, JSON_THROW_ON_ERROR);
@@ -152,5 +197,25 @@ final class FHIRQuestionnaireObservationPopulateTest extends TestCase
         }
 
         return null;
+    }
+
+    /**
+     * The severities of an `OperationOutcome`'s issues (empty when null).
+     *
+     * @return list<string>
+     */
+    private function issueSeverities(?object $outcome): array
+    {
+        $severities = [];
+        foreach ($outcome->issue ?? [] as $issue) {
+            if (\is_object($issue)) {
+                $severity = $issue->severity->value ?? null;
+                if (\is_string($severity)) {
+                    $severities[] = $severity;
+                }
+            }
+        }
+
+        return $severities;
     }
 }
