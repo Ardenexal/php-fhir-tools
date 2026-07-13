@@ -9,30 +9,44 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Metadata\Extension\SafeExtensionReader;
 use Ardenexal\FHIRTools\Component\Models\R4\Enum\IssueSeverity;
 use Ardenexal\FHIRTools\Component\Models\R4\Enum\IssueType;
+use Ardenexal\FHIRTools\Component\Validation\FHIRQuestionnaireResolverInterface;
 
 /**
- * Expression-based `Questionnaire/$populate` (M01 scope).
+ * Expression-based `Questionnaire/$populate` (M01 + M02 scope).
  *
  * Binds each launch-context resource ({@see PopulateContext::$launchContextResources}) as a FHIRPath
- * external constant (`%patient`, …), walks the Questionnaire's items depth-first, evaluates every leaf
- * item's `initialExpression` against that context, and assembles a `QuestionnaireResponse`. Group items
- * that contain answered descendants are reproduced as nested response items; items that yield neither an
- * answer nor an answered descendant are omitted (matching the reference engine's output).
+ * external constant (`%patient`, …), resolves `variable` chains into further external constants, walks
+ * the Questionnaire's items depth-first evaluating each item's `initialExpression`, and assembles a
+ * `QuestionnaireResponse`. Group items carrying an `itemPopulationContext` are repeated once per context
+ * result, with the context name bound to each result for the repetition's descendants. Items that yield
+ * neither an answer nor an answered descendant are omitted (matching the reference engine's output).
+ * Items with an `observationLinkPeriod` (and no `initialExpression`) are populated from the most-recent
+ * eligible matching `Observation` supplied via {@see PopulateContext::$dataProvider} (offline-first).
  *
- * ## Guardrails proven by the M01 linchpin spikes
+ * ## Design facts (proven against the reference engine — see `tests/SOURCES.md`)
+ *
+ * - **`enableWhen` is NOT applied.** The SDC `$populate` spec directs implementations to "fill in as much
+ *   data as possible, even if it may not always be needed"; disabled-state is a display-time concern. So
+ *   `enableWhen`-disabled items are still populated.
+ * - **`itemPopulationContext`** repeats a group once per context result; `%<name>` binds to each result.
+ * - **Empty ≠ false.** An `initialExpression` that resolves to empty yields no answer (an information
+ *   issue), never a `false`/default value — the spec mandates the empty set be treated as "not answered".
+ *
+ * ## Guardrails
  *
  * Every Questionnaire input is deserializer-origin at runtime, so all extension reads go through
  * {@see SafeExtensionReader} (guarded against uninitialized typed properties on constructor-bypassed
- * objects) rather than bare `$ext->url`/`$ext->value`. External constants are stored in a dedicated
- * `EvaluationContext` slot that survives the `setRootResource()` mutation `FHIRPathService::evaluate()`
- * applies, so one bound context is reused across every item's evaluation.
+ * objects). External constants live in a dedicated `EvaluationContext` slot that survives the
+ * `setRootResource()` mutation `FHIRPathService::evaluate()` applies, so a bound context is reused across
+ * evaluations; each scope (root, item, repetition) derives an immutable child context.
  *
- * ## Deferred to M02/M03 (see the sdc-populate plan)
+ * ## Deferred (see the sdc-populate plan / backlog)
  *
- * `variable` chains, `itemPopulationContext` repeating groups, observation-based population,
- * `enableWhen` suppression, full item-type coercion, and non-FHIRPath expression languages
- * (CQL, `x-fhir-query`). Unsupported item types and non-FHIRPath expressions surface as issues rather
- * than silently dropping an answer.
+ * Binding-driven `code`→`Coding` promotion (a bare code systematised via the item's value-set binding)
+ * and non-FHIRPath expression languages (CQL, `x-fhir-query`). Unsupported item types and non-FHIRPath
+ * expressions surface as issues. Answer coercion covers the primitive, temporal, and
+ * `Coding`/`Quantity`/`Reference` datatypes; canonical-URL resolution is wired via
+ * {@see FHIRQuestionnaireResolverInterface}; observation-based population reads a supplied data provider.
  */
 final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
 {
@@ -42,32 +56,68 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
     private const string INITIAL_EXPRESSION_URL =
         'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression';
 
+    private const string VARIABLE_URL = 'http://hl7.org/fhir/StructureDefinition/variable';
+
+    private const string ITEM_POPULATION_CONTEXT_URL =
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemPopulationContext';
+
+    private const string OBSERVATION_LINK_PERIOD_URL =
+        'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationLinkPeriod';
+
     private const string LAUNCH_CONTEXT_NAME_URL = 'name';
 
     private const string FHIRPATH_LANGUAGE = 'text/fhirpath';
 
+    /**
+     * Observation statuses eligible for observation-based population — a completed/authoritative result.
+     * (SDC: preliminary/registered/cancelled/entered-in-error are excluded.)
+     *
+     * @var list<string>
+     */
+    private const array OBSERVATION_STATUSES = ['final', 'amended', 'corrected'];
+
     public function __construct(
         private readonly FHIRPathService $fhirPath = new FHIRPathService(),
         private readonly SafeExtensionReader $extensions = new SafeExtensionReader(),
+        /**
+         * Resolves a canonical URL passed to {@see populate()} to a Questionnaire resource. Optional — when
+         * null, a string `$questionnaire` cannot be resolved and yields an empty QR plus a warning. NB the
+         * resolver interface is R5-typed by existing design; the resolved Questionnaire is read
+         * version-agnostically, so it populates a QR of whatever {@see PopulateContext::$fhirVersion} asks.
+         */
+        private readonly ?FHIRQuestionnaireResolverInterface $questionnaireResolver = null,
     ) {
     }
 
-    public function populate(object $questionnaire, PopulateContext $context): PopulateResult
+    public function populate(object|string $questionnaire, PopulateContext $context): PopulateResult
     {
         $factory = new PopulateModelFactory($context->fhirVersion);
 
         /** @var list<object> $issues */
         $issues = [];
 
+        $resolved = $this->resolveQuestionnaire($questionnaire, $factory, $issues);
+        if ($resolved === null) {
+            // Canonical URL could not be resolved (no resolver, or not found): return an empty in-progress
+            // QR carrying the requested canonical plus the warning, rather than throwing.
+            $response = $factory->questionnaireResponse(
+                canonical: \is_string($questionnaire) ? $questionnaire : null,
+                status: 'in-progress',
+                subject: $context->subject !== null ? $factory->reference($context->subject) : null,
+                authored: $this->nowInstant(),
+                items: [],
+            );
+
+            return new PopulateResult($response, $factory->operationOutcome($issues));
+        }
+        $questionnaire = $resolved;
+
         $evalContext = $this->bindLaunchContext($questionnaire, $context, $factory, $issues);
 
-        $responseItems = [];
-        foreach ($this->itemsOf($questionnaire) as $item) {
-            $built = $this->buildResponseItem($item, $evalContext, $factory, $issues);
-            if ($built !== null) {
-                $responseItems[] = $built;
-            }
-        }
+        // Root-level `variable` extensions become external constants visible to every item expression.
+        $evalContext = $this->applyVariables($questionnaire, $evalContext, $factory, $issues);
+
+        $responseItems = $this->buildItems($this->itemsOf($questionnaire), $evalContext, $context, $factory, $issues);
 
         $response = $factory->questionnaireResponse(
             canonical: $this->canonicalUrlOf($questionnaire),
@@ -80,6 +130,46 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
         $outcome = $issues === [] ? null : $factory->operationOutcome($issues);
 
         return new PopulateResult($response, $outcome);
+    }
+
+    /**
+     * Resolve the `$questionnaire` argument to a Questionnaire object: pass a model object through
+     * unchanged; resolve a canonical URL string via the configured resolver. Returns null (with a warning
+     * issue) when a string cannot be resolved — no resolver configured, or the URL is not found.
+     *
+     * @param list<object> $issues
+     */
+    private function resolveQuestionnaire(object|string $questionnaire, PopulateModelFactory $factory, array &$issues): ?object
+    {
+        if (\is_object($questionnaire)) {
+            return $questionnaire;
+        }
+
+        if ($this->questionnaireResolver === null) {
+            $issues[] = $factory->issue(
+                IssueSeverity::warning->value,
+                IssueType::processingfailure->value,
+                \sprintf(
+                    "A canonical Questionnaire URL '%s' was supplied but no resolver is configured; cannot populate.",
+                    $questionnaire,
+                ),
+            );
+
+            return null;
+        }
+
+        $resolved = $this->questionnaireResolver->resolve($questionnaire);
+        if ($resolved === null) {
+            $issues[] = $factory->issue(
+                IssueSeverity::warning->value,
+                IssueType::processingfailure->value,
+                \sprintf("Questionnaire canonical URL '%s' could not be resolved; cannot populate.", $questionnaire),
+            );
+
+            return null;
+        }
+
+        return $resolved;
     }
 
     /**
@@ -115,12 +205,104 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
     }
 
     /**
-     * Build a `QuestionnaireResponse.item` for a Questionnaire item, or null when it yields neither an
-     * answer nor an answered descendant (such items are omitted, matching the reference output).
+     * Resolve the `variable` extensions declared on a node (Questionnaire root or item) in declaration
+     * order, binding each result as an external constant `%<name>` available to later variables and to
+     * descendant expressions. Returns a new context; the input is not mutated.
+     *
+     * Multi-valued variables are bound to their first value (the FHIRPath engine resolves an external
+     * constant as a single node); a warning records the truncation. Repeating semantics belong to
+     * `itemPopulationContext`, not `variable`.
      *
      * @param list<object> $issues
      */
-    private function buildResponseItem(object $item, EvaluationContext $evalContext, PopulateModelFactory $factory, array &$issues): ?object
+    private function applyVariables(object $node, EvaluationContext $evalContext, PopulateModelFactory $factory, array &$issues): EvaluationContext
+    {
+        foreach ($this->extensionsOf($node) as $ext) {
+            if ($this->extensions->readUrl($ext) !== self::VARIABLE_URL) {
+                continue;
+            }
+
+            $definition = $this->namedExpressionOf($ext, $factory, $issues, 'variable');
+            if ($definition === null) {
+                continue;
+            }
+            [$name, $expression] = $definition;
+
+            $values = $this->evaluateExpression($expression, $evalContext, $factory, $issues, \sprintf("variable '%s'", $name));
+            if ($values === []) {
+                continue;
+            }
+
+            if (\count($values) > 1) {
+                $issues[] = $factory->issue(
+                    IssueSeverity::information->value,
+                    IssueType::informationalnote->value,
+                    \sprintf("variable '%s' resolved to %d values; only the first is bound.", $name, \count($values)),
+                );
+            }
+
+            $evalContext = $evalContext->withExternalConstant($name, $values[0]);
+        }
+
+        return $evalContext;
+    }
+
+    /**
+     * Build the response items for a list of Questionnaire items, expanding any `itemPopulationContext`
+     * group into one repetition per context result.
+     *
+     * @param list<object> $items
+     * @param list<object> $issues
+     *
+     * @return list<object>
+     */
+    private function buildItems(array $items, EvaluationContext $evalContext, PopulateContext $populateContext, PopulateModelFactory $factory, array &$issues): array
+    {
+        $result = [];
+
+        foreach ($items as $item) {
+            // Item-level `variable`s extend the context for this item and its descendants.
+            $itemContext = $this->applyVariables($item, $evalContext, $factory, $issues);
+
+            $populationContext = $this->itemPopulationContextOf($item, $factory, $issues);
+            if ($populationContext === null) {
+                $built = $this->buildOneItem($item, $itemContext, $populateContext, $factory, $issues);
+                if ($built !== null) {
+                    $result[] = $built;
+                }
+
+                continue;
+            }
+
+            // itemPopulationContext: one group repetition per context result, `%<name>` bound to each.
+            [$contextName, $contextExpression] = $populationContext;
+            $contextResults                    = $this->evaluateExpression(
+                $contextExpression,
+                $itemContext,
+                $factory,
+                $issues,
+                \sprintf("itemPopulationContext '%s'", $contextName),
+            );
+
+            foreach ($contextResults as $contextResult) {
+                $repetitionContext = $itemContext->withExternalConstant($contextName, $contextResult);
+                $built             = $this->buildOneItem($item, $repetitionContext, $populateContext, $factory, $issues);
+                if ($built !== null) {
+                    $result[] = $built;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Build a single `QuestionnaireResponse.item` from a Questionnaire item in the given context, or null
+     * when it yields neither an answer nor an answered descendant (such items are omitted).
+     *
+     * @param list<object> $issues
+     */
+    private function buildOneItem(object $item, EvaluationContext $evalContext, PopulateContext $populateContext, PopulateModelFactory $factory, array &$issues): ?object
     {
         $linkId = $this->stringify($item->linkId ?? null);
         if ($linkId === null) {
@@ -131,32 +313,32 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
 
         $answers    = [];
         $expression = $this->initialExpressionOf($item, $factory, $issues, $linkId);
-        if ($expression !== null) {
-            try {
-                $values = $this->fhirPath
-                    ->evaluate($expression, null, $evalContext, $factory->fhirVersionValue())
-                    ->toArray();
-            } catch (\Throwable $e) {
-                // A malformed expression, or one referencing an unbound launch context (`%patient` when
-                // no Patient was supplied), raises rather than returning empty. Degrade to a warning so a
-                // single bad item cannot abort the whole populate. (Full malformed-expression handling: M03.)
-                $issues[] = $factory->issue(
-                    IssueSeverity::warning->value,
-                    IssueType::processingfailure->value,
-                    \sprintf("initialExpression for item '%s' could not be evaluated: %s", $linkId, $e->getMessage()),
-                );
-
-                $values = [];
-            }
+        if ($expression === null && $this->hasObservationLinkPeriod($item)) {
+            // Observation-based population is an alternative to expression-based; it applies only when the
+            // item has no initialExpression. Populates from the most-recent matching supplied Observation.
+            $answers = $this->populateFromObservation($item, $itemType, $linkId, $populateContext, $factory, $issues);
+        } elseif ($expression !== null) {
+            $values = $this->evaluateExpression($expression, $evalContext, $factory, $issues, \sprintf("initialExpression for item '%s'", $linkId));
 
             if ($values === []) {
                 // Observable, not silent: a launch-context-bound expression that resolves to nothing must
-                // be distinguishable from a legitimately-unanswered item (M03's "empty ≠ false" rule).
+                // be distinguishable from a legitimately-unanswered item ("empty set = not answered").
                 $issues[] = $factory->issue(
                     IssueSeverity::information->value,
                     IssueType::informationalnote->value,
                     \sprintf("initialExpression for item '%s' returned no value; item left unanswered.", $linkId),
                 );
+            } elseif (\count($values) > 1 && !$this->isRepeating($item)) {
+                $issues[] = $factory->issue(
+                    IssueSeverity::warning->value,
+                    IssueType::processingfailure->value,
+                    \sprintf(
+                        "initialExpression for item '%s' produced %d values but the item does not repeat; only the first is used.",
+                        $linkId,
+                        \count($values),
+                    ),
+                );
+                $values = [$values[0]];
             }
 
             foreach ($values as $value) {
@@ -167,13 +349,7 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
             }
         }
 
-        $childItems = [];
-        foreach ($this->itemsOf($item) as $child) {
-            $builtChild = $this->buildResponseItem($child, $evalContext, $factory, $issues);
-            if ($builtChild !== null) {
-                $childItems[] = $builtChild;
-            }
-        }
+        $childItems = $this->buildItems($this->itemsOf($item), $evalContext, $populateContext, $factory, $issues);
 
         if ($answers === [] && $childItems === []) {
             return null;
@@ -183,10 +359,34 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
     }
 
     /**
-     * Coerce an evaluated scalar to the answer `value[x]` shape for the item's type, or null (with a
-     * warning issue) when the type's coercion is not yet supported. M01 covers the primitive scalar
-     * types the expression engine returns directly; full coercion (temporal, Coding, Quantity, Reference)
-     * lands in M02.
+     * Evaluate a FHIRPath expression against the given context, degrading a raised error (malformed
+     * expression, unbound external constant) to a warning issue and an empty result rather than aborting
+     * the whole run.
+     *
+     * @param list<object> $issues
+     *
+     * @return list<mixed>
+     */
+    private function evaluateExpression(string $expression, EvaluationContext $evalContext, PopulateModelFactory $factory, array &$issues, string $label): array
+    {
+        try {
+            return $this->fhirPath
+                ->evaluate($expression, null, $evalContext, $factory->fhirVersionValue())
+                ->toArray();
+        } catch (\Throwable $e) {
+            $issues[] = $factory->issue(
+                IssueSeverity::warning->value,
+                IssueType::processingfailure->value,
+                \sprintf('%s could not be evaluated: %s', ucfirst($label), $e->getMessage()),
+            );
+
+            return [];
+        }
+    }
+
+    /**
+     * Coerce an evaluated value to the answer `value[x]` shape for the item's type, or null (with a
+     * warning issue) when the value cannot be coerced. A type mismatch is reported, never silently dropped.
      *
      * @param list<object> $issues
      */
@@ -197,17 +397,39 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
         switch ($itemType) {
             case 'string':
             case 'text':
-                return $scalar !== null ? $factory->stringValue($scalar) : null;
+                return $scalar !== null ? $factory->stringValue($scalar) : $this->mismatch($itemType, $linkId, $factory, $issues);
             case 'url':
-                return $scalar !== null ? $factory->uriValue($scalar) : null;
+                return $scalar !== null ? $factory->uriValue($scalar) : $this->mismatch($itemType, $linkId, $factory, $issues);
             case 'boolean':
-                return \is_bool($value) ? $value : null;
+                return \is_bool($value) ? $value : $this->mismatch($itemType, $linkId, $factory, $issues);
             case 'integer':
-                return \is_int($value) ? $value : (\is_numeric($scalar) ? (int) $scalar : null);
+                if (\is_int($value)) {
+                    return $value;
+                }
+
+                return \is_string($scalar) && $this->isIntegerString($scalar) ? (int) $scalar : $this->mismatch($itemType, $linkId, $factory, $issues);
             case 'decimal':
                 // The `decimal` answer variant is a raw string (→ `valueDecimal`), distinct from the
                 // `StringPrimitive` `string` variant (→ `valueString`).
-                return $scalar;
+                return $scalar !== null && is_numeric($scalar) ? $scalar : $this->mismatch($itemType, $linkId, $factory, $issues);
+            case 'date':
+            case 'dateTime':
+            case 'time':
+                return $scalar !== null
+                    ? $this->coerceTemporal($itemType, $scalar, $linkId, $factory, $issues)
+                    : $this->mismatch($itemType, $linkId, $factory, $issues);
+            case 'choice':
+            case 'open-choice':
+            case 'quantity':
+            case 'reference':
+            case 'attachment':
+                // Strict-by-source-datatype (matching the reference engine): the expression must already
+                // resolve to the right FHIR datatype OBJECT (`Coding`/`Quantity`/`Reference`/`Attachment`).
+                // The answer choice normalizer maps the object's class to the correct `value[x]` key, so the
+                // object is passed through intact. A bare scalar for a complex item is a mismatch (the engine
+                // rejects it), never silently coerced. Binding-driven `code`→`Coding` promotion (a bare code
+                // systematised via the item's value-set binding) is deferred — see the sdc-populate backlog.
+                return \is_object($value) ? $value : $this->mismatch($itemType, $linkId, $factory, $issues);
             default:
                 $issues[] = $factory->issue(
                     IssueSeverity::warning->value,
@@ -225,6 +447,320 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
     }
 
     /**
+     * Wrap a scalar into a temporal primitive (`date`/`dateTime`/`time`), reporting a mismatch when the
+     * scalar cannot be parsed as that FHIR temporal type.
+     *
+     * @param list<object> $issues
+     */
+    private function coerceTemporal(string $itemType, string $scalar, string $linkId, PopulateModelFactory $factory, array &$issues): mixed
+    {
+        try {
+            return match ($itemType) {
+                'date'     => $factory->dateValue($scalar),
+                'dateTime' => $factory->dateTimeValue($scalar),
+                default    => $factory->timeValue($scalar),
+            };
+        } catch (\Throwable) {
+            return $this->mismatch($itemType, $linkId, $factory, $issues, \sprintf('value "%s" is not a valid %s', $scalar, $itemType));
+        }
+    }
+
+    /**
+     * Record a coercion mismatch as a warning and return null (no answer). Centralises the
+     * "observable, not silent" discipline for every failed coercion branch.
+     *
+     * @param list<object> $issues
+     */
+    private function mismatch(?string $itemType, string $linkId, PopulateModelFactory $factory, array &$issues, ?string $detail = null): null
+    {
+        $issues[] = $factory->issue(
+            IssueSeverity::warning->value,
+            IssueType::processingfailure->value,
+            \sprintf(
+                "initialExpression for item '%s' produced a value incompatible with item type '%s'%s; the answer was skipped.",
+                $linkId,
+                $itemType ?? '(none)',
+                $detail !== null ? ' (' . $detail . ')' : '',
+            ),
+        );
+
+        return null;
+    }
+
+    /**
+     * Whether an item carries an `observationLinkPeriod` extension (observation-based population).
+     */
+    private function hasObservationLinkPeriod(object $item): bool
+    {
+        foreach ($this->extensionsOf($item) as $ext) {
+            if ($this->extensions->readUrl($ext) === self::OBSERVATION_LINK_PERIOD_URL) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Populate an item from the most-recent supplied `Observation` that matches the item's `code`, has an
+     * eligible status, and whose effective time falls within the `observationLinkPeriod` window. Returns
+     * the answers (0 or 1); records an information/warning issue when the data seam is absent, the item has
+     * no code, or nothing matches. No reference oracle exists for this mechanism (see `tests/SOURCES.md`);
+     * the selection is spec-driven and covered by deterministic unit tests.
+     *
+     * @param list<object> $issues
+     *
+     * @return list<object>
+     */
+    private function populateFromObservation(object $item, ?string $itemType, string $linkId, PopulateContext $populateContext, PopulateModelFactory $factory, array &$issues): array
+    {
+        $provider = $populateContext->dataProvider;
+        if ($provider === null) {
+            $issues[] = $factory->issue(
+                IssueSeverity::information->value,
+                IssueType::informationalnote->value,
+                \sprintf("Item '%s' uses observationLinkPeriod but no data provider was supplied; item left unanswered.", $linkId),
+            );
+
+            return [];
+        }
+
+        $itemKeys = $this->itemCodingKeys($item);
+        if ($itemKeys === []) {
+            $issues[] = $factory->issue(
+                IssueSeverity::warning->value,
+                IssueType::processingfailure->value,
+                \sprintf("Item '%s' has observationLinkPeriod but no item.code to match Observations against; item left unanswered.", $linkId),
+            );
+
+            return [];
+        }
+
+        [$windowStart, $windowEnd] = $this->observationWindow($item);
+
+        $best   = null;
+        $bestTs = null;
+        foreach ($provider->observations() as $observation) {
+            if (!$this->observationStatusEligible($observation) || !$this->observationMatchesCodes($observation, $itemKeys)) {
+                continue;
+            }
+
+            $timestamp = $this->observationEffectiveTimestamp($observation);
+            if ($timestamp === null
+                || ($windowStart !== null && $timestamp < $windowStart)
+                || ($windowEnd !== null && $timestamp > $windowEnd)) {
+                continue;
+            }
+
+            if ($bestTs === null || $timestamp > $bestTs) {
+                $best   = $observation;
+                $bestTs = $timestamp;
+            }
+        }
+
+        if ($best === null) {
+            $issues[] = $factory->issue(
+                IssueSeverity::information->value,
+                IssueType::informationalnote->value,
+                \sprintf("No matching Observation for item '%s' within its observationLinkPeriod; item left unanswered.", $linkId),
+            );
+
+            return [];
+        }
+
+        $value = $best->value ?? null;
+        if ($value === null) {
+            $issues[] = $factory->issue(
+                IssueSeverity::warning->value,
+                IssueType::processingfailure->value,
+                \sprintf("The Observation matched for item '%s' carries no value; item left unanswered.", $linkId),
+            );
+
+            return [];
+        }
+
+        $coerced = $this->coerceAnswerValue($itemType, $value, $linkId, $factory, $issues);
+
+        return $coerced !== null ? [$factory->answer($coerced)] : [];
+    }
+
+    /**
+     * The `[start, end]` Unix-timestamp bounds of an item's `observationLinkPeriod`, either bound null when
+     * unbounded. A `Period` gives explicit start/end; a `Duration` gives `[now - duration, now]`.
+     *
+     * @return array{0: int|null, 1: int|null}
+     */
+    private function observationWindow(object $item): array
+    {
+        $value = null;
+        foreach ($this->extensionsOf($item) as $ext) {
+            if ($this->extensions->readUrl($ext) === self::OBSERVATION_LINK_PERIOD_URL) {
+                $value = $this->extensions->readValue($ext);
+                break;
+            }
+        }
+
+        if (!\is_object($value)) {
+            return [null, null];
+        }
+
+        // Period (has start/end declared) → explicit bounds.
+        if (property_exists($value, 'start') || property_exists($value, 'end')) {
+            return [
+                $this->parseTimestamp($this->stringify($value->start ?? null)),
+                $this->parseTimestamp($this->stringify($value->end ?? null)),
+            ];
+        }
+
+        // Duration (has value/unit/code) → look back from now.
+        if (property_exists($value, 'value')) {
+            $seconds = $this->durationSeconds($value);
+
+            return [$seconds !== null ? time() - $seconds : null, time()];
+        }
+
+        return [null, null];
+    }
+
+    /**
+     * Approximate a `Duration` as whole seconds (year≈365d, month≈30d — adequate for a look-back window),
+     * or null when the amount or UCUM unit/code is unrecognised.
+     */
+    private function durationSeconds(object $duration): ?int
+    {
+        $amount = $this->stringify($duration->value ?? null);
+        if ($amount === null || !is_numeric($amount)) {
+            return null;
+        }
+
+        $unit    = $this->stringify($duration->code ?? null) ?? $this->stringify($duration->unit ?? null);
+        $perUnit = match ($unit) {
+            'a', 'year', 'years'       => 365 * 86400,
+            'mo', 'month', 'months'    => 30  * 86400,
+            'wk', 'week', 'weeks'      => 7   * 86400,
+            'd', 'day', 'days'         => 86400,
+            'h', 'hour', 'hours'       => 3600,
+            'min', 'minute', 'minutes' => 60,
+            's', 'second', 'seconds'   => 1,
+            default                    => null,
+        };
+
+        return $perUnit !== null ? (int) round((float) $amount * $perUnit) : null;
+    }
+
+    /**
+     * Whether an Observation's status is eligible for population (final / amended / corrected).
+     */
+    private function observationStatusEligible(object $observation): bool
+    {
+        $status = $this->codeOf($observation->status ?? null);
+
+        return $status !== null && \in_array($status, self::OBSERVATION_STATUSES, true);
+    }
+
+    /**
+     * Whether an Observation's `code.coding` shares any `system|code` key with the item's codes.
+     *
+     * @param list<string> $itemKeys
+     */
+    private function observationMatchesCodes(object $observation, array $itemKeys): bool
+    {
+        $code = $observation->code ?? null;
+        if (!\is_object($code)) {
+            return false;
+        }
+
+        $codings = $code->coding ?? null;
+        if (!\is_array($codings)) {
+            return false;
+        }
+
+        foreach ($codings as $coding) {
+            if (\is_object($coding)) {
+                $key = $this->codingKey($coding);
+                if ($key !== null && \in_array($key, $itemKeys, true)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * The `system|code` keys of an item's `code` Codings.
+     *
+     * @return list<string>
+     */
+    private function itemCodingKeys(object $item): array
+    {
+        $codes = $item->code ?? null;
+        if (!\is_array($codes)) {
+            return [];
+        }
+
+        $keys = [];
+        foreach ($codes as $coding) {
+            if (\is_object($coding)) {
+                $key = $this->codingKey($coding);
+                if ($key !== null) {
+                    $keys[] = $key;
+                }
+            }
+        }
+
+        return $keys;
+    }
+
+    /**
+     * A `system|code` key for a Coding (empty system tolerated), or null when it has no code.
+     */
+    private function codingKey(object $coding): ?string
+    {
+        $code = $this->stringify($coding->code ?? null);
+        if ($code === null) {
+            return null;
+        }
+
+        return ($this->stringify($coding->system ?? null) ?? '') . '|' . $code;
+    }
+
+    /**
+     * The effective Unix timestamp of an Observation (`effectiveDateTime`/`effectiveInstant`, or a
+     * `effectivePeriod`'s start/end), or null when unreadable.
+     */
+    private function observationEffectiveTimestamp(object $observation): ?int
+    {
+        $effective = $observation->effective ?? null;
+        if (!\is_object($effective)) {
+            return $this->parseTimestamp($this->stringify($effective));
+        }
+
+        if (property_exists($effective, 'start') || property_exists($effective, 'end')) {
+            return $this->parseTimestamp($this->stringify($effective->start ?? null))
+                ?? $this->parseTimestamp($this->stringify($effective->end ?? null));
+        }
+
+        return $this->parseTimestamp($this->stringify($effective));
+    }
+
+    /**
+     * Parse a FHIR date/dateTime/instant string to a Unix timestamp, or null when absent/unparseable.
+     */
+    private function parseTimestamp(?string $value): ?int
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        try {
+            return (new \DateTimeImmutable($value))->getTimestamp();
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /**
      * Read an item's `initialExpression` FHIRPath string, or null when absent, unreadable, or expressed
      * in a non-FHIRPath language (CQL / `x-fhir-query` are deferred — reported as a warning).
      *
@@ -232,13 +768,8 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
      */
     private function initialExpressionOf(object $item, PopulateModelFactory $factory, array &$issues, string $linkId): ?string
     {
-        $extensions = $item->extension ?? null;
-        if (!\is_array($extensions)) {
-            return null;
-        }
-
-        foreach ($extensions as $ext) {
-            if (!\is_object($ext) || $this->extensions->readUrl($ext) !== self::INITIAL_EXPRESSION_URL) {
+        foreach ($this->extensionsOf($item) as $ext) {
+            if ($this->extensions->readUrl($ext) !== self::INITIAL_EXPRESSION_URL) {
                 continue;
             }
 
@@ -247,20 +778,7 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
                 return null;
             }
 
-            $language = $this->stringify($expressionValue->language ?? null);
-            if ($language !== null && $language !== self::FHIRPATH_LANGUAGE) {
-                $issues[] = $factory->issue(
-                    IssueSeverity::warning->value,
-                    IssueType::processingfailure->value,
-                    \sprintf(
-                        "initialExpression for item '%s' uses expression language '%s'; only '%s' is "
-                        . 'supported (CQL / x-fhir-query are deferred). The item was left unanswered.',
-                        $linkId,
-                        $language,
-                        self::FHIRPATH_LANGUAGE,
-                    ),
-                );
-
+            if (!$this->isFhirPath($expressionValue, $factory, $issues, \sprintf("initialExpression for item '%s'", $linkId))) {
                 return null;
             }
 
@@ -271,6 +789,79 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
     }
 
     /**
+     * Read the `itemPopulationContext` of a group item as a `[name, expression]` pair, or null when absent.
+     *
+     * @param list<object> $issues
+     *
+     * @return array{0: string, 1: string}|null
+     */
+    private function itemPopulationContextOf(object $item, PopulateModelFactory $factory, array &$issues): ?array
+    {
+        foreach ($this->extensionsOf($item) as $ext) {
+            if ($this->extensions->readUrl($ext) === self::ITEM_POPULATION_CONTEXT_URL) {
+                return $this->namedExpressionOf($ext, $factory, $issues, 'itemPopulationContext');
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Read a named FHIRPath `Expression` (`variable` / `itemPopulationContext` `valueExpression`) as a
+     * `[name, expression]` pair, or null when incomplete or in an unsupported language.
+     *
+     * @param list<object> $issues
+     *
+     * @return array{0: string, 1: string}|null
+     */
+    private function namedExpressionOf(object $ext, PopulateModelFactory $factory, array &$issues, string $kind): ?array
+    {
+        $expressionValue = $this->extensions->readValue($ext);
+        if (!\is_object($expressionValue)) {
+            return null;
+        }
+
+        if (!$this->isFhirPath($expressionValue, $factory, $issues, $kind)) {
+            return null;
+        }
+
+        $name       = $this->stringify($expressionValue->name ?? null);
+        $expression = $this->stringify($expressionValue->expression ?? null);
+        if ($name === null || $expression === null) {
+            return null;
+        }
+
+        return [$name, $expression];
+    }
+
+    /**
+     * Whether an `Expression`'s language is FHIRPath (or unset, which defaults to FHIRPath here). Emits a
+     * warning and returns false for CQL / `x-fhir-query` (deferred).
+     *
+     * @param list<object> $issues
+     */
+    private function isFhirPath(object $expressionValue, PopulateModelFactory $factory, array &$issues, string $label): bool
+    {
+        $language = $this->stringify($expressionValue->language ?? null);
+        if ($language !== null && $language !== self::FHIRPATH_LANGUAGE) {
+            $issues[] = $factory->issue(
+                IssueSeverity::warning->value,
+                IssueType::processingfailure->value,
+                \sprintf(
+                    "%s uses expression language '%s'; only '%s' is supported (CQL / x-fhir-query are deferred).",
+                    ucfirst($label),
+                    $language,
+                    self::FHIRPATH_LANGUAGE,
+                ),
+            );
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * The SDC `launchContext` names the Questionnaire declares (its root `launchContext` extensions'
      * `name` sub-extension), so a caller that omits a declared context can be told.
      *
@@ -278,14 +869,9 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
      */
     private function declaredLaunchContextNames(object $questionnaire): array
     {
-        $extensions = $questionnaire->extension ?? null;
-        if (!\is_array($extensions)) {
-            return [];
-        }
-
         $names = [];
-        foreach ($extensions as $ext) {
-            if (!\is_object($ext) || $this->extensions->readUrl($ext) !== self::LAUNCH_CONTEXT_URL) {
+        foreach ($this->extensionsOf($questionnaire) as $ext) {
+            if ($this->extensions->readUrl($ext) !== self::LAUNCH_CONTEXT_URL) {
                 continue;
             }
 
@@ -330,6 +916,21 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
     }
 
     /**
+     * The `extension[]` of a node, filtered to objects.
+     *
+     * @return list<object>
+     */
+    private function extensionsOf(object $node): array
+    {
+        $extensions = $node->extension ?? null;
+        if (!\is_array($extensions)) {
+            return [];
+        }
+
+        return array_values(array_filter($extensions, static fn (mixed $e): bool => \is_object($e)));
+    }
+
+    /**
      * The child items of a Questionnaire (or Questionnaire item), filtered to objects.
      *
      * @return list<object>
@@ -342,6 +943,23 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
         }
 
         return array_values(array_filter($items, static fn (mixed $i): bool => \is_object($i)));
+    }
+
+    /**
+     * Whether a Questionnaire item is marked `repeats = true`.
+     */
+    private function isRepeating(object $item): bool
+    {
+        $repeats = $item->repeats ?? null;
+        if (\is_bool($repeats)) {
+            return $repeats;
+        }
+
+        if (\is_object($repeats) && property_exists($repeats, 'value')) {
+            return ($repeats->value ?? null) === true;
+        }
+
+        return false;
     }
 
     /**
@@ -405,6 +1023,15 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
         }
 
         return null;
+    }
+
+    /**
+     * Whether a string is a plain base-10 integer (optionally signed) — used to accept an integer answer
+     * the FHIRPath engine returned as a numeric string without misreading a decimal as an integer.
+     */
+    private function isIntegerString(string $value): bool
+    {
+        return preg_match('/^[+-]?\d+$/', $value) === 1;
     }
 
     /**

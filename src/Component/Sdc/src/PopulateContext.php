@@ -35,6 +35,12 @@ final class PopulateContext
          * unset. The SDC populate guidance sets the subject; it is optional (0..1) on the QR.
          */
         public readonly ?string $subject = null,
+        /**
+         * Supplies candidate `Observation`s for observation-based population (`observationLinkPeriod`), or
+         * null to disable it. Offline-first: the caller pre-fetches the data (see
+         * {@see BundlePopulationDataProvider}); no live fetching happens in the library.
+         */
+        public readonly ?PopulationDataProviderInterface $dataProvider = null,
     ) {
     }
 }

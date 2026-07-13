@@ -8,10 +8,13 @@ use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\QuestionnaireResource;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\QuestionnaireResponseResource;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\PatientResource as R5PatientResource;
+use Ardenexal\FHIRTools\Component\Models\R5\Resource\QuestionnaireResource as R5QuestionnaireResource;
 use Ardenexal\FHIRTools\Component\Sdc\FHIRQuestionnairePopulateService;
 use Ardenexal\FHIRTools\Component\Sdc\PopulateContext;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Validation\FHIRQuestionnaireResolverInterface;
 use PHPUnit\Framework\TestCase;
 use Ardenexal\FHIRTools\Component\Sdc\PopulateResult;
 use Ardenexal\FHIRTools\Component\Sdc\Tests\Integration\Populate\FHIRPopulateConformanceTest;
@@ -83,6 +86,60 @@ final class FHIRQuestionnairePopulateServiceTest extends TestCase
         $severities = $this->issueSeverities($issues);
         self::assertContains('information', $severities, 'Missing declared launchContext should raise an information issue.');
         self::assertContains('warning', $severities, 'An unbound %patient expression should degrade to a warning, not throw.');
+    }
+
+    public function testResolvesCanonicalUrlViaResolverAndPopulates(): void
+    {
+        $r5 = FHIRSerializationService::createDefault(FhirVersion::R5);
+
+        $questionnaire = $r5->deserializeFromJson(
+            $this->fixture('populate-launchcontext-initial.questionnaire.json'),
+            R5QuestionnaireResource::class,
+        );
+        self::assertInstanceOf(R5QuestionnaireResource::class, $questionnaire);
+
+        $patient = $r5->deserializeFromJson(
+            $this->fixture('populate-launchcontext-initial.patient.json'),
+            R5PatientResource::class,
+        );
+
+        $resolver = new class ($questionnaire) implements FHIRQuestionnaireResolverInterface {
+            public function __construct(private readonly R5QuestionnaireResource $questionnaire)
+            {
+            }
+
+            public function resolve(string $canonicalUrl): ?R5QuestionnaireResource
+            {
+                return $canonicalUrl === 'http://example.org/Questionnaire/populate-spike' ? $this->questionnaire : null;
+            }
+        };
+
+        $service = new FHIRQuestionnairePopulateService(questionnaireResolver: $resolver);
+        $result  = $service->populate(
+            'http://example.org/Questionnaire/populate-spike',
+            new PopulateContext(fhirVersion: FhirVersion::R5, launchContextResources: ['patient' => $patient]),
+        );
+
+        // Canonical resolved → R5 QR populated from the R5 launch Patient (this also exercises the R5 path).
+        $answerValue = $result->getResponse()->item[0]->answer[0]->value ?? null;
+        self::assertSame('Peter', $this->stringify($answerValue));
+    }
+
+    public function testUnresolvableCanonicalUrlWithoutResolverDegradesToWarning(): void
+    {
+        $service = new FHIRQuestionnairePopulateService();
+        $result  = $service->populate(
+            'http://example.org/Questionnaire/does-not-exist',
+            new PopulateContext(fhirVersion: FhirVersion::R4),
+        );
+
+        $response = $result->getResponse();
+        self::assertInstanceOf(QuestionnaireResponseResource::class, $response);
+        self::assertSame([], $response->item, 'An unresolvable canonical must yield an empty QR, not a crash.');
+
+        $issues = $result->getIssues();
+        self::assertNotNull($issues);
+        self::assertContains('warning', $this->issueSeverities($issues));
     }
 
     private function populate(object $patient): PopulateResult

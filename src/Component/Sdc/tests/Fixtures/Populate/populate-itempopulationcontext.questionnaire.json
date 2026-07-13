@@ -1,0 +1,35 @@
+{
+  "resourceType": "Questionnaire",
+  "status": "active",
+  "url": "http://example.org/Questionnaire/probe-ipc",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext",
+      "extension": [
+        { "url": "name", "valueCoding": { "system": "http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "code": "patient" } },
+        { "url": "type", "valueCode": "Patient" }
+      ]
+    }
+  ],
+  "item": [
+    {
+      "linkId": "names",
+      "type": "group",
+      "repeats": true,
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemPopulationContext",
+          "valueExpression": { "name": "nameCtx", "language": "text/fhirpath", "expression": "%patient.name" }
+        }
+      ],
+      "item": [
+        { "linkId": "given", "type": "string", "extension": [
+          { "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+            "valueExpression": { "language": "text/fhirpath", "expression": "%nameCtx.given.first()" } } ] },
+        { "linkId": "family", "type": "string", "extension": [
+          { "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+            "valueExpression": { "language": "text/fhirpath", "expression": "%nameCtx.family" } } ] }
+      ]
+    }
+  ]
+}

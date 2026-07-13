@@ -333,3 +333,72 @@ reference output. Fixtures:
 per the SDC populate guidance, so `FHIRPopulateConformanceTest` adds `subject` to its local
 `IGNORED_KEYS` (mirroring how the extract subclass drops `url`) — dropping it in the shared base would
 weaken the `$extract` oracle. `authored`/`id`/`lastUpdated`/`text` are already dropped by the shared base.
+
+---
+
+## `$populate` M02 mechanism probes (forms-lab, R4B) — 2026-07-13
+
+Probed `POST https://fhir.forms-lab.com/Questionnaire/$populate` to establish which M02 mechanisms the
+reference engine supports before building each (oracle-first). All returned HTTP 200.
+
+- **`variable` (root)** — SUPPORTED. A root `http://hl7.org/fhir/StructureDefinition/variable` with
+  `valueExpression {name:'pName', expression:'%patient.name.first()'}` is resolvable by a later item's
+  `initialExpression` `%pName.given.first()` → `"Peter"`.
+- **Type coercion** — SUPPORTED for the primitives the engine returns directly: `date` item ←
+  `%patient.birthDate` → `valueDate`; `boolean` ← `%patient.active` → `valueBoolean`; `integer` ←
+  `%patient.name.count()` → `valueInteger`. (Coding/Quantity/Reference adaptation still to be probed per
+  case as those oracles are added.)
+- **`itemPopulationContext` (repeating group)** — SUPPORTED and the key semantic: a group item with
+  `itemPopulationContext {name:'nameCtx', expression:'%patient.name'}` is emitted **once per context
+  result** (2 names → 2 `names` group items), and within each repetition `%nameCtx` is bound to *that*
+  result element, so `%nameCtx.given.first()` / `%nameCtx.family` populate per-repetition.
+- **`enableWhen` — NOT suppressed (spec-confirmed, not just reference-matched).** A `dependent` item
+  disabled by `enableWhen (trigger = true)` with `trigger` populated to `false` was **still populated**
+  (`valueString "Peter"`). This is not merely forms-lab's choice — the **normative SDC $populate spec**
+  (`HL7/sdc input/pagecontent/populate.xml`) states: *"When pre-populating a questionnaire, it makes
+  sense to 'fill in' as much data as possible, even if it may not always be needed. However, such data
+  should not be shown to the user until the given item is 'enabled'."* So `enableWhen` is a **display-time**
+  concern; populate fills disabled items. The toolkit matches this — it does NOT pre-suppress
+  `enableWhen`-disabled items (reverses the original M02 plan task; see M02.md). Optional opt-in
+  suppression is a possible future backlog item, not default behaviour. The same spec section confirms
+  the empty-set rule: *"An empty set SHALL be treated as 'not answered' rather than being converted to a
+  boolean value of 'false'."* — validating M01's empty→info-issue (no answer) design.
+
+Probe payloads: kept out of the repo (synthetic, reproducible from the descriptions above).
+
+---
+
+## `$populate` M02 coercion + observation findings — 2026-07-13
+
+**Answer-value coercion is strict-by-source-datatype (forms-lab, confirmed by probe).** The expression
+must already resolve to the FHIR datatype the item type expects; the engine rejects a mismatch with a
+fatal `OperationOutcome` (`invalidAnswerType`), it does not lenient-coerce:
+
+- `choice`/`open-choice` ← a `Coding` datatype → `valueCoding` (system/code/display intact). A
+  `CodeableConcept` is rejected — use `.coding.first()`. Oracle: `populate-coercion-coding-marital.*`.
+- `quantity` ← a `Quantity` datatype → `valueQuantity` (value/unit/system/code intact). Oracle:
+  `populate-coercion-quantity.*` (uses a **two-launchContext** input: `patient` + `obs`).
+- `reference` ← a `Reference` datatype → `valueReference` verbatim. A bare string or whole resource is
+  rejected. Oracle: `populate-coercion-reference.*`.
+
+The toolkit matches this: complex-typed items pass the datatype **object** through (the answer choice
+normalizer maps the object's class → the right `value[x]`); a bare scalar for a complex item is a
+mismatch warning. **DEFERRED (→ `backlog.md`):** binding-driven `code`→`Coding` promotion — forms-lab
+turns a bare `code` (e.g. `%patient.gender`) into a systematised `valueCoding` by reading the item's
+required value-set binding (`gender` → `system: http://hl7.org/fhir/administrative-gender`). Replicating
+that needs terminology-binding resolution the populate engine does not carry, so a bare code for a choice
+item is currently a mismatch rather than a promoted Coding.
+
+**Observation-based population (`observationLinkPeriod`) — NO reachable reference oracle.** Probed
+forms-lab (`QForms`, publisher brianpos.com, fhirVersion 4.3.0 R4B) exhaustively: it does **not**
+implement `observationLinkPeriod`. Its CapabilityStatement advertises no `Observation`/`Patient` resource
+types and no store, so the spec-standard "server queries its own clinical record" path is structurally
+impossible there; and when the candidate Observations were supplied as a `Bundle` launch context, the
+`observationLinkPeriod` item still populated empty. A **control** in the same request (an
+`initialExpression` reading the same Bundle) DID populate — proving the Bundle context is reachable and
+the engine simply ignores `observationLinkPeriod` semantics (code-match + period + most-recent). A wide
+explicit `valuePeriod` ruled out a date-window artifact. **Consequence:** observation-based `$populate`
+is implemented and unit-tested **deterministically** (spec-driven: match `item.code` codings, filter
+Observations to status in {final, amended, corrected} within the link period, choose the most recent by
+effective time) — never oracle-seeded. Same sanctioned exception SOURCES.md already records for
+observation-based `$extract`.

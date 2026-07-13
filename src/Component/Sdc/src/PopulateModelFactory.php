@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Sdc;
 
+use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDate;
 use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDateTime;
+use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRTime;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Metadata\Extension\SafeExtensionReader;
 
@@ -113,6 +115,36 @@ final class PopulateModelFactory
         $class = $this->fqcn('Primitive\\UriPrimitive');
 
         return new $class(value: $value);
+    }
+
+    /**
+     * Wrap an ISO date string as this version's `DatePrimitive` (→ `valueDate`).
+     */
+    public function dateValue(string $value): object
+    {
+        $class = $this->fqcn('Primitive\\DatePrimitive');
+
+        return new $class(value: FHIRDate::parse($value));
+    }
+
+    /**
+     * Wrap an ISO dateTime string as this version's `DateTimePrimitive` (→ `valueDateTime`).
+     */
+    public function dateTimeValue(string $value): object
+    {
+        $class = $this->fqcn('Primitive\\DateTimePrimitive');
+
+        return new $class(value: FHIRDateTime::parse($value));
+    }
+
+    /**
+     * Wrap an ISO time string as this version's `TimePrimitive` (→ `valueTime`).
+     */
+    public function timeValue(string $value): object
+    {
+        $class = $this->fqcn('Primitive\\TimePrimitive');
+
+        return new $class(value: FHIRTime::parse($value));
     }
 
     /**

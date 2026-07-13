@@ -17,11 +17,13 @@ interface PopulateServiceInterface
     /**
      * Populate a QuestionnaireResponse from a Questionnaire and its launch context.
      *
-     * @param object          $questionnaire a version-specific Questionnaire model carrying the SDC
-     *                                       population directives (`launchContext`, `initialExpression`)
+     * @param object|string   $questionnaire a version-specific Questionnaire model carrying the SDC
+     *                                       population directives (`launchContext`, `initialExpression`), OR
+     *                                       a canonical URL string resolved via a configured
+     *                                       `FHIRQuestionnaireResolverInterface`
      * @param PopulateContext $context       target version + launch-context resources + subject
      *
      * @return PopulateResult the generated QuestionnaireResponse plus any informational/warning issues
      */
-    public function populate(object $questionnaire, PopulateContext $context): PopulateResult;
+    public function populate(object|string $questionnaire, PopulateContext $context): PopulateResult;
 }

@@ -1,0 +1,9 @@
+{
+  "resourceType": "Patient",
+  "id": "pt",
+  "active": true,
+  "gender": "male",
+  "maritalStatus": { "coding": [ { "system": "http://terminology.hl7.org/CodeSystem/v3-MaritalStatus", "code": "M", "display": "Married" } ] },
+  "name": [ { "family": "Chalmers", "given": ["Peter"] } ],
+  "birthDate": "1974-12-25"
+}
