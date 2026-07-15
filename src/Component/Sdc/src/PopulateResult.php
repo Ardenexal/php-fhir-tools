@@ -14,10 +14,13 @@ namespace Ardenexal\FHIRTools\Component\Sdc;
  */
 final class PopulateResult
 {
+    /**
+     * @param object      $response the generated `QuestionnaireResponse` (a version-specific model)
+     * @param object|null $issues   the `OperationOutcome` of informational/warning issues raised during
+     *                              population, or null when there were none
+     */
     public function __construct(
-        /** The generated `QuestionnaireResponse` (a version-specific model). */
         private readonly object $response,
-        /** Informational/warning issues raised during population, or null when there were none. */
         private readonly ?object $issues = null,
     ) {
     }

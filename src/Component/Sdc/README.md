@@ -15,13 +15,91 @@ This component implements the SDC operations:
 
 - **`QuestionnaireResponse/$extract`** — implemented for observation-, definition-, and template-based
   extraction (see below). Delivered by the `sdc-extract` feature plan.
-- **`Questionnaire/$populate`** — delivered by the `sdc-populate` feature plan.
+- **`Questionnaire/$populate`** — implemented for expression-based population (`launchContext` +
+  `initialExpression`, root/item `variable`, `itemPopulationContext` repeating groups) and
+  observation-based population (`observationLinkPeriod`), R4 / R4B / R5. Delivered by the
+  `sdc-populate` feature plan.
 
 Shared prerequisites (see `.goat-flow/plans/sdc-foundation/`):
 
 - The conformance oracle harness (`tests/Integration/AbstractSdcConformanceTest.php`) — a reusable
   test base that compares the **deserialized model** field-by-field against a frozen reference
   baseline, with an explicit ignore-list for spec-legal serialization divergence.
+
+## `Questionnaire/$populate`
+
+`FHIRQuestionnairePopulateService` pre-fills a `QuestionnaireResponse` from a `Questionnaire`'s SDC
+population directives plus caller-supplied launch-context data, per the
+[SDC populate operation](https://build.fhir.org/ig/HL7/sdc/en/populate.html). Call
+`populate($questionnaire, new PopulateContext(...))`; the returned `PopulateResult` carries the generated
+`QuestionnaireResponse` plus an optional companion `OperationOutcome`.
+
+```php
+$service = new FHIRQuestionnairePopulateService();
+$result  = $service->populate($questionnaire, new PopulateContext(
+    fhirVersion:            FhirVersion::R4,            // output model namespace (R4 / R4B / R5)
+    launchContextResources: ['patient' => $patient],   // bound as FHIRPath %patient, %encounter, …
+    subject:                'Patient/123',              // sets QuestionnaireResponse.subject (optional)
+    dataProvider:           new BundlePopulationDataProvider($dataBundle), // observation-based (optional)
+));
+$response = $result->getResponse();    // a QuestionnaireResponse (status: in-progress)
+$issues   = $result->getIssues();      // an OperationOutcome, or null when nothing to report
+```
+
+A canonical URL **string** may be passed instead of a Questionnaire object when the service is
+constructed with a `FHIRQuestionnaireResolverInterface`; without one, a string argument yields an empty
+QR plus a warning.
+
+### Supported population mechanisms
+
+| Mechanism | Directive | Notes |
+|---|---|---|
+| **Launch context** | `launchContext` + `initialExpression` | Each supplied resource is bound as `%<name>`; each item's `initialExpression` is evaluated and coerced to the item's answer type. |
+| **Variables** | `variable` (root + item) | Resolved in declaration order into further `%<name>` constants; a multi-valued variable binds its first value (a warning records the truncation). |
+| **Repeating groups** | `itemPopulationContext` | A group is emitted **once per context result**, with `%<name>` bound to each result for its descendants; nesting is supported. |
+| **Observation-based** | `observationLinkPeriod` | Populates from the most-recent eligible `Observation` (status `final`/`amended`/`corrected`, matching `item.code`, within the link period) supplied via the `dataProvider`. |
+
+### Behaviour contract
+
+- **Offline-first.** All launch-context data and observations are supplied by the caller up front; the
+  service performs no live FHIR fetching.
+- **`enableWhen` is not applied.** Disabled items are still populated — the spec treats `enableWhen` as a
+  display-time concern ("fill in as much data as possible, even if it may not always be needed").
+- **Empty set = not answered.** An expression resolving to empty — a boolean included, and an empty
+  string — produces **no** answer and an `information` issue, never a `false`/empty value.
+- **Never throws.** A malformed expression, an unresolvable canonical URL, a missing launch context, an
+  empty `itemPopulationContext`, or an item with no `linkId` each degrade to an `OperationOutcome` issue
+  while the rest of the form still populates.
+- **Answer coercion is strict-by-source-datatype.** Complex item types (`choice`/`quantity`/`reference`/
+  `attachment`) require the expression to resolve to the right FHIR datatype object; a bare scalar for a
+  complex item is a mismatch warning, not a silent coercion.
+
+### Exclusions
+
+- **StructureMap-based population** (`sourceStructureMap`) — requires a FHIR Mapping Language engine,
+  which the toolkit does not ship. Deferred (see `sdc-populate/backlog.md`).
+- **Live data fetching** — `x-fhir-query`, `dataEndpoint`, server-side `data` retrieval. Supply a
+  `dataProvider` instead.
+- **CQL expressions** (`text/cql`) — FHIRPath only; a non-FHIRPath language surfaces a warning and is
+  skipped.
+- **`calculatedExpression`** — continuous re-population as source answers change.
+- **`candidateExpression` / `contextExpression` / `answerExpression`** — interactive answer-selection,
+  a UI concern.
+- **`populatehtml` / `populatelink`** — HTML/link rendering (UI concern; not deprecated — current in
+  SDC v4.0.0).
+- **Binding-driven `code`→`Coding` promotion** — a bare code for a choice item is not promoted to a
+  systematised `Coding` via the item's value-set binding (tracked in `sdc-populate/backlog.md`).
+- **Generated SDC profile classes** (Populatable/Extractable Questionnaire, SDC QuestionnaireResponse) —
+  the engine reads extensions by URL and needs no profile classes; profile conformance is a `Validation`
+  concern.
+- **Generated typed SDC extension classes** — the engine reads extensions by URL via `SafeExtensionReader`
+  (version-drift robust); typed extension classes are an optional authoring layer only (see `backlog.md`).
+- **Access control / PHI authorization** — this offline library populates from whatever context the
+  caller supplies and performs no permission filtering. The SDC spec's "SHALL NOT populate data the user
+  is not permitted to access" is a caller responsibility.
+
+For the full design rationale and boundary decisions, see
+`.goat-flow/learning-loop/decisions/ADR-011-sdc-populate-boundaries.md`.
 
 ## `QuestionnaireResponse/$extract`
 

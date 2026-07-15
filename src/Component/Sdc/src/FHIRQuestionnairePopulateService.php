@@ -12,7 +12,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\Enum\IssueType;
 use Ardenexal\FHIRTools\Component\Validation\FHIRQuestionnaireResolverInterface;
 
 /**
- * Expression-based `Questionnaire/$populate` (M01 + M02 scope).
+ * Expression- and observation-based `Questionnaire/$populate`.
  *
  * Binds each launch-context resource ({@see PopulateContext::$launchContextResources}) as a FHIRPath
  * external constant (`%patient`, …), resolves `variable` chains into further external constants, walks
@@ -76,19 +76,47 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
      */
     private const array OBSERVATION_STATUSES = ['final', 'amended', 'corrected'];
 
+    /**
+     * @param FHIRPathService                         $fhirPath              engine evaluating every
+     *                                                                       `initialExpression` / `variable` /
+     *                                                                       `itemPopulationContext` expression
+     * @param SafeExtensionReader                     $extensions            guarded reader for the SDC
+     *                                                                       extensions on deserializer-origin
+     *                                                                       Questionnaire objects
+     * @param FHIRQuestionnaireResolverInterface|null $questionnaireResolver resolves a canonical URL passed to
+     *                                                                       {@see populate()} to a
+     *                                                                       Questionnaire; optional — when null
+     *                                                                       a string `$questionnaire` yields an
+     *                                                                       empty QR plus a warning. The
+     *                                                                       resolver is R5-typed by existing
+     *                                                                       design, but the resolved
+     *                                                                       Questionnaire is read
+     *                                                                       version-agnostically, so it
+     *                                                                       populates a QR of whatever
+     *                                                                       {@see PopulateContext::$fhirVersion}
+     *                                                                       asks
+     */
     public function __construct(
         private readonly FHIRPathService $fhirPath = new FHIRPathService(),
         private readonly SafeExtensionReader $extensions = new SafeExtensionReader(),
-        /**
-         * Resolves a canonical URL passed to {@see populate()} to a Questionnaire resource. Optional — when
-         * null, a string `$questionnaire` cannot be resolved and yields an empty QR plus a warning. NB the
-         * resolver interface is R5-typed by existing design; the resolved Questionnaire is read
-         * version-agnostically, so it populates a QR of whatever {@see PopulateContext::$fhirVersion} asks.
-         */
         private readonly ?FHIRQuestionnaireResolverInterface $questionnaireResolver = null,
     ) {
     }
 
+    /**
+     * Populate a QuestionnaireResponse from a Questionnaire and its launch context.
+     *
+     * Never throws: an unresolvable canonical URL, a malformed expression, or a missing launch context each
+     * degrade to an `OperationOutcome` issue on the returned {@see PopulateResult} while the rest of the form
+     * still populates. See the class docblock for the mechanisms applied and their order.
+     *
+     * @param object|string   $questionnaire a version-specific Questionnaire model carrying the SDC population
+     *                                       directives, OR a canonical URL string resolved via the configured
+     *                                       {@see FHIRQuestionnaireResolverInterface}
+     * @param PopulateContext $context       target version, launch-context resources, subject, and data provider
+     *
+     * @return PopulateResult the generated QuestionnaireResponse plus any informational/warning issues
+     */
     public function populate(object|string $questionnaire, PopulateContext $context): PopulateResult
     {
         $factory = new PopulateModelFactory($context->fhirVersion);
@@ -284,6 +312,21 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
                 \sprintf("itemPopulationContext '%s'", $contextName),
             );
 
+            if ($contextResults === []) {
+                // Observable, not silent: an empty context expression omits the whole group and its
+                // descendants. Without a trace this is indistinguishable from a Questionnaire with no such
+                // group — mirror the empty-`initialExpression` information issue so the omission is visible.
+                $issues[] = $factory->issue(
+                    IssueSeverity::information->value,
+                    IssueType::informationalnote->value,
+                    \sprintf(
+                        "itemPopulationContext '%s' (item '%s') resolved to no results; the group and its descendants were not populated.",
+                        $contextName,
+                        $this->stringify($item->linkId ?? null) ?? '(no linkId)',
+                    ),
+                );
+            }
+
             foreach ($contextResults as $contextResult) {
                 $repetitionContext = $itemContext->withExternalConstant($contextName, $contextResult);
                 $built             = $this->buildOneItem($item, $repetitionContext, $populateContext, $factory, $issues);
@@ -306,6 +349,14 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
     {
         $linkId = $this->stringify($item->linkId ?? null);
         if ($linkId === null) {
+            // Observable, not silent: an item without a linkId cannot be represented as a QR answer, but
+            // dropping it without a trace hides a malformed Questionnaire. Record it and skip only this item.
+            $issues[] = $factory->issue(
+                IssueSeverity::warning->value,
+                IssueType::invalidcontent->value,
+                'A Questionnaire item without a linkId was skipped; it cannot be represented in the response.',
+            );
+
             return null;
         }
 
@@ -370,13 +421,19 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
     private function evaluateExpression(string $expression, EvaluationContext $evalContext, PopulateModelFactory $factory, array &$issues, string $label): array
     {
         try {
-            return $this->fhirPath
-                ->evaluate($expression, null, $evalContext, $factory->fhirVersionValue())
-                ->toArray();
+            // array_values guarantees the declared list<mixed> shape (toArray() is only array<int, mixed>).
+            return array_values(
+                $this->fhirPath
+                    ->evaluate($expression, null, $evalContext, $factory->fhirVersionValue())
+                    ->toArray(),
+            );
         } catch (\Throwable $e) {
+            // A malformed / unevaluable expression is an invalid input, not a processing fault: degrade to a
+            // warning issue (code `invalid`) and an empty result so the rest of the Questionnaire still
+            // populates rather than aborting the whole run.
             $issues[] = $factory->issue(
                 IssueSeverity::warning->value,
-                IssueType::processingfailure->value,
+                IssueType::invalidcontent->value,
                 \sprintf('%s could not be evaluated: %s', ucfirst($label), $e->getMessage()),
             );
 
@@ -394,9 +451,28 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
     {
         $scalar = $this->stringify($value);
 
+        // An item with no declared type has no coercion target; handling it here also narrows $itemType to a
+        // non-null string for every case below (so the temporal branch can pass it as a plain string).
+        if ($itemType === null) {
+            return $this->unsupportedTypeIssue(null, $linkId, $factory, $issues);
+        }
+
         switch ($itemType) {
             case 'string':
             case 'text':
+                if ($this->isEmptyString($value)) {
+                    // A FHIR `string` must be non-empty (min length 1), so an empty-string result is not a
+                    // type mismatch — it is simply "not answered". Emit an information issue (parity with the
+                    // empty-`initialExpression` branch), never a misleading incompatible-type warning.
+                    $issues[] = $factory->issue(
+                        IssueSeverity::information->value,
+                        IssueType::informationalnote->value,
+                        \sprintf("initialExpression for item '%s' produced an empty string; item left unanswered.", $linkId),
+                    );
+
+                    return null;
+                }
+
                 return $scalar !== null ? $factory->stringValue($scalar) : $this->mismatch($itemType, $linkId, $factory, $issues);
             case 'url':
                 return $scalar !== null ? $factory->uriValue($scalar) : $this->mismatch($itemType, $linkId, $factory, $issues);
@@ -431,19 +507,31 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
                 // systematised via the item's value-set binding) is deferred — see the sdc-populate backlog.
                 return \is_object($value) ? $value : $this->mismatch($itemType, $linkId, $factory, $issues);
             default:
-                $issues[] = $factory->issue(
-                    IssueSeverity::warning->value,
-                    IssueType::processingfailure->value,
-                    \sprintf(
-                        "initialExpression for item '%s' produced a value for item type '%s', whose answer "
-                        . 'coercion is not yet supported; the answer was skipped.',
-                        $linkId,
-                        $itemType ?? '(none)',
-                    ),
-                );
-
-                return null;
+                return $this->unsupportedTypeIssue($itemType, $linkId, $factory, $issues);
         }
+    }
+
+    /**
+     * Record that an item type has no answer coercion yet (or the item declares no type) as a warning, and
+     * return null (no answer). Shared by the null-type guard and the switch default so both report the same
+     * "not yet supported" message.
+     *
+     * @param list<object> $issues
+     */
+    private function unsupportedTypeIssue(?string $itemType, string $linkId, PopulateModelFactory $factory, array &$issues): null
+    {
+        $issues[] = $factory->issue(
+            IssueSeverity::warning->value,
+            IssueType::processingfailure->value,
+            \sprintf(
+                "initialExpression for item '%s' produced a value for item type '%s', whose answer "
+                . 'coercion is not yet supported; the answer was skipped.',
+                $linkId,
+                $itemType ?? '(none)',
+            ),
+        );
+
+        return null;
     }
 
     /**
@@ -1034,6 +1122,25 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
         }
 
         return null;
+    }
+
+    /**
+     * Whether a value is a *present* empty string — a bare `''` or a primitive wrapper whose inner `value`
+     * is `''` — as opposed to an absent/unreadable value. {@see stringify} collapses both empty and absent
+     * to null, so this distinguishes "answered with an empty string" (not a type mismatch) from a genuinely
+     * unusable value; only the former is treated as "not answered".
+     */
+    private function isEmptyString(mixed $value): bool
+    {
+        if (\is_string($value)) {
+            return $value === '';
+        }
+
+        if (\is_object($value) && property_exists($value, 'value')) {
+            return ($value->value ?? null) === '';
+        }
+
+        return false;
     }
 
     /**

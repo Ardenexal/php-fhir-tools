@@ -142,6 +142,253 @@ final class FHIRQuestionnairePopulateServiceTest extends TestCase
         self::assertContains('warning', $this->issueSeverities($issues));
     }
 
+    public function testMalformedExpressionEmitsInvalidWarningAndContinuesPopulation(): void
+    {
+        // Two string items: the first carries a syntactically-broken FHIRPath expression, the second a valid
+        // literal. A malformed expression must degrade to a warning (code `invalid`) without aborting the run,
+        // so the second item still populates.
+        $questionnaire = $this->questionnaire([
+            $this->stringItemArray('broken', 'foo('),
+            $this->stringItemArray('ok', "'value'"),
+        ]);
+
+        $result   = $this->populateQuestionnaire($questionnaire);
+        $response = $result->getResponse();
+        self::assertInstanceOf(QuestionnaireResponseResource::class, $response);
+
+        // The valid item still produced its answer despite the sibling's broken expression.
+        self::assertCount(1, $response->item);
+        self::assertSame('ok', $this->stringify($response->item[0]->linkId ?? null));
+        self::assertSame('value', $this->stringify($response->item[0]->answer[0]->value ?? null));
+
+        $issues = $result->getIssues();
+        self::assertNotNull($issues);
+        self::assertContains('warning', $this->issueSeverities($issues));
+        self::assertContains('invalid', $this->issueCodes($issues), 'A malformed expression must report code `invalid`.');
+    }
+
+    public function testEmptyStringResultOmitsAnswerAsNotAnsweredNotMismatch(): void
+    {
+        // A string item whose initialExpression resolves to '' (a present but empty string) must be treated
+        // as "not answered" — no answer entry, and an *information* issue, never an incompatible-type warning.
+        $questionnaire = $this->questionnaire([$this->stringItemArray('empty', "''")]);
+
+        $result   = $this->populateQuestionnaire($questionnaire);
+        $response = $result->getResponse();
+        self::assertInstanceOf(QuestionnaireResponseResource::class, $response);
+        self::assertSame([], $response->item, 'An empty-string result must omit the item, not emit valueString "".');
+
+        $issues = $result->getIssues();
+        self::assertNotNull($issues);
+        $severities = $this->issueSeverities($issues);
+        self::assertContains('information', $severities);
+        self::assertNotContains('warning', $severities, 'An empty string is not a type mismatch.');
+    }
+
+    public function testBooleanEmptyExpressionIsNotCoercedToFalse(): void
+    {
+        // A boolean item whose initialExpression returns the empty collection must be left unanswered — the
+        // spec's "empty set = not answered" rule; it must NOT be coerced to `valueBoolean: false`.
+        $questionnaire = $this->questionnaire([$this->itemArray('flag', 'boolean', '{}')]);
+
+        $result   = $this->populateQuestionnaire($questionnaire);
+        $response = $result->getResponse();
+        self::assertInstanceOf(QuestionnaireResponseResource::class, $response);
+        self::assertSame([], $response->item, 'An empty boolean result must be omitted, not set to false.');
+
+        $issues = $result->getIssues();
+        self::assertNotNull($issues);
+        self::assertContains('information', $this->issueSeverities($issues));
+    }
+
+    public function testItemWithoutLinkIdIsDroppedWithWarning(): void
+    {
+        // An item carrying no linkId cannot be represented in the QuestionnaireResponse. It is skipped, but
+        // the drop must be observable: a warning (code `invalid`), not a silent disappearance.
+        $questionnaire = $this->deserialize(
+            '{"resourceType":"Questionnaire","status":"active","item":[{"type":"string"}]}',
+            QuestionnaireResource::class,
+        );
+
+        $result   = $this->populateQuestionnaire($questionnaire);
+        $response = $result->getResponse();
+        self::assertInstanceOf(QuestionnaireResponseResource::class, $response);
+        self::assertSame([], $response->item);
+
+        $issues = $result->getIssues();
+        self::assertNotNull($issues, 'A null-linkId drop must be observable.');
+        self::assertContains('warning', $this->issueSeverities($issues));
+        self::assertContains('invalid', $this->issueCodes($issues));
+    }
+
+    public function testEmptyItemPopulationContextEmitsInformationIssueAndOmitsGroup(): void
+    {
+        // A group whose itemPopulationContext resolves to nothing omits the whole group and its descendants.
+        // That omission must be observable — an information issue — not silent.
+        $questionnaire = $this->deserialize(
+            json_encode([
+                'resourceType' => 'Questionnaire',
+                'status'       => 'active',
+                'item'         => [[
+                    'linkId'    => 'grp',
+                    'type'      => 'group',
+                    'extension' => [$this->itemPopulationContextExtension('ctx', '{}')],
+                    'item'      => [$this->stringItemArray('child', "'x'")],
+                ]],
+            ], JSON_THROW_ON_ERROR),
+            QuestionnaireResource::class,
+        );
+
+        $result   = $this->populateQuestionnaire($questionnaire);
+        $response = $result->getResponse();
+        self::assertInstanceOf(QuestionnaireResponseResource::class, $response);
+        self::assertSame([], $response->item, 'An empty itemPopulationContext must omit the group.');
+
+        $issues = $result->getIssues();
+        self::assertNotNull($issues, 'An empty-context group omission must be observable.');
+        self::assertContains('information', $this->issueSeverities($issues));
+    }
+
+    public function testNestedRepeatingGroupsPopulate(): void
+    {
+        // itemPopulationContext nested inside itemPopulationContext: the outer repeats per Patient.name, the
+        // inner repeats per that name's given[]. Every given across every name must produce a leaf answer.
+        $patient = $this->deserialize(
+            '{"resourceType":"Patient","name":[' .
+            '{"family":"Smith","given":["John","Jack"]},' .
+            '{"family":"Doe","given":["Jane"]}]}',
+            PatientResource::class,
+        );
+
+        $questionnaire = $this->deserialize(
+            json_encode([
+                'resourceType' => 'Questionnaire',
+                'status'       => 'active',
+                'item'         => [[
+                    'linkId'    => 'names',
+                    'type'      => 'group',
+                    'extension' => [$this->itemPopulationContextExtension('nm', '%patient.name')],
+                    'item'      => [[
+                        'linkId'    => 'givens',
+                        'type'      => 'group',
+                        'extension' => [$this->itemPopulationContextExtension('gv', '%nm.given')],
+                        'item'      => [$this->stringItemArray('given', '%gv')],
+                    ]],
+                ]],
+            ], JSON_THROW_ON_ERROR),
+            QuestionnaireResource::class,
+        );
+
+        $result = (new FHIRQuestionnairePopulateService())->populate(
+            $questionnaire,
+            new PopulateContext(fhirVersion: FhirVersion::R4, launchContextResources: ['patient' => $patient]),
+        );
+
+        $answers = $this->collectStringAnswers($result->getResponse());
+        sort($answers);
+        self::assertSame(['Jack', 'Jane', 'John'], $answers, 'Each given across each name must populate a leaf answer.');
+    }
+
+    private function populateQuestionnaire(object $questionnaire): PopulateResult
+    {
+        return (new FHIRQuestionnairePopulateService())->populate(
+            $questionnaire,
+            new PopulateContext(fhirVersion: FhirVersion::R4),
+        );
+    }
+
+    /**
+     * Deserialize a Questionnaire built from an array of item arrays.
+     *
+     * @param list<array<string, mixed>> $items
+     */
+    private function questionnaire(array $items): object
+    {
+        return $this->deserialize(
+            json_encode(['resourceType' => 'Questionnaire', 'status' => 'active', 'item' => $items], JSON_THROW_ON_ERROR),
+            QuestionnaireResource::class,
+        );
+    }
+
+    /**
+     * A Questionnaire item as a plain array carrying a string-typed `initialExpression`.
+     *
+     * @return array<string, mixed>
+     */
+    private function stringItemArray(string $linkId, string $expression): array
+    {
+        return $this->itemArray($linkId, 'string', $expression);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function itemArray(string $linkId, string $type, string $expression): array
+    {
+        return [
+            'linkId'    => $linkId,
+            'type'      => $type,
+            'extension' => [[
+                'url'             => 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression',
+                'valueExpression' => ['language' => 'text/fhirpath', 'expression' => $expression],
+            ]],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function itemPopulationContextExtension(string $name, string $expression): array
+    {
+        return [
+            'url'             => 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemPopulationContext',
+            'valueExpression' => ['name' => $name, 'language' => 'text/fhirpath', 'expression' => $expression],
+        ];
+    }
+
+    /**
+     * Every string answer value anywhere in a QuestionnaireResponse item tree.
+     *
+     * @return list<string>
+     */
+    private function collectStringAnswers(object $response): array
+    {
+        $collect = static function(array $items, callable $self): array {
+            $out = [];
+            foreach ($items as $item) {
+                foreach ($item->answer ?? [] as $answer) {
+                    $value = $answer->value ?? null;
+                    if (\is_object($value) && property_exists($value, 'value') && \is_string($value->value ?? null)) {
+                        $out[] = $value->value;
+                    }
+                }
+                $out = [...$out, ...$self($item->item ?? [], $self)];
+            }
+
+            return $out;
+        };
+
+        return $collect($response->item ?? [], $collect);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function issueCodes(object $outcome): array
+    {
+        $codes = [];
+        foreach ($outcome->issue ?? [] as $issue) {
+            if (\is_object($issue)) {
+                $code = $this->stringify($issue->code->value ?? null);
+                if ($code !== null) {
+                    $codes[] = $code;
+                }
+            }
+        }
+
+        return $codes;
+    }
+
     private function populate(object $patient): PopulateResult
     {
         return (new FHIRQuestionnairePopulateService())->populate(

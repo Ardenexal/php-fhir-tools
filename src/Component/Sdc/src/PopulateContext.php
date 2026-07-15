@@ -15,31 +15,38 @@ use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
  * `dataEndpoint` fetching happens here — a live-fetch provider can be layered on later without changing
  * this seam.
  *
- * M01 scope: expression-based population from `launchContext` + `initialExpression` only. `variable`
- * chains, `itemPopulationContext`, and observation-based population arrive in M02.
+ * Supported population mechanisms: `launchContext` + `initialExpression`, root/item `variable` chains,
+ * `itemPopulationContext` repeating groups, and observation-based population (`observationLinkPeriod`,
+ * via {@see $dataProvider}). Non-FHIRPath expression languages (CQL, `x-fhir-query`) and StructureMap-
+ * based population are out of scope — see the component README and the sdc-populate backlog.
  */
 final class PopulateContext
 {
     /**
-     * @param array<string, object> $launchContextResources launch-context resources keyed by SDC
-     *                                                      launchContext name (e.g. `patient` => Patient
-     *                                                      model). Each is bound as the FHIRPath external
-     *                                                      constant `%<name>`.
+     * @param FhirVersion                          $fhirVersion            model namespace the produced
+     *                                                                     QuestionnaireResponse belongs to
+     *                                                                     (`R4`/`R4B`/`R5`)
+     * @param array<string, object>                $launchContextResources launch-context resources keyed by
+     *                                                                     SDC launchContext name (e.g.
+     *                                                                     `patient` => Patient model); each
+     *                                                                     is bound as the FHIRPath external
+     *                                                                     constant `%<name>`
+     * @param string|null                          $subject                reference for
+     *                                                                     `QuestionnaireResponse.subject`
+     *                                                                     (e.g. `Patient/123`), or null to
+     *                                                                     leave it unset — the SDC guidance
+     *                                                                     sets it, but it is optional (0..1)
+     * @param PopulationDataProviderInterface|null $dataProvider           supplies candidate `Observation`s
+     *                                                                     for observation-based population
+     *                                                                     (`observationLinkPeriod`), or null
+     *                                                                     to disable it; offline-first, the
+     *                                                                     caller pre-fetches the data (see
+     *                                                                     {@see BundlePopulationDataProvider})
      */
     public function __construct(
-        /** Model namespace the produced QuestionnaireResponse belongs to (R4-only for M01). */
         public readonly FhirVersion $fhirVersion = FhirVersion::R4,
         public readonly array $launchContextResources = [],
-        /**
-         * Reference string for `QuestionnaireResponse.subject` (e.g. `Patient/123`), or null to leave it
-         * unset. The SDC populate guidance sets the subject; it is optional (0..1) on the QR.
-         */
         public readonly ?string $subject = null,
-        /**
-         * Supplies candidate `Observation`s for observation-based population (`observationLinkPeriod`), or
-         * null to disable it. Offline-first: the caller pre-fetches the data (see
-         * {@see BundlePopulationDataProvider}); no live fetching happens in the library.
-         */
         public readonly ?PopulationDataProviderInterface $dataProvider = null,
     ) {
     }

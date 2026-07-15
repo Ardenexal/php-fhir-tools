@@ -434,3 +434,48 @@ is implemented and unit-tested **deterministically** (spec-driven: match `item.c
 Observations to status in {final, amended, corrected} within the link period, choose the most recent by
 effective time) — never oracle-seeded. Same sanctioned exception SOURCES.md already records for
 observation-based `$extract`.
+
+---
+
+## `$populate` M03 — Conformance corpus finalisation (full SDC-IG triage)
+
+Authoritative upstream list captured `2026-07-13` from
+`gh api repos/HL7/sdc/contents/input/resources?ref=master` (every `Questionnaire`/`StructureMap`
+example that could exercise `$populate`). Every populate-relevant SDC-IG example is triaged below —
+covered by a vendored oracle, or deferred with a reason and a `backlog.md` pointer. No SDC-IG example
+is silently unaccounted for.
+
+| SDC-IG example (`HL7/sdc` `input/resources/`) | Populate mechanism(s) | Status |
+|---|---|---|
+| `Questionnaire-CardiologyForm.json` | `calculatedExpression` only | **Deferred** — `calculatedExpression` (continuous re-population as source answers change) needs a re-evaluation trigger model. Carries no `launchContext`/`initialExpression`, so it is not a plain-`$populate` oracle candidate. → `backlog.md` (Next). |
+| `Questionnaire-rxterms.json` | `x-fhir-query`, `answerExpression`, `calculatedExpression`, `variable` | **Deferred** — dominated by `x-fhir-query` (live `dataEndpoint` fetch) and `answerExpression` (interactive answer-option selection); both are out of scope for the offline-first, headless engine. → `backlog.md` (`x-fhir-query`/`dataEndpoint` under Later; answer-selection under Maybe, `candidateExpression`/`contextExpression`). |
+| `Questionnaire-trivia-questionnaire.xml` | none | **Not applicable** — a quiz form carrying no populate directive (no `initialExpression`/`launchContext`/`itemPopulationContext`/`variable`); nothing for `$populate` to exercise. |
+| `StructureMap-questionnaire-population-transform.xml` | StructureMap-based population (`sourceStructureMap`) | **Deferred** — requires a FHIR Mapping Language engine, absent from the toolkit. Shared with StructureMap-based `$extract`; largest deferred item. → `backlog.md` (Maybe, "StructureMap-based population"). |
+
+**Corpus-coverage bias (the honest consequence — recorded, not a gap to close).** Every published
+SDC-IG populate example above uses a mechanism this engine deliberately does not implement
+(`x-fhir-query`, `calculatedExpression`, `answerExpression`, StructureMap). None can serve as an
+oracle case for the offline-first / FHIRPath-only feature set. The mechanisms the toolkit **does**
+implement — `launchContext` + `initialExpression`, root/item `variable`, `itemPopulationContext`
+repeating groups, and datatype coercion — are therefore proven against **authored-input +
+forms-lab-vendored-output** oracles (the seven `populate-*` cases documented above), not against IG
+example forms. This skew toward simpler forms is the expected outcome of the offline-first boundary and
+is recorded as decision item (a) in the sdc-populate ADR (`ADR-011`).
+
+**Covered mechanism corpus (vendored forms-lab oracles, not IG examples):**
+`populate-launchcontext-initial` (M01), plus the six M02 cases (`populate-variables-coercion`,
+`populate-itempopulationcontext`, `populate-enablewhen-notsuppressed`, `populate-coercion-quantity`,
+`populate-coercion-reference`, `populate-coercion-coding-marital`) — see the per-file provenance table
+above. Observation-based population is proven deterministically (no reachable oracle), as recorded in
+the observation-based section above.
+
+**phpdoc / gruff-php `docs.*` decision (M03).** The public API surface of the populate files was given
+full phpdoc (`populate()`, all `__construct()`s with `@param` tags, `PopulateResult`,
+`BundlePopulationDataProvider`; `docs.missing-public-phpdoc` and `docs.missing-property-phpdoc` → 0). The
+residual `docs.missing-param-tag` / `docs.missing-return-tag` / `docs.return-comment` findings on
+**private** helpers are **accepted advisory debt, not filled with type-only tags**: `code-comments.md`
+forbids restating a type signature, and the already-shipped `$extract` files
+(`FHIRQuestionnaireResponseExtractService`, `TemplateExtractor`) carry the identical density unaddressed
+with no repo-wide baseline — so filling only the populate files would be an inconsistency, not an
+improvement. No `.gruff-baseline.json` was introduced (the repo uses none). Decision made in M03 with
+explicit maintainer approval.

@@ -13,11 +13,21 @@ namespace Ardenexal\FHIRTools\Component\Sdc;
  */
 final class BundlePopulationDataProvider implements PopulationDataProviderInterface
 {
+    /**
+     * @param object $bundle a pre-fetched FHIR `Bundle` (any version) whose entries hold the resources
+     *                       relevant to population; only its `Observation` entries are surfaced
+     */
     public function __construct(
         private readonly object $bundle,
     ) {
     }
 
+    /**
+     * Every `Observation` resource found among the Bundle's entries (deserializer-origin objects tolerated),
+     * in entry order. Returns an empty list when the Bundle has no entries or none are Observations.
+     *
+     * @return list<object>
+     */
     public function observations(): array
     {
         $entries = $this->bundle->entry ?? null;

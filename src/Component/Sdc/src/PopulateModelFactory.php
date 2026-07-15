@@ -27,6 +27,10 @@ use Ardenexal\FHIRTools\Component\Metadata\Extension\SafeExtensionReader;
  */
 final class PopulateModelFactory
 {
+    /**
+     * @param FhirVersion $version the model namespace (`R4`/`R4B`/`R5`) every object this factory builds —
+     *                             and the FHIRPath evaluation scope — is resolved from
+     */
     public function __construct(
         private readonly FhirVersion $version,
     ) {
