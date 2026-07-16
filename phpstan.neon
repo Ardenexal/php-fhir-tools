@@ -12,6 +12,7 @@ parameters:
         - src/Component/Models/src/
         - src/Component/FHIRPath/src/
         - src/Component/Validation/src/
+        - src/Component/Sdc/src/
         - mate/src/
     excludePaths:
         - */vendor/*
