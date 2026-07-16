@@ -161,63 +161,105 @@ final class DefinitionExtractionWalker
         array &$issues,
     ): void {
         foreach ($responseItems as $responseItem) {
-            $linkId     = $this->qrReader->linkIdOf($responseItem);
-            $sourceItem = $linkId     !== null ? ($itemIndex[$linkId] ?? null) : null;
-            $segments   = $sourceItem !== null ? $this->definitionSegments($sourceItem) : null;
+            $this->walkOneItem($responseItem, $itemIndex, $context, $basePath, $rootResource, $rootType, $factory, $evalContext, $issues);
+        }
+    }
 
-            // Calculated fields declared on this item are written to their absolute path from the
-            // resource root, independent of the hierarchical answer-write context.
-            if ($sourceItem !== null) {
-                $this->applyDefinitionExtractValues($sourceItem, $responseItem, $rootResource, $rootType, $factory, $evalContext, $issues);
+    /**
+     * Process one response item within the walk: apply its calculated fields, then either descend (a
+     * logical group with no `definition`), establish one intermediate element and recurse into it (a group
+     * item), or write its answers relative to the enclosing context (a leaf). Returning ends this item's
+     * processing (equivalent to `continue` in the enclosing loop).
+     *
+     * @param array<string, object>  $itemIndex
+     * @param non-empty-list<string> $basePath
+     * @param list<object>           $issues    accumulated by reference
+     */
+    private function walkOneItem(
+        object $responseItem,
+        array $itemIndex,
+        object $context,
+        array $basePath,
+        object $rootResource,
+        string $rootType,
+        ExtractModelFactory $factory,
+        EvaluationContext $evalContext,
+        array &$issues,
+    ): void {
+        $linkId     = $this->qrReader->linkIdOf($responseItem);
+        $sourceItem = $linkId     !== null ? ($itemIndex[$linkId] ?? null) : null;
+        $segments   = $sourceItem !== null ? $this->definitionSegments($sourceItem) : null;
+
+        // Calculated fields declared on this item are written to their absolute path from the
+        // resource root, independent of the hierarchical answer-write context.
+        if ($sourceItem !== null) {
+            $this->applyDefinitionExtractValues($sourceItem, $responseItem, $rootResource, $rootType, $factory, $evalContext, $issues);
+        }
+
+        // No definition (logical group) — recurse in the same context.
+        if ($segments === null) {
+            $this->walkDefinitionItems($this->qrReader->childItems($responseItem), $itemIndex, $context, $basePath, $rootResource, $rootType, $factory, $evalContext, $issues);
+
+            return;
+        }
+
+        $relative = $this->relativeSegments($segments, $basePath);
+        if ($relative === null) {
+            $issues[] = $factory->issue(
+                IssueSeverity::warning->value,
+                IssueType::processingfailure->value,
+                \sprintf('definition path "%s" is not within the enclosing extraction context %s.', implode('.', $segments), implode('.', $basePath)),
+            );
+
+            return;
+        }
+
+        if ($relative === []) {
+            // Definition equals the context path — nothing to write here, just descend.
+            $this->walkDefinitionItems($this->qrReader->childItems($responseItem), $itemIndex, $context, $basePath, $rootResource, $rootType, $factory, $evalContext, $issues);
+
+            return;
+        }
+
+        $answers    = $this->qrReader->answersOf($responseItem);
+        $childItems = $this->qrReader->childItems($responseItem);
+
+        if ($answers === [] && $childItems !== []) {
+            // Group item: establish one intermediate element and recurse into it.
+            try {
+                $child = $this->writer->createIntermediate($context, $relative);
+            } catch (\RuntimeException $e) {
+                $issues[] = $factory->issue(IssueSeverity::warning->value, IssueType::processingfailure->value, $e->getMessage());
+
+                return;
             }
+            $this->walkDefinitionItems($childItems, $itemIndex, $child, $segments, $rootResource, $rootType, $factory, $evalContext, $issues);
 
-            // No definition (logical group) — recurse in the same context.
-            if ($segments === null) {
-                $this->walkDefinitionItems($this->qrReader->childItems($responseItem), $itemIndex, $context, $basePath, $rootResource, $rootType, $factory, $evalContext, $issues);
-                continue;
-            }
+            return;
+        }
 
-            $relative = $this->relativeSegments($segments, $basePath);
-            if ($relative === null) {
-                $issues[] = $factory->issue(
-                    IssueSeverity::warning->value,
-                    IssueType::processingfailure->value,
-                    \sprintf('definition path "%s" is not within the enclosing extraction context %s.', implode('.', $segments), implode('.', $basePath)),
-                );
-                continue;
-            }
+        // Leaf item: write each answer relative to the current context, then descend into any children.
+        $this->writeAnswerLeaves($context, $relative, $answers, $factory, $issues);
+        if ($childItems !== []) {
+            $this->walkDefinitionItems($childItems, $itemIndex, $context, $basePath, $rootResource, $rootType, $factory, $evalContext, $issues);
+        }
+    }
 
-            if ($relative === []) {
-                // Definition equals the context path — nothing to write here, just descend.
-                $this->walkDefinitionItems($this->qrReader->childItems($responseItem), $itemIndex, $context, $basePath, $rootResource, $rootType, $factory, $evalContext, $issues);
-                continue;
-            }
-
-            $answers    = $this->qrReader->answersOf($responseItem);
-            $childItems = $this->qrReader->childItems($responseItem);
-
-            if ($answers === [] && $childItems !== []) {
-                // Group item: establish one intermediate element and recurse into it.
-                try {
-                    $child = $this->writer->createIntermediate($context, $relative);
-                } catch (\RuntimeException $e) {
-                    $issues[] = $factory->issue(IssueSeverity::warning->value, IssueType::processingfailure->value, $e->getMessage());
-                    continue;
-                }
-                $this->walkDefinitionItems($childItems, $itemIndex, $child, $segments, $rootResource, $rootType, $factory, $evalContext, $issues);
-                continue;
-            }
-
-            // Leaf item: write each answer relative to the current context.
-            foreach ($answers as $answer) {
-                try {
-                    $this->writer->writeLeaf($context, $relative, $this->qrReader->answerValue($answer));
-                } catch (\RuntimeException $e) {
-                    $issues[] = $factory->issue(IssueSeverity::warning->value, IssueType::processingfailure->value, $e->getMessage());
-                }
-            }
-            if ($childItems !== []) {
-                $this->walkDefinitionItems($childItems, $itemIndex, $context, $basePath, $rootResource, $rootType, $factory, $evalContext, $issues);
+    /**
+     * Write each answer of a leaf item to `$relative` under `$context`, recording a warning per answer whose
+     * write fails (a bad path or incompatible type) without aborting the remaining answers.
+     *
+     * @param non-empty-list<string> $relative
+     * @param list<object>           $answers
+     * @param list<object>           $issues   accumulated by reference
+     */
+    private function writeAnswerLeaves(object $context, array $relative, array $answers, ExtractModelFactory $factory, array &$issues): void
+    {
+        foreach ($answers as $answer) {
+            try {
+                $this->writer->writeLeaf($context, $relative, $this->qrReader->answerValue($answer));
+            } catch (\RuntimeException $e) {
+                $issues[] = $factory->issue(IssueSeverity::warning->value, IssueType::processingfailure->value, $e->getMessage());
             }
         }
     }
@@ -344,68 +386,110 @@ final class DefinitionExtractionWalker
             if ($this->extensionReader->readUrl($extension) !== self::DEFINITION_EXTRACT_VALUE_URL) {
                 continue;
             }
+            $this->applyOneExtractValue($extension, $responseItem, $rootResource, $rootType, $factory, $evalContext, $issues);
+        }
+    }
 
-            // A `definitionExtractValue` sources its value from EITHER a FHIRPath `expression` (evaluated
-            // against the QR) OR a `fixed-value` sub-extension carrying a literal (a `code`, `uri`,
-            // `Coding`, `CodeableConcept`, …). Both target the same absolute `definition` path.
-            $definitionExt = $this->extensionReader->findExtension($extension, 'definition');
-            $expressionExt = $this->extensionReader->findExtension($extension, 'expression');
-            $fixedExt      = $this->extensionReader->findExtension($extension, 'fixed-value');
-            if ($definitionExt === null || ($expressionExt === null && $fixedExt === null)) {
-                continue;
+    /**
+     * Apply one `definitionExtractValue` sub-extension: resolve its target `definition` path (absolute from
+     * the resource root) and its value (a FHIRPath `expression` evaluated against the QR, or a `fixed-value`
+     * literal), then write it via {@see DefinitionPathWriter}. Returning ends this extension's processing
+     * (equivalent to `continue` in the enclosing loop); a path outside the resource or a failed write records
+     * a warning.
+     *
+     * @param list<object> $issues accumulated by reference
+     */
+    private function applyOneExtractValue(
+        object $extension,
+        object $responseItem,
+        object $rootResource,
+        string $rootType,
+        ExtractModelFactory $factory,
+        EvaluationContext $evalContext,
+        array &$issues,
+    ): void {
+        // A `definitionExtractValue` sources its value from EITHER a FHIRPath `expression` (evaluated
+        // against the QR) OR a `fixed-value` sub-extension carrying a literal (a `code`, `uri`,
+        // `Coding`, `CodeableConcept`, …). Both target the same absolute `definition` path.
+        $definitionExt = $this->extensionReader->findExtension($extension, 'definition');
+        $expressionExt = $this->extensionReader->findExtension($extension, 'expression');
+        $fixedExt      = $this->extensionReader->findExtension($extension, 'fixed-value');
+        if ($definitionExt === null || ($expressionExt === null && $fixedExt === null)) {
+            return;
+        }
+
+        $definition = $this->qrReader->stringifyPrimitive($this->extensionReader->readValue($definitionExt));
+        if ($definition === null) {
+            return;
+        }
+
+        $segments = $this->segmentsFromDefinition($definition);
+        $relative = $segments !== null ? $this->relativeSegments($segments, [$rootType]) : null;
+        if ($relative === null || $relative === []) {
+            $issues[] = $factory->issue(
+                IssueSeverity::warning->value,
+                IssueType::processingfailure->value,
+                \sprintf('definitionExtractValue path "%s" is not within the resource type %s.', $definition, $rootType),
+            );
+
+            return;
+        }
+
+        $value = $this->resolveExtractValue($expressionExt, $fixedExt, $responseItem, $factory, $evalContext, $issues);
+        if ($value === null) {
+            // An empty result set / absent-or-unreadable fixed value / failed expression — nothing to write.
+            return;
+        }
+
+        try {
+            // The writer coerces a raw string scalar into the target property's primitive wrapper.
+            // Catch \Throwable (not just \RuntimeException): a calculated value whose type does not
+            // match a strictly-typed leaf (e.g. a computed number for a string-typed primitive) would
+            // otherwise raise a \TypeError and abort the whole extraction — surface it as an issue.
+            $this->writer->writeLeaf($rootResource, $relative, $value);
+        } catch (\Throwable $e) {
+            $issues[] = $factory->issue(IssueSeverity::warning->value, IssueType::processingfailure->value, $e->getMessage());
+        }
+    }
+
+    /**
+     * Resolve a `definitionExtractValue`'s value: the first result of its FHIRPath `expression` (evaluated
+     * with `$responseItem` as focus), or its `fixed-value` literal. Returns null when the expression is
+     * unreadable, evaluates empty, or fails (recording a warning on failure), or when no source is present.
+     *
+     * @param list<object> $issues accumulated by reference
+     */
+    private function resolveExtractValue(
+        ?object $expressionExt,
+        ?object $fixedExt,
+        object $responseItem,
+        ExtractModelFactory $factory,
+        EvaluationContext $evalContext,
+        array &$issues,
+    ): mixed {
+        if ($expressionExt !== null) {
+            $expression = $this->qrReader->expressionString($this->extensionReader->readValue($expressionExt));
+            if ($expression === null) {
+                return null;
             }
-
-            $definition = $this->qrReader->stringifyPrimitive($this->extensionReader->readValue($definitionExt));
-            if ($definition === null) {
-                continue;
-            }
-
-            $segments = $this->segmentsFromDefinition($definition);
-            $relative = $segments !== null ? $this->relativeSegments($segments, [$rootType]) : null;
-            if ($relative === null || $relative === []) {
+            try {
+                return $this->evaluateToScalar($expression, $responseItem, $factory, $evalContext);
+            } catch (\Throwable $e) {
                 $issues[] = $factory->issue(
                     IssueSeverity::warning->value,
                     IssueType::processingfailure->value,
-                    \sprintf('definitionExtractValue path "%s" is not within the resource type %s.', $definition, $rootType),
+                    \sprintf('definitionExtractValue expression "%s" failed to evaluate: %s', $expression, $e->getMessage()),
                 );
-                continue;
-            }
 
-            if ($expressionExt !== null) {
-                $expression = $this->qrReader->expressionString($this->extensionReader->readValue($expressionExt));
-                if ($expression === null) {
-                    continue;
-                }
-                try {
-                    $value = $this->evaluateToScalar($expression, $responseItem, $factory, $evalContext);
-                } catch (\Throwable $e) {
-                    $issues[] = $factory->issue(
-                        IssueSeverity::warning->value,
-                        IssueType::processingfailure->value,
-                        \sprintf('definitionExtractValue expression "%s" failed to evaluate: %s', $expression, $e->getMessage()),
-                    );
-                    continue;
-                }
-            } else {
-                // $fixedExt is non-null here (guaranteed by the guard above).
-                $value = $this->extensionReader->readValue($fixedExt);
-            }
-
-            if ($value === null) {
-                // An empty result set / absent fixed value is not an error — nothing to write.
-                continue;
-            }
-
-            try {
-                // The writer coerces a raw string scalar into the target property's primitive wrapper.
-                // Catch \Throwable (not just \RuntimeException): a calculated value whose type does not
-                // match a strictly-typed leaf (e.g. a computed number for a string-typed primitive) would
-                // otherwise raise a \TypeError and abort the whole extraction — surface it as an issue.
-                $this->writer->writeLeaf($rootResource, $relative, $value);
-            } catch (\Throwable $e) {
-                $issues[] = $factory->issue(IssueSeverity::warning->value, IssueType::processingfailure->value, $e->getMessage());
+                return null;
             }
         }
+
+        if ($fixedExt !== null) {
+            return $this->extensionReader->readValue($fixedExt);
+        }
+
+        return null;
     }
 
     /**
