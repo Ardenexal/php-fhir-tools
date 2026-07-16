@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Sdc;
+namespace Ardenexal\FHIRTools\Component\Sdc\Contract;
+
+use Ardenexal\FHIRTools\Component\Sdc\ExtractContext;
+use Ardenexal\FHIRTools\Component\Sdc\ExtractResult;
 
 /**
  * Transforms a completed `QuestionnaireResponse` into FHIR resources per the SDC `$extract` operation.

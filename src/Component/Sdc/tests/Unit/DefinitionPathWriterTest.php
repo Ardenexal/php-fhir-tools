@@ -8,7 +8,7 @@ use Ardenexal\FHIRTools\Component\Models\R4\DataType\Reference;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\UriPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\RelatedPersonResource;
-use Ardenexal\FHIRTools\Component\Sdc\DefinitionPathWriter;
+use Ardenexal\FHIRTools\Component\Sdc\Extract\DefinitionPathWriter;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider;

@@ -6,7 +6,6 @@ namespace Ardenexal\FHIRTools\Component\Sdc\Populate;
 
 use Ardenexal\FHIRTools\Component\Models\R4\Enum\IssueSeverity;
 use Ardenexal\FHIRTools\Component\Models\R4\Enum\IssueType;
-use Ardenexal\FHIRTools\Component\Sdc\PopulateModelFactory;
 use Ardenexal\FHIRTools\Component\Sdc\FHIRQuestionnairePopulateService;
 
 /**

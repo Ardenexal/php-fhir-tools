@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Sdc;
+namespace Ardenexal\FHIRTools\Component\Sdc\Populate;
 
 use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDate;
 use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRDateTime;
 use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRTime;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Metadata\Extension\SafeExtensionReader;
+use Ardenexal\FHIRTools\Component\Sdc\Extract\ExtractModelFactory;
 
 /**
  * Version-scoped construction of the model objects a `$populate` run assembles.
@@ -24,6 +25,8 @@ use Ardenexal\FHIRTools\Component\Metadata\Extension\SafeExtensionReader;
  *
  * FHIR *codes* (`'in-progress'`, issue severities/types) are version-stable strings, so they are taken
  * as literals; only the wrapper classes are per-version.
+ *
+ * @internal implementation detail of the `Sdc` population path; not part of the public API
  */
 final class PopulateModelFactory
 {

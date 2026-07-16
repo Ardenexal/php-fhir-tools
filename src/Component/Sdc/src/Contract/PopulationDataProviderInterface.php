@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Sdc;
+namespace Ardenexal\FHIRTools\Component\Sdc\Contract;
+
+use Ardenexal\FHIRTools\Component\Sdc\FHIRQuestionnairePopulateService;
+use Ardenexal\FHIRTools\Component\Sdc\PopulateContext;
 
 /**
  * Supplies the candidate resources observation-based population draws on.

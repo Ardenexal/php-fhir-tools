@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Sdc;
 
+use Ardenexal\FHIRTools\Component\Sdc\Contract\PopulationDataProviderInterface;
+
 /**
  * In-memory {@see PopulationDataProviderInterface} backed by a pre-fetched FHIR `Bundle`.
  *

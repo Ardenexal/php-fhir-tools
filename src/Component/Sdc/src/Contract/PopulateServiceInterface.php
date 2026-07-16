@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Sdc;
+namespace Ardenexal\FHIRTools\Component\Sdc\Contract;
+
+use Ardenexal\FHIRTools\Component\Sdc\PopulateContext;
+use Ardenexal\FHIRTools\Component\Sdc\PopulateResult;
 
 /**
  * Generates a pre-filled `QuestionnaireResponse` from a `Questionnaire` plus contextual data, per the

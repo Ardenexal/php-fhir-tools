@@ -25,8 +25,12 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 use Ardenexal\FHIRTools\Component\Serialization\FHIRSerializationService;
+use Ardenexal\FHIRTools\Component\Sdc\Contract\ExtractServiceInterface;
 use Ardenexal\FHIRTools\Component\Sdc\Extract\DefinitionExtractionWalker;
+use Ardenexal\FHIRTools\Component\Sdc\Extract\DefinitionPathWriter;
+use Ardenexal\FHIRTools\Component\Sdc\Extract\ExtractModelFactory;
 use Ardenexal\FHIRTools\Component\Sdc\Extract\QuestionnaireResponseReader;
+use Ardenexal\FHIRTools\Component\Sdc\Extract\TemplateExtractor;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\FHIRMetadataExtractor;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider;
 

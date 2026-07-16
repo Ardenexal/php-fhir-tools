@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Sdc;
 
+use Ardenexal\FHIRTools\Component\Sdc\Contract\PopulationDataProviderInterface;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
 
 /**

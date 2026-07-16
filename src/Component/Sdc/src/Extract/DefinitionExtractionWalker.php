@@ -9,8 +9,6 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Metadata\Extension\SafeExtensionReader;
 use Ardenexal\FHIRTools\Component\Models\R4\Enum\IssueSeverity;
 use Ardenexal\FHIRTools\Component\Models\R4\Enum\IssueType;
-use Ardenexal\FHIRTools\Component\Sdc\DefinitionPathWriter;
-use Ardenexal\FHIRTools\Component\Sdc\ExtractModelFactory;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider;
 use Ardenexal\FHIRTools\Component\Sdc\FHIRQuestionnaireResponseExtractService;
 

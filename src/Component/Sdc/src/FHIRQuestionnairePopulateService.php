@@ -9,9 +9,11 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Metadata\Extension\SafeExtensionReader;
 use Ardenexal\FHIRTools\Component\Models\R4\Enum\IssueSeverity;
 use Ardenexal\FHIRTools\Component\Models\R4\Enum\IssueType;
+use Ardenexal\FHIRTools\Component\Sdc\Contract\PopulateServiceInterface;
 use Ardenexal\FHIRTools\Component\Sdc\Populate\AnswerValueCoercer;
 use Ardenexal\FHIRTools\Component\Sdc\Populate\FhirPrimitiveReader;
 use Ardenexal\FHIRTools\Component\Sdc\Populate\ObservationSelector;
+use Ardenexal\FHIRTools\Component\Sdc\Populate\PopulateModelFactory;
 use Ardenexal\FHIRTools\Component\Validation\FHIRQuestionnaireResolverInterface;
 
 /**

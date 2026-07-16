@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Sdc;
+namespace Ardenexal\FHIRTools\Component\Sdc\Extract;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
@@ -43,6 +43,8 @@ use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvide
  * external constants (`%NewPatientId`). This is the same focus/`%resource` split the definition-based
  * path proved (the evaluator's per-call `setRootResource()` mutates only a per-call clone, so the shared
  * context's `resourceNode` survives) — passing a non-null `fhirVersion` forces that defensive clone.
+ *
+ * @internal implementation detail of the `Sdc` extraction path; not part of the public API
  */
 final class TemplateExtractor
 {
