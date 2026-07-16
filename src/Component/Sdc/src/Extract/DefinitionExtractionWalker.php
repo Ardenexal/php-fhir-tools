@@ -2,14 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Sdc;
+namespace Ardenexal\FHIRTools\Component\Sdc\Extract;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Metadata\Extension\SafeExtensionReader;
 use Ardenexal\FHIRTools\Component\Models\R4\Enum\IssueSeverity;
 use Ardenexal\FHIRTools\Component\Models\R4\Enum\IssueType;
+use Ardenexal\FHIRTools\Component\Sdc\DefinitionPathWriter;
+use Ardenexal\FHIRTools\Component\Sdc\ExtractModelFactory;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvider;
+use Ardenexal\FHIRTools\Component\Sdc\FHIRQuestionnaireResponseExtractService;
 
 /**
  * Definition-based `$extract`: walks a `QuestionnaireResponse` subtree building one resource per

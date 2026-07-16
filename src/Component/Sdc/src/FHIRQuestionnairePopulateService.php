@@ -9,6 +9,9 @@ use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
 use Ardenexal\FHIRTools\Component\Metadata\Extension\SafeExtensionReader;
 use Ardenexal\FHIRTools\Component\Models\R4\Enum\IssueSeverity;
 use Ardenexal\FHIRTools\Component\Models\R4\Enum\IssueType;
+use Ardenexal\FHIRTools\Component\Sdc\Populate\AnswerValueCoercer;
+use Ardenexal\FHIRTools\Component\Sdc\Populate\FhirPrimitiveReader;
+use Ardenexal\FHIRTools\Component\Sdc\Populate\ObservationSelector;
 use Ardenexal\FHIRTools\Component\Validation\FHIRQuestionnaireResolverInterface;
 
 /**
@@ -100,9 +103,9 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
         ?AnswerValueCoercer $coercer = null,
         ?ObservationSelector $observations = null,
     ) {
-        $this->primitives   = $primitives     ?? new FhirPrimitiveReader();
+        $this->primitives   = $primitives        ?? new FhirPrimitiveReader();
         $this->coercer      = $coercer           ?? new AnswerValueCoercer($this->primitives);
-        $this->observations = $observations ?? new ObservationSelector($this->extensions, $this->primitives, $this->coercer);
+        $this->observations = $observations      ?? new ObservationSelector($this->extensions, $this->primitives, $this->coercer);
     }
 
     private readonly FhirPrimitiveReader $primitives;

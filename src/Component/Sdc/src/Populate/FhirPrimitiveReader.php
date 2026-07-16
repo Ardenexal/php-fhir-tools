@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Sdc;
+namespace Ardenexal\FHIRTools\Component\Sdc\Populate;
+
+use Ardenexal\FHIRTools\Component\Sdc\FHIRQuestionnairePopulateService;
 
 /**
  * Reads FHIR primitive-wrapper-or-scalar values off deserializer-origin models, tolerating

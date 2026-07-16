@@ -2,11 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Sdc;
+namespace Ardenexal\FHIRTools\Component\Sdc\Populate;
 
 use Ardenexal\FHIRTools\Component\Metadata\Extension\SafeExtensionReader;
 use Ardenexal\FHIRTools\Component\Models\R4\Enum\IssueSeverity;
 use Ardenexal\FHIRTools\Component\Models\R4\Enum\IssueType;
+use Ardenexal\FHIRTools\Component\Sdc\PopulateContext;
+use Ardenexal\FHIRTools\Component\Sdc\PopulateModelFactory;
+use Ardenexal\FHIRTools\Component\Sdc\FHIRQuestionnairePopulateService;
 
 /**
  * Observation-based population for `observationLinkPeriod` items: selects the most-recent supplied

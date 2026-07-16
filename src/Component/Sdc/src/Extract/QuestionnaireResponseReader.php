@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Sdc;
+namespace Ardenexal\FHIRTools\Component\Sdc\Extract;
+
+use Ardenexal\FHIRTools\Component\Sdc\FHIRQuestionnaireResponseExtractService;
+use Ardenexal\FHIRTools\Component\Sdc\Populate\FhirPrimitiveReader;
 
 /**
  * Tolerant structural reads over deserializer-origin `QuestionnaireResponse` / `Questionnaire` item

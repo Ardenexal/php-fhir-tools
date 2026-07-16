@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Sdc;
+namespace Ardenexal\FHIRTools\Component\Sdc\Populate;
 
 use Ardenexal\FHIRTools\Component\Models\R4\Enum\IssueSeverity;
 use Ardenexal\FHIRTools\Component\Models\R4\Enum\IssueType;
+use Ardenexal\FHIRTools\Component\Sdc\PopulateModelFactory;
+use Ardenexal\FHIRTools\Component\Sdc\FHIRQuestionnairePopulateService;
 
 /**
  * Coerces an expression result to the FHIR datatype an answer of a given `Questionnaire.item.type`
