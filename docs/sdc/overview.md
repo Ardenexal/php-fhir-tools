@@ -1,5 +1,5 @@
 ---
-description: Populate and extract FHIR resources for SDC Questionnaires.
+description: Populate QuestionnaireResponses and extract FHIR resources for SDC Questionnaires.
 icon: file-export
 ---
 
