@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Sdc;
+namespace Ardenexal\FHIRTools\Component\Sdc\Extract;
 
 use Ardenexal\FHIRTools\Component\Models\Primitive\FHIRInstant;
 use Ardenexal\FHIRTools\Component\Serialization\FhirVersion;
@@ -25,6 +25,8 @@ use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvide
  *
  * The FHIR *codes* passed in (`'transaction'`, `'POST'`/`'PUT'`, issue severities/types) are
  * version-stable strings, so they are taken as literals; only the wrapper classes are per-version.
+ *
+ * @internal implementation detail of the `Sdc` extraction path; not part of the public API
  */
 final class ExtractModelFactory
 {

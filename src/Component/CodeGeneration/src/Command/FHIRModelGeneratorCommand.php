@@ -517,10 +517,9 @@ class FHIRModelGeneratorCommand extends Command
                 $targetNamespace->add($class);
 
                 match ($kind) {
-                    'resource'       => $resourceCount++,
-                    'complex-type'   => $dataTypeCount++,
-                    'primitive-type' => $primitiveCount++,
-                    default          => null
+                    'resource'     => $resourceCount++,
+                    'complex-type' => $dataTypeCount++,
+                    default        => $primitiveCount++,
                 };
             } else {
                 $output->writeln("<error>Failed to generate class for {$name}</error>");

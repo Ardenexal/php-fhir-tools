@@ -1,0 +1,51 @@
+{
+  "resourceType": "Questionnaire",
+  "status": "active",
+  "url": "http://example.org/Questionnaire/populate-spike",
+  "name": "PopulateSpike",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext",
+      "extension": [
+        {
+          "url": "name",
+          "valueCoding": {
+            "system": "http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext",
+            "code": "patient"
+          }
+        },
+        { "url": "type", "valueCode": "Patient" }
+      ]
+    }
+  ],
+  "item": [
+    {
+      "linkId": "patient-given",
+      "type": "string",
+      "text": "Given name",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+          "valueExpression": {
+            "language": "text/fhirpath",
+            "expression": "%patient.name.first().given.first()"
+          }
+        }
+      ]
+    },
+    {
+      "linkId": "patient-family",
+      "type": "string",
+      "text": "Family name",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+          "valueExpression": {
+            "language": "text/fhirpath",
+            "expression": "%patient.name.first().family"
+          }
+        }
+      ]
+    }
+  ]
+}

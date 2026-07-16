@@ -1,0 +1,26 @@
+{
+  "resourceType": "Questionnaire",
+  "status": "active",
+  "url": "http://example.org/Questionnaire/probe-coding-marital",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext",
+      "extension": [
+        { "url": "name", "valueCoding": { "system": "http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "code": "patient" } },
+        { "url": "type", "valueCode": "Patient" }
+      ]
+    }
+  ],
+  "item": [
+    {
+      "linkId": "q-marital",
+      "type": "choice",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+          "valueExpression": { "language": "text/fhirpath", "expression": "%patient.maritalStatus.coding.first()" }
+        }
+      ]
+    }
+  ]
+}

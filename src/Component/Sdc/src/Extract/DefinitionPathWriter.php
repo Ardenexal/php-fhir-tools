@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Sdc;
+namespace Ardenexal\FHIRTools\Component\Sdc\Extract;
 
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadata;
 use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProviderInterface;
@@ -23,6 +23,8 @@ use Ardenexal\FHIRTools\Component\Serialization\Metadata\PropertyMetadataProvide
  * Segments are PHP property names relative to a context object; a trailing choice marker (`value[x]`)
  * is normalised to the backing property (`value`). A flat `definition` carries no array index and no
  * concrete choice type, so append-vs-set and the polymorphic variant are decided from metadata.
+ *
+ * @internal implementation detail of the `Sdc` extraction path; not part of the public API
  */
 final class DefinitionPathWriter
 {

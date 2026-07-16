@@ -1,0 +1,7 @@
+{
+  "resourceType": "Observation",
+  "id": "obs1",
+  "status": "final",
+  "code": { "coding": [ { "system": "http://loinc.org", "code": "29463-7", "display": "Body Weight" } ] },
+  "valueQuantity": { "value": 72.5, "unit": "kg", "system": "http://unitsofmeasure.org", "code": "kg" }
+}

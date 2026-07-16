@@ -297,3 +297,198 @@ field checks (`testProvenanceEntryEmittedWhenRequested`) and its cardinality was
 toolkit validator (`isValid: true`, 0 errors; only the `dom-6` narrative best-practice warning). It is
 **never** part of a byte-compared oracle fixture — the existing oracle Bundles stay Provenance-free so
 they need no re-vendoring.
+
+---
+
+## `$populate` conformance oracle (sdc-populate M01 — expression-based, R4)
+
+**Working oracle engine for `$populate`: `fhir.forms-lab.com` (fhirVersion 4.3.0 = R4B).**
+The M00 spike had flagged the fhirpath-lab *R4* backend (`sqlonfhir 4.0.16`,
+`sqlonfhir-r4.azurewebsites.net`) as **unable to evaluate `initialExpression`** and too fragile to
+seed. Re-probed on 2026-07-12 against `fhir.forms-lab.com` — the R4B engine that already seeds the
+`$extract` oracles — and it **does** evaluate `initialExpression` end-to-end:
+
+| Field | Value |
+|-------|-------|
+| Engine | forms-lab (`fhir.forms-lab.com`) |
+| FHIR version | 4.3.0 (R4B; wire-compatible with R4 for the primitives this case exercises) |
+| Operation | `POST Questionnaire/$populate` (type-level) |
+| Input shape | FHIR `Parameters`: `questionnaire` (resource) + `subject` (valueReference) + `context` (parts `name`=valueString, `content`=resource) |
+| Captured | 2026-07-12, HTTP 200 |
+
+**Case `populate-launchcontext-initial` (minimal, M01-scoped):** a Questionnaire carrying ONLY a
+`launchContext` (`patient` → `Patient`) and two leaf items with `initialExpression`
+(`%patient.name.first().given.first()` → `"Peter"`, `%patient.name.first().family` → `"Chalmers"`).
+The form deliberately uses no mechanism M01 does not implement, so a subset implementation matches the
+reference output. Fixtures:
+
+- `Fixtures/Populate/populate-launchcontext-initial.questionnaire.json` — **input**, authored (input-side
+  artifacts may be authored; only expected output must be vendored).
+- `Fixtures/Populate/populate-launchcontext-initial.patient.json` — **input** launch-context Patient.
+- `Fixtures/Populate/populate-launchcontext-initial.expected-qr.json` — **frozen forms-lab output**
+  (the vendored oracle; never hand-authored, never seeded from this toolkit).
+
+**Spec-legal divergences to tolerate in the test subclass (not the shared harness):** forms-lab omits
+`QuestionnaireResponse.subject` from its output (subject is 0..1 optional). This toolkit sets `subject`
+per the SDC populate guidance, so `FHIRPopulateConformanceTest` adds `subject` to its local
+`IGNORED_KEYS` (mirroring how the extract subclass drops `url`) — dropping it in the shared base would
+weaken the `$extract` oracle. `authored`/`id`/`lastUpdated`/`text` are already dropped by the shared base.
+
+---
+
+## `$populate` M02 mechanism probes (forms-lab, R4B) — 2026-07-13
+
+Probed `POST https://fhir.forms-lab.com/Questionnaire/$populate` to establish which M02 mechanisms the
+reference engine supports before building each (oracle-first). All returned HTTP 200.
+
+- **`variable` (root)** — SUPPORTED. A root `http://hl7.org/fhir/StructureDefinition/variable` with
+  `valueExpression {name:'pName', expression:'%patient.name.first()'}` is resolvable by a later item's
+  `initialExpression` `%pName.given.first()` → `"Peter"`.
+- **Type coercion** — SUPPORTED for the primitives the engine returns directly: `date` item ←
+  `%patient.birthDate` → `valueDate`; `boolean` ← `%patient.active` → `valueBoolean`; `integer` ←
+  `%patient.name.count()` → `valueInteger`. (Coding/Quantity/Reference adaptation still to be probed per
+  case as those oracles are added.)
+- **`itemPopulationContext` (repeating group)** — SUPPORTED and the key semantic: a group item with
+  `itemPopulationContext {name:'nameCtx', expression:'%patient.name'}` is emitted **once per context
+  result** (2 names → 2 `names` group items), and within each repetition `%nameCtx` is bound to *that*
+  result element, so `%nameCtx.given.first()` / `%nameCtx.family` populate per-repetition.
+- **`enableWhen` — NOT suppressed (spec-confirmed, not just reference-matched).** A `dependent` item
+  disabled by `enableWhen (trigger = true)` with `trigger` populated to `false` was **still populated**
+  (`valueString "Peter"`). This is not merely forms-lab's choice — the **normative SDC $populate spec**
+  (`HL7/sdc input/pagecontent/populate.xml`) states: *"When pre-populating a questionnaire, it makes
+  sense to 'fill in' as much data as possible, even if it may not always be needed. However, such data
+  should not be shown to the user until the given item is 'enabled'."* So `enableWhen` is a **display-time**
+  concern; populate fills disabled items. The toolkit matches this — it does NOT pre-suppress
+  `enableWhen`-disabled items (reverses the original M02 plan task; see M02.md). Optional opt-in
+  suppression is a possible future backlog item, not default behaviour. The same spec section confirms
+  the empty-set rule: *"An empty set SHALL be treated as 'not answered' rather than being converted to a
+  boolean value of 'false'."* — validating M01's empty→info-issue (no answer) design.
+
+Probe payloads: kept out of the repo (synthetic, reproducible from the descriptions above).
+
+---
+
+## `$populate` M02 oracle fixtures — per-file provenance
+
+The six M02 `$populate` oracle cases below share this provenance (recorded per-file here so the audit
+trail matches the `$extract` corpus, rather than living only in the prose above):
+
+| Field | Value |
+|-------|-------|
+| Engine | forms-lab (`fhir.forms-lab.com`) — the same R4B-native engine that seeds the `$extract` oracles and the M01 `populate-launchcontext-initial` oracle |
+| FHIR version | 4.3.0 (R4B; wire-compatible with R4 for the content these cases exercise) |
+| Operation / Endpoint | `POST https://fhir.forms-lab.com/Questionnaire/$populate` (type-level) |
+| Captured | 2026-07-13, HTTP 200 |
+| Input fixtures (`.questionnaire.json` / `.patient.json` / `.observation.json`) | **authored** — input-side artifacts may be authored; only the expected output must be vendored |
+| `*.expected-qr.json` | **frozen forms-lab output** — vendored verbatim, never hand-authored, never seeded from this toolkit |
+| Probe request payloads | **not retained** in the repo (reproducible from the input fixtures + the `Parameters` input shape documented in the M01 oracle entry above) |
+
+Per-case files and what each locks against regression:
+
+| Case (`Fixtures/Populate/<case>.*`) | Input fixtures | Expected oracle | Mechanism frozen |
+|---|---|---|---|
+| `populate-variables-coercion` | `.questionnaire.json`, `.patient.json` | `.expected-qr.json` | root `variable` (`%pName`) reused by a later item expression; primitive coercion (date/boolean/integer) |
+| `populate-itempopulationcontext` | `.questionnaire.json`, `.patient.json` | `.expected-qr.json` | repeating group: one group repetition per `itemPopulationContext` result, `%ctx` bound per repetition |
+| `populate-enablewhen-notsuppressed` | `.questionnaire.json`, `.patient.json` | `.expected-qr.json` | the `enableWhen` non-suppression reversal — a disabled dependent item is still populated |
+| `populate-coercion-quantity` | `.questionnaire.json`, `.patient.json`, `.observation.json` | `.expected-qr.json` | `Quantity` datatype pass-through → `valueQuantity`; **two** launch contexts (`patient` + `obs`) |
+| `populate-coercion-reference` | `.questionnaire.json`, `.patient.json` | `.expected-qr.json` | `Reference` datatype pass-through → `valueReference` |
+| `populate-coercion-coding-marital` | `.questionnaire.json`, `.patient.json` | `.expected-qr.json` | `Coding` datatype pass-through → `valueCoding` (`display` asserted directly in `testCodingCoercionPreservesDisplay`, since the harness ignores it) |
+
+The frozen bytes carry the forms-lab serialization signature (a `meta.lastUpdated` with an explicit
+`+00:00` offset and .NET-style fractional seconds, e.g. `2026-07-12T23:26:32.6618845+00:00`), consistent
+with the genuine engine origin above rather than a toolkit-produced output.
+
+---
+
+## `$populate` M02 coercion + observation findings — 2026-07-13
+
+**Answer-value coercion is strict-by-source-datatype (forms-lab, confirmed by probe).** The expression
+must already resolve to the FHIR datatype the item type expects; the engine rejects a mismatch with a
+fatal `OperationOutcome` (`invalidAnswerType`), it does not lenient-coerce:
+
+- `choice`/`open-choice` ← a `Coding` datatype → `valueCoding` (system/code/display intact). A
+  `CodeableConcept` is rejected — use `.coding.first()`. Oracle: `populate-coercion-coding-marital.*`.
+- `quantity` ← a `Quantity` datatype → `valueQuantity` (value/unit/system/code intact). Oracle:
+  `populate-coercion-quantity.*` (uses a **two-launchContext** input: `patient` + `obs`).
+- `reference` ← a `Reference` datatype → `valueReference` verbatim. A bare string or whole resource is
+  rejected. Oracle: `populate-coercion-reference.*`.
+
+The toolkit matches this: complex-typed items pass the datatype **object** through (the answer choice
+normalizer maps the object's class → the right `value[x]`); a bare scalar for a complex item is a
+mismatch warning. **DEFERRED (→ `backlog.md`):** binding-driven `code`→`Coding` promotion — forms-lab
+turns a bare `code` (e.g. `%patient.gender`) into a systematised `valueCoding` by reading the item's
+required value-set binding (`gender` → `system: http://hl7.org/fhir/administrative-gender`). Replicating
+that needs terminology-binding resolution the populate engine does not carry, so a bare code for a choice
+item is currently a mismatch rather than a promoted Coding.
+
+**Observation-based population (`observationLinkPeriod`) — NO reachable reference oracle.** Probed
+forms-lab (`QForms`, publisher brianpos.com, fhirVersion 4.3.0 R4B) exhaustively: it does **not**
+implement `observationLinkPeriod`. Its CapabilityStatement advertises no `Observation`/`Patient` resource
+types and no store, so the spec-standard "server queries its own clinical record" path is structurally
+impossible there; and when the candidate Observations were supplied as a `Bundle` launch context, the
+`observationLinkPeriod` item still populated empty. A **control** in the same request (an
+`initialExpression` reading the same Bundle) DID populate — proving the Bundle context is reachable and
+the engine simply ignores `observationLinkPeriod` semantics (code-match + period + most-recent). A wide
+explicit `valuePeriod` ruled out a date-window artifact. **Consequence:** observation-based `$populate`
+is implemented and unit-tested **deterministically** (spec-driven: match `item.code` codings, filter
+Observations to status in {final, amended, corrected} within the link period, restrict to the populate
+subject when one is stated — see below, choose the most recent by effective time) — never oracle-seeded.
+Same sanctioned exception SOURCES.md already records for observation-based `$extract`.
+
+**Subject scoping (strict-exclude, decided 2026-07-16).** When `PopulateContext::$subject` is set, an
+Observation must be confirmably about that subject to be eligible: `ObservationSelector` compares the
+`Type/id` tail of `Observation.subject.reference` against the requested subject (tolerating an
+absolute-URL prefix / `_history` suffix), and excludes any code+status+window candidate that is for a
+different subject **or carries no readable subject**. This aligns with the `observationLinkPeriod` spec
+intent (the server draws on the record *for that patient*) and guards the offline-first data seam against
+a broad/mixed-subject `Bundle` leaking another patient's value. When candidates matched by code and
+status but none could be subject-confirmed, the item is left unanswered with a **warning** (not the
+softer "nothing matched" information issue). With no subject stated, selection stays code/status/window
+only. Covered by `FHIRQuestionnaireObservationPopulateTest` (`testSubjectScopeExcludesOtherPatientObservation`,
+`testAllCandidatesWrongSubjectLeavesUnansweredWithWarning`, `testSubjectAbsentObservationExcludedWhenSubjectEnforced`,
+`testAbsoluteAndVersionedSubjectReferenceStillMatches`).
+
+---
+
+## `$populate` M03 — Conformance corpus finalisation (full SDC-IG triage)
+
+Authoritative upstream list captured `2026-07-13` from
+`gh api repos/HL7/sdc/contents/input/resources?ref=master` (every `Questionnaire`/`StructureMap`
+example that could exercise `$populate`). Every populate-relevant SDC-IG example is triaged below —
+covered by a vendored oracle, or deferred with a reason and a `backlog.md` pointer. No SDC-IG example
+is silently unaccounted for.
+
+| SDC-IG example (`HL7/sdc` `input/resources/`) | Populate mechanism(s) | Status |
+|---|---|---|
+| `Questionnaire-CardiologyForm.json` | `calculatedExpression` only | **Deferred** — `calculatedExpression` (continuous re-population as source answers change) needs a re-evaluation trigger model. Carries no `launchContext`/`initialExpression`, so it is not a plain-`$populate` oracle candidate. → `backlog.md` (Next). |
+| `Questionnaire-rxterms.json` | `x-fhir-query`, `answerExpression`, `calculatedExpression`, `variable` | **Deferred** — dominated by `x-fhir-query` (live `dataEndpoint` fetch) and `answerExpression` (interactive answer-option selection); both are out of scope for the offline-first, headless engine. → `backlog.md` (`x-fhir-query`/`dataEndpoint` under Later; answer-selection under Maybe, `candidateExpression`/`contextExpression`). |
+| `Questionnaire-trivia-questionnaire.xml` | none | **Not applicable** — a quiz form carrying no populate directive (no `initialExpression`/`launchContext`/`itemPopulationContext`/`variable`); nothing for `$populate` to exercise. |
+| `StructureMap-questionnaire-population-transform.xml` | StructureMap-based population (`sourceStructureMap`) | **Deferred** — requires a FHIR Mapping Language engine, absent from the toolkit. Shared with StructureMap-based `$extract`; largest deferred item. → `backlog.md` (Maybe, "StructureMap-based population"). |
+
+**Corpus-coverage bias (the honest consequence — recorded, not a gap to close).** Every published
+SDC-IG populate example above uses a mechanism this engine deliberately does not implement
+(`x-fhir-query`, `calculatedExpression`, `answerExpression`, StructureMap). None can serve as an
+oracle case for the offline-first / FHIRPath-only feature set. The mechanisms the toolkit **does**
+implement — `launchContext` + `initialExpression`, root/item `variable`, `itemPopulationContext`
+repeating groups, and datatype coercion — are therefore proven against **authored-input +
+forms-lab-vendored-output** oracles (the seven `populate-*` cases documented above), not against IG
+example forms. This skew toward simpler forms is the expected outcome of the offline-first boundary and
+is recorded as decision item (a) in the sdc-populate ADR (`ADR-011`).
+
+**Covered mechanism corpus (vendored forms-lab oracles, not IG examples):**
+`populate-launchcontext-initial` (M01), plus the six M02 cases (`populate-variables-coercion`,
+`populate-itempopulationcontext`, `populate-enablewhen-notsuppressed`, `populate-coercion-quantity`,
+`populate-coercion-reference`, `populate-coercion-coding-marital`) — see the per-file provenance table
+above. Observation-based population is proven deterministically (no reachable oracle), as recorded in
+the observation-based section above.
+
+**phpdoc / gruff-php `docs.*` decision (M03).** The public API surface of the populate files was given
+full phpdoc (`populate()`, all `__construct()`s with `@param` tags, `PopulateResult`,
+`BundlePopulationDataProvider`; `docs.missing-public-phpdoc` and `docs.missing-property-phpdoc` → 0). The
+residual `docs.missing-param-tag` / `docs.missing-return-tag` / `docs.return-comment` findings on
+**private** helpers are **accepted advisory debt, not filled with type-only tags**: `code-comments.md`
+forbids restating a type signature, and the already-shipped `$extract` files
+(`FHIRQuestionnaireResponseExtractService`, `TemplateExtractor`) carry the identical density unaddressed
+with no repo-wide baseline — so filling only the populate files would be an inconsistency, not an
+improvement. No `.gruff-baseline.json` was introduced (the repo uses none). Decision made in M03 with
+explicit maintainer approval.
