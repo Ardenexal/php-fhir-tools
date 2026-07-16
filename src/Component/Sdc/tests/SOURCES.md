@@ -431,9 +431,22 @@ impossible there; and when the candidate Observations were supplied as a `Bundle
 the engine simply ignores `observationLinkPeriod` semantics (code-match + period + most-recent). A wide
 explicit `valuePeriod` ruled out a date-window artifact. **Consequence:** observation-based `$populate`
 is implemented and unit-tested **deterministically** (spec-driven: match `item.code` codings, filter
-Observations to status in {final, amended, corrected} within the link period, choose the most recent by
-effective time) — never oracle-seeded. Same sanctioned exception SOURCES.md already records for
-observation-based `$extract`.
+Observations to status in {final, amended, corrected} within the link period, restrict to the populate
+subject when one is stated — see below, choose the most recent by effective time) — never oracle-seeded.
+Same sanctioned exception SOURCES.md already records for observation-based `$extract`.
+
+**Subject scoping (strict-exclude, decided 2026-07-16).** When `PopulateContext::$subject` is set, an
+Observation must be confirmably about that subject to be eligible: `ObservationSelector` compares the
+`Type/id` tail of `Observation.subject.reference` against the requested subject (tolerating an
+absolute-URL prefix / `_history` suffix), and excludes any code+status+window candidate that is for a
+different subject **or carries no readable subject**. This aligns with the `observationLinkPeriod` spec
+intent (the server draws on the record *for that patient*) and guards the offline-first data seam against
+a broad/mixed-subject `Bundle` leaking another patient's value. When candidates matched by code and
+status but none could be subject-confirmed, the item is left unanswered with a **warning** (not the
+softer "nothing matched" information issue). With no subject stated, selection stays code/status/window
+only. Covered by `FHIRQuestionnaireObservationPopulateTest` (`testSubjectScopeExcludesOtherPatientObservation`,
+`testAllCandidatesWrongSubjectLeavesUnansweredWithWarning`, `testSubjectAbsentObservationExcludedWhenSubjectEnforced`,
+`testAbsoluteAndVersionedSubjectReferenceStillMatches`).
 
 ---
 

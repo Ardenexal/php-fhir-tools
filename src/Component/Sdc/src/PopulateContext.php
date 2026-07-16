@@ -36,7 +36,12 @@ final class PopulateContext
      *                                                                     `QuestionnaireResponse.subject`
      *                                                                     (e.g. `Patient/123`), or null to
      *                                                                     leave it unset — the SDC guidance
-     *                                                                     sets it, but it is optional (0..1)
+     *                                                                     sets it, but it is optional (0..1).
+     *                                                                     When set, it also scopes
+     *                                                                     observation-based population: only
+     *                                                                     `Observation`s confirmably about
+     *                                                                     this subject are eligible (see
+     *                                                                     {@see ObservationSelector})
      * @param PopulationDataProviderInterface|null $dataProvider           supplies candidate `Observation`s
      *                                                                     for observation-based population
      *                                                                     (`observationLinkPeriod`), or null

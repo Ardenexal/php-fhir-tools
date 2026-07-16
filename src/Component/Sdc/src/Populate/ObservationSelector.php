@@ -12,8 +12,15 @@ use Ardenexal\FHIRTools\Component\Sdc\FHIRQuestionnairePopulateService;
 
 /**
  * Observation-based population for `observationLinkPeriod` items: selects the most-recent supplied
- * `Observation` that matches an item's `code`, has an eligible status, and whose effective time falls
- * within the item's link-period window, and coerces its value to the item's answer.
+ * `Observation` that matches an item's `code`, has an eligible status, is confirmably about the
+ * populate subject (when one is stated — see below), and whose effective time falls within the item's
+ * link-period window, and coerces its value to the item's answer.
+ *
+ * Subject-scoped (strict): when {@see PopulateContext::$subject} is set, only Observations whose
+ * `subject` matches are eligible — a code+status+window candidate for a *different* subject, or one
+ * carrying no readable subject, is excluded rather than silently populated (guarding against
+ * wrong-patient data when an offline-first caller supplies a broad/mixed-subject Bundle). With no
+ * subject stated, selection is code/status/window only.
  *
  * Offline-first: reads only the caller-supplied {@see PopulateContext::$dataProvider}; no live fetch.
  * No reference oracle exists for this mechanism (see `tests/SOURCES.md`); selection is spec-driven and
@@ -68,9 +75,11 @@ final class ObservationSelector
 
     /**
      * Populate an item from the most-recent supplied `Observation` that matches the item's `code`, has an
-     * eligible status, and whose effective time falls within the `observationLinkPeriod` window. Returns
-     * the answers (0 or 1) plus any information/warning issues raised (the data seam is absent, the item
-     * has no code, nothing matches, or the match carries no value).
+     * eligible status, is about the populate subject (when {@see PopulateContext::$subject} is set), and
+     * whose effective time falls within the `observationLinkPeriod` window. Returns the answers (0 or 1)
+     * plus any information/warning issues raised (the data seam is absent, the item has no code, nothing
+     * matches, code+status candidates existed but were for another/unconfirmed subject, or the match
+     * carries no value).
      *
      * @return array{answers: list<object>, issues: list<object>}
      */
@@ -103,6 +112,15 @@ final class ObservationSelector
 
         [$windowStart, $windowEnd] = $this->observationWindow($item, $linkId, $factory, $issues);
 
+        // Subject enforcement: when the caller states who the QR is about, an Observation must be
+        // confirmed to be about that same subject to be eligible — a code+status+window match for a
+        // *different* (or unconfirmable) subject is excluded, never silently populated. The data seam
+        // is offline-first and may hand over a broad Bundle, so this guards against wrong-patient data.
+        // With no subject stated there is nothing to enforce against, so selection is code/status/window
+        // only (unchanged).
+        $expectedSubject  = $populateContext->subject;
+        $subjectExcluded  = false;
+
         $best   = null;
         $bestTs = null;
         foreach ($provider->observations() as $observation) {
@@ -117,6 +135,14 @@ final class ObservationSelector
                 continue;
             }
 
+            // Subject last, so a candidate is remembered as "excluded" only when it would otherwise have
+            // been selected (code + status + window all passed) but is not confirmably about the subject —
+            // keeping the reported reason accurate rather than blaming subject for an out-of-window miss.
+            if ($expectedSubject !== null && !$this->observationMatchesSubject($observation, $expectedSubject)) {
+                $subjectExcluded = true;
+                continue;
+            }
+
             if ($bestTs === null || $timestamp > $bestTs) {
                 $best   = $observation;
                 $bestTs = $timestamp;
@@ -124,11 +150,26 @@ final class ObservationSelector
         }
 
         if ($best === null) {
-            $issues[] = $factory->issue(
-                IssueSeverity::information->value,
-                IssueType::informationalnote->value,
-                \sprintf("No matching Observation for item '%s' within its observationLinkPeriod; item left unanswered.", $linkId),
-            );
+            if ($subjectExcluded && $expectedSubject !== null) {
+                // Candidates matched by code and status but none could be confirmed to be about the
+                // populate subject — a stronger, more actionable signal than "nothing matched" (it usually
+                // means an unscoped/mixed-subject data Bundle was supplied), so raise it as a warning.
+                $issues[] = $factory->issue(
+                    IssueSeverity::warning->value,
+                    IssueType::processingfailure->value,
+                    \sprintf(
+                        "Observation(s) matched item '%s' by code, status, and link period but none could be confirmed to be about the populate subject '%s'; item left unanswered.",
+                        $linkId,
+                        $expectedSubject,
+                    ),
+                );
+            } else {
+                $issues[] = $factory->issue(
+                    IssueSeverity::information->value,
+                    IssueType::informationalnote->value,
+                    \sprintf("No matching Observation for item '%s' within its observationLinkPeriod; item left unanswered.", $linkId),
+                );
+            }
 
             return ['answers' => [], 'issues' => $issues];
         }
@@ -264,6 +305,45 @@ final class ObservationSelector
         }
 
         return false;
+    }
+
+    /**
+     * Whether an Observation is confirmably about the populate subject, comparing the `Type/id` tail of
+     * `Observation.subject.reference` against `$expectedSubject` (tolerating an absolute-URL prefix or a
+     * `_history` version suffix on either side). An Observation whose subject is absent or unreadable
+     * returns false — under subject enforcement it cannot be confirmed to be about the requested patient,
+     * so it is excluded (see {@see PopulateContext::$subject} and the strict-exclude policy).
+     */
+    private function observationMatchesSubject(object $observation, string $expectedSubject): bool
+    {
+        $subject   = $observation->subject ?? null;
+        $reference = \is_object($subject)
+            ? $this->primitives->stringify($subject->reference ?? null)
+            : $this->primitives->stringify($subject);
+
+        if ($reference === null) {
+            return false;
+        }
+
+        return $this->referenceTail($reference) === $this->referenceTail($expectedSubject);
+    }
+
+    /**
+     * The `Type/id` tail of a reference string: the absolute-URL prefix and any `/_history/...` version
+     * suffix are dropped, so a relative (`Patient/123`), absolute (`http://host/fhir/Patient/123`), or
+     * versioned (`Patient/123/_history/2`) reference to the same resource compares equal.
+     */
+    private function referenceTail(string $reference): string
+    {
+        $historyPos = strpos($reference, '/_history');
+        if ($historyPos !== false) {
+            $reference = substr($reference, 0, $historyPos);
+        }
+
+        $segments = array_values(array_filter(explode('/', $reference), static fn (string $s): bool => $s !== ''));
+        $count    = \count($segments);
+
+        return $count >= 2 ? $segments[$count - 2] . '/' . $segments[$count - 1] : $reference;
     }
 
     /**
