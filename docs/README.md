@@ -50,7 +50,7 @@ wires everything for you.
       <td><a href="fhirpath/overview.md">FHIRPath</a></td>
     </tr>
     <tr>
-      <td>SDC — extract resources from a QuestionnaireResponse (<code>$extract</code>)</td>
+      <td>SDC — populate (<code>$populate</code>) QuestionnaireResponses and extract (<code>$extract</code>) FHIR resources</td>
       <td><code>ardenexal/fhir-sdc</code></td>
       <td><a href="sdc/overview.md">SDC</a></td>
     </tr>
