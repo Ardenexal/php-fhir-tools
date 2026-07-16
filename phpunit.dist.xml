@@ -28,6 +28,7 @@
             <directory>src/Component/FHIRPath/tests/Unit</directory>
             <directory>src/Component/Validation/tests/Unit</directory>
             <directory>src/Component/Sdc/tests/Unit</directory>
+            <directory>src/Component/HttpClient/tests/Unit</directory>
         </testsuite>
         <testsuite name="integration">
             <directory>tests/Integration</directory>
@@ -102,6 +103,7 @@
             <directory>src/Component/FHIRPath/src</directory>
             <directory>src/Component/Validation/src</directory>
             <directory>src/Component/Sdc/src</directory>
+            <directory>src/Component/HttpClient/src</directory>
         </include>
         <exclude>
             <directory>src/Exception</directory>

@@ -1,6 +1,6 @@
 {
-    "name": "ardenexal/fhir-sdc",
-    "description": "Structured Data Capture (SDC) operations for FHIR: Questionnaire $populate and QuestionnaireResponse $extract",
+    "name": "ardenexal/fhir-http-client",
+    "description": "FHIR REST client: application/x-fhir-query resolution and typed FHIR server access",
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -13,32 +13,33 @@
     "prefer-stable": true,
     "require": {
         "php": ">=8.3",
-        "ardenexal/fhir-http-client": "^0.4",
         "ardenexal/fhir-metadata": "^0.4",
         "ardenexal/fhir-models": "^0.4",
         "ardenexal/fhir-path": "^0.4",
         "ardenexal/fhir-serialization": "^0.4",
-        "ardenexal/fhir-validation": "^0.4",
-        "symfony/property-access": "^6.4|^7.4"
+        "psr/cache": "^3.0",
+        "symfony/http-client-contracts": "^3.4"
+    },
+    "require-dev": {
+        "symfony/http-client": "^6.4|^7.4"
     },
     "autoload": {
         "psr-4": {
-            "Ardenexal\\FHIRTools\\Component\\Sdc\\": "src/"
+            "Ardenexal\\FHIRTools\\Component\\HttpClient\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Ardenexal\\FHIRTools\\Component\\Sdc\\Tests\\": "tests/"
+            "Ardenexal\\FHIRTools\\Component\\HttpClient\\Tests\\": "tests/"
         }
     },
     "keywords": [
         "fhir",
         "healthcare",
         "hl7",
-        "sdc",
-        "questionnaire",
-        "populate",
-        "extract"
+        "http",
+        "x-fhir-query",
+        "symfony"
     ],
     "homepage": "https://github.com/ardenexal/fhir-tools",
     "support": {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Validation;
+namespace Ardenexal\FHIRTools\Component\Metadata\Contract;
 
 /**
  * Contract for FHIR terminology validation. Implementations call a terminology server's

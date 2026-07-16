@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit;
+namespace Ardenexal\FHIRTools\Component\HttpClient\Tests\Unit;
 
-use Ardenexal\FHIRTools\Component\Validation\CachingFHIRTerminologyClient;
-use Ardenexal\FHIRTools\Component\Validation\CodingValidationResult;
-use Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyClientInterface;
+use Ardenexal\FHIRTools\Component\HttpClient\CachingFHIRTerminologyClient;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\CodingValidationResult;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;

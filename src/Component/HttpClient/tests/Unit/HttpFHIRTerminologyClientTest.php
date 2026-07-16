@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit;
+namespace Ardenexal\FHIRTools\Component\HttpClient\Tests\Unit;
 
-use Ardenexal\FHIRTools\Component\Validation\HttpFHIRTerminologyClient;
+use Ardenexal\FHIRTools\Component\HttpClient\HttpFHIRTerminologyClient;
+use Ardenexal\FHIRTools\Component\HttpClient\FHIRHttpClient;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -28,7 +29,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
             return new MockResponse(json_encode($this->parametersResponse(true)) ?: '{}');
         });
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL));
         $client->validateCode(self::VS_URL, 'final');
 
         self::assertStringContainsString('/ValueSet/$validate-code?', (string) $capturedUrl);
@@ -45,7 +46,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
             return new MockResponse(json_encode($this->parametersResponse(true)) ?: '{}');
         });
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL . '/');
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL . '/'));
         $client->validateCode(self::VS_URL, 'final');
 
         self::assertStringNotContainsString('//', str_replace('https://', '', (string) $capturedUrl));
@@ -61,7 +62,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
             json_encode($this->parametersResponse(true)) ?: '{}',
         ));
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL));
 
         self::assertTrue($client->validateCode(self::VS_URL, 'final'));
     }
@@ -72,7 +73,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
             json_encode($this->parametersResponse(false)) ?: '{}',
         ));
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL));
 
         self::assertFalse($client->validateCode(self::VS_URL, 'unknown-code'));
     }
@@ -85,7 +86,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
     {
         $mockClient = new MockHttpClient(new MockResponse('Internal Server Error', ['http_code' => 500]));
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL));
 
         self::assertFalse($client->validateCode(self::VS_URL, 'final'));
     }
@@ -94,7 +95,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
     {
         $mockClient = new MockHttpClient(new MockResponse('not-json'));
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL));
 
         self::assertFalse($client->validateCode(self::VS_URL, 'final'));
     }
@@ -103,7 +104,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
     {
         $mockClient = new MockHttpClient(new MockResponse(json_encode(['resourceType' => 'Parameters']) ?: '{}'));
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL));
 
         self::assertFalse($client->validateCode(self::VS_URL, 'final'));
     }
@@ -113,7 +114,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
         $body       = json_encode(['parameter' => [['name' => 'display', 'valueString' => 'Final']]]);
         $mockClient = new MockHttpClient(new MockResponse($body ?: '{}'));
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL));
 
         self::assertFalse($client->validateCode(self::VS_URL, 'final'));
     }
@@ -128,7 +129,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
             json_encode($this->parametersResponse(true)) ?: '{}',
         ));
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL));
 
         self::assertTrue($client->validateCode(self::VS_URL, 42));
     }
@@ -139,7 +140,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
             json_encode($this->parametersResponse(true)) ?: '{}',
         ));
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL));
 
         self::assertTrue($client->validateCode(self::VS_URL, HttpFHIRTerminologyClientTestEnum::Final));
     }
@@ -150,7 +151,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
             json_encode($this->parametersResponse(true)) ?: '{}',
         ));
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL));
 
         self::assertFalse($client->validateCode(self::VS_URL, null));
     }
@@ -161,7 +162,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
             json_encode($this->parametersResponse(true)) ?: '{}',
         ));
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL));
 
         self::assertFalse($client->validateCode(self::VS_URL, ''));
     }
@@ -179,7 +180,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
             return new MockResponse(json_encode($this->parametersResponse(true)) ?: '{}');
         });
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL));
         $client->validateCoding(self::VS_URL, 'http://loinc.org', '8867-4');
 
         self::assertStringContainsString('/ValueSet/$validate-code?', (string) $capturedUrl);
@@ -194,7 +195,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
             json_encode($this->parametersResponse(true)) ?: '{}',
         ));
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL));
 
         self::assertTrue($client->validateCoding(self::VS_URL, 'http://loinc.org', '8867-4'));
     }
@@ -205,7 +206,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
             json_encode($this->parametersResponse(false)) ?: '{}',
         ));
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL));
 
         self::assertFalse($client->validateCoding(self::VS_URL, 'http://loinc.org', 'bad-code'));
     }
@@ -214,7 +215,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
     {
         $mockClient = new MockHttpClient(new MockResponse('Internal Server Error', ['http_code' => 500]));
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL));
 
         self::assertFalse($client->validateCoding(self::VS_URL, 'http://loinc.org', '8867-4'));
     }
@@ -223,7 +224,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
     {
         $mockClient = new MockHttpClient(new MockResponse('not-json'));
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL));
 
         self::assertFalse($client->validateCoding(self::VS_URL, 'http://loinc.org', '8867-4'));
     }
@@ -232,7 +233,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
     {
         $mockClient = new MockHttpClient(new MockResponse(json_encode(['resourceType' => 'Parameters']) ?: '{}'));
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL));
 
         self::assertFalse($client->validateCoding(self::VS_URL, 'http://loinc.org', '8867-4'));
     }
@@ -242,7 +243,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
         $body       = json_encode(['parameter' => [['name' => 'display', 'valueString' => 'Heart rate']]]);
         $mockClient = new MockHttpClient(new MockResponse($body ?: '{}'));
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL));
 
         self::assertFalse($client->validateCoding(self::VS_URL, 'http://loinc.org', '8867-4'));
     }
@@ -260,7 +261,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
             return new MockResponse(json_encode($this->parametersResponse(true)) ?: '{}');
         });
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL));
         $client->validateCodingWithDisplay(self::VS_URL, 'http://loinc.org', '8867-4', 'Heart rate');
 
         self::assertStringContainsString('display=' . urlencode('Heart rate'), (string) $capturedUrl);
@@ -274,7 +275,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
             json_encode($this->parametersResponse(true)) ?: '{}',
         ));
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL));
         $result = $client->validateCodingWithDisplay(self::VS_URL, 'http://loinc.org', '8867-4', 'Heart rate');
 
         self::assertTrue($result->valid);
@@ -292,7 +293,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
         ]);
         $mockClient = new MockHttpClient(new MockResponse($body ?: '{}'));
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL));
         $result = $client->validateCodingWithDisplay(self::VS_URL, 'http://loinc.org', '8867-4', 'heart rate');
 
         self::assertTrue($result->valid);
@@ -303,7 +304,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
     {
         $mockClient = new MockHttpClient(new MockResponse('Error', ['http_code' => 500]));
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL));
         $result = $client->validateCodingWithDisplay(self::VS_URL, 'http://loinc.org', '8867-4', 'Heart rate');
 
         self::assertFalse($result->valid);
@@ -314,7 +315,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
     {
         $mockClient = new MockHttpClient(new MockResponse('not-json'));
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL));
         $result = $client->validateCodingWithDisplay(self::VS_URL, 'http://loinc.org', '8867-4', 'Heart rate');
 
         self::assertFalse($result->valid);
@@ -334,7 +335,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
             return new MockResponse(json_encode($this->parametersResponse(true)) ?: '{}');
         });
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL));
         $client->validateCode(self::VS_URL, 'final');
 
         $flat = implode(' ', array_map('implode', (array) $capturedHeaders));
@@ -355,7 +356,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
             return new MockResponse(json_encode($this->parametersResponse(true)) ?: '{}');
         });
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL));
         $client->validateCode(self::VS_URL, 'final');
 
         self::assertSame('GET', $capturedMethod);
@@ -370,7 +371,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
             return new MockResponse(json_encode($this->parametersResponse(true)) ?: '{}');
         });
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL, true);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL), true);
         $client->validateCode(self::VS_URL, 'final');
 
         self::assertSame('POST', $capturedMethod);
@@ -385,7 +386,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
             return new MockResponse(json_encode($this->parametersResponse(true)) ?: '{}');
         });
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL, true);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL), true);
         $client->validateCode(self::VS_URL, 'final');
 
         $body = json_decode((string) $capturedBody, true);
@@ -408,7 +409,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
             json_encode($this->parametersResponse(true)) ?: '{}',
         ));
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL, true);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL), true);
 
         self::assertTrue($client->validateCode(self::VS_URL, 'final'));
     }
@@ -419,7 +420,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
             json_encode($this->parametersResponse(false)) ?: '{}',
         ));
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL, true);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL), true);
 
         self::assertFalse($client->validateCode(self::VS_URL, 'bad-code'));
     }
@@ -428,7 +429,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
     {
         $mockClient = new MockHttpClient(new MockResponse('Internal Server Error', ['http_code' => 500]));
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL, true);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL), true);
 
         self::assertFalse($client->validateCode(self::VS_URL, 'final'));
     }
@@ -446,7 +447,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
             return new MockResponse(json_encode($this->parametersResponse(true)) ?: '{}');
         });
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL, true);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL), true);
         $client->validateCoding(self::VS_URL, 'http://loinc.org', '8867-4');
 
         $body = json_decode((string) $capturedBody, true);
@@ -475,7 +476,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
             return new MockResponse(json_encode($this->parametersResponse(true)) ?: '{}');
         });
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL, true);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL), true);
         $client->validateCodingWithDisplay(self::VS_URL, 'http://loinc.org', '8867-4', 'Heart rate');
 
         $body = json_decode((string) $capturedBody, true);
@@ -501,7 +502,7 @@ final class HttpFHIRTerminologyClientTest extends TestCase
             return new MockResponse(json_encode($this->parametersResponse(true)) ?: '{}');
         });
 
-        $client = new HttpFHIRTerminologyClient($mockClient, self::SERVER_URL, true);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($mockClient, self::SERVER_URL), true);
         $client->validateCode(self::VS_URL, 'final');
 
         $flat = implode(' ', array_map('implode', (array) $capturedHeaders));

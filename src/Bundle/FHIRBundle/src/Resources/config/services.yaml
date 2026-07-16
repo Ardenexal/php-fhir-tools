@@ -116,14 +116,15 @@ services:
     Ardenexal\FHIRTools\Component\Validation\NullFHIRTerminologyClient: ~
 
     # To use a real terminology server, override the FHIRTerminologyClientInterface alias in your
-    # application's services.yaml and register HttpFHIRTerminologyClient with your server URL:
+    # application's services.yaml and wire HttpFHIRTerminologyClient over a FHIRHttpClient for your server:
     #
-    #   Ardenexal\FHIRTools\Component\Validation\HttpFHIRTerminologyClient:
+    #   Ardenexal\FHIRTools\Component\HttpClient\FHIRHttpClient:
     #       arguments:
-    #           $serverUrl: '%env(FHIR_TERMINOLOGY_SERVER_URL)%'
-    #   Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyClientInterface:
-    #       alias: 'Ardenexal\FHIRTools\Component\Validation\HttpFHIRTerminologyClient'
-    Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyClientInterface:
+    #           $baseUrl: '%env(FHIR_TERMINOLOGY_SERVER_URL)%'
+    #   Ardenexal\FHIRTools\Component\HttpClient\HttpFHIRTerminologyClient: ~
+    #   Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientInterface:
+    #       alias: 'Ardenexal\FHIRTools\Component\HttpClient\HttpFHIRTerminologyClient'
+    Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientInterface:
         alias: 'Ardenexal\FHIRTools\Component\Validation\NullFHIRTerminologyClient'
 
     Ardenexal\FHIRTools\Component\Validation\Validator\FHIRValueSetBindingValidator:
@@ -133,7 +134,7 @@ services:
                 - 'Ardenexal\FHIRTools\Component\Models\R4\Enum'
                 - 'Ardenexal\FHIRTools\Component\Models\R4B\Enum'
                 - 'Ardenexal\FHIRTools\Component\Models\R5\Enum'
-            $terminologyClient: '@Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyClientInterface'
+            $terminologyClient: '@Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientInterface'
         tags:
             - { name: 'validator.constraint_validator', alias: 'Ardenexal\FHIRTools\Component\Metadata\Attribute\Validation\FHIRValueSetBindingValidator' }
 
