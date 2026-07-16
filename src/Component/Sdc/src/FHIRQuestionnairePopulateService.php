@@ -95,13 +95,25 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
      *                                                                       populates a QR of whatever
      *                                                                       {@see PopulateContext::$fhirVersion}
      *                                                                       asks
+     * @param FhirPrimitiveReader|null                $primitives            shared primitive-value reader;
+     *                                                                       defaults to a new instance
+     * @param AnswerValueCoercer|null                 $coercer               answer coercer; defaults to one
+     *                                                                       bound to the same $primitives
      */
     public function __construct(
         private readonly FHIRPathService $fhirPath = new FHIRPathService(),
         private readonly SafeExtensionReader $extensions = new SafeExtensionReader(),
         private readonly ?FHIRQuestionnaireResolverInterface $questionnaireResolver = null,
+        ?FhirPrimitiveReader $primitives = null,
+        ?AnswerValueCoercer $coercer = null,
     ) {
+        $this->primitives = $primitives ?? new FhirPrimitiveReader();
+        $this->coercer    = $coercer       ?? new AnswerValueCoercer($this->primitives);
     }
+
+    private readonly FhirPrimitiveReader $primitives;
+
+    private readonly AnswerValueCoercer $coercer;
 
     /**
      * Populate a QuestionnaireResponse from a Questionnaire and its launch context.
@@ -322,7 +334,7 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
                     \sprintf(
                         "itemPopulationContext '%s' (item '%s') resolved to no results; the group and its descendants were not populated.",
                         $contextName,
-                        $this->stringify($item->linkId ?? null) ?? '(no linkId)',
+                        $this->primitives->stringify($item->linkId ?? null) ?? '(no linkId)',
                     ),
                 );
             }
@@ -347,7 +359,7 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
      */
     private function buildOneItem(object $item, EvaluationContext $evalContext, PopulateContext $populateContext, PopulateModelFactory $factory, array &$issues): ?object
     {
-        $linkId = $this->stringify($item->linkId ?? null);
+        $linkId = $this->primitives->stringify($item->linkId ?? null);
         if ($linkId === null) {
             // Observable, not silent: an item without a linkId cannot be represented as a QR answer, but
             // dropping it without a trace hides a malformed Questionnaire. Record it and skip only this item.
@@ -360,7 +372,7 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
             return null;
         }
 
-        $itemType = $this->codeOf($item->type ?? null);
+        $itemType = $this->primitives->codeOf($item->type ?? null);
 
         $answers    = [];
         $expression = $this->initialExpressionOf($item, $factory, $issues, $linkId);
@@ -393,7 +405,7 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
             }
 
             foreach ($values as $value) {
-                $coerced = $this->coerceAnswerValue($itemType, $value, $linkId, $factory, $issues);
+                $coerced = $this->coercer->coerce($itemType, $value, $linkId, $factory, $issues);
                 if ($coerced !== null) {
                     $answers[] = $factory->answer($coerced);
                 }
@@ -406,7 +418,7 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
             return null;
         }
 
-        return $factory->responseItem($linkId, $this->stringify($item->text ?? null), $answers, $childItems);
+        return $factory->responseItem($linkId, $this->primitives->stringify($item->text ?? null), $answers, $childItems);
     }
 
     /**
@@ -439,140 +451,6 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
 
             return [];
         }
-    }
-
-    /**
-     * Coerce an evaluated value to the answer `value[x]` shape for the item's type, or null (with a
-     * warning issue) when the value cannot be coerced. A type mismatch is reported, never silently dropped.
-     *
-     * @param list<object> $issues
-     */
-    private function coerceAnswerValue(?string $itemType, mixed $value, string $linkId, PopulateModelFactory $factory, array &$issues): mixed
-    {
-        $scalar = $this->stringify($value);
-
-        // An item with no declared type has no coercion target; handling it here also narrows $itemType to a
-        // non-null string for every case below (so the temporal branch can pass it as a plain string).
-        if ($itemType === null) {
-            return $this->unsupportedTypeIssue(null, $linkId, $factory, $issues);
-        }
-
-        switch ($itemType) {
-            case 'string':
-            case 'text':
-                if ($this->isEmptyString($value)) {
-                    // A FHIR `string` must be non-empty (min length 1), so an empty-string result is not a
-                    // type mismatch — it is simply "not answered". Emit an information issue (parity with the
-                    // empty-`initialExpression` branch), never a misleading incompatible-type warning.
-                    $issues[] = $factory->issue(
-                        IssueSeverity::information->value,
-                        IssueType::informationalnote->value,
-                        \sprintf("initialExpression for item '%s' produced an empty string; item left unanswered.", $linkId),
-                    );
-
-                    return null;
-                }
-
-                return $scalar !== null ? $factory->stringValue($scalar) : $this->mismatch($itemType, $linkId, $factory, $issues);
-            case 'url':
-                return $scalar !== null ? $factory->uriValue($scalar) : $this->mismatch($itemType, $linkId, $factory, $issues);
-            case 'boolean':
-                return \is_bool($value) ? $value : $this->mismatch($itemType, $linkId, $factory, $issues);
-            case 'integer':
-                if (\is_int($value)) {
-                    return $value;
-                }
-
-                return \is_string($scalar) && $this->isIntegerString($scalar) ? (int) $scalar : $this->mismatch($itemType, $linkId, $factory, $issues);
-            case 'decimal':
-                // The `decimal` answer variant is a raw string (→ `valueDecimal`), distinct from the
-                // `StringPrimitive` `string` variant (→ `valueString`).
-                return $scalar !== null && is_numeric($scalar) ? $scalar : $this->mismatch($itemType, $linkId, $factory, $issues);
-            case 'date':
-            case 'dateTime':
-            case 'time':
-                return $scalar !== null
-                    ? $this->coerceTemporal($itemType, $scalar, $linkId, $factory, $issues)
-                    : $this->mismatch($itemType, $linkId, $factory, $issues);
-            case 'choice':
-            case 'open-choice':
-            case 'quantity':
-            case 'reference':
-            case 'attachment':
-                // Strict-by-source-datatype (matching the reference engine): the expression must already
-                // resolve to the right FHIR datatype OBJECT (`Coding`/`Quantity`/`Reference`/`Attachment`).
-                // The answer choice normalizer maps the object's class to the correct `value[x]` key, so the
-                // object is passed through intact. A bare scalar for a complex item is a mismatch (the engine
-                // rejects it), never silently coerced. Binding-driven `code`→`Coding` promotion (a bare code
-                // systematised via the item's value-set binding) is deferred — see the sdc-populate backlog.
-                return \is_object($value) ? $value : $this->mismatch($itemType, $linkId, $factory, $issues);
-            default:
-                return $this->unsupportedTypeIssue($itemType, $linkId, $factory, $issues);
-        }
-    }
-
-    /**
-     * Record that an item type has no answer coercion yet (or the item declares no type) as a warning, and
-     * return null (no answer). Shared by the null-type guard and the switch default so both report the same
-     * "not yet supported" message.
-     *
-     * @param list<object> $issues
-     */
-    private function unsupportedTypeIssue(?string $itemType, string $linkId, PopulateModelFactory $factory, array &$issues): null
-    {
-        $issues[] = $factory->issue(
-            IssueSeverity::warning->value,
-            IssueType::processingfailure->value,
-            \sprintf(
-                "initialExpression for item '%s' produced a value for item type '%s', whose answer "
-                . 'coercion is not yet supported; the answer was skipped.',
-                $linkId,
-                $itemType ?? '(none)',
-            ),
-        );
-
-        return null;
-    }
-
-    /**
-     * Wrap a scalar into a temporal primitive (`date`/`dateTime`/`time`), reporting a mismatch when the
-     * scalar cannot be parsed as that FHIR temporal type.
-     *
-     * @param list<object> $issues
-     */
-    private function coerceTemporal(string $itemType, string $scalar, string $linkId, PopulateModelFactory $factory, array &$issues): mixed
-    {
-        try {
-            return match ($itemType) {
-                'date'     => $factory->dateValue($scalar),
-                'dateTime' => $factory->dateTimeValue($scalar),
-                default    => $factory->timeValue($scalar),
-            };
-        } catch (\Throwable) {
-            return $this->mismatch($itemType, $linkId, $factory, $issues, \sprintf('value "%s" is not a valid %s', $scalar, $itemType));
-        }
-    }
-
-    /**
-     * Record a coercion mismatch as a warning and return null (no answer). Centralises the
-     * "observable, not silent" discipline for every failed coercion branch.
-     *
-     * @param list<object> $issues
-     */
-    private function mismatch(?string $itemType, string $linkId, PopulateModelFactory $factory, array &$issues, ?string $detail = null): null
-    {
-        $issues[] = $factory->issue(
-            IssueSeverity::warning->value,
-            IssueType::processingfailure->value,
-            \sprintf(
-                "initialExpression for item '%s' produced a value incompatible with item type '%s'%s; the answer was skipped.",
-                $linkId,
-                $itemType ?? '(none)',
-                $detail !== null ? ' (' . $detail . ')' : '',
-            ),
-        );
-
-        return null;
     }
 
     /**
@@ -667,7 +545,7 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
             return [];
         }
 
-        $coerced = $this->coerceAnswerValue($itemType, $value, $linkId, $factory, $issues);
+        $coerced = $this->coercer->coerce($itemType, $value, $linkId, $factory, $issues);
 
         return $coerced !== null ? [$factory->answer($coerced)] : [];
     }
@@ -699,8 +577,8 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
         // Period (has start/end declared) → explicit bounds.
         if (property_exists($value, 'start') || property_exists($value, 'end')) {
             return [
-                $this->parseTimestamp($this->stringify($value->start ?? null)),
-                $this->parseTimestamp($this->stringify($value->end ?? null)),
+                $this->primitives->parseTimestamp($this->primitives->stringify($value->start ?? null)),
+                $this->primitives->parseTimestamp($this->primitives->stringify($value->end ?? null)),
             ];
         }
 
@@ -727,12 +605,12 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
      */
     private function durationSeconds(object $duration): ?int
     {
-        $amount = $this->stringify($duration->value ?? null);
+        $amount = $this->primitives->stringify($duration->value ?? null);
         if ($amount === null || !is_numeric($amount)) {
             return null;
         }
 
-        $unit    = $this->stringify($duration->code ?? null) ?? $this->stringify($duration->unit ?? null);
+        $unit    = $this->primitives->stringify($duration->code ?? null) ?? $this->primitives->stringify($duration->unit ?? null);
         $perUnit = match ($unit) {
             'a', 'year', 'years'       => 365 * 86400,
             'mo', 'month', 'months'    => 30  * 86400,
@@ -752,7 +630,7 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
      */
     private function observationStatusEligible(object $observation): bool
     {
-        $status = $this->codeOf($observation->status ?? null);
+        $status = $this->primitives->codeOf($observation->status ?? null);
 
         return $status !== null && \in_array($status, self::OBSERVATION_STATUSES, true);
     }
@@ -816,12 +694,12 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
      */
     private function codingKey(object $coding): ?string
     {
-        $code = $this->stringify($coding->code ?? null);
+        $code = $this->primitives->stringify($coding->code ?? null);
         if ($code === null) {
             return null;
         }
 
-        return ($this->stringify($coding->system ?? null) ?? '') . '|' . $code;
+        return ($this->primitives->stringify($coding->system ?? null) ?? '') . '|' . $code;
     }
 
     /**
@@ -832,31 +710,15 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
     {
         $effective = $observation->effective ?? null;
         if (!\is_object($effective)) {
-            return $this->parseTimestamp($this->stringify($effective));
+            return $this->primitives->parseTimestamp($this->primitives->stringify($effective));
         }
 
         if (property_exists($effective, 'start') || property_exists($effective, 'end')) {
-            return $this->parseTimestamp($this->stringify($effective->start ?? null))
-                ?? $this->parseTimestamp($this->stringify($effective->end ?? null));
+            return $this->primitives->parseTimestamp($this->primitives->stringify($effective->start ?? null))
+                ?? $this->primitives->parseTimestamp($this->primitives->stringify($effective->end ?? null));
         }
 
-        return $this->parseTimestamp($this->stringify($effective));
-    }
-
-    /**
-     * Parse a FHIR date/dateTime/instant string to a Unix timestamp, or null when absent/unparseable.
-     */
-    private function parseTimestamp(?string $value): ?int
-    {
-        if ($value === null) {
-            return null;
-        }
-
-        try {
-            return (new \DateTimeImmutable($value))->getTimestamp();
-        } catch (\Throwable) {
-            return null;
-        }
+        return $this->primitives->parseTimestamp($this->primitives->stringify($effective));
     }
 
     /**
@@ -881,7 +743,7 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
                 return null;
             }
 
-            return $this->stringify($expressionValue->expression ?? null);
+            return $this->primitives->stringify($expressionValue->expression ?? null);
         }
 
         return null;
@@ -924,8 +786,8 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
             return null;
         }
 
-        $name       = $this->stringify($expressionValue->name ?? null);
-        $expression = $this->stringify($expressionValue->expression ?? null);
+        $name       = $this->primitives->stringify($expressionValue->name ?? null);
+        $expression = $this->primitives->stringify($expressionValue->expression ?? null);
         if ($name === null || $expression === null) {
             return null;
         }
@@ -941,7 +803,7 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
      */
     private function isFhirPath(object $expressionValue, PopulateModelFactory $factory, array &$issues, string $label): bool
     {
-        $language = $this->stringify($expressionValue->language ?? null);
+        $language = $this->primitives->stringify($expressionValue->language ?? null);
         if ($language !== null && $language !== self::FHIRPATH_LANGUAGE) {
             $issues[] = $factory->issue(
                 IssueSeverity::warning->value,
@@ -1001,14 +863,14 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
         if (\is_object($value)) {
             // Coding: read its `.code`.
             if (property_exists($value, 'code')) {
-                $code = $this->stringify($value->code ?? null);
+                $code = $this->primitives->stringify($value->code ?? null);
                 if ($code !== null) {
                     return $code;
                 }
             }
 
             // id / string primitive wrapper.
-            return $this->stringify($value);
+            return $this->primitives->stringify($value);
         }
 
         return null;
@@ -1066,90 +928,7 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
      */
     private function canonicalUrlOf(object $questionnaire): ?string
     {
-        return $this->stringify($questionnaire->url ?? null);
-    }
-
-    /**
-     * Read a code-type wrapper (`QuestionnaireItemTypeType` etc.) down to its string code, or null.
-     */
-    private function codeOf(mixed $type): ?string
-    {
-        if ($type === null) {
-            return null;
-        }
-
-        if (\is_object($type) && property_exists($type, 'value')) {
-            $inner = $type->value ?? null;
-            if ($inner instanceof \BackedEnum) {
-                return (string) $inner->value;
-            }
-
-            return \is_string($inner) && $inner !== '' ? $inner : null;
-        }
-
-        return $this->stringify($type);
-    }
-
-    /**
-     * Coerce a primitive-wrapper-or-scalar value to a plain string, tolerating a constructor-bypassed
-     * object (uninitialized `value` read via `isset`), or null when unreadable/empty.
-     */
-    private function stringify(mixed $value): ?string
-    {
-        if (\is_string($value)) {
-            return $value === '' ? null : $value;
-        }
-
-        if (\is_bool($value)) {
-            return $value ? 'true' : 'false';
-        }
-
-        if (\is_int($value) || \is_float($value)) {
-            return (string) $value;
-        }
-
-        if (\is_object($value) && property_exists($value, 'value')) {
-            $inner = $value->value ?? null;
-
-            if (\is_string($inner)) {
-                return $inner === '' ? null : $inner;
-            }
-            if (\is_object($inner) && method_exists($inner, '__toString')) {
-                $string = (string) $inner;
-
-                return $string === '' ? null : $string;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Whether a value is a *present* empty string — a bare `''` or a primitive wrapper whose inner `value`
-     * is `''` — as opposed to an absent/unreadable value. {@see stringify} collapses both empty and absent
-     * to null, so this distinguishes "answered with an empty string" (not a type mismatch) from a genuinely
-     * unusable value; only the former is treated as "not answered".
-     */
-    private function isEmptyString(mixed $value): bool
-    {
-        if (\is_string($value)) {
-            return $value === '';
-        }
-
-        if (\is_object($value) && property_exists($value, 'value')) {
-            return ($value->value ?? null) === '';
-        }
-
-        return false;
-    }
-
-    /**
-     * Whether a string is a plain base-10 integer (optionally signed) — used to accept an integer answer
-     * the FHIRPath engine returned as a numeric string without misreading a decimal as an integer.
-     */
-    private function isIntegerString(string $value): bool
-    {
-        return preg_match('/^[+-]?\d+$/', $value) === 1;
+        return $this->primitives->stringify($questionnaire->url ?? null);
     }
 
     /**
