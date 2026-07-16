@@ -236,7 +236,11 @@ final class ObservationSelector
                 );
             }
 
-            return [$seconds !== null ? time() - $seconds : null, time()];
+            // Capture "now" once so the window's start and end share a single reference instant (a second
+            // time() call could tick, widening the window by a second and making it harder to reason about).
+            $now = time();
+
+            return [$seconds !== null ? $now - $seconds : null, $now];
         }
 
         return [null, null];

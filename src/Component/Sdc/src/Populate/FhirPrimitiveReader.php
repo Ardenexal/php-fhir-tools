@@ -103,6 +103,10 @@ final class FhirPrimitiveReader
 
     /**
      * Parse a FHIR temporal string to a Unix timestamp, or null when absent or unparseable.
+     *
+     * A timezone-less input (e.g. a date-only `"2024-01-01"`) is interpreted as UTC so window comparisons
+     * are deterministic regardless of the process default timezone; the UTC hint is ignored when the string
+     * already carries an offset (`Z`/`+hh:mm`).
      */
     public function parseTimestamp(?string $value): ?int
     {
@@ -111,7 +115,7 @@ final class FhirPrimitiveReader
         }
 
         try {
-            return (new \DateTimeImmutable($value))->getTimestamp();
+            return (new \DateTimeImmutable($value, new \DateTimeZone('UTC')))->getTimestamp();
         } catch (\Throwable) {
             return null;
         }
