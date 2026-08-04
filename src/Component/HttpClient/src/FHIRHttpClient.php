@@ -132,10 +132,15 @@ final class FHIRHttpClient implements FHIRHttpClientInterface
         $basePath   = rtrim($base['path'] ?? '', '/');
 
         if ($basePath !== '') {
-            if (!str_starts_with($targetPath, $basePath)) {
+            // Boundary-checked prefix match: `$basePath` must be the whole path or end at a `/`, so a base
+            // of `/fhir` doesn't wrongly match a sibling path like `/fhir2/...`.
+            if ($targetPath === $basePath) {
+                $targetPath = '';
+            } elseif (str_starts_with($targetPath, $basePath . '/')) {
+                $targetPath = substr($targetPath, strlen($basePath));
+            } else {
                 return null;
             }
-            $targetPath = substr($targetPath, strlen($basePath));
         }
 
         $relativePath = ltrim($targetPath, '/');

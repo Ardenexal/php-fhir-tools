@@ -191,6 +191,21 @@ final class XFhirQueryResolverTest extends TestCase
         self::assertSame('Observation?status=final', $out);
     }
 
+    public function testCodeableConceptWithEmptyCodingArrayDropsTheWholeParameter(): void
+    {
+        // A CodeableConcept present but with no `.coding` entries (e.g. text-only) formats to an empty
+        // string, not an empty collection — it must still be dropped like {{%patient.id}} being empty,
+        // never kept as a bare `code=`.
+        $context = (new EvaluationContext())->withExternalConstant('cc', [
+            'coding' => [],
+            'text'   => 'unstructured only',
+        ]);
+
+        $out = $this->resolver->resolve('Condition?code={{%cc}}&status=active', $context);
+
+        self::assertSame('Condition?status=active', $out);
+    }
+
     public function testUnterminatedHoleThrows(): void
     {
         $this->expectException(\InvalidArgumentException::class);

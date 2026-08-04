@@ -204,6 +204,32 @@ final class FHIRHttpClientTest extends TestCase
         self::assertNull($fhir->followLink('https://example.org/other/Observation?page=2', 'R5'));
     }
 
+    public function testFollowLinkRejectsSameOriginSiblingPathSharingBasePathPrefix(): void
+    {
+        // A base path of "/fhir" must not treat "/fhir2/..." as under its prefix — only a whole-segment
+        // match ("/fhir" itself or "/fhir/...") counts, never a same-origin sibling path with the string
+        // "/fhir" as a mere prefix.
+        $client = new MockHttpClient(new MockResponse(self::BUNDLE_JSON, ['http_code' => 200]));
+        $fhir   = new FHIRHttpClient($client, 'https://example.org/fhir/');
+
+        self::assertNull($fhir->followLink('https://example.org/fhir2/Observation?page=2', 'R5'));
+        self::assertSame(0, $client->getRequestsCount(), 'A sibling path sharing only a string prefix must never be dispatched.');
+    }
+
+    public function testFollowLinkFetchesUrlWhosePathExactlyMatchesBasePath(): void
+    {
+        // A link path equal to the base path itself (no trailing segment) is the whole-segment match's
+        // boundary case — it must still resolve, just to an empty relative path.
+        $response = new MockResponse(self::BUNDLE_JSON, ['http_code' => 200]);
+        $client   = new MockHttpClient($response);
+        $fhir     = new FHIRHttpClient($client, 'https://example.org/fhir/');
+
+        $bundle = $fhir->followLink('https://example.org/fhir?_getpages=abc', 'R5');
+
+        self::assertInstanceOf(BundleResource::class, $bundle);
+        self::assertSame('https://example.org/fhir/?_getpages=abc', $response->getRequestUrl());
+    }
+
     public function testFollowLinkRejectsMalformedUrl(): void
     {
         $client = new MockHttpClient(new MockResponse(self::BUNDLE_JSON, ['http_code' => 200]));

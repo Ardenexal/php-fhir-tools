@@ -165,7 +165,16 @@ final class XFhirQueryResolver
 
         $tokens = [];
         foreach ($items as $item) {
-            $tokens[] = $this->formatAtom($item);
+            $token = $this->formatAtom($item);
+            if ($token !== '') {
+                $tokens[] = $token;
+            }
+        }
+
+        // An atom formatting to empty (e.g. an unsupported result type) is dropped like an empty
+        // collection would be — per the empty-substitution policy, not kept as a blank/partial token.
+        if ($tokens === []) {
+            return null;
         }
 
         // Multiple values → comma-joined "or" list; the comma is a raw separator, not encoded.
