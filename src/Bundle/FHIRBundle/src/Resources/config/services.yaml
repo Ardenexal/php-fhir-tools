@@ -8,6 +8,19 @@ services:
     Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService:
         public: true
 
+    Ardenexal\FHIRTools\Component\HttpClient\NullFHIRHttpClient: ~
+
+    # To use a real FHIR server for FHIRPath resolve()/memberOf(), override the FHIRHttpClientInterface
+    # alias in your application's services.yaml:
+    #
+    #   Ardenexal\FHIRTools\Component\HttpClient\FHIRHttpClient:
+    #       arguments:
+    #           $baseUrl: '%env(FHIR_SERVER_URL)%'
+    #   Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRHttpClientInterface:
+    #       alias: 'Ardenexal\FHIRTools\Component\HttpClient\FHIRHttpClient'
+    Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRHttpClientInterface:
+        alias: 'Ardenexal\FHIRTools\Component\HttpClient\NullFHIRHttpClient'
+
     # FHIRPath Console Commands
     Ardenexal\FHIRTools\Bundle\FHIRBundle\Command\FHIRPathEvaluateCommand:
         arguments:

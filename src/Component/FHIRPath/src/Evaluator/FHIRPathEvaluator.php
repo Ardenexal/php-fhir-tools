@@ -23,6 +23,7 @@ use Ardenexal\FHIRTools\Component\Metadata\Attribute\FhirProperty;
 use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTemporalValue;
 use Ardenexal\FHIRTools\Component\FHIRPath\Parser\TokenType;
 use Ardenexal\FHIRTools\Component\FHIRPath\Function\FunctionRegistry;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRHttpClientInterface;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDate;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDateTime;
 use Ardenexal\FHIRTools\Component\FHIRPath\Type\FHIRPathDecimal;
@@ -89,25 +90,28 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     private ?LoggerInterface $logger = null;
 
     /**
-     * Base FHIR server URL used by resolve() for relative and canonical references.
-     * e.g. "https://r4.smarthealthit.org"
+     * Shared FHIR HTTP client used by resolve() for relative (`Type/id`) and canonical-search
+     * references against the configured FHIR server.
      */
-    private ?string $fhirServerUrl = null;
+    private ?FHIRHttpClientInterface $fhirHttpClient = null;
 
     /**
-     * Terminology server URL used by memberOf() to call ValueSet/$validate-code.
-     * Falls back to fhirServerUrl when not explicitly set.
-     * e.g. "https://tx.fhir.org/r4"
+     * Shared FHIR HTTP client used by memberOf() to call ValueSet/$validate-code against a
+     * terminology server. Falls back to fhirHttpClient when not explicitly set (mirrors a
+     * single server serving both roles).
      */
-    private ?string $terminologyUrl = null;
+    private ?FHIRHttpClientInterface $terminologyHttpClient = null;
 
     /**
-     * PSR-18 HTTP client used by resolve() to fetch remote FHIR resources.
+     * PSR-18 HTTP client used by resolve() to fetch a reference's own absolute URL directly.
+     * Distinct from fhirHttpClient/terminologyHttpClient, which are bound to one configured
+     * base URL: an absolute reference may point at a different host entirely, which a
+     * base-URL-bound FHIRHttpClientInterface implementation cannot express.
      */
     private ?ClientInterface $httpClient = null;
 
     /**
-     * PSR-17 request factory used by resolve() to build GET requests.
+     * PSR-17 request factory used alongside httpClient to build GET requests.
      * Must be provided together with the HTTP client.
      */
     private ?RequestFactoryInterface $requestFactory = null;
@@ -137,47 +141,44 @@ final class FHIRPathEvaluator implements ExpressionVisitor
     }
 
     /**
-     * Set the base FHIR server URL used by resolve() when resolving relative
-     * references (e.g. "Patient/123") and canonical search queries.
-     *
-     * Must not have a trailing slash — e.g. "https://r4.smarthealthit.org".
+     * Set the shared FHIR HTTP client used by resolve() for relative (`Type/id`) and
+     * canonical-search references against the configured FHIR server.
      */
-    public function setFhirServerUrl(string $url): void
+    public function setFhirHttpClient(FHIRHttpClientInterface $client): void
     {
-        $this->fhirServerUrl = rtrim($url, '/');
+        $this->fhirHttpClient = $client;
     }
 
     /**
-     * Return the configured FHIR server URL, or null if not set.
+     * Return the configured FHIR HTTP client, or null if not set.
      */
-    public function getFhirServerUrl(): ?string
+    public function getFhirHttpClient(): ?FHIRHttpClientInterface
     {
-        return $this->fhirServerUrl;
+        return $this->fhirHttpClient;
     }
 
     /**
-     * Set the terminology server URL used by memberOf() for ValueSet/$validate-code calls.
-     * When not set, memberOf() falls back to the fhirServerUrl.
-     *
-     * Must not have a trailing slash — e.g. "https://tx.fhir.org/r4".
+     * Set the FHIR HTTP client used by memberOf() for ValueSet/$validate-code calls.
+     * When not set, memberOf() falls back to the fhirHttpClient.
      */
-    public function setTerminologyUrl(string $url): void
+    public function setTerminologyHttpClient(FHIRHttpClientInterface $client): void
     {
-        $this->terminologyUrl = rtrim($url, '/');
+        $this->terminologyHttpClient = $client;
     }
 
     /**
-     * Return the terminology server URL.
-     * Falls back to fhirServerUrl if terminologyUrl was not explicitly set.
+     * Return the terminology HTTP client.
+     * Falls back to fhirHttpClient if terminologyHttpClient was not explicitly set.
      */
-    public function getTerminologyUrl(): ?string
+    public function getTerminologyHttpClient(): ?FHIRHttpClientInterface
     {
-        return $this->terminologyUrl ?? $this->fhirServerUrl;
+        return $this->terminologyHttpClient ?? $this->fhirHttpClient;
     }
 
     /**
-     * Set the PSR-18 HTTP client and PSR-17 request factory used by resolve()
-     * to fetch remote FHIR resources.
+     * Set the PSR-18 HTTP client and PSR-17 request factory used by resolve() to fetch a
+     * reference's own absolute URL directly (a host that may differ from fhirHttpClient's
+     * configured base URL).
      *
      * Both are required together: the factory creates GET requests, the client
      * sends them. Any PSR-18 compatible client works (Guzzle, Symfony HttpClient
