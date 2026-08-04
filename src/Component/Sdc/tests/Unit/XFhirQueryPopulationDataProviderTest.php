@@ -104,20 +104,105 @@ final class XFhirQueryPopulationDataProviderTest extends TestCase
             BundleResource::class,
         );
     }
+
+    // -------------------------------------------------------------------------
+    // Multi-page result following (M06)
+    // -------------------------------------------------------------------------
+
+    public function testFollowsNextLinkAcrossMultiplePages(): void
+    {
+        $page1 = $this->pageWithOneMatch('p1', 'https://fhir.example.com/Observation?page=2');
+        $page2 = $this->pageWithOneMatch('p2', null); // no further next link — pagination ends naturally
+
+        $provider  = new XFhirQueryPopulationDataProvider(new StubFHIRHttpClient($page1, [$page2]));
+        $resources = $provider->resourcesForQuery('Observation?subject=Patient/1', 'R4');
+
+        self::assertIsArray($resources);
+        self::assertSame(['p1', 'p2'], array_map(static fn ($r) => $r->id ?? null, $resources));
+    }
+
+    public function testStopsPaginationWhenNextPageFetchFails(): void
+    {
+        $page1 = $this->pageWithOneMatch('p1', 'https://fhir.example.com/Observation?page=2');
+
+        // followLink() returns null (transport failure, or an off-host link FHIRHttpClient rejected) —
+        // page 1 already succeeded, so the result is the accumulated (partial) list, not null.
+        $provider  = new XFhirQueryPopulationDataProvider(new StubFHIRHttpClient($page1, [null]));
+        $resources = $provider->resourcesForQuery('Observation?subject=Patient/1', 'R4');
+
+        self::assertSame(['p1'], array_map(static fn ($r) => $r->id ?? null, $resources ?? []));
+    }
+
+    public function testPageLimitBoundsIterationCount(): void
+    {
+        // Every page (including the last one the provider is allowed to fetch) carries a `next` link, so
+        // without a bound this would loop forever. 60 pages are available; MAX_PAGES = 50 must stop the
+        // provider at exactly 50 total pages (page 1 + 49 followLink() calls), never touching pages 51-60.
+        $page1 = $this->pageWithOneMatch('page-1', 'https://fhir.example.com/Observation?page=2');
+
+        $subsequentPages = [];
+        for ($i = 2; $i <= 60; ++$i) {
+            $subsequentPages[] = $this->pageWithOneMatch("page-{$i}", 'https://fhir.example.com/Observation?page=' . ($i + 1));
+        }
+
+        $provider  = new XFhirQueryPopulationDataProvider(new StubFHIRHttpClient($page1, $subsequentPages));
+        $resources = $provider->resourcesForQuery('Observation?subject=Patient/1', 'R4');
+
+        self::assertIsArray($resources);
+        self::assertCount(50, $resources, 'Must stop at exactly 50 total pages, not follow all 60 available.');
+        self::assertSame('page-50', end($resources)->id ?? null);
+    }
+
+    private function pageWithOneMatch(string $id, ?string $nextUrl): object
+    {
+        $link = $nextUrl !== null ? [['relation' => 'next', 'url' => $nextUrl]] : [];
+
+        return FHIRSerializationService::createDefault(FhirVersion::R4)->deserializeFromJson(
+            json_encode([
+                'resourceType' => 'Bundle',
+                'type'         => 'searchset',
+                'link'         => $link,
+                'entry'        => [
+                    [
+                        'resource' => ['resourceType' => 'Observation', 'id' => $id, 'status' => 'final', 'code' => []],
+                        'search'   => ['mode' => 'match'],
+                    ],
+                ],
+            ], JSON_THROW_ON_ERROR),
+            BundleResource::class,
+        );
+    }
 }
 
 /**
- * Stub FHIR HTTP client returning a fixed search Bundle (or null to simulate a fetch failure).
+ * Stub FHIR HTTP client returning a fixed search Bundle (or null to simulate a fetch failure), then
+ * successive pages (or null) from $subsequentPages on each followLink() call, in order — the last item
+ * having no further `next` link ends pagination naturally.
  */
 final class StubFHIRHttpClient implements FHIRHttpClientInterface
 {
-    public function __construct(private readonly ?object $bundle)
-    {
+    private int $followLinkCalls = 0;
+
+    /**
+     * @param list<object|null> $subsequentPages
+     */
+    public function __construct(
+        private readonly ?object $bundle,
+        private readonly array $subsequentPages = [],
+    ) {
     }
 
     public function search(string $search, string $fhirVersion): ?object
     {
         return $this->bundle;
+    }
+
+    public function followLink(string $url, string $fhirVersion): ?object
+    {
+        $page = $this->subsequentPages[$this->followLinkCalls] ?? null;
+        ++$this->followLinkCalls;
+
+        return $page;
     }
 
     public function request(string $method, string $path, ?string $body = null, array $headers = []): ?string

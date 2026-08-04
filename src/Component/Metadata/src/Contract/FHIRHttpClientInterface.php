@@ -40,4 +40,21 @@ interface FHIRHttpClientInterface
      * @return string|null the raw response body on a 2xx response, or null on any non-2xx/transport error
      */
     public function request(string $method, string $path, ?string $body = null, array $headers = []): ?string;
+
+    /**
+     * Follow an absolute URL taken from a server-supplied `Bundle.link` (e.g. `relation = 'next'`) and
+     * deserialize the result into a typed Bundle, mirroring {@see self::search()}.
+     *
+     * Implementations MUST reject (return null for) any URL whose origin does not match the client's own
+     * configured server — this is the SSRF guardrail for server-supplied links, since a `search()` search
+     * string cannot carry a foreign host but an absolute `link.url` can. Rejecting a cross-origin link is
+     * indistinguishable from any other failure to the caller: pagination simply stops.
+     *
+     * @param string $url         an absolute URL taken verbatim from `Bundle.link.url`
+     * @param string $fhirVersion the model namespace the Bundle is deserialized into: `R4`, `R4B`, or `R5`
+     *
+     * @return object|null the typed Bundle resource, or null when the URL is cross-origin or on any
+     *                     transport/HTTP/parse error
+     */
+    public function followLink(string $url, string $fhirVersion): ?object;
 }

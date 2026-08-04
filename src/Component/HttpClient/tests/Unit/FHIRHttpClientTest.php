@@ -138,4 +138,89 @@ final class FHIRHttpClientTest extends TestCase
 
         self::assertNull($fhir->request('GET', 'metadata'), 'A timeout must degrade to null, never an uncaught exception.');
     }
+
+    /**
+     * Pagination (M06): a `Bundle.link[relation=next]` URL is server-supplied and absolute, unlike a
+     * resolver-produced search string — it can carry a foreign host. followLink() must reduce it to a
+     * relative path and re-dispatch through the same fixed-authority request() join, never fetching the
+     * absolute URL directly.
+     */
+    public function testFollowLinkFetchesSameOriginUrl(): void
+    {
+        $response = new MockResponse(self::BUNDLE_JSON, ['http_code' => 200]);
+        $client   = new MockHttpClient($response);
+        $fhir     = new FHIRHttpClient($client, 'https://example.org/fhir/');
+
+        $bundle = $fhir->followLink('https://example.org/fhir/Observation?page=2', 'R5');
+
+        self::assertInstanceOf(BundleResource::class, $bundle);
+        self::assertSame('https://example.org/fhir/Observation?page=2', $response->getRequestUrl());
+    }
+
+    public function testFollowLinkTreatsExplicitDefaultPortAsSameOrigin(): void
+    {
+        $response = new MockResponse(self::BUNDLE_JSON, ['http_code' => 200]);
+        $client   = new MockHttpClient($response);
+        $fhir     = new FHIRHttpClient($client, 'https://example.org/fhir/');
+
+        $bundle = $fhir->followLink('https://example.org:443/fhir/Observation?page=2', 'R5');
+
+        self::assertInstanceOf(BundleResource::class, $bundle);
+    }
+
+    public function testFollowLinkRejectsCrossOriginHost(): void
+    {
+        $response = new MockResponse(self::BUNDLE_JSON, ['http_code' => 200]);
+        $client   = new MockHttpClient($response);
+        $fhir     = new FHIRHttpClient($client, 'https://example.org/fhir/');
+
+        self::assertNull($fhir->followLink('https://evil.example/fhir/Observation?page=2', 'R5'));
+        self::assertSame(0, $client->getRequestsCount(), 'A cross-origin link must never be dispatched at all.');
+    }
+
+    public function testFollowLinkRejectsCrossOriginScheme(): void
+    {
+        $client = new MockHttpClient(new MockResponse(self::BUNDLE_JSON, ['http_code' => 200]));
+        $fhir   = new FHIRHttpClient($client, 'https://example.org/fhir/');
+
+        self::assertNull($fhir->followLink('http://example.org/fhir/Observation?page=2', 'R5'));
+    }
+
+    public function testFollowLinkRejectsCrossOriginPort(): void
+    {
+        $client = new MockHttpClient(new MockResponse(self::BUNDLE_JSON, ['http_code' => 200]));
+        $fhir   = new FHIRHttpClient($client, 'https://example.org/fhir/');
+
+        self::assertNull($fhir->followLink('https://example.org:8443/fhir/Observation?page=2', 'R5'));
+    }
+
+    public function testFollowLinkRejectsSameOriginPathOutsideBasePrefix(): void
+    {
+        // Same host+scheme+port, but a path this client's fixed base path cannot re-express without
+        // either duplicating or losing the "/fhir" prefix — rejected rather than risk fetching the wrong URL.
+        $client = new MockHttpClient(new MockResponse(self::BUNDLE_JSON, ['http_code' => 200]));
+        $fhir   = new FHIRHttpClient($client, 'https://example.org/fhir/');
+
+        self::assertNull($fhir->followLink('https://example.org/other/Observation?page=2', 'R5'));
+    }
+
+    public function testFollowLinkRejectsMalformedUrl(): void
+    {
+        $client = new MockHttpClient(new MockResponse(self::BUNDLE_JSON, ['http_code' => 200]));
+        $fhir   = new FHIRHttpClient($client, 'https://example.org/fhir/');
+
+        self::assertNull($fhir->followLink('not a url at all ://', 'R5'));
+    }
+
+    public function testFollowLinkWithRootBaseUrlFetchesAnySameOriginPath(): void
+    {
+        $response = new MockResponse(self::BUNDLE_JSON, ['http_code' => 200]);
+        $client   = new MockHttpClient($response);
+        $fhir     = new FHIRHttpClient($client, 'https://example.org');
+
+        $bundle = $fhir->followLink('https://example.org/Observation?page=2', 'R5');
+
+        self::assertInstanceOf(BundleResource::class, $bundle);
+        self::assertSame('https://example.org/Observation?page=2', $response->getRequestUrl());
+    }
 }

@@ -47,13 +47,24 @@ final class FHIRHttpClient implements FHIRHttpClientInterface
             return null;
         }
 
-        $bundleClass = sprintf('Ardenexal\\FHIRTools\\Component\\Models\\%s\\Resource\\BundleResource', $version->value);
+        return $this->deserializeBundle($body, $version);
+    }
 
-        try {
-            return $this->serializerFor($version)->deserializeFromJson($body, $bundleClass);
-        } catch (\Throwable) { // -- rationale: graceful degradation — a malformed/unexpected server body yields null, never an exception (mirrors the transport-error posture); the specific failure mode is not actionable to the caller.
+    public function followLink(string $url, string $fhirVersion): ?object
+    {
+        $version = FhirVersion::from($fhirVersion);
+
+        $path = $this->sameOriginPath($url);
+        if ($path === null) {
             return null;
         }
+
+        $body = $this->request('GET', $path);
+        if ($body === null) {
+            return null;
+        }
+
+        return $this->deserializeBundle($body, $version);
     }
 
     public function request(string $method, string $path, ?string $body = null, array $headers = []): ?string
@@ -83,5 +94,75 @@ final class FHIRHttpClient implements FHIRHttpClientInterface
     private function serializerFor(FhirVersion $version): FHIRSerializationService
     {
         return $this->serializers[$version->value] ??= FHIRSerializationService::createDefault($version);
+    }
+
+    private function deserializeBundle(string $body, FhirVersion $version): ?object
+    {
+        $bundleClass = sprintf('Ardenexal\\FHIRTools\\Component\\Models\\%s\\Resource\\BundleResource', $version->value);
+
+        try {
+            return $this->serializerFor($version)->deserializeFromJson($body, $bundleClass);
+        } catch (\Throwable) { // -- rationale: graceful degradation — a malformed/unexpected server body yields null, never an exception (mirrors the transport-error posture); the specific failure mode is not actionable to the caller.
+            return null;
+        }
+    }
+
+    /**
+     * Reduce an absolute URL to a path relative to this client's own base URL, suitable for {@see self::request()}
+     * (which re-joins whatever path is returned onto that same base URL). Returns null when the URL's origin
+     * (scheme+host+port, default ports normalized) doesn't match — the SSRF guardrail for server-supplied
+     * links — or when its path isn't under the base URL's own path prefix, which request() has no way to
+     * express without either duplicating or losing that prefix.
+     */
+    private function sameOriginPath(string $absoluteUrl): ?string
+    {
+        $target = parse_url($absoluteUrl);
+        $base   = parse_url($this->baseUrl);
+        if (!is_array($target) || !is_array($base)) {
+            return null;
+        }
+
+        $targetOrigin = $this->originOf($target);
+        $baseOrigin   = $this->originOf($base);
+        if ($targetOrigin === null || $baseOrigin === null || $targetOrigin !== $baseOrigin) {
+            return null;
+        }
+
+        $targetPath = $target['path'] ?? '/';
+        $basePath   = rtrim($base['path'] ?? '', '/');
+
+        if ($basePath !== '') {
+            if (!str_starts_with($targetPath, $basePath)) {
+                return null;
+            }
+            $targetPath = substr($targetPath, strlen($basePath));
+        }
+
+        $relativePath = ltrim($targetPath, '/');
+        if (isset($target['query'])) {
+            $relativePath .= '?' . $target['query'];
+        }
+
+        return $relativePath;
+    }
+
+    /**
+     * Normalize a parse_url() result to a `scheme://host:port` origin string, filling in the scheme's
+     * default port when none is given so `https://h/` and `https://h:443/` compare equal.
+     *
+     * @param array<string, int|string> $urlParts
+     */
+    private function originOf(array $urlParts): ?string
+    {
+        if (!isset($urlParts['scheme'], $urlParts['host'])) {
+            return null;
+        }
+
+        $scheme       = strtolower((string) $urlParts['scheme']);
+        $host         = strtolower((string) $urlParts['host']);
+        $defaultPorts = ['http' => 80, 'https' => 443];
+        $port         = $urlParts['port'] ?? ($defaultPorts[$scheme] ?? null);
+
+        return $scheme . '://' . $host . ($port !== null ? ':' . $port : '');
     }
 }

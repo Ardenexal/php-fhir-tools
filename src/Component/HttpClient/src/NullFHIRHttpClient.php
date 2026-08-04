@@ -24,4 +24,9 @@ final class NullFHIRHttpClient implements FHIRHttpClientInterface
     {
         return null;
     }
+
+    public function followLink(string $url, string $fhirVersion): ?object
+    {
+        return null;
+    }
 }

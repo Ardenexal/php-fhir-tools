@@ -25,6 +25,10 @@ client used by SDC `$populate`'s opt-in live x-fhir-query path, and the relocate
 - **`request(string $method, string $path, ?string $body = null, array $headers = []): ?string`** —
   the lower-level escape hatch: an arbitrary FHIR REST call (e.g. `$validate-code`) returning the raw
   response body, or `null` on failure. `search()` is built on top of this.
+- **`followLink(string $url, string $fhirVersion): ?BundleResource`** — follow a server-supplied
+  `Bundle.link.url` (e.g. `relation = 'next'`) and get back a typed `Bundle` page, or `null` when the URL
+  is cross-origin (rejected) or on any transport/HTTP/parse failure. See **Multi-page result following**
+  below.
 
 ```php
 $client = new FHIRHttpClient($symfonyHttpClient, 'https://fhir.example.org/r4');
@@ -32,6 +36,39 @@ $client = new FHIRHttpClient($symfonyHttpClient, 'https://fhir.example.org/r4');
 $bundle = $client->search('Observation?subject=Patient/123&status=final', 'R4');
 // $bundle is a typed BundleResource, or null (server unreachable, timed out, 4xx/5xx, bad body)
 ```
+
+### Multi-page result following
+
+A searchset that spans more than one page carries a `Bundle.link` entry with `relation = 'next'`. Callers
+that need every result — not just the first page — follow it via `followLink()`:
+
+```php
+$page = $client->search('Observation?subject=Patient/123', 'R4');
+while ($page !== null) {
+    // ... collect $page's entries ...
+    $nextUrl = /* extract link.where(relation = 'next').url from $page, e.g. via FHIRPath */;
+    $page    = $nextUrl !== null ? $client->followLink($nextUrl, 'R4') : null;
+}
+```
+
+`XFhirQueryPopulationDataProvider` (Sdc) does exactly this for x-fhir-query population, bounded to 50
+pages — see its class docblock for the bound's rationale.
+
+**Same-origin only.** Unlike a `search()` search string (which the resolver builds and can never carry a
+foreign host — see *Security posture* below), a `next` link's URL is server-supplied and absolute. If it
+pointed anywhere the client wanted, that would reopen exactly the SSRF gap `search()` closes structurally.
+`followLink()` rejects (returns `null` for) any URL whose origin — scheme, host, and port — doesn't match
+the client's own configured `baseUrl`, or whose path isn't under `baseUrl`'s own path prefix (a path
+outside that prefix can't be safely re-expressed through the fixed-authority `request()` join without
+either duplicating or losing the prefix). A well-behaved FHIR server always echoes links under its own
+configured endpoint, so this holds for normal deployments; it does not accommodate a server deliberately
+proxied behind a different public host than the one configured as `baseUrl`.
+
+**Partial-failure posture.** If a later page's fetch fails — off-host rejection, transport error, or simply
+no further `next` link — pagination stops there and whatever pages were fetched successfully are returned.
+This mirrors the graceful-degradation posture used throughout this transport stack (a fetch failure
+degrades to `null`/omission, never a distinct error signal); only the **first** page's failure is
+distinguished (as `resourcesForQuery()` returning `null`, meaning the whole search failed).
 
 ### Authentication
 
@@ -81,13 +118,18 @@ drops, the `?` itself is omitted rather than emitting the fetch-everything form 
 
 ## Security posture
 
-- **SSRF.** Every evaluated leaf value is percent-encoded before substitution
+- **SSRF (resolved search strings).** Every evaluated leaf value is percent-encoded before substitution
   (`XFhirQueryResolver::encode()`), so launch-context data can never inject an unescaped scheme, host, or
   path separator into the resolved search string. `FHIRHttpClient::request()` always joins the resolved
   search onto the caller-configured `baseUrl` (`rtrim($baseUrl, '/') . '/' . ltrim($path, '/')`) — the
   base URL is always the request's authority; the search string can only ever land in its path/query,
   never redirect to a different host. See `FHIRQuestionnaireXFhirQueryPopulateTest` and
   `XFhirQueryResolverTest` / `FHIRHttpClientTest` for the tests proving this.
+- **SSRF (server-supplied `next` links).** A `Bundle.link.url` is absolute and server-supplied, so the
+  percent-encoding guarantee above doesn't apply to it. `followLink()` closes this the same way `search()`
+  closes the resolved-string case, just checked at the origin level instead of by construction: same-origin
+  URLs are followed, everything else is rejected. See *Multi-page result following* above and
+  `FHIRHttpClientTest::testFollowLinkRejectsCrossOriginHost` / `...Scheme` / `...Port`.
 - **PHI / access control.** This library fetches whatever the configured server returns for the resolved
   search and applies **no** permission filtering — deciding what a given user may see, and constraining
   the query (or the launch context that parameterises it) accordingly, is the caller's responsibility.
