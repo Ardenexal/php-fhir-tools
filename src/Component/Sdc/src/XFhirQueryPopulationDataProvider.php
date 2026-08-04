@@ -32,11 +32,13 @@ final class XFhirQueryPopulationDataProvider implements QueryPopulationDataProvi
             return null; // fetch failure — distinct from an empty searchset
         }
 
-        // Navigate `entry.resource` via the FHIRPath engine: it reads deserializer-origin objects tolerantly
-        // (getters, uninitialized typed properties, arrays) and returns the entry resources. Taking every
-        // entry resource (not just search.mode = 'match') is a documented M04 refinement.
+        // Navigate `entry.where(search.mode = 'match').resource` via the FHIRPath engine: it reads
+        // deserializer-origin objects tolerantly (getters, uninitialized typed properties, arrays). Filtering
+        // to `search.mode = 'match'` excludes `_include`d resources and `search.mode = 'outcome'`
+        // (OperationOutcome) entries, which would otherwise be bound as spurious %<name> context results.
+        // An entry with no `search.mode` (a plain, non-searchset Bundle) is not a match and is excluded.
         $resources = [];
-        foreach ($this->fhirPath->evaluate('entry.resource', $bundle, null, $fhirVersion)->toArray() as $item) {
+        foreach ($this->fhirPath->evaluate("entry.where(search.mode = 'match').resource", $bundle, null, $fhirVersion)->toArray() as $item) {
             if (\is_object($item)) {
                 $resources[] = $item;
             }

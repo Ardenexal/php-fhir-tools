@@ -46,6 +46,44 @@ final class XFhirQueryPopulationDataProviderTest extends TestCase
         self::assertSame([], $provider->resourcesForQuery('Observation?subject=Patient/1', 'R4'));
     }
 
+    /**
+     * Searchset entry filter (M04): a searchset may carry `_include`d resources (`search.mode = 'include'`)
+     * and `OperationOutcome` entries (`search.mode = 'outcome'`) alongside the actual matches. Only
+     * `search.mode = 'match'` entries are population data; the others must not be bound as spurious
+     * `%<name>` context results.
+     */
+    public function testFiltersOutNonMatchSearchModeEntries(): void
+    {
+        $bundle = FHIRSerializationService::createDefault(FhirVersion::R4)->deserializeFromJson(
+            json_encode([
+                'resourceType' => 'Bundle',
+                'type'         => 'searchset',
+                'entry'        => [
+                    [
+                        'resource' => ['resourceType' => 'Observation', 'id' => 'match-1', 'status' => 'final', 'code' => []],
+                        'search'   => ['mode' => 'match'],
+                    ],
+                    [
+                        'resource' => ['resourceType' => 'Patient', 'id' => 'included-1'],
+                        'search'   => ['mode' => 'include'],
+                    ],
+                    [
+                        'resource' => ['resourceType' => 'OperationOutcome', 'id' => 'outcome-1', 'issue' => []],
+                        'search'   => ['mode' => 'outcome'],
+                    ],
+                ],
+            ], JSON_THROW_ON_ERROR),
+            BundleResource::class,
+        );
+        $provider = new XFhirQueryPopulationDataProvider(new StubFHIRHttpClient($bundle));
+
+        $resources = $provider->resourcesForQuery('Observation?subject=Patient/1', 'R4');
+
+        self::assertIsArray($resources);
+        self::assertCount(1, $resources);
+        self::assertSame('match-1', $resources[0]->id ?? null);
+    }
+
     private function searchsetWithTwoObservations(): object
     {
         return FHIRSerializationService::createDefault(FhirVersion::R4)->deserializeFromJson(
@@ -53,8 +91,14 @@ final class XFhirQueryPopulationDataProviderTest extends TestCase
                 'resourceType' => 'Bundle',
                 'type'         => 'searchset',
                 'entry'        => [
-                    ['resource' => ['resourceType' => 'Observation', 'id' => 'o1', 'status' => 'final', 'code' => []]],
-                    ['resource' => ['resourceType' => 'Observation', 'id' => 'o2', 'status' => 'final', 'code' => []]],
+                    [
+                        'resource' => ['resourceType' => 'Observation', 'id' => 'o1', 'status' => 'final', 'code' => []],
+                        'search'   => ['mode' => 'match'],
+                    ],
+                    [
+                        'resource' => ['resourceType' => 'Observation', 'id' => 'o2', 'status' => 'final', 'code' => []],
+                        'search'   => ['mode' => 'match'],
+                    ],
                 ],
             ], JSON_THROW_ON_ERROR),
             BundleResource::class,
