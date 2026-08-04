@@ -49,6 +49,7 @@
         "symfony/yaml": "^6.4|^7.4"
     },
     "require-dev": {
+        "blundergoat/gruff-php": "^0.5",
         "brianium/paratest": "^7.20",
         "fhir/fhir-test-cases": "1.7.49",
         "giorgiosironi/eris": "^1.0",
@@ -83,7 +84,9 @@
             "Ardenexal\\FHIRTools\\Component\\Models\\": "src/Component/Models/src/",
             "Ardenexal\\FHIRTools\\Component\\Metadata\\": "src/Component/Metadata/src/",
             "Ardenexal\\FHIRTools\\Component\\FHIRPath\\": "src/Component/FHIRPath/src/",
-            "Ardenexal\\FHIRTools\\Component\\Validation\\": "src/Component/Validation/src/"
+            "Ardenexal\\FHIRTools\\Component\\Validation\\": "src/Component/Validation/src/",
+            "Ardenexal\\FHIRTools\\Component\\Sdc\\": "src/Component/Sdc/src/",
+            "Ardenexal\\FHIRTools\\Component\\HttpClient\\": "src/Component/HttpClient/src/"
         }
     },
     "autoload-dev": {
@@ -93,6 +96,8 @@
             "Ardenexal\\FHIRTools\\Component\\FHIRPath\\Tests\\": "src/Component/FHIRPath/tests/",
             "Ardenexal\\FHIRTools\\Component\\Serialization\\Tests\\": "src/Component/Serialization/tests/",
             "Ardenexal\\FHIRTools\\Component\\Validation\\Tests\\": "src/Component/Validation/tests/",
+            "Ardenexal\\FHIRTools\\Component\\Sdc\\Tests\\": "src/Component/Sdc/tests/",
+            "Ardenexal\\FHIRTools\\Component\\HttpClient\\Tests\\": "src/Component/HttpClient/tests/",
             "Ardenexal\\FHIRTools\\Benchmarks\\": "bench/",
             "App\\Mate\\": "mate/src/"
         }
@@ -135,6 +140,8 @@
         "test-ai-fhirpath-spec": "php scripts/ai-test-runner.php --testsuite=fhirpath-spec --functional --max-batch-size=50",
         "test-ai-questionnaire-spec": "php scripts/ai-test-runner.php --testsuite=questionnaire-spec",
         "test-ai-brianpos-spec": "php scripts/ai-test-runner.php --testsuite=brianpos-questionnaire-spec",
+        "test-ai-sdc-extract-spec": "php scripts/ai-test-runner.php --testsuite=sdc-extract-spec",
+        "test-ai-sdc-populate-spec": "php scripts/ai-test-runner.php --testsuite=sdc-populate-spec",
         "test": "php ./vendor/phpunit/phpunit/phpunit --testdox --testdox-summary",
         "test-unit": "php ./vendor/bin/paratest --testsuite=unit",
         "test-coverage": "php ./vendor/bin/paratest --coverage-html coverage --coverage-clover coverage/clover.xml",

@@ -1,0 +1,9 @@
+{
+  "resourceType": "Patient",
+  "id": "pt",
+  "maritalStatus": {
+    "coding": [
+      { "system": "http://terminology.hl7.org/CodeSystem/v3-MaritalStatus", "code": "M", "display": "Married" }
+    ]
+  }
+}

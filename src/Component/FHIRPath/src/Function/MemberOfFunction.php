@@ -7,9 +7,7 @@ namespace Ardenexal\FHIRTools\Component\FHIRPath\Function;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\Collection;
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Exception\EvaluationException;
-use Psr\Http\Client\ClientExceptionInterface;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestFactoryInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRHttpClientInterface;
 
 /**
  * memberOf(valueSet: String): Boolean
@@ -29,14 +27,13 @@ use Psr\Http\Message\RequestFactoryInterface;
  *  - `[false]` — code is not a member of the ValueSet
  *  - `[]`      — bad input, non-2xx response, or malformed Parameters response
  *
- * Throws EvaluationException when no terminology URL or HTTP client is configured
+ * Throws EvaluationException when no terminology HTTP client is configured
  * (mirrors the JS reference implementation's throw behaviour).
  *
  * Configuration on FHIRPathEvaluator:
- *   $evaluator->setTerminologyUrl('https://tx.fhir.org/r4');
- *   $evaluator->setHttpClient($psr18Client, $psr17RequestFactory);
+ *   $evaluator->setTerminologyHttpClient($terminologyHttpClient);
  *
- * Falls back to fhirServerUrl when terminologyUrl is not explicitly set.
+ * Falls back to fhirHttpClient when terminologyHttpClient is not explicitly set.
  *
  * Does NOT depend on Models or CodeGeneration.
  *
@@ -77,40 +74,29 @@ final class MemberOfFunction extends AbstractFunction
             return Collection::empty();
         }
 
-        // Require a terminology server URL (mirrors JS throw behaviour)
-        $terminologyUrl = $evaluator->getTerminologyUrl();
-        if ($terminologyUrl === null) {
-            throw new EvaluationException('memberOf() requires a terminology server URL — call setTerminologyUrl() or setFhirServerUrl() on the evaluator', 0, 0);
+        // Require a terminology HTTP client (mirrors JS throw behaviour)
+        $terminologyHttpClient = $evaluator->getTerminologyHttpClient();
+        if ($terminologyHttpClient === null) {
+            throw new EvaluationException('memberOf() requires a terminology HTTP client — call setTerminologyHttpClient() or setFhirHttpClient() on the evaluator', 0, 0);
         }
 
-        // Require an HTTP client (mirrors JS throw behaviour)
-        $httpClient     = $evaluator->getHttpClient();
-        $requestFactory = $evaluator->getRequestFactory();
-        if ($httpClient === null || $requestFactory === null) {
-            throw new EvaluationException('memberOf() requires an HTTP client — call setHttpClient() on the evaluator', 0, 0);
-        }
-
-        return $this->dispatchInput($item, $vsUrl, $terminologyUrl, $httpClient, $requestFactory);
+        return $this->dispatchInput($item, $vsUrl, $terminologyHttpClient);
     }
 
     /**
      * Dispatch input to the correct validation strategy based on FHIR type.
      *
-     * @param string                  $vsUrl          ValueSet URL
-     * @param string                  $terminologyUrl Base terminology server URL (no trailing slash)
-     * @param ClientInterface         $httpClient     PSR-18 HTTP client
-     * @param RequestFactoryInterface $requestFactory PSR-17 request factory
+     * @param string                  $vsUrl                 ValueSet URL
+     * @param FHIRHttpClientInterface $terminologyHttpClient Terminology FHIR HTTP client
      */
     private function dispatchInput(
         mixed $item,
         string $vsUrl,
-        string $terminologyUrl,
-        ClientInterface $httpClient,
-        RequestFactoryInterface $requestFactory
+        FHIRHttpClientInterface $terminologyHttpClient
     ): Collection {
         // Plain code string
         if (is_string($item)) {
-            $result = $this->validateCode($vsUrl, ['url' => $vsUrl, 'code' => $item], $terminologyUrl, $httpClient, $requestFactory);
+            $result = $this->validateCode(['url' => $vsUrl, 'code' => $item], $terminologyHttpClient);
 
             return $result !== null ? Collection::single($result) : Collection::empty();
         }
@@ -121,7 +107,7 @@ final class MemberOfFunction extends AbstractFunction
 
         // CodeableConcept: has a `coding` key containing a list of Codings
         if (array_key_exists('coding', $item) && is_array($item['coding'])) {
-            return $this->validateCodeableConcept($item['coding'], $vsUrl, $terminologyUrl, $httpClient, $requestFactory);
+            return $this->validateCodeableConcept($item['coding'], $vsUrl, $terminologyHttpClient);
         }
 
         // Coding: has a `code` key
@@ -131,7 +117,7 @@ final class MemberOfFunction extends AbstractFunction
                 return Collection::empty();
             }
 
-            $result = $this->validateCode($vsUrl, $queryParams, $terminologyUrl, $httpClient, $requestFactory);
+            $result = $this->validateCode($queryParams, $terminologyHttpClient);
 
             return $result !== null ? Collection::single($result) : Collection::empty();
         }
@@ -143,18 +129,14 @@ final class MemberOfFunction extends AbstractFunction
      * Validate a CodeableConcept by iterating its Coding list.
      * Returns true if any Coding validates, false if none do, or empty on error.
      *
-     * @param array<int, mixed>       $codings        List of Coding arrays
-     * @param string                  $vsUrl          ValueSet URL
-     * @param string                  $terminologyUrl Base terminology server URL
-     * @param ClientInterface         $httpClient     PSR-18 HTTP client
-     * @param RequestFactoryInterface $requestFactory PSR-17 request factory
+     * @param array<int, mixed>       $codings               List of Coding arrays
+     * @param string                  $vsUrl                 ValueSet URL
+     * @param FHIRHttpClientInterface $terminologyHttpClient Terminology FHIR HTTP client
      */
     private function validateCodeableConcept(
         array $codings,
         string $vsUrl,
-        string $terminologyUrl,
-        ClientInterface $httpClient,
-        RequestFactoryInterface $requestFactory
+        FHIRHttpClientInterface $terminologyHttpClient
     ): Collection {
         $anyResult = false;
 
@@ -168,7 +150,7 @@ final class MemberOfFunction extends AbstractFunction
                 continue;
             }
 
-            $result = $this->validateCode($vsUrl, $queryParams, $terminologyUrl, $httpClient, $requestFactory);
+            $result = $this->validateCode($queryParams, $terminologyHttpClient);
 
             if ($result === true) {
                 return Collection::single(true);
@@ -227,21 +209,15 @@ final class MemberOfFunction extends AbstractFunction
      *
      * Returns true/false from the `result` parameter, or null on HTTP/parse error.
      *
-     * @param string                  $vsUrl          ValueSet URL (used only for URL building)
-     * @param array<string, string>   $queryParams    Query params to send
-     * @param string                  $terminologyUrl Base terminology server URL (no trailing slash)
-     * @param ClientInterface         $httpClient     PSR-18 HTTP client
-     * @param RequestFactoryInterface $requestFactory PSR-17 request factory
+     * @param array<string, string>   $queryParams           Query params to send
+     * @param FHIRHttpClientInterface $terminologyHttpClient Terminology FHIR HTTP client
      */
     private function validateCode(
-        string $vsUrl,
         array $queryParams,
-        string $terminologyUrl,
-        ClientInterface $httpClient,
-        RequestFactoryInterface $requestFactory
+        FHIRHttpClientInterface $terminologyHttpClient
     ): ?bool {
-        $url  = $terminologyUrl . '/ValueSet/$validate-code?' . http_build_query($queryParams);
-        $data = $this->fetch($url, $httpClient, $requestFactory);
+        $path = 'ValueSet/$validate-code?' . http_build_query($queryParams);
+        $data = $this->fetch($path, $terminologyHttpClient);
 
         if ($data === null) {
             return null;
@@ -266,32 +242,25 @@ final class MemberOfFunction extends AbstractFunction
     }
 
     /**
-     * Send a GET request via the PSR-18 client and decode the JSON response body.
+     * Send a GET request via the FHIR HTTP client and decode the JSON response body.
      *
-     * Returns null on any transport error, non-2xx response, or non-JSON body.
+     * Returns null on any transport/HTTP error (per FHIRHttpClientInterface's graceful-degradation
+     * contract) or a non-JSON-array body.
      *
-     * @param string                  $url            URL to fetch
-     * @param ClientInterface         $httpClient     PSR-18 HTTP client
-     * @param RequestFactoryInterface $requestFactory PSR-17 request factory
+     * @param string                  $path                  server-relative path to fetch
+     * @param FHIRHttpClientInterface $terminologyHttpClient Terminology FHIR HTTP client
      *
      * @return array<string, mixed>|null
      */
-    private function fetch(string $url, ClientInterface $httpClient, RequestFactoryInterface $requestFactory): ?array
+    private function fetch(string $path, FHIRHttpClientInterface $terminologyHttpClient): ?array
     {
-        try {
-            $request  = $requestFactory->createRequest('GET', $url);
-            $response = $httpClient->sendRequest($request);
-
-            if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
-                return null;
-            }
-
-            $body = (string) $response->getBody();
-            $data = json_decode($body, true);
-
-            return is_array($data) ? $data : null;
-        } catch (ClientExceptionInterface) {
+        $body = $terminologyHttpClient->request('GET', $path);
+        if ($body === null) {
             return null;
         }
+
+        $data = json_decode($body, true);
+
+        return is_array($data) ? $data : null;
     }
 }

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation;
 
+use Ardenexal\FHIRTools\Component\Metadata\Contract\CodingValidationResult;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientInterface;
+
 /**
  * Pre-loaded in-memory terminology client for offline and test use.
  * Entries not in the map default to $defaultResult (true = allow unknown, false = deny unknown).

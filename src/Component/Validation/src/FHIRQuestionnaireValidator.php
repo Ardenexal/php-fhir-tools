@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Validation;
 
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientFactoryInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientInterface;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Attachment as R4Attachment;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding as R4Coding;
 use Ardenexal\FHIRTools\Component\Models\R4\DataType\Quantity as R4Quantity;

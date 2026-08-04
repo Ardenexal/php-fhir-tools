@@ -14,6 +14,7 @@ This is a library monorepo. Each component is published as a standalone Composer
 | `ardenexal/fhir-serialization` | Read/write FHIR JSON or XML |
 | `ardenexal/fhir-validation` | Validate resources against base and profile constraints |
 | `ardenexal/fhir-path` | Evaluate FHIRPath 2.0 expressions |
+| `ardenexal/fhir-sdc` | Run SDC `$populate` (pre-fill a `QuestionnaireResponse` from launch context) and `$extract` (turn a completed `QuestionnaireResponse` into a transaction Bundle of FHIR resources) |
 | `ardenexal/fhir-models` | Use the pre-generated R4 / R4B / R5 model classes |
 | `ardenexal/fhir-metadata` | Shared FHIR attributes and interfaces (a dependency of the others) |
 

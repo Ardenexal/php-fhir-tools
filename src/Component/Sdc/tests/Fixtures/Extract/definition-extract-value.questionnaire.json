@@ -1,0 +1,37 @@
+{
+    "resourceType": "Questionnaire",
+    "id": "defnvalue-probe",
+    "url": "http://fhirtools.dev/Questionnaire/defnvalue-probe",
+    "status": "active",
+    "item": [
+        {
+            "extension": [
+                {
+                    "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-definitionExtract",
+                    "extension": [
+                        { "url": "definition", "valueCanonical": "http://hl7.org/fhir/StructureDefinition/Patient" }
+                    ]
+                }
+            ],
+            "linkId": "patient",
+            "text": "Patient",
+            "type": "group",
+            "item": [
+                {
+                    "extension": [
+                        {
+                            "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-definitionExtractValue",
+                            "extension": [
+                                { "url": "definition", "valueUri": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.identifier.system" },
+                                { "url": "expression", "valueExpression": { "language": "text/fhirpath", "expression": "'http://example.org/mrn'" } }
+                            ]
+                        }
+                    ],
+                    "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.identifier.value",
+                    "linkId": "mrn",
+                    "type": "string"
+                }
+            ]
+        }
+    ]
+}

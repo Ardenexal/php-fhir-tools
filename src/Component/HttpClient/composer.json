@@ -1,0 +1,54 @@
+{
+    "name": "ardenexal/fhir-http-client",
+    "description": "FHIR REST client: application/x-fhir-query resolution and typed FHIR server access",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "FHIR Tools Contributors",
+            "email": "contributors@fhirtools.dev"
+        }
+    ],
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=8.3",
+        "ardenexal/fhir-metadata": "^0.4",
+        "ardenexal/fhir-models": "^0.4",
+        "ardenexal/fhir-path": "^0.4",
+        "ardenexal/fhir-serialization": "^0.4",
+        "psr/cache": "^3.0",
+        "symfony/http-client-contracts": "^3.4"
+    },
+    "require-dev": {
+        "symfony/http-client": "^6.4|^7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ardenexal\\FHIRTools\\Component\\HttpClient\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ardenexal\\FHIRTools\\Component\\HttpClient\\Tests\\": "tests/"
+        }
+    },
+    "keywords": [
+        "fhir",
+        "healthcare",
+        "hl7",
+        "http",
+        "x-fhir-query",
+        "symfony"
+    ],
+    "homepage": "https://github.com/ardenexal/fhir-tools",
+    "support": {
+        "issues": "https://github.com/ardenexal/fhir-tools/issues",
+        "source": "https://github.com/ardenexal/fhir-tools"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "0.4.x-dev"
+        }
+    }
+}

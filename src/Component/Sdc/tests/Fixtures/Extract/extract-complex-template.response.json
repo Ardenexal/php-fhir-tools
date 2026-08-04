@@ -1,0 +1,163 @@
+{
+  "resourceType": "QuestionnaireResponse",
+  "status": "in-progress",
+  "questionnaire": "http://hl7.org/fhir/uv/sdc/Questionnaire/extract-complex-template",
+  "item": [
+    {
+      "linkId": "patient",
+      "text": "Patient Information",
+      "item": [
+        {
+          "linkId": "name",
+          "text": "Name",
+          "item": [
+            {
+              "linkId": "given",
+              "text": "Given Name(s)",
+              "answer": [
+                {
+                  "id": "given-repeat-Rt295rk2XsCcpvGcQzrZZ",
+                  "valueString": "Carlos"
+                }
+              ]
+            },
+            {
+              "linkId": "family",
+              "text": "Family/Surname",
+              "answer": [
+                {
+                  "valueString": "Ramirez"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "gender",
+          "text": "Gender",
+          "answer": [
+            {
+              "valueCoding": {
+                "system": "http://hl7.org/fhir/administrative-gender",
+                "code": "male",
+                "display": "Male"
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "dob",
+          "text": "Date of Birth",
+          "answer": [
+            {
+              "valueDate": "1990-02-07"
+            }
+          ]
+        },
+        {
+          "linkId": "ihi",
+          "text": "National Identifier (IHI)",
+          "answer": [
+            {
+              "valueString": "92304872038472"
+            }
+          ]
+        },
+        {
+          "linkId": "mobile-phone",
+          "text": "Mobile Phone number",
+          "answer": [
+            {
+              "valueString": "109348180293810"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "contacts",
+      "text": "Contacts",
+      "item": [
+        {
+          "linkId": "contact-name",
+          "text": "Name",
+          "answer": [
+            {
+              "valueString": "Alex"
+            }
+          ]
+        },
+        {
+          "linkId": "relationship",
+          "text": "Relationship",
+          "answer": [
+            {
+              "valueCoding": {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0131",
+                "code": "CP",
+                "display": "Contact person",
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/5.0/StructureDefinition/extension-ValueSet.expansion.contains.property",
+                    "extension": [
+                      {
+                        "url": "code",
+                        "valueCode": "status"
+                      },
+                      {
+                        "url": "value",
+                        "valueCode": "deprecated"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "linkId": "phone",
+          "text": "Phone",
+          "answer": [
+            {
+              "valueString": "0427343456"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "obs",
+      "text": "Observations",
+      "item": [
+        {
+          "linkId": "height",
+          "text": "What is your current height (m)",
+          "answer": [
+            {
+              "valueDecimal": 173
+            }
+          ]
+        },
+        {
+          "linkId": "weight",
+          "text": "What is your current weight (kg)",
+          "answer": [
+            {
+              "valueDecimal": 110
+            }
+          ]
+        },
+        {
+          "linkId": "complication",
+          "text": "Have you had a Sigmoidoscopy Complication (concern with invasive procedure, for example)",
+          "answer": [
+            {
+              "valueBoolean": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

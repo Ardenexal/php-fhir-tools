@@ -10,6 +10,7 @@ Thumbs.db
 .kiro/
 .claude/
 .goat-flow/
+.gruff-cache/
 
 ###> symfony/framework-bundle ###
 /config/secrets/prod/prod.decrypt.private.php

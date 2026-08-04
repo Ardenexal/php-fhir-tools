@@ -6,8 +6,8 @@ namespace Ardenexal\FHIRTools\Bundle\FHIRBundle\Tests\Unit;
 
 use Ardenexal\FHIRTools\Bundle\FHIRBundle\DependencyInjection\Configuration;
 use Ardenexal\FHIRTools\Bundle\FHIRBundle\DependencyInjection\FHIRExtension;
-use Ardenexal\FHIRTools\Component\Validation\CachingFHIRTerminologyClient;
-use Ardenexal\FHIRTools\Component\Validation\FHIRTerminologyClientInterface;
+use Ardenexal\FHIRTools\Component\HttpClient\CachingFHIRTerminologyClient;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientInterface;
 use Ardenexal\FHIRTools\Component\Validation\NullFHIRTerminologyClient;
 use Symfony\Component\DependencyInjection\Reference;
 use Eris\Generator;

@@ -1,0 +1,28 @@
+{
+  "resourceType": "QuestionnaireResponse",
+  "meta": {
+    "lastUpdated": "2026-07-12T11:17:51.6879879+00:00"
+  },
+  "questionnaire": "http://example.org/Questionnaire/populate-spike",
+  "status": "in-progress",
+  "item": [
+    {
+      "linkId": "patient-given",
+      "text": "Given name",
+      "answer": [
+        {
+          "valueString": "Peter"
+        }
+      ]
+    },
+    {
+      "linkId": "patient-family",
+      "text": "Family name",
+      "answer": [
+        {
+          "valueString": "Chalmers"
+        }
+      ]
+    }
+  ]
+}
