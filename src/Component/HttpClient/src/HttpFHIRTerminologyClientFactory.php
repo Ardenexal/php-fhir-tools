@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Validation;
+namespace Ardenexal\FHIRTools\Component\HttpClient;
 
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientFactoryInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -26,7 +28,7 @@ final class HttpFHIRTerminologyClientFactory implements FHIRTerminologyClientFac
 
     public function createForServer(string $baseUrl): FHIRTerminologyClientInterface
     {
-        $client = new HttpFHIRTerminologyClient($this->httpClient, $baseUrl, $this->usePost);
+        $client = new HttpFHIRTerminologyClient(new FHIRHttpClient($this->httpClient, $baseUrl), $this->usePost);
 
         if ($this->cache !== null) {
             return new CachingFHIRTerminologyClient($client, $this->cache, $this->ttl);

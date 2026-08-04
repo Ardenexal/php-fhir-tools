@@ -8,6 +8,7 @@
     "require": {
         "php": ">=8.3",
         "ardenexal/fhir-code-generation": "^0.4",
+        "ardenexal/fhir-http-client": "^0.4",
         "ardenexal/fhir-metadata": "^0.4",
         "ardenexal/fhir-path": "^0.4",
         "ardenexal/fhir-serialization": "^0.4",

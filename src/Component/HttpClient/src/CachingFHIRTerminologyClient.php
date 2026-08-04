@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Validation;
+namespace Ardenexal\FHIRTools\Component\HttpClient;
 
+use Ardenexal\FHIRTools\Component\Metadata\Contract\CodingValidationResult;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**

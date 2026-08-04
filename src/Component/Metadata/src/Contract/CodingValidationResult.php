@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Validation;
+namespace Ardenexal\FHIRTools\Component\Metadata\Contract;
 
 /**
  * Value object returned by validateCodingWithDisplay() carrying both the membership result

@@ -6,10 +6,12 @@ namespace Ardenexal\FHIRTools\Component\Sdc;
 
 use Ardenexal\FHIRTools\Component\FHIRPath\Evaluator\EvaluationContext;
 use Ardenexal\FHIRTools\Component\FHIRPath\Service\FHIRPathService;
+use Ardenexal\FHIRTools\Component\HttpClient\XFhirQuery\XFhirQueryResolver;
 use Ardenexal\FHIRTools\Component\Metadata\Extension\SafeExtensionReader;
 use Ardenexal\FHIRTools\Component\Models\R4\Enum\IssueSeverity;
 use Ardenexal\FHIRTools\Component\Models\R4\Enum\IssueType;
 use Ardenexal\FHIRTools\Component\Sdc\Contract\PopulateServiceInterface;
+use Ardenexal\FHIRTools\Component\Sdc\Contract\QueryPopulationDataProviderInterface;
 use Ardenexal\FHIRTools\Component\Sdc\Populate\AnswerValueCoercer;
 use Ardenexal\FHIRTools\Component\Sdc\Populate\FhirPrimitiveReader;
 use Ardenexal\FHIRTools\Component\Sdc\Populate\ObservationSelector;
@@ -70,6 +72,8 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
 
     private const string FHIRPATH_LANGUAGE = 'text/fhirpath';
 
+    private const string X_FHIR_QUERY_LANGUAGE = 'application/x-fhir-query';
+
     /**
      * @param FHIRPathService                         $fhirPath              engine evaluating every
      *                                                                       `initialExpression` / `variable` /
@@ -104,10 +108,14 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
         ?FhirPrimitiveReader $primitives = null,
         ?AnswerValueCoercer $coercer = null,
         ?ObservationSelector $observations = null,
+        ?XFhirQueryResolver $xFhirQueryResolver = null,
     ) {
-        $this->primitives   = $primitives        ?? new FhirPrimitiveReader();
-        $this->coercer      = $coercer           ?? new AnswerValueCoercer($this->primitives);
-        $this->observations = $observations      ?? new ObservationSelector($this->extensions, $this->primitives, $this->coercer);
+        $this->primitives         = $primitives        ?? new FhirPrimitiveReader();
+        $this->coercer            = $coercer           ?? new AnswerValueCoercer($this->primitives);
+        $this->observations       = $observations      ?? new ObservationSelector($this->extensions, $this->primitives, $this->coercer);
+        // Pure, offline template resolver — reuses the service's FHIRPath engine (no second engine). Only
+        // exercised when a QueryPopulationDataProviderInterface is supplied on the PopulateContext.
+        $this->xFhirQueryResolver = $xFhirQueryResolver ?? new XFhirQueryResolver($this->fhirPath);
     }
 
     private readonly FhirPrimitiveReader $primitives;
@@ -115,6 +123,8 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
     private readonly AnswerValueCoercer $coercer;
 
     private readonly ObservationSelector $observations;
+
+    private readonly XFhirQueryResolver $xFhirQueryResolver;
 
     /**
      * Populate a QuestionnaireResponse from a Questionnaire and its launch context.
@@ -156,7 +166,7 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
         $evalContext = $this->bindLaunchContext($questionnaire, $context, $factory, $issues);
 
         // Root-level `variable` extensions become external constants visible to every item expression.
-        $evalContext = $this->applyVariables($questionnaire, $evalContext, $factory, $issues);
+        $evalContext = $this->applyVariables($questionnaire, $evalContext, $factory, $issues, $context->queryProvider);
 
         $responseItems = $this->buildItems($this->itemsOf($questionnaire), $evalContext, $context, $factory, $issues);
 
@@ -256,11 +266,33 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
      *
      * @param list<object> $issues
      */
-    private function applyVariables(object $node, EvaluationContext $evalContext, PopulateModelFactory $factory, array &$issues): EvaluationContext
+    private function applyVariables(object $node, EvaluationContext $evalContext, PopulateModelFactory $factory, array &$issues, ?QueryPopulationDataProviderInterface $queryProvider): EvaluationContext
     {
         foreach ($this->extensionsOf($node) as $ext) {
             if ($this->extensions->readUrl($ext) !== self::VARIABLE_URL) {
                 continue;
+            }
+
+            // x-fhir-query context variable (opt-in): resolve + fetch when a query provider is configured.
+            // With no provider this block is skipped and the FHIRPath path below runs unchanged.
+            if ($queryProvider !== null) {
+                $xq = $this->xFhirQueryContextResults($ext, $evalContext, $factory, $issues, $queryProvider, 'variable');
+                if ($xq !== null) {
+                    [$name, $values] = $xq;
+                    if ($name !== null && $values !== []) {
+                        if (\count($values) > 1) {
+                            $issues[] = $factory->issue(
+                                IssueSeverity::information->value,
+                                IssueType::informationalnote->value,
+                                \sprintf("variable '%s' resolved to %d values; only the first is bound.", $name, \count($values)),
+                            );
+                        }
+
+                        $evalContext = $evalContext->withExternalConstant($name, $values[0]);
+                    }
+
+                    continue;
+                }
             }
 
             $definition = $this->namedExpressionOf($ext, $factory, $issues, 'variable');
@@ -289,6 +321,95 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
     }
 
     /**
+     * Find the `itemPopulationContext` extension on an item, or null when absent.
+     *
+     * Mirrors the URL scan in {@see itemPopulationContextOf()} but returns the raw extension (no reading,
+     * no warning) so the x-fhir-query pre-check can inspect its Expression language before the FHIRPath path.
+     */
+    private function itemPopulationContextExtension(object $item): ?object
+    {
+        foreach ($this->extensionsOf($item) as $ext) {
+            if ($this->extensions->readUrl($ext) === self::ITEM_POPULATION_CONTEXT_URL) {
+                return $ext;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Handle an `application/x-fhir-query` **context** Expression (`variable` / `itemPopulationContext`) on
+     * the given extension, resolving the template offline and dispatching it through the supplied provider.
+     *
+     * Returns null when the extension is not x-fhir-query — the caller then uses its normal FHIRPath path
+     * (which also emits the deferred-language warning for CQL). Otherwise returns `[name, resources]`
+     * (resources possibly empty), or `[null, []]` when the x-fhir-query is unusable (missing name/expression),
+     * so the caller does not fall through to the deferred-language warning for a language it does support.
+     *
+     * A fetch failure (provider returns null) is a `warning`; an empty match set is handled by the caller as
+     * its usual empty-context case. Template resolution is offline; only the provider dispatch is networked.
+     *
+     * @param list<object> $issues
+     *
+     * @return array{0: string|null, 1: list<object>}|null
+     */
+    private function xFhirQueryContextResults(
+        object $ext,
+        EvaluationContext $evalContext,
+        PopulateModelFactory $factory,
+        array &$issues,
+        QueryPopulationDataProviderInterface $queryProvider,
+        string $kind,
+    ): ?array {
+        $expressionValue = $this->extensions->readValue($ext);
+        if (!\is_object($expressionValue)) {
+            return null;
+        }
+
+        $language = $this->primitives->stringify($expressionValue->language ?? null);
+        if ($language !== self::X_FHIR_QUERY_LANGUAGE) {
+            return null; // not x-fhir-query — leave it to the FHIRPath path
+        }
+
+        $name     = $this->primitives->stringify($expressionValue->name ?? null);
+        $template = $this->primitives->stringify($expressionValue->expression ?? null);
+        if ($name === null || $template === null) {
+            $issues[] = $factory->issue(
+                IssueSeverity::warning->value,
+                IssueType::invalidcontent->value,
+                \sprintf('%s x-fhir-query is missing a name or expression; skipped.', ucfirst($kind)),
+            );
+
+            return [null, []];
+        }
+
+        try {
+            $resolved = $this->xFhirQueryResolver->resolve($template, $evalContext, $factory->fhirVersionValue());
+        } catch (\Throwable $e) {
+            $issues[] = $factory->issue(
+                IssueSeverity::warning->value,
+                IssueType::invalidcontent->value,
+                \sprintf("%s x-fhir-query '%s' could not be resolved: %s", $kind, $name, $e->getMessage()),
+            );
+
+            return [$name, []];
+        }
+
+        $resources = $queryProvider->resourcesForQuery($resolved, $factory->fhirVersionValue());
+        if ($resources === null) {
+            $issues[] = $factory->issue(
+                IssueSeverity::warning->value,
+                IssueType::processingfailure->value,
+                \sprintf("%s x-fhir-query '%s' fetch failed; no results were populated.", $kind, $name),
+            );
+
+            return [$name, []];
+        }
+
+        return [$name, $resources];
+    }
+
+    /**
      * Build the response items for a list of Questionnaire items, expanding any `itemPopulationContext`
      * group into one repetition per context result.
      *
@@ -303,27 +424,54 @@ final class FHIRQuestionnairePopulateService implements PopulateServiceInterface
 
         foreach ($items as $item) {
             // Item-level `variable`s extend the context for this item and its descendants.
-            $itemContext = $this->applyVariables($item, $evalContext, $factory, $issues);
+            $itemContext = $this->applyVariables($item, $evalContext, $factory, $issues, $populateContext->queryProvider);
 
-            $populationContext = $this->itemPopulationContextOf($item, $factory, $issues);
-            if ($populationContext === null) {
-                $built = $this->buildOneItem($item, $itemContext, $populateContext, $factory, $issues);
-                if ($built !== null) {
-                    $result[] = $built;
+            // Resolve this item's populationContext into [name, results] — via x-fhir-query (opt-in) or FHIRPath.
+            $contextName    = null;
+            $contextResults = null;
+
+            // x-fhir-query itemPopulationContext (opt-in): only entered when a query provider is configured,
+            // so the FHIRPath path below is unchanged when population is offline.
+            if ($populateContext->queryProvider !== null) {
+                $contextExt = $this->itemPopulationContextExtension($item);
+                if ($contextExt !== null) {
+                    $xq = $this->xFhirQueryContextResults($contextExt, $itemContext, $factory, $issues, $populateContext->queryProvider, 'itemPopulationContext');
+                    if ($xq !== null) {
+                        [$contextName, $contextResults] = $xq;
+                        if ($contextName === null) {
+                            // Unusable x-fhir-query (missing name/expression) — build the group once, unrepeated.
+                            $built = $this->buildOneItem($item, $itemContext, $populateContext, $factory, $issues);
+                            if ($built !== null) {
+                                $result[] = $built;
+                            }
+
+                            continue;
+                        }
+                    }
                 }
-
-                continue;
             }
 
-            // itemPopulationContext: one group repetition per context result, `%<name>` bound to each.
-            [$contextName, $contextExpression] = $populationContext;
-            $contextResults                    = $this->evaluateExpression(
-                $contextExpression,
-                $itemContext,
-                $factory,
-                $issues,
-                \sprintf("itemPopulationContext '%s'", $contextName),
-            );
+            if ($contextResults === null) {
+                $populationContext = $this->itemPopulationContextOf($item, $factory, $issues);
+                if ($populationContext === null) {
+                    $built = $this->buildOneItem($item, $itemContext, $populateContext, $factory, $issues);
+                    if ($built !== null) {
+                        $result[] = $built;
+                    }
+
+                    continue;
+                }
+
+                // itemPopulationContext: one group repetition per context result, `%<name>` bound to each.
+                [$contextName, $contextExpression] = $populationContext;
+                $contextResults                    = $this->evaluateExpression(
+                    $contextExpression,
+                    $itemContext,
+                    $factory,
+                    $issues,
+                    \sprintf("itemPopulationContext '%s'", $contextName),
+                );
+            }
 
             if ($contextResults === []) {
                 // Observable, not silent: an empty context expression omits the whole group and its

@@ -2,20 +2,24 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Validation;
+namespace Ardenexal\FHIRTools\Component\HttpClient;
 
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\CodingValidationResult;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRHttpClientInterface;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientInterface;
 
 /**
  * Calls a FHIR terminology server's ValueSet/$validate-code operation.
  * Returns false on any HTTP or parse error (graceful degradation).
+ *
+ * Transport (base-URL joining, headers, status handling, graceful-null) is delegated to the shared
+ * {@see FHIRHttpClientInterface}; this class owns only the $validate-code request shaping and the
+ * Parameters-response parsing. The server base URL lives on the injected client.
  */
 final class HttpFHIRTerminologyClient implements FHIRTerminologyClientInterface
 {
     public function __construct(
-        private readonly HttpClientInterface $httpClient,
-        private readonly string $serverUrl,
+        private readonly FHIRHttpClientInterface $httpClient,
         private readonly bool $usePost = false,
     ) {
     }
@@ -108,31 +112,17 @@ final class HttpFHIRTerminologyClient implements FHIRTerminologyClientInterface
      */
     private function dispatchRaw(string $endpoint, array $params): ?string
     {
-        $base = rtrim($this->serverUrl, '/') . '/' . ltrim($endpoint, '/');
-
-        try {
-            if ($this->usePost) {
-                $response = $this->httpClient->request('POST', $base, [
-                    'headers' => [
-                        'Content-Type' => 'application/fhir+json',
-                        'Accept'       => 'application/fhir+json',
-                    ],
-                    'body' => $this->buildParametersBody($params),
-                ]);
-            } else {
-                $response = $this->httpClient->request('GET', $base . '?' . http_build_query($params), [
-                    'headers' => ['Accept' => 'application/fhir+json'],
-                ]);
+        if ($this->usePost) {
+            try {
+                $body = $this->buildParametersBody($params);
+            } catch (\JsonException) {
+                return null; // malformed parameter value (e.g. invalid UTF-8) — graceful, as before
             }
 
-            if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
-                return null;
-            }
-
-            return $response->getContent();
-        } catch (TransportExceptionInterface|\JsonException) {
-            return null;
+            return $this->httpClient->request('POST', $endpoint, $body, ['Content-Type' => 'application/fhir+json']);
         }
+
+        return $this->httpClient->request('GET', $endpoint . '?' . http_build_query($params));
     }
 
     /**

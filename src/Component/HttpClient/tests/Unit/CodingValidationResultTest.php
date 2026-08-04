@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ardenexal\FHIRTools\Component\Validation\Tests\Unit;
+namespace Ardenexal\FHIRTools\Component\HttpClient\Tests\Unit;
 
-use Ardenexal\FHIRTools\Component\Validation\CodingValidationResult;
+use Ardenexal\FHIRTools\Component\Metadata\Contract\CodingValidationResult;
 use PHPUnit\Framework\TestCase;
 
 final class CodingValidationResultTest extends TestCase

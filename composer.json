@@ -85,7 +85,8 @@
             "Ardenexal\\FHIRTools\\Component\\Metadata\\": "src/Component/Metadata/src/",
             "Ardenexal\\FHIRTools\\Component\\FHIRPath\\": "src/Component/FHIRPath/src/",
             "Ardenexal\\FHIRTools\\Component\\Validation\\": "src/Component/Validation/src/",
-            "Ardenexal\\FHIRTools\\Component\\Sdc\\": "src/Component/Sdc/src/"
+            "Ardenexal\\FHIRTools\\Component\\Sdc\\": "src/Component/Sdc/src/",
+            "Ardenexal\\FHIRTools\\Component\\HttpClient\\": "src/Component/HttpClient/src/"
         }
     },
     "autoload-dev": {
@@ -96,6 +97,7 @@
             "Ardenexal\\FHIRTools\\Component\\Serialization\\Tests\\": "src/Component/Serialization/tests/",
             "Ardenexal\\FHIRTools\\Component\\Validation\\Tests\\": "src/Component/Validation/tests/",
             "Ardenexal\\FHIRTools\\Component\\Sdc\\Tests\\": "src/Component/Sdc/tests/",
+            "Ardenexal\\FHIRTools\\Component\\HttpClient\\Tests\\": "src/Component/HttpClient/tests/",
             "Ardenexal\\FHIRTools\\Benchmarks\\": "bench/",
             "App\\Mate\\": "mate/src/"
         }
