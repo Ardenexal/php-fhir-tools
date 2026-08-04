@@ -94,6 +94,39 @@ final class FHIRQuestionnaireXFhirQueryPopulateTest extends TestCase
         self::assertStringContainsStringIgnoringCase('fetch failed', $this->issueText($outcome));
     }
 
+    /**
+     * Empty-substitution policy end-to-end (M04): when every hole in the template resolves empty, the
+     * resolver drops the whole search (see {@see XFhirQueryResolver} docblock), so the provider is asked
+     * for the bare, unscoped resource-type search. A legitimately empty result set (provider returns `[]`,
+     * not `null`) is the caller's "no results" case, not a fetch failure — it surfaces the same
+     * information issue the FHIRPath itemPopulationContext path already emits for an empty context.
+     */
+    public function testAllHolesEmptyResolvesToUnscopedSearchAndSurfacesNoResultsNotice(): void
+    {
+        $provider = new RecordingQueryProvider([]); // legitimate empty searchset
+
+        // %patient has no id -> {{%patient.id}} resolves empty -> the whole `link=` parameter is dropped ->
+        // the resolved search is the bare, unscoped `Patient`.
+        $result = (new FHIRQuestionnairePopulateService())->populate(
+            $this->questionnaire(),
+            new PopulateContext(
+                fhirVersion: FhirVersion::R4,
+                launchContextResources: ['patient' => $this->deserialize(
+                    json_encode(['resourceType' => 'Patient'], JSON_THROW_ON_ERROR),
+                    PatientResource::class,
+                )],
+                queryProvider: $provider,
+            ),
+        );
+
+        self::assertSame('Patient', $provider->lastSearch, 'Every hole empty -> the whole query parameter is dropped.');
+        self::assertSame([], $this->collectStringAnswers($result->getResponse()));
+
+        $outcome = $result->getIssues();
+        self::assertNotNull($outcome);
+        self::assertStringContainsStringIgnoringCase('resolved to no results', $this->issueText($outcome));
+    }
+
     private function populate(QueryPopulationDataProviderInterface $provider): PopulateResult
     {
         return (new FHIRQuestionnairePopulateService())->populate(

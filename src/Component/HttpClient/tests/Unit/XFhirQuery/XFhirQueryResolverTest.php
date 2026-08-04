@@ -197,4 +197,36 @@ final class XFhirQueryResolverTest extends TestCase
 
         $this->resolver->resolve('Observation?subject={{%patient.id', new EvaluationContext());
     }
+
+    /**
+     * SSRF guardrail (M04): a launch-context value is content the caller does not control the shape of (e.g.
+     * a Patient's `name` field). If a scheme/host substring in an evaluated value were emitted raw, it could
+     * cause a naive base-URL + search-string join downstream to be misread as a different authority. The
+     * resolver's percent-encoding of every leaf value neutralises this: the substituted text can never
+     * contain a literal `://` or `/` from evaluated data.
+     */
+    public function testEvaluatedValueContainingSchemeIsPercentEncoded(): void
+    {
+        $context = (new EvaluationContext())->withExternalConstant('patient', [
+            'resourceType' => 'Patient',
+            'id'           => 'http://evil.example/Patient',
+        ]);
+
+        $out = $this->resolver->resolve('Observation?subject={{%patient.id}}', $context);
+
+        self::assertSame('Observation?subject=http%3A%2F%2Fevil.example%2FPatient', $out);
+        self::assertStringNotContainsString('://', $out);
+    }
+
+    public function testEvaluatedValueContainingProtocolRelativeHostIsPercentEncoded(): void
+    {
+        $context = (new EvaluationContext())->withExternalConstant('patient', [
+            'resourceType' => 'Patient',
+            'id'           => '//evil.example/Patient',
+        ]);
+
+        $out = $this->resolver->resolve('Observation?subject={{%patient.id}}', $context);
+
+        self::assertSame('Observation?subject=%2F%2Fevil.example%2FPatient', $out);
+    }
 }
