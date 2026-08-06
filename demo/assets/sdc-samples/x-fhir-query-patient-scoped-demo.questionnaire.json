@@ -1,0 +1,158 @@
+{
+  "resourceType": "Questionnaire",
+  "id": "x-fhir-query-patient-scoped-demo",
+  "url": "http://example.org/Questionnaire/x-fhir-query-patient-scoped-demo",
+  "name": "XFhirQueryPatientScopedDemo",
+  "title": "Patient intake with live server lookup (x-fhir-query demo)",
+  "status": "active",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext",
+      "extension": [
+        { "url": "name", "valueCoding": { "system": "http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "code": "patient" } },
+        { "url": "type", "valueCode": "Patient" }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/variable",
+      "valueExpression": {
+        "name": "obs",
+        "language": "application/x-fhir-query",
+        "expression": "Observation?subject=Patient/{{%patient.id}}&_count=100&_sort=-date"
+      }
+    }
+  ],
+  "item": [
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-definitionExtract",
+          "extension": [
+            { "url": "definition", "valueCanonical": "http://hl7.org/fhir/StructureDefinition/Patient" }
+          ]
+        }
+      ],
+      "linkId": "intake",
+      "text": "Patient details",
+      "type": "group",
+      "item": [
+        {
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name.given",
+          "linkId": "given",
+          "text": "Given name",
+          "type": "string",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+              "valueExpression": { "language": "text/fhirpath", "expression": "iif(%patient.name.where(use='official').exists(), %patient.name.where(use='official').first(), %patient.name.first()).given.first()" }
+            }
+          ]
+        },
+        {
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.name.family",
+          "linkId": "family",
+          "text": "Family name",
+          "type": "string",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+              "valueExpression": { "language": "text/fhirpath", "expression": "iif(%patient.name.where(use='official').exists(), %patient.name.where(use='official').first(), %patient.name.first()).family" }
+            }
+          ]
+        },
+        {
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.gender",
+          "linkId": "gender",
+          "text": "Gender",
+          "type": "choice",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+              "valueExpression": { "language": "text/fhirpath", "expression": "%patient.gender" }
+            }
+          ],
+          "answerOption": [
+            { "valueCoding": { "system": "http://hl7.org/fhir/administrative-gender", "code": "male", "display": "Male" } },
+            { "valueCoding": { "system": "http://hl7.org/fhir/administrative-gender", "code": "female", "display": "Female" } },
+            { "valueCoding": { "system": "http://hl7.org/fhir/administrative-gender", "code": "other", "display": "Other" } },
+            { "valueCoding": { "system": "http://hl7.org/fhir/administrative-gender", "code": "unknown", "display": "Unknown" } }
+          ]
+        },
+        {
+          "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.birthDate",
+          "linkId": "dob",
+          "text": "Date of birth",
+          "type": "date",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+              "valueExpression": { "language": "text/fhirpath", "expression": "%patient.birthDate" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "emergencyContactName",
+      "text": "Emergency contact name",
+      "type": "string",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+          "valueExpression": { "language": "text/fhirpath", "expression": "%patient.contact.first().name.text" }
+        }
+      ]
+    },
+    {
+      "linkId": "emergencyContactPhone",
+      "text": "Emergency contact phone",
+      "type": "string",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+          "valueExpression": { "language": "text/fhirpath", "expression": "%patient.contact.first().telecom.where(use='mobile').first().value" }
+        }
+      ]
+    },
+    {
+      "linkId": "lookup",
+      "text": "From the live FHIR server",
+      "type": "group",
+      "item": [
+        {
+          "linkId": "patientId",
+          "text": "Patient ID (from your pasted launch context)",
+          "type": "string",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+              "valueExpression": { "language": "text/fhirpath", "expression": "%patient.id" }
+            }
+          ]
+        },
+        {
+          "linkId": "mostRecentObsCode",
+          "text": "Most recent observation code",
+          "type": "string",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+              "valueExpression": { "language": "text/fhirpath", "expression": "%obs.code.coding.first().display" }
+            }
+          ]
+        },
+        {
+          "linkId": "mostRecentObsDate",
+          "text": "Most recent observation date",
+          "type": "string",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+              "valueExpression": { "language": "text/fhirpath", "expression": "%obs.effective" }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

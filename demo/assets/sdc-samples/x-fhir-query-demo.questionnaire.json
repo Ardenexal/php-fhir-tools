@@ -1,0 +1,49 @@
+{
+  "resourceType": "Questionnaire",
+  "id": "x-fhir-query-demo",
+  "url": "http://example.org/Questionnaire/x-fhir-query-demo",
+  "name": "XFhirQueryDemo",
+  "title": "Live server lookup (x-fhir-query demo)",
+  "status": "active",
+  "item": [
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemPopulationContext",
+          "valueExpression": {
+            "name": "match",
+            "language": "application/x-fhir-query",
+            "expression": "Patient?_count=1"
+          }
+        }
+      ],
+      "linkId": "lookup",
+      "text": "Patient fetched from the configured FHIR server",
+      "type": "group",
+      "item": [
+        {
+          "linkId": "lookupId",
+          "text": "Patient id",
+          "type": "string",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+              "valueExpression": { "language": "text/fhirpath", "expression": "%match.id" }
+            }
+          ]
+        },
+        {
+          "linkId": "lookupFamily",
+          "text": "Patient family name",
+          "type": "string",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
+              "valueExpression": { "language": "text/fhirpath", "expression": "%match.name.first().family" }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

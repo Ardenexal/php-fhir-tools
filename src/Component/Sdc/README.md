@@ -26,6 +26,14 @@ Shared prerequisites (see `.goat-flow/plans/sdc-foundation/`):
   test base that compares the **deserialized model** field-by-field against a frozen reference
   baseline, with an explicit ignore-list for spec-legal serialization divergence.
 
+## Try it: `/sdc` demo playground
+
+The `demo/` Symfony app has a working `$populate`/`$extract` playground at `/sdc` — pick or paste a
+Questionnaire, fill in its form, Populate it from launch-context JSON, and Extract the answers into a
+transaction Bundle. Offline-first by default; set `FHIR_SERVER_URL`/`FHIR_TERMINOLOGY_SERVER_URL` to
+opt into live `application/x-fhir-query` population and terminology code checking against a real
+server (see `demo/CLAUDE.md`). Run `symfony local:server:start` from `demo/` and visit `/sdc`.
+
 ## `Questionnaire/$populate`
 
 `FHIRQuestionnairePopulateService` pre-fills a `QuestionnaireResponse` from a `Questionnaire`'s SDC

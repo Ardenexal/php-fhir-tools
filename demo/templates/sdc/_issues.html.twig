@@ -1,0 +1,14 @@
+{% set colorMap = {
+    'error':       {border: 'border-red-200',   bg: 'bg-red-50',   text: 'text-red-800'},
+    'warning':     {border: 'border-amber-200', bg: 'bg-amber-50', text: 'text-amber-800'},
+    'information': {border: 'border-blue-200',  bg: 'bg-blue-50',  text: 'text-blue-800'},
+} %}
+
+<ul class="space-y-2">
+    {% for issue in issues %}
+        {% set colors = colorMap[issue.severity] ?? colorMap['information'] %}
+        <li class="rounded-lg border {{ colors.border }} {{ colors.bg }} px-3 py-2 text-sm {{ colors.text }}">
+            {{ issue.diagnostics }}
+        </li>
+    {% endfor %}
+</ul>

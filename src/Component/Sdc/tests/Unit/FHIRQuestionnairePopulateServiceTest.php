@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ardenexal\FHIRTools\Component\Sdc\Tests\Unit;
 
+use Ardenexal\FHIRTools\Component\Models\R4\DataType\Coding;
 use Ardenexal\FHIRTools\Component\Models\R4\Primitive\StringPrimitive;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\PatientResource;
 use Ardenexal\FHIRTools\Component\Models\R4\Resource\QuestionnaireResource;
@@ -219,6 +220,103 @@ final class FHIRQuestionnairePopulateServiceTest extends TestCase
         self::assertNotNull($issues, 'A null-linkId drop must be observable.');
         self::assertContains('warning', $this->issueSeverities($issues));
         self::assertContains('invalid', $this->issueCodes($issues));
+    }
+
+    /**
+     * A bare `code` value (e.g. `Patient.gender`, not a `Coding`) for a `choice` item must promote to the
+     * matching `Coding` when it equals the `code` of one of the item's own declared `answerOption`
+     * entries — the exact system/display the Questionnaire author declared, not a guessed/constructed one.
+     */
+    public function testBareCodeChoiceValuePromotesToMatchingAnswerOptionCoding(): void
+    {
+        $patient = $this->deserialize(
+            '{"resourceType":"Patient","gender":"male"}',
+            PatientResource::class,
+        );
+
+        $questionnaire = $this->deserialize(
+            json_encode([
+                'resourceType' => 'Questionnaire',
+                'status'       => 'active',
+                'item'         => [[
+                    'linkId'       => 'gender',
+                    'type'         => 'choice',
+                    'extension'    => [[
+                        'url'             => 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression',
+                        'valueExpression' => ['language' => 'text/fhirpath', 'expression' => '%patient.gender'],
+                    ]],
+                    'answerOption' => [
+                        ['valueCoding' => ['system' => 'http://hl7.org/fhir/administrative-gender', 'code' => 'male', 'display' => 'Male']],
+                        ['valueCoding' => ['system' => 'http://hl7.org/fhir/administrative-gender', 'code' => 'female', 'display' => 'Female']],
+                    ],
+                ]],
+            ], JSON_THROW_ON_ERROR),
+            QuestionnaireResource::class,
+        );
+
+        $result = (new FHIRQuestionnairePopulateService())->populate(
+            $questionnaire,
+            new PopulateContext(fhirVersion: FhirVersion::R4, launchContextResources: ['patient' => $patient]),
+        );
+
+        $response = $result->getResponse();
+        self::assertInstanceOf(QuestionnaireResponseResource::class, $response);
+
+        $answerValue = $response->item[0]->answer[0]->value ?? null;
+        self::assertInstanceOf(Coding::class, $answerValue);
+        self::assertSame('male', $this->stringify($answerValue->code ?? null));
+        self::assertSame('http://hl7.org/fhir/administrative-gender', $this->stringify($answerValue->system ?? null));
+
+        // No mismatch/warning issue — this is a successful, observable coercion, not a degraded fallback.
+        $issues = $result->getIssues();
+        if ($issues !== null) {
+            self::assertNotContains('warning', $this->issueSeverities($issues));
+        }
+    }
+
+    /**
+     * A bare scalar that matches none of the item's `answerOption` codes is still a genuine mismatch —
+     * the promotion is an exact-match selection, never a fallback construction of an arbitrary `Coding`.
+     */
+    public function testUnmatchedBareCodeChoiceValueStillMismatches(): void
+    {
+        $patient = $this->deserialize(
+            '{"resourceType":"Patient","gender":"other"}',
+            PatientResource::class,
+        );
+
+        $questionnaire = $this->deserialize(
+            json_encode([
+                'resourceType' => 'Questionnaire',
+                'status'       => 'active',
+                'item'         => [[
+                    'linkId'       => 'gender',
+                    'type'         => 'choice',
+                    'extension'    => [[
+                        'url'             => 'http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression',
+                        'valueExpression' => ['language' => 'text/fhirpath', 'expression' => '%patient.gender'],
+                    ]],
+                    'answerOption' => [
+                        ['valueCoding' => ['system' => 'http://hl7.org/fhir/administrative-gender', 'code' => 'male', 'display' => 'Male']],
+                        ['valueCoding' => ['system' => 'http://hl7.org/fhir/administrative-gender', 'code' => 'female', 'display' => 'Female']],
+                    ],
+                ]],
+            ], JSON_THROW_ON_ERROR),
+            QuestionnaireResource::class,
+        );
+
+        $result = (new FHIRQuestionnairePopulateService())->populate(
+            $questionnaire,
+            new PopulateContext(fhirVersion: FhirVersion::R4, launchContextResources: ['patient' => $patient]),
+        );
+
+        $response = $result->getResponse();
+        self::assertInstanceOf(QuestionnaireResponseResource::class, $response);
+        self::assertSame([], $response->item, 'An unmatched bare code must not fabricate an answer; the unanswered item is omitted.');
+
+        $issues = $result->getIssues();
+        self::assertNotNull($issues);
+        self::assertContains('warning', $this->issueSeverities($issues));
     }
 
     public function testEmptyItemPopulationContextEmitsInformationIssueAndOmitsGroup(): void

@@ -1,0 +1,205 @@
+{% extends 'base.html.twig' %}
+{% import 'sdc/_fields.html.twig' as fields_macro %}
+
+{% block title %}SDC Playground{% endblock %}
+
+{% block body %}
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">SDC Playground</h1>
+    <p class="mt-1 text-gray-500 text-sm">
+        Pick a sample Questionnaire (or paste your own), fill it in, Populate it from launch-context
+        JSON, and Extract the answers into a FHIR transaction Bundle.
+    </p>
+    <div class="mt-3 flex flex-wrap gap-2" data-server-status>
+        <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium {{ fhirServerConfigured ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-gray-100 text-gray-500 border border-gray-200' }}">
+            <span class="h-1.5 w-1.5 rounded-full {{ fhirServerConfigured ? 'bg-green-500' : 'bg-gray-400' }}"></span>
+            FHIR server: {{ fhirServerConfigured ? 'configured' ~ (fhirServerAuthMechanism ? ' (' ~ fhirServerAuthMechanism ~ ')' : ' (unauthenticated)') : 'not configured (offline-first)' }}
+        </span>
+        <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium {{ terminologyServerConfigured ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-gray-100 text-gray-500 border border-gray-200' }}">
+            <span class="h-1.5 w-1.5 rounded-full {{ terminologyServerConfigured ? 'bg-green-500' : 'bg-gray-400' }}"></span>
+            Terminology server: {{ terminologyServerConfigured ? 'configured' : 'not configured' }}
+        </span>
+    </div>
+</div>
+
+{# Turbo Frame wraps the picker + form + results. On POST, Turbo swaps just this block —
+   nav/header never re-render. All three forms below (Load, Extract, Populate) live inside it. #}
+<turbo-frame id="sdc-playground" class="block">
+
+{% if error is not null %}
+<div data-error-panel class="mb-6 bg-red-50 border border-red-200 rounded-xl p-4">
+    <h3 class="text-sm font-semibold text-red-700 mb-1">Error</h3>
+    <p class="text-sm text-red-600 font-mono">{{ error }}</p>
+</div>
+{% endif %}
+
+{% if showOauthCredentialFields or showAuthHeaderField %}
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6" data-session-credentials>
+    <form action="{{ path('app_sdc_credentials_set') }}" method="POST" class="space-y-3">
+        <input type="hidden" name="questionnaireJson" value="{{ questionnaireJson }}">
+        <h2 class="text-sm font-semibold text-gray-700">Your test credentials (this session only)</h2>
+        <p class="text-xs text-gray-500">
+            Set your own credentials to test as a different user against the configured FHIR server.
+            Stored only in your session — never persisted, never logged, never shown back here.
+        </p>
+
+        {% if showOauthCredentialFields %}
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label for="oauth-client-id" class="block text-xs font-medium text-gray-700 mb-1">OAuth Client ID</label>
+                    <input type="text" id="oauth-client-id" name="oauthClientId" autocomplete="off"
+                           class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label for="oauth-client-secret" class="block text-xs font-medium text-gray-700 mb-1">OAuth Client Secret</label>
+                    <input type="password" id="oauth-client-secret" name="oauthClientSecret" autocomplete="off"
+                           class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+            </div>
+        {% endif %}
+
+        {% if showAuthHeaderField %}
+            <div>
+                <label for="auth-header-value" class="block text-xs font-medium text-gray-700 mb-1">{{ authHeaderName }} value</label>
+                <input type="password" id="auth-header-value" name="authHeaderValue" autocomplete="off" placeholder="e.g. Bearer &lt;token&gt;"
+                       class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+        {% endif %}
+
+        <div class="flex items-center gap-3">
+            <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700">
+                Set my credentials
+            </button>
+            {% if sessionCredentialsSet %}
+                <span class="text-xs text-green-600" data-session-credentials-indicator>Session credentials are set.</span>
+            {% endif %}
+        </div>
+    </form>
+    {% if sessionCredentialsSet %}
+        <form action="{{ path('app_sdc_credentials_clear') }}" method="POST" class="mt-2">
+            <input type="hidden" name="questionnaireJson" value="{{ questionnaireJson }}">
+            <button type="submit" class="text-xs text-red-600 hover:text-red-800">Clear my credentials</button>
+        </form>
+    {% endif %}
+</div>
+{% endif %}
+
+{% if gallery is not empty %}
+<div class="mb-6">
+    <h2 class="text-sm font-semibold text-gray-700 mb-2">Example gallery</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" data-sample-gallery>
+        {% for entry in gallery %}
+            <form action="{{ path('app_sdc_render') }}" method="POST">
+                <input type="hidden" name="source" value="{{ entry.value }}">
+                <button type="submit"
+                        class="w-full text-left bg-white rounded-xl border border-gray-200 p-4 hover:border-indigo-300 hover:shadow-sm transition">
+                    <span class="block text-sm font-semibold text-gray-900">{{ entry.label }}</span>
+                    <span class="block mt-1 text-xs text-gray-500">{{ entry.description }}</span>
+                </button>
+            </form>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+    <form action="{{ path('app_sdc_render') }}" method="POST" class="space-y-4" data-controller="sdc-picker">
+        <div>
+            <label for="source-select" class="block text-sm font-medium text-gray-700 mb-1">Sample Questionnaire</label>
+            <select id="source-select" name="source" data-action="sdc-picker#toggleCustom"
+                    class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                {% for sample in samples %}
+                    <option value="{{ sample.value }}">{{ sample.label }}</option>
+                {% endfor %}
+                <option value="custom">Paste your own JSON…</option>
+            </select>
+        </div>
+        <div data-sdc-picker-target="customJson" class="hidden">
+            <label for="custom-json" class="block text-sm font-medium text-gray-700 mb-1">Questionnaire JSON</label>
+            <textarea id="custom-json" name="customJson" rows="8" placeholder='{"resourceType": "Questionnaire", ...}'
+                      class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+        </div>
+        <button type="submit" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700">
+            Load
+        </button>
+    </form>
+</div>
+
+{% if questionnaireJson %}
+<div class="mb-4 text-sm text-gray-500">
+    Loaded: <span class="font-semibold text-gray-700">{{ questionnaireTitle }}</span>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <div class="space-y-6">
+        <form action="{{ path('app_sdc_extract') }}" method="POST"
+              class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4"
+              data-controller="sdc-enable-when sdc-repeat">
+            <input type="hidden" name="questionnaireJson" value="{{ questionnaireJson }}">
+            <h2 class="text-sm font-semibold text-gray-700">Form</h2>
+
+            {{ fields_macro.field_inputs(fields, 'answers', codeCheckResults) }}
+
+            <button type="submit" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700">
+                Extract
+            </button>
+        </form>
+
+        <form action="{{ path('app_sdc_populate') }}" method="POST"
+              class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
+            <input type="hidden" name="questionnaireJson" value="{{ questionnaireJson }}">
+            <h2 class="text-sm font-semibold text-gray-700">Populate from launch context</h2>
+
+            {% if canFetchLaunchContextById %}
+                <div>
+                    <label for="launch-context-id" class="block text-sm font-medium text-gray-700 mb-1">Fetch by ID from the FHIR server</label>
+                    <input type="text" id="launch-context-id" name="launchContextId" value="{{ launchContextId }}" placeholder="e.g. 123"
+                           class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <p class="mt-1 text-xs text-gray-400">When set, this takes precedence over the pasted JSON below — Populate fetches this ID from the configured server instead.</p>
+                </div>
+                <div class="text-center text-xs text-gray-400">— or —</div>
+            {% endif %}
+
+            <label for="launch-context-json" class="sr-only">Launch context JSON</label>
+            <textarea id="launch-context-json" name="launchContextJson" rows="6" placeholder='{"resourceType": "Patient", ...}'
+                      class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ launchContextJson }}</textarea>
+            <button type="submit" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700">
+                Populate
+            </button>
+
+            {% if populateIssues is not empty %}
+                <div data-populate-issues>
+                    {{ include('sdc/_issues.html.twig', {issues: populateIssues}) }}
+                </div>
+            {% endif %}
+        </form>
+    </div>
+
+    <div class="space-y-4">
+        {% if extractResult %}
+            <div data-extract-result>
+                <h2 class="text-sm font-semibold text-gray-700 mb-1">Extract result (transaction Bundle)</h2>
+                <pre class="bg-gray-900 text-gray-100 rounded-lg p-4 text-xs overflow-x-auto">{{ extractResult }}</pre>
+            </div>
+        {% endif %}
+
+        {% if extractIssues is not empty %}
+            <div data-extract-issues>
+                {{ include('sdc/_issues.html.twig', {issues: extractIssues}) }}
+            </div>
+        {% endif %}
+
+        {% if questionnaireResponseJson %}
+            <details data-qr-json-viewer class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+                <summary class="text-sm font-semibold text-gray-700 cursor-pointer">View QuestionnaireResponse JSON</summary>
+                <pre class="mt-3 bg-gray-900 text-gray-100 rounded-lg p-4 text-xs overflow-x-auto">{{ questionnaireResponseJson }}</pre>
+            </details>
+        {% endif %}
+    </div>
+
+</div>
+{% endif %}
+
+</turbo-frame>
+{% endblock %}

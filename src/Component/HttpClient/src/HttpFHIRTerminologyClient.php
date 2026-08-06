@@ -27,9 +27,13 @@ final class HttpFHIRTerminologyClient implements FHIRTerminologyClientInterface
     /**
      * Returns true when $value is a valid member of the named value set.
      *
-     * Calls GET /ValueSet/$validate-code with url and code parameters. Returns false on any
-     * HTTP error, transport failure, malformed response, or when the value cannot be converted
-     * to a string (e.g. null or unsupported object type).
+     * Calls GET /ValueSet/$validate-code with url, code, and inferSystem=true parameters. A bare code
+     * with no system is ambiguous per the operation's own definition; `inferSystem` asks the server to
+     * resolve the system itself when the value set's compose makes that unambiguous. Without it, a strict
+     * spec-compliant server (confirmed against tx.fhir.org) replies "unable to find code to validate" for
+     * every code, valid or not — this parameter is what makes the method's "true when valid" contract
+     * actually reachable. Returns false on any HTTP error, transport failure, malformed response, or when
+     * the value cannot be converted to a string (e.g. null or unsupported object type).
      *
      * @param string $valueSetUrl Canonical URL of the value set to check against
      * @param mixed  $value       The code to validate; accepts string, int, or BackedEnum
@@ -43,7 +47,7 @@ final class HttpFHIRTerminologyClient implements FHIRTerminologyClientInterface
             return false;
         }
 
-        $body = $this->dispatchRaw('ValueSet/$validate-code', ['url' => $valueSetUrl, 'code' => $code]);
+        $body = $this->dispatchRaw('ValueSet/$validate-code', ['url' => $valueSetUrl, 'code' => $code, 'inferSystem' => 'true']);
 
         return $body !== null && $this->parseResultParameter($body);
     }
@@ -200,6 +204,7 @@ final class HttpFHIRTerminologyClient implements FHIRTerminologyClientInterface
             $parameters[] = match ($name) {
                 'url', 'system' => ['name' => $name, 'valueUri'  => $value],
                 'code'          => ['name' => $name, 'valueCode' => $value],
+                'inferSystem'   => ['name' => $name, 'valueBoolean' => $value === 'true'],
                 default         => ['name' => $name, 'valueString' => $value],
             };
         }
