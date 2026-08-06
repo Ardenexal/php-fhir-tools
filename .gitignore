@@ -41,3 +41,5 @@ phpstan.neon
 ###< phpunit/phpunit ###
 
 node_modules/
+/.playwright-mcp/
+

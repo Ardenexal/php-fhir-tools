@@ -13,9 +13,15 @@ use Ardenexal\FHIRTools\Component\Sdc\FHIRQuestionnairePopulateService;
  * requires, emitting an `OperationOutcome` issue (via the supplied {@see PopulateModelFactory}) for every
  * empty, mismatched, or unsupported case rather than dropping a value silently.
  *
- * Strict-by-source-datatype for complex items (`choice`/`quantity`/`reference`/`attachment`): the
- * expression must already resolve to the target datatype object; a bare scalar is a mismatch, never a
- * silent coercion. Extracted from {@see FHIRQuestionnairePopulateService}; behaviour is unchanged.
+ * Strict-by-source-datatype for complex items (`quantity`/`reference`/`attachment`): the expression must
+ * already resolve to the target datatype object; a bare scalar is a mismatch, never a silent coercion.
+ *
+ * `choice`/`open-choice` gets one narrow, deterministic exception: a bare scalar (e.g. a FHIR `code`
+ * element such as `Patient.gender`) is promoted to the matching `Coding` when it equals the `code` of one
+ * of the item's own declared `answerOption` entries. This is not "guessing" a datatype — it is an exact
+ * match against a value the Questionnaire author already enumerated — so it does not weaken strictness
+ * for `answerValueSet`-bound items (no fixed option list to match against) or for the other complex
+ * types. Extracted from {@see FHIRQuestionnairePopulateService}; behaviour otherwise unchanged.
  *
  * @internal implementation detail of the `Sdc` population path; not part of the public API
  */
@@ -35,8 +41,12 @@ final class AnswerValueCoercer
      * (with an issue recorded) when the value is empty, mismatched, or the type is unsupported.
      *
      * @param list<object> $issues
+     * @param list<object> $answerOptions the item's own declared `answerOption` list (each a version's
+     *                                    `QuestionnaireItemAnswerOption`; empty for `answerValueSet`-bound
+     *                                    or non-choice items); used only to promote a bare
+     *                                    `choice`/`open-choice` scalar to its matching `Coding`
      */
-    public function coerce(?string $itemType, mixed $value, string $linkId, PopulateModelFactory $factory, array &$issues): mixed
+    public function coerce(?string $itemType, mixed $value, string $linkId, PopulateModelFactory $factory, array &$issues, array $answerOptions = []): mixed
     {
         $scalar = $this->primitives->stringify($value);
 
@@ -85,19 +95,84 @@ final class AnswerValueCoercer
                     : $this->mismatch($itemType, $linkId, $factory, $issues);
             case 'choice':
             case 'open-choice':
+                if (\is_object($value)) {
+                    return $value;
+                }
+
+                $promoted = $this->promoteToOptionCoding($value, $answerOptions);
+
+                return $promoted ?? $this->mismatch($itemType, $linkId, $factory, $issues);
             case 'quantity':
             case 'reference':
             case 'attachment':
                 // Strict-by-source-datatype (matching the reference engine): the expression must already
-                // resolve to the right FHIR datatype OBJECT (`Coding`/`Quantity`/`Reference`/`Attachment`).
-                // The answer choice normalizer maps the object's class to the correct `value[x]` key, so the
-                // object is passed through intact. A bare scalar for a complex item is a mismatch (the engine
-                // rejects it), never silently coerced. Binding-driven `code`→`Coding` promotion (a bare code
-                // systematised via the item's value-set binding) is deferred — see the sdc-populate backlog.
+                // resolve to the right FHIR datatype OBJECT (`Quantity`/`Reference`/`Attachment`). The
+                // answer choice normalizer maps the object's class to the correct `value[x]` key, so the
+                // object is passed through intact. A bare scalar for a complex item is a mismatch (the
+                // engine rejects it), never silently coerced. There is no fixed, per-item option list to
+                // match a bare scalar against for these types (unlike `choice`'s `answerOption`), so no
+                // promotion path exists here.
                 return \is_object($value) ? $value : $this->mismatch($itemType, $linkId, $factory, $issues);
             default:
                 return $this->unsupportedTypeIssue($itemType, $linkId, $factory, $issues);
         }
+    }
+
+    /**
+     * The item's own declared `answerOption` list, filtered to actual option objects — the shape
+     * {@see self::coerce()}'s `$answerOptions` parameter expects. Empty for `answerValueSet`-bound or
+     * non-choice items (or one with no/malformed `answerOption` property). Shared by every caller that
+     * builds `$answerOptions` for `coerce()` (`FHIRQuestionnairePopulateService`, `ObservationSelector`)
+     * so the same filtering can't drift between them.
+     *
+     * @return list<object>
+     */
+    public static function answerOptionsFrom(object $item): array
+    {
+        $answerOptions = [];
+        foreach (\is_array($item->answerOption ?? null) ? $item->answerOption : [] as $option) {
+            if (\is_object($option)) {
+                $answerOptions[] = $option;
+            }
+        }
+
+        return $answerOptions;
+    }
+
+    /**
+     * Promote a bare scalar (e.g. a FHIR `code` primitive like `Patient.gender`) to the `Coding` of the
+     * `answerOption` entry whose `valueCoding.code` it exactly matches, or null when it matches none (or
+     * there is nothing to match against — an `answerValueSet`-bound item has no `answerOption` list).
+     *
+     * Returns the option's own `Coding` instance directly: the Questionnaire author already declared its
+     * `system`/`display`, so there is nothing to construct — only to select.
+     *
+     * @param list<object> $answerOptions
+     */
+    private function promoteToOptionCoding(mixed $value, array $answerOptions): ?object
+    {
+        $scalar = $this->primitives->stringify($value);
+        if ($scalar === null) {
+            return null;
+        }
+
+        foreach ($answerOptions as $option) {
+            if (!property_exists($option, 'value')) {
+                continue;
+            }
+
+            $optionValue = $option->value ?? null;
+            if (!\is_object($optionValue) || !property_exists($optionValue, 'code')) {
+                continue;
+            }
+
+            $code = $this->primitives->stringify($optionValue->code ?? null);
+            if ($code !== null && $code === $scalar) {
+                return $optionValue;
+            }
+        }
+
+        return null;
     }
 
     /**

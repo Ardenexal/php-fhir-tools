@@ -7,6 +7,20 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    # Empty-string defaults for the operator-configured external server env vars (M04). Declaring the
+    # default here — rather than in demo/.env — means an operator opts in purely via a real environment
+    # variable or `.env.local`; the demo repo itself ships with no server configured (offline-first).
+    env(FHIR_SERVER_URL): ''
+    env(FHIR_TERMINOLOGY_SERVER_URL): ''
+
+    # FHIR server authentication (M06) — both operator-configured only, both optional, independently
+    # composable. See ExternalClientFactory::assertAuthConfigurationIsConsistent() for the misconfiguration
+    # guards (all-or-nothing per group; no header-name collision between the two).
+    env(FHIR_SERVER_OAUTH_TOKEN_URL): ''
+    env(FHIR_SERVER_OAUTH_CLIENT_ID): ''
+    env(FHIR_SERVER_OAUTH_CLIENT_SECRET): ''
+    env(FHIR_SERVER_AUTH_HEADER_NAME): ''
+    env(FHIR_SERVER_AUTH_HEADER_VALUE): ''
 
 services:
     # default configuration for services in *this* file
@@ -23,3 +37,59 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    # SDC spike (M01): registered here, not in FHIRBundle's own services.yaml, since FHIRBundle
+    # does not depend on ardenexal/fhir-sdc.
+    Ardenexal\FHIRTools\Component\Sdc\FHIRQuestionnairePopulateService:
+        public: true
+
+    Ardenexal\FHIRTools\Component\Sdc\Contract\PopulateServiceInterface:
+        alias: 'Ardenexal\FHIRTools\Component\Sdc\FHIRQuestionnairePopulateService'
+        public: true
+
+    Ardenexal\FHIRTools\Component\Sdc\FHIRQuestionnaireResponseExtractService:
+        public: true
+
+    Ardenexal\FHIRTools\Component\Sdc\Contract\ExtractServiceInterface:
+        alias: 'Ardenexal\FHIRTools\Component\Sdc\FHIRQuestionnaireResponseExtractService'
+        public: true
+
+    # External FHIR/terminology server connectivity (M04): a plain alias can't switch classes at runtime
+    # (only at container-compile time), so these are wired as factory services instead. Overriding these
+    # interfaces here (rather than scoping to /sdc only) matches FHIRBundle's own documented override
+    # pattern (see src/Bundle/FHIRBundle/src/Resources/config/services.yaml) and means the demo's
+    # /fhirpath resolve()/memberOf() and /validate terminology checks go live too, consistently, when an
+    # operator configures a server — not just /sdc's populate/code-check actions.
+    Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRHttpClientInterface:
+        factory: ['@App\Sdc\ExternalClientFactory', 'httpClient']
+        arguments:
+            - '%env(FHIR_SERVER_URL)%'
+            - '%env(FHIR_SERVER_OAUTH_TOKEN_URL)%'
+            - '%env(FHIR_SERVER_OAUTH_CLIENT_ID)%'
+            - '%env(FHIR_SERVER_OAUTH_CLIENT_SECRET)%'
+            - '%env(FHIR_SERVER_AUTH_HEADER_NAME)%'
+            - '%env(FHIR_SERVER_AUTH_HEADER_VALUE)%'
+        public: true
+
+    Ardenexal\FHIRTools\Component\Metadata\Contract\FHIRTerminologyClientInterface:
+        factory: ['@App\Sdc\ExternalClientFactory', 'terminologyClient']
+        arguments: ['%env(FHIR_TERMINOLOGY_SERVER_URL)%']
+        public: true
+
+    # SdcController's status badge (M06) needs to know *which* auth mechanism is active for display —
+    # never the secret/header value, only whether OAuth or a manual header name is configured — so these
+    # two scalar args are bound explicitly (they're not autowirable by type like the rest of its
+    # constructor). The `App\:` resource above already registers the class; this only overrides args.
+    # $oauthClientIdEnv is bound only so the status badge can tell "OAuth fully configured via env" apart
+    # from "operator enabled the token URL, waiting on a visitor's session credentials" (M07) — a client
+    # id is not secret, so holding it briefly for this presence check is fine. $authHeaderValueSetViaEnv
+    # uses Symfony's `bool:` env processor for the same "is it configured" check on the header *value* —
+    # which IS secret, so only a boolean ever reaches the controller, never the string itself.
+    App\Controller\SdcController:
+        autowire: true
+        autoconfigure: true
+        arguments:
+            $oauthTokenUrl: '%env(FHIR_SERVER_OAUTH_TOKEN_URL)%'
+            $oauthClientIdEnv: '%env(FHIR_SERVER_OAUTH_CLIENT_ID)%'
+            $authHeaderName: '%env(FHIR_SERVER_AUTH_HEADER_NAME)%'
+            $authHeaderValueSetViaEnv: '%env(bool:FHIR_SERVER_AUTH_HEADER_VALUE)%'

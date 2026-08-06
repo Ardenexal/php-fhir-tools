@@ -55,7 +55,9 @@
             "Ardenexal\\FHIRTools\\Component\\Models\\": "../src/Component/Models/src/",
             "Ardenexal\\FHIRTools\\Component\\Metadata\\": "../src/Component/Metadata/src/",
             "Ardenexal\\FHIRTools\\Component\\FHIRPath\\": "../src/Component/FHIRPath/src/",
-            "Ardenexal\\FHIRTools\\Component\\Validation\\": "../src/Component/Validation/src/"
+            "Ardenexal\\FHIRTools\\Component\\Validation\\": "../src/Component/Validation/src/",
+            "Ardenexal\\FHIRTools\\Component\\HttpClient\\": "../src/Component/HttpClient/src/",
+            "Ardenexal\\FHIRTools\\Component\\Sdc\\": "../src/Component/Sdc/src/"
         }
     },
     "autoload-dev": {

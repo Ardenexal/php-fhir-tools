@@ -185,7 +185,9 @@ final class ObservationSelector
             return ['answers' => [], 'issues' => $issues];
         }
 
-        $coerced = $this->coercer->coerce($itemType, $value, $linkId, $factory, $issues);
+        $answerOptions = AnswerValueCoercer::answerOptionsFrom($item);
+
+        $coerced = $this->coercer->coerce($itemType, $value, $linkId, $factory, $issues, $answerOptions);
 
         return [
             'answers' => $coerced !== null ? [$factory->answer($coerced)] : [],

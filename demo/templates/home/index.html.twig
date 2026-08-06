@@ -8,7 +8,7 @@
     <p class="mt-2 text-gray-600">Interactive playground for the PHP FHIR Tools runtime components.</p>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     <a href="{{ path('app_fhirpath') }}"
        class="block bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:border-indigo-400 hover:shadow-md transition">
         <div class="flex items-start gap-4">
@@ -42,6 +42,25 @@
                     <li>• Validate FHIR resource structure</li>
                     <li>• Convert JSON ↔ XML</li>
                     <li>• Inspect resource metadata</li>
+                </ul>
+            </div>
+        </div>
+    </a>
+
+    <a href="{{ path('app_sdc') }}"
+       class="block bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:border-indigo-400 hover:shadow-md transition">
+        <div class="flex items-start gap-4">
+            <div class="text-3xl">📋</div>
+            <div>
+                <h2 class="text-xl font-semibold text-gray-900">SDC Playground</h2>
+                <p class="mt-1 text-gray-500 text-sm">
+                    Fill in a Questionnaire form, pre-fill it from launch-context data, and extract the
+                    answers into FHIR resources per the Structured Data Capture IG.
+                </p>
+                <ul class="mt-3 text-xs text-gray-400 space-y-0.5">
+                    <li>• Populate a QuestionnaireResponse from launch context</li>
+                    <li>• Extract answers into a transaction Bundle</li>
+                    <li>• string/boolean/choice/group items, non-repeating</li>
                 </ul>
             </div>
         </div>
